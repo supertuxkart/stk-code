@@ -83,7 +83,8 @@ namespace StringUtils
     std::vector<std::string>         splitPath(const std::string& path);
     
     // ------------------------------------------------------------------------
-    /** Replaces the first %s or %i/%d in the string with the first value 
+    /** 
+     *  Replaces the first %s or %i/%d in the string with the first value 
      *  converted to a string), the 2nd %s or %d with the second value etc.
      *  So this is basically a simplified s(n)printf replacement, but doesn't
      *  do any fancy formatting (and no type checks either - so you can print
@@ -96,6 +97,10 @@ namespace StringUtils
      *  and this is in the best case very confusing for translators (which get
      *  to see two strings instead of one sentence, see xgettext manual 
      *  for why this is a bad idea)
+     *  In order to accomodate translations even more, you can use formats %0, %1, %2, etc...
+     *  where %0 is replaced by the first argument, %1 by the second argument, etc...
+     *  This allows translated strings to not necessarily insert the words in the same order as
+     *  in english.
      *  \param s String in which all %s or %d are replaced.
      *  \param all_vals Value(s) to replace all %s or %d with.
      */
@@ -147,7 +152,7 @@ namespace StringUtils
     // ------------------------------------------------------------------------
     /** Shortcut insert_values taking three values, see above for
      *  full docs.
-     *  \param s String in which all %s or %d are replaced.
+     *  \param s String in which all %s, %d are replaced.
      *  \param v1 Value to replace.
      */
     template <class T1>

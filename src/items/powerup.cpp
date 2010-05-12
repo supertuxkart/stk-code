@@ -32,6 +32,25 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
+// we can't use string array constants here because gettext should not be invoked too
+// early when STK starts.
+
+//I18N: message shown when using the anchor weapon; %s is the name of the victim
+#define ANCHOR_STRING_0    _("Arrr, the %s dropped anchor, Captain!")
+
+//I18N: message shown when using the parachute weapon
+#define PARACHUTE_STRING_0 _("Geronimo!!!")
+
+const int SWAPPER_STRING_COUNT = 2;
+const wchar_t* getSwapperString(const int id)
+{
+    switch (id)
+    {
+        case 0: return _("Magic, son. Nothing else in the world smells like that.");
+        case 1: return _("A wizard did it!");
+        default: assert(false);
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Constructor, stores the kart to which this powerup belongs. 
@@ -160,13 +179,18 @@ void Powerup::use()
     case PowerupManager::POWERUP_ZIPPER:   m_owner->handleZipper();
         break ;
     case PowerupManager::POWERUP_SWITCH:
+        {
         item_manager->switchItems();
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
-        // Apocalypse Now style
-        gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40,
+
+        RandomGenerator random;
+        const int message = random.get(SWAPPER_STRING_COUNT);
+        
+        gui->addMessage(getSwapperString(message), NULL, 3.0f, 40,
                         video::SColor(255, 255, 255, 255), false);
         break;
+        }
     case PowerupManager::POWERUP_CAKE:
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
@@ -221,7 +245,7 @@ void Powerup::use()
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(_("Arrr, the %s dropped anchor, Captain!"), kart->getName().c_str()).c_str();
+                anchor_message += StringUtils::insertValues(ANCHOR_STRING_0, kart->getName().c_str()).c_str();
                 gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
                 break;
             }
@@ -259,7 +283,7 @@ void Powerup::use()
             m_sound_use->play();
 
             // Parachutist shout
-            gui->addMessage(_("Geronimo!!!"), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(PARACHUTE_STRING_0, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         }
         break;
 

@@ -20,6 +20,8 @@
 
 #include "utils/string_utils.hpp"
 
+#include "coreutil.h"
+
 #include "math.h"
 #include <algorithm>
 #include <cstring>
@@ -266,6 +268,9 @@ namespace StringUtils
         {
             std::vector<std::string> sv = StringUtils::split(s, '%', true);
             std::string new_string="";
+            
+            unsigned int insertValID = 0;
+            
             const unsigned int item_count = sv.size();
             for (unsigned int i=0; i<item_count; i++)
             {
@@ -277,12 +282,19 @@ namespace StringUtils
                 {
                     if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
                     {
-                        assert(all_vals.size() > 0);
-                        new_string += all_vals[0]+sv[i].substr(2);
-                        all_vals.erase(all_vals.begin());
+                        assert(all_vals.size() > insertValID);
+                        new_string += all_vals[insertValID] + sv[i].substr(2);
+                    }
+                    else if(sv[i][1]>='0' && sv[i][1]<= '9')
+                    {
+                        const unsigned int index = sv[i][1] - '0';
+                        assert(all_vals.size() > index);
+                        new_string += all_vals[index] + sv[i].substr(2);
                     }
                     else
-                        new_string+=sv[i];
+                    {
+                        new_string += sv[i];
+                    }
                 }
             }
             return new_string;
@@ -300,6 +312,8 @@ namespace StringUtils
     {
         try
         {
+            unsigned int insertValID = 0;
+
             std::vector<irr::core::stringw> sv = StringUtils::split(s, '%', true);
             irr::core::stringw new_string="";
             for (unsigned int i=0; i<sv.size(); i++)
@@ -312,12 +326,20 @@ namespace StringUtils
                 {
                     if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
                     {
-                        new_string += all_vals[0].c_str();
+                        new_string += all_vals[insertValID].c_str();
                         new_string += sv[i].subString(2, sv[i].size()-2);
-                        all_vals.erase(all_vals.begin());
+                        insertValID++;
+                    }
+                    else if(irr::core::isdigit(sv[i][1]))
+                    {
+                        const unsigned int index = irr::core::stringc(sv[i].c_str()).c_str()[1] - '0';
+                        assert(all_vals.size() > index);
+                        new_string += all_vals[index] + sv[i].subString(2, sv[i].size()-2);
                     }
                     else
+                    {
                         new_string+=sv[i];
+                    }
                 }
             }
             return new_string;

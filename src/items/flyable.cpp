@@ -35,6 +35,34 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+const wchar_t* getCakeString(const int n)
+{
+    switch (n)
+    {
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 0: return _("%0 eats too much of %1's cake");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 1: return _("%0 is dubious of %1's cooking skills");
+        default: assert(false);
+    }
+}
+const int CAKE_STRINGS_AMOUNT = 2;
+
+const wchar_t* getBowlingString(const int n)
+{
+    switch (n)
+    {
+        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+        case 0 : return _("%0 will not play bowling with %1 again");
+        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+        case 1 : return _("%1 strikes %0");
+        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+        case 2 : return _("%0 is bowled over by %1");
+        default: assert(false);
+    }
+}
+const int BOWLING_STRINGS_AMOUNT = 3;
+
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
 scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
@@ -353,21 +381,31 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     {
         RaceGUI* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
-        switch(m_type) {
+        switch(m_type)
+        {
             case PowerupManager::POWERUP_CAKE:
-                hit_message += StringUtils::insertValues(_("%s eats too much of %s's cake"),
+            {
+                RandomGenerator r;
+                const int messageID = r.get(CAKE_STRINGS_AMOUNT);
+                hit_message += StringUtils::insertValues(getCakeString(messageID),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();
+            }
             break;
             case PowerupManager::POWERUP_PLUNGER: 
                 // Handled by plunger.cpp Plunger::hit
             break;
             case PowerupManager::POWERUP_BOWLING:
-                hit_message += StringUtils::insertValues(_("%s will not play bowling with %s again"),
+            {
+                RandomGenerator r;
+                const int messageID = r.get(BOWLING_STRINGS_AMOUNT);
+                
+                hit_message += StringUtils::insertValues(getBowlingString(messageID),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();
+            }
             break;
             default:
                 printf("Failed message for %i\n", m_type);
