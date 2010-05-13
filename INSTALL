@@ -46,7 +46,7 @@ install following packages:
 libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
 
 do a:
-$ svn checkout https://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/main/branches/irrlicht
+$ svn checkout https://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/main/trunk
 
 Get irrlicht-1.x.zip and unzip it, compile irrlicht:
 $ cd irrlicht-1.x/source/Irrlicht/
