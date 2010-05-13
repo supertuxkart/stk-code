@@ -70,6 +70,8 @@ void EmergencyAnimation::forceRescue()
     m_up_velocity = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
+    m_kart->attach(ATTACH_TINYTUX, m_timer);
+
     // FIXME: which version to use?
     m_curr_rotation.setHPR(m_kart->getRotation());
 

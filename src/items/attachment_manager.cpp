@@ -48,7 +48,7 @@ initAttachmentType iat[]=
     {ATTACH_PARACHUTE,   "parachute.b3d"},
     {ATTACH_BOMB,        "bomb.b3d"},
     {ATTACH_ANVIL,       "anchor.b3d"},
-    {ATTACH_TINYTUX,     "parachute.b3d"},
+    {ATTACH_TINYTUX,     "reset-button.b3d"},
     {ATTACH_MAX,         ""},
 };
 
