@@ -382,12 +382,9 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
 
         const Material* material=0;
         TriangleMesh *tmesh = m_track_mesh;
-        if(t) {
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
+        if(t)
+        {
             std::string image = std::string(core::stringc(t->getName()).c_str());
-#else
-            std::string image = std::string(t->getName().c_str());
-#endif
             material=material_manager->getMaterial(StringUtils::getBasename(image));
             // Zipper are converted to non-collision mesh, since otherwise
             // the road becomes 'bumpy' if the meshes are not 100% correctly
@@ -532,11 +529,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 const std::string texture_name = 
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
                     StringUtils::getBasename(core::stringc(t->getName()).c_str());
-#else
-                    StringUtils::getBasename(t->getName().c_str());
-#endif
                 if(texture_name!=name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));

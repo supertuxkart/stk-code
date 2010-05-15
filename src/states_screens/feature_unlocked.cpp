@@ -196,13 +196,8 @@ void FeatureUnlockedCutScene::init()
             m.Shininess      = 0;
             //m.setFlag(video::EMF_TEXTURE_WRAP, false);
             
-    #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
             m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
             m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-    #else
-            m.TextureLayer[0].TextureWrap = video::ETC_CLAMP_TO_EDGE;
-    #endif
-
             scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m,
                                                                     m_unlocked_stuff[n].m_w,
                                                                     m_unlocked_stuff[n].m_h);

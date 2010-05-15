@@ -73,11 +73,7 @@ void MaterialManager::setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const
 void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
                                           scene::IMeshBuffer *mb) const
 {
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
     const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
-#else
-    const std::string image = StringUtils::getBasename(t->getName().c_str());
-#endif
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {

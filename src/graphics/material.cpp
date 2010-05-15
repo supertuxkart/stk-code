@@ -174,8 +174,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->setFlag(video::EMF_TRILINEAR_FILTER, true);
     }
     
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
-
     if ( (m_clamp_tex & UCLAMP) != 0)
     {
         //  m->setFlag();
@@ -201,7 +199,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         }
     }
 
-#endif
 
     if(!m_backface_culling)
         m->setFlag(video::EMF_BACK_FACE_CULLING, false);

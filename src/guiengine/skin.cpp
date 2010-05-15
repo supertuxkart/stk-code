@@ -1509,18 +1509,11 @@ void Skin::drawBGFadeColor()
 
 // -----------------------------------------------------------------------------
 
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR==7)
 core::rect< s32 > Skin::draw3DWindowBackground(IGUIElement *element, bool drawTitleBar, 
                                                video::SColor titleBarColor, 
                                                const core::rect< s32 > &rect,
                                                const core::rect< s32 > *clip,
                                                core::rect<s32>* checkClientArea)
-#else
-core::rect< s32 > Skin::draw3DWindowBackground(IGUIElement *element, bool drawTitleBar, 
-                                               video::SColor titleBarColor, 
-                                               const core::rect< s32 > &rect,
-                                               const core::rect< s32 > *clip)
-#endif
 {
     drawBGFadeColor();
     

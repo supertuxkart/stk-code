@@ -184,7 +184,7 @@ void IrrDriver::initDevice()
     //const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     //m_race_font     = m_gui_env->getFont(font.c_str());
         
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
+
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
     material2D.setFlag(video::EMF_ANTI_ALIASING, true);
     for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
@@ -198,7 +198,7 @@ void IrrDriver::initDevice()
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
-#endif
+
     
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
@@ -453,11 +453,7 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
  */
 scene::ISceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 {
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
     return m_scene_manager->addOctreeSceneNode(mesh);
-#else
-    return m_scene_manager->addOctTreeSceneNode(mesh);
-#endif
 }   // addOctTree
 
 // ----------------------------------------------------------------------------
