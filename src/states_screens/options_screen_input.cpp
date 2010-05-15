@@ -17,8 +17,9 @@
 
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_input2.hpp"
-#include "states_screens/options_screen_av.hpp"
+#include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_video.hpp"
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
@@ -173,7 +174,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
-        if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
+        if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
+        else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
         else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }

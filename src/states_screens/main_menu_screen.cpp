@@ -26,7 +26,7 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/options_screen_av.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
 // FIXME : remove, temporary test
@@ -124,7 +124,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
     else if (selection == "options")
     {
-        StateManager::get()->pushScreen( OptionsScreenAV::getInstance() );
+        StateManager::get()->pushScreen( OptionsScreenVideo::getInstance() );
     }
     else if (selection == "quit")
     {

@@ -6,8 +6,10 @@
     <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-        <icon-button id="tab_audio_video" width="128" height="128" icon="gui/options_audio_video.png"
-                I18N="Section in the settings menu"  text="Audio/Video"/>
+        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"
+                I18N="Section in the settings menu" text="Graphics"/>
+        <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"
+                I18N="Section in the settings menu" text="Audio"/>
         <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"
                 I18N="Section in the settings menu"  text="Players"/>
         <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"

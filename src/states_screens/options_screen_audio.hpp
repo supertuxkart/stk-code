@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_OPTIONS_SCREEN_AV_HPP__
-#define __HEADER_OPTIONS_SCREEN_AV_HPP__
+#ifndef __HEADER_OPTIONS_SCREEN_AUDIO_HPP__
+#define __HEADER_OPTIONS_SCREEN_AUDIO_HPP__
 
 #include <string>
 #include "irrlicht.h"
@@ -29,16 +29,15 @@ namespace GUIEngine { class Widget; }
 struct Input;
 
 /**
-  * \brief Audio/video options screen
+  * \brief Audio options screen
   * \ingroup states_screens
   */
-class OptionsScreenAV : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenAV>
+class OptionsScreenAudio : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenAudio>
 {
-    OptionsScreenAV();
-    bool m_inited;
+    OptionsScreenAudio();
     
 public:
-    friend class GUIEngine::ScreenSingleton<OptionsScreenAV>;
+    friend class GUIEngine::ScreenSingleton<OptionsScreenAudio>;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();

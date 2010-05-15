@@ -292,14 +292,16 @@ supertuxkart_SOURCES = \
  states_screens/kart_selection.hpp \
  states_screens/main_menu_screen.cpp \
  states_screens/main_menu_screen.hpp \
- states_screens/options_screen_av.cpp \
- states_screens/options_screen_av.hpp \
+ states_screens/options_screen_audio.cpp \
+ states_screens/options_screen_audio.hpp \
  states_screens/options_screen_input.cpp \
  states_screens/options_screen_input.hpp \
  states_screens/options_screen_input2.cpp \
  states_screens/options_screen_input2.hpp \
  states_screens/options_screen_players.cpp \
  states_screens/options_screen_players.hpp \
+ states_screens/options_screen_video.cpp \
+ states_screens/options_screen_video.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
  states_screens/race_setup_screen.cpp \
