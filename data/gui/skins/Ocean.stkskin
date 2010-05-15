@@ -115,21 +115,9 @@ when the border that intersect at this corner are enabled.
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
-<element type="spinner2" state="neutral" image="ocean/glassspinner2.png"
-    left_border="110" right_border="110" top_border="0" bottom_border="36"
-    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-
-<element type="spinner2" state="focused" image="ocean/glassspinner2_focus.png"
-    left_border="110" right_border="110" top_border="0" bottom_border="36"
-    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-
 <!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
      on top of the spinner's background -->
 <element type="spinner" state="down" image="ocean/glassspinner_down.png"
-    left_border="110" right_border="110" top_border="0" bottom_border="36"
-    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-
-<element type="spinner2" state="down" image="ocean/glassspinner2_down.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
