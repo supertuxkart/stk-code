@@ -209,8 +209,16 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
 
         if (type == Input::IT_KEYBOARD && value > Input::MAX_VALUE/2)
         {
-            OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
-            return;
+            m_sensed_input_high_kbd.insert(btnID);
+        }
+        else if (type == Input::IT_KEYBOARD && value == 0)
+        {
+            // only notify on key release
+            if (m_sensed_input_high_kbd.find(m_sensed_input->btnID) != m_sensed_input_high_kbd.end())
+            {
+                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
+                return;
+            }
         }
         else if (type == Input::IT_STICKMOTION)
         {
@@ -235,12 +243,12 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
             // It is necessary to test both ids because the center position is always positive (0)
             const int input_id = axisDirection*50 + btnID;
             const int input_id_inverse = (axisDirection?0:-1) *50 + btnID;
-            bool id_has_high_value = m_sensed_input_high.find(input_id) != m_sensed_input_high.end();
-            bool inverse_id_has_high_value = m_sensed_input_high.find(input_id_inverse) != m_sensed_input_high.end();
+            bool id_has_high_value = m_sensed_input_high_gamepad.find(input_id) != m_sensed_input_high_gamepad.end();
+            bool inverse_id_has_high_value = m_sensed_input_high_gamepad.find(input_id_inverse) != m_sensed_input_high_gamepad.end();
 
             if (!id_has_high_value && abs(value) > Input::MAX_VALUE*6.0f/7.0f) 
             {
-                m_sensed_input_high.insert(input_id);
+                m_sensed_input_high_gamepad.insert(input_id);
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && id_has_high_value )
             {
@@ -751,7 +759,8 @@ void InputManager::setMode(InputDriverMode new_mode)
                     // Leaving input sense mode.
 
                     //irr_driver->showPointer();
-                    m_sensed_input_high.clear();
+                    m_sensed_input_high_gamepad.clear();
+                    m_sensed_input_high_kbd.clear();
 
                     // The order is deliberate just in case someone starts to make
                     // STK multithreaded: m_sensed_input must not be 0 when

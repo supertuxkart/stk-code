@@ -57,8 +57,9 @@ private:
 
     Input          *m_sensed_input;
     DeviceManager  *m_device_manager;
-    std::set<int>   m_sensed_input_high;
-    
+    std::set<int>   m_sensed_input_high_gamepad;
+    std::set<int>   m_sensed_input_high_kbd;
+
     InputDriverMode  m_mode;
     
     /** When at true, only the master player can play with menus */
