@@ -68,7 +68,7 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
-
+        
     public:
         
         SpinnerWidget(const bool gauge=false);

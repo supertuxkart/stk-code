@@ -208,6 +208,11 @@ namespace GUIEngine
       * \return     the widget that bears that irrlicht ID, or NULL if it was not found
       */
     Widget* getWidget(const int id);
+    
+    /**
+      * \brief call when skin in user config was updated
+      */
+    void reloadSkin();
 }
 
 #endif

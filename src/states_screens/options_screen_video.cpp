@@ -31,7 +31,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
-
+#include "utils/string_utils.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -52,6 +52,45 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui")
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
+    
+    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+    assert( skinSelector != NULL );
+    
+    skinSelector->m_properties[PROP_WARP_AROUND] = "true";
+    
+    m_skins.clear();
+    skinSelector->clearLabels();
+    
+    std::set<std::string> skinFiles;
+    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "/skins",
+                            true /* is full path */, true /* make full path */ );
+    
+    for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
+    {
+        if ( (*it).find(".stkskin") != std::string::npos )
+        {
+            m_skins.push_back( *it );
+        }
+    }
+    
+    if (m_skins.size() == 0)
+    {
+        std::cerr << "WARNING: could not find a single skin, make sure that "
+                     "the data files are correctly installed\n";
+        skinSelector->m_deactivated = true;
+        return;
+    }
+        
+    const int skinCount = m_skins.size();
+    for (int n=0; n<skinCount; n++)
+    {
+        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
+        const std::string skinName = StringUtils::removeExtension( skinFileName );
+        skinSelector->addLabel( core::stringw(skinName.c_str()) );
+    }
+    skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
+
 }
 
 // -----------------------------------------------------------------------------
@@ -60,6 +99,9 @@ void OptionsScreenVideo::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
+    
+    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+    assert( skinSelector != NULL );
     
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
@@ -125,6 +167,28 @@ void OptionsScreenVideo::init()
         }
     }  // end for
     
+    // --- select the right skin in the spinner
+    
+    bool currSkinFound = false;
+    const int skinCount = m_skins.size();
+    for (int n=0; n<skinCount; n++)
+    {
+        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
+        
+        if (UserConfigParams::m_skin_file.c_str() == skinFileName)
+        {
+            skinSelector->setValue(n);
+            currSkinFound = true;
+            break;
+        }
+    }
+    if (!currSkinFound)
+    {
+        std::cerr << "WARNING: couldn't find current skin in the list of skins!!\n";
+        skinSelector->setValue(0);
+        GUIEngine::reloadSkin();
+    }
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -166,6 +230,15 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
 
         irr_driver->changeResolution(w, h, w2->getState());
     }
+    else if (name == "skinchoice")
+    {
+        GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+        assert( skinSelector != NULL );
+        
+        const core::stringw selectedSkin = skinSelector->getStringValue();
+        UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
+        GUIEngine::reloadSkin();
+    }
     
 }
 
@@ -173,6 +246,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
 
 void OptionsScreenVideo::tearDown()
 {
+    // save changes when leaving screen
+    user_config->saveConfig();
 }
 
 // -----------------------------------------------------------------------------

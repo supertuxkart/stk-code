@@ -18,8 +18,14 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
         
-        
         <spacer height="20" width="10"/>
+
+        <label width="100%" I18N="In the graphics settings" text="Skin"/>
+        <!-- FIXME: don't hardcode size -->
+        <spinner id="skinchoice" width="300" height="50" />
+
+        <spacer height="40" width="10"/>
+        <label width="100%" I18N="In the graphics settings" text="Resolution"/>
         
         <scrollable_ribbon id="resolutions" proportion="2" label_location="each"
                            width="100%" square_items="false"

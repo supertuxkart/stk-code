@@ -271,8 +271,15 @@ namespace GUIEngine
         bool m_dialog;
         float m_dialog_size;
         
+        /**
+          * \brief load a skin from the file specified in the user configuration file
+          * \throw std::runtime_error if file cannot be read
+          */
         Skin(irr::gui::IGUISkin* fallback_skin);
+        
         ~Skin();
+        
+        irr::gui::IGUISkin* getFallbackSkin() { return m_fallback_skin; }
 
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
         void drawBgImage();

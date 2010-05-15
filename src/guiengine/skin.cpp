@@ -26,6 +26,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include <cassert>
+#include <stdexcept>
 #include <iostream>
 
 using namespace GUIEngine;
@@ -133,12 +134,17 @@ namespace SkinConfig
         m_colors[type+"::"+state] = color;
     }
     
+    /**
+      * \brief loads skin information from a STK skin file
+      * \throw std::runtime_error if file cannot be read
+      */
     static void loadFromFile(std::string file)
     {
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
         {
             std::cerr << "Could not read XML file " << file.c_str() << std::endl;
+            throw std::runtime_error("Invalid skin file");
         }
         
         const int amount = root->getNumNodes();

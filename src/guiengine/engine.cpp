@@ -52,7 +52,7 @@
  \li \ref widget9
  \li \ref widget10
  \li \ref widget11
-
+ 
  \ref props
  \li \ref prop1
  \li \ref prop2
@@ -72,7 +72,7 @@
  \li \ref prop16
  \li \ref prop17
  \li \ref prop18
-
+ 
  \ref code
  
  \n
@@ -97,12 +97,12 @@
  Orientation of tabs (up or down) is automatically inferred from on-screen position
  
  \note Ribbon widgets are of spawn type (\<ribbon\> ... \</ribbon\>) and may contain icon-buttons or buttons
-       as children.
+ as children.
  \note Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not
-       (this will affect the type of highlighting used)
+ (this will affect the type of highlighting used)
  \note All elements within a ribbon must have an 'ID' property
  \note Ribbons (e.g. tabs) can have their elements dynamically added at runtime, too. Just add
-       no children to the ribbon in the XML file, and add them at runtime through the method for this.
+ no children to the ribbon in the XML file, and add them at runtime through the method for this.
  
  \n
  \subsection widget2 WTYPE_SPINNER
@@ -412,7 +412,7 @@ using namespace irr::video;
 
 namespace GUIEngine
 {
-
+    
     namespace Private
     {
         IGUIEnvironment* g_env;
@@ -431,12 +431,12 @@ namespace GUIEngine
         int small_font_height;
     }
     using namespace Private;
-   
+    
     ptr_vector<Widget, REF> needsUpdate;
     
     //FIXME: the contents of this vector are never ever freed
     ptr_vector<Screen, REF> g_loaded_screens;
-
+    
     float dt = 0;
     
     float getLatestDt()
@@ -466,7 +466,7 @@ namespace GUIEngine
         
         // add message
         gui_messages.push_back( MenuMessage(message, time) );
-
+        
     }
     
     Widget* getFocusForPlayer(const int playerID)
@@ -495,7 +495,7 @@ namespace GUIEngine
         // otherwise check if the focus is the given widget
         return g_focus_for_player[playerID]->isSameIrrlichtWidgetAs(w);
     }
-       
+    
     int getFontHeight()
     {
         return Private::font_height;
@@ -506,311 +506,357 @@ namespace GUIEngine
         return Private::small_font_height;
     }
     
-// -----------------------------------------------------------------------------  
-void clear()
-{
-    g_env->clear();
-    if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
-    g_current_screen = NULL;
-}
-// ----------------------------------------------------------------------------- 
-    
-void cleanForGame()
-{
-    clear();
-    
-    //FIXME: I'm not very sure why this isn't called in the regular clear() method??
-    needsUpdate.clearWithoutDeleting();
-}
-    
-// -----------------------------------------------------------------------------  
-void switchToScreen(const char* screen_name)
-{    
-    needsUpdate.clearWithoutDeleting();
-    
-    // clean what was left by the previous screen
-    g_env->clear();
-    if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
-    g_current_screen = NULL;
-    Widget::resetIDCounters();
-    
-    // check if we already loaded this screen
-    const int screen_amount = g_loaded_screens.size();
-    for(int n=0; n<screen_amount; n++)
+    // -----------------------------------------------------------------------------  
+    void clear()
     {
-        if (g_loaded_screens[n].getName() == screen_name)
-        {
-            g_current_screen = g_loaded_screens.get(n);
-            break;
-        }
+        g_env->clear();
+        if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
+        g_current_screen = NULL;
     }
+    // ----------------------------------------------------------------------------- 
     
-    // screen not found in list of existing ones
-    if (g_current_screen == NULL)
+    void cleanForGame()
     {
-        assert(false);
-        return;
-    }
-    
-    
-    // show screen
-    g_current_screen->addWidgets();
-}
-// -----------------------------------------------------------------------------
-    
-void addScreenToList(Screen* cutscene)
-{
-    g_loaded_screens.push_back(cutscene);
-}
-    
-// -----------------------------------------------------------------------------
-
-void reshowCurrentScreen()
-{
-    needsUpdate.clearWithoutDeleting();
-    g_state_manager->reshowTopMostMenu();
-    //g_current_screen->addWidgets();
-}
-    
-// -----------------------------------------------------------------------------
-void cleanUp()
-{
-    if (g_skin != NULL) delete g_skin;
-    g_skin = NULL;
-
-    for (int i=0; i<g_loaded_screens.size(); i++)
-    {
-        g_loaded_screens[i].unload();
-    }
-    
-    g_current_screen = NULL;
-    needsUpdate.clearWithoutDeleting();
-    
-    if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
-
-    delete g_font;
-    g_font = NULL;
-    delete g_title_font;
-    g_title_font = NULL;
-    delete g_small_font;
-    g_small_font = NULL;
+        clear();
         
-    // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
-}
-    
-// -----------------------------------------------------------------------------
-void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager* state_manager )
-{
-    g_env = device_a->getGUIEnvironment();
-    g_device = device_a;
-    g_driver = driver_a;
-    g_state_manager = state_manager;
-    
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
-    {
-        g_focus_for_player[n] = NULL;
+        //FIXME: I'm not very sure why this isn't called in the regular clear() method??
+        needsUpdate.clearWithoutDeleting();
     }
     
-    /*
-     To make the g_font a little bit nicer, we load an external g_font
-     and set it as the new default g_font in the g_skin.
-     To keep the standard g_font for tool tip text, we set it to
-     the built-in g_font.
-     */
-    g_skin = new Skin(g_env->getSkin());
-    g_env->setSkin(g_skin);
-    //g_skin = g_env->getSkin();
+    // -----------------------------------------------------------------------------  
+    void switchToScreen(const char* screen_name)
+    {    
+        needsUpdate.clearWithoutDeleting();
+        
+        // clean what was left by the previous screen
+        g_env->clear();
+        if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
+        g_current_screen = NULL;
+        Widget::resetIDCounters();
+        
+        // check if we already loaded this screen
+        const int screen_amount = g_loaded_screens.size();
+        for(int n=0; n<screen_amount; n++)
+        {
+            if (g_loaded_screens[n].getName() == screen_name)
+            {
+                g_current_screen = g_loaded_screens.get(n);
+                break;
+            }
+        }
+        
+        // screen not found in list of existing ones
+        if (g_current_screen == NULL)
+        {
+            assert(false);
+            return;
+        }
+        
+        
+        // show screen
+        g_current_screen->addWidgets();
+    }
+    // -----------------------------------------------------------------------------
     
-    // font size is resolution-dependent.
-    // normal text will range from 0.8, in 640x* resolutions (won't scale below that) to
-    // 1.0, in 1024x* resolutions, and linearly up
-    // normal text will range from 0.2, in 640x* resolutions (won't scale below that) to
-    // 0.4, in 1024x* resolutions, and linearly up
-    const int screen_width = irr_driver->getFrameSize().Width;
-    const float normal_text_scale = 0.7f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-    const float title_text_scale = 0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-
-    //ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/okolaks.xml").c_str());
-    ScalableFont* sfont = new ScalableFont(g_env, file_manager->getFontFile("StkFont.xml").c_str() );
-    sfont->setScale(normal_text_scale);
-    sfont->setKerningHeight(-5);
-    g_font = sfont;
+    void addScreenToList(Screen* cutscene)
+    {
+        g_loaded_screens.push_back(cutscene);
+    }
     
-    Private::font_height = g_font->getDimension( L"X" ).Height;
-
-    //ScalableFont* sfont_smaller = new ScalableFont(g_env, file_manager->getFontFile("StkFont.xml").c_str() );
-    ScalableFont* sfont_smaller = sfont->getHollowCopy();
-    sfont_smaller->setScale(normal_text_scale*0.8f);
-    sfont_smaller->setKerningHeight(-5);
-    g_small_font = sfont_smaller;
+    // -----------------------------------------------------------------------------
     
-    Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
-
-    ScalableFont* sfont2 = new ScalableFont(g_env, file_manager->getFontFile("title_font.xml").c_str() );
-    sfont2->m_fallback_font = sfont;
-    sfont2->m_fallback_font_scale = 4.0f; // because the fallback font is much smaller than the title font
-    sfont2->m_fallback_kerning_width = 15;
-    sfont2->setScale(title_text_scale);
-    sfont2->setKerningWidth(-18);
-    sfont2->m_black_border = true;
-    g_title_font = sfont2;
+    void reshowCurrentScreen()
+    {
+        needsUpdate.clearWithoutDeleting();
+        g_state_manager->reshowTopMostMenu();
+        //g_current_screen->addWidgets();
+    }
     
-
-    if (g_font != NULL) g_skin->setFont(g_font);
+    // -----------------------------------------------------------------------------
+    void cleanUp()
+    {
+        if (g_skin != NULL) delete g_skin;
+        g_skin = NULL;
+        
+        for (int i=0; i<g_loaded_screens.size(); i++)
+        {
+            g_loaded_screens[i].unload();
+        }
+        
+        g_current_screen = NULL;
+        needsUpdate.clearWithoutDeleting();
+        
+        if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
+        
+        delete g_font;
+        g_font = NULL;
+        delete g_title_font;
+        g_title_font = NULL;
+        delete g_small_font;
+        g_small_font = NULL;
+        
+        // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
+    }
     
-    //g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
+    // -----------------------------------------------------------------------------
+    void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager* state_manager )
+    {
+        g_env = device_a->getGUIEnvironment();
+        g_device = device_a;
+        g_driver = driver_a;
+        g_state_manager = state_manager;
+        
+        for (int n=0; n<MAX_PLAYER_COUNT; n++)
+        {
+            g_focus_for_player[n] = NULL;
+        }
+        
+        /*
+         To make the g_font a little bit nicer, we load an external g_font
+         and set it as the new default g_font in the g_skin.
+         To keep the standard g_font for tool tip text, we set it to
+         the built-in g_font.
+         */
+        try
+        {
+            g_skin = new Skin(g_env->getSkin());
+            g_env->setSkin(g_skin);
+        }
+        catch (std::runtime_error& err)
+        {
+            std::cerr << "ERROR, cannot load skin specified in user config. Falling back to defaults.\n";
+            UserConfigParams::m_skin_file.revertToDefaults();
+            
+            try
+            {
+                g_skin = new Skin(g_env->getSkin());
+                g_env->setSkin(g_skin);
+            }
+            catch (std::runtime_error& err)
+            {
+                std::cerr << "FATAL, cannot load default GUI skin\n";
+                throw err;
+            }
+        }
+        //g_skin = g_env->getSkin();
+        
+        // font size is resolution-dependent.
+        // normal text will range from 0.8, in 640x* resolutions (won't scale below that) to
+        // 1.0, in 1024x* resolutions, and linearly up
+        // normal text will range from 0.2, in 640x* resolutions (won't scale below that) to
+        // 0.4, in 1024x* resolutions, and linearly up
+        const int screen_width = irr_driver->getFrameSize().Width;
+        const float normal_text_scale = 0.7f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+        const float title_text_scale = 0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+        
+        //ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/okolaks.xml").c_str());
+        ScalableFont* sfont = new ScalableFont(g_env, file_manager->getFontFile("StkFont.xml").c_str() );
+        sfont->setScale(normal_text_scale);
+        sfont->setKerningHeight(-5);
+        g_font = sfont;
+        
+        Private::font_height = g_font->getDimension( L"X" ).Height;
+        
+        //ScalableFont* sfont_smaller = new ScalableFont(g_env, file_manager->getFontFile("StkFont.xml").c_str() );
+        ScalableFont* sfont_smaller = sfont->getHollowCopy();
+        sfont_smaller->setScale(normal_text_scale*0.8f);
+        sfont_smaller->setKerningHeight(-5);
+        g_small_font = sfont_smaller;
+        
+        Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
+        
+        ScalableFont* sfont2 = new ScalableFont(g_env, file_manager->getFontFile("title_font.xml").c_str() );
+        sfont2->m_fallback_font = sfont;
+        sfont2->m_fallback_font_scale = 4.0f; // because the fallback font is much smaller than the title font
+        sfont2->m_fallback_kerning_width = 15;
+        sfont2->setScale(title_text_scale);
+        sfont2->setKerningWidth(-18);
+        sfont2->m_black_border = true;
+        g_title_font = sfont2;
+        
+        
+        if (g_font != NULL) g_skin->setFont(g_font);
+        
+        //g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
+        
+        // set event receiver
+        g_device->setEventReceiver(EventHandler::get());
+    }
     
-    // set event receiver
-    g_device->setEventReceiver(EventHandler::get());
-}
-
-// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
     
-void render(float elapsed_time)
-{    
-    GUIEngine::dt = elapsed_time;
+    void reloadSkin()
+    {
+        assert(g_skin != NULL);
+        
+        irr::gui::IGUISkin* fallbackSkin = g_skin->getFallbackSkin();
+        
+        Skin* newSkin;
+        try
+        {
+            // it's important to create the new skin before deleting the old one
+            //so that the fallback skin is not dropped
+            newSkin = new Skin(fallbackSkin);
+        }
+        catch (std::runtime_error& err)
+        {
+            std::cerr << "ERROR, cannot load newly specified skin!\n";
+            return;
+        }
+        
+        delete g_skin;
+        
+        g_skin = newSkin;
+        g_env->setSkin(g_skin);
+    }
     
-     // ---- menu drawing
+    // -----------------------------------------------------------------------------
     
-    // draw background image and sections
+    void render(float elapsed_time)
+    {    
+        GUIEngine::dt = elapsed_time;
+        
+        // ---- menu drawing
+        
+        // draw background image and sections
+        
+        const GameState gamestate = g_state_manager->getGameState();
+        
+        if (gamestate == MENU && !GUIEngine::getCurrentScreen()->needs3D())
+        {
+            g_skin->drawBgImage();
+        }
+        else if (gamestate == INGAME_MENU)
+        {
+            g_skin->drawBGFadeColor();
+        }
+        
+        g_driver->enableMaterial2D();
+        
+        if (gamestate == MENU || gamestate == INGAME_MENU)
+        {
+            g_skin->renderSections();
+        }
+        
+        // let irrLicht do the rest (the Skin object will be called for further render)
+        g_env->drawAll();
+        
+        // ---- some menus may need updating
+        if (gamestate != GAME)
+        {
+            if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
+            else                                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+        }
+        else
+        {
+            if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
+            else                                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
+        }
+        
+        if (gamestate != GAME && !gui_messages.empty())
+        {
+            core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
+            const int text_height = getFontHeight() + 20;
+            const int y_from = screen_size.Height - text_height;
+            
+            int count = 0;
+            
+            std::vector<MenuMessage>::iterator it;
+            for (it=gui_messages.begin(); it != gui_messages.end();)
+            {
+                if ((*it).m_time > 0.0f)
+                {
+                    (*it).m_time -= dt;
+                    
+                    core::rect<s32> msgRect(core::position2d<s32>(0, y_from - count*text_height),
+                                            core::dimension2d<s32>(screen_size.Width, text_height) );
+                    
+                    Private::g_driver->draw2DRectangle( SColor(255,252,248,230), msgRect);
+                    Private::g_font->draw((*it).m_message.c_str(),
+                                          msgRect,
+                                          video::SColor(255, 255, 0, 0),
+                                          true /* hcenter */, true /* vcenter */);  
+                    count++;
+                    it++;
+                }
+                else
+                {
+                    it = gui_messages.erase(it);
+                }
+            }
+        }
+        
+        g_driver->enableMaterial2D(false);
+        
+    }   // render
     
-    const GameState gamestate = g_state_manager->getGameState();
+    // -----------------------------------------------------------------------------    
     
-    if (gamestate == MENU && !GUIEngine::getCurrentScreen()->needs3D())
+    void renderLoading()
     {
         g_skin->drawBgImage();
-    }
-    else if (gamestate == INGAME_MENU)
-    {
-        g_skin->drawBGFadeColor();
-    }
-    
-    g_driver->enableMaterial2D();
-    
-    if (gamestate == MENU || gamestate == INGAME_MENU)
-    {
-        g_skin->renderSections();
-    }
-    
-    // let irrLicht do the rest (the Skin object will be called for further render)
-    g_env->drawAll();
-    
-    // ---- some menus may need updating
-    if (gamestate != GAME)
-    {
-        if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
-        else                                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
-    }
-    else
-    {
-        if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
-        else                                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
-    }
-    
-    if (gamestate != GAME && !gui_messages.empty())
-    {
-        core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
-        const int text_height = getFontHeight() + 20;
-        const int y_from = screen_size.Height - text_height;
+        ITexture* loading = irr_driver->getTexture( file_manager->getGUIDir() + "/loading.png" );
         
-        int count = 0;
+        const int texture_w = loading->getSize().Width;
+        const int texture_h = loading->getSize().Height;
         
-        std::vector<MenuMessage>::iterator it;
-        for (it=gui_messages.begin(); it != gui_messages.end();)
+        core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        const int screen_w = frame_size.Width;
+        const int screen_h = frame_size.Height;
+        
+        const core::rect< s32 > dest_area = core::rect< s32 >(screen_w/2 - texture_w/2,
+                                                              screen_h/2 - texture_h/2,
+                                                              screen_w/2 + texture_w/2,
+                                                              screen_h/2 + texture_h/2);
+        
+        const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+        
+        GUIEngine::getDriver()->draw2DImage( loading, dest_area, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        
+        
+        g_title_font->draw(_("Loading"),
+                           core::rect< s32 >( 0, screen_h/2 + texture_h/2, screen_w, screen_h ),
+                           SColor(255,255,255,255),
+                           true/* center h */, false /* center v */ );
+        
+    } // renderLoading
+    
+    // -----------------------------------------------------------------------------
+    
+    Widget* getWidget(const char* name)
+    {
+        // if a modal dialog is shown, search within it too
+        if (ModalDialog::isADialogActive())
         {
-            if ((*it).m_time > 0.0f)
-            {
-                (*it).m_time -= dt;
-                
-                core::rect<s32> msgRect(core::position2d<s32>(0, y_from - count*text_height),
-                                        core::dimension2d<s32>(screen_size.Width, text_height) );
-                
-                Private::g_driver->draw2DRectangle( SColor(255,252,248,230), msgRect);
-                Private::g_font->draw((*it).m_message.c_str(),
-                                      msgRect,
-                                      video::SColor(255, 255, 0, 0),
-                                      true /* hcenter */, true /* vcenter */);  
-                count++;
-                it++;
-            }
-            else
-            {
-                it = gui_messages.erase(it);
-            }
+            Widget* widgetWithinDialog = Screen::getWidget(name, &(ModalDialog::getCurrent()->m_children));
+            if (widgetWithinDialog != NULL) return widgetWithinDialog;
         }
-    }
-    
-    g_driver->enableMaterial2D(false);
-
-}   // render
-
-// -----------------------------------------------------------------------------    
-
-void renderLoading()
-{
-    g_skin->drawBgImage();
-    ITexture* loading = irr_driver->getTexture( file_manager->getGUIDir() + "/loading.png" );
-    
-    const int texture_w = loading->getSize().Width;
-    const int texture_h = loading->getSize().Height;
-    
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    const int screen_w = frame_size.Width;
-    const int screen_h = frame_size.Height;
-    
-    const core::rect< s32 > dest_area = core::rect< s32 >(screen_w/2 - texture_w/2,
-                                                          screen_h/2 - texture_h/2,
-                                                          screen_w/2 + texture_w/2,
-                                                          screen_h/2 + texture_h/2);
-    
-    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
-    
-    GUIEngine::getDriver()->draw2DImage( loading, dest_area, source_area,
-                                        0 /* no clipping */, 0, true /* alpha */);
-    
-    
-    g_title_font->draw(_("Loading"),
-                       core::rect< s32 >( 0, screen_h/2 + texture_h/2, screen_w, screen_h ),
-                       SColor(255,255,255,255),
-                       true/* center h */, false /* center v */ );
-    
-} // renderLoading
-    
-// -----------------------------------------------------------------------------
-    
-Widget* getWidget(const char* name)
-{
-    // if a modal dialog is shown, search within it too
-    if (ModalDialog::isADialogActive())
-    {
-        Widget* widgetWithinDialog = Screen::getWidget(name, &(ModalDialog::getCurrent()->m_children));
-        if (widgetWithinDialog != NULL) return widgetWithinDialog;
-    }
-    
-    Screen* screen = getCurrentScreen();
-    
-    if (screen == NULL) return NULL;
-    
-    return screen->getWidget(name);
-}
-    
-// -----------------------------------------------------------------------------
-    
-Widget* getWidget(const int id)
-{
-    // if a modal dialog is shown, search within it too
-    if (ModalDialog::isADialogActive())
-    {        
-        Widget* widgetWithinDialog = Screen::getWidget(id, &(ModalDialog::getCurrent()->m_children));
-        if (widgetWithinDialog != NULL) return widgetWithinDialog;
-    }
-    
-    Screen* screen = getCurrentScreen();
-    
-    if (screen == NULL) return NULL;
-    
-    return screen->getWidget(id);
-}
-
         
+        Screen* screen = getCurrentScreen();
+        
+        if (screen == NULL) return NULL;
+        
+        return screen->getWidget(name);
+    }
+    
+    // -----------------------------------------------------------------------------
+    
+    Widget* getWidget(const int id)
+    {
+        // if a modal dialog is shown, search within it too
+        if (ModalDialog::isADialogActive())
+        {        
+            Widget* widgetWithinDialog = Screen::getWidget(id, &(ModalDialog::getCurrent()->m_children));
+            if (widgetWithinDialog != NULL) return widgetWithinDialog;
+        }
+        
+        Screen* screen = getCurrentScreen();
+        
+        if (screen == NULL) return NULL;
+        
+        return screen->getWidget(id);
+    }
+    
+    
 }

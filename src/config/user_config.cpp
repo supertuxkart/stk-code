@@ -116,15 +116,22 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 
 IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
 }
+
+// ---------------------------------------------------------------------------------------
+
 IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName,
                                        GroupUserConfigParam* group, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     group->addChild(this);
     if(comment != NULL) this->comment = comment;
@@ -133,13 +140,13 @@ IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName,
 void IntUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
+    stream << "    <" << paramName << " value=\"" << m_value << "\" />\n\n";
 }
 
 std::string IntUserConfigParam::toString() const
 {
     char buffer[16];
-    sprintf(buffer, "%i", value);
+    sprintf(buffer, "%i", m_value);
     return buffer;
 }
 
@@ -152,19 +159,22 @@ void IntUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
         return;
     }
 
-    child->get( "value", &value );
+    child->get( "value", &m_value );
     //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
 void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
-    node->get( paramName, &value );
+    node->get( paramName, &m_value );
 }
 
 // ---------------------------------------------------------------------------------------
 
 StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment)
 {
-    this->value = defaultValue;
+    
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
@@ -172,7 +182,9 @@ StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const cha
 StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName,
                                              GroupUserConfigParam* group, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     group->addChild(this);
     if(comment != NULL) this->comment = comment;
@@ -182,30 +194,32 @@ StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const cha
 void StringUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
+    stream << "    <" << paramName << " value=\"" << m_value << "\" />\n\n";
 }
 void StringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
 
-    child->get( "value", &value );
+    child->get( "value", &m_value );
 }
 void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
-    node->get( paramName, &value );
+    node->get( paramName, &m_value );
 }
 
 std::string StringUserConfigParam::toString() const
 {
-    return value;
+    return m_value;
 }
 
 // ---------------------------------------------------------------------------------------
 
 BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramName, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
@@ -213,7 +227,9 @@ BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramNam
 BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramName,
                                          GroupUserConfigParam* group, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     group->addChild(this);
     if(comment != NULL) this->comment = comment;
@@ -223,7 +239,7 @@ BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramNam
 void BoolUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" ) << "\" />\n\n";
+    stream << "    <" << paramName << " value=\"" << (m_value ? "true" : "false" ) << "\" />\n\n";
 }
 void BoolUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
@@ -235,35 +251,40 @@ void BoolUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 
     if(textValue == "true")
     {
-        value = true;
+        m_value = true;
     }
     else if(textValue == "false")
     {
-        value = false;
+        m_value = false;
     }
     else
+    {
         std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
+    }
 }
+
 void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     std::string textValue = "";
     node->get( paramName, &textValue );
 
-    if(textValue == "true")
+    if (textValue == "true")
     {
-        value = true;
+        m_value = true;
     }
-    else if(textValue == "false")
+    else if (textValue == "false")
     {
-        value = false;
+        m_value = false;
     }
     else
+    {
         std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
+    }
 }
 
 std::string BoolUserConfigParam::toString() const
 {
-    return (value ? "true" : "false" );
+    return (m_value ? "true" : "false" );
 }
 
 
@@ -271,15 +292,20 @@ std::string BoolUserConfigParam::toString() const
 
 FloatUserConfigParam::FloatUserConfigParam(float defaultValue, const char* paramName, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
 }
+
 FloatUserConfigParam::FloatUserConfigParam(float defaultValue, const char* paramName,
                                            GroupUserConfigParam* group, const char* comment)
 {
-    this->value = defaultValue;
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
     this->paramName = paramName;
     group->addChild(this);
     if(comment != NULL) this->comment = comment;
@@ -288,24 +314,26 @@ FloatUserConfigParam::FloatUserConfigParam(float defaultValue, const char* param
 void FloatUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
+    stream << "    <" << paramName << " value=\"" << m_value << "\" />\n\n";
 }
+
 void FloatUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
 
-    child->get( "value", &value );
+    child->get( "value", &m_value );
 }
+
 void FloatUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
-    node->get( paramName, &value );
+    node->get( paramName, &m_value );
 }
 
 std::string FloatUserConfigParam::toString() const
 {
     char buffer[16];
-    sprintf(buffer, "%f", value);
+    sprintf(buffer, "%f", m_value);
     return buffer;
 }
 

@@ -83,8 +83,11 @@ public:
 
 class IntUserConfigParam : public UserConfigParam
 {
-    int value;
+    int m_value;
+    int m_default_value;
+    
 public:
+    
     IntUserConfigParam(int defaultValue, const char* paramName, const char* comment = NULL);
     IntUserConfigParam(int defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
@@ -93,17 +96,21 @@ public:
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
-    
-    operator int() const { return value; }
-    int& operator++(int dummy) { value++; return value; }
-    int& operator=(const int& v) { value = v; return value; }
-    int& operator=(const IntUserConfigParam& v) { value = (int)v; return value; }
+    void revertToDefaults() { m_value = m_default_value; }
+
+    operator int() const { return m_value; }
+    int& operator++(int dummy) { m_value++; return m_value; }
+    int& operator=(const int& v) { m_value = v; return m_value; }
+    int& operator=(const IntUserConfigParam& v) { m_value = (int)v; return m_value; }
 };
 
 class StringUserConfigParam : public UserConfigParam
 {
-    std::string value;
+    std::string m_value;
+    std::string m_default_value;
+    
 public:
+    
     StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment = NULL);
     StringUserConfigParam(const char* defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
@@ -112,18 +119,22 @@ public:
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
+    void revertToDefaults() { m_value = m_default_value; }
+    
     std::string toString() const;
     
-    operator std::string() const { return value; }
-    std::string& operator=(const std::string& v) { value = v; return value; }
-    std::string& operator=(const StringUserConfigParam& v) { value = (std::string)v; return value; }
+    operator std::string() const { return m_value; }
+    std::string& operator=(const std::string& v) { m_value = v; return m_value; }
+    std::string& operator=(const StringUserConfigParam& v) { m_value = (std::string)v; return m_value; }
 
-    const char* c_str() const { return value.c_str(); }
+    const char* c_str() const { return m_value.c_str(); }
 };
 
 class BoolUserConfigParam : public UserConfigParam
 {
-    bool value;
+    bool m_value;
+    bool m_default_value;
+    
 public:
     BoolUserConfigParam(bool defaultValue, const char* paramName, const char* comment = NULL);
     BoolUserConfigParam(bool defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
@@ -134,15 +145,18 @@ public:
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
+    void revertToDefaults() { m_value = m_default_value; }
     
-    operator bool() const { return value; }
-    bool& operator=(const bool& v) { value = v; return value; }
-    bool& operator=(const BoolUserConfigParam& v) { value = (bool)v; return value; }
+    operator bool() const { return m_value; }
+    bool& operator=(const bool& v) { m_value = v; return m_value; }
+    bool& operator=(const BoolUserConfigParam& v) { m_value = (bool)v; return m_value; }
 };
 
 class FloatUserConfigParam : public UserConfigParam
 {
-    float value;
+    float m_value;
+    float m_default_value;
+    
 public:
     FloatUserConfigParam(float defaultValue, const char* paramName, const char* comment = NULL);
     FloatUserConfigParam(float defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
@@ -152,10 +166,11 @@ public:
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
+    void revertToDefaults() { m_value = m_default_value; }
     
-    operator float() const { return value; }
-    float& operator=(const float& v) { value = v; return value; }
-    float& operator=(const FloatUserConfigParam& v) { value = (float)v; return value; }
+    operator float() const { return m_value; }
+    float& operator=(const float& v) { m_value = v; return m_value; }
+    float& operator=(const FloatUserConfigParam& v) { m_value = (float)v; return m_value; }
 };
 
 
@@ -295,7 +310,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("jungle", "last_track", "Name of the last track used.") ); 
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("glass.stkskin", "skin_file", "Name of the skin to use") );
+            PARAM_DEFAULT(  StringUserConfigParam("Glass.stkskin", "skin_file", "Name of the skin to use") );
 
     PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
 

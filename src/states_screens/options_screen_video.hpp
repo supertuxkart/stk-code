@@ -37,6 +37,8 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
     OptionsScreenVideo();
     bool m_inited;
     
+    std::vector<std::string> m_skins;
+
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
     

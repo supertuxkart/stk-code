@@ -53,15 +53,29 @@ void SpinnerWidget::add()
         int i;
         std::istringstream myStream(min_s);
         bool is_number = (myStream >> i)!=0;
-        if(is_number) m_min = i;
-        else m_min = 0;
+        if (is_number)
+        {
+            m_min = i;
+        }
+        else
+        {
+            std::cerr << "WARNING : invalid value from spinner widget minimum value '" << min_s << "'\n";
+            m_min = 0;
+        }
     }
     {
         int i;
         std::istringstream myStream(max_s);
         bool is_number = (myStream >> i)!=0;
-        if(is_number) m_max = i;
-        else m_max = 10;
+        if (is_number)
+        {
+            m_max = i;
+        }
+        else
+        {
+            std::cerr << "WARNING : invalid value from spinner widget maximal value '" << max_s << "'\n";
+            m_max = 10;
+        }
     }
     
     m_value = (m_min + m_max)/2;
@@ -146,6 +160,9 @@ void SpinnerWidget::add()
     m_children[2].m_event_handler = this;
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
+    
+    // refresh display
+    setValue(m_value);
 }
 
 // -----------------------------------------------------------------------------
@@ -262,7 +279,8 @@ void SpinnerWidget::addLabel(stringw label)
     m_labels.push_back(label);
     m_min = 0;
     m_max = m_labels.size()-1;
-    setValue(0);
+    
+    if (m_element != NULL) setValue(0);
 }
 
 // -----------------------------------------------------------------------------
@@ -280,6 +298,8 @@ void SpinnerWidget::setValue(const int new_value)
     }
     else if (m_labels.size() > 0)
     {
+        assert(new_value >= 0);
+        assert(new_value < (int)m_labels.size());
         m_children[1].m_element->setText(m_labels[new_value].c_str() );
     }
     else if (m_text.size() > 0)
