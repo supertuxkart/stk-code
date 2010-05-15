@@ -601,6 +601,8 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
 
 void DynamicRibbonWidget::scroll(const int x_delta)
 {
+    if (m_deactivated) return;
+    
     // Refuse to scroll when everything is visible
     if ((int)m_items.size() <= m_row_amount*m_col_amount) return;
     
@@ -874,6 +876,8 @@ void DynamicRibbonWidget::update(float dt)
 // -----------------------------------------------------------------------------
 bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt)
 {
+    if (m_deactivated) return false;
+    
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
     m_selected_item[playerID] = item_id;
@@ -911,6 +915,8 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
 // -----------------------------------------------------------------------------
 bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt)
 {
+    if (m_deactivated) return false;
+    
     const int item_count = m_items.size();
     for (int n=0; n<item_count; n++)
     {

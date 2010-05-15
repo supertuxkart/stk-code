@@ -480,6 +480,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
                 
+                if (w->m_deactivated) return EVENT_BLOCK;
+                
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 const int playerID = input_manager->getPlayerKeyboardID();
                 if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;

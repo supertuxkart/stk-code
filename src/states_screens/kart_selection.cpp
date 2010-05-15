@@ -762,7 +762,7 @@ void KartSelectionScreen::init()
     
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
-    tabs->m_deactivated = false;
+    tabs->setActivated();
     
     // FIXME: Reload previous kart selection screen state
     m_kart_widgets.clearAndDeleteAll();
@@ -1122,7 +1122,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
         assert( tabs != NULL );
-        tabs->m_deactivated = true;
+        tabs->setDeactivated();
         
         // validate choices to notify player of duplicates
         const bool names_ok = validateIdentChoices();

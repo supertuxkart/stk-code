@@ -230,6 +230,9 @@ namespace GUIEngine
         /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
         int m_badges;
         
+        /** A simple flag that can be raised to hide this widget */
+        bool m_deactivated;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -296,6 +299,12 @@ namespace GUIEngine
         /** Set to false if widget is something that should not receieve focus */
         bool m_focusable;
         
+        /** \brief undos setDeactivated() */
+        void setActivated();
+        
+        /** \brief greys out the widget, making it not clickable for the user */
+        void setDeactivated();
+        
         /** Used in two cases :
             1) For 'placeholder' divisions; at the time the layout is created, there is nothing to
                place there yet, but we know there eventually will. So in this case pass 'true' to the
@@ -303,9 +312,6 @@ namespace GUIEngine
             2) Theorically, in 'add()', derived widgets should checked if this value is set, and use
                it instead of creating a new ID if it is. In practice, it's not widely implemented (FIXME) */
         int m_reserved_id;
-        
-        /** A simple flag that can be raised to hide this widget */
-        bool m_deactivated;
         
         Widget(WidgetType type, bool reserve_id = false);
         virtual ~Widget();

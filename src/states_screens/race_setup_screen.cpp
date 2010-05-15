@@ -142,16 +142,18 @@ void RaceSetupScreen::onGameModeChanged()
     // deactivate the AI karts count widget for modes for which we have no AI
     //FIXME? Don't hardcode here which modes have an AI and which don't
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
-    kartamount->m_deactivated = (gamemode == "3strikes");
-    
-    // use this dirty trick to hide the number inside the spinner (FIXME)
-    if (kartamount->m_deactivated)
+    if (gamemode == "3strikes")
     {
+        kartamount->setDeactivated();
+        
+        // dirty trick to hide the number inside the spinner (FIXME)
         kartamount->m_text = L"-";
         kartamount->setValue( kartamount->getValue() );
     }
-    else if (kartamount->m_text.size() > 0)
+    else
     {
+        kartamount->setActivated();
+        
         kartamount->m_text = L"";
         kartamount->setValue( kartamount->getValue() );
     }

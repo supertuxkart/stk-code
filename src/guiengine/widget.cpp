@@ -132,6 +132,34 @@ void Widget::elementRemoved()
 }
 
 // -----------------------------------------------------------------------------
+
+void Widget::setActivated()
+{
+    if (!m_deactivated) return; // already active, nothing to do
+    
+    m_deactivated = false;
+    const int count = m_children.size();
+    for (int n=0; n<count; n++)
+    {
+        m_children[n].setActivated();
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void Widget::setDeactivated()
+{
+    if (m_deactivated) return; // already deactivated, nothing to do
+
+    m_deactivated = true;
+    const int count = m_children.size();
+    for (int n=0; n<count; n++)
+    {
+        m_children[n].setDeactivated();
+    }
+}
+
+// -----------------------------------------------------------------------------
 namespace GUIEngine
 {
     // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values... xD

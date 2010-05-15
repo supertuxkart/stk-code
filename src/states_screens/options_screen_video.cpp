@@ -25,6 +25,7 @@
 #include "audio/sfx_base.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -77,7 +78,7 @@ void OptionsScreenVideo::loadedFromFile()
     {
         std::cerr << "WARNING: could not find a single skin, make sure that "
                      "the data files are correctly installed\n";
-        skinSelector->m_deactivated = true;
+        skinSelector->setDeactivated();
         return;
     }
         
@@ -102,6 +103,9 @@ void OptionsScreenVideo::init()
     
     GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
+    
+    GUIEngine::ButtonWidget* applyBtn = this->getWidget<GUIEngine::ButtonWidget>("apply_resolution");
+    assert( applyBtn != NULL );
     
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
@@ -146,6 +150,20 @@ void OptionsScreenVideo::init()
     } // end if not inited
     
     res->updateItemDisplay();
+    
+    // forbid changing resolution from in-game
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        res->setDeactivated();
+        full->setDeactivated();
+        applyBtn->setDeactivated();
+    }
+    else
+    {
+        res->setActivated();
+        full->setActivated();
+        applyBtn->setActivated();
+    }
     
     // ---- select current resolution every time
     const std::vector<VideoMode>& modes = irr_driver->getVideoModes();

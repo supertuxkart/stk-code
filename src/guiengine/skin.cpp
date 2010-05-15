@@ -657,7 +657,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
 {
     // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
     // we ever need to...
-    if (widget->m_deactivated) return;
+    //if (widget->m_deactivated) return;
     
     bool mark_selected = widget->isSelected(PLAYER_ID_GAME_MASTER);
     bool always_show_selection = false;
@@ -676,6 +676,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     /* tab-bar ribbons */
     if (type == RIBBON_TABS)
     {
+        // for now jsut don't draw it, change that if ever needed
+        if (widget->m_deactivated) return;
+        
         BoxRenderParams* params;
         
         if (mark_selected && (focused || parent_focused))
@@ -726,8 +729,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
         {
-            //GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255,0,0), rect );
-
             ITexture* tex_bubble = SkinConfig::m_render_params["selectionHalo::neutral"].getImage();   
             
             const int texture_w = tex_bubble->getSize().Width;
@@ -746,10 +747,20 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                                                        rect.UpperLeftCorner.Y - y_shift_up),
                                      dimension2d< s32 >(rectWidth, rectHeight) );
             
-            //GUIEngine::getDriver()->draw2DRectangleOutline( rect2, SColor(255, 0,255,0) );
-
-            GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
-                                                0 /* no clipping */, 0, true /* alpha */);
+            if (widget->m_deactivated)
+            {
+                SColor colors[] =  { SColor(100,255,255,255),
+                                     SColor(100,255,255,255),
+                                     SColor(100,255,255,255),
+                                     SColor(100,255,255,255) };
+                GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
+                                                    0 /* no clipping */, colors, true /* alpha */);
+            }
+            else
+            {
+                GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
+                                                    0 /* no clipping */, 0, true /* alpha */);
+            }
         }
         
         // if multiple player selected the same ribbon item, we need to know to make it visible
@@ -987,11 +998,6 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
  */
 void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
-    // we ever need to...
-    if (widget->m_deactivated) return;
-    
-    
     if (focused)
     {
         int grow = 45;
@@ -1046,9 +1052,23 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
     }
     
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
-    GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
-                                        core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
-                                        0 /* no clipping */, 0, true /* alpha */);
+    
+    if (widget->m_deactivated)
+    {
+        SColor colors[] =  { SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255) };
+        GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
+                                            core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
+                                            0 /* no clipping */, colors, true /* alpha */);
+    }
+    else
+    {
+        GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
+                                            core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
+                                            0 /* no clipping */, 0, true /* alpha */);
+    }
     
 }
         
@@ -1058,10 +1078,6 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
  */
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
 { 
-    // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
-    // we ever need to...
-    if (widget->m_deactivated) return;
-    
     CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
     
     ITexture* texture;
@@ -1082,8 +1098,20 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
     
     const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
     
-    GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
-                                        0 /* no clipping */, 0, true /* alpha */);
+    if (widget->m_deactivated)
+    {
+        SColor colors[] =  { SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255) };
+        GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
+                                            0 /* no clipping */, colors, true /* alpha */);
+    }
+    else
+    {
+        GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
+                                             0 /* no clipping */, 0, true /* alpha */);
+    }
 }
 
 /**
