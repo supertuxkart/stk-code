@@ -621,6 +621,8 @@ namespace GUIEngine
         {
             g_skin = new Skin(g_env->getSkin());
             g_env->setSkin(g_skin);
+            g_skin->drop(); // GUI env grabbed it
+            assert(g_skin->getReferenceCount() == 1);
         }
         catch (std::runtime_error& err)
         {
@@ -631,6 +633,7 @@ namespace GUIEngine
             {
                 g_skin = new Skin(g_env->getSkin());
                 g_env->setSkin(g_skin);
+                assert(g_skin->getReferenceCount() == 1);
             }
             catch (std::runtime_error& err)
             {
@@ -704,10 +707,12 @@ namespace GUIEngine
             return;
         }
         
-        delete g_skin;
-        
+        assert(g_skin->getReferenceCount() == 1);
+
         g_skin = newSkin;
-        g_env->setSkin(g_skin);
+        g_env->setSkin(g_skin); // will also drop (and thus delete) the previous skin
+        g_skin->drop(); // g_env grabbed it
+        assert(g_skin->getReferenceCount() == 1);
     }
     
     // -----------------------------------------------------------------------------
