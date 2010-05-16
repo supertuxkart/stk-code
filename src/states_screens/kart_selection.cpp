@@ -266,7 +266,7 @@ public:
         
         const int playerAmount = UserConfigParams::m_all_players.size();
         m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
-        m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
+        m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = StringUtils::toString(playerAmount-1);
         m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
         m_player_ident_spinner->m_properties[PROP_WARP_AROUND] = "true";
 
