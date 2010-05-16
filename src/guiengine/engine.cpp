@@ -633,6 +633,7 @@ namespace GUIEngine
             {
                 g_skin = new Skin(g_env->getSkin());
                 g_env->setSkin(g_skin);
+                g_skin->drop(); // GUI env grabbed it
                 assert(g_skin->getReferenceCount() == 1);
             }
             catch (std::runtime_error& err)
