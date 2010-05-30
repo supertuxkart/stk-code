@@ -23,7 +23,7 @@ using namespace irr::video;
 
 const float INITIAL_Y = -3.0f;
 
-const float DURATION = 20.0f;
+const float DURATION = 15.0f;
 
 const float CAMERA_END_X = -15.0f;
 const float CAMERA_END_Y = 1.5f;
@@ -141,18 +141,18 @@ void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
     const int lastFrame = m_garage_door->getEndFrame();
     if (m_global_time < 6.0f)
     {
-        m_garage_door->setCurrentFrame( (m_global_time/10.0f)*lastFrame );
+        m_garage_door->setCurrentFrame( (m_global_time/6.0f)*lastFrame );
     }
     else if (m_global_time > DURATION - 6.0f )
     {
-        m_garage_door->setCurrentFrame( (1.0f - ((m_global_time - (DURATION - 10.0f))/10.0f))*lastFrame );
+        m_garage_door->setCurrentFrame( (1.0f - ((m_global_time - (DURATION - 6.0f))/6.0f))*lastFrame );
     }
     //else if (m_global_time < DURATION)
     //{
     //    m_garage_door->setCurrentFrame( lastFrame );
     //}
     
-    const float kartProgression = m_global_time/(DURATION - 5.0f);
+    const float kartProgression = m_global_time/(DURATION - 6.0f);
     if (kartProgression <= 1.0f)
     {
         m_kart_x = KART_START_X + (KART_END_X - KART_START_X)*kartProgression;
@@ -160,9 +160,12 @@ void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
     }
     
     const float progression = m_global_time / DURATION;
-    m_camera_x = CAMERA_START_X + (CAMERA_END_X - CAMERA_START_X)*progression;
-    m_camera_y = CAMERA_START_Y + (CAMERA_END_Y - CAMERA_START_Y)*progression;
-    m_camera_z = CAMERA_START_Z + (CAMERA_END_Z - CAMERA_START_Z)*progression;
+    if (progression <= 1.5f)
+    {
+        m_camera_x = CAMERA_START_X + (CAMERA_END_X - CAMERA_START_X)*progression;
+        m_camera_y = CAMERA_START_Y + (CAMERA_END_Y - CAMERA_START_Y)*progression;
+        m_camera_z = CAMERA_START_Z + (CAMERA_END_Z - CAMERA_START_Z)*progression;
+    }
     
     m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
