@@ -39,6 +39,10 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
+#if ENABLE_BIDI
+#include <fribidi.h>
+#endif
+
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
 
@@ -49,6 +53,7 @@ bool remove_bom = false;
 Translations::Translations()
 { 
 #ifdef ENABLE_NLS
+    
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
@@ -58,7 +63,45 @@ Translations::Translations()
 #else
     setlocale(LC_MESSAGES, "");
 #endif
+    
+    // FIXME: I couldn't find a way to ask gettext what language it currently uses xD that's the closest I found
+    const char* language = getenv("LANGUAGE");
+    const char* lc_all = getenv("LC_ALL");
+    const char* lc_type = getenv("LC_CTYPE");
+    const char* lc_msg = getenv("LC_MESSAGES");
+    const char* lang = getenv("LANG");
+
+    const char* firstNonNull = NULL;
+    if (language != NULL)      firstNonNull = language;
+    else if (lc_all != NULL)   firstNonNull = lc_all;
+    else if (lc_type != NULL)  firstNonNull = lc_type;
+    else if (lc_msg != NULL)   firstNonNull = lc_msg;
+    else if (lang != NULL)     firstNonNull = lang;
+
+    if (firstNonNull != NULL)
+    {
+        if (strcmp(firstNonNull, "he") == 0 || strcmp(firstNonNull, "yi") == 0)
+        {
+            // Hebrew
+            m_rtl = true;
+        }
+        else if (strcmp(firstNonNull, "ar") == 0 || strcmp(firstNonNull, "az") == 0)
+        {
+            // Arabic
+            m_rtl = true;
+        }
+        else
+        {
+            m_rtl = false;
+        }
+    }
+    else
+    {
+        m_rtl = false;
+    }
+    
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
+    
     if (sizeof(wchar_t) == 4)
     {
         // FIXME: will probably not work on PPC maccs
@@ -131,9 +174,73 @@ const wchar_t* Translations::w_gettext(const char* original)
     
     wchar_t* out_ptr = (wchar_t*)original_t;
     if (remove_bom) out_ptr++;
+    
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
-    return out_ptr;
+    
+    
+#if ENABLE_BIDI
+    
+    const int FRIBIDI_BUFFER_SIZE = 512;
+    FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
+    
+    int len = 0;
+    int n = 0;
+    //std::cout << "fribidi input : ";
+    for (n = 0; ; n++) 
+    {
+        fribidiInput[n] = out_ptr[n];
+        //std::cout << (int)fribidiInput[n] << " ";
+        len++;
+        
+        if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
+        {
+            std::cerr << "WARNING : translated stirng too long, truncating!\n";
+            fribidiInput[n] = 0;
+            break;
+        }
+        if (fribidiInput[n] == 0) break; // stop on '\0'
+    }
+    //std::cout << " (len=" << len << ")\n";
 
+    FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
+    
+    static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
+    
+    fribidi_boolean result = fribidi_log2vis(fribidiInput,
+                                             len-1,
+                                             &pbase_dir,
+                                             fribidiOutput,
+                                             /* gint        *position_L_to_V_list */ NULL,
+                                             /* gint        *position_V_to_L_list */ NULL,
+                                             /* gint8       *embedding_level_list */ NULL
+                                             );
+    
+    if (!result)
+    {
+        std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
+    }
+    
+    //std::cout << "fribidi output : ";
+    //for (FriBidiChar* c=fribidiOutput; *c != 0; c++)
+    //{
+    //    std::cout << (int)fribidiOutput[n] << " ";
+    //}
+    //std::cout << "\n";
+
+    
+    return (const wchar_t*)fribidiOutput;
+    
+#else
+    
+    return out_ptr;
+    
+#endif
 }
+
+bool Translations::isRTLLanguage() const
+{
+    return m_rtl;
+}
+

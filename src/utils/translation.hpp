@@ -46,9 +46,11 @@ class Translations
 {
 private:
     irr::core::stringw m_converted_string;
+    bool m_rtl;
 public:
                        Translations();
     const wchar_t     *w_gettext(const char* original);
+    bool               isRTLLanguage() const;
 };   // Translations
 
 

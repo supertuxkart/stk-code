@@ -12,6 +12,7 @@
 #include <iostream>
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "utils/translation.hpp"
 
 namespace irr
 {
@@ -27,7 +28,8 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     m_fallback_font_scale = 1.0f;
     m_fallback_kerning_width = 0;
     m_is_hollow_copy = false;
-    
+    m_rtl = translations->isRTLLanguage();
+
     m_black_border = false;
     
 	#ifdef _DEBUG
@@ -107,7 +109,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
 
                 TextureInfo info;
                 info.m_file_name = fn;
-                info.m_has_alpha = (alpha == core::stringw("false"));
+                info.m_has_alpha = (alpha == core::stringw("true"));
                 info.m_scale = scale;
                 
 				// disable mipmaps+filtering
@@ -197,7 +199,8 @@ bool ScalableFont::load(io::IXMLReader* xml)
 				rectangle.LowerRightCorner.Y = val;
 
 				CharacterMap[ch] = Areas.size();
-                //std::cout << "Inserting character '" << ch << "' with area " << Areas.size() << std::endl;
+                
+                //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
 
 				// make frame
 				f.rectNumber = SpriteBank->getPositions().size();
@@ -252,24 +255,27 @@ void ScalableFont::setMaxHeight()
 
 
 //! loads a font file, native file needed, for texture parsing
+    /*
 bool ScalableFont::load(io::IReadFile* file)
 {
 	if (!Driver) return false;
 
 	return loadTexture(Driver->createImageFromFile(file), file->getFileName());
 }
-
+*/
 
 //! loads a font file, native file needed, for texture parsing
+    /*
 bool ScalableFont::load(const io::path& filename)
 {
 	if (!Driver) return false;
 
 	return loadTexture(Driver->createImageFromFile( filename ), filename);
 }
-
+*/
 
 //! load & prepare font from ITexture
+#if 0
 bool ScalableFont::loadTexture(video::IImage* image, const io::path& name)
 {
 	if (!image) return false;
@@ -313,7 +319,7 @@ bool ScalableFont::loadTexture(video::IImage* image, const io::path& name)
 		flag[1] = Driver->getTextureCreationFlag ( video::ETCF_CREATE_MIP_MAPS );
 
 		Driver->setTextureCreationFlag(video::ETCF_ALLOW_NON_POWER_2, true);
-		Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false );
+		Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true );
 
 		SpriteBank->addTexture(Driver->addTexture(name, tmpImage));
 
@@ -328,9 +334,10 @@ bool ScalableFont::loadTexture(video::IImage* image, const io::path& name)
 
 	return ret;
 }
+#endif
 
-
-void ScalableFont::readPositions(video::IImage* image, s32& lowerRightPositions)
+/*
+void ScalableFont::readPositions(video::IImage* image, s32& spriteID)
 {
 	const core::dimension2d<u32> size = image->getDimension();
 
@@ -360,17 +367,17 @@ void ScalableFont::readPositions(video::IImage* image, s32& lowerRightPositions)
 			if (c == colorLowerRight)
 			{
 				// too many lower right points
-				if (SpriteBank->getPositions().size()<=(u32)lowerRightPositions)
+				if (SpriteBank->getPositions().size()<=(u32)spriteID)
 				{
-					lowerRightPositions = 0;
+					spriteID = 0;
 					return;
 				}
 
 				image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
-				SpriteBank->getPositions()[lowerRightPositions].LowerRightCorner = pos;
+				SpriteBank->getPositions()[spriteID].LowerRightCorner = pos;
 				// add frame to sprite bank
 				SGUISpriteFrame f;
-				f.rectNumber = lowerRightPositions;
+				f.rectNumber = spriteID;
 				f.textureNumber = 0;
 				SGUISprite s;
 				s.Frames.push_back(f);
@@ -380,14 +387,14 @@ void ScalableFont::readPositions(video::IImage* image, s32& lowerRightPositions)
 				SFontArea a;
 				a.overhang = 0;
 				a.underhang = 0;
-				a.spriteno = lowerRightPositions;
-				a.width = SpriteBank->getPositions()[lowerRightPositions].getWidth();
+				a.spriteno = spriteID;
+				a.width = SpriteBank->getPositions()[spriteID].getWidth();
 				Areas.push_back(a);
 				// map letter to character
-				wchar_t ch = (wchar_t)(lowerRightPositions + 32);
-				CharacterMap[ch] = lowerRightPositions;
+				wchar_t ch = (wchar_t)(spriteID + 32);
+				CharacterMap[ch] = spriteID;
 
-				++lowerRightPositions;
+				++spriteID;
 			}
 			else
 			if (c == colorBackGround)
@@ -395,7 +402,7 @@ void ScalableFont::readPositions(video::IImage* image, s32& lowerRightPositions)
 		}
 	}
 }
-
+*/
 
 //! set an Pixel Offset on Drawing ( scale position on width )
 void ScalableFont::setKerningWidth(s32 kerning)
@@ -460,7 +467,7 @@ s32 ScalableFont::getAreaFromCharacter(const wchar_t c, bool* fallback_font) con
     }
 	else
     {
-        //std::wcout << L"This font does not have this character : <" << c << L">" << std::endl;
+        std::cout << "The font does not have this character : <" << (int)c << L">" << std::endl;
         if (fallback_font != NULL) *fallback_font = false;
 		return WrongCharacter;
     }
@@ -556,11 +563,15 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 	core::dimension2d<s32> textDimension;
 	core::position2d<s32> offset = position.UpperLeftCorner;
 
-	if (hcenter || vcenter || clip) textDimension = getDimension(text.c_str());
+	if (m_rtl || hcenter || vcenter || clip) textDimension = getDimension(text.c_str());
 
 	if (hcenter)
     {
 		offset.X += (position.getWidth() - textDimension.Width) / 2;
+    }
+    else if (m_rtl)
+    {
+        offset.X += (position.getWidth() - textDimension.Width);
     }
 
 	if (vcenter)
@@ -776,12 +787,27 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
                                 title_colors, true);
         }
         else
-        {
+        {              
             driver->draw2DImage(texture,
                                 dest,
                                 source,
                                 clip,
                                 colors, true);
+            
+#ifdef FONT_DEBUG
+            driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
+                               core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),
+                               video::SColor(255, 255,0,0));
+            driver->draw2DLine(core::position2d<s32>(dest.LowerRightCorner.X, dest.LowerRightCorner.Y),
+                               core::position2d<s32>(dest.LowerRightCorner.X, dest.UpperLeftCorner.Y),
+                               video::SColor(255, 255,0,0));
+            driver->draw2DLine(core::position2d<s32>(dest.LowerRightCorner.X, dest.LowerRightCorner.Y),
+                               core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),
+                               video::SColor(255, 255,0,0));
+            driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
+                               core::position2d<s32>(dest.LowerRightCorner.X, dest.UpperLeftCorner.Y),
+                               video::SColor(255, 255,0,0));
+#endif
         }
     }
 }

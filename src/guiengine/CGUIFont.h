@@ -54,6 +54,7 @@ class ScalableFont : public IGUIFontBitmap
     void lazyLoadTexture(int texID);
     
     bool m_is_hollow_copy;
+    bool m_rtl;
 public:
 
     bool m_black_border;
@@ -84,10 +85,10 @@ public:
 	virtual ~ScalableFont();
 
 	//! loads a font from a texture file
-	bool load(const io::path& filename);
+	//bool load(const io::path& filename);
 
 	//! loads a font from a texture file
-	bool load(io::IReadFile* file);
+	//bool load(io::IReadFile* file);
 
 	//! loads a font from an XML file
 	bool load(io::IXMLReader* xml);
@@ -141,9 +142,9 @@ private:
     int getCharWidth(const SFontArea& area, const bool fallback) const;
 
 	//! load & prepare font from ITexture
-	bool loadTexture(video::IImage * image, const io::path& name);
+	//bool loadTexture(video::IImage * image, const io::path& name);
 
-	void readPositions(video::IImage* texture, s32& lowerRightPositions);
+	//void readPositions(video::IImage* texture, s32& lowerRightPositions);
 
 	s32 getAreaFromCharacter (const wchar_t c, bool* fallback_font) const;
 	void setMaxHeight();
