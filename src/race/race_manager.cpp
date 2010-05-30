@@ -33,7 +33,8 @@
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_manager.hpp"
-#include "states_screens/grand_prix_over.hpp"
+#include "states_screens/grand_prix_lose.hpp"
+#include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -397,14 +398,18 @@ void RaceManager::exitRace()
         unlock_manager->grandPrixFinished();
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
-        StateManager::get()->pushScreen        ( GrandPrixOver::getInstance()  );
+        
+        // TODO: show lose screen when losing
+        StateManager::get()->pushScreen        ( GrandPrixWin::getInstance()  );
         
         std::string winners[3];
         for (unsigned int i=0; i < m_kart_status.size(); ++i)
         {
             if(UserConfigParams::m_verbosity>=5)
+            {
                 std::cout << m_kart_status[i].m_ident << " has GP final rank "
                           << m_kart_status[i].m_gp_rank << std::endl;
+            }
 
             const int rank = m_kart_status[i].m_gp_rank;
             if (rank >= 0 && rank < 3)
@@ -413,7 +418,7 @@ void RaceManager::exitRace()
             }
         }
         
-        GrandPrixOver::getInstance()->setKarts(winners);
+        GrandPrixWin::getInstance()->setKarts(winners);
     }
 
     World::deleteWorld();

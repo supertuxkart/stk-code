@@ -429,6 +429,7 @@ namespace GUIEngine
         
         int font_height;
         int small_font_height;
+        int title_font_height;
     }
     using namespace Private;
     
@@ -495,6 +496,12 @@ namespace GUIEngine
         // otherwise check if the focus is the given widget
         return g_focus_for_player[playerID]->isSameIrrlichtWidgetAs(w);
     }
+    
+    int getTitleFontHeight()
+    {
+        return Private::title_font_height;
+    }
+
     
     int getFontHeight()
     {
@@ -677,7 +684,8 @@ namespace GUIEngine
         sfont2->setKerningWidth(-18);
         sfont2->m_black_border = true;
         g_title_font = sfont2;
-        
+        Private::title_font_height = g_title_font->getDimension( L"X" ).Height;
+
         
         if (g_font != NULL) g_skin->setFont(g_font);
         
