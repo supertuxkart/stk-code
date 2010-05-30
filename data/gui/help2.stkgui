@@ -16,9 +16,7 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
         <label align="center" I18N="In the help menu" text="To help you win, there are some powerups you can collect :"/>
-        
-        <spacer height="25" width="10"/>
-        
+                
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/bubblegum-icon.png"/>
             <spacer width="25" height="25"/>
@@ -56,7 +54,13 @@
             <spacer width="25" height="25"/>
             <label proportion="1" height="100%" word_wrap="true" text="Anchor - slows down greatly the kart in the first position"/>
         </div>
-    
+        
+        <div width="100%" proportion="1" layout="horizontal-row">
+            <icon align="center" width="64" height="64" icon="models/swap-icon.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="1" height="100%" word_wrap="true" text="Swapper - gift boxes are transformed into bananas and vice versa for a short time"/>
+        </div>
+        
     </box>
     <spacer width="50" height="45" /> 
 </div>
