@@ -399,11 +399,12 @@ void RaceManager::exitRace()
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
         
-        // TODO: show lose screen when losing
-        StateManager::get()->pushScreen        ( GrandPrixWin::getInstance()  );
-        
+
+        bool someHumanPlayerWon = false;
+        const unsigned int kartStatusCount = m_kart_status.size();
         std::string winners[3];
-        for (unsigned int i=0; i < m_kart_status.size(); ++i)
+        std::vector<std::string> humanLosers; // because we don't care about AIs that lost
+        for (unsigned int i=0; i < kartStatusCount; ++i)
         {
             if(UserConfigParams::m_verbosity>=5)
             {
@@ -415,10 +416,46 @@ void RaceManager::exitRace()
             if (rank >= 0 && rank < 3)
             {
                 winners[rank] = m_kart_status[i].m_ident;
+                if (m_kart_status[i].m_kart_type == KT_PLAYER ||
+                    m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
+                {
+                    someHumanPlayerWon = true;
+                }
+            }
+            else if (rank >= 3)
+            {
+                if (m_kart_status[i].m_kart_type == KT_PLAYER ||
+                    m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
+                {
+                    humanLosers.push_back(m_kart_status[i].m_ident);
+                }
             }
         }
         
-        GrandPrixWin::getInstance()->setKarts(winners);
+        if (someHumanPlayerWon)
+        {
+            StateManager::get()->pushScreen( GrandPrixWin::getInstance()  );
+            GrandPrixWin::getInstance()->setKarts(winners);
+        }
+        else
+        {
+            StateManager::get()->pushScreen( GrandPrixLose::getInstance()  );
+            
+            if (humanLosers.size() > 1)
+            {
+                // TODO: support multiplayer GPs!!
+                GrandPrixLose::getInstance()->setKart( humanLosers[0] );
+            }
+            else if (humanLosers.size() == 1)
+            {
+                GrandPrixLose::getInstance()->setKart( humanLosers[0] );
+            }
+            else
+            {
+                std::cerr << "RaceManager::exitRace() : what's going on?? no winners and no losers??\n";
+                GrandPrixLose::getInstance()->setKart( "nolok" );
+            }
+        }
     }
 
     World::deleteWorld();
