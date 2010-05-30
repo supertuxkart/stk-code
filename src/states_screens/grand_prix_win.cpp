@@ -1,5 +1,5 @@
 
-#include "states_screens/grand_prix_over.hpp"
+#include "states_screens/grand_prix_win.hpp"
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -25,11 +25,11 @@ const float INITIAL_Y = -3.0f;
 const float INITIAL_PODIUM_Y = -3.6f;
 const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
 
-DEFINE_SCREEN_SINGLETON( GrandPrixOver );
+DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")
+GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
 {
     setNeeds3D(true);
     
@@ -38,7 +38,7 @@ GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::loadedFromFile()
+void GrandPrixWin::loadedFromFile()
 {
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
@@ -77,7 +77,7 @@ void traverse(scene::ISceneNode* curr, int level=0)
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::init()
+void GrandPrixWin::init()
 {
     if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
     {
@@ -185,7 +185,7 @@ void GrandPrixOver::init()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::tearDown()
+void GrandPrixWin::tearDown()
 {
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
@@ -211,10 +211,10 @@ void GrandPrixOver::tearDown()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
+void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
 {
     m_global_time += dt;
-    
+        
     m_sky_angle += dt*2;
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
@@ -223,6 +223,8 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
     // ---- karts move
     if (m_phase == 1)
     {
+        assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
+        
         int karts_not_yet_done = 0;
         for (int k=0; k<3; k++)
         {
@@ -328,7 +330,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
     
     static int test_y = 0;
     
-    GUIEngine::getTitleFont()->draw(_("Grand Prix Results"),
+    GUIEngine::getTitleFont()->draw(_("You won the Grand Prix!"),
                                     core::rect< s32 >( 0, test_y, w, h/10 ),
                                     color,
                                     true/* center h */, true /* center v */ );
@@ -336,7 +338,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::eventCallback(GUIEngine::Widget* widget,
+void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
                                             const std::string& name,
                                             const int playerID)
 {
@@ -367,7 +369,7 @@ void GrandPrixOver::eventCallback(GUIEngine::Widget* widget,
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixOver::setKarts(const std::string idents_arg[3])
+void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
     // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
     std::string idents[3];
@@ -385,6 +387,7 @@ void GrandPrixOver::setKarts(const std::string idents_arg[3])
         if (kart != NULL)
         {
             KartModel* kartModel = kart->getKartModel();
+            assert(kartModel != NULL);
             
             m_kart_x[n] = m_podium_x[n];
             m_kart_y[n] = INITIAL_Y;
@@ -392,9 +395,9 @@ void GrandPrixOver::setKarts(const std::string idents_arg[3])
             m_kart_rotation[n] = 0.0f;
             
             kart_main_node = irr_driver->addMesh(kartModel->getModel());
+            assert(kart_main_node != NULL);
             kart_main_node->setPosition( core::vector3df(m_kart_x[n], m_kart_y[n], m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
-            kart_main_node->updateAbsolutePosition();
             
             for (int wheel=0; wheel<4; wheel++)
             {
@@ -405,9 +408,15 @@ void GrandPrixOver::setKarts(const std::string idents_arg[3])
                 wheel_model->updateAbsolutePosition();
             }
         }
+        else
+        {
+            std::cerr << "GrandPrixWin : warning : kart '" << idents[n] << "' not found!\n";
+        }
         
         m_kart_node[n] = kart_main_node;
-    }
+    } // end for
+    
+    assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
 }
 
 // -------------------------------------------------------------------------------------

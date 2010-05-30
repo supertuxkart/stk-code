@@ -1,5 +1,5 @@
-#ifndef HEADER_GRAND_PRIX_OVER_HPP
-#define HEADER_GRAND_PRIX_OVER_HPP
+#ifndef HEADER_GRAND_PRIX_LOSE_HPP
+#define HEADER_GRAND_PRIX_LOSE_HPP
 
 #include "guiengine/screen.hpp"
 
@@ -10,11 +10,11 @@ class KartProperties;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixOver : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixOver>
+class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixLose>
 {
-    friend class GUIEngine::ScreenSingleton<GrandPrixOver>;
+    friend class GUIEngine::ScreenSingleton<GrandPrixLose>;
     
-    GrandPrixOver();
+    GrandPrixLose();
     
     /** sky angle, 0-360 */
     float m_sky_angle;
@@ -22,10 +22,11 @@ class GrandPrixOver : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     /** Global evolution of time */
     double m_global_time;
     
-    irr::scene::IMeshSceneNode* m_village;
+    irr::scene::IMeshSceneNode* m_garage;
 
-    irr::scene::IMeshSceneNode* m_podium_step[3];
-    irr::scene::ISceneNode* m_kart_node[3];
+    irr::scene::IAnimatedMeshSceneNode* m_garage_door;
+
+    irr::scene::ISceneNode* m_kart_node;
     
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
@@ -34,9 +35,7 @@ class GrandPrixOver : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     
     int m_phase;
     
-    float m_kart_x[3], m_kart_y[3], m_kart_z[3];
-    float m_podium_x[3], m_podium_z[3];
-    float m_kart_rotation[3];
+    float m_kart_x, m_kart_y, m_kart_z;
     
     float m_camera_x, m_camera_y, m_camera_z;
     float m_camera_target_x, m_camera_target_z;
@@ -58,7 +57,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
-    void setKarts(const std::string idents[3]);
+    void setKart(const std::string ident);
 
 };
 

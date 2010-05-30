@@ -31,7 +31,8 @@
 
 // FIXME : remove, temporary test
 #include "states_screens/feature_unlocked.hpp"
-#include "states_screens/grand_prix_over.hpp"
+#include "states_screens/grand_prix_lose.hpp"
+#include "states_screens/grand_prix_win.hpp"
 
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -82,17 +83,17 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
-        static int i = 0;
+        static int i = 2;
         i++;
         
-        if (i % 3 == 0)
+        if (i % 4 == 0)
         {
             // the passed kart will not be modified, that's why I allow myself to use const_cast
             scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),
                                    L"Unlocked");
             StateManager::get()->pushScreen(scene);
         }
-        else if (i % 3 == 1)
+        else if (i % 4 == 1)
         {
             std::vector<video::ITexture*> textures;
             textures.push_back(irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()));
@@ -109,12 +110,18 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             
             StateManager::get()->pushScreen(scene);
         }
+        else if (i % 4 == 2)
+        {
+            GrandPrixWin* scene = GrandPrixWin::getInstance();
+            const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
+            StateManager::get()->pushScreen(scene);
+            scene->setKarts( winners );
+        }
         else
         {
-            GrandPrixOver* scene = GrandPrixOver::getInstance();
-            const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
-            scene->setKarts( winners );
+            GrandPrixLose* scene = GrandPrixLose::getInstance();
             StateManager::get()->pushScreen(scene);
+            scene->setKart( "nolok" );
         }
     }
     
