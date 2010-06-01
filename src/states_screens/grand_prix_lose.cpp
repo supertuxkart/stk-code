@@ -60,8 +60,7 @@ void GrandPrixLose::loadedFromFile()
 
 void GrandPrixLose::init()
 {
-    // TODO: change music    
-    music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
+    music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music")));
 
     m_phase = 1;
     m_sky_angle = 0.0f;
@@ -69,7 +68,7 @@ void GrandPrixLose::init()
     
     m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("clouds.png"),
                                    16 /* hori_res */, 16 /* vert_res */,
-                           1.0f /* texture_percent */,  2.0f /* sphere_percent */);
+                                   1.0f /* texture_percent */,  2.0f /* sphere_percent */);
     
     m_camera = irr_driver->addCameraSceneNode();
     m_camera_x = CAMERA_START_X;
