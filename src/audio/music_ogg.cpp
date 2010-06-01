@@ -36,7 +36,7 @@ MusicOggStream::MusicOggStream()
 {
     //m_oggStream= NULL;
     m_soundBuffers[0] = m_soundBuffers[1]= 0;
-    m_soundSource= 0;
+    m_soundSource= -1;
     m_pausedMusic= true;
 }   // MusicOggStream
 
@@ -50,6 +50,8 @@ MusicOggStream::~MusicOggStream()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::load(const std::string& filename)
 {
+    if (isPlaying()) stopMusic();
+    
     m_error = true;
     m_fileName = filename;
     if(m_fileName=="") return false;  
@@ -75,19 +77,14 @@ bool MusicOggStream::load(const std::string& filename)
     
     m_vorbisInfo = ov_info(&m_oggStream, -1);
 
-    if(m_vorbisInfo->channels == 1)
-        nb_channels = AL_FORMAT_MONO16;
-    else
-        nb_channels = AL_FORMAT_STEREO16;
-
+    if (m_vorbisInfo->channels == 1) nb_channels = AL_FORMAT_MONO16;
+    else                             nb_channels = AL_FORMAT_STEREO16;
 
     alGenBuffers(2, m_soundBuffers);
-    if(check() == false)
-        return false;
+    if (check("alGenBuffers") == false) return false;
 
     alGenSources(1, &m_soundSource);
-    if(check() == false)
-        return false;
+    if (check("alGenSources") == false) return false;
 
     alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
@@ -111,8 +108,7 @@ bool MusicOggStream::empty()
         ALuint buffer = 0;
         alSourceUnqueueBuffers(m_soundSource, 1, &buffer);
 
-        if(check() == false)
-            return false;
+        if (!check("alSourceUnqueueBuffers")) return false;
     }
 
     return true;
@@ -129,16 +125,18 @@ bool MusicOggStream::release()
 
     pauseMusic();
     m_fileName= "";
-
+    
     empty();
     alDeleteSources(1, &m_soundSource);
-    check();
+    check("alDeleteSources");
     alDeleteBuffers(2, m_soundBuffers);
-    check();
+    check("alDeleteBuffers");
 
     // Handle error correctly
     if(!m_error) ov_clear(&m_oggStream);
 
+    m_soundSource = -1;
+    
     return true;
 }   // release
 
@@ -165,6 +163,8 @@ bool MusicOggStream::playMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::isPlaying()
 {
+    if (m_soundSource == -1) return false;
+    
     ALenum state;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
 
@@ -229,7 +229,7 @@ void MusicOggStream::updateFaster(float percent, float max_pitch)
 void MusicOggStream::update()
 {
 
-    if (m_pausedMusic)
+    if (m_pausedMusic || m_soundSource == -1)
     {
         // nothing todo
         return;
@@ -245,7 +245,7 @@ void MusicOggStream::update()
         ALuint buffer;
 
         alSourceUnqueueBuffers(m_soundSource, 1, &buffer);
-        if(!check()) return;
+        if(!check("alSourceUnqueueBuffers")) return;
 
         active = streamIntoBuffer(buffer);
         if(!active)
@@ -257,7 +257,7 @@ void MusicOggStream::update()
         }
 
         alSourceQueueBuffers(m_soundSource, 1, &buffer);
-        if(!check()) return;
+        if (!check("alSourceQueueBuffers")) return;
     }
 
     if (active)
@@ -305,19 +305,49 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
     if(size == 0) return false;
 
     alBufferData(buffer, nb_channels, pcm, size, m_vorbisInfo->rate);
-    check();
+    check("alBufferData");
 
     return true;
 }   // streamIntoBuffer
 
 //-----------------------------------------------------------------------------
-bool MusicOggStream::check()
+bool MusicOggStream::check(const char* what)
 {
     int error = alGetError();
 
-    if(error != AL_NO_ERROR)
+    if (error != AL_NO_ERROR)
     {
-        fprintf(stderr, "OpenAL error: %d\n", error);
+        const char* errMessage;
+        switch (error)
+        {
+            case AL_INVALID_NAME:
+                errMessage = "AL_INVALID_NAME";
+                break;
+
+            case AL_ILLEGAL_ENUM:
+                //case AL_INVALID_ENUM:
+                errMessage = "AL_ILLEGAL_ENUM";
+                break;
+            
+            case AL_INVALID_VALUE:
+                errMessage = "AL_INVALID_VALUE";
+                break;
+
+            case AL_ILLEGAL_COMMAND:
+                //case AL_INVALID_OPERATION:
+                errMessage = "AL_ILLEGAL_COMMAND";
+                break;
+                
+            case AL_OUT_OF_MEMORY:
+                errMessage = "AL_OUT_OF_MEMORY";
+                break;
+                
+            default:
+                errMessage = "other error";
+                break;
+            
+        }
+        fprintf(stderr, "OpenAL error %d at %s : %s\n", error, what, errMessage);
         return false;
     }
 

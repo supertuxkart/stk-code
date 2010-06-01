@@ -63,7 +63,7 @@ public:
 
 protected:
     bool empty();
-    bool check();
+    bool check(const char* what);
     std::string errorString(int code);
 
 private:
