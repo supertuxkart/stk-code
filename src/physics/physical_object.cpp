@@ -54,7 +54,8 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     if     (shape=="cone"   ) m_body_type = MP_CONE;
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
-
+    else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
+    
     m_init_pos.setIdentity();
     m_init_pos.setOrigin(m_init_xyz);
 
