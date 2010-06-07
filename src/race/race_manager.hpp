@@ -279,7 +279,6 @@ public:
     const GrandPrixData  *getGrandPrix()  const { return &m_grand_prix;             }
     unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
-    const std::string& getItemStyle()     const { return m_grand_prix.getItemStyle(); }
     
     void         computeGPRanks();
     int          getKartGPRank(const int kart_id)

@@ -39,7 +39,6 @@ class GrandPrixData
     
     std::string m_id;                  //!< Internal name of the grand prix, not translated
     std::string m_filename;            //!< Original filename, only for error handling needed
-    std::string m_item_style;          //!< item style which overwrites the track default
     
     /**
       * The ident of the tracks in this grand prix in their right order, ident
@@ -68,7 +67,6 @@ public:
     /** @return the internale name identifier of the Grand Prix (not translated) */
     const std::string& getId          ()        const { return m_id;            }
     
-    const std::string& getItemStyle   ()        const { return m_item_style;    }
     const std::string& getFilename    ()        const { return m_filename;      }
     const std::string& getTrack(size_t track_index) const { assert(track_index >= 0); assert(track_index < m_tracks.size()); 
                                                        return m_tracks[track_index]; }

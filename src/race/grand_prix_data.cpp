@@ -53,20 +53,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
             throw std::logic_error("File contents are incomplete or corrupt");
         }
         m_name = _(temp_name.c_str());
-        foundName = true;
-        
-        /*
-        std::string temp_desc;
-        const int readDesc = root->get( "description", &temp_desc );
-        if (readDesc == 1 && temp_desc.size() > 0)
-        {
-            m_description = _(temp_desc.c_str());
-        }
-         */
-        
-        // This used to be there, but I'm leaving it out since it seems it was unused
-        // lisp->get("item", m_item_style);
-        
+        foundName = true;                
     }
     else
     {
