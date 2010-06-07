@@ -76,8 +76,6 @@ void QuadGraph::setStartCoordinate(const CheckLine &cl)
                 m_quad_filename.c_str());
         return;
     }
-    Vec3 xyz;
-    spatialToTrack(&xyz, start_point, sector);
 }   // setStartCoordinate
 
 // -----------------------------------------------------------------------------
@@ -304,11 +302,10 @@ void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) 
 
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL
- *  space) and transforms them into coordinates based on the track. It is
- *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
+ *  space) and transforms them into coordinates based on the track. The y-axis
  *  of the returned vector is how much of the track the point has gone
- *  through, the x-axis is on which side of the road it is. The Z axis
- *  is not changed.
+ *  through, the x-axis is on which side of the road it is (relative to a line
+ *  connecting the two center points of a quad). The Y axis is not changed.
  *  \param dst Returns the results in the X and Z coordinates.
  *  \param xyz The position of the kart.
  *  \param sector The graph node the position is on.
