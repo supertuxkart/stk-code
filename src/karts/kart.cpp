@@ -1062,12 +1062,9 @@ void Kart::updatePhysics(float dt)
         if(m_speed > 4.0)
             engine_power *= m_power_reduction;
 
-        // Lose some traction when skidding, so it is not abused by player
-        // The AI will be allowed to cheat on medium and hard difficulty in
-        // order to make them more competitive (this might be removed once
-        // the AI is better).
-        if(m_controls.m_drift && 
-            (race_manager->getDifficulty()==RaceManager::RD_EASY || m_controller->isPlayerController()) )
+        // Lose some traction when skidding, to balance the adventage
+        // Up to r5483 AIs were allowed to cheat in medium and high diff levels
+        if(m_controls.m_drift)
             engine_power *= 0.5f;
         applyEngineForce(engine_power);
 
