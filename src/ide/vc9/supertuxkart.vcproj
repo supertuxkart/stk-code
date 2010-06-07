@@ -834,7 +834,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\grand_prix_over.cpp"
+					RelativePath="..\..\states_screens\grand_prix_lose.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\grand_prix_win.cpp"
 					>
 				</File>
 				<File
@@ -858,7 +862,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\options_screen_av.cpp"
+					RelativePath="..\..\states_screens\options_screen_audio.cpp"
 					>
 				</File>
 				<File
@@ -871,6 +875,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\options_screen_players.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_video.cpp"
 					>
 				</File>
 				<File
@@ -1636,7 +1644,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\grand_prix_over.hpp"
+					RelativePath="..\..\states_screens\grand_prix_lose.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\grand_prix_win.hpp"
 					>
 				</File>
 				<File
@@ -1660,7 +1672,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\options_screen_av.hpp"
+					RelativePath="..\..\states_screens\options_screen_audio.hpp"
 					>
 				</File>
 				<File
@@ -1673,6 +1685,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\options_screen_players.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_video.hpp"
 					>
 				</File>
 				<File
