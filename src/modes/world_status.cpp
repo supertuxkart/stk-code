@@ -31,8 +31,7 @@ WorldStatus::WorldStatus()
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_phase           = SETUP_PHASE;
-    m_previous_phase  = SETUP_PHASE;  // initialise it just in case
-    m_phase           = SETUP_PHASE;
+    m_previous_phase  = UNDEFINED_PHASE;  // initialise it just in case
     
     // FIXME - is it a really good idea to reload and delete the sound every race??
     m_prestart_sound  = sfx_manager->createSoundSource("prestart");
@@ -47,7 +46,7 @@ void WorldStatus::reset()
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_phase           = READY_PHASE; // FIXME - unsure
-    m_previous_phase  = SETUP_PHASE;
+    m_previous_phase  = UNDEFINED_PHASE;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -218,7 +217,7 @@ void WorldStatus::setTime(const float time)
  */
 void WorldStatus::pause(Phase phase)
 {
-    assert(m_previous_phase==SETUP_PHASE);
+    assert(m_previous_phase==UNDEFINED_PHASE);
     m_previous_phase = m_phase;
     m_phase          = phase;
 }   // pause
@@ -231,5 +230,5 @@ void WorldStatus::unpause()
     m_phase          = m_previous_phase;
     // Set m_previous_phase so that we can use an assert
     // in pause to detect incorrect pause/unpause sequences.
-    m_previous_phase = SETUP_PHASE;
-}
+    m_previous_phase = UNDEFINED_PHASE;
+}   // unpause

@@ -71,6 +71,8 @@ public:
         // Display the in-game menu, but no update of world or anything
         IN_GAME_MENU_PHASE,
 
+        // Undefined, used in asserts to catch incorrect states.
+        UNDEFINED_PHASE
     };
 protected:
     SFXBase    *m_prestart_sound;
@@ -123,11 +125,7 @@ public:
     /** Returns the current race time. */
     float   getTime() const      { return m_time; }
 
-    /** Returns the value of the auxiliary timer. */
-    float   getAuxiliaryTimer() const {return m_auxiliary_timer; }
-    /**
-        * Call each frame, with the elapsed time as argument.
-     */
+    /** Call each frame, with the elapsed time as argument. */
     void    update(const float dt);
     
     void    setTime(const float time);
@@ -137,15 +135,11 @@ public:
     virtual void enterRaceOverState();
     virtual void terminateRace();
     
-    /*
-     * Will be called to notify your derived class that the clock,
-     * which is in COUNTDOWN mode, has reached zero.
-     */
+    /** Will be called to notify your derived class that the clock,
+     *  which is in COUNTDOWN mode, has reached zero. */
     virtual void countdownReachedZero() {};
     
-    /*
-     * Called when the race actually starts.
-     */
+    /** Called when the race actually starts. */
     virtual void onGo() {};
     
     
