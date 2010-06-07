@@ -68,7 +68,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
         float radius = 0.5f*std::max(extend.getY(), extend.getZ());
         m_collision_shape = new btConeShapeX(radius, extend.getX());
     }
-    else if(shape=="coneY")
+    else if(shape=="coneY" || shape=="cone")
     {
         float radius = 0.5f*std::max(extend.getX(), extend.getZ());
         m_collision_shape = new btConeShape(radius, extend.getY());

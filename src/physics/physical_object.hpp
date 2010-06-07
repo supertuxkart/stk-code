@@ -36,7 +36,10 @@ class XMLNode;
 class PhysicalObject : public TrackObject
 {
 public:
-    enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
+    /** The supported collision shapes. */
+    enum bodyTypes {MP_NONE, 
+                    MP_CONE, MP_CONE_X, MP_CONE_Z,
+                    MP_BOX, MP_SPHERE};
 
 protected:
     /** The shape of this object. */
