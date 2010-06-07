@@ -158,7 +158,8 @@ void WorldStatus::update(const float dt)
             // Change to next phase if delay is over
             if(m_auxiliary_timer > stk_config->m_delay_finish_time)
             {
-                m_phase           = RESULT_DISPLAY_PHASE;
+                m_phase = RESULT_DISPLAY_PHASE;
+                terminateRace();
                 new RaceOverDialog(0.6f, 0.9f);
             }
             break;
@@ -166,7 +167,6 @@ void WorldStatus::update(const float dt)
         case RESULT_DISPLAY_PHASE : 
             if(((RaceOverDialog*)GUIEngine::ModalDialog::getCurrent())->menuIsFinished())
             {
-                terminateRace();
                 m_phase = FINISH_PHASE;
             }
             break;
