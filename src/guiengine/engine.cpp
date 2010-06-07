@@ -633,6 +633,7 @@ namespace GUIEngine
         }
         catch (std::runtime_error& err)
         {
+            (void)err;   // avoid warning about unused variable
             std::cerr << "ERROR, cannot load skin specified in user config. Falling back to defaults.\n";
             UserConfigParams::m_skin_file.revertToDefaults();
             
@@ -712,6 +713,7 @@ namespace GUIEngine
         }
         catch (std::runtime_error& err)
         {
+            (void)err;  // avoid warning about unused variable
             std::cerr << "ERROR, cannot load newly specified skin!\n";
             return;
         }

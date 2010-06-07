@@ -165,8 +165,8 @@ namespace GUIEngine
             r = -1;
             g = -1;
             b = -1;
-        }
-    };
+        }   // SkinWidgetContainer
+    };   // class SkinWidgetContainer
     
     class Widget;
     
