@@ -362,7 +362,7 @@ namespace StringUtils
     {
         int min        = (int) floor ( time / 60.0 ) ;
         int sec        = (int) floor ( time - (double) ( 60 * min ) ) ;
-        int hundredths = (int) floor ( 100.0f * (time - (double)(sec + 60* min)));
+        int hundredths = (int) floor ( 100.0f * (time - (double)(sec + 60* min))+0.5f);
         // The proper c++ way would be:
         // std::ostringstream s;
         // s<<std::setw(2)<<std::setfill(' ')<<min<<":"
