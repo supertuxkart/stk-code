@@ -55,14 +55,14 @@ using namespace irr;
 
 const float Track::NOHIT           = -99999.9f;
 
+btTransform global_start;
+
 // ----------------------------------------------------------------------------
 Track::Track(std::string filename)
 {
     m_filename             = filename;
     m_root                 = StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                = StringUtils::getBasename(m_root);
-    m_item_style           = "";
-    //m_description          = "";
     m_designer             = "";
     m_screenshot           = "";
     m_version              = 0;
@@ -75,6 +75,8 @@ Track::Track(std::string filename)
     m_quad_graph           = NULL;
     m_animation_manager    = NULL;
     m_check_manager        = NULL;
+    m_start_angle          = 0;
+    m_start_transform.setIdentity();
     loadTrackInfo();
 }   // Track
 
@@ -158,21 +160,59 @@ const Vec3& Track::trackToSpatial(const int sector) const
 }   // trackToSpatial
 
 //-----------------------------------------------------------------------------
+/** This function determines the linear transform and rotation for the start
+ *  coordinates in order to line up propery behind the specified start line.
+ *  The transform and rotation is saved in a matrix and applied to all
+ *  start coordinates later on, see getStartTransform().
+ *  \param line The start line.
+ */
+void Track::setStartCoordinates(const core::line2df& line)
+{
+    core::vector2df start = line.start;
+    core::vector2df end   = line.end;
+
+    m_start_angle = -atan2(end.Y - start.Y,
+                           end.X - start.X);
+    core::vector2df mid   = (start+end)*0.5f;
+    btQuaternion q(Vec3(0, 1, 0), m_start_angle);
+    global_start.setRotation(q);
+    global_start.setOrigin(Vec3(mid.X, 0, mid.Y));
+}   // setStartCoordinates
+
+//-----------------------------------------------------------------------------
 /** Returns the start coordinates for a kart on a given position pos
     (with pos ranging from 0 to kart_num-1).
 */
 btTransform Track::getStartTransform(unsigned int pos) const
 {
+    Vec3  orig;
+    float angle;
+    if(pos<m_start_positions.size())
+    {
+        orig  = m_start_positions[pos];
+        angle = 0;
+    }
+    else
+    {
+        // Distance from middle of start line in X direction.
+        // +-X_DIST is used to place the karts left/right
+        const float X_DIST = 1.5f;
+        // Distance from start line in Z direction. 
+        const float Z_DIST_FROM_START = 1.5f;
+        const float Z_DIST            = 1.5f;
+        orig = Vec3( X_DIST * (pos%2==0) ? 1.0f : -1.0f, 
+                      1.0f, 
+                     -Z_DIST*pos-Z_DIST_FROM_START);
+        orig  = global_start(orig);
+        angle = m_start_angle;
+    }
 
-    Vec3 orig = pos<m_start_positions.size() 
-              ? m_start_positions[pos]
-              : Vec3( (pos%2==0)?1.5f:-1.5f, 1.0f,  -1.5f*pos-1.5f);
     btTransform start;
     start.setOrigin(orig);
     start.setRotation(btQuaternion(btVector3(0, 1, 0), 
                                    pos<m_start_heading.size() 
                                    ? DEGREE_TO_RAD*m_start_heading[pos]
-                                   : 0.0f ));
+                                   : angle ));
     return start;
 }   // getStartTransform
 
@@ -208,7 +248,6 @@ void Track::loadTrackInfo()
     std::vector<std::string> filenames;
     root->get("music",                 &filenames);
     getMusicInformation(filenames, m_music);
-    root->get("item",                  &m_item_style);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);

@@ -65,8 +65,21 @@ private:
     std::vector<MusicInformation*> m_music;
     /** Start heading of karts (if specified in the scene file). */
     std::vector<float>       m_start_heading;
+
     /** Start positions of karts (if specified in the scene file). */
     std::vector<Vec3>        m_start_positions;
+
+    /** A transform which is applied to the default start coordinates
+     *  (i.e. only if no start coordinates are defined for the track).
+     *  This is used to position the karts in case that the lap counting
+     *  line is not centered around (0,0,0), or rotated. */
+    btTransform              m_start_transform;
+    /** The explicit angle of the lap counting line. This angle can
+     *  not be easily deduced from m_start_transform (problem with the
+     *  sign), so it is saved additionally so that karts can be rotated
+     *  properly if no explicit start positions are given. */
+    float                    m_start_angle;
+
     std::string              m_item_style;
     std::string              m_description;
     std::string              m_designer;
@@ -223,7 +236,6 @@ public:
     /** Returns an absolute path to the screenshot file of this track */
     const std::string& getScreenshotFile () const {return m_screenshot;         }
     
-    const std::string& getItemStyle      () const {return m_item_style;         }
     btTransform        getStartTransform (unsigned int pos) const;
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;
@@ -232,6 +244,7 @@ public:
     void               update(float dt);
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
+    void               setStartCoordinates(const core::line2df& line);
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const

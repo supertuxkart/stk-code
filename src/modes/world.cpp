@@ -448,8 +448,8 @@ void World::update(float dt)
     // the order of karts will be incorrect, since this kart will not
     // have started the next lap. While this will only last for one
     // frame (since in the next frame the check manager will detect
-    // the new lap), it causes an unwanted display of icons in the
-    // icon display.
+    // the new lap), it causes an incorrect display of icons in the
+    // icon display for this one frame.
     m_track->update(dt);
 
     projectile_manager->update(dt);

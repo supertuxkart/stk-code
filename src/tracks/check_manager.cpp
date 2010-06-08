@@ -40,6 +40,7 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
             if(cl->getType()==CheckStructure::CT_NEW_LAP)
             {
                 track->getQuadGraph().setStartCoordinate(*cl);
+                track->setStartCoordinates(cl->getLine2D());
             }
         }   // checkline
         else if(type=="check-sphere")
