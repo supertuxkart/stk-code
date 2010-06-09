@@ -67,8 +67,9 @@ private:
     scene::IAnimatedMesh *m_mesh;
 
     /** This is a pointer to the scene node of the kart this model belongs
-     *  to. It is necessary to adjust animations. */
-    scene::IAnimatedMeshSceneNode *m_node;
+     *  to. It is necessary to adjust animations, and it is not used
+     *  (i.e. neither read nor written) if animations are disabled. */
+    scene::IAnimatedMeshSceneNode *m_animated_node;
 
     /** Value used to indicate undefined entries. */
     static float UNDEFINED;

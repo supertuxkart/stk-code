@@ -240,6 +240,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx", &m_video_group) );
     
+    PARAM_PREFIX BoolUserConfigParam        m_show_steering_animations
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "steering_animations", &m_video_group, "Display steering animations in race") );
+
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps

@@ -98,10 +98,23 @@ KartModel::~KartModel()
  */
 void KartModel::attachModel(scene::ISceneNode **node)
 {
-    *node = irr_driver->addAnimatedMesh(m_mesh);
-    m_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
-    m_node->setAnimationSpeed(1500);
-    m_node->setLoopMode(false);
+    if(UserConfigParams::m_show_steering_animations)
+    {
+        *node = irr_driver->addAnimatedMesh(m_mesh);
+        m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
+        m_animated_node->setAnimationSpeed(1500);
+        m_animated_node->setLoopMode(false);
+    }
+    else
+    {
+        // If no animations are shown, make sure to pick the frame
+        // with a straight ahead animation (if exist).
+        int straight_frame = m_animation_frame[AF_STRAIGHT]>=0 
+                           ? m_animation_frame[AF_STRAIGHT]
+                           : 0;
+        *node = irr_driver->addMesh(m_mesh->getMesh(straight_frame));
+    }
+
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
@@ -117,6 +130,8 @@ void KartModel::loadModels(const KartProperties &kart_properties)
 {
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
+    if(!UserConfigParams::m_show_steering_animations)
+        m_mesh->setHardwareMappingHint(scene::EHM_STATIC);
     Vec3 min, max;
     if(!m_mesh)
     {
@@ -235,21 +250,23 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
  */
 void KartModel::setAnimation(AnimationFrameType type)
 {
+    if(!UserConfigParams::m_show_steering_animations) return;
+
     m_current_animation = type;
     if(!m_current_animation==AF_DEFAULT)
     {
-        m_node->setLoopMode(false);
-        m_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
+        m_animated_node->setLoopMode(false);
+        m_animated_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
                              m_animation_frame[AF_STRAIGHT] );
     }
 
     if(m_current_animation!=AF_DEFAULT &&  m_animation_frame[type]>-1)
     {
         AnimationFrameType end = (AnimationFrameType)(type+1);
-        m_node->setFrameLoop(m_animation_frame[type], 
+        m_animated_node->setFrameLoop(m_animation_frame[type], 
                              m_animation_frame[end]    );
-        m_node->setLoopMode(true);
-        m_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setLoopMode(true);
+        m_animated_node->setAnimationSpeed(m_animation_speed);
     }
 }   // setEndAnimation
 
@@ -303,6 +320,8 @@ void KartModel::update(float rotation, float visual_steer,
 
     if(m_animation_frame[AF_LEFT]<0) return;   // no animations defined
 
+    if(!UserConfigParams::m_show_steering_animations) return;
+
     // Update animation if necessary
     // -----------------------------
     // FIXME: this implementation is currently very simple, it will always
@@ -321,19 +340,19 @@ void KartModel::update(float rotation, float visual_steer,
     // No changes to current frame loop
     if(end==last_end) return;
 
-    int begin = (int)m_node->getFrameNr();
+    int begin = (int)m_animated_node->getFrameNr();
     last_end = end;
     // Handle reverse animation, which are done by setting
     // the animation speed to a negative number.
     if(begin<end)
     {
-        m_node->setFrameLoop(begin, end);
-        m_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(begin, end);
+        m_animated_node->setAnimationSpeed(m_animation_speed);
     }
     else
     {
-        m_node->setFrameLoop(begin, end);
-        m_node->setAnimationSpeed(-m_animation_speed);
+        m_animated_node->setFrameLoop(begin, end);
+        m_animated_node->setAnimationSpeed(-m_animation_speed);
     }
 }   // update
 
