@@ -22,6 +22,7 @@
 #include "utils/ptr_vector.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/skin.hpp"
+#include "input/input_manager.hpp"
 
 class PlayerProfile;
 
@@ -47,6 +48,8 @@ namespace GUIEngine
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
         
+        InputManager::InputDriverMode m_previous_mode;
+    
         /**
          * Creates a modal dialog with given percentage of screen width and height
          */

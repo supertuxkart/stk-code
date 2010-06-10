@@ -87,6 +87,7 @@ public:
     
     void   setMode(InputDriverMode);        
     bool   isInMode(InputDriverMode);
+    InputDriverMode getMode() { return m_mode; } 
     
     /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
     void   setMasterPlayerOnly(bool enabled);

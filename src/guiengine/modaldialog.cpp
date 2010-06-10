@@ -19,6 +19,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widget.hpp"
+#include "input/input_manager.hpp"
 
 using namespace irr;
 
@@ -64,6 +65,9 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
+    
+    m_previous_mode=input_manager->getMode();
+    input_manager->setMode(InputManager::MENU);
 }
 
 ModalDialog::~ModalDialog()
@@ -82,6 +86,8 @@ ModalDialog::~ModalDialog()
     // restore previous pointer state
     if (pointer_was_shown)  irr_driver->showPointer();
     else                    irr_driver->hidePointer();
+
+    input_manager->setMode(m_previous_mode);
 }
 
 void ModalDialog::clearWindow()
