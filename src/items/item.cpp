@@ -42,6 +42,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                         : -1 ;
     m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
+    m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
