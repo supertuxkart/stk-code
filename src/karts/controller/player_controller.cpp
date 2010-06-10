@@ -393,7 +393,7 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
         switch(item.getType())
         {
         case Item::ITEM_BANANA:
-            //m_ugh_sound->play();
+            m_ugh_sound->play();
             break;
         case Item::ITEM_BUBBLEGUM:
             //The skid sound is played by the kart class. Do nothing here.
