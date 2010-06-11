@@ -140,6 +140,7 @@ private:
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
     float       m_wheel_base;          /**< Wheel base of the kart.          */
     float       m_nitro_power_boost;   /**< Nitro power boost.               */
+    float       m_nitro_consumption;   /**< Nitro consumption.               */
     std::string m_engine_sfx_type;     /**< Engine sound effect.             */
 
     // bullet physics data
@@ -305,6 +306,9 @@ public:
 
     /** Returns the nitro power boost. */
     float getNitroPowerBoost        () const {return m_nitro_power_boost;        }
+
+    /** Returns the nitro consumption. */
+    float getNitroConsumption       () const {return m_nitro_consumption;        }
 
     /** Returns a shift of the center of mass (lowering the center of mass 
      *  makes the karts more stable. */

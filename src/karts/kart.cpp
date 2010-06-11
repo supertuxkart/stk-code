@@ -818,7 +818,7 @@ void Kart::handleZipper()
 float Kart::handleNitro(float dt)
 {
     if(!m_controls.m_nitro) return 0.0;
-    m_collected_energy -= dt;
+    m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
     if(m_collected_energy<0)
     {
         m_collected_energy = 0;

@@ -108,8 +108,10 @@
          necessary. -->
     <rescue vert-offset="0.0" time="2" height="2"/>
 
-    <!-- Nitro: power-boost is the increase in engine power, i.e. 1=plus 100% -->
-    <nitro power-boost="3"/>
+    <!-- Nitro: power-boost: increase in engine power, i.e. 1=plus 100%
+         consumption: nitro consumption - heavier characters can be set
+         to need more nitro than lighter character. -->
+    <nitro power-boost="3" consumption="1"/>
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.
