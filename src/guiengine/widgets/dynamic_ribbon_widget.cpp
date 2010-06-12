@@ -368,6 +368,7 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
 void DynamicRibbonWidget::clearItems()
 {
     m_items.clear();
+    m_animated_contents = false;
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
