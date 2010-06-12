@@ -78,9 +78,13 @@ void Highscores::readEntry(const XMLNode &node)
     for(unsigned int i=0; i<node.getNumNodes(); i++) 
     {
         const XMLNode *entry = node.getNode(i);
-        entry->get("time",      &m_time[i]            );
-        entry->get("name",      &m_name[i]            );
-        entry->get("kart-name", &m_kart_name[i]       );
+        entry->get("time",     &m_time[i]            );
+        entry->get("name",     &m_name[i]            );
+        entry->get("kartname", &m_kart_name[i]       );
+        
+        // a non-empty entry needs a non-empty kart name.
+        assert(m_time[i] <= 0.0f || m_kart_name[i].size() > 0);
+        assert(m_time[i] <= 0.0f || m_name[i].size() > 0);
     }
 }   // readEntry
 
