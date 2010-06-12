@@ -107,10 +107,14 @@ void Highscores::writeEntry(std::ofstream &writer)
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
-        writer << "             <entry time    =\""<<m_time[i]<<"\"\n";
-        writer << "                    name    =\""<<m_name[i]<<"\"\n";
-        writer << "                    kartname=\""<<m_kart_name[i]
-               << "\"/>\n";
+        if (m_time[i] > 0.0f)
+        {
+            assert(m_kart_name[i].size() > 0);
+            writer << "             <entry time    =\""<<m_time[i]<<"\"\n";
+            writer << "                    name    =\""<<m_name[i]<<"\"\n";
+            writer << "                    kartname=\""<<m_kart_name[i]
+                   << "\"/>\n";
+        }
     }   // for i
     writer << "  </highscore>\n";
 }   // writeEntry
@@ -151,6 +155,8 @@ int Highscores::addData(const std::string& kart_name,
         {
             for(int j=HIGHSCORE_LEN-2;j>=i;j--)
             {
+                assert(m_kart_name[j].size() > 0);
+                assert(m_time[j] > 0);
                 m_name[j+1]      = m_name[j];
                 m_kart_name[j+1] = m_kart_name[j];
                 m_time[j+1]      = m_time[j];
