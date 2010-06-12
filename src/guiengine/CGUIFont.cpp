@@ -467,7 +467,7 @@ s32 ScalableFont::getAreaFromCharacter(const wchar_t c, bool* fallback_font) con
     }
 	else
     {
-        std::cout << "The font does not have this character : <" << (int)c << L">" << std::endl;
+        //std::cout << "The font does not have this character : <" << (int)c << ">" << std::endl;
         if (fallback_font != NULL) *fallback_font = false;
 		return WrongCharacter;
     }
