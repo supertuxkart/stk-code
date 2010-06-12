@@ -61,14 +61,8 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
                                                                m_irrlicht_window);
     a->setTabStop(false);
 
-    // ---- High Scores
     const int hscores_y_from = y1;
     const int hscores_y_to = y1 + (y2 - y1)*2/3;
-    if (has_highscores)
-    {
-        addHighScoreWidgets(hscores_y_from, hscores_y_to);
-        updateHighScores();
-    }
     
     // ---- Track credits
     Track* track = track_manager->getTrack(trackIdent);
@@ -152,6 +146,16 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     okBtn->add();
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);
+    
+    // ---- High Scores
+    if (has_highscores)
+    {
+        addHighScoreWidgets(hscores_y_from, hscores_y_to);
+        const int num_laps = m_spinner->getValue();
+        race_manager->setNumLaps(num_laps);
+        updateHighScores();
+    }
+    
     
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
