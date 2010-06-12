@@ -76,6 +76,8 @@ Track::Track(std::string filename)
     m_animation_manager    = NULL;
     m_check_manager        = NULL;
     m_start_angle          = 0;
+    m_sky_dx               = 0.05f;
+    m_sky_dy               = 0.0f;
     m_start_transform.setIdentity();
     loadTrackInfo();
 }   // Track
@@ -797,7 +799,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                m_animated_textures.push_back(new MovingTexture(m, 0.05f, 0.0f));
+                m_animated_textures.push_back(new MovingTexture(m, m_sky_dx, m_sky_dy));
             }   // for j<MATERIAL_MAX_TEXTURES
         }   // for i<getMaterialCount
 
@@ -886,6 +888,8 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         xml_node.get("horizontal",      &m_sky_hori_segments  );
         xml_node.get("sphere-percent",  &m_sky_sphere_percent );
         xml_node.get("texture-percent", &m_sky_texture_percent);
+        xml_node.get("speed-x", &m_sky_dx );
+        xml_node.get("speed-y", &m_sky_dy);
 
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")

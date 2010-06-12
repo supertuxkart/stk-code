@@ -112,6 +112,9 @@ private:
     enum {SKY_NONE, SKY_BOX, 
           SKY_DOME, SKY_COLOR}          m_sky_type;
 
+    /** sky rotation speed */
+    float m_sky_dx, m_sky_dy;
+    
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
     std::vector<std::string> m_sky_textures;
