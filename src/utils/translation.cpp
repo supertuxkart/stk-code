@@ -40,7 +40,7 @@
 #include "utils/constants.hpp"
 
 #if ENABLE_BIDI
-#include <fribidi.h>
+#include <fribidi/fribidi.h>
 #endif
 
 // set to 1 to debug i18n

@@ -318,6 +318,36 @@ fi
 
 LIBS=$save_LIBS
 
+# ==================
+# Check for Fribidi
+# ==================
+
+save_LIBS=$LIBS
+
+# also check in /usr/local
+CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+LDFLAGS="$LDFLAGS -L/usr/local/lib"
+
+# search for the libraries needed to use ogg vorbis
+AC_SEARCH_LIBS(fribidi_log2vis, [fribidi], have_fribidi=yes, have_fribidi=no)
+
+if test x$have_fribidi = xyes; then       
+    AC_CHECK_HEADER(fribidi/fribidi.h, have_fribidi_hdr=yes)
+fi
+SUMMARY="$SUMMARY\n"
+
+if test x$have_fribidi = xyes -a x$have_fribidi_hdr = xyes; then
+    AC_DEFINE([ENABLE_BIDI], 1, [Defined when Fribidi is available])
+    SUMMARY="$SUMMARY\nFribidi (RTL languages support) support enabled."
+    fribidi_LIBS="$LIBS"
+else
+    SUMMARY="$SUMMARY\nFribidi (RTL languages support) support disabled."
+    fribidi_LIBS=""
+fi
+
+LIBS=$save_LIBS
+
+
 # ======================================================
 # Try to supply the SVN revision number for the compiler
 # ======================================================
@@ -374,6 +404,7 @@ CHECK_GETTEXT(external)
 # subst bars in Makefile.am
 # =========================
 AC_SUBST(irrlicht_LIBS)
+AC_SUBST(fribidi_LIBS)
 AC_SUBST(bullet_LIBS)
 AC_SUBST(enet_LIBS)
 AC_SUBST(opengl_LIBS)
