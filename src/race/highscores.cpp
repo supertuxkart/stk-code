@@ -83,8 +83,14 @@ void Highscores::readEntry(const XMLNode &node)
         entry->get("kartname", &m_kart_name[i]       );
         
         // a non-empty entry needs a non-empty kart name.
-        assert(m_time[i] <= 0.0f || m_kart_name[i].size() > 0);
-        assert(m_time[i] <= 0.0f || m_name[i].size() > 0);
+        if (!(m_time[i] <= 0.0f || m_kart_name[i].size() > 0))
+        {
+            throw std::logic_error("Invalid highscore entry : empty kart name");
+        }
+        if (!(m_time[i] <= 0.0f || m_name[i].size() > 0))
+        {
+            throw std::logic_error("Invalid highscore entry : empty kart name");
+        }
     }
 }   // readEntry
 

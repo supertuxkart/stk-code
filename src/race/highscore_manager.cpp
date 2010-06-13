@@ -106,7 +106,16 @@ void HighscoreManager::loadHighscores()
         for(unsigned int i=0; i<root->getNumNodes(); i++)
         {
             const XMLNode *node = root->getNode(i);
-            Highscores *highscores = new Highscores(*node);
+            Highscores *highscores;
+            try
+            {
+                highscores = new Highscores(*node);
+            }
+            catch (std::logic_error& e)
+            {
+                fprintf(stderr, "Invalid highscore entry will be skipped : %s\n", e.what());
+                continue;
+            }
             m_all_scores.push_back(highscores);
         }   // next entry
         
