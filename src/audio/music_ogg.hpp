@@ -77,6 +77,8 @@ private:
     vorbis_info*    m_vorbisInfo;
     bool            m_error;
 
+    bool            m_playing;
+    
     ALuint m_soundBuffers[2];
     ALuint m_soundSource;
     ALenum nb_channels;

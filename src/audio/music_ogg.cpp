@@ -36,8 +36,9 @@ MusicOggStream::MusicOggStream()
 {
     //m_oggStream= NULL;
     m_soundBuffers[0] = m_soundBuffers[1]= 0;
-    m_soundSource= -1;
-    m_pausedMusic= true;
+    m_soundSource     = -1;
+    m_pausedMusic     = true;
+    m_playing         = false;
 }   // MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -136,6 +137,7 @@ bool MusicOggStream::release()
     if(!m_error) ov_clear(&m_oggStream);
 
     m_soundSource = -1;
+    m_playing = false;
     
     return true;
 }   // release
@@ -155,7 +157,8 @@ bool MusicOggStream::playMusic()
     alSourceQueueBuffers(m_soundSource, 2, m_soundBuffers);
 
     alSourcePlay(m_soundSource);
-    m_pausedMusic= false;
+    m_pausedMusic = false;
+    m_playing = true;
 
     return true;
 }   // playMusic
@@ -163,23 +166,29 @@ bool MusicOggStream::playMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::isPlaying()
 {
+    return m_playing;
+    
+    /*
     if (m_soundSource == -1) return false;
     
     ALenum state;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
 
     return (state == AL_PLAYING);
+     */
 }   // isPlaying
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::stopMusic()
 {
+    m_playing = false;
     return (release());
 }   // stopMusic
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::pauseMusic()
 {
+    m_playing = false;
     if (m_fileName == "")
     {
         // nothing is loaded
@@ -194,6 +203,8 @@ bool MusicOggStream::pauseMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::resumeMusic()
 {
+    m_playing = true;
+    
     if (m_fileName == "")
     {
         // nothing is loaded
