@@ -159,8 +159,6 @@ int Highscores::addData(const std::string& kart_name,
         {
             for(int j=HIGHSCORE_LEN-2;j>=i;j--)
             {
-                assert(m_kart_name[j].size() > 0);
-                assert(m_time[j] > 0);
                 m_name[j+1]      = m_name[j];
                 m_kart_name[j+1] = m_kart_name[j];
                 m_time[j+1]      = m_time[j];
