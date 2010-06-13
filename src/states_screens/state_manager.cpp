@@ -198,7 +198,11 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
         
         if (newState == MENU)
         {
-            music_manager->startMusic(stk_config->m_title_music);
+            Screen* screen = GUIEngine::getCurrentScreen();
+            if (screen != NULL)
+            {
+                music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+            }
         }
         else if (newState == INGAME_MENU)
         {
@@ -207,6 +211,13 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
                 World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
         }
     }    
+}
+
+// ----------------------------------------------------------------------------
+
+void StateManager::onTopMostScreenChanged()
+{
+    music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
 }
 
 // ----------------------------------------------------------------------------

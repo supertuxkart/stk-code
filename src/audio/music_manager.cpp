@@ -134,8 +134,11 @@ void MusicManager::addMusicToTracks()
 //-----------------------------------------------------------------------------
 void MusicManager::startMusic(MusicInformation* mi)
 {
+    // If this music is already playing, ignore this call.
+    if (m_current_music != NULL && m_current_music == mi && m_current_music->isPlaying()) return;
+    
     // It is possible here that startMusic() will be called without first calling stopMusic().
-    // This would cause a memory leak by overwriting m_current_music without first releasing it's resources. 
+    // This would cause a memory leak by overwriting m_current_music without first releasing its resources. 
     // Guard against this here by making sure that stopMusic() is called before starting new music.
     stopMusic();
     m_current_music = mi;

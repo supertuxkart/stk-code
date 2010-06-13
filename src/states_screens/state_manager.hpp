@@ -141,6 +141,9 @@ public:
     /** \brief implementing callback from base class AbstractStateManager */
     virtual void onStackEmptied();
     
+    /** \brief implementing callback from base class AbstractStateManager */
+    virtual void onTopMostScreenChanged();
+    
     // singleton
     static StateManager* get();
     

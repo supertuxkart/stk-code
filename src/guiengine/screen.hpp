@@ -25,6 +25,7 @@
 
 #include "irrlicht.h"
 
+#include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
@@ -267,7 +268,7 @@ namespace GUIEngine
           */
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
         
-        
+        virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
     };
     
 }

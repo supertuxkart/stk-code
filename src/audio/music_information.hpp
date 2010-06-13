@@ -82,5 +82,6 @@ public:
     void               resumeMusic      ();
     void               volumeMusic      (float gain);
     void               switchToFastMusic();
+    bool               isPlaying() const;
 };   // MusicInformation
 #endif

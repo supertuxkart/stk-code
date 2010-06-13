@@ -60,7 +60,8 @@ public:
     virtual bool pauseMusic();
     virtual bool resumeMusic();
     virtual void volumeMusic (float gain);
-
+    virtual bool isPlaying();
+    
 protected:
     bool empty();
     bool check(const char* what);
@@ -68,7 +69,6 @@ protected:
 
 private:
     bool release();
-    bool isPlaying();
     bool streamIntoBuffer(ALuint buffer);
 
     std::string     m_fileName;

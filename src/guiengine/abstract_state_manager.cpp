@@ -98,7 +98,10 @@ void AbstractStateManager::pushMenu(std::string name)
         setGameState(MENU);
     }
     switchToScreen(name.c_str());
+    
+    onTopMostScreenChanged();
 }
+
 
 // -----------------------------------------------------------------------------
 
@@ -107,6 +110,8 @@ void AbstractStateManager::pushScreen(Screen* screen)
     if (!screen->isLoaded()) screen->loadFromFile();
     pushMenu(screen->getName());
     screen->init();
+    
+    onTopMostScreenChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -128,6 +133,8 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     
     // Send init event to new menu
     getCurrentScreen()->init();
+    
+    onTopMostScreenChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -149,6 +156,8 @@ void AbstractStateManager::reshowTopMostMenu()
     Screen* screen = getCurrentScreen();
     if (!screen->isLoaded()) screen->loadFromFile();
     screen->init();
+    
+    onTopMostScreenChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -183,6 +192,8 @@ void AbstractStateManager::popMenu()
         if (!screen->isLoaded()) screen->loadFromFile();
         screen->init();
     }
+    
+    onTopMostScreenChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -202,6 +213,8 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     
     switchToScreen(name.c_str());
     getCurrentScreen()->init();
+    
+    onTopMostScreenChanged();
 }
 
 // -----------------------------------------------------------------------------
@@ -223,6 +236,8 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     
     switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
     getCurrentScreen()->init();
+    
+    onTopMostScreenChanged();
 }
 
 

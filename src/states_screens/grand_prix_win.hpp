@@ -41,6 +41,8 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     float m_camera_x, m_camera_y, m_camera_z;
     float m_camera_target_x, m_camera_target_z;
     
+    MusicInformation* m_music;
+    
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -61,6 +63,7 @@ public:
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);
 
+    virtual MusicInformation* getMusic() const { return m_music; }
 };
 
 #endif

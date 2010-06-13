@@ -116,6 +116,8 @@ namespace GUIEngine
           */
         virtual void onStackEmptied() = 0;
         
+        virtual void onTopMostScreenChanged() = 0;
+        
     };
     
 }

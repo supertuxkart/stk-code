@@ -39,6 +39,8 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     
     float m_camera_x, m_camera_y, m_camera_z;
     float m_camera_target_x, m_camera_target_z;
+
+    MusicInformation* m_music;
     
 public:
 
@@ -58,6 +60,8 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     void setKart(const std::string ident);
+
+    virtual MusicInformation* getMusic() const { return m_music; }
 
 };
 

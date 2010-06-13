@@ -118,20 +118,12 @@ void MainLoop::run()
 {
     IrrlichtDevice* device = irr_driver->getDevice();
 
-    bool music_on = false;
     m_curr_time = device->getTimer()->getRealTime();
     while(!m_abort)
     {
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
-        if (!music_on && !World::getWorld())
-        {
-            //FIXME: that code can't really work, I don't think "music_on" is updated everytime it should
-            music_manager->stopMusic();   // stop potential 'left over' music from race
-            music_manager->startMusic(stk_config->m_title_music);
-            music_on = true;
-        }
         network_manager->update(dt);
 
         if (World::getWorld())  // race is active if world exists
@@ -140,7 +132,6 @@ void MainLoop::run()
             // till all clients have reached this state.
             if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
             updateRace(dt);
-            music_on = false; 
         }   // if race is active
 
         music_manager->update(dt);

@@ -339,3 +339,10 @@ void MusicInformation::switchToFastMusic()
 }   // switchToFastMusic
 
 //-----------------------------------------------------------------------------
+
+bool MusicInformation::isPlaying() const
+{
+    return (m_normal_music != NULL && m_normal_music->isPlaying()) || (m_fast_music != NULL && m_fast_music->isPlaying());
+}
+
+//-----------------------------------------------------------------------------
