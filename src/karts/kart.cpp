@@ -1244,8 +1244,9 @@ void Kart::updatePhysics(float dt)
         }
         else
         {
-            // When flying, fixed and fast engine noise to make it more scary
-            m_engine_sound->speed(1.4f);
+            // When flying, fixed value but not too high pitch
+            // This gives some variation (vs previous "on wheels" one)
+            m_engine_sound->speed(0.9f);
         }
         m_engine_sound->position(getXYZ());
     }
