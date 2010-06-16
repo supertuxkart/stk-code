@@ -185,8 +185,7 @@ private:
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                      bool drop);
     void loadQuadGraph(unsigned int mode_id);
-    void convertTrackToBullet(const scene::IMesh *mesh,
-                              const scene::ISceneNode*node);
+    void convertTrackToBullet(const scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void createWater(const XMLNode &node);
     void getMusicInformation(std::vector<std::string>&  filenames, 

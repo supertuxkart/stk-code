@@ -47,6 +47,8 @@ supertuxkart_SOURCES = \
  config/user_config.hpp \
  config/device_config.cpp \
  config/device_config.hpp \
+ graphics/CBatchingMesh.cpp \
+ graphics/CBatchingMesh.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
  graphics/explosion.cpp \

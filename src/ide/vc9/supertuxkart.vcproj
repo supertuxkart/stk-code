@@ -538,6 +538,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\CBatchingMesh.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\explosion.cpp"
 					>
 				</File>
@@ -1377,6 +1381,10 @@
 				>
 				<File
 					RelativePath="..\..\graphics\camera.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\CBatchingMesh.h"
 					>
 				</File>
 				<File

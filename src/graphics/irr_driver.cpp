@@ -368,7 +368,7 @@ void IrrDriver::cancelResChange()
 void IrrDriver::printRenderStats()
 {
     io::IAttributes * attr = m_scene_manager->getParameters();
-    printf("[%ls], FPS:%03d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
+    printf("[%ls], FPS:%3d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
 	   m_video_driver->getName(),
 	   m_video_driver->getFPS (),
 	   (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
@@ -451,7 +451,7 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
 /** Adds a mesh that will be optimised using an oct tree.
  *  \param mesh Mesh to add.
  */
-scene::ISceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
+scene::IMeshSceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 {
     return m_scene_manager->addOctreeSceneNode(mesh);
 }   // addOctTree
@@ -860,8 +860,12 @@ void IrrDriver::update(float dt)
     }   // just to mark the begin/end scene block
     m_device->getVideoDriver()->endScene();
     // Enable this next print statement to get render information printed
-    // E.g. number of triangles rendered, culled etc.
-    //printRenderStats();
+    // E.g. number of triangles rendered, culled etc. The stats is only
+    // printed while the race is running and not while the in-game menu
+    // is shown. This way the output can be studied by just opening the
+    // menu.
+    //if(World::getWorld() && World::getWorld()->isRacePhase()) 
+    //    printRenderStats();
 }   // update
 
 // ----------------------------------------------------------------------------

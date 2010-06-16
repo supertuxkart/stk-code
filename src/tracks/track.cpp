@@ -31,6 +31,7 @@ using namespace irr;
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/CBatchingMesh.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -129,6 +130,9 @@ void Track::cleanup()
     }
     m_all_nodes.clear();
 
+    // The meshes stored in the scene nodes are dropped now.
+    // But to really remove all track meshes from memory
+    // they have to be removed from the cache.
     for(unsigned int i=0; i<m_all_meshes.size(); i++)
     {
         irr_driver->removeMesh(m_all_meshes[i]);
@@ -388,9 +392,9 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     }
 
     m_track_mesh->removeBody();
-    for(unsigned int i=main_track_count; i<m_all_meshes.size(); i++)
+    for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
-        convertTrackToBullet(m_all_meshes[i], m_all_nodes[i]);
+        convertTrackToBullet(m_all_nodes[i]);
     }
     m_track_mesh->createBody();
     m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
@@ -402,11 +406,31 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
  */
-void Track::convertTrackToBullet(const scene::IMesh *mesh,
-                                 const scene::ISceneNode *node)
+void Track::convertTrackToBullet(const scene::ISceneNode *node)
 {
     const core::vector3df &pos = node->getPosition();
     const core::vector3df &hpr = node->getRotation();
+    scene::IMesh *mesh;
+    switch(node->getType())
+    {
+        case scene::ESNT_MESH          :
+        case scene::ESNT_WATER_SURFACE :
+        case scene::ESNT_OCTREE        : 
+             mesh = ((scene::IMeshSceneNode*)node)->getMesh();
+             break;
+        case scene::ESNT_ANIMATED_MESH :
+             mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
+             break;
+        case scene::ESNT_SKY_BOX :
+        case scene::ESNT_SKY_DOME:
+            // Don't add sky box/dome to the physics model.
+            return;
+            break;
+        default:
+            printf("Unknown scene node type.\n");
+            return;
+    }   // switch node->getType()
+
     core::matrix4 mat;
     mat.setRotationDegrees(hpr);
     mat.setTranslation(pos);
@@ -451,6 +475,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
+
 // ----------------------------------------------------------------------------
 /** Loads the main track model (i.e. all other objects contained in the
  *  scene might use raycast on this track model to determine the actual
@@ -462,18 +487,36 @@ bool Track::loadMainTrack(const XMLNode &root)
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+"/"+model_name;
-    scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+//    scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+    scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if(!mesh)
     {
         fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
                 track_node->getName().c_str(), model_name.c_str());
         exit(-1);
     }
-    
-    m_all_meshes.push_back(mesh);
-    //scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
-    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
-    mesh->setHardwareMappingHint(scene::EHM_STATIC);
+
+    // The mesh as returned does not have all mesh buffers with the same
+    // texture combined. This can result in a _HUGE_ overhead. E.g. instead
+    // of 46 different mesh buffers over 500 (for some tracks even >1000)
+    // were created. This means less effect from hardware support, less
+    // vertices per opengl operation, more overhead on CPU, ...
+    // So till we have a better b3d exporter which can combine the different
+    // meshes which use the same texture when exporting, the meshes are
+    // combined using CBatchingMesh.
+    scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
+    merged_mesh->addMesh(mesh);
+    merged_mesh->finalize();
+    // FIXME: LEAK: What happens to this mesh? If it is dropped here,
+    // something breaks in the Batching mesh (and the conversion to
+    // bullet crashes), but atm this mesh is not freed.
+    //mesh->drop();
+
+    m_all_meshes.push_back(merged_mesh);
+    //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
+    scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    //merged_mesh->setHardwareMappingHint(scene::EHM_STATIC);
+
     core::vector3df xyz(0,0,0);
     track_node->getXYZ(&xyz);
     core::vector3df hpr(0,0,0);
@@ -483,7 +526,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     handleAnimatedTextures(scene_node, *track_node);
     m_all_nodes.push_back(scene_node);
 
-    MeshTools::minMax3D(mesh, &m_aabb_min, &m_aabb_max);
+    MeshTools::minMax3D(merged_mesh, &m_aabb_min, &m_aabb_max);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
@@ -522,9 +565,9 @@ bool Track::loadMainTrack(const XMLNode &root)
     }   // for i
 
     // This will (at this stage) only convert the main track model.
-    for(unsigned int i=0; i<m_all_meshes.size(); i++)
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        convertTrackToBullet(m_all_meshes[i], m_all_nodes[i]);
+        convertTrackToBullet(m_all_nodes[i]);
     }
     if (m_track_mesh == NULL)
     {
@@ -640,6 +683,7 @@ void Track::createWater(const XMLNode &node)
                 node.getName().c_str(), model_name.c_str());
         return;
     }
+    mesh->grab();
     m_all_meshes.push_back(mesh);
     core::vector3df xyz(0,0,0);
     node.getXYZ(&xyz);
@@ -697,7 +741,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         throw std::runtime_error(msg.str());
     }
     loadMainTrack(*root);
-    unsigned int main_track_count = m_all_meshes.size();
+    unsigned int main_track_count = m_all_nodes.size();
 
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -871,7 +915,15 @@ void Track::adjustForFog(scene::ISceneNode *node)
 {
     node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
 }   // adjustForFog
+
 //-----------------------------------------------------------------------------
+/** Handles a sky-dome or sky-box. It takes the xml node with the 
+ *  corresponding data for the sky and stores the corresponding data in
+ *  the corresponding data structures.
+ *  \param xml_node XML node with the sky data.
+ *  \param filename Name of the file which is read, only used to print
+ *         meaningful error messages.
+ */
 void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 {
     if(xml_node.getName()=="sky-dome")

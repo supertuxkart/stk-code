@@ -110,7 +110,7 @@ public:
     scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h);
     scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
                                        float wave_speed, float wave_length);
-    scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
+    scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent=NULL);
 
