@@ -24,6 +24,7 @@
 		9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F1EB107961560067ECF5 /* options_screen_input.cpp */; };
 		9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F1ED107961560067ECF5 /* options_screen_players.cpp */; };
 		9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */; };
+		9525B71411C851D30094BD96 /* CBatchingMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9525B71211C851D30094BD96 /* CBatchingMesh.cpp */; };
 		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
 		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
 		95263DEE0FD7471900CF5F92 /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE40FD7471900CF5F92 /* highscore_manager.cpp */; };
@@ -341,6 +342,8 @@
 		9522F1EE107961560067ECF5 /* options_screen_input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_input.hpp; path = ../../states_screens/options_screen_input.hpp; sourceTree = SOURCE_ROOT; };
 		9524739410497C75000C197E /* dynamic_ribbon_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dynamic_ribbon_widget.hpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.hpp; sourceTree = SOURCE_ROOT; };
 		9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_ribbon_widget.cpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.cpp; sourceTree = SOURCE_ROOT; };
+		9525B71211C851D30094BD96 /* CBatchingMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBatchingMesh.cpp; path = ../../graphics/CBatchingMesh.cpp; sourceTree = SOURCE_ROOT; };
+		9525B71311C851D30094BD96 /* CBatchingMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CBatchingMesh.hpp; path = ../../graphics/CBatchingMesh.hpp; sourceTree = SOURCE_ROOT; };
 		95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = ../../race/grand_prix_data.cpp; sourceTree = SOURCE_ROOT; };
 		95263DE10FD7471900CF5F92 /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../race/grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
 		95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../race/grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -1159,6 +1162,8 @@
 		952A152C103F66D600B1895D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				9525B71211C851D30094BD96 /* CBatchingMesh.cpp */,
+				9525B71311C851D30094BD96 /* CBatchingMesh.hpp */,
 				952A152D103F66D600B1895D /* camera.cpp */,
 				952A152E103F66D600B1895D /* camera.hpp */,
 				952A152F103F66D600B1895D /* explosion.cpp */,
@@ -2559,6 +2564,7 @@
 				9556A881119EF976009C558F /* options_screen_video.cpp in Sources */,
 				9586318411B1EC9F00B8B4AF /* grand_prix_lose.cpp in Sources */,
 				9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */,
+				9525B71411C851D30094BD96 /* CBatchingMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
