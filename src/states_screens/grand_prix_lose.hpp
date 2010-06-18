@@ -20,7 +20,7 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     float m_sky_angle;
     
     /** Global evolution of time */
-    double m_global_time;
+    float m_global_time;
     
     irr::scene::IMeshSceneNode* m_garage;
 
