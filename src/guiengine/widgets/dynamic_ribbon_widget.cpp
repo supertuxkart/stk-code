@@ -30,8 +30,6 @@ using namespace irr::gui;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
-const char* DynamicRibbonWidget::NO_ITEM_ID = "?";
-
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {
     m_scroll_offset        = 0;
@@ -696,9 +694,9 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
             return;
         }
     }
-    
-    if (selection_id == NO_ITEM_ID) m_label->setText( L"" );
-    else                            m_label->setText( L"Unknown Item" );
+
+    if (selection_id == RibbonWidget::NO_ITEM_ID) m_label->setText( L"" );
+    else                                          m_label->setText( L"Unknown Item" );
 }
 
 // -----------------------------------------------------------------------------
@@ -823,7 +821,7 @@ void DynamicRibbonWidget::updateItemDisplay()
             else
             {
                 icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
-                icon->m_properties[PROP_ID] = NO_ITEM_ID;
+                icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
                 //std::cout << "    item " << i << " is a FILLER\n";
             }
         } // next column

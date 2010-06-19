@@ -19,7 +19,6 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp" //FIXME: needs to be removed
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -28,6 +27,7 @@
 
 #include <cmath>
 
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -35,6 +35,9 @@ using namespace irr::gui;
 #ifndef round
 #  define round(x)  (floor(x+0.5f))
 #endif
+
+const char* RibbonWidget::NO_ITEM_ID = "?";
+
 
 // -----------------------------------------------------------------------------
 
@@ -331,7 +334,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     
     // if we reached a filler item, move again (but don't warp)
     // FIXME: why is a constant from DynamicRibbon used here??
-    if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
+    if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID) 
     {
         if (m_selection[playerID] + 1 < m_children.size())
         {
@@ -375,7 +378,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     }
     
     // if we reached a filler item, move again (but don't warp)
-    if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
+    if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID) 
     {
         if (m_selection[playerID] > 0) leftPressed(playerID);
     }

@@ -125,7 +125,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 unlock_manager->playLockSound();
             }
-            else if (selection == DynamicRibbonWidget::NO_ITEM_ID)
+            else if (selection == RibbonWidget::NO_ITEM_ID)
             {
             }
             else

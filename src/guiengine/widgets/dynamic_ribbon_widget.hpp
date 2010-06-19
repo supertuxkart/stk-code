@@ -162,11 +162,7 @@ namespace GUIEngine
         
 
     public:
-        
-        /** Internal identifier of filler items that aer added in a grid ribbon widget to fill
-          * lines when the number of items cannot be divided by the number of rows in the grid
-          */
-        static const char* NO_ITEM_ID;
+    
         
         /**
           * \param combo     Whether this is a "combo" ribbon, i.e. whether there is always one selected item.

@@ -1441,7 +1441,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         unlock_manager->playLockSound();
     }
-    else if (selected_kart_group != DynamicRibbonWidget::NO_ITEM_ID)
+    else if (selected_kart_group != RibbonWidget::NO_ITEM_ID)
     {        
         std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
         const int kart_amount = group.size();

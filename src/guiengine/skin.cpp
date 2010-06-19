@@ -807,7 +807,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                 if (!always_show_selection && !show_focus) return;
                 
                 // don't mark filler items as focused
-                if (widget->m_properties[PROP_ID] == DynamicRibbonWidget::NO_ITEM_ID) return;
+                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID) return;
                 
                 //const int texture_w = m_tex_squarefocus->getSize().Width;
                 //const int texture_h = m_tex_squarefocus->getSize().Height;

@@ -81,6 +81,13 @@ namespace GUIEngine
         
     public:
         
+        /** 
+         * Internal identifier of filler items that are added in a ribbon widget to fill
+         * lines when the number of items cannot be divided by the number of rows in the grid
+         * (mostly used by dynamic ribbon widgets, but the base ribbon needs to know about filler items)
+         */
+        static const char* NO_ITEM_ID;
+        
         /** Contains which element within the ribbon is currently focused by player 0 (used by the skin to
             show mouse hovers over items that are not selected). Only used for COMBO ribbons. */
         Widget* m_mouse_focus;
