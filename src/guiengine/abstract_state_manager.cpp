@@ -201,9 +201,6 @@ void AbstractStateManager::popMenu()
 void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
     std::string name = screen->getName();
-
-    //FIXME: this doesn't go in the *abstract* state manager
-    //assert(World::getWorld()==NULL);
     
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
