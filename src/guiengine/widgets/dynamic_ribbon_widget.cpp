@@ -96,7 +96,6 @@ void DynamicRibbonWidget::add()
     }
     
     // ---- add arrow buttons on each side
-    // FIXME? these arrow buttons are outside of the widget's boundaries
     if (m_left_widget != NULL)
     {
         m_left_widget->elementRemoved();
