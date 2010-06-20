@@ -77,17 +77,17 @@ private:
     {
     private:
     public:
-        ALuint   m_sfx_buffer;
-        bool     m_sfx_positional;
-        float    m_sfx_rolloff;
-        float    m_sfx_gain;
+        ALuint   m_buffer;
+        bool     m_positional;
+        float    m_rolloff;
+        float    m_gain;
         
         SFXBufferInfo()
         {
-            m_sfx_buffer = 0;
-            m_sfx_gain = 1.0f;
-            m_sfx_rolloff = 0.1f;
-            m_sfx_positional = false;
+            m_buffer     = 0;
+            m_gain       = 1.0f;
+            m_rolloff    = 0.1f;
+            m_positional = false;
         }
 
         
@@ -95,8 +95,8 @@ private:
           * and the OpenAL source must not be deleted on a copy */
         void freeBuffer()
         {
-            alDeleteBuffers(1, &m_sfx_buffer);
-            m_sfx_buffer = 0;
+            alDeleteBuffers(1, &m_buffer);
+            m_buffer = 0;
         }
         ~SFXBufferInfo()
         {
@@ -121,27 +121,30 @@ private:
 
     void                      loadSfx();
 
-    void                      loadSingleSfx(const XMLNode* node);
-
+    bool                      loadVorbisBuffer(const std::string &name, 
+                                               ALuint buffer);
 public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    bool                     addSingleSfx(  const char* sfx_name,
-                                            std::string filename,
-                                            bool        positional,
-                                            float       rolloff,
-                                            float       gain);
+    void                     loadSingleSfx(const XMLNode* node,
+                                           const std::string &path=std::string(""));
+    bool                     addSingleSfx(const std::string &sfx_name,
+                                          const std::string &filename,
+                                          bool               positional,
+                                          float              rolloff,
+                                          float              gain);
 
     SFXBase*                 createSoundSource(const SFXBufferInfo& info, 
                                                const bool addToSFXList=true);
-    SFXBase*                 createSoundSource(const char* name, 
+    SFXBase*                 createSoundSource(const std::string &name, 
                                                const bool addToSFXList=true);
     
     void                     deleteSFX(SFXBase *sfx);
+    void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
     void                     resumeAll();
-    
+    bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
     float                    getMasterSFXVolume() const { return m_master_gain; }
     
@@ -149,10 +152,7 @@ public:
     static const std::string getErrorString(int err);
     
     void                     positionListener(const Vec3 &position, const Vec3 &front);
-
-    /** Positional sound is cool, but creating a new object just to play a simple
-        menu sound is not. This function allows for 'quick sounds' in a single call.*/
-    void                     quickSound(const char* soundName);
+    void                     quickSound(const std::string &soundName);
 
 };
 

@@ -98,9 +98,6 @@ Kart::Kart (const std::string& ident, int position,
     // Set position and heading:
     m_reset_transform      = init_transform;
 
-    // Neglecting the roll resistance (which is small for high speeds compared
-    // to the air resistance), maximum speed is reached when the engine
-    // power equals the air resistance force, resulting in this formula:
     m_max_speed               = m_kart_properties->getMaxSpeed();
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
@@ -120,11 +117,12 @@ Kart::Kart (const std::string& ident, int position,
         }
     }*/
 
-    m_engine_sound = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound   = sfx_manager->createSoundSource( "beep"  );
-    m_crash_sound  = sfx_manager->createSoundSource( "crash" );
-    m_goo_sound    = sfx_manager->createSoundSource( "goo"   );
-    m_skid_sound   = sfx_manager->createSoundSource( "skid"  );
+    m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
+    m_beep_sound    = sfx_manager->createSoundSource( "beep"  );
+    m_crash_sound   = sfx_manager->createSoundSource( "crash" );
+    m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
+    m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
+    m_terrain_sound = NULL;
 
     if(!m_engine_sound)
     {
@@ -409,6 +407,12 @@ void Kart::reset()
     m_max_speed_reduction  = 0.0f;
     m_power_reduction      = 1.0f;
     m_slipstream_mode      = SS_NONE;
+    m_last_material        = NULL;
+    if(m_terrain_sound)
+    {
+        m_terrain_sound->stop();
+        sfx_manager->deleteSFX(m_terrain_sound);
+    }
 
     m_controls.m_steer     = 0.0f;
     m_controls.m_accel     = 0.0f;
@@ -734,7 +738,7 @@ void Kart::update(float dt)
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
-    const Material* material=getMaterial();
+    const Material* material=TerrainInfo::getMaterial();
     m_power_reduction = 1.0f;
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
@@ -746,6 +750,28 @@ void Kart::update(float dt)
     }
     else if(material)
     {
+        // Stop a terrain specific sfx if the terrain has changed
+        if(m_last_material!=material)
+        {
+            if(m_terrain_sound) 
+            {
+                m_terrain_sound->stop();
+                sfx_manager->deleteSFX(m_terrain_sound);
+            }
+            const std::string s = material->getSFXName();
+            if(s!="")
+            {
+                m_terrain_sound = sfx_manager->createSoundSource(s);
+                m_terrain_sound->position(getXYZ());
+                m_terrain_sound->play();
+                m_terrain_sound->loop();
+            }
+            else
+                m_terrain_sound = NULL;
+        }
+        if(m_terrain_sound) material->setSFXSpeed(m_terrain_sound, m_speed);
+        m_last_material = material;
+
         // Sometimes the material can be 0. This can happen if a kart is above
         // another kart (e.g. mass collision, or one kart falling on another
         // kart). Bullet does not have any triangle information in this case,

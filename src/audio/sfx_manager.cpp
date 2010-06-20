@@ -142,7 +142,7 @@ void SFXManager::loadSfx()
  *  based on a routine by Peter Mulholland, used with permission (quote : 
  *  "Feel free to use")
  */
-bool loadVorbisBuffer(const char *name, ALuint buffer)
+bool SFXManager::loadVorbisBuffer(const std::string &name, ALuint buffer)
 {
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
 
@@ -158,7 +158,7 @@ bool loadVorbisBuffer(const char *name, ALuint buffer)
         return false;
     }
     
-    file = fopen(name, "rb");
+    file = fopen(name.c_str(), "rb");
     
     if(!file)
     {
@@ -242,48 +242,51 @@ const char *SFXManager::getCustomTagName(int id)
 */
 
 // -----------------------------------------------------------------------------
-/*
-
-addSingleSfx()
-
-    Introduces a mechanism by which one can load sound effects beyond the basic
-    enumerated types.  This will be used when loading custom sound effects for
-    individual karts (character voices) so that we can avoid creating an
-    enumeration for each effect, for each kart.
-
-    \param sfxFile must be an absolute pathname
-    \return        whether loading this sound effect was successful
+/** Introduces a mechanism by which one can load sound effects beyond the basic
+ *  enumerated types.  This will be used when loading custom sound effects for
+ *  individual karts (character voices) so that we can avoid creating an
+ *  enumeration for each effect, for each kart.
+ *  \param sfx_name
+ *  \param sfxFile must be an absolute pathname
+ *  \return        whether loading this sound effect was successful
 
 */
-bool SFXManager::addSingleSfx(const char*    sfx_name,
-                              std::string    sfx_file,
-                              bool           positional,
-                              float          rolloff,
-                              float          gain)
+bool SFXManager::addSingleSfx(const std::string &sfx_name,
+                              const std::string &sfx_file,
+                              bool               positional,
+                              float              rolloff,
+                              float              gain)
 {
-    std::string filename;
-    
-    SFXBufferInfo sfx_info;
-    
 
-    sfx_info.m_sfx_rolloff    = rolloff;
-    sfx_info.m_sfx_positional = positional;
-    sfx_info.m_sfx_gain       = gain;
+    SFXBufferInfo sfx_info;
+    sfx_info.m_rolloff    = rolloff;
+    sfx_info.m_positional = positional;
+    sfx_info.m_gain       = gain;
     
+    if(!m_initialized) 
+    {
+        // Even if not initialised store the (useless) data in the mapping to
+        // avoid later warnings/errors.
+        m_all_sfx_types[sfx_name] = sfx_info;
+        return false;
+    }
+
     if(UserConfigParams::m_verbosity>=5) 
         printf("Loading SFX %s\n", sfx_file.c_str());
     
     alGetError(); // clear errors from previously
     
-    alGenBuffers(1, &sfx_info.m_sfx_buffer);
+    alGenBuffers(1, &sfx_info.m_buffer);
     if (!checkError("generating a buffer"))
     {
         return false;
     }
-    
-    if (!loadVorbisBuffer(sfx_name, sfx_info.m_sfx_buffer))
+
+    assert( alIsBuffer(sfx_info.m_buffer) );
+
+    if (!loadVorbisBuffer(sfx_file, sfx_info.m_buffer))
     {
-        fprintf(stderr, "Could not load sound effect %s\n", sfx_name);
+        fprintf(stderr, "Could not load sound effect %s\n", sfx_file.c_str());
         return false;
     }
     
@@ -293,50 +296,48 @@ bool SFXManager::addSingleSfx(const char*    sfx_name,
 } // addSingleSFX
 
 //----------------------------------------------------------------------------
-
-void SFXManager::loadSingleSfx(const XMLNode* node)
+/** Loads a single sfx from the XML specification.
+ *  \param node The XML node with the data for this sfx.
+ */
+void SFXManager::loadSingleSfx(const XMLNode* node,
+                               const std::string &path)
 {
     std::string filename;
-    std::string sfx_name;
 
-    SFXBufferInfo sfxInfo;
-    
     if (node->get("filename", &filename) == 0)
     {
-        fprintf(stderr, "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
+        fprintf(stderr, 
+                "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
         return;
     }
     
+    std::string sfx_name;
     if (node->get("name", &sfx_name) == 0)
     {
-        fprintf(stderr, "/!\\ The 'name' attribute is mandatory in the SFX XML file!\n");
+        fprintf(stderr, 
+                "/!\\ The 'name' attribute is mandatory in the SFX XML file!\n");
         return;
     }
-    
-    node->get("rolloff",     &sfxInfo.m_sfx_rolloff     );
-    node->get("positional",  &sfxInfo.m_sfx_positional  );
-    node->get("volume",      &sfxInfo.m_sfx_gain        );
-
-    std::string path = file_manager->getSFXFile(filename);
-    if(UserConfigParams::m_verbosity>=5) 
-        printf("Loading SFX %s\n", path.c_str());
-
-    // Only try loading if the sound manager was properly initialised.
-    if(m_initialized)
+    if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
-        alGenBuffers(1, &sfxInfo.m_sfx_buffer);
-        if (!checkError("generating a buffer")) return;
+        fprintf(stderr, 
+                "There is already a sfx named '%s' installed - new one is ignored.\n",
+                sfx_name.c_str());
+        return;
+    }
 
-        assert( alIsBuffer(sfxInfo.m_sfx_buffer) );
+    SFXBufferInfo sfx_info;
+    node->get("rolloff",     &sfx_info.m_rolloff     );
+    node->get("positional",  &sfx_info.m_positional  );
+    node->get("volume",      &sfx_info.m_gain        );
 
-        if (!loadVorbisBuffer(path.c_str(), sfxInfo.m_sfx_buffer))
-        {
-            fprintf(stderr, "Could not load sound effect %s\n", path.c_str());
-            return;
-        }
-    }   // if m_initialized
-    m_all_sfx_types[sfx_name.c_str()] = sfxInfo;
-    
+    // Only use the filename if no full path is specified. This is used
+    // to load terrain specific sfx.
+    const std::string full_path = (path=="") ? file_manager->getSFXFile(filename)
+                                             : path;
+    addSingleSfx(sfx_name, full_path, sfx_info.m_positional, sfx_info.m_rolloff,
+                 sfx_info.m_gain);
+
     /*
     std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.begin();
     for (; i != m_all_sfx_types.end(); i++ )
@@ -362,12 +363,12 @@ SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info,
 
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        positional = info.m_sfx_positional;
+        positional = info.m_positional;
     }
 
-    assert( alIsBuffer(info.m_sfx_buffer) );
+    assert( alIsBuffer(info.m_buffer) );
 
-    SFXBase* sfx = new SFXOpenAL(info.m_sfx_buffer, positional, info.m_sfx_rolloff, info.m_sfx_gain);
+    SFXBase* sfx = new SFXOpenAL(info.m_buffer, positional, info.m_rolloff, info.m_gain);
     
     // debugging
     /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
@@ -380,8 +381,8 @@ SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info,
 }   // createSoundSource
 
 //----------------------------------------------------------------------------
-
-SFXBase* SFXManager::createSoundSource(const char* name, const bool addToSFXList)
+SFXBase* SFXManager::createSoundSource(const std::string &name, 
+                                       const bool addToSFXList)
 {
     std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
@@ -400,6 +401,36 @@ SFXBase* SFXManager::createSoundSource(const char* name, const bool addToSFXList
     
     return createSoundSource( i->second, addToSFXList );
 }  // createSoundSource
+
+//----------------------------------------------------------------------------
+/** Returns true if a sfx with the given name exists.
+ *  \param name The internal name of the sfx (not the name of the ogg file)
+ */
+bool SFXManager::soundExist(const std::string &name)
+{
+    return m_all_sfx_types.find(name) != m_all_sfx_types.end();
+}   // soundExist
+
+//----------------------------------------------------------------------------
+/** This function removes a sfx buffer info entry from the mapping, and
+ *  frees the openal buffer.
+ *  \param name The name of the mapping entry to remove.
+ */
+void SFXManager::deleteSFXMapping(const std::string &name)
+{
+    std::map<std::string, SFXBufferInfo>::iterator i;
+    i = m_all_sfx_types.find(name);
+
+    if(i==m_all_sfx_types.end())
+    {
+        fprintf(stderr, "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
+        return;
+    }
+    (*i).second.freeBuffer();
+    
+    m_all_sfx_types.erase(i);
+
+}   // deleteSFXMapping
 
 //----------------------------------------------------------------------------
 /** Delete a sound effect object, and removes it from the internal list of
@@ -453,6 +484,10 @@ void SFXManager::resumeAll()
 }   // resumeAll
 
 //-----------------------------------------------------------------------------
+/** Returns whether or not an openal error has occurred. If so, an error 
+ *  message is printed containing the given context.
+ *  \param context Context to specify in the error message.
+ */
 bool SFXManager::checkError(const std::string &context)
 {
     // Check (and clear) the error flag
@@ -468,6 +503,9 @@ bool SFXManager::checkError(const std::string &context)
 }   // checkError
 
 //-----------------------------------------------------------------------------
+/** Sets the master volume for all sound effects.
+ *  \param gain The volume to set.
+ */
 void SFXManager::setMasterSFXVolume(float gain)
 {
     if (gain > 1.0)  gain = 1.0f;
@@ -531,18 +569,22 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 }
 
 //-----------------------------------------------------------------------------
+/** Positional sound is cool, but creating a new object just to play a simple
+ *  menu sound is not. This function allows for 'quick sounds' in a single call.
+ *  \param sound_type Internal name of the sfx to play.
+ */
 
-void SFXManager::quickSound(const char* soundType)
+void SFXManager::quickSound(const std::string &sound_type)
 {
     if(!sfxAllowed()) return;
-    std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(soundType);
+    std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(sound_type);
     
     if (sound == m_quick_sounds.end())
     {
         // sound not yet in our local list of quick sounds
-        SFXBase* newSound = sfx_manager->createSoundSource(soundType, false);
+        SFXBase* newSound = sfx_manager->createSoundSource(sound_type, false);
         newSound->play();
-        m_quick_sounds[soundType] = newSound;
+        m_quick_sounds[sound_type] = newSound;
     }
     else
     {

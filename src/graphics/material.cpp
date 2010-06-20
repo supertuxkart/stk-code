@@ -22,6 +22,7 @@
 
 #include <stdexcept>
 
+#include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -76,6 +77,25 @@ Material::Material(const XMLNode *node, int index)
             s.c_str());
     else
         m_graphical_effect = GE_NONE;
+
+    // Terrain-specifc sound effect
+    for(unsigned int i=0; i<node->getNumNodes(); i++)
+    {
+        const XMLNode *sfx= node->getNode(i);
+        if(sfx->getName()!="sfx")
+        {
+            printf("Warning: unknown node type '%s' for texture '%s' - ignored.\n",
+                    sfx->getName().c_str(), m_texname);
+            continue;
+        }
+        if(m_sfx_name!="")
+        {
+            printf("Warning: more than one sfx specified for texture '%s' - ignored.\n",
+                   m_texname.c_str());
+            continue;
+        }
+        initCustomSFX(sfx);
+    }   // for i <node->getNumNodes()
     install(/*is_full_path*/false);
 }   // Material
 
@@ -93,11 +113,9 @@ Material::Material(const std::string& fname, int index, bool is_full_path)
 }   // Material
 
 //-----------------------------------------------------------------------------
-Material::~Material()
-{
-}   // ~Material
-
-//-----------------------------------------------------------------------------
+/** Inits all material data with the default settings.
+ *  \param Index of this material in the material_manager index array.
+ */
 void Material::init(unsigned int index)
 {
     m_index              = index;
@@ -115,8 +133,13 @@ void Material::init(unsigned int index)
     m_resetter           = false;
     m_max_speed_fraction = 1.0f;
     m_slowdown           = 1.0f;
+    m_sfx_name           = "";
+    m_sfx_min_speed      = 0.0f;
+    m_sfx_max_speed      = 30;
+    m_sfx_min_pitch      = 1.0f;
+    m_sfx_max_pitch      = 1.0f;
     m_graphical_effect   = GE_NONE;
-}
+}   // init
 
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
@@ -127,6 +150,78 @@ void Material::install(bool is_full_path)
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
 }   // install
+//-----------------------------------------------------------------------------
+Material::~Material()
+{
+    // If a special sfx is installed (that isn't part of stk itself), the
+    // entry needs to be removed from the sfx_manager's mapping, since other
+    // tracks might use the same name.
+    if(m_sfx_name!="" && m_sfx_name==m_texname)
+    {
+        sfx_manager->deleteSFXMapping(m_sfx_name);
+    }
+}   // ~Material
+
+//-----------------------------------------------------------------------------
+/** Initialise the data structures for a custom sfx to be played when a
+ *  kart is driving on that particular material.
+ *  \param sfx The xml node containing the information for this sfx.
+ */
+void Material::initCustomSFX(const XMLNode *sfx)
+{
+    m_sfx_name="";
+    // The name of the 'name' attribute must be the same as the one
+    // used in sfx_manager, since the sfx_manager will be reading this
+    // xml node, too.
+    sfx->get("name", &m_sfx_name);
+    if(m_sfx_name=="") m_sfx_name = m_texname;
+    sfx->get("min-speed", &m_sfx_min_speed);
+    sfx->get("max-speed", &m_sfx_max_speed);
+    sfx->get("min-pitch", &m_sfx_min_pitch);
+    sfx->get("max-pitch", &m_sfx_max_pitch);
+    m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
+                          / (m_sfx_max_speed - m_sfx_min_speed);
+
+    if(!sfx_manager->soundExist(m_sfx_name))
+    {
+        std::string filename;
+        sfx->get("filename", &filename);
+        // The directory for the track was added to the model search path
+        // so just misuse the getModelFile function
+        const std::string full_path = file_manager->getModelFile(filename);
+        sfx_manager->loadSingleSfx(sfx, full_path);
+    }
+}   // initCustomSFX
+
+//-----------------------------------------------------------------------------
+/** Adjusts the pitch of the given sfx depending on the given speed.
+ *  \param sfx The sound effect to adjust.
+ *  \param speed The speed of the kart.
+ */
+void Material::setSFXSpeed(SFXBase *sfx, float speed) const
+{
+    if(sfx->getStatus()==SFXManager::SFX_STOPED)
+    {
+        if(speed<m_sfx_min_speed) return;
+        sfx->play();
+    }
+    else if(sfx->getStatus()==SFXManager::SFX_PLAYING)
+    {
+        if(speed<m_sfx_min_speed) 
+        {
+            sfx->stop();
+            return;
+        }
+    }
+    if(speed > m_sfx_max_speed)
+    {
+        sfx->speed(m_sfx_max_pitch);
+        return;
+    }
+
+    float f = m_sfx_pitch_per_speed * (speed-m_sfx_min_speed) + m_sfx_min_pitch;
+    sfx->speed(f);
+}   // setSFXSpeed
 
 //-----------------------------------------------------------------------------
 /** Sets the appropriate flags in an irrlicht SMaterial.

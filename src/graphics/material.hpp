@@ -26,6 +26,7 @@
 using namespace irr;
 
 class XMLNode;
+class SFXBase;
 
 /**
   * \ingroup graphics
@@ -39,6 +40,9 @@ private:
     video::ITexture *m_texture;
     unsigned int     m_index;
     std::string      m_texname;
+    /** Name of a special sfx to play when a kart is on this terrain, or
+     *  "" if no special sfx exists. */
+    std::string      m_sfx_name;
     GraphicalEffect  m_graphical_effect;
     bool             m_zipper;
     bool             m_resetter;
@@ -63,15 +67,29 @@ private:
     float            m_slowdown;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
-    void init    (unsigned int index);
-    void install (bool is_full_path=false);
+    /** The minimum speed at which a special sfx is started to be played. */
+    float            m_sfx_min_speed;
+    /** The speed at which the maximum pitch is used. */
+    float            m_sfx_max_speed;
+    /** The minimum pitch to be used (at minimum speed). */
+    float            m_sfx_min_pitch;
+    /** The maximum pitch to be used (at maximum speed). */
+    float            m_sfx_max_pitch;
+    /** (max_pitch-min_pitch) / (max_speed - min_speed). Used to adjust
+     *  the pitch of a sfx depending on speed of the kart.
+     */
+    float            m_sfx_pitch_per_speed;
 
+    void  init    (unsigned int index);
+    void  install (bool is_full_path=false);
+    void  initCustomSFX(const XMLNode *sfx);
 public:
           Material(const XMLNode *node, int index);
           Material(const std::string& fname, int index, 
                    bool is_full_path=false);
          ~Material ();
 
+    void  setSFXSpeed(SFXBase *sfx, float speed) const;
     void  setMaterialProperties(video::SMaterial *m) const;
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const   { return m_texture;        }
@@ -92,6 +110,10 @@ public:
     bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
     /** Returns true if this material should have water splashes. */
     bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}
+    /** Returns the name of a special sfx to play while a kart is on this
+     *  terrain. The string will be "" if no special sfx exists. */
+    const std::string &
+         getSFXName          () const { return m_sfx_name; }
 } ;
 
 
