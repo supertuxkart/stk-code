@@ -278,12 +278,9 @@ void Kart::createPhysics()
  */
 Kart::~Kart()
 {
-    //stop the engine sound
-    if(m_engine_sound)
-    {
-        m_engine_sound->stop();
-    }
-
+    //stop kart specific sfx
+    if(m_engine_sound)  m_engine_sound->stop();
+    if(m_terrain_sound) m_terrain_sound->stop();
     // Delete all custom sounds (TODO: add back when properly done)
     /*
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
@@ -296,6 +293,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
+    if(m_terrain_sound) sfx_manager->deleteSFX(m_terrain_sound);
 
     if(m_smoke_system)        delete m_smoke_system;
     if(m_water_splash_system) delete m_water_splash_system;
