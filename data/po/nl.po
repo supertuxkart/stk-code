@@ -3,19 +3,19 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-24 20:29+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2010-06-17 18:32+0000\n"
+"Last-Translator: Koen_VL <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-28 03:49+0000\n"
+"X-Launchpad-Export-Date: 2010-06-18 03:43+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/states_screens/options_screen_input.cpp:92
 #, c-format
 msgid "   Keyboard %i"
-msgstr ""
+msgstr "   Toetsenbord %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
@@ -89,13 +89,13 @@ msgstr "%i ronden"
 #: src/states_screens/dialogs/race_over_dialog.cpp:171
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : overleefde %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:317
 #, c-format
 msgid "%s by %s"
-msgstr "%s bij %s"
+msgstr "%s door %s"
 
 #: src/items/powerup.cpp:48
 #, c-format
@@ -110,12 +110,12 @@ msgstr "%s is klaar"
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s geeft een tournée general!"
 
 #: src/modes/world.cpp:598
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "%s is uitgeschakeld."
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:256
@@ -162,7 +162,7 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:150
 msgid "3 Strikes Battle"
-msgstr "3 slag strijd"
+msgstr "Veldslag"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -200,7 +200,7 @@ msgstr "Versnellen"
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:59
 msgid "Add Keyboard Configuration"
-msgstr "Toetsenbord configuratie toevoegen"
+msgstr "Toetsenbordconfiguratie toevoegen"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
@@ -218,7 +218,7 @@ msgstr "Apparaat toevoegen"
 #. I18N: track group
 #: data/po/gui_strings.h:106
 msgid "Add-Ons"
-msgstr "Extra"
+msgstr "Extra's"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -234,7 +234,7 @@ msgstr "Alle"
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:343
 msgid "All Tracks"
-msgstr "Alle levels"
+msgstr "Alle parcours"
 
 #: src/states_screens/race_setup_screen.cpp:181
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -243,12 +243,12 @@ msgstr "Bruut geweld is toegestaan, dus grijp die wapens en zet ze slim in!"
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:499
 msgid "All tracks"
-msgstr ""
+msgstr "Alle parcours"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:36
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr "Aambeeld â Remt de kart in leidende positie af"
+msgstr "Aambeeld - remt de kart die de leiding heeft af"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
@@ -287,7 +287,7 @@ msgstr "Het einde van de wereld"
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "Geluid"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu

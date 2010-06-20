@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-28 12:22+0000\n"
-"Last-Translator: Jorge Mariano <jmariano@ymail.com>\n"
+"PO-Revision-Date: 2010-06-16 11:00+0000\n"
+"Last-Translator: Reuma Mordechai <Unknown>\n"
 "Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-29 04:05+0000\n"
+"X-Launchpad-Export-Date: 2010-06-17 03:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/states_screens/options_screen_input.cpp:92
@@ -25,52 +25,52 @@ msgstr "   מקלדת %i"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 נושך את הפתיון של %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 אוכל יותר מדי מהעוגה של %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 מקבל מתנה מגניבה מ%1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 קיבל כדור מ%1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 מפקפק ביכולת הבישול של %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
 msgid "%0 should not play with %1's lunch"
-msgstr ""
+msgstr "%0 אל תשחק באוכל של %1!"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr ""
+msgstr "%0 לא ישחק באולינג עם %1 שוב"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 מושך את %0 לסיבוב חופשי"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "%1 תוקע פומפה ל%0 בפרצוף"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 עושה סטרייק ל%0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
@@ -81,7 +81,7 @@ msgstr ""
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
 #, c-format
 msgid "%i laps"
-msgstr ""
+msgstr "%i הקפות"
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -89,28 +89,28 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:171
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s שרד למשך %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:317
 #, c-format
 msgid "%s by %s"
-msgstr ""
+msgstr "%s על ידי %s"
 
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s הוא פיראט גדול!"
 
 #: src/states_screens/kart_selection.cpp:429
 #, c-format
 msgid "%s is ready"
-msgstr ""
+msgstr "%s מוכן"
 
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s משחק את הסיבוב הבא של גרוג!"
 
 #: src/modes/world.cpp:598
 #, c-format
@@ -120,19 +120,19 @@ msgstr ""
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:256
 msgid "(Empty)"
-msgstr "(ריק)"
+msgstr "ריק"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:218
 msgid "(more players can join by pressing 'fire' now)"
-msgstr ""
+msgstr "שחקנים נוספים יכולים להצטרף כעת על ידי לחיצה על 'אש'"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:289
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "ניתן לשנות את מקשי המשחק על ידי לחיצה על אפשרויות בתפריט"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -143,6 +143,9 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
+"ניתן לשחק רוב המודלים בגרנד פרי: ניתן לשחק בכמה יחד במקום לשחק כשחקן בודד. "
+"ככול שתשיג רמה גבוהה יותר תקבל יותר נקודות. בסיום, השחקן עם מירב הנקודות "
+"זוכה בסיבוב."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:168
@@ -154,7 +157,7 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:150
 msgid "3 Strikes Battle"
-msgstr "קרב של 3 פגיות"
+msgstr "קרב של שלוש פגיעות"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -162,11 +165,13 @@ msgstr "קרב של 3 פגיות"
 msgid ""
 "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr "קרב של 3 פגיות: רק במשחק של רב שחקנים. תפגה בהם עם הנשקים עד שימותו."
+msgstr ""
+"קרב של שלוש פגיעות: ניתן לשחק רק עם מספר שחקנים. תפגע באחרים עם נשק, עד "
+"שכולם ימותו"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:181
 msgid "= Highscores ="
-msgstr ""
+msgstr "= ניקוד גבוה ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
@@ -185,12 +190,12 @@ msgstr "אודות"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:136
 msgid "Accelerate"
-msgstr "מהירות"
+msgstr "האצה"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:59
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "הוסף תצורת מקלדת"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
@@ -202,13 +207,13 @@ msgstr "הוסף שחקן"
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:165
 msgid "Add a device"
-msgstr ""
+msgstr "הוסף התקן"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: data/po/gui_strings.h:106
 msgid "Add-Ons"
-msgstr ""
+msgstr "תוספים"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -228,7 +233,7 @@ msgstr "כל המסלולים"
 
 #: src/states_screens/race_setup_screen.cpp:181
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
+msgstr "הכל מותר, אז תפוס את הנשקים והשתמש בהם בתבונה!"
 
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:499

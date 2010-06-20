@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-31 07:06+0000\n"
-"Last-Translator: Wolfs <Unknown>\n"
+"PO-Revision-Date: 2010-06-16 16:57+0000\n"
+"Last-Translator: Evolution <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-01 03:54+0000\n"
+"X-Launchpad-Export-Date: 2010-06-17 03:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-"
 "vanilla/supertuxkart\n"
@@ -47,12 +47,12 @@ msgstr "%0 wurde von %1 weggekegelt"
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0 is dubious of %1s cooking skills"
+msgstr "%0 findet %1s Kochkünste bedenklich."
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
 msgid "%0 should not play with %1's lunch"
-msgstr "%0 sollte nicht mit %1's Essen spielen"
+msgstr "%0 sollte nicht mit %1s Essen spielen"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
@@ -257,7 +257,7 @@ msgstr "Anker - Bremst das Kart an erster Position sehr stark ab"
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:378
 msgid "Apply video changes"
-msgstr "Videoeinstellungen anwenden"
+msgstr "Videoeinstellungen übernehmen"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
@@ -461,7 +461,7 @@ msgstr "Löschen bestätigen"
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:127
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr "Auflösung innerhalb von %d Sekunden bestätigen"
+msgstr "Auflösung innerhalb von %i Sekunden bestätigen"
 
 #: src/states_screens/race_setup_screen.cpp:188
 msgid "Contains no powerups, so only your driving skills matter!"
@@ -618,7 +618,7 @@ msgstr "Schießen"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:148
 msgid "Follow the Leader"
-msgstr "Folge dem Führenden"
+msgstr "Folge dem Leader"
 
 #. I18N: ./data/tracks/city/city.challenge
 #: data/po/gui_strings.h:457

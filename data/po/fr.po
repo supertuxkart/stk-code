@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-30 16:45+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2010-06-13 17:09+0000\n"
+"Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-31 03:57+0000\n"
+"X-Launchpad-Export-Date: 2010-06-14 03:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: French\n"
 
@@ -21,17 +21,17 @@ msgstr "   Clavier %i"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 mord à l'appât de %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 a goûté au gateau de %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 obtient un masque courtoisie de %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
@@ -56,7 +56,7 @@ msgstr "%0 ne jouera plus au bowling avec %1"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 s'accroche à %0 pour un tour gratuit"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
@@ -71,7 +71,7 @@ msgstr ""
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 teste un rayon tracteur sur %0"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
@@ -96,7 +96,7 @@ msgstr "%s par %s"
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s est un puissant pirate!"
 
 #: src/states_screens/kart_selection.cpp:429
 #, c-format
@@ -106,7 +106,7 @@ msgstr "%s est prêt"
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s paie la prochaine tournée de rhum!"
 
 #: src/modes/world.cpp:598
 #, c-format
@@ -174,7 +174,7 @@ msgstr "= Meilleurs scores ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr ""
+msgstr "Un sorcier l'a fait!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:427
 msgid "Abort Grand Prix"
@@ -283,7 +283,7 @@ msgstr "Au bout du monde"
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -343,7 +343,7 @@ msgstr "Retour au menu principal"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Banane? Boite? Banane? Boite? Banane? Boite?"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -504,7 +504,7 @@ msgstr "Voulez-vous vraiment supprimer le joueur '%s' ?"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "Veux-tu faire voler des cerf-volants?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
@@ -651,7 +651,7 @@ msgstr "Résultats GP :"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "Touches pour le jeu"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -755,7 +755,7 @@ msgstr ""
 #: src/input/input_manager.cpp:449
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Désolé '%s', il est trop tard pour joindre le jeu!"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -818,7 +818,7 @@ msgstr "Fais mordre la poussière à tes rivaux!"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:93
 msgid "Menu Keys"
-msgstr ""
+msgstr "Touches pour le menu"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:494
@@ -953,7 +953,7 @@ msgstr "Joueurs"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:351
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "S'il-vous-plait re-configurez vos touches"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:27
@@ -1086,7 +1086,7 @@ msgstr "Voir le prix remporté"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
 msgid "Select"
-msgstr ""
+msgstr "Sélectionner"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:138
@@ -1184,7 +1184,7 @@ msgstr ""
 
 #: src/items/powerup.cpp:64
 msgid "The Space Shuttle has landed!"
-msgstr ""
+msgstr "La navette spatialle est atterrie!"
 
 #: src/race/highscore_manager.cpp:96
 msgid ""
@@ -1200,7 +1200,7 @@ msgstr "Ce Grand Prix est corrompu"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:691
 msgid "Time"
-msgstr ""
+msgstr "Temps"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:146
