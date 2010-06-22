@@ -760,14 +760,17 @@ void Kart::update(float dt)
             if(s!="")
             {
                 m_terrain_sound = sfx_manager->createSoundSource(s);
-                m_terrain_sound->position(getXYZ());
                 m_terrain_sound->play();
                 m_terrain_sound->loop();
             }
             else
                 m_terrain_sound = NULL;
         }
-        if(m_terrain_sound) material->setSFXSpeed(m_terrain_sound, m_speed);
+        if(m_terrain_sound) 
+        {
+            m_terrain_sound->position(getXYZ());
+            material->setSFXSpeed(m_terrain_sound, m_speed);
+        }
         m_last_material = material;
 
         // Sometimes the material can be 0. This can happen if a kart is above
