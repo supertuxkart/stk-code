@@ -387,7 +387,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        fprintf( stderr, "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name);
+        fprintf( stderr, "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
         
         /*
         std::map<std::string, SFXBufferInfo>::iterator it = m_all_sfx_types.begin();
