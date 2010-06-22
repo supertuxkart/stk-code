@@ -85,7 +85,7 @@ Material::Material(const XMLNode *node, int index)
         if(sfx->getName()!="sfx")
         {
             printf("Warning: unknown node type '%s' for texture '%s' - ignored.\n",
-                    sfx->getName().c_str(), m_texname);
+                    sfx->getName().c_str(), m_texname.c_str());
             continue;
         }
         if(m_sfx_name!="")
