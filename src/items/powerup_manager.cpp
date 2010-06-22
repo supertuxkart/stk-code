@@ -240,10 +240,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 {
     m_position_to_class.clear();
-    const World *world = World::getWorld();
     // In battle mode no positions exist, so use only position 1
     unsigned int end_position = (race_manager->isBattleMode()) ? 1 : num_karts;
-    for(unsigned int position =1; position <= num_karts; position++)
+    for(unsigned int position =1; position <= end_position; position++)
     {
         // Set up the mapping of position to position class:
         // -------------------------------------------------
