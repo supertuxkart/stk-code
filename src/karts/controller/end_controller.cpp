@@ -78,7 +78,6 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         int current = i;
         for(unsigned int j=0; j<look_ahead; j++)
         {
-            int next = m_next_node_index[current];
             l.push_back(m_next_node_index[current]);
             current = m_next_node_index[current];
         }   // for j<look_ahead
