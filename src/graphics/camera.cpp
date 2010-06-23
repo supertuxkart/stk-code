@@ -150,6 +150,14 @@ void Camera::setMode(Mode mode)
         m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
     }
+    if(mode==CM_FINAL)
+    {
+#undef NEW_FINAL_CAMERA
+#ifdef NEW_FINAL_CAMERA
+        m_camera->setPosition(core::vector3df(-2, 1, 10));
+        m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+#endif
+    }
 
     m_mode = mode;
 }   // setMode
@@ -269,6 +277,43 @@ void Camera::update(float dt)
             smoothMoveCamera(dt, wanted_position, wanted_target);
             break;
         }
+    case CM_FINAL:
+#ifdef NEW_FINAL_CAMERA
+        {
+            const core::vector3df &cp = m_camera->getAbsolutePosition();
+            const Vec3            &kp = m_kart->getXYZ();
+            // Estimate the fov, assuming that the vector from the camera to
+            // the kart and the kart length are orthogonal to each other
+            // --> tan (fov) = kart_length / camera_kart_distance
+            // In order to show a little bit of the surrounding of the kart
+            // the kart length is multiplied by 3 (experimentally found, but
+            // this way we have approx one kart length on the left and right
+            // side of the screen for the surroundings)
+            float fov = atan2(3*m_kart->getKartLength(),
+                                (cp-kp.toIrrVector()).getLength());
+            m_camera->setFOV(fov);
+            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+            break;
+        }
+#else
+        {
+            wanted_target.setY(wanted_target.getY()+ 0.75f);
+            float angle_around = m_kart->getHeading()
+                               //+ m_rotation_range * m_kart->getSteerPercent() 
+                               //* m_kart->getSkidding()
+                               ;
+            float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
+            wanted_position.setX( sin(angle_around));
+            wanted_position.setY( sin(angle_up)    );
+            wanted_position.setZ( cos(angle_around));
+            wanted_position *= m_distance * 2.0f;
+            wanted_position += wanted_target;
+            smoothMoveCamera(dt, wanted_position, wanted_target);
+            m_camera->setPosition(wanted_position.toIrrVector());
+            m_camera->setTarget(wanted_target.toIrrVector());
+            break;
+        }
+#endif
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             wanted_target.setY(wanted_target.getY()+ 0.75f);

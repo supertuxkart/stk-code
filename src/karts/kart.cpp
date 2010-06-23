@@ -480,7 +480,7 @@ void Kart::finishedRace(float time)
             m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
-        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
+        if (m_camera) m_camera->setMode(Camera::CM_FINAL);
         
         RaceGUI* m = World::getWorld()->getRaceGUI();
         if(m)

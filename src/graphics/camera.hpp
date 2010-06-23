@@ -40,6 +40,7 @@ public:
         CM_CLOSEUP,       //!< Closer to kart
         CM_REVERSE,       //!< Looking backwards
         CM_LEADER_MODE,   //!< for deleted player karts in follow the leader
+        CM_FINAL,         //!< Final camera
         CM_SIMPLE_REPLAY
     };
 
