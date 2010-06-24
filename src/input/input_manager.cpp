@@ -353,9 +353,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         // If we're in the kart menu awaiting new players, do special things
         // when a device presses fire or rescue
         if (m_device_manager->getAssignMode() == DETECT_NEW)
-        {
+        {            
             // Player is unjoining
-            if ((player != NULL) && (action == PA_RESCUE))
+            if ((player != NULL) && (action == PA_RESCUE || action == PA_MENU_CANCEL))
             {
                 // returns true if the event was handled
                 if (KartSelectionScreen::getInstance()->playerQuit( player ))
