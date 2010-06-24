@@ -440,6 +440,7 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  */
 void SFXManager::deleteSFX(SFXBase *sfx)
 {
+    if(sfx) sfx->stop();
     std::vector<SFXBase*>::iterator i;
     i=std::find(m_all_sfx.begin(), m_all_sfx.end(), sfx);
 

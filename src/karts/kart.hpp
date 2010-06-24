@@ -187,6 +187,9 @@ private:
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
+    /** A pointer to the previous terrain sound needs to be saved so that an
+     *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
+    SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;

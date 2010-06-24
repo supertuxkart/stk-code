@@ -122,7 +122,8 @@ Kart::Kart (const std::string& ident, int position,
     m_crash_sound   = sfx_manager->createSoundSource( "crash" );
     m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
     m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
-    m_terrain_sound = NULL;
+    m_terrain_sound          = NULL;
+    m_previous_terrain_sound = NULL;
 
     if(!m_engine_sound)
     {
@@ -266,7 +267,7 @@ void Kart::createPhysics()
     if(m_engine_sound)
     {
         m_engine_sound->speed(0.6f);
-        m_engine_sound->loop();
+        m_engine_sound->setLoop(true);
         m_engine_sound->play();
     }
 }   // createPhysics
@@ -278,9 +279,6 @@ void Kart::createPhysics()
  */
 Kart::~Kart()
 {
-    //stop kart specific sfx
-    if(m_engine_sound)  m_engine_sound->stop();
-    if(m_terrain_sound) m_terrain_sound->stop();
     // Delete all custom sounds (TODO: add back when properly done)
     /*
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
@@ -293,8 +291,8 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
-    if(m_terrain_sound) sfx_manager->deleteSFX(m_terrain_sound);
-
+    if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
+    if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_smoke_system)        delete m_smoke_system;
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
@@ -408,8 +406,11 @@ void Kart::reset()
     m_last_material        = NULL;
     if(m_terrain_sound)
     {
-        m_terrain_sound->stop();
         sfx_manager->deleteSFX(m_terrain_sound);
+    }
+    if(m_previous_terrain_sound)
+    {
+        sfx_manager->deleteSFX(m_previous_terrain_sound);
     }
 
     m_controls.m_steer     = 0.0f;
@@ -480,7 +481,7 @@ void Kart::finishedRace(float time)
             m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
-        if (m_camera) m_camera->setMode(Camera::CM_FINAL);
+        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
         
         RaceGUI* m = World::getWorld()->getRaceGUI();
         if(m)
@@ -748,23 +749,44 @@ void Kart::update(float dt)
     }
     else if(material)
     {
-        // Stop a terrain specific sfx if the terrain has changed
+        // If a terrain specific sfx is already being played, when a new
+        // terrain is entered, an old sfx should be finished (once, not
+        // looped anymore of course). The m_terrain_sound is then copied
+        // to a m_previous_terrain_sound, for which looping is disabled.
+        // In case that three sfx needed to be played (i.e. a previous is
+        // playing, a current is playing, and a new terrain with sfx is
+        // entered), the oldest (previous) sfx is stopped and deleted.
         if(m_last_material!=material)
         {
-            if(m_terrain_sound) 
+            // First stop any previously playing terrain sound
+            // and remove it, sp that m_previous_terrain_sound
+            // can be used again.
+            if(m_previous_terrain_sound)
             {
-                m_terrain_sound->stop();
-                sfx_manager->deleteSFX(m_terrain_sound);
+                sfx_manager->deleteSFX(m_previous_terrain_sound);
             }
+            m_previous_terrain_sound = m_terrain_sound;
+            if(m_previous_terrain_sound)
+                m_previous_terrain_sound->setLoop(false);
+
             const std::string s = material->getSFXName();
             if(s!="")
             {
                 m_terrain_sound = sfx_manager->createSoundSource(s);
                 m_terrain_sound->play();
-                m_terrain_sound->loop();
+                m_terrain_sound->setLoop(true);
             }
             else
                 m_terrain_sound = NULL;
+        }
+        if(m_previous_terrain_sound && 
+            m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPED)
+        {
+            // We don't modify the position of m_previous_terrain_sound 
+            // anymore, so that it keeps on playing at the place where the 
+            // kart left the material.
+            sfx_manager->deleteSFX(m_previous_terrain_sound);
+            m_previous_terrain_sound = NULL;
         }
         if(m_terrain_sound) 
         {

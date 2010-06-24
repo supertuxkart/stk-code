@@ -117,11 +117,11 @@ void SFXOpenAL::volume(float gain)
 //-----------------------------------------------------------------------------
 /** Loops this sound effect.
  */
-void SFXOpenAL::loop()
+void SFXOpenAL::setLoop(bool status)
 {
     if(!m_ok) return;
 
-    alSourcei(m_soundSource, AL_LOOPING, AL_TRUE);
+    alSourcei(m_soundSource, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
     SFXManager::checkError("looping");
 }   // loop
 

@@ -45,7 +45,7 @@ public:
                                   SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain);
     virtual                      ~SFXOpenAL();
     virtual void                  play();
-    virtual void                  loop();
+    virtual void                  setLoop(bool status);
     virtual void                  stop();
     virtual void                  pause();
     virtual void                  resume();
