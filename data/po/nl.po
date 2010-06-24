@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-06-17 18:32+0000\n"
-"Last-Translator: Koen_VL <Unknown>\n"
+"PO-Revision-Date: 2010-06-20 22:33+0000\n"
+"Last-Translator: STK-team <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-18 03:43+0000\n"
+"X-Launchpad-Export-Date: 2010-06-22 04:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/states_screens/options_screen_input.cpp:92
@@ -20,27 +20,27 @@ msgstr "   Toetsenbord %i"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%1 heeft %0 aan de haak geslagen"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%1 z'n taart ligt zwaar op de maag van %0"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%1 deed het licht uit bij %0"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 werd van de baan gekegeld door %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 houdt niet van %1 z'n kookkunsten"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
@@ -50,27 +50,27 @@ msgstr ""
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr ""
+msgstr "%0 zal niet meer bowlen met %1"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 heeft de teugels van %0 vast"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "%1 ontstopt %0 z'n gezicht."
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 kegelt %0 van de baan"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%0 is %1s trekpaard"
 
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
@@ -171,8 +171,8 @@ msgid ""
 "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
-"Veldslag: alleen voor meerdere spelers.\n"
-"Raak de tegenstanders drie maal met je wapens om te winnen."
+"Veldslag: alleen voor meerdere spelers.\r\n"
+"Raak de tegenstanders driemaal met je wapens om te winnen."
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:181
 msgid "= Highscores ="
@@ -184,7 +184,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:427
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Grand Prix stoppen"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -355,8 +355,8 @@ msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
 msgstr ""
-"Bowling Bal - Stuitert van de wanden. Als je naar achteren kijkt, dan wordt "
-"hij naar achtereen gegooid."
+"Bowling Bal - Stuitert tegen wanden. Als je achter je kijkt wordt hij naar "
+"achter gegooid."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:139
@@ -373,7 +373,7 @@ msgstr "Bubblegum - Laat een plakkerige smurrie achter."
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
-"Taart - Gooi hem naar je dichtsbijzijnde tegenstander, goed op de korte "
+"Taartje - Gooi hem naar je dichtsbijzijnde tegenstander, goed op korte "
 "afstanden en rechte stukken."
 
 #: src/states_screens/dialogs/player_info_dialog.cpp:87
@@ -395,7 +395,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:125
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "Ongeldige spelersnaam."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -449,7 +449,7 @@ msgid ""
 "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
 msgstr ""
 "Wordt eerste in 'het einde van de wereld' op niveau 'Coureur' met 3 "
-"tegenstanders"
+"tegenstanders."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:151
@@ -459,7 +459,7 @@ msgstr "Verwijderen bevestigen"
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:127
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr ""
+msgstr "Bevestig de resolutie binnen %i seconden"
 
 #: src/states_screens/race_setup_screen.cpp:188
 msgid "Contains no powerups, so only your driving skills matter!"
@@ -510,7 +510,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
 msgid "Down"
-msgstr ""
+msgstr "Omlaag"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -649,7 +649,7 @@ msgstr ""
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "Besturing"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -700,7 +700,7 @@ msgstr "Grand Prix"
 
 #: src/states_screens/grand_prix_over.cpp:331
 msgid "Grand Prix Results"
-msgstr ""
+msgstr "Grand Prix uitslag"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -716,7 +716,7 @@ msgstr ""
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr ""
+msgstr "Beeld"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -762,7 +762,7 @@ msgstr "Gemiddeld"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:64
 msgid "Keep this resolution"
-msgstr ""
+msgstr "Deze resolutie behouden"
 
 #: src/states_screens/race_gui.cpp:89
 msgid "Lap"
@@ -779,7 +779,7 @@ msgstr "Links"
 
 #: src/guiengine/engine.cpp:824
 msgid "Loading"
-msgstr ""
+msgstr "Laden"
 
 #: src/states_screens/arenas_screen.cpp:193
 #: src/states_screens/arenas_screen.cpp:216
@@ -794,7 +794,7 @@ msgstr "Op slot: Te openen door uitdagingen te winnen"
 
 #: src/states_screens/tracks_screen.cpp:218
 msgid "Locked!"
-msgstr ""
+msgstr "Vergrendeld"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:151
@@ -814,7 +814,7 @@ msgstr "Laat je rivalen stof happen!"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:93
 msgid "Menu Keys"
-msgstr ""
+msgstr "Menu"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:494
@@ -843,7 +843,7 @@ msgstr "Netwerk"
 #: src/challenges/challenge.cpp:53
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Grand Prix '%s' nu beschikbaar"
 
 #: src/challenges/challenge.cpp:58
 #, c-format
@@ -862,12 +862,12 @@ msgstr ""
 #: src/challenges/challenge.cpp:64
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Kart '%s' nu beschikbaar"
 
 #: src/challenges/challenge.cpp:41
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Parcours '%s' nu beschikbaar"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:145
@@ -949,7 +949,7 @@ msgstr "Spelers"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:351
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Herconfigureer de toetsencombinaties"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:27
@@ -1051,7 +1051,7 @@ msgstr "Herstellen"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:370
 msgid "Resolution"
-msgstr ""
+msgstr "Resolutie"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:100
@@ -1075,12 +1075,12 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:356
 msgid "See unlocked features"
-msgstr ""
+msgstr "Bekijk de vergrendelde items"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
 msgid "Select"
-msgstr ""
+msgstr "Selecteer"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:138
@@ -1106,7 +1106,7 @@ msgstr "Korte bocht"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:366
 msgid "Skin"
-msgstr ""
+msgstr "Thema"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
 #: data/po/gui_strings.h:490
@@ -1127,7 +1127,7 @@ msgstr "Standaard"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:144
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Start Grand Prix"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:145
 msgid "Start Race"
@@ -1136,12 +1136,12 @@ msgstr "Start wedstrijd"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:130
 msgid "Steer Left"
-msgstr ""
+msgstr "Stuur links"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:133
 msgid "Steer Right"
-msgstr ""
+msgstr "Stuur rechts"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
@@ -1194,7 +1194,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:691
 msgid "Time"
-msgstr ""
+msgstr "Tijd"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:146
@@ -1249,7 +1249,7 @@ msgstr "Parcours door %s"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:160
 msgid "Up"
-msgstr ""
+msgstr "Omhoog"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1257,7 +1257,7 @@ msgstr ""
 #. I18N: Sound volume in options
 #: data/po/gui_strings.h:78 data/po/gui_strings.h:90
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 #: src/modes/linear_world.cpp:777
 msgid "WRONG WAY!"
@@ -1343,12 +1343,12 @@ msgstr "Race afgelopen!"
 
 #: src/modes/world.cpp:594
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Je bent uitgeschakeld!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:344
 #: src/states_screens/grand_prix_over.cpp:87
 msgid "You unlocked a new feature!"
-msgstr ""
+msgstr "Je hebt een nieuw item ontgrendeld!"
 
 #: src/karts/kart.cpp:486 src/karts/kart.cpp:505
 msgid "You won the race!"

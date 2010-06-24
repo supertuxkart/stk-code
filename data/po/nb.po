@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-24 20:28+0000\n"
+"PO-Revision-Date: 2010-06-22 21:37+0000\n"
 "Last-Translator: Magne Djupvik <Unknown>\n"
 "Language-Team: STK norwegian team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-28 03:50+0000\n"
+"X-Launchpad-Export-Date: 2010-06-23 04:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NORWAY\n"
 "X-Poedit-Language: Norwegian Bokmal\n"
@@ -17,47 +17,47 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:92
 #, c-format
 msgid "   Keyboard %i"
-msgstr ""
+msgstr "   Tastatur %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 biter på %1s agn"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 spiser for mye av %1s kake"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 får en stilig maske av %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 er bowlet over av %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 er usikker på %1s kokekunst"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
 msgid "%0 should not play with %1's lunch"
-msgstr ""
+msgstr "%0 burde ikke leke med %1s lunsj"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr ""
+msgstr "%0 vil ikke spille bowling med %1 igjen"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 hekter seg på %0 for en gratis kjøretur"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
@@ -67,12 +67,12 @@ msgstr ""
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 treffer %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 tester en trekkstråle på %0"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
@@ -92,12 +92,12 @@ msgstr "%i. %s: overlevde i %s"
 #: src/modes/linear_world.cpp:317
 #, c-format
 msgid "%s by %s"
-msgstr ""
+msgstr "%s av %s"
 
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s er en mektig pirat!"
 
 #: src/states_screens/kart_selection.cpp:429
 #, c-format
@@ -107,12 +107,12 @@ msgstr "%s er klar"
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s betaler neste runde med grogg!"
 
 #: src/modes/world.cpp:598
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' er blitt eliminert."
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:256
@@ -175,11 +175,11 @@ msgstr "= Beste tider ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr ""
+msgstr "En magiker gjorde det!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:427
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Avbryt Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -238,7 +238,7 @@ msgstr "Alle metoder tillatt, så ta opp våpen og bruk dem smart!"
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:499
 msgid "All tracks"
-msgstr ""
+msgstr "All baner"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:36
@@ -282,7 +282,7 @@ msgstr "At World's End"
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "Lyd"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -328,7 +328,7 @@ msgstr "Fortsett løp"
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:408
 msgid "Back to device list"
-msgstr ""
+msgstr "Tilbake til enhetsliste"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: ./data/gui/challenges.stkgui
@@ -342,7 +342,7 @@ msgstr "Tilbake til hovedmenyen"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Banan? Boks? Banan? Boks? Banan? Boks?"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -386,11 +386,11 @@ msgstr "Avbryt fjerning"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:175
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Avbryt/Tilbake"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:125
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "Kan ikke legge til en spiller med dette navnet."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -499,12 +499,12 @@ msgstr "Vil du virkelig slette spiller '%s'?"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "Har du lyst til å fly drage?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
 msgid "Down"
-msgstr ""
+msgstr "Ned"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -514,7 +514,7 @@ msgstr "Påslått"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:696
 msgid "Energy"
-msgstr ""
+msgstr "Energi"
 
 #. I18N: In the 'add new player' dialog
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:40
@@ -607,7 +607,7 @@ msgstr "Skyt"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:148
 msgid "Follow the Leader"
-msgstr ""
+msgstr "Følg lederen"
 
 #. I18N: ./data/tracks/city/city.challenge
 #: data/po/gui_strings.h:457
@@ -640,12 +640,12 @@ msgstr "Fullskjerm"
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:260
 msgid "GP scores :"
-msgstr ""
+msgstr "Poengsum GP :"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "Spilltaster"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -696,7 +696,7 @@ msgstr "Grand Prix"
 
 #: src/states_screens/grand_prix_over.cpp:331
 msgid "Grand Prix Results"
-msgstr ""
+msgstr "Resultater Grand Prix"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -712,7 +712,7 @@ msgstr ""
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr ""
+msgstr "Grafikk"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -747,7 +747,7 @@ msgstr ""
 #: src/input/input_manager.cpp:449
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Ignorerer '%s', du må slutte deg til tidligere for å spille!"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -810,7 +810,7 @@ msgstr "La dine motstandere bite i gresset!"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:93
 msgid "Menu Keys"
-msgstr ""
+msgstr "Menytaster"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:494
@@ -839,12 +839,12 @@ msgstr "Nettverk"
 #: src/challenges/challenge.cpp:53
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Ny Grand Prix '%s' nå tilgjengelig"
 
 #: src/challenges/challenge.cpp:58
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr ""
+msgstr "Ny vanskelighetsgrad '%s' nå tilgjengelig"
 
 #: src/modes/linear_world.cpp:311
 msgid "New fastest lap"
@@ -853,17 +853,17 @@ msgstr "Ny raskeste runde"
 #: src/challenges/challenge.cpp:47
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Ny spillmodus '%s' nå tilgjengelig"
 
 #: src/challenges/challenge.cpp:64
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Ny kart '%s' nå tilgjengelig"
 
 #: src/challenges/challenge.cpp:41
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Ny bane '%s' nå tilgjengelig"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:145
@@ -968,7 +968,7 @@ msgstr "Trykk en tast"
 #. I18N: In key bindings configuration menu
 #: data/po/gui_strings.h:161
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
+msgstr "Trykk enter eller dobbeltklikk på en enhet for å konfigurere den"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
@@ -1048,7 +1048,7 @@ msgstr "Redd"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:370
 msgid "Resolution"
-msgstr ""
+msgstr "Oppløsning"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:100
@@ -1076,7 +1076,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
 msgid "Select"
-msgstr ""
+msgstr "Velg"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:138
@@ -1102,7 +1102,7 @@ msgstr "Sving brått"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:366
 msgid "Skin"
-msgstr ""
+msgstr "Tema"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
 #: data/po/gui_strings.h:490
@@ -1123,7 +1123,7 @@ msgstr "Standard"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:144
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Start Grand Prix"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:145
 msgid "Start Race"
@@ -1132,12 +1132,12 @@ msgstr "Start løp"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:130
 msgid "Steer Left"
-msgstr ""
+msgstr "Sving venstre"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:133
 msgid "Steer Right"
-msgstr ""
+msgstr "Sving høyre"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
@@ -1172,7 +1172,7 @@ msgstr "'Sving brått'-knappen lar deg ha bedre kontroll i skarpe svinger"
 
 #: src/items/powerup.cpp:64
 msgid "The Space Shuttle has landed!"
-msgstr ""
+msgstr "Romfartøyet har landet!"
 
 #: src/race/highscore_manager.cpp:96
 msgid ""
@@ -1188,7 +1188,7 @@ msgstr "Denne Grand Prix er i ustand!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:691
 msgid "Time"
-msgstr ""
+msgstr "Tid"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:146
@@ -1241,7 +1241,7 @@ msgstr "Bane laget av %s"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:160
 msgid "Up"
-msgstr ""
+msgstr "Opp"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1249,7 +1249,7 @@ msgstr ""
 #. I18N: Sound volume in options
 #: data/po/gui_strings.h:78 data/po/gui_strings.h:90
 msgid "Volume"
-msgstr ""
+msgstr "Volum"
 
 #: src/modes/linear_world.cpp:777
 msgid "WRONG WAY!"
@@ -1331,7 +1331,7 @@ msgstr "Du fullførte løpet!"
 
 #: src/modes/world.cpp:594
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Du er blitt eliminert!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:344
 #: src/states_screens/grand_prix_over.cpp:87
@@ -1347,12 +1347,16 @@ msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Din konfigurasjonsfil var deformert, så den ble slettet og en ny vil bli "
+"laget."
 
 #: src/config/user_config.cpp:432
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Din konfigurasjonsfil var for gammel, så den ble slettet og en ny vil bli "
+"laget."
 
 #: src/input/device_manager.cpp:353
 msgid "Your input config file is not compatible with this version of STK."
