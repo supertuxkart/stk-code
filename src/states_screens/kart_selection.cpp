@@ -1005,7 +1005,8 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             const bool success = w->setSelection(selectedKart.c_str(), n, true);
             if (!success)
             {
-                // TODO: handle players that lose their kart
+                std::cerr << "Failed to select kart " << selectedKart.c_str() << " for player " << n
+                          << ", what's going on??\n";
             }
         }
     }
