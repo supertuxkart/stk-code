@@ -825,7 +825,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         //parentRibbon->getSelectionIDString(1) << " vs " << widget->m_properties[PROP_ID].c_str() << std::endl;
         //}
         
-        if (parentRibbon->isFocusedForPlayer(1) && parentRibbon->getSelectionIDString(1) == widget->m_properties[PROP_ID])
+        if (parentRibbon->isFocusedForPlayer(1) &&
+            parentRibbon->getSelectionIDString(1) == widget->m_properties[PROP_ID])
         {            
             if (nPlayersOnThisItem > 0)
             {
@@ -835,25 +836,60 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                 rect2.UpperLeftCorner.Y -= enlarge;
                 rect2.LowerRightCorner.X += enlarge;
                 rect2.LowerRightCorner.Y += enlarge;
-                drawBoxFromStretchableTexture(parentRibbonWidget, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
+                                              SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             else
             {
-                drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                                              SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             
             nPlayersOnThisItem++;
         }
         
-        if (parentRibbon->isFocusedForPlayer(2) && parentRibbon->getSelectionIDString(2) == widget->m_properties[PROP_ID])
+        if (parentRibbon->isFocusedForPlayer(2) &&
+            parentRibbon->getSelectionIDString(2) == widget->m_properties[PROP_ID])
         {
-            drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            if (nPlayersOnThisItem > 0)
+            {
+                core::rect< s32 > rect2 =  rect;
+                const int enlarge = nPlayersOnThisItem*6;
+                rect2.UpperLeftCorner.X -= enlarge;
+                rect2.UpperLeftCorner.Y -= enlarge;
+                rect2.LowerRightCorner.X += enlarge;
+                rect2.LowerRightCorner.Y += enlarge;
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
+                                              SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            }
+            else
+            {
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                                              SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            }
             nPlayersOnThisItem++;
         }
         
-        if (parentRibbon->isFocusedForPlayer(3) && parentRibbon->getSelectionIDString(3) == widget->m_properties[PROP_ID])
+        if (parentRibbon->isFocusedForPlayer(3) &&
+            parentRibbon->getSelectionIDString(3) == widget->m_properties[PROP_ID])
         {
-            drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+            if (nPlayersOnThisItem > 0)
+            {
+                core::rect< s32 > rect2 =  rect;
+                const int enlarge = nPlayersOnThisItem*6;
+                rect2.UpperLeftCorner.X -= enlarge;
+                rect2.UpperLeftCorner.Y -= enlarge;
+                rect2.LowerRightCorner.X += enlarge;
+                rect2.LowerRightCorner.Y += enlarge;
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
+                                              SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+            }
+            else
+            {
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                                              SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+            }
+            nPlayersOnThisItem++;
         }
         
         drawIconButton(rect, widget, pressed, focused);
