@@ -708,6 +708,7 @@ public:
 
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
+    m_removed_widget = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -924,8 +925,6 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     return true;
 }
 
-PlayerKartWidget* removedWidget = NULL;
-
 // -----------------------------------------------------------------------------
 // Returns true if event was handled succesfully
 bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
@@ -935,13 +934,16 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        std::cout << "playerQuit() called outside of kart selection screen.\n";
+        std::cerr << "ERROR: playerQuit() called outside of kart selection screen, "
+                  << "or the XML file for this screen was changed without adapting the code accordingly\n";
         return false;
     }
 
     // If last player quits, return to main menu
     if (m_kart_widgets.size() <= 1) return false;
 
+    std::map<PlayerKartWidget*, std::string> selections;
+    
     // Find the player ID associated to this player
     for (int n=0; n<m_kart_widgets.size(); n++)
     {
@@ -955,7 +957,10 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             }
             
             playerID = n;
-            break;
+        }
+        else
+        {
+            selections[m_kart_widgets.get(n)] = m_kart_widgets[n].getKartInternalName();
         }
     }
     if (playerID == -1)
@@ -974,23 +979,47 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     GUIEngine::focusNothingForPlayer(playerID);
     
     // keep the removed kart a while, for the 'disappear' animation to take place
-    removedWidget = m_kart_widgets.remove(playerID);
+    m_removed_widget = m_kart_widgets.remove(playerID);
     
     // Tell the StateManager to remove this player
     StateManager::get()->removeActivePlayer(playerID);
     
-    // Karts count changed, maybe order too, so renumber them. Also takes
-    // care of updating selections.
+    // Karts count changed, maybe order too, so renumber them.
     renumberKarts();
     
     // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
     // and will stop when the widget has disappeared)
     Widget* fullarea = this->getWidget("playerskarts");
-    removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h, 0, 0);
+    m_removed_widget->move( m_removed_widget->x + m_removed_widget->w/2, fullarea->y + fullarea->h, 0, 0);
+    
+    // update selections
+    
+    const int amount = m_kart_widgets.size();
+    for (int n=0; n<amount; n++)
+    {
+        const std::string& selectedKart = selections[m_kart_widgets.get(n)];
+        if (selectedKart.size() > 0)
+        {
+            std::cout << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << " selected "
+                      << selectedKart.c_str() << "\n";
+            const bool success = w->setSelection(selectedKart.c_str(), n, true);
+            if (!success)
+            {
+                // TODO: handle players that lose their kart
+            }
+        }
+    }
+    
+    /*
+    for (std::map<PlayerKartWidget*, std::string>::iterator it = selections.begin(); 
+         it != selectiosn.end();
+         it++)
+    {
+    }
+     */
     
     // check if all players are ready
     bool allPlayersReady = true;
-    const int amount = m_kart_widgets.size();
     for (int n=0; n<amount; n++)
     {            
         if (!m_kart_widgets[n].isReady())
@@ -1016,16 +1045,16 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
     }
     
     // When a kart widget is removed, it's a kept a while, for the disappear animation to take place
-    if (removedWidget != NULL)
+    if (m_removed_widget != NULL)
     {
-        removedWidget->onUpdate(delta);
+        m_removed_widget->onUpdate(delta);
        
-        if (removedWidget->w == 0 || removedWidget->h == 0)
+        if (m_removed_widget->w == 0 || m_removed_widget->h == 0)
         {
             // destruct when too small (for "disappear" effects)
-            this->manualRemoveWidget(removedWidget);
-            delete removedWidget;
-            removedWidget = NULL;
+            this->manualRemoveWidget(m_removed_widget);
+            delete m_removed_widget;
+            m_removed_widget = NULL;
         }
     }
 }
@@ -1390,7 +1419,7 @@ void KartSelectionScreen::renumberKarts()
     Widget* fullarea = this->getWidget("playerskarts");
     const int splitWidth = fullarea->w / m_kart_widgets.size();
 
-    printf("Renumbering karts...");
+    //printf("Renumbering karts...");
     for (int n=0; n < m_kart_widgets.size(); n++)
     {
         m_kart_widgets[n].setPlayerID(n);
@@ -1398,7 +1427,7 @@ void KartSelectionScreen::renumberKarts()
     }
 
     w->updateItemDisplay();
-    printf("OK\n");
+    //printf("OK\n");
 
 }
 

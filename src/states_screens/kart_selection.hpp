@@ -52,6 +52,8 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
       */
     bool m_player_confirmed;
     
+    PlayerKartWidget* m_removed_widget;
+    
     /** Called when all players selected their kart */
     void allPlayersDone();
     
