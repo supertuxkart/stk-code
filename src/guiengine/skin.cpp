@@ -676,9 +676,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     /* tab-bar ribbons */
     if (type == RIBBON_TABS)
     {
-        // for now jsut don't draw it, change that if ever needed
-        if (widget->m_deactivated) return;
-        
         BoxRenderParams* params;
         
         if (mark_selected && (focused || parent_focused))
@@ -701,7 +698,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             else               rect2.LowerRightCorner.Y += 10;
         }
         
-        drawBoxFromStretchableTexture(widget, rect2, *params, parentRibbon->m_deactivated);
+        drawBoxFromStretchableTexture(widget, rect2, *params, parentRibbon->m_deactivated || widget->m_deactivated);
         
         
     }
