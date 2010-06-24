@@ -555,9 +555,16 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 // we don't want that since we do our own custom processing for keys
                 if (w->m_type == WTYPE_LIST)
                 {
+                    // FIXME: fix that better
                     // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
                     // Obviously will not work if the list is the first item of the screen.
-                    GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
+                    IGUIElement* elem = getCurrentScreen()->getFirstWidget()->getIrrlichtElement();
+                    if (elem->getType() == EGUIET_LIST_BOX) 
+                    {
+                        elem = getCurrentScreen()->getLastWidget()->getIrrlichtElement();
+                        assert(elem->getType() != EGUIET_LIST_BOX);
+                    }
+                    GUIEngine::getGUIEnv()->setFocus( elem );
                     return EVENT_BLOCK; // confirms to irrLicht that we processed it
                 }
                 
