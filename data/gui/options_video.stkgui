@@ -42,16 +42,15 @@
         
         <spacer height="10" width="10"/>
 
-        <button id="apply_resolution" height="35"
+        <button id="apply_resolution"
                 I18N="In the video settings menu" text="Apply video changes" />
         
     </box>
     
-<spacer width="50" height="40" /> 
-    
+    <spacer width="50" height="10" /> 
+    <button id="back" x="20" width="250" align="left"
+            I18N="In the options menu, to go back to the main menu or game" text="Back"/>
+     
 </div>
-
-<button id="back" x="20" y="-40" width="250" height="35" align="left"
-        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
 
 </stkgui>

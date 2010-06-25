@@ -43,7 +43,7 @@ namespace GUIEngine
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getHeightNeededAroundLabel() const { return 8; }
+        virtual int getHeightNeededAroundLabel() const { return 4; }
         
     public:
         ButtonWidget();
