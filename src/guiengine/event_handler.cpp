@@ -267,30 +267,44 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         el = NULL;
     }
     
+    bool found = false;
+    
     // find closest widget
-    if (el != NULL && el->getTabGroup() != NULL &&
-        el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
+    if (el != NULL && el->getTabGroup() != NULL)
     {
-        //std::cout << "Navigating up to " << closest->getID() << std::endl;
-        Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
-        if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
-
-        //FIXME: something's wrong here, I use 'closestWidget', THEN verify it's not NULL xD
-        
-        closestWidget->setFocusForPlayer(playerID);
-        
-        // when focusing a list by going up, select the last item of the list
-        if (closestWidget != NULL && closestWidget->m_type == WTYPE_LIST)
+        // if the current widget is e.g. 15, search for widget 14, 13, 12, ... (up to 10 IDs may be missing)
+        for (int n=0; n<10 && !found; n++)
         {
-            IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
-            assert(list != NULL);
+            const bool success = el->getTabGroup()->getNextElement(el->getTabOrder() - n,
+                                                                   true /* reverse */, false /* group */,
+                                                                   first, closest);
             
-            list->setSelected( list->getItemCount()-1 );
-            return;
-        }
+            if (success)
+            {
+                //std::cout << "Navigating up to " << closest->getID() << std::endl;
+                Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
+                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+
+                //FIXME: something's wrong here, I use 'closestWidget', THEN verify it's not NULL xD
+                
+                closestWidget->setFocusForPlayer(playerID);
+                
+                // when focusing a list by going up, select the last item of the list
+                if (closestWidget != NULL && closestWidget->m_type == WTYPE_LIST)
+                {
+                    IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
+                    assert(list != NULL);
+                    
+                    list->setSelected( list->getItemCount()-1 );
+                    return;
+                }
+                found = true;
+            }
+        } // end for
         
     }
-    else
+    
+    if (!found)
     {        
         //std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
         //if (el == NULL) std::cout << "    because el is null\n";
@@ -372,25 +386,39 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         el = NULL;
     }
     
-    if (el != NULL && el->getTabGroup() != NULL &&
-       el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
+    bool found = false;
+    
+    if (el != NULL && el->getTabGroup() != NULL)
     {
-        Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
-        if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
-        
-        assert( closestWidget != NULL );
-        closestWidget->setFocusForPlayer(playerID);
-        
-        // another list exception : when entering a list, select the first item
-        if (closestWidget->m_type == WTYPE_LIST)
+        // if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
+        for (int n=0; n<10 && !found; n++)
         {
-            IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
-            assert(list != NULL);
+            const bool success = el->getTabGroup()->getNextElement(el->getTabOrder()+n,
+                                                                   false, false, first, closest);
+            
+            if (success)
+            {
+                Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
+                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+                
+                assert( closestWidget != NULL );
+                closestWidget->setFocusForPlayer(playerID);
+                
+                // another list exception : when entering a list, select the first item
+                if (closestWidget->m_type == WTYPE_LIST)
+                {
+                    IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
+                    assert(list != NULL);
 
-            list->setSelected(0);
-        }
+                    list->setSelected(0);
+                }
+                
+                found = true;
+            }
+        } // end for
     }
-    else
+    
+    if (!found)
     {
 
         // select the first widget
