@@ -360,9 +360,10 @@ namespace StringUtils
      */
     std::string timeToString(float time)
     {
-        int min        = (int) floor ( time / 60.0 ) ;
-        int sec        = (int) floor ( time - (double) ( 60 * min ) ) ;
-        int hundredths = (int) floor ( 100.0f * (time - (double)(sec + 60* min))+0.5f);
+        int int_time   = time*100.0f+0.5f;
+        int min        = int_time / 6000;
+        int sec        = (int_time-min*6000)/100;
+        int hundredths = (int_time - min*6000-sec*100);
         // The proper c++ way would be:
         // std::ostringstream s;
         // s<<std::setw(2)<<std::setfill(' ')<<min<<":"
