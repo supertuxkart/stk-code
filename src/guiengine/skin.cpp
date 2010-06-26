@@ -302,7 +302,6 @@ void Skin::drawBgImage()
     if(bg_image == NULL)
     {
         int texture_w, texture_h;
-        // TODO/FIXME? - user preferences still include a background image choice 
         bg_image = SkinConfig::m_render_params["background::neutral"].getImage();
         assert(bg_image != NULL);
         texture_w = bg_image->getSize().Width;
