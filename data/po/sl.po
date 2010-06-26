@@ -1,80 +1,83 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: SuperTuxKart 0.7\n"
+"Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-24 20:24+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
-"Language-Team: Andrej Znidarsic <andrej.znidarsic@gmail.com>\n"
+"PO-Revision-Date: 2010-06-25 00:18+0000\n"
+"Last-Translator: D-Men <Unknown>\n"
+"Language-Team: STK SLO Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-28 03:50+0000\n"
+"X-Launchpad-Export-Date: 2010-06-26 04:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: SLOVENIA\n"
 "X-Poedit-Language: Slovenian\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Bookmarks: 48,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
 #: src/states_screens/options_screen_input.cpp:92
 #, c-format
 msgid "   Keyboard %i"
-msgstr ""
+msgstr "   Tipkovnica %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 je zagrabil %1-evo vabo"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 je pojedel preveč kosov %1-eve torte"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 je dobil razkošno masko od %1-a"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%1 je podrl %0-a"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 dvomi v %1-eve kuharske sposobnosti"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
 msgid "%0 should not play with %1's lunch"
-msgstr ""
+msgstr "%0 se ne bi smel igrati s %1-evo malico"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr ""
+msgstr "%0 s %1-em ne bo več podiral kegljev"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 se je prilepil k %0-u za brezplačno voznjo"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "%1 je združil %0-ev obraz z odmaševalcem"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 je udaril %0-a"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 preizkuša vlečni žarek na %0-u"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
@@ -88,18 +91,18 @@ msgstr "%i krogov"
 #: src/states_screens/dialogs/race_over_dialog.cpp:171
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : preživel %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:317
 #, c-format
 msgid "%s by %s"
-msgstr ""
+msgstr "%s - %s"
 
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s je mogočen gusar!"
 
 #: src/states_screens/kart_selection.cpp:429
 #, c-format
@@ -109,12 +112,12 @@ msgstr "%s je pripravljen"
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s plača naslednjo rundo groga!"
 
 #: src/modes/world.cpp:598
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' je bil odstranjen."
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:256
@@ -125,7 +128,7 @@ msgstr "(Prazno)"
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:218
 msgid "(more players can join by pressing 'fire' now)"
-msgstr "(več igralcev se lahko pridruži s pritiskom 'ogenj')"
+msgstr "(več igralcev se lahko pridruži s pritiskom na tipko 'ogenj')"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -144,8 +147,8 @@ msgid ""
 "wins the cup."
 msgstr ""
 "* Večino teh načinov igre je mogoče igrati v obliki turnirja: namesto "
-"posamezne dirke, se igra več iger v vrsti. Za boljši rezultat dobite več "
-"točk. Na koncu pokal zmaga igralec z največ točkami."
+"posamezne dirke se igra več iger v vrsti. Za boljši rezultat dobite več "
+"točk. Na koncu pokal dobi igralec z največ točkami."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:168
@@ -153,8 +156,8 @@ msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
 msgstr ""
-"* Katera nastavitev bo uporabljena je odvisno od tega katera tipka 'ogenj' "
-"je pritisnjena za pridruževanje igri."
+"* Katera nastavitev bo uporabljena je odvisno od tega, katera izmed tipk "
+"'ogenj' je pritisnjena za pridruževanje igri."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:150
@@ -168,8 +171,8 @@ msgid ""
 "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
-"Bitka na 3 zmage: samo v več igralskem načinu. Streljajte na ostale z "
-"orožji, dokler ne izgubijo vseh svojih življenj."
+"Bitka na 3 zmage: samo v večigralskem načinu. Streljajte na ostale z orožji, "
+"dokler ne izgubijo vseh svojih življenj."
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:181
 msgid "= Highscores ="
@@ -177,11 +180,11 @@ msgstr "= Najboljši rezultati ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr ""
+msgstr "Čarovnik je bil!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:427
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Prekliči turnir"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -203,7 +206,7 @@ msgstr "Dodajanje nastavitev tipkovnice"
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:199
 msgid "Add Player"
-msgstr "Dodajanje igralca"
+msgstr "Dodaj igralca"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -240,18 +243,18 @@ msgstr "Vse je dovoljeno, zato dobite orožja in jih pametno uporabite!"
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:499
 msgid "All tracks"
-msgstr ""
+msgstr "Vse proge"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:36
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr "Nakovalo - močno upočasni prvo vozilo"
+msgstr "Sidro - močno upočasni prvo vozilo"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:378
 msgid "Apply video changes"
-msgstr "Uveljavi spremembe slike"
+msgstr "Uveljavi slikovne nastavitve"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
@@ -263,7 +266,7 @@ msgstr "Arene"
 #: src/items/powerup.cpp:46
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr ""
+msgstr "Arrr, %s se je zasidral, kapitan!"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:493
@@ -284,13 +287,13 @@ msgstr "Na koncu sveta"
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "Zvok"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:273
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "Izmikajte se bananam!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/input.cpp:478
@@ -324,13 +327,13 @@ msgstr "Nazaj"
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:70
 msgid "Back to Race"
-msgstr ""
+msgstr "Nazaj k dirki"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:408
 msgid "Back to device list"
-msgstr ""
+msgstr "Nazaj k seznamu naprav"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: ./data/gui/challenges.stkgui
@@ -340,11 +343,11 @@ msgstr "Nazaj na glavni meni"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:395
 msgid "Back to the main menu"
-msgstr "Nazaj v glavni meni"
+msgstr "Nazaj na glavni meni"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Banana? Škatla? Banana? Škatla? Banana? Škatla?"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -362,7 +365,7 @@ msgstr "Zavora"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:21
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr "Žvečilni gumi - za sabo pustite lepljivo roza packo"
+msgstr "Žvečilni gumi - za sabo pustite lepljivo roza lužo"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:24
@@ -387,11 +390,11 @@ msgstr "Preklic odstranitve"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:175
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Prekliči/Nazaj"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:125
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "Igralca s tem imenom ni mogoče dodati."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -414,7 +417,7 @@ msgstr "Izbor vozila"
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:463
 msgid "Collect Nitro in Math Class"
-msgstr "Zberite nitro v Matematični Učilnici"
+msgstr "Zberite nitro v Matematični učilnici"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -436,14 +439,16 @@ msgid ""
 "bar at the right of the game screen."
 msgstr ""
 "Pobiranje nitra vam omogoča povečano hitrost, kadarkoli pritisnete primerno "
-"tipko. Trenutno količino nitrota lahko vidite v stolpcu na desni strani "
+"tipko. Trenutno količino nitra lahko vidite v stolpcu na desni strani "
 "zaslona."
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:418
 msgid ""
 "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
-msgstr "Zmagajte v turnirju Na koncu sveta s 3 'Drikač' tekmovalci."
+msgstr ""
+"Zmagajte v turnirju Na koncu sveta s 3 računalniškimi tekmovalci na stopnji "
+"'Dirkač'."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:151
@@ -453,7 +458,7 @@ msgstr "Potrditev odstranitve"
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:127
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr ""
+msgstr "Potrditev ločljivosti: še %i sekund"
 
 #: src/states_screens/race_setup_screen.cpp:188
 msgid "Contains no powerups, so only your driving skills matter!"
@@ -499,12 +504,12 @@ msgstr "Ali ste prepričani, da želite izbrisati igralca '%s' ?"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "Ali želite spuščati zmaje?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
 msgid "Down"
-msgstr ""
+msgstr "Dol"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -514,7 +519,7 @@ msgstr "Omogočeno"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:696
 msgid "Energy"
-msgstr ""
+msgstr "Energija"
 
 #. I18N: In the 'add new player' dialog
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:40
@@ -524,7 +529,7 @@ msgstr "Vnos imena novega igralca"
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:110
 msgid "Exit Race"
-msgstr "Končaj dirko"
+msgstr "Izstop iz dirke"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -534,7 +539,7 @@ msgstr "Napredno"
 
 #: src/states_screens/feature_unlocked.cpp:378
 msgid "Feature Unlocked"
-msgstr "Zmožnost je odklenjena"
+msgstr "Posebnost je odklenjena"
 
 #: src/modes/linear_world.cpp:259
 msgid "Final lap!"
@@ -546,14 +551,14 @@ msgid ""
 "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
 msgstr ""
 "Končajte 3 kroge v dirkalni progi s 3 lahkimi računalniškimi nasprotniki v "
-"manj kot 2 minutah 40 sekund."
+"manj kot 2 minutah in 40 sekundah."
 
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
 #: data/po/gui_strings.h:454
 msgid ""
 "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
 msgstr ""
-"Končajte 3 kroge v progi Mesto s 3 računalniškimi vozniki v manj kot 4 "
+"Končajte 3 kroge v mestni progi s 3 računalniškimi vozniki v manj kot 4 "
 "minutah in 20 sekundah."
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
@@ -562,22 +567,22 @@ msgid ""
 "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
 msgstr ""
 "Končajte 3 kroge na progi Tuxova avtocesta s 3 računalniškimi vozniki v manj "
-"kot 3 minutah 35 sekundah."
+"kot 3 minutah in 35 sekundah."
 
 #. I18N: ./data/tracks/jungle/jungle.challenge
 #: data/po/gui_strings.h:445
 msgid "Finish Race track in 2:40"
-msgstr "Končajte progo Dirkališče v 2:40"
+msgstr "Končajte dirkalno progo v 2 minutah in 40 sekundah"
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:469
 msgid "Finish Tux Tollway track in 3:35"
-msgstr "Končajte progo Tuxova avtocesta v 3:35"
+msgstr "Končajte progo Tuxova avtocesta v 3 minutah in 35 sekundah"
 
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
 #: data/po/gui_strings.h:451
 msgid "Finish the City track in 4:20"
-msgstr "Končajte progo Mesto v 4:20"
+msgstr "Končajte mestno progo v 4 minutah in 20 sekundah"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:466
@@ -585,6 +590,8 @@ msgid ""
 "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
 msgstr ""
+"Končaj tri kroge Oliverjeve Matematične učilnice z vsaj 6 enotami nitra pod "
+"52 sekundami."
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:424
@@ -608,7 +615,7 @@ msgstr "Ogenj"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:148
 msgid "Follow the Leader"
-msgstr "Sledenje vodji"
+msgstr "Sledite vodji"
 
 #. I18N: ./data/tracks/city/city.challenge
 #: data/po/gui_strings.h:457
@@ -629,7 +636,7 @@ msgid ""
 "the leader will get you eliminated too!"
 msgstr ""
 "Sledite vodji: poskusite biti drugi, saj je zadnji dirkač izločen, ko števec "
-"doseže ničlo. Pozor: izločeni ste tudi, če vodjo prehitite !"
+"doseže ničlo. Pozor: izločeni ste tudi, če vodjo prehitite!"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -640,12 +647,12 @@ msgstr "Celozaslonski način"
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:260
 msgid "GP scores :"
-msgstr ""
+msgstr "GP točke :"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "Tipke za igranje"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -662,13 +669,13 @@ msgstr "Načini igre"
 #: src/input/input.cpp:482
 #, c-format
 msgid "Gamepad button %d"
-msgstr "Gamepad gumb %d"
+msgstr "Gumb na igralnem ploščku %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/input.cpp:486
 #, c-format
 msgid "Gamepad hat %d"
-msgstr "Gamepad večsmerni gumb %d"
+msgstr "Večsmerni gumb na igralnem ploščku %d"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -682,11 +689,11 @@ msgstr "Splošno"
 
 #: src/items/powerup.cpp:63
 msgid "Geronimo!!!"
-msgstr ""
+msgstr "Geronimo!!!"
 
 #: src/states_screens/race_gui.cpp:93
 msgid "Go!"
-msgstr "Zdaj !"
+msgstr "Pelji !"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
@@ -696,7 +703,7 @@ msgstr "Turnir"
 
 #: src/states_screens/grand_prix_over.cpp:331
 msgid "Grand Prix Results"
-msgstr ""
+msgstr "Rezultati turnirja"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -712,7 +719,7 @@ msgstr ""
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr ""
+msgstr "Grafika"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -741,14 +748,14 @@ msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
 msgstr ""
-"Če vidite gumb s ključavnico kot je na desni, morate dokončati izziv da jo "
-"odklenete."
+"Če vidite gumb s ključavnico kot je ta na desni, morate dokončati izziv, da "
+"jo odklenete."
 
 #. I18N: message shown when an input device is used but is not associated to any player
 #: src/input/input_manager.cpp:449
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Ignoriranje '%s', za igranje bi se morali priključiti prej!"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -759,7 +766,7 @@ msgstr "Srednje"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:64
 msgid "Keep this resolution"
-msgstr ""
+msgstr "Obdrži to ločljivost"
 
 #: src/states_screens/race_gui.cpp:89
 msgid "Lap"
@@ -776,7 +783,7 @@ msgstr "Levo"
 
 #: src/guiengine/engine.cpp:824
 msgid "Loading"
-msgstr ""
+msgstr "Nalaganje"
 
 #: src/states_screens/arenas_screen.cpp:193
 #: src/states_screens/arenas_screen.cpp:216
@@ -787,11 +794,11 @@ msgstr ""
 #: src/states_screens/tracks_screen.cpp:269
 #: src/states_screens/tracks_screen.cpp:293
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Zaklenjeno: rešitev dejavne izzive za dostop do več!"
+msgstr "Zaklenjeno: rešite aktivne izzive za dostop do večih stvari!"
 
 #: src/states_screens/tracks_screen.cpp:218
 msgid "Locked!"
-msgstr ""
+msgstr "Zaklenjeno!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:151
@@ -800,18 +807,18 @@ msgstr "Pogled nazaj"
 
 #: src/items/powerup.cpp:80
 msgid "Magic, son. Nothing else in the world smells like that."
-msgstr ""
+msgstr "Čarovnija, sine. Nič na svetu nima takšnega vonja."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:265
 msgid "Make your rivals bite dust!"
-msgstr "Prisilite nasprotnike da žrejo prah!"
+msgstr "Prisilite nasprotnike, da žrejo prah!"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:93
 msgid "Menu Keys"
-msgstr ""
+msgstr "Menijske tipke"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:494
@@ -835,17 +842,17 @@ msgstr "Glasba"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:226
 msgid "Networking"
-msgstr "Mrežno igranje"
+msgstr "Omreževanje"
 
 #: src/challenges/challenge.cpp:53
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Na voljo je nov turnir '%s'"
 
 #: src/challenges/challenge.cpp:58
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr ""
+msgstr "Na voljo je nova težavnostna stopnja '%s'"
 
 #: src/modes/linear_world.cpp:311
 msgid "New fastest lap"
@@ -854,17 +861,17 @@ msgstr "Nov najhitrejši krog"
 #: src/challenges/challenge.cpp:47
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Na voljo je nov igralni način '%s'"
 
 #: src/challenges/challenge.cpp:64
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Na voljo je novo vozilo '%s'"
 
 #: src/challenges/challenge.cpp:41
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Na voljo je nova proga '%s'"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:145
@@ -874,7 +881,7 @@ msgstr "Nitro"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:144
 msgid "Normal Race"
-msgstr ""
+msgstr "Navadna dirka"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -892,7 +899,7 @@ msgstr "Število računalniških igralcev"
 #. I18N: only the game master is allowed to
 #: src/input/input_manager.cpp:474
 msgid "Only the Game Master may act at this point!"
-msgstr ""
+msgstr "Nastavitve lahko izvede samo igralec gostitelj!"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -905,15 +912,15 @@ msgstr "Možnosti"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:33
 msgid "Parachute - slows down all karts in a better position!"
-msgstr "Padalo - upočasni vse tekmovalce na boljšem mestu!"
+msgstr "Padalo - upočasni vsa vozila na boljšem mestu!"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:57
 msgid "Paused"
-msgstr "V premoru"
+msgstr "Premor"
 
 #: src/karts/controller/player_controller.cpp:280
 msgid "Penalty time!!"
-msgstr "Kazenski čas !!"
+msgstr "Kazenski čas!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
 #: data/po/gui_strings.h:487
@@ -946,7 +953,7 @@ msgstr "Igralci"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:351
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Prosim, ponovno nastavite funkcije tipk."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:27
@@ -970,20 +977,22 @@ msgstr "Pritisk tipke"
 #: data/po/gui_strings.h:161
 msgid "Press enter or double-click on a device to configure it"
 msgstr ""
+"Za nastavitev naprave pritisnite potrditveno tipko (enter) ali pa jo dvojno "
+"kliknite"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:195
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr ""
-"Pritisnite potrditveno tipko (enter) ali dvokliknite na igralca za njegovo "
-"urejanje"
+"Za urejanje igralca pritisnite potrditveno tipko (enter) ali pa ga dvojno "
+"kliknite"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:246
 msgid "Quit"
-msgstr "Končaj"
+msgstr "Konec"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -1002,7 +1011,7 @@ msgstr "Nastavitev dirke"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:383
 msgid "Race in this track again"
-msgstr "Ponovno dirkaj na tej progi"
+msgstr "Ponovna dirka na tej progi"
 
 #: src/states_screens/arenas_screen.cpp:226
 msgid "Random Arena"
@@ -1020,7 +1029,7 @@ msgstr "Naključna proga"
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui.cpp:91
 msgid "Ready!"
-msgstr "Pripravljeni !"
+msgstr "Pripravljeni!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1045,18 +1054,18 @@ msgstr "Preimenuj"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:154
 msgid "Rescue"
-msgstr "Rešitev"
+msgstr "Reševanje"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:370
 msgid "Resolution"
-msgstr ""
+msgstr "Ločljivost"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:100
 msgid "Restart Race"
-msgstr "Ponovno začni dirko"
+msgstr "Ponoven začetek dirke"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:169
@@ -1070,16 +1079,16 @@ msgid ""
 "eliminated too!"
 msgstr ""
 "Sledite vodji: poskusite biti drugi, saj je zadnji dirkač izločen, ko števec "
-"doseže ničlo. Pozor: izločeni ste tudi, če vodjo prehitite !"
+"doseže ničlo. Pozor: izločeni ste tudi, če vodjo prehitite!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:356
 msgid "See unlocked features"
-msgstr ""
+msgstr "Poglej odklenjene posebnosti"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
 msgid "Select"
-msgstr ""
+msgstr "Izbira"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:138
@@ -1088,13 +1097,13 @@ msgstr "Izbor načina igre"
 
 #: src/states_screens/race_gui.cpp:92
 msgid "Set!"
-msgstr "Pozor !"
+msgstr "Pozor!"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:94
 #: src/states_screens/dialogs/race_over_dialog.cpp:372
 msgid "Setup New Race"
-msgstr "Nastavi novo dirko"
+msgstr "Nastavitev nove dirke"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:148
@@ -1105,12 +1114,12 @@ msgstr "Oster zavoj"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:366
 msgid "Skin"
-msgstr ""
+msgstr "Tema"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
 #: data/po/gui_strings.h:490
 msgid "Snag Drive"
-msgstr "Problematična vožnja"
+msgstr "Težavna vožnja"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
@@ -1122,11 +1131,11 @@ msgstr "Zvočni učinki"
 #. I18N: track group
 #: data/po/gui_strings.h:102
 msgid "Standard"
-msgstr "Občiajno"
+msgstr "Običajno"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:144
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Začni turnir"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:145
 msgid "Start Race"
@@ -1135,12 +1144,12 @@ msgstr "Začni dirko"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:130
 msgid "Steer Left"
-msgstr ""
+msgstr "Zavij levo"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:133
 msgid "Steer Right"
-msgstr ""
+msgstr "Zavij desno"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
@@ -1177,36 +1186,36 @@ msgstr ""
 
 #: src/items/powerup.cpp:64
 msgid "The Space Shuttle has landed!"
-msgstr ""
+msgstr "Space Shuttle je pristal!"
 
 #: src/race/highscore_manager.cpp:96
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr ""
-"Datoteka z najboljšimi izidi je bila prestara, \n"
+"Datoteka z najboljšimi izidi je bila prestara,\n"
 "zato so bili vsi rezultati izbrisani."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:149
 msgid "This Grand Prix is broken!"
-msgstr ""
+msgstr "Ta turnir je pokvarjen!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:691
 msgid "Time"
-msgstr ""
+msgstr "Čas"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:146
 msgid "Time Trial"
-msgstr "Vožnja na čas"
+msgstr "Dirka na čas"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:319
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
-"Vožnja na čas: Ne vsebuje dodatkov,\n"
-"zato štejejo samo vaše vozniške sposobnosti!"
+"Dirka na čas: Ne vsebuje nobenih pripomočkov, štejejo samo vaše vozniške "
+"sposobnosti!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:48
 msgid ""
@@ -1237,7 +1246,7 @@ msgstr "Za lažjo zmago lahko poberete različne dodatke:"
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
 #: data/po/gui_strings.h:496
 msgid "To the Moon and Back"
-msgstr "Na luno in nazaj"
+msgstr "Na Luno in nazaj"
 
 #. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
 #: src/states_screens/dialogs/track_info_dialog.cpp:79
@@ -1248,7 +1257,7 @@ msgstr "Progo je ustvaril %s"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:160
 msgid "Up"
-msgstr ""
+msgstr "Gor"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1256,7 +1265,7 @@ msgstr ""
 #. I18N: Sound volume in options
 #: data/po/gui_strings.h:78 data/po/gui_strings.h:90
 msgid "Volume"
-msgstr ""
+msgstr "Glasnost"
 
 #: src/modes/linear_world.cpp:777
 msgid "WRONG WAY!"
@@ -1282,8 +1291,8 @@ msgstr "Zmagajte turnir Pingvinovo igrišče"
 #: data/po/gui_strings.h:484
 msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
 msgstr ""
-"Zmagajte turnir Pingvinovo igrišče s 3 'naprednimi' računalniškimi "
-"tekmovalci."
+"Zmagajte turnir Pingvinovo igrišče s 3 računalniškimi tekmovalci na stopnji "
+"'Dirkač'."
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:427
@@ -1295,24 +1304,29 @@ msgstr "Zmagajte turnir Na luno in nazaj"
 msgid ""
 "Win a 1 lap Head to Head on Tux Tollway against 1 'Racer' level AI kart."
 msgstr ""
-"Zmagajte 1 krog dolgo dirko na Tuxovi avtocesti proti 1 'naprednemu' "
-"tekmovalcu."
+"Zmagajte 1 krog dolgo dirko na Tuxovi avtocesti proti 1 računalniškemu "
+"tekmovalcu na stopnji 'Dirkač'."
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:442
 msgid "Win a 4 lap race on Snow Mountain against 4 'Racer' level AI kart."
 msgstr ""
-"Zmagajte 4 kroge dolgo dirko na Sneženi gori proti 4 'naprednim' tekmovalcem."
+"Zmagajte 4 kroge dolgo dirko na Sneženi gori proti 4 računalniškim "
+"tekmovalcem na stopnji 'Dirkač'."
 
 #. I18N: ./data/tracks/city/city.challenge
 #: data/po/gui_strings.h:460
 msgid "Win a Follow the Leader race with 3 AI karts in the Amazonian Jungle."
-msgstr "Zmagajte dirko sledenje vodji s 3 tekmovalci v Amazonski džungli."
+msgstr ""
+"Zmagajte dirko sledenje vodji s 3 računalniškimi tekmovalci v Amazonski "
+"džungli."
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:436
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
-msgstr "Zmagajte dirko sledenje vodji s 3 tekmovalci na Puščavskem otoku."
+msgstr ""
+"Zmagajte dirko sledenje vodji s 3 računalniškimi tekmovalci na Puščavskem "
+"otoku."
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:475
@@ -1327,46 +1341,52 @@ msgstr "Zmagajte dirko na Sneženi gori"
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:415
 msgid "Win the At World's End Grand Prix"
-msgstr "Zmagajte turnir na koncu sveta"
+msgstr "Zmagajte turnir Na koncu sveta"
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:430
 msgid ""
 "Win the To the Moon and Back Grand Prix with 3 'Racer' Level AI karts."
-msgstr "Zmagajte turnir Na luno in nazaj s 3 'naprednimi' tekmovalci."
+msgstr ""
+"Zmagajte turnir Na luno in nazaj s 3 računalniškimi tekmovalci na stopnji "
+"'Dirkač'."
 
 #: src/karts/kart.cpp:486 src/karts/kart.cpp:505
 msgid "You finished the race!"
-msgstr "Končali ste dirko !"
+msgstr "Končali ste dirko!"
 
 #: src/modes/world.cpp:594
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Bili ste odstranjeni!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:344
 #: src/states_screens/grand_prix_over.cpp:87
 msgid "You unlocked a new feature!"
-msgstr ""
+msgstr "Odklenili ste novo posebnost!"
 
 #: src/karts/kart.cpp:486 src/karts/kart.cpp:505
 msgid "You won the race!"
-msgstr "Zmagali ste !"
+msgstr "Zmagali ste!"
 
 #: src/config/user_config.cpp:422
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Vaša nastavitvena datoteka je bila izmaličena, zato je bila izbrisana. "
+"Ustvarjena bo bila nova."
 
 #: src/config/user_config.cpp:432
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Vaša nastavitvena datotek je bila prestara, zato je bila izbrisana. "
+"Ustvarjena bo bila nova."
 
 #: src/input/device_manager.cpp:353
 msgid "Your input config file is not compatible with this version of STK."
-msgstr ""
+msgstr "Vaša vhodna nastavitvena datoteka ni združljiva s to verzijo STK-ja."
 
 #. I18N: Unbound key binding
 #. I18N: ./data/gui/options_device.stkgui
@@ -1374,95 +1394,11 @@ msgstr ""
 msgid "[none]"
 msgstr "[noben]"
 
-#~ msgid ""
-#~ "'%s' has\n"
-#~ "been eliminated."
-#~ msgstr ""
-#~ "'%s' je bil \n"
-#~ "izločen."
-
-#~ msgid "Audio/Video"
-#~ msgstr "Zvok / Slika"
-
-#~ msgid ""
-#~ "Finish with at least 6 points of intro on three laps of Oliver's Math Class "
-#~ "in under 52 seconds."
-#~ msgstr ""
-#~ "Zberite vsaj 6 nitro točk v treh krogih Oliverjeve Matematične Učilnice v "
-#~ "manj kot 52 sekundah."
-
-#, c-format
-#~ msgid "Keyboard %i"
-#~ msgstr "Tipkovnica %i"
-
-#~ msgid ""
-#~ "New Grand Prix '%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Dostopen je nov turnir \n"
-#~ "'%s'"
-
-#~ msgid ""
-#~ "New difficulty\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Nova težavnost \n"
-#~ "'%s' \n"
-#~ "je na voljo"
-
-#~ msgid ""
-#~ "New game mode\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Novi načini igre \n"
-#~ "'%s' \n"
-#~ "so na voljo"
-
-#~ msgid ""
-#~ "New kart\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Nov dirkalnik '%s' \n"
-#~ "je na voljo"
-
-#~ msgid ""
-#~ "New track '%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Nova proga '%s' \n"
-#~ "je na voljo"
-
-#~ msgid "Special"
-#~ msgstr "Posebno"
-
-#~ msgid "Video"
-#~ msgstr "Slika"
-
-#~ msgid ""
-#~ "You have been\n"
-#~ "eliminated!"
-#~ msgstr "Bili ste izločeni!"
-
-#~ msgid "%dx%d Blacklisted"
-#~ msgstr "%dx%d je na črni listi"
-
 #~ msgid "Active Challenges"
 #~ msgstr "Aktivni izzivi"
 
-#~ msgid "All tracks included in SuperTuxKart"
-#~ msgstr "Vse proge vključene v SuperTuxKart"
-
 #~ msgid "Amazonian Journey"
 #~ msgstr "Amazonsko potovanje"
-
-#~ msgid "Apply "
-#~ msgstr "Uporabi "
-
-#~ msgid "Apply %dx%d"
-#~ msgstr "Uporabi %dx%d"
 
 #~ msgid "Around the Lighthouse"
 #~ msgstr "Okoli svetilnika"
@@ -1470,115 +1406,29 @@ msgstr "[noben]"
 #~ msgid "Avoid bananas"
 #~ msgstr "Izogibajte se bananam"
 
-#~ msgid "Back to the menu"
-#~ msgstr "Nazaj v meni"
-
 #~ msgid "Become server"
 #~ msgstr "Postani strežnik"
-
-#~ msgid "Can't connect to server"
-#~ msgstr "Ne morem se povezati s strežnikom."
-
-#~ msgid "Canyon"
-#~ msgstr "Kanjon"
-
-#~ msgid "Choose your controls, %s"
-#~ msgstr "Izberite način nadzora vozila %s"
 
 #~ msgid "City"
 #~ msgstr "Mesto"
 
-#~ msgid "Clear from Blacklist"
-#~ msgstr "Očisti s črnega seznama"
-
-#~ msgid "Confirm Resolution Within %d Seconds"
-#~ msgstr "Potrdite resolucijo v %d sekundah"
-
-#~ msgid "Confirm Resolution Within 5 Seconds"
-#~ msgstr "Potrdite resolucijo v 5 sekundah"
-
-#~ msgid "Connect to server"
-#~ msgstr "Poveži se s strežnikom"
-
 #~ msgid "Connected:"
 #~ msgstr "Povezan:"
-
-#~ msgid ""
-#~ "Created by Ingo Ruhnke,\n"
-#~ "modified by M. Gagnon"
-#~ msgstr ""
-#~ "Ustvaril Ingo Ruhnke, \n"
-#~ " spremenil M.Gagnon"
-
-#~ msgid ""
-#~ "Created by Oliver & Steve Baker\n"
-#~ "modified by Marianne Gagnon"
-#~ msgstr ""
-#~ "Ustvarila Oliver & Steve Baker \n"
-#~ "spremenila Marianne Gagnon"
-
-#~ msgid "Crescent Crossing"
-#~ msgstr "Roglijčkovo Prečkanje"
 
 #~ msgid "Current: %dx%d"
 #~ msgstr "Trenutno: %dx%d"
 
-#~ msgid "Decrease Resolution"
-#~ msgstr "Znižaj resolucijo"
-
-#~ msgid "Difficulty"
-#~ msgstr "Težavnost"
-
-#~ msgid "Display"
-#~ msgstr "Zaslon"
-
-#~ msgid "Display Settings"
-#~ msgstr "Nastavitve zaslona"
-
 #~ msgid "Driver"
 #~ msgstr "Voznik"
-
-#~ msgid "Edit controls for who?"
-#~ msgstr "Urejanje tipk za koga ?"
 
 #~ msgid "First grand prix, easy to get started"
 #~ msgstr "Prvi turnir, lahek za začetek"
 
-#~ msgid "Fort Magma"
-#~ msgstr "Trdnjava magme"
-
 #~ msgid "Four Players"
 #~ msgstr "Štirje igralci"
 
-#~ msgid "Game mode help"
-#~ msgstr "Pomoč načinov iger"
-
-#~ msgid "Go back to the main menu"
-#~ msgstr "Nazaj v glavni meni"
-
 #~ msgid "Grab blue boxes and nitro"
 #~ msgstr "Pobirajte modre škatle in nitro"
-
-#~ msgid ""
-#~ "Grand Prix: Win victory points \n"
-#~ "by racing through a group of tracks,  \n"
-#~ "most points wins (shortest time in case of a tie!)          "
-#~ msgstr ""
-#~ "Turnir: Z dobro uvrstitvijo pridobite točke na več dirkah. \n"
-#~ "Igralec z največ točkami zmaga. \n"
-#~ "(V primeru izenačenja se gleda najkrajši čas!)          "
-
-#~ msgid "Increase Resolution"
-#~ msgstr "Zvišaj resolucijo"
-
-#~ msgid "Invalid"
-#~ msgstr "Neveljaven/o"
-
-#~ msgid "Invalid short-cut!!"
-#~ msgstr "Neveljavna bližnjica !!"
-
-#~ msgid "King Weird's Castle"
-#~ msgstr "Grad kralja Čudaka"
 
 #~ msgid "Last grand prix, longer and harder"
 #~ msgstr "Zadnji turnir, daljši in težji"
@@ -1586,24 +1436,14 @@ msgstr "[noben]"
 #~ msgid "Loading race..."
 #~ msgstr "Nalaganje dirke..."
 
-#~ msgid "Next >"
-#~ msgstr "Naprej >"
-
 #~ msgid "Next background"
 #~ msgstr "Naslednje ozadje"
-
-#~ msgid "No Grand Prix selected"
-#~ msgstr "Noben turnir ni izbran"
 
 #~ msgid "Number of laps"
 #~ msgstr "Število krogov"
 
 #~ msgid "OK"
 #~ msgstr "V redu"
-
-#~ msgid "Old config file found, check your key bindings!"
-#~ msgstr ""
-#~ "Obstaja stara nastavitvena datoteka, preverite nastavitve tipkovnice !"
 
 #~ msgid "Oliver's Math Class"
 #~ msgstr "Oliverjeva matematična učilnica"
@@ -1626,32 +1466,14 @@ msgstr "[noben]"
 #~ msgid "Player 4"
 #~ msgstr "Igralec 4"
 
-#~ msgid "Player Config"
-#~ msgstr "Igralčeve nastavitve"
-
 #~ msgid "Player name"
 #~ msgstr "Ime igralca"
 
 #~ msgid "Prehistoric Island"
 #~ msgstr "Prazgodovinski otok"
 
-#~ msgid "Press <ESC> to go back"
-#~ msgstr "Pritisnite <ESC> za nazaj"
-
 #~ msgid "Quick Race"
 #~ msgstr "Hitra dirka"
-
-#~ msgid "Quick race: Pick a single track, shortest time wins.         "
-#~ msgstr "Hitra dirka: Izberite eno progo, najhitrejši zmaga.         "
-
-#~ msgid "REV"
-#~ msgstr "Nazaj"
-
-#~ msgid "Racetrack"
-#~ msgstr "Dirkališče"
-
-#~ msgid "Return To Race"
-#~ msgstr "Vrni se k dirki"
 
 #~ msgid "Second grand prix"
 #~ msgstr "Drugi turnir"
@@ -1662,26 +1484,8 @@ msgstr "[noben]"
 #~ msgid "Single Player"
 #~ msgstr "En igralec"
 
-#~ msgid "Single Race"
-#~ msgstr "Ena dirka"
-
-#~ msgid "Skyline"
-#~ msgstr "Nebotičnik"
-
-#~ msgid "SnowTux Peak"
-#~ msgstr "Vrh snežnoTux"
-
 #~ msgid "Sound"
 #~ msgstr "Zvok"
-
-#~ msgid "Splitscreen"
-#~ msgstr "Razdeljen zaslon"
-
-#~ msgid "Synchronising network..."
-#~ msgstr "Sinhronizacija mreže"
-
-#~ msgid "Synchronising."
-#~ msgstr "Sinhroniziracija..."
 
 #~ msgid "The Island"
 #~ msgstr "Otok"
@@ -1698,26 +1502,8 @@ msgstr "[noben]"
 #~ msgid "Three Players"
 #~ msgstr "Trije igralci"
 
-#~ msgid "Turn off music"
-#~ msgstr "Izklopi glasbo"
-
-#~ msgid "Turn off sound effects"
-#~ msgstr "Izklopi zvočne učinke"
-
-#~ msgid "Turn on music"
-#~ msgstr "Vklopi glasbo"
-
-#~ msgid "Turn on sound effects"
-#~ msgstr "Vklopi zvočne učinke"
-
-#~ msgid "Tux Tollway"
-#~ msgstr "Tuxova avtocesta"
-
 #~ msgid "Two Players"
 #~ msgstr "Dva igralca"
-
-#~ msgid "Waiting for clients"
-#~ msgstr "Čakanje na ostale igralce"
 
 #~ msgid "Waiting for server"
 #~ msgstr "Čakanje na strežnik"
@@ -1728,14 +1514,496 @@ msgstr "[noben]"
 #~ msgid "XR591"
 #~ msgstr "XR591"
 
-#~ msgid "Zipper - speed boost"
-#~ msgstr "Vžigalnik - poveča hitrost"
-
-#~ msgid "joy %d axis %d  %c"
-#~ msgstr "joy %d os %d %c"
-
-#~ msgid "joy %d btn %d"
-#~ msgstr "joy %d gumb %d"
-
 #~ msgid "not set"
 #~ msgstr "ni nastavljeno"
+
+#~ msgid "%dx%d Blacklisted"
+#~ msgstr "%dx%d na črni listi"
+
+#~ msgid ""
+#~ "'%s' has\n"
+#~ "been eliminated."
+#~ msgstr ""
+#~ "'%s' je\n"
+#~ "bil odstranjen."
+
+#~ msgid ""
+#~ "3 Strikes Battle : only in multiplayer games.\n"
+#~ "Hit others with weapons until they lose all their lives."
+#~ msgstr ""
+#~ "Bitka na 3 zmage : samo v večigralskih igrah.\n"
+#~ "Zadevajte ostale z orožji, dokler ne izgubijo vseh življenj."
+
+#~ msgid "< Back"
+#~ msgstr "< Nazaj"
+
+#~ msgid "All tracks included in SuperTuxKart"
+#~ msgstr "Vse proge, vključene v SuperTuxKart"
+
+#~ msgid "Anvil - slows down greatly the kart in the first position"
+#~ msgstr "Sidro - močno upočasni vozilo na prvem mestu"
+
+#~ msgid "Apply "
+#~ msgstr "Uveljavi "
+
+#~ msgid "Apply %dx%d"
+#~ msgstr "Uveljavi %dx%d"
+
+#~ msgid "At world's end"
+#~ msgstr "Na koncu sveta"
+
+#~ msgid "Back to the menu"
+#~ msgstr "Nazaj na meni"
+
+#~ msgid ""
+#~ "Bowling Ball - bounces off walls. If you are looking back,\n"
+#~ "it will be thrown backwards."
+#~ msgstr ""
+#~ "Krogla za kegljanje - odbija se od zidov. Če gledate nazaj,\n"
+#~ "bo vržena nazaj."
+
+#~ msgid ""
+#~ "Cake - thrown at the closest rival,\n"
+#~ "best on short ranges and long straights"
+#~ msgstr ""
+#~ "Torta - vržena v najbližjega nasprotnika,\n"
+#~ "najboljša na kratkih razdeljah in dolgih ravninah"
+
+#~ msgid "Can't connect to server"
+#~ msgstr "Ni povezave do strežnika"
+
+#~ msgid "Canyon"
+#~ msgstr "Soteska"
+
+#~ msgid "Choose your controls, %s"
+#~ msgstr "Izberite svoje kontrole, %s"
+
+#~ msgid "Clear from Blacklist"
+#~ msgstr "Počisti iz črne liste"
+
+#~ msgid ""
+#~ "Collecting nitro allows you to get speed boosts whenever you\n"
+#~ "wish by pressing the appropriate key. You can see your\n"
+#~ "current level of nitro in the bar at the right of the game screen."
+#~ msgstr ""
+#~ "Zbiranje nitra vam omogoča pridobitev hitrostnih pospeškov, kadarkoli\n"
+#~ "pritisnete na ustrezno tipko. Vašo trenutno količino nitra lahko vidite v "
+#~ "stolpcu na desni strani zaslona."
+
+#~ msgid ""
+#~ "Come first in the At World's End\n"
+#~ "Grand Prix with 3 'Racer'\n"
+#~ "Level AI karts."
+#~ msgstr ""
+#~ "Zmagajte na turnirju Na koncu sveta\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "na stopnji 'Dirkač'."
+
+#~ msgid "Confirm Resolution"
+#~ msgstr "Potrditev ločljivosti"
+
+#~ msgid "Confirm Resolution Within %d Seconds"
+#~ msgstr "Potrditev ločljivosti: še %d sekund"
+
+#~ msgid "Confirm Resolution Within 5 Seconds"
+#~ msgstr "Potrditev ločljivosti v 5 sekundah"
+
+#~ msgid "Connect to server"
+#~ msgstr "Povezovanje na strežnik"
+
+#~ msgid ""
+#~ "Created by Ingo Ruhnke,\n"
+#~ "modified by M. Gagnon"
+#~ msgstr ""
+#~ "Ustvaril: Ingo Ruhnke,\n"
+#~ "spremenil: M. Gagnon"
+
+#~ msgid ""
+#~ "Created by Oliver & Steve Baker\n"
+#~ "modified by Marianne Gagnon"
+#~ msgstr ""
+#~ "Ustvarila: Oliver & Steve Baker,\n"
+#~ "spremenila: Marianne Gagnon"
+
+#~ msgid "Crescent Crossing"
+#~ msgstr "Polmesečno križišče"
+
+#~ msgid "Decrease Resolution"
+#~ msgstr "Pomanjšanje ločljivosti"
+
+#~ msgid "Difficulty"
+#~ msgstr "Težavnostna stopnja"
+
+#~ msgid "Display"
+#~ msgstr "Prikaz"
+
+#~ msgid "Display Settings"
+#~ msgstr "Nastavitve prikaza"
+
+#~ msgid "Edit controls for who?"
+#~ msgstr "Urejanje kontrol za koga?"
+
+#~ msgid ""
+#~ "Finish 3 laps in Racetrack\n"
+#~ "with 3 easy AI karts\n"
+#~ "in under 2:40 minutes."
+#~ msgstr ""
+#~ "Končajte 3 kroge na dirkalni progi\n"
+#~ "s 3 lahkimi računalniško vodenimi vozili\n"
+#~ "v manj kot 2 minutah in 40 sekundah."
+
+#~ msgid ""
+#~ "Finish 3 laps on the City track\n"
+#~ "with 3 AI karts\n"
+#~ "in under 4:20 minutes."
+#~ msgstr ""
+#~ "Končajte 3 kroge na mestni progi\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "v manj kot 4 minutah in 20 sekundah."
+
+#~ msgid ""
+#~ "Finish 3 laps on the Tux Tollway\n"
+#~ "track with 3 AI karts\n"
+#~ "in under 3:35 minutes."
+#~ msgstr ""
+#~ "Končajte 3 kroge na Tuxevi avtocesti\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "v manj kot 3 minutah in 35 sekundah."
+
+#~ msgid ""
+#~ "Finish with at least 9 nitro \n"
+#~ "points on 3 laps of Shifting Sands\n"
+#~ "in under 2:20 minutes."
+#~ msgstr ""
+#~ "Končajte z vsaj 9 enotami nitra\n"
+#~ "v 3 krogih Premikajočih sipin\n"
+#~ "v manj kot 2 minutah in 20 sekundah."
+
+#~ msgid ""
+#~ "Finsih with at least 6 points\n"
+#~ " of intro on three laps of\n"
+#~ "Oliver's Math Class\n"
+#~ "in under 52 seconds."
+#~ msgstr ""
+#~ "Končajte z vsaj 6 enotami nitra\n"
+#~ "v 3 krogih Oliverjeve matematične učilnice\n"
+#~ "v manj kot 52 sekundah."
+
+#~ msgid ""
+#~ "Follow the Leader on a\n"
+#~ "Desert Island"
+#~ msgstr ""
+#~ "Sledite vodji na\n"
+#~ "Puščavskem otoku"
+
+#~ msgid ""
+#~ "Follow the leader: run for second place, as the last kart\n"
+#~ "will be disqualified every time the counter hits zero.\n"
+#~ " Beware : going in front of the leader will get you eliminated too!"
+#~ msgstr ""
+#~ "Sledite vodji: potegujte se za drugo mesto, saj bo zadnje vozilo\n"
+#~ "izločeno vsakič, ko števec doseže ničlo.\n"
+#~ "Pozor: izločitev bo povzročilo tudi prehitevanje vodje!"
+
+#~ msgid "Force your rivals bite *your* dust!"
+#~ msgstr "Prisilite vaše nasprotnike, da žrejo *vaš* prah!"
+
+#~ msgid "Fort Magma"
+#~ msgstr "Utrdba magme"
+
+#~ msgid "Fullscreen mode"
+#~ msgstr "Celozaslonski način"
+
+#~ msgid "Game mode help"
+#~ msgstr "Pomoč glede igralnih načinov"
+
+#~ msgid "Game modes"
+#~ msgstr "Igralni načini"
+
+#~ msgid "Go back to the main menu"
+#~ msgstr "Pojdi nazaj na glavni meni"
+
+#~ msgid ""
+#~ "Grand Prix: Win victory points \n"
+#~ "by racing through a group of tracks,  \n"
+#~ "most points wins (shortest time in case of a tie!)          "
+#~ msgstr ""
+#~ "Turnir: Priborite si zmagovalne točke\n"
+#~ "z dirkanjem skozi skupino prog, \n"
+#~ "zmaga največ točk (če je neodločeno zmaga najkrajši čas)          "
+
+#~ msgid ""
+#~ "If you see a button with a lock like the one to the right,\n"
+#~ "you need to complete a challenge to unlock it."
+#~ msgstr ""
+#~ "Če vidite gumb s ključavnico, kot je prikazano na desni,\n"
+#~ "morate dokončati izziv, da jo odklenete."
+
+#~ msgid "Increase Resolution"
+#~ msgstr "Povečanje ločljivosti"
+
+#~ msgid "Invalid"
+#~ msgstr "Neveljavno"
+
+#~ msgid "Invalid short-cut!!"
+#~ msgstr "Neveljavna bližnjica!"
+
+#~ msgid "King Weird's Castle"
+#~ msgstr "Grad kralja Čudnega"
+
+#~ msgid "Look back"
+#~ msgstr "Pogled nazaj"
+
+#~ msgid "New Feature Unlocked"
+#~ msgstr "Odklenjena nova posebnost"
+
+#~ msgid ""
+#~ "New Grand Prix '%s'\n"
+#~ "now available"
+#~ msgstr ""
+#~ "Na voljo je novi turnir\n"
+#~ "'%s'"
+
+#~ msgid ""
+#~ "New difficulty\n"
+#~ "'%s'\n"
+#~ "now available"
+#~ msgstr ""
+#~ "Na voljo je\n"
+#~ "nova težavnostna stopnja\n"
+#~ "'%s'"
+
+#~ msgid ""
+#~ "New game mode\n"
+#~ "'%s'\n"
+#~ "now available"
+#~ msgstr ""
+#~ "Na voljo je\n"
+#~ "nov igralni način\n"
+#~ "'%s'"
+
+#~ msgid ""
+#~ "New kart\n"
+#~ "'%s'\n"
+#~ "now available"
+#~ msgstr ""
+#~ "Nea voljo je\n"
+#~ "novo vozilo\n"
+#~ "'%s'"
+
+#~ msgid ""
+#~ "New track '%s'\n"
+#~ "now available"
+#~ msgstr ""
+#~ "Na voljo je nova proga\n"
+#~ "'%s'"
+
+#~ msgid "Next >"
+#~ msgstr "Naslednje >"
+
+#~ msgid "No Grand Prix selected"
+#~ msgstr "Ni izbranega turnirja"
+
+#~ msgid "Number of karts"
+#~ msgstr "Število vozil"
+
+#~ msgid "Old config file found, check your key bindings!"
+#~ msgstr "Najdena stara nastavitvena datoteka, preverite vaše nastavitve tipk!"
+
+#~ msgid "Player "
+#~ msgstr "Igralec "
+
+#~ msgid "Player Config"
+#~ msgstr "Nastavitev igralca"
+
+#~ msgid ""
+#~ "Plunger - throw straight to pull an opponent back,\n"
+#~ "or throw while looking back to make one lose sight!"
+#~ msgstr ""
+#~ "Odmaševalec odtokov - vrzite naravnost, da nasprotnika potegnete nazaj\n"
+#~ "ali pa vrzite medtem, ko gledate nazaj, da nasprotnika začasno oslepite!"
+
+#~ msgid "Press <ESC> to Cancel"
+#~ msgstr "Pritisnite <ESC> za preklic"
+
+#~ msgid "Press <ESC> to go back"
+#~ msgstr "Pritisnite <ESC> za vrnitev nazaj"
+
+#~ msgid "Press key"
+#~ msgstr "Pritisnite tipko"
+
+#~ msgid "Quick race: Pick a single track, shortest time wins.         "
+#~ msgstr "Hitra dirka: Izberite posamično progo, zmaga najkrajši čas.         "
+
+#~ msgid "REV"
+#~ msgstr "Vrtljaji"
+
+#~ msgid "Race results"
+#~ msgstr "Rezultati dirke"
+
+#~ msgid "Racer"
+#~ msgstr "Dirkač"
+
+#~ msgid "Racetrack"
+#~ msgstr "Dirkalna proga"
+
+#~ msgid "Return To Race"
+#~ msgstr "Vrnitev na dirko"
+
+#~ msgid "Select network mode"
+#~ msgstr "Izbira mrežnega načina"
+
+#~ msgid "Single Race"
+#~ msgstr "Posamična dirka"
+
+#~ msgid "Skyline"
+#~ msgstr "Obzorje"
+
+#~ msgid "Snow Mountain"
+#~ msgstr "Snežena gora"
+
+#~ msgid "SnowTux Peak"
+#~ msgstr "Vrh snežni Tux"
+
+#~ msgid "Sound Settings"
+#~ msgstr "Nastavitve zvoka"
+
+#~ msgid "Splitscreen"
+#~ msgstr "Deljeni zaslon"
+
+#~ msgid "Star Track"
+#~ msgstr "Zvezdna proga"
+
+#~ msgid "Start race"
+#~ msgstr "Začetek dirke"
+
+#~ msgid "Synchronising network..."
+#~ msgstr "Sinhroniziranje omrežja..."
+
+#~ msgid "Synchronising."
+#~ msgstr "Sinhroniziranje."
+
+#~ msgid ""
+#~ "The 'sharp turn' key allows you to do sharp turns\n"
+#~ "and have better control in tight curves"
+#~ msgstr ""
+#~ "Tipka 'Oster zavoj' vam omogoča izvajanje ostrih zavojev\n"
+#~ "in boljši nadzor v tesnih ovinkih"
+
+#~ msgid ""
+#~ "The current key bindings can be seen/changed in the\n"
+#~ "Options->Player Config menu."
+#~ msgstr ""
+#~ "Trenutne nastavitve tipke se lahko preverijo/spremenijo v\n"
+#~ "meniju Možnosti->Nastavitev igralca."
+
+#~ msgid "To help you win, there are certain powerups you can grab:"
+#~ msgstr "Da si pomagate do zmage, lahko poberete določene pripomočke:"
+
+#~ msgid "Turn off music"
+#~ msgstr "Izklop glasbe"
+
+#~ msgid "Turn off sound effects"
+#~ msgstr "Izklop zvočnih učinkov"
+
+#~ msgid "Turn on music"
+#~ msgstr "Vklop glasbe"
+
+#~ msgid "Turn on sound effects"
+#~ msgstr "Vklop zvočnih učinkov"
+
+#~ msgid "Tux Tollway"
+#~ msgstr "Tuxeva avtocesta"
+
+#~ msgid "Waiting for clients"
+#~ msgstr "Čakanje na odjemalce"
+
+#~ msgid ""
+#~ "Win Penguin Playground Grand\n"
+#~ "Prix"
+#~ msgstr "Zmagajte na turnirju Pingvinovo igrišče"
+
+#~ msgid ""
+#~ "Win Penguin Playground Grand\n"
+#~ "Prix with 3 'Racer' Level AI karts."
+#~ msgstr ""
+#~ "Zmagajte na turnirju Pingvinovo igrišče\n"
+#~ "s 3 računalniško vodenimi vozili."
+
+#~ msgid ""
+#~ "Win To the Moon and Back\n"
+#~ "Grand Prix"
+#~ msgstr "Zmagajte na turnirju Na Luno in nazaj"
+
+#~ msgid ""
+#~ "Win a 1 lap Head to Head\n"
+#~ "on Tux Tollway against 1 'Racer'\n"
+#~ "level AI kart."
+#~ msgstr ""
+#~ "Zmagajte 1 krog dolgo dirko\n"
+#~ "na Tuxevi avtocesti proti 1\n"
+#~ "računalniško vodenemu vozilu na stopnji 'Dirkač'."
+
+#~ msgid ""
+#~ "Win a Follow the Leader race\n"
+#~ "with 3 AI karts\n"
+#~ "in the Amazonian Jungle."
+#~ msgstr ""
+#~ "Zmagajte dirko tipa sledite vodji\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "v Amazonski džungli."
+
+#~ msgid ""
+#~ "Win a Follow the Leader race\n"
+#~ "with 3 AI karts\n"
+#~ "on a Desert Island."
+#~ msgstr ""
+#~ "Zmagajte dirko tipa sledite vodji\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "na Puščavskem otoku."
+
+#~ msgid ""
+#~ "Win a Head to Head on\n"
+#~ "Tux Tollway"
+#~ msgstr ""
+#~ "Zmagajte dirko 1 na 1\n"
+#~ "na Tuxevi avtocesti"
+
+#~ msgid ""
+#~ "Win the At World's End\n"
+#~ "Grand Prix"
+#~ msgstr "Zmagajte na turnirju Na koncu sveta"
+
+#~ msgid ""
+#~ "Win the To the Moon and Back\n"
+#~ "Grand Prix with 3 'Racer'\n"
+#~ "Level AI karts."
+#~ msgstr ""
+#~ "Zmagajte na turnirju Na Luno in nazaj\n"
+#~ "s 3 računalniško vodenimi vozili\n"
+#~ "na stopnji 'Dirkač'."
+
+#~ msgid ""
+#~ "You have been\n"
+#~ "eliminated!"
+#~ msgstr ""
+#~ "Bili ste\n"
+#~ "izločeni!"
+
+#~ msgid "Zipper - speed boost"
+#~ msgstr "Zadrga - pospešek"
+
+#~ msgid "joy %d axis %d  %c"
+#~ msgstr "joy %d axis %d  %c"
+
+#~ msgid "joy %d btn %d"
+#~ msgstr "joy %d btn %d"
+
+#~ msgid "joy %d hat %d"
+#~ msgstr "joy %d hat %d"
+
+#~ msgid "mouse axis %d %c"
+#~ msgstr "mouse axis %d %c"
+
+#~ msgid "mouse btn %d"
+#~ msgstr "mouse btn %d"

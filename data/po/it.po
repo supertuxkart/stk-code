@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-06-22 08:13+0000\n"
-"Last-Translator: t3ddy <Unknown>\n"
+"PO-Revision-Date: 2010-06-24 16:38+0000\n"
+"Last-Translator: STK-team <Unknown>\n"
 "Language-Team: STK italian <pvinci26@hotmail.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-23 04:04+0000\n"
+"X-Launchpad-Export-Date: 2010-06-25 04:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Italian\n"
 
@@ -671,7 +671,7 @@ msgstr "Gamepad pulsante %d"
 #: src/input/input.cpp:486
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Gamepad levetta %d"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu

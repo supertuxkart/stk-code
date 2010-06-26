@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-06-22 21:37+0000\n"
+"PO-Revision-Date: 2010-06-26 01:02+0000\n"
 "Last-Translator: Magne Djupvik <Unknown>\n"
 "Language-Team: STK norwegian team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-23 04:04+0000\n"
+"X-Launchpad-Export-Date: 2010-06-26 04:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NORWAY\n"
 "X-Poedit-Language: Norwegian Bokmal\n"
@@ -62,7 +62,7 @@ msgstr "%1 hekter seg på %0 for en gratis kjøretur"
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "%1 stapper %0s ansikt inn i en sugekopp"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
@@ -534,7 +534,7 @@ msgstr "Ekspert"
 
 #: src/states_screens/feature_unlocked.cpp:378
 msgid "Feature Unlocked"
-msgstr ""
+msgstr "Ny funksjon tilgjengelig"
 
 #: src/modes/linear_world.cpp:259
 msgid "Final lap!"
@@ -668,7 +668,7 @@ msgstr "Gamepad-knapp %d"
 #: src/input/input.cpp:486
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Styrespak for håndkontroll %d"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -891,7 +891,7 @@ msgstr "Antall AI-karter"
 #. I18N: only the game master is allowed to
 #: src/input/input_manager.cpp:474
 msgid "Only the Game Master may act at this point!"
-msgstr ""
+msgstr "Bare spillets grunnlegger kan gjøre noe nå!"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -945,7 +945,7 @@ msgstr "Spillere"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:351
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Vennligst rekonfigurer dine tastaturbindinger."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:27
@@ -1071,7 +1071,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:356
 msgid "See unlocked features"
-msgstr ""
+msgstr "Se tilgjengelige funksjoner"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
@@ -1336,7 +1336,7 @@ msgstr "Du er blitt eliminert!"
 #: src/states_screens/dialogs/race_over_dialog.cpp:344
 #: src/states_screens/grand_prix_over.cpp:87
 msgid "You unlocked a new feature!"
-msgstr ""
+msgstr "Du avdekket en ny funksjon!"
 
 #: src/karts/kart.cpp:486 src/karts/kart.cpp:505
 msgid "You won the race!"
@@ -1361,6 +1361,7 @@ msgstr ""
 #: src/input/device_manager.cpp:353
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
+"Din inndatas konfigurasjonsfil er ikke kompatibel med denne versjonen av STK."
 
 #. I18N: Unbound key binding
 #. I18N: ./data/gui/options_device.stkgui

@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7 PL\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-05-24 20:29+0000\n"
-"Last-Translator: Patryk Wychowaniec <Unknown>\n"
+"PO-Revision-Date: 2010-06-25 10:26+0000\n"
+"Last-Translator: Patryk13_03 <patryk1303@gmail.com>\n"
 "Language-Team: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-28 03:50+0000\n"
+"X-Launchpad-Export-Date: 2010-06-26 04:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-Language: Polish\n"
@@ -17,27 +17,27 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:92
 #, c-format
 msgid "   Keyboard %i"
-msgstr ""
+msgstr "   Klawiatura: %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 łapie za tyłek %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 zjadł za dużo ciasta od %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 dostaje śmieszną maskę od %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 strącony przez %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
@@ -52,7 +52,7 @@ msgstr ""
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr ""
+msgstr "%0 nie zagra już ponownie z kręgle z %1"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
@@ -279,7 +279,7 @@ msgstr "Na końcu świata"
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "Dźwięk"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -325,7 +325,7 @@ msgstr "Powrót do wyścigu"
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:408
 msgid "Back to device list"
-msgstr ""
+msgstr "Powrót do listy urządzeń"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: ./data/gui/challenges.stkgui
@@ -339,7 +339,7 @@ msgstr "Powrót do głównego menu"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Banan? Skrzynia? Banan? Skrzynia? Banan? Skrzynia?"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -383,7 +383,7 @@ msgstr "Anuluj usunięcie"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:175
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Anuluj/Powróć"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:125
 msgid "Cannot add a player with this name."
@@ -500,7 +500,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
 msgid "Down"
-msgstr ""
+msgstr "Dół"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -510,7 +510,7 @@ msgstr "Włączone"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:696
 msgid "Energy"
-msgstr ""
+msgstr "Energia"
 
 #. I18N: In the 'add new player' dialog
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:40
@@ -640,7 +640,7 @@ msgstr "Wyniki GP:"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "Klawisze gry"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -707,7 +707,7 @@ msgstr "Rezultaty grand prix"
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr ""
+msgstr "Grafika"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -741,7 +741,7 @@ msgstr ""
 #: src/input/input_manager.cpp:449
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Ignorowanie '%s', powinieneś/powinnaś dołączyć wcześniej go gry!"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -804,7 +804,7 @@ msgstr "Pokonaj przyciwników!"
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:93
 msgid "Menu Keys"
-msgstr ""
+msgstr "Klawisze menu"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:494
@@ -939,7 +939,7 @@ msgstr "Gracze"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:351
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Ustaw sterowanie jeszcze raz."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:27
@@ -1042,7 +1042,7 @@ msgstr "Ratunek"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:370
 msgid "Resolution"
-msgstr ""
+msgstr "Rozdzielczość"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:100
@@ -1070,7 +1070,7 @@ msgstr "Zobacz odblokowane funkcje"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:172
 msgid "Select"
-msgstr ""
+msgstr "Wybierz"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:138
@@ -1096,7 +1096,7 @@ msgstr "Skręt rekina"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:366
 msgid "Skin"
-msgstr ""
+msgstr "Skórka"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
 #: data/po/gui_strings.h:490
@@ -1126,12 +1126,12 @@ msgstr "Zacznij wyścig"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:130
 msgid "Steer Left"
-msgstr ""
+msgstr "Skręt w lewo"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:133
 msgid "Steer Right"
-msgstr ""
+msgstr "Skręt w prawo"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help1.stkgui
@@ -1182,7 +1182,7 @@ msgstr "To grand prix jest uszkodzone!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:691
 msgid "Time"
-msgstr ""
+msgstr "Czas"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:146
@@ -1237,7 +1237,7 @@ msgstr "Autor trasy: %s"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:160
 msgid "Up"
-msgstr ""
+msgstr "Góra"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1245,7 +1245,7 @@ msgstr ""
 #. I18N: Sound volume in options
 #: data/po/gui_strings.h:78 data/po/gui_strings.h:90
 msgid "Volume"
-msgstr ""
+msgstr "Głośność"
 
 #: src/modes/linear_world.cpp:777
 msgid "WRONG WAY!"
