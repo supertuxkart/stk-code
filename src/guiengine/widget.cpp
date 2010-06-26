@@ -134,9 +134,9 @@ void Widget::elementRemoved()
 // -----------------------------------------------------------------------------
 
 void Widget::setActivated()
-{
-    if (!m_deactivated) return; // already active, nothing to do
-    
+{    
+    // even if this one is already active, do it anyway on purpose, maybe the
+    // children widgets need to be updated
     m_deactivated = false;
     const int count = m_children.size();
     for (int n=0; n<count; n++)
@@ -149,8 +149,8 @@ void Widget::setActivated()
 
 void Widget::setDeactivated()
 {
-    if (m_deactivated) return; // already deactivated, nothing to do
-
+    // even if this one is already inactive, do it anyway on purpose, maybe the
+    // children widgets need to be updated
     m_deactivated = true;
     const int count = m_children.size();
     for (int n=0; n<count; n++)

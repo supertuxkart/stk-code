@@ -120,6 +120,8 @@ void OptionsScreenVideo::init()
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
     {
+        res->clearItems();
+        
         const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
         const int amount = modes.size();
         for(int n=0; n<amount; n++)
@@ -150,7 +152,7 @@ void OptionsScreenVideo::init()
     } // end if not inited
     
     res->updateItemDisplay();
-    
+        
     // forbid changing resolution from in-game
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
     {
