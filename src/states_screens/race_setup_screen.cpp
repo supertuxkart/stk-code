@@ -136,8 +136,7 @@ void RaceSetupScreen::onGameModeChanged()
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
     
-    //FIXME: don't hardcode player 0?
-    std::string gamemode = w2->getSelectionIDString(0);
+    std::string gamemode = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     // deactivate the AI karts count widget for modes for which we have no AI
     //FIXME? Don't hardcode here which modes have an AI and which don't
