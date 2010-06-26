@@ -85,7 +85,6 @@ void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
     
-    //FIXME: need to delete this pointer
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
@@ -93,6 +92,8 @@ void Screen::loadFromFile()
     
     // invoke callback so that the class deriving from Screen is aware of this event
     loadedFromFile();
+    
+    delete xml;
 }
 
 // -----------------------------------------------------------------------------
