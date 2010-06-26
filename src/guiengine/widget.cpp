@@ -162,12 +162,15 @@ void Widget::setDeactivated()
 // -----------------------------------------------------------------------------
 namespace GUIEngine
 {
-    // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values... xD
+    // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values
+    const unsigned int focusableIdsBase = 100;
+    const unsigned int unfocusableIdsBase = 1000;
+    
     /** Used to assign irrLicht IDs to widgets dynamically */
-    static unsigned int id_counter = 100;
+    static unsigned int id_counter = focusableIdsBase;
     
     /** for items that can't be reached with keyboard navigation but can be clicked */
-    static unsigned int id_counter_2 = 1000;
+    static unsigned int id_counter_2 = unfocusableIdsBase;
 }
 
 int Widget::getNewID()
@@ -177,6 +180,13 @@ int Widget::getNewID()
 int Widget::getNewNoFocusID()
 {
     return id_counter_2++;
+}
+
+
+bool Widget::isFocusableId(const int id)
+{
+    if (id >= unfocusableIdsBase) return false;
+    else                          return true;
 }
 
 // -----------------------------------------------------------------------------

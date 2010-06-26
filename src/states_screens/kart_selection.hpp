@@ -95,7 +95,7 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver*);
-    
+
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
 };

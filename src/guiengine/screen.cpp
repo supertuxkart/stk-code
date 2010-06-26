@@ -50,6 +50,8 @@ Screen::Screen(const char* file)
     m_throttle_FPS   = true;
     m_render_3d      = false;
     m_loaded         = false;
+    m_first_widget   = NULL;
+    m_last_widget    = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -82,6 +84,7 @@ Screen::~Screen()
 void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
+    
     //FIXME: need to delete this pointer
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
@@ -111,7 +114,6 @@ void Screen::unload()
 
 // -----------------------------------------------------------------------------
 
-/* small shortcut so this method can be called without arguments */
 void Screen::calculateLayout()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -326,7 +328,9 @@ void Screen::addWidgets()
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     else std::cerr << "Couldn't select first widget, NULL was returned\n";
 }
+
 // -----------------------------------------------------------------------------
+
 void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
@@ -356,6 +360,7 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
 }
 
 // -----------------------------------------------------------------------------
+
 /**
  * Called when screen is removed. This means all irrlicht widgets this object has pointers
  * to are now gone. Set all references to NULL to avoid problems.
@@ -378,13 +383,17 @@ void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
         }
     }
 }
+
 // -----------------------------------------------------------------------------
+
 void Screen::manualAddWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
     m_widgets.push_back(w);
 }
+
 // -----------------------------------------------------------------------------
+
 void Screen::manualRemoveWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -445,7 +454,8 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
         
         if (widget.searchInsideMe() && widget.m_children.size() > 0)
         {
-            // std::cout << "widget = <" << widget.m_properties[PROP_ID].c_str() << ">  widget.m_children.size()=" << widget.m_children.size() << std::endl;
+            // std::cout << "widget = <" << widget.m_properties[PROP_ID].c_str() 
+            //           << ">  widget.m_children.size()=" << widget.m_children.size() << std::endl;
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }
@@ -453,9 +463,12 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
     
     return NULL;
 }
+
 // -----------------------------------------------------------------------------
+
 Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
 {
+    if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
     
     for (int i = 0; i < within_vector->size(); i++)
@@ -484,9 +497,12 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
     }
     return NULL;
 }
+
 // -----------------------------------------------------------------------------
+
 Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 {
+    if (m_last_widget != NULL) return m_last_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
     
     for (int i = within_vector->size()-1; i >= 0; i--)

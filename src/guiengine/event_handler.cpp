@@ -277,7 +277,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         {
             const bool success = el->getTabGroup()->getNextElement(el->getTabOrder() - n,
                                                                    true /* reverse */, false /* group */,
-                                                                   first, closest);
+                                                                   first, closest, true);
             
             if (success)
             {
@@ -394,7 +394,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         for (int n=0; n<10 && !found; n++)
         {
             const bool success = el->getTabGroup()->getNextElement(el->getTabOrder()+n,
-                                                                   false, false, first, closest);
+                                                                   false, false, first, closest, true);
             
             if (success)
             {

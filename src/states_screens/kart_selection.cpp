@@ -68,23 +68,28 @@ public:
     FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUTTON)
     {
         m_parent = parent;
-        m_reserved_id = -1;
         m_supports_multiplayer = true;
         
         x = 0;
         y = 0;
         w = 1;
         h = 1;
+        
+        m_reserved_id = Widget::getNewNoFocusID();
     }
     
     void setRootID(const int reservedID)
     {
+        assert(reservedID != -1);
         m_reserved_id = reservedID;
+        if (m_element != NULL)
+        {
+            m_element->setID(m_reserved_id);
+        }
     }
     
     virtual void add()
     {
-        assert(m_reserved_id != -1);
         core::rect<s32> widget_size = core::rect<s32>(x, y, x + w, y + h);
         
         //gui::IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(L" ", widget_size, false, false, NULL, m_reserved_id);
@@ -96,6 +101,7 @@ public:
         m_element->setTabOrder(id);
         m_element->setVisible(false);
     }
+    
     
     virtual EventPropagation focused(const int playerID);
 };
@@ -716,12 +722,14 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 void KartSelectionScreen::loadedFromFile()
 {
     g_dispatcher = new FocusDispatcher(this);
+    m_first_widget = g_dispatcher;
     m_player_confirmed = false;
     
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     
+    m_last_widget = tabs;
     tabs->clearAllChildren();
     
     const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
@@ -759,6 +767,21 @@ void KartSelectionScreen::loadedFromFile()
 
 void KartSelectionScreen::init()
 {
+    Widget* placeholder = this->getWidget("playerskarts");
+    assert(placeholder != NULL);
+    
+    g_dispatcher->setRootID(placeholder->m_reserved_id);
+
+    g_root_id = placeholder->m_reserved_id;
+    if (!m_widgets.contains(g_dispatcher))
+    {
+        m_widgets.push_back(g_dispatcher);
+        
+        // this is only needed if the dispatcher wasn't already in the list of widgets.
+        // If it already was, it was added along other widgets.
+        g_dispatcher->add();
+    }
+    
     m_player_confirmed = false;
     
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
@@ -810,6 +833,17 @@ void KartSelectionScreen::init()
     
     // Player 0 select default kart
     w->setSelection(UserConfigParams::m_default_kart, 0, true);
+    
+    /*
+    std::cout << "===== screen contents =====\n";
+    gui::IGUIElement* root = GUIEngine::getGUIEnv()->getRootGUIElement();
+    const core::list< gui::IGUIElement * > children = root->getChildren();
+    for (core::list< gui::IGUIElement * >::ConstIterator it = children.begin(); it != children.end(); it++)
+    {
+        std::cout << (*it)->getID() << " : " << (*it)->getTypeName() << " " << core::stringc((*it)->getText()).c_str() << "\n";
+    }
+    std::cout << "==========================\n";
+     */
 }
 
 // -----------------------------------------------------------------------------
@@ -834,10 +868,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
     if (UserConfigParams::m_verbosity>=5) std::cout << "playerJoin() ==========\n";
 
-    if (g_dispatcher == NULL)
-    {
-        g_dispatcher = new FocusDispatcher(this);
-    }
+    assert (g_dispatcher != NULL);
     
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
@@ -881,18 +912,6 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     const int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
     StateManager::ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
-    
-    // ---- Create focus dispatcher
-    if (firstPlayer)
-    {
-        g_dispatcher->setRootID(kartsArea.m_reserved_id);
-        g_dispatcher->add();
-        if (!m_widgets.contains(g_dispatcher)) m_widgets.push_back(g_dispatcher);
-
-        // We keep the ID of the "root" widget, see comment at top
-        g_root_id = kartsArea.m_reserved_id;
-        //std::cout << "++++ root ID : " << g_root_id << std::endl;
-    }
     
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
@@ -1011,13 +1030,6 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
         }
     }
     
-    /*
-    for (std::map<PlayerKartWidget*, std::string>::iterator it = selections.begin(); 
-         it != selectiosn.end();
-         it++)
-    {
-    }
-     */
     
     // check if all players are ready
     bool allPlayersReady = true;
@@ -1511,7 +1523,7 @@ EventPropagation FocusDispatcher::focused(const int playerID)
 { 
     if(UserConfigParams::m_verbosity>=5)
         std::cout << "FocusDispatcher focused by player " << playerID << std::endl;
-    
+
     // since this screen is multiplayer, redirect focus to the right widget
     const int amount = m_parent->m_kart_widgets.size();
     for (int n=0; n<amount; n++)
@@ -1534,7 +1546,8 @@ EventPropagation FocusDispatcher::focused(const int playerID)
         }
     }
     
-    assert(false);
+    std::cerr << "WARNING: the focus dispatcher in kart selection screen can't find the widget for player " << playerID << "!\n";
+    //assert(false);
     return GUIEngine::EVENT_LET;        
 }
 

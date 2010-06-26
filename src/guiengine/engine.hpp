@@ -148,6 +148,8 @@ namespace GUIEngine
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
 
+    Screen*                           getScreenNamed(const char* name);
+    
     /** \return the height of the title font in pixels */
     int   getTitleFontHeight();
     

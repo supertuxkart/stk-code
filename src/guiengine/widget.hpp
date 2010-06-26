@@ -386,6 +386,8 @@ namespace GUIEngine
         static int getNewID();
         static int getNewNoFocusID();
         
+        static bool isFocusableId(const int id);
+        
         /**
          * Override in children to possibly receive updates (you may need to register to
          * them first)

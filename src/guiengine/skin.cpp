@@ -744,7 +744,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                                                        rect.UpperLeftCorner.Y - y_shift_up),
                                      dimension2d< s32 >(rectWidth, rectHeight) );
             
-            if (widget->m_deactivated)
+            if (widget->m_deactivated || ID_DEBUG)
             {
                 SColor colors[] =  { SColor(100,255,255,255),
                                      SColor(100,255,255,255),
@@ -1063,7 +1063,8 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
     }
     
     core::rect< s32 > sized_rect = rect;
-    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
+        widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
         const float texture_size = sin(m_dialog_size*M_PI*0.5f);
@@ -1086,7 +1087,7 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
     
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
     
-    if (widget->m_deactivated)
+    if (widget->m_deactivated || ID_DEBUG)
     {
         SColor colors[] =  { SColor(100,255,255,255),
                              SColor(100,255,255,255),
@@ -1389,7 +1390,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     }
 
     
-    if (ID_DEBUG && id != -1)
+    if (ID_DEBUG && id != -1 && Widget::isFocusableId(id))
     {
         irr::core::stringw idstring;
         idstring += id;

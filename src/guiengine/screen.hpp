@@ -90,6 +90,18 @@ namespace GUIEngine
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         
         /**
+          * Screen is generally able to determine its first widget just fine, but in highly complex screens
+          * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+          */
+        Widget* m_first_widget;
+        
+        /**
+         * Screen is generally able to determine its last widget just fine, but in highly complex screens
+         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+         */
+        Widget* m_last_widget;
+        
+        /**
           * @brief Recursive call that lays out children widget within parent (or screen if none).
           *
           * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
@@ -171,7 +183,7 @@ namespace GUIEngine
         /** \brief adds the irrLicht widgets corresponding to this screen to the IGUIEnvironment */
         void addWidgets();
         
-        /** called after all widgets have been added. namely expands layouts into absolute positions */
+        /** \brief called after all widgets have been added. namely expands layouts into absolute positions */
         void calculateLayout();
         
         /** \brief can be used for custom purposes for which the load-screen-from-XML code won't make it */
@@ -230,8 +242,14 @@ namespace GUIEngine
           */
         virtual void unloaded() {}
         
+        /**
+          * \brief Optional callback invoked very early, before widgets have been added (contrast with
+          *        init(), which is invoked afer widgets were added)
+          */
+        virtual void beforeAddingWidget() {}
+        
         /** 
-          * \brief callback invoked when entering this menu
+          * \brief callback invoked when entering this menu (after the widgets have been added)
           *
           * \note the same instance of your object may be entered/left more than once, so make sure that
           * one instance of your object can be used several times if the same screen is visited several
