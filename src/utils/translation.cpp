@@ -208,7 +208,7 @@ const wchar_t* Translations::w_gettext(const char* original)
         FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
         
         static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
-        
+        for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
         fribidi_boolean result = fribidi_log2vis(fribidiInput,
                                                  len-1,
                                                  &pbase_dir,
