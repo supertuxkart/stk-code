@@ -1458,6 +1458,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     
     // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
     
+    int usableKartCount = 0;
+
     if (selected_kart_group == ALL_KART_GROUPS_ID)
     {
         const int kart_amount = kart_properties_manager->getNumberOfKarts();
@@ -1475,6 +1477,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             else
             {
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                usableKartCount++;
             }
         }
     }
@@ -1502,11 +1505,16 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             else
             {
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                usableKartCount++;
             }
         }
     }
+    
     // add random
-    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
+    if (usableKartCount > 1)
+    {
+        w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
+    }
     
     w->updateItemDisplay();    
 }
