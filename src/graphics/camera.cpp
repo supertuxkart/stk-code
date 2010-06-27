@@ -133,7 +133,8 @@ void Camera::setupCamera()
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
-}   // setupCamera
+    
+    }   // setupCamera
 
 // ----------------------------------------------------------------------------
 /** Sets the mode of the camera.
@@ -149,6 +150,10 @@ void Camera::setMode(Mode mode)
         computeNormalCameraPosition(&wanted_position, &wanted_target);
         m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
+        assert(!isnan(m_camera->getPosition().X));
+        assert(!isnan(m_camera->getPosition().Y));
+        assert(!isnan(m_camera->getPosition().Z));
+
     }
     if(mode==CM_FINAL)
     {
@@ -190,6 +195,10 @@ void Camera::setInitialTransform()
                           + core::vector3df(0, 25, -50)   );
     m_camera->setRotation(core::vector3df(0, 0, 0));
     m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
+    
+    assert(!isnan(m_camera->getPosition().X));
+    assert(!isnan(m_camera->getPosition().Y));
+    assert(!isnan(m_camera->getPosition().Z));
 }   // setInitialTransform
 
 //-----------------------------------------------------------------------------
@@ -209,6 +218,10 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);
 
+    assert(!isnan(m_camera->getPosition().X));
+    assert(!isnan(m_camera->getPosition().Y));
+    assert(!isnan(m_camera->getPosition().Z));
+    
     if (race_manager->getNumLocalPlayers() < 2)
     {
         sfx_manager->positionListener(current_position,  current_target - current_position);
