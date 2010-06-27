@@ -181,58 +181,58 @@ const wchar_t* Translations::w_gettext(const char* original)
     
     
 #if ENABLE_BIDI
-    
-    const int FRIBIDI_BUFFER_SIZE = 512;
-    FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-    
-    int len = 0;
-    int n = 0;
-    //std::cout << "fribidi input : ";
-    for (n = 0; ; n++) 
+    if(this->isRTLLanguage())
     {
-        fribidiInput[n] = out_ptr[n];
-        //std::cout << (int)fribidiInput[n] << " ";
-        len++;
+        const int FRIBIDI_BUFFER_SIZE = 512;
+        FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
         
-        if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
+        int len = 0;
+        int n = 0;
+        //std::cout << "fribidi input : ";
+        for (n = 0; ; n++) 
         {
-            std::cerr << "WARNING : translated stirng too long, truncating!\n";
-            fribidiInput[n] = 0;
-            break;
+            fribidiInput[n] = out_ptr[n];
+            //std::cout << (int)fribidiInput[n] << " ";
+            len++;
+            
+            if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
+            {
+                std::cerr << "WARNING : translated string too long, truncating!\n";
+                fribidiInput[n] = 0;
+                break;
+            }
+            if (fribidiInput[n] == 0) break; // stop on '\0'
         }
-        if (fribidiInput[n] == 0) break; // stop on '\0'
-    }
-    //std::cout << " (len=" << len << ")\n";
+        //std::cout << " (len=" << len << ")\n";
 
-    FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
-    
-    static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
-    
-    fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                             len-1,
-                                             &pbase_dir,
-                                             fribidiOutput,
-                                             /* gint        *position_L_to_V_list */ NULL,
-                                             /* gint        *position_V_to_L_list */ NULL,
-                                             /* gint8       *embedding_level_list */ NULL
-                                             );
-    
-    if (!result)
-    {
-        std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
-    }
-    
-    //std::cout << "fribidi output : ";
-    //for (FriBidiChar* c=fribidiOutput; *c != 0; c++)
-    //{
-    //    std::cout << (int)fribidiOutput[n] << " ";
-    //}
-    //std::cout << "\n";
+        FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
+        
+        static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
+        
+        fribidi_boolean result = fribidi_log2vis(fribidiInput,
+                                                 len-1,
+                                                 &pbase_dir,
+                                                 fribidiOutput,
+                                                 /* gint        *position_L_to_V_list */ NULL,
+                                                 /* gint        *position_V_to_L_list */ NULL,
+                                                 /* gint8       *embedding_level_list */ NULL
+                                                 );
+        
+        if (!result)
+        {
+            std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
+        }
+        
+        //std::cout << "fribidi output : ";
+        //for (FriBidiChar* c=fribidiOutput; *c != 0; c++)
+        //{
+        //    std::cout << (int)fribidiOutput[n] << " ";
+        //}
+        //std::cout << "\n";
 
-    
-    return (const wchar_t*)fribidiOutput;
-    
-#else
+        
+        return (const wchar_t*)fribidiOutput;
+    }
     
     return out_ptr;
     
