@@ -221,6 +221,8 @@ const wchar_t* Translations::w_gettext(const char* original)
         if (!result)
         {
             std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
+            m_converted_string = core::stringw(original);
+            return m_converted_string.c_str();
         }
         
         //std::cout << "fribidi output : ";
