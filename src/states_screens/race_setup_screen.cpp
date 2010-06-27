@@ -167,6 +167,8 @@ void RaceSetupScreen::init()
     w->setSelection( race_manager->getDifficulty(), PLAYER_ID_GAME_MASTER );
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
+    kartamount->setActivated();
+    kartamount->m_text = L""; // FIXME: dirty trick (see below)
     kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
