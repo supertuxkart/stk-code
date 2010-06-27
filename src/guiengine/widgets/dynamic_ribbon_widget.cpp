@@ -821,6 +821,7 @@ void DynamicRibbonWidget::updateItemDisplay()
             else
             {
                 icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
+                icon->resetAllBadges();
                 icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
                 //std::cout << "    item " << i << " is a FILLER\n";
             }
