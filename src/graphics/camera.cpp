@@ -255,6 +255,7 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY( sin(angle_up)    );
     wanted_position->setZ(-cos(angle_around));
+    
     *wanted_position *= m_distance;
     *wanted_position += *wanted_target;
 }   // computeNormalCameraPosition

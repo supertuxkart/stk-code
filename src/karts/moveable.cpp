@@ -31,6 +31,7 @@ Moveable::Moveable()
     m_motion_state    = 0;
     m_mesh            = NULL;
     m_node            = NULL;
+    m_heading         = 0;
 }   // Moveable
 
 //-----------------------------------------------------------------------------
