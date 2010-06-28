@@ -27,6 +27,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/nitro.hpp"
 #include "graphics/shadow.hpp"
@@ -481,7 +482,7 @@ void Kart::finishedRace(float time)
             m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
-        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
+        if (m_camera) m_camera->setMode(Camera::CM_FINAL);
         
         RaceGUI* m = World::getWorld()->getRaceGUI();
         if(m)

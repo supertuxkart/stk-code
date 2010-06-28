@@ -31,6 +31,7 @@ using namespace irr;
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -813,6 +814,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
         {
             handleSky(*node, path);
+        }
+        else if(name=="end-cameras")
+        {
+            Camera::readEndCamera(*node);
         }
         else
         {

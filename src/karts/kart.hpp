@@ -25,7 +25,6 @@
 
 #include "btBulletDynamicsCommon.h"
 
-#include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/emergency_animation.hpp"
@@ -36,19 +35,20 @@
 #include "karts/kart_model.hpp"
 #include "tracks/terrain_info.hpp"
 
-class SkidMarks;
-class Shadow;
-class Item;
-class Smoke;
-class WaterSplash;
-class Nitro;
-class SlipStream;
-class SFXBase;
-class btUprightConstraint;
 class btKart;
+class btUprightConstraint;
 class btVehicleTuning;
+class Camera;
+class Item;
+class Nitro;
 class Quad;
+class Shadow;
+class SFXBase;
+class SkidMarks;
+class SlipStream;
+class Smoke;
 class Stars;
+class WaterSplash;
 
 /** The main kart class. All type of karts are of this object, but with 
  *  different controllers. The controllers are what turn a kart into a 

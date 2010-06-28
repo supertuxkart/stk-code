@@ -360,7 +360,7 @@ namespace StringUtils
      */
     std::string timeToString(float time)
     {
-        int int_time   = time*100.0f+0.5f;
+        int int_time   = (int)(time*100.0f+0.5f);
         int min        = int_time / 6000;
         int sec        = (int_time-min*6000)/100;
         int hundredths = (int_time - min*6000-sec*100);

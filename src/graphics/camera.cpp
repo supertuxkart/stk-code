@@ -29,11 +29,14 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "io/xml_node.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+
+std::vector<Camera::EndCameraInformation> Camera::m_end_cameras;
 
 Camera::Camera(int camera_index, const Kart* kart)
 {
@@ -63,6 +66,23 @@ Camera::~Camera()
 {
     irr_driver->removeCameraSceneNode(m_camera);
 }   // ~Camera
+
+//-----------------------------------------------------------------------------
+/** Reads the information about the end camera. This information is shared
+ *  between all cameras, so this is a static function.
+ *  \param node The XML node containing all end camera informations
+ */
+void Camera::readEndCamera(const XMLNode &root)
+{
+    m_end_cameras.clear();
+    for(unsigned int i=0; i<root.getNumNodes(); i++)
+    {
+        const XMLNode *node = root.getNode(i);
+        EndCameraInformation eci;
+        if(!eci.readXML(*node)) continue;
+        m_end_cameras.push_back(eci);
+    }   // for i<getNumNodes()
+}   // readEndCamera
 
 //-----------------------------------------------------------------------------
 /** Sets up the viewport, aspect ratio, field of view, and scaling for this
@@ -154,6 +174,7 @@ void Camera::setMode(Mode mode)
         computeNormalCameraPosition(&wanted_position, &wanted_target);
         m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
+
         assert(!isnan(m_camera->getPosition().X));
         assert(!isnan(m_camera->getPosition().Y));
         assert(!isnan(m_camera->getPosition().Z));
@@ -161,12 +182,15 @@ void Camera::setMode(Mode mode)
     }
     if(mode==CM_FINAL)
     {
-#undef NEW_FINAL_CAMERA
-#ifdef NEW_FINAL_CAMERA
-        m_camera->setPosition(core::vector3df(-2, 1, 10));
-        m_camera->setTarget(m_kart->getXYZ().toIrrVector());
-#endif
-    }
+        m_next_end_camera    = m_end_cameras.size()>1 ? 1 : 0;
+        m_current_end_camera = 0;
+        if(m_end_cameras.size()>0 && 
+            m_end_cameras[0].m_type==EndCameraInformation::EC_STATIC_FOLLOW_KART)
+        {
+            m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
+            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+        }
+    }   // mode==CM_FINAL
 
     m_mode = mode;
 }   // setMode
@@ -199,7 +223,8 @@ void Camera::setInitialTransform()
                           + core::vector3df(0, 25, -50)   );
     m_camera->setRotation(core::vector3df(0, 0, 0));
     m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
-    
+    m_camera->setFOV(m_fov);
+
     assert(!isnan(m_camera->getPosition().X));
     assert(!isnan(m_camera->getPosition().Y));
     assert(!isnan(m_camera->getPosition().Z));
@@ -296,48 +321,14 @@ void Camera::update(float dt)
             break;
         }
     case CM_FINAL:
-#ifdef NEW_FINAL_CAMERA
         {
-            const core::vector3df &cp = m_camera->getAbsolutePosition();
-            const Vec3            &kp = m_kart->getXYZ();
-            // Estimate the fov, assuming that the vector from the camera to
-            // the kart and the kart length are orthogonal to each other
-            // --> tan (fov) = kart_length / camera_kart_distance
-            // In order to show a little bit of the surrounding of the kart
-            // the kart length is multiplied by 3 (experimentally found, but
-            // this way we have approx one kart length on the left and right
-            // side of the screen for the surroundings)
-            float fov = atan2(3*m_kart->getKartLength(),
-                                (cp-kp.toIrrVector()).getLength());
-            m_camera->setFOV(fov);
-            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+            handleEndCamera(dt);
             break;
         }
-#else
-        {
-            wanted_target.setY(wanted_target.getY()+ 0.75f);
-            float angle_around = m_kart->getHeading()
-                               //+ m_rotation_range * m_kart->getSteerPercent() 
-                               //* m_kart->getSkidding()
-                               ;
-            float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
-            wanted_position.setX( sin(angle_around));
-            wanted_position.setY( sin(angle_up)    );
-            wanted_position.setZ( cos(angle_around));
-            wanted_position *= m_distance * 2.0f;
-            wanted_position += wanted_target;
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            m_camera->setPosition(wanted_position.toIrrVector());
-            m_camera->setTarget(wanted_target.toIrrVector());
-            break;
-        }
-#endif
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             wanted_target.setY(wanted_target.getY()+ 0.75f);
-            float angle_around = m_kart->getHeading()
-                               + m_rotation_range * m_kart->getSteerPercent() 
-                               * m_kart->getSkidding();
+            float angle_around = m_kart->getHeading();
             float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY( sin(angle_up)    );
@@ -388,6 +379,73 @@ void Camera::update(float dt)
     }
 
 }   // update
+
+// ----------------------------------------------------------------------------
+/** This function handles the end camera. It adjusts the camera position
+ *  according to the current camera type, and checks if a switch to the 
+ *  next camera should be made.
+ *  \param dt Time step size.
+*/
+void Camera::handleEndCamera(float dt)
+{
+    switch(m_end_cameras[m_current_end_camera].m_type)
+    {
+    case EndCameraInformation::EC_STATIC_FOLLOW_KART:
+        {
+            const core::vector3df &cp = m_camera->getAbsolutePosition();
+            const Vec3            &kp = m_kart->getXYZ();
+            // Estimate the fov, assuming that the vector from the camera to
+            // the kart and the kart length are orthogonal to each other
+            // --> tan (fov) = kart_length / camera_kart_distance
+            // In order to show a little bit of the surrounding of the kart
+            // the kart length is multiplied by 3 (experimentally found, but
+            // this way we have approx one kart length on the left and right
+            // side of the screen for the surroundings)
+            float fov = 3*atan2(m_kart->getKartLength(),
+                                (cp-kp.toIrrVector()).getLength());
+            m_camera->setFOV(fov);
+            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+            break;
+        }
+    case EndCameraInformation::EC_AHEAD_OF_KART:
+        {
+            Vec3 wanted_target = m_kart->getXYZ();
+            wanted_target.setY(wanted_target.getY()+ 0.75f);
+            float angle_around = m_kart->getHeading()
+                //+ m_rotation_range * m_kart->getSteerPercent() 
+                //* m_kart->getSkidding()
+                ;
+            float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
+            Vec3 wanted_position;
+            wanted_position.setX( sin(angle_around));
+            wanted_position.setY( sin(angle_up)    );
+            wanted_position.setZ( cos(angle_around));
+            wanted_position *= m_distance * 2.0f;
+            wanted_position += wanted_target;
+            smoothMoveCamera(dt, wanted_position, wanted_target);
+            m_camera->setPosition(wanted_position.toIrrVector());
+            m_camera->setTarget(wanted_target.toIrrVector());
+            break;
+        }
+    default: break;
+    }   // switch
+
+    // Now test if the kart is close enough to the next end camera, and
+    // if so activate it.
+    if( m_end_cameras.size()>0 && 
+        m_end_cameras[m_next_end_camera].isReached(m_kart->getXYZ()))
+    {
+        m_current_end_camera = m_next_end_camera;
+        if(m_end_cameras[m_current_end_camera].m_type
+            ==EndCameraInformation::EC_STATIC_FOLLOW_KART)
+            m_camera->setPosition(
+                m_end_cameras[m_current_end_camera].m_position.toIrrVector()
+                );
+        m_camera->setFOV(m_fov);
+        m_next_end_camera++;
+        if(m_next_end_camera>=m_end_cameras.size()) m_next_end_camera = 0;
+    }
+}   // handleEndCamera
 
 // ----------------------------------------------------------------------------
 /** Sets viewport etc. for this camera. Called from irr_driver just before
