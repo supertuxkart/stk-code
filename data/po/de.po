@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-06-20 22:33+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2010-06-26 15:55+0000\n"
+"Last-Translator: Wolfs <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-22 04:32+0000\n"
+"X-Launchpad-Export-Date: 2010-06-27 03:58+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-"
 "vanilla/supertuxkart\n"
@@ -42,7 +42,7 @@ msgstr "%0 bekommt von %1 eine hübsche Maske"
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr "%0 wurde von %1 weggekegelt"
+msgstr "%0 wird von %1 weggekegelt"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
@@ -723,7 +723,7 @@ msgstr "Grand Prix Ergebnisse"
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr "Grafik"
+msgstr "Grafik- und Bildbearbeitung"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -731,7 +731,7 @@ msgstr "Grafik"
 #: src/states_screens/dialogs/race_paused_dialog.cpp:107
 #: data/po/gui_strings.h:238
 msgid "Help"
-msgstr "Hilfe"
+msgstr "&Hilfe"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:220
 msgid "Highscores"
@@ -766,12 +766,12 @@ msgstr ""
 #. I18N: Difficulty
 #: data/po/gui_strings.h:131
 msgid "Intermediate"
-msgstr "Fahrer"
+msgstr ""
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:64
 msgid "Keep this resolution"
-msgstr "Auflösung beibehalten"
+msgstr "Diese Auflösung beibehalten"
 
 #: src/states_screens/race_gui.cpp:89
 msgid "Lap"

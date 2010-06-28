@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-05-25 20:45+0200\n"
-"PO-Revision-Date: 2010-06-25 15:00+0000\n"
+"PO-Revision-Date: 2010-06-27 07:55+0000\n"
 "Last-Translator: JJ <Unknown>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-26 04:13+0000\n"
+"X-Launchpad-Export-Date: 2010-06-28 03:59+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/states_screens/options_screen_input.cpp:92
@@ -132,7 +132,7 @@ msgstr "'아이템 사용키'를 누르시면 다른분들도 참가하실 수 �
 #. I18N: in the help screen
 #: data/po/gui_strings.h:289
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "현재 키 조합은 메뉴 - 설정탭에서 보시거나 변경하실 수 있습니다."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -143,18 +143,20 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
+"대부분의 게임 모드들은 그랜드 픽스 방식으로 플레이 하실 수 있습니다. 그랜드 픽스란 여러 맵을 연속적으로 플레이 하는 게임 방식을 "
+"말하며, 각 맵마다 높은 등수로 들어올수록 높은 점수를 받습니다. 마지막에 가장 많은 점수를 딴 플레이어가 승리하게 됩니다."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:168
 msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
-msgstr ""
+msgstr "어떤 \"아이템 사용키\"를 눌러 게임에 참가하느냐에 따라 어떤 설정을 사용할지가 결정됩니다."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:150
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "배틀 모드"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -162,19 +164,19 @@ msgstr ""
 msgid ""
 "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr ""
+msgstr "배틀모드입니다. 멀티플레이에서만 가능하며 상대가 목숨을 잃을 때가지 아이템으로 상대를 공격하세요!"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:181
 msgid "= Highscores ="
-msgstr ""
+msgstr "= 최고 기록 ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr ""
+msgstr "마법의 힘입니다!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:427
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "그랜드 픽스를 끝냅니다."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -185,30 +187,30 @@ msgstr "프로그램 정보"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:136
 msgid "Accelerate"
-msgstr ""
+msgstr "가속"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:59
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "키보드 설정을 추가합니다"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:199
 msgid "Add Player"
-msgstr ""
+msgstr "플레이어 추가"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:165
 msgid "Add a device"
-msgstr ""
+msgstr "컨트롤러를 추가합니다."
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: data/po/gui_strings.h:106
 msgid "Add-Ons"
-msgstr ""
+msgstr "부가기능"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -218,13 +220,13 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:753
 #: src/states_screens/tracks_screen.cpp:85 data/po/gui_strings.h:110
 msgid "All"
-msgstr ""
+msgstr "모두"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:343
 msgid "All Tracks"
-msgstr ""
+msgstr "모든 트랙"
 
 #: src/states_screens/race_setup_screen.cpp:181
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -233,18 +235,18 @@ msgstr ""
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:499
 msgid "All tracks"
-msgstr ""
+msgstr "모든 트랙"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:36
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr ""
+msgstr "닻 - 현재 1등인 카트의 속도를 급격하게 낮춥니다."
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:378
 msgid "Apply video changes"
-msgstr ""
+msgstr "그래픽 설정을 적용합니다."
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
@@ -256,12 +258,12 @@ msgstr ""
 #: src/items/powerup.cpp:46
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr ""
+msgstr "으악! %s가 닻을 내렸습니다 선장님!!"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:493
 msgid "At World's End"
-msgstr ""
+msgstr "세상의 끝에서"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -277,13 +279,13 @@ msgstr ""
 #: data/po/gui_strings.h:183 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:393
 msgid "Audio"
-msgstr ""
+msgstr "오디오"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:273
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "바나나를 피하세요!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/input.cpp:478
@@ -312,110 +314,110 @@ msgstr ""
 #: data/po/gui_strings.h:335 data/po/gui_strings.h:382
 #: data/po/gui_strings.h:412
 msgid "Back"
-msgstr ""
+msgstr "뒤로"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:70
 msgid "Back to Race"
-msgstr ""
+msgstr "게임 이어하기"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:408
 msgid "Back to device list"
-msgstr ""
+msgstr "컨트롤러 목록으로 돌아가기"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: ./data/gui/challenges.stkgui
 #: data/po/gui_strings.h:47 data/po/gui_strings.h:210
 msgid "Back to main menu"
-msgstr ""
+msgstr "메인 메뉴로 돌아가기"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:395
 msgid "Back to the main menu"
-msgstr ""
+msgstr "메인 메뉴로 돌아가기"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "바나나? 상자? 바나나? 상자? 바나나? 상자?"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
-msgstr ""
+msgstr "볼링볼 - 벽에 부딪히면 튕겨나갑니다. 뒤를 보는 상태에서 던지면 뒤로 던질 수 있습니다."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:139
 msgid "Brake"
-msgstr ""
+msgstr "브레이크"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:21
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr ""
+msgstr "풍선껌 - 씹다가 버린 끈적끈적한 분홍색 풍선껌을 길바닥에 떨어뜨립니다."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:24
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
-msgstr ""
+msgstr "케이크 - 가장 가까이에 위치한 상대에게 던집니다. 가깝고 직선 방향에 있을 수록 명중률이 높습니다."
 
 #: src/states_screens/dialogs/player_info_dialog.cpp:87
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:74
 #: src/states_screens/dialogs/add_device_dialog.cpp:74
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:80
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:169
 msgid "Cancel Remove"
-msgstr ""
+msgstr "삭제 취소"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:175
 msgid "Cancel/Back"
-msgstr ""
+msgstr "취소/뒤로가기"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:125
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "다른이름으로 다시 시도해보세요."
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:230
 msgid "Challenges"
-msgstr ""
+msgstr "도전 모드"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:207
 msgid "Challenges : Trophy Room"
-msgstr ""
+msgstr "도전 모드 : 수상 실적"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:214
 msgid "Choose a Kart"
-msgstr ""
+msgstr "카트를 고르세요!"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:463
 msgid "Collect Nitro in Math Class"
-msgstr ""
+msgstr "'수학 교실' 맵에서 니트로(가속 아이템) 모으기"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:269
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr ""
+msgstr "파란 박스를 모으세요. 무기를 얻거나 카트 성능이 향상됩니다."
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:421
 msgid "Collect the Pharaohs Treasure"
-msgstr ""
+msgstr "파라오의 보물을 찾으세요!!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -425,36 +427,38 @@ msgid ""
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
 msgstr ""
+"니트로(가속 아이템)을 모으면 \"가속\"키를 누를때 마다 부스터로 속도를 향상시킵니다. 현재 모은 니트로의 양을 화면 오른쪽에서 확인 "
+"할 수 있습니다."
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:418
 msgid ""
 "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
-msgstr ""
+msgstr "\"세상의 끝\" 그랜드 픽스 모드를 \"보통\" 난이도로  1등을 해보세요!"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:151
 msgid "Confirm Remove"
-msgstr ""
+msgstr "삭제 확인"
 
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:127
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr ""
+msgstr "현재 해상도를 유지하시려면 %i 초 내에 확인을 누르세요"
 
 #: src/states_screens/race_setup_screen.cpp:188
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "아이템이 없습니다! 따라서 뛰어난 운전 실력이 관건입니다!"
 
 #. I18N: ./data/gui/grand_prix_over.stkgui
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #: data/po/gui_strings.h:113 data/po/gui_strings.h:116
 msgid "Continue"
-msgstr ""
+msgstr "계속"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:412
 msgid "Continue Grand Prix"
-msgstr ""
+msgstr "그랜드 픽스를 계속합니다."
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -470,85 +474,85 @@ msgstr ""
 #: data/po/gui_strings.h:191 data/po/gui_strings.h:362
 #: data/po/gui_strings.h:401
 msgid "Controls"
-msgstr ""
+msgstr "컨트롤"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 #: data/po/gui_strings.h:44
 msgid "Credits"
-msgstr ""
+msgstr "만든 사람들"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:135
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr ""
+msgstr "정말 '%s\"을 (를) 삭제하시겠습니까?"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "연 한번 날려보실레요?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:163
 msgid "Down"
-msgstr ""
+msgstr "아래"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
 #: data/po/gui_strings.h:74 data/po/gui_strings.h:86
 msgid "Enabled"
-msgstr ""
+msgstr "사용함"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:696
 msgid "Energy"
-msgstr ""
+msgstr "에너지"
 
 #. I18N: In the 'add new player' dialog
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:40
 msgid "Enter the new player's name"
-msgstr ""
+msgstr "새 플레이어의 이름을 입력하세요"
 
 #. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:110
 msgid "Exit Race"
-msgstr ""
+msgstr "경기 그만하기"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:135
 msgid "Expert"
-msgstr ""
+msgstr "어려움"
 
 #: src/states_screens/feature_unlocked.cpp:378
 msgid "Feature Unlocked"
-msgstr ""
+msgstr "기능이 잠겨있음"
 
 #: src/modes/linear_world.cpp:259
 msgid "Final lap!"
-msgstr ""
+msgstr "마지막 바퀴입니다!!"
 
 #. I18N: ./data/tracks/jungle/jungle.challenge
 #: data/po/gui_strings.h:448
 msgid ""
 "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
-msgstr ""
+msgstr "\"레이스트랙\" 맵을 난이도가 \"쉬움\"인 3명의 플레이어와 함께 2분 40초 안에 세바퀴를 돌아보세요!"
 
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
 #: data/po/gui_strings.h:454
 msgid ""
 "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
-msgstr ""
+msgstr "\"도시\"맵을 3명의 플레이어와함께 4분 20초만에 끝내보세요."
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:472
 msgid ""
 "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
-msgstr ""
+msgstr "\"턱스 고속도로\" 맵을 3명의 플레이어와 함께 3분 35초 안에 세바퀴를 돌아보세요!"
 
 #. I18N: ./data/tracks/jungle/jungle.challenge
 #: data/po/gui_strings.h:445
 msgid "Finish Race track in 2:40"
-msgstr ""
+msgstr "2분 40초안에 끝내보세요!"
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:469
@@ -558,7 +562,7 @@ msgstr ""
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
 #: data/po/gui_strings.h:451
 msgid "Finish the City track in 4:20"
-msgstr ""
+msgstr "\"도시\" 맵을 4분 20초안에 끝내보세요!"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:466
@@ -566,6 +570,7 @@ msgid ""
 "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
 msgstr ""
+"\"올리버의 수학교실\" 맵을 52초안에 3바퀴를 돌아보세요. 단, 최소한 니트로 (가속 아이템) 점수가 6점은 되야합니다."
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:424
@@ -573,31 +578,32 @@ msgid ""
 "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr ""
+"\"움직이는 모래\" 맵을 2분 20초 안에 3바퀴를 돌아보세요. 단, 최소한 니트로 (가속 아이템) 점수가 9점은 되야합니다."
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui.cpp:88
 msgid "Finished"
-msgstr ""
+msgstr "완주했습니다!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:142
 msgid "Fire"
-msgstr ""
+msgstr "아이템 사용키 (발사)"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:148
 msgid "Follow the Leader"
-msgstr ""
+msgstr "대장 꼬리잡기 모드"
 
 #. I18N: ./data/tracks/city/city.challenge
 #: data/po/gui_strings.h:457
 msgid "Follow the Leader in the Jungle"
-msgstr ""
+msgstr "\"정글\" 맵에서 대장 꼬리잡기 모드로 플레이하기"
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:433
 msgid "Follow the Leader on a Desert Island"
-msgstr ""
+msgstr "\"사막섬\" 맵을 대장 꼬리잡기 모드로 플레이하기"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -607,22 +613,24 @@ msgid ""
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
 msgstr ""
+"대장 꼬리잡기 모드 : 2위로 달리셔야 합니다. 카운트 다운이 0이 될 때마다 꼴찌인 플레이어가 탈락합니다. 주의 : 대장(1위)을 "
+"앞지르는 경우도 탈락입니다!"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:374
 msgid "Fullscreen"
-msgstr ""
+msgstr "전체화면"
 
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:260
 msgid "GP scores :"
-msgstr ""
+msgstr "그랜드픽스 점수:"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:80
 msgid "Game Keys"
-msgstr ""
+msgstr "조종키 설정하기"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: Tab in help menu
@@ -633,7 +641,7 @@ msgstr ""
 #: data/po/gui_strings.h:14 data/po/gui_strings.h:261
 #: data/po/gui_strings.h:308
 msgid "Game Modes"
-msgstr ""
+msgstr "게임 모드"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/input.cpp:482
@@ -655,25 +663,25 @@ msgstr ""
 #. I18N: Tab in help menu
 #: data/po/gui_strings.h:6 data/po/gui_strings.h:253 data/po/gui_strings.h:300
 msgid "General"
-msgstr ""
+msgstr "일반"
 
 #: src/items/powerup.cpp:63
 msgid "Geronimo!!!"
-msgstr ""
+msgstr "제로니모!!! (북아메리카 원주민 아파치족의 영웅)"
 
 #: src/states_screens/race_gui.cpp:93
 msgid "Go!"
-msgstr ""
+msgstr "출발!!"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:339
 msgid "Grand Prix"
-msgstr ""
+msgstr "그랜드 픽스 모드"
 
 #: src/states_screens/grand_prix_over.cpp:331
 msgid "Grand Prix Results"
-msgstr ""
+msgstr "그랜드 픽스 결과"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -689,7 +697,7 @@ msgstr ""
 #: data/po/gui_strings.h:179 data/po/gui_strings.h:350
 #: data/po/gui_strings.h:389
 msgid "Graphics"
-msgstr ""
+msgstr "그래픽"
 
 #. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
@@ -697,17 +705,17 @@ msgstr ""
 #: src/states_screens/dialogs/race_paused_dialog.cpp:107
 #: data/po/gui_strings.h:238
 msgid "Help"
-msgstr ""
+msgstr "도움말"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:220
 msgid "Highscores"
-msgstr ""
+msgstr "최고 기록"
 
 #: src/states_screens/race_setup_screen.cpp:210
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr ""
+msgstr "상대의 목숨이 다할 때까지 무기를 던져 맞추세요!! (멀티플레이에서만 가능합니다)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -715,7 +723,7 @@ msgstr ""
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr ""
+msgstr "이렇게 생긴 자물쇠는 도전과제를 끝내야만 풀립니다!!"
 
 #. I18N: message shown when an input device is used but is not associated to any player
 #: src/input/input_manager.cpp:449
@@ -727,20 +735,20 @@ msgstr ""
 #. I18N: Difficulty
 #: data/po/gui_strings.h:131
 msgid "Intermediate"
-msgstr ""
+msgstr "보통"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:64
 msgid "Keep this resolution"
-msgstr ""
+msgstr "현재 해상도를 유지합니다"
 
 #: src/states_screens/race_gui.cpp:89
 msgid "Lap"
-msgstr ""
+msgstr "바퀴"
 
 #: src/modes/follow_the_leader.cpp:140
 msgid "Leader"
-msgstr ""
+msgstr "대장"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:166
@@ -1296,19 +1304,19 @@ msgstr ""
 
 #: src/karts/kart.cpp:486 src/karts/kart.cpp:505
 msgid "You won the race!"
-msgstr ""
+msgstr "경기에서 승리했어요!!"
 
 #: src/config/user_config.cpp:422
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "설정파일이 잘못되어서 삭제하고 새로운 파일을 생성합니다."
 
 #: src/config/user_config.cpp:432
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "설정파일이 너무 오래되어서 삭제하고 새로운 파일을 생성합니다."
 
 #: src/input/device_manager.cpp:353
 msgid "Your input config file is not compatible with this version of STK."
@@ -1318,4 +1326,4 @@ msgstr ""
 #. I18N: ./data/gui/options_device.stkgui
 #: src/input/input.cpp:39 data/po/gui_strings.h:404
 msgid "[none]"
-msgstr ""
+msgstr "[없음]"
