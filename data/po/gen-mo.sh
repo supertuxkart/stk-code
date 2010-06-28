@@ -20,4 +20,5 @@ msgfmt sv.po -o sv/LC_MESSAGES/supertuxkart.mo
 msgfmt uk.po -o uk/LC_MESSAGES/supertuxkart.mo
 msgfmt zh_CN.po -o zh_CN/LC_MESSAGES/supertuxkart.mo
 msgfmt he.po -o he/LC_MESSAGES/supertuxkart.mo
+msgfmt ko.po -o ko/LC_MESSAGES/supertuxkart.mo
 
