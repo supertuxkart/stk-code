@@ -20,7 +20,11 @@
 
 #include "graphics/camera.hpp"
 
-#include "math.h"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
 
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
