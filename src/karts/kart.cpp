@@ -621,6 +621,9 @@ bool Kart::isNearGround() const
  */
 void Kart::update(float dt)
 {
+    // Update the position and other data taken from the physics    
+    Moveable::update(dt);
+
     if(!history->replayHistory())
         m_controller->update(dt);
     if(m_camera)
@@ -694,8 +697,6 @@ void Kart::update(float dt)
     }  // UserConfigParams::m_graphical_effects
 
     updatePhysics(dt);
-
-    Moveable::update(dt);
 
     /* (TODO: add back when properly done)
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)

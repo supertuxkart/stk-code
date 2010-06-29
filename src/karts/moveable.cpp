@@ -63,10 +63,6 @@ void Moveable::setNode(scene::ISceneNode *n)
 void Moveable::updateGraphics(const Vec3& offset_xyz,  
                               const btQuaternion& rotation)
 {
-#ifdef DEBUG_PRINT
-    printf("moveable: %f %f (%f %f)\n", getXYZ().getX(), getXYZ().getZ(),
-        off_xyz.getX(), off_xyz.getZ());
-#endif
     Vec3 xyz=getXYZ()+offset_xyz;
     btQuaternion r_all = getRotation()*rotation;
     Vec3 hpr;
