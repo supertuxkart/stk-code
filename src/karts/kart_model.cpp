@@ -253,7 +253,7 @@ void KartModel::setAnimation(AnimationFrameType type)
     if(!UserConfigParams::m_show_steering_animations) return;
 
     m_current_animation = type;
-    if(!m_current_animation==AF_DEFAULT)
+    if(m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
         m_animated_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
