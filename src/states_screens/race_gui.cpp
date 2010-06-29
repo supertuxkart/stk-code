@@ -378,7 +378,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 
     
     int y;
-    int ICON_WIDTH=40*(UserConfigParams::m_width/800.0f);
+    int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
     int ICON_PLAYER_WIDTH=50;
     if(UserConfigParams::m_height<600)
     {
@@ -447,7 +447,7 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
 
     int nSize=(int)(64.0f*std::min(scaling.X, scaling.Y));
         
-    int itemSpacing = std::min(scaling.X, scaling.Y)*30;
+    int itemSpacing = (int)(std::min(scaling.X, scaling.Y)*30);
     
     int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2 - (n * itemSpacing)/2;
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
