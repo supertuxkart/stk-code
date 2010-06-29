@@ -257,8 +257,13 @@ void RaceGUI::renderGlobal(float dt)
 void RaceGUI::renderPlayerView(const Kart *kart)
 {
     const core::recti &viewport    = kart->getCamera()->getViewport();
-    const core::vector2df &scaling = kart->getCamera()->getScaling();
+    core::vector2df scaling = kart->getCamera()->getScaling();
+    //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
     
+    scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
+    
+    //std::cout << "Scale : " << scaling.X << ", " << scaling.Y << std::endl;
+
     if (kart->hasViewBlockedByPlunger())
     {
         int offset_y = viewport.UpperLeftCorner.Y;
@@ -536,9 +541,11 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
     core::vector2di offset = viewport.UpperLeftCorner;
-    offset.X              += (int)((UserConfigParams::m_width-10)*scaling.X) - meter_width;
+    offset.X              += viewport.getWidth() - meter_width - (int)(10*scaling.X);
     offset.Y               = viewport.LowerRightCorner.Y-(int)(10*scaling.Y);
 
+    std::cout << "speedometer : " << meter_width << "x" << meter_height << " @ " << offset.X << ", " << offset.Y << std::endl;
+    
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
     video::IVideoDriver *video = irr_driver->getVideoDriver();
