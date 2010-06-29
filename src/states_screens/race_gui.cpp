@@ -378,7 +378,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 
     
     int y;
-    int ICON_WIDTH=40;
+    int ICON_WIDTH=40*(UserConfigParams::m_width/800.0f);
     int ICON_PLAYER_WIDTH=50;
     if(UserConfigParams::m_height<600)
     {
@@ -447,12 +447,10 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
 
     int nSize=(int)(64.0f*std::min(scaling.X, scaling.Y));
         
-    int x1 = (int)((UserConfigParams::m_width/2-32) * scaling.X) 
-           + viewport.UpperLeftCorner.X;
-    //int y1 = UserConfigParams::m_height - viewport.LowerRightCorner.Y 
-    //       + (int)(20 * scaling.Y)+nSize;
-    int y1 = viewport.UpperLeftCorner.Y 
-           + (int)(20 * scaling.Y);
+    int itemSpacing = std::min(scaling.X, scaling.Y)*30;
+    
+    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2 - (n * itemSpacing)/2;
+    int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     assert(powerup != NULL);
     assert(powerup->getIcon() != NULL);
@@ -462,7 +460,7 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
     
     for ( int i = 0 ; i < n ; i++ )
     {
-        int x2=(int)(x1+i*std::min(scaling.X, scaling.Y)*30);
+        int x2=(int)(x1+i*itemSpacing);
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, NULL, 
                                                   NULL, true);
@@ -543,8 +541,6 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
     core::vector2di offset = viewport.UpperLeftCorner;
     offset.X              += viewport.getWidth() - meter_width - (int)(10*scaling.X);
     offset.Y               = viewport.LowerRightCorner.Y-(int)(10*scaling.Y);
-
-    std::cout << "speedometer : " << meter_width << "x" << meter_height << " @ " << offset.X << ", " << offset.Y << std::endl;
     
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
