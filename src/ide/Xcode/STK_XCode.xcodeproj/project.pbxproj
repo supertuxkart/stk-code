@@ -53,6 +53,11 @@
 		954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C270FF98B6E0047FE3E /* animation_manager.cpp */; };
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
 		954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */; };
+		9551B27111DC0D4D002DD140 /* addons_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B26D11DC0D4D002DD140 /* addons_screen.cpp */; };
+		9551B27211DC0D4D002DD140 /* addons_update_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */; };
+		9551B27A11DC0D6A002DD140 /* addons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B27411DC0D6A002DD140 /* addons.cpp */; };
+		9551B27B11DC0D6A002DD140 /* network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B27611DC0D6A002DD140 /* network.cpp */; };
+		9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B27811DC0D6A002DD140 /* zip.cpp */; };
 		9551C8270FC1B72500DB481B /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
 		9551C8290FC1B72500DB481B /* sfx_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */; };
@@ -407,6 +412,16 @@
 		954E4C2A0FF98B6E0047FE3E /* billboard_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = billboard_animation.hpp; path = ../../animations/billboard_animation.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = three_d_animation.cpp; path = ../../animations/three_d_animation.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C2C0FF98B6E0047FE3E /* three_d_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = three_d_animation.hpp; path = ../../animations/three_d_animation.hpp; sourceTree = SOURCE_ROOT; };
+		9551B26D11DC0D4D002DD140 /* addons_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_screen.cpp; path = ../../states_screens/addons_screen.cpp; sourceTree = SOURCE_ROOT; };
+		9551B26E11DC0D4D002DD140 /* addons_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_screen.hpp; path = ../../states_screens/addons_screen.hpp; sourceTree = SOURCE_ROOT; };
+		9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_update_screen.cpp; path = ../../states_screens/addons_update_screen.cpp; sourceTree = SOURCE_ROOT; };
+		9551B27011DC0D4D002DD140 /* addons_update_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_update_screen.hpp; path = ../../states_screens/addons_update_screen.hpp; sourceTree = SOURCE_ROOT; };
+		9551B27411DC0D6A002DD140 /* addons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons.cpp; path = ../../addons/addons.cpp; sourceTree = SOURCE_ROOT; };
+		9551B27511DC0D6A002DD140 /* addons.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons.hpp; path = ../../addons/addons.hpp; sourceTree = SOURCE_ROOT; };
+		9551B27611DC0D6A002DD140 /* network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network.cpp; path = ../../addons/network.cpp; sourceTree = SOURCE_ROOT; };
+		9551B27711DC0D6A002DD140 /* network.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network.hpp; path = ../../addons/network.hpp; sourceTree = SOURCE_ROOT; };
+		9551B27811DC0D6A002DD140 /* zip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = zip.cpp; path = ../../addons/zip.cpp; sourceTree = SOURCE_ROOT; };
+		9551B27911DC0D6A002DD140 /* zip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip.hpp; path = ../../addons/zip.hpp; sourceTree = SOURCE_ROOT; };
 		9551C7F90FC1B63C00DB481B /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = /Library/Frameworks/Ogg.framework; sourceTree = "<absolute>"; };
 		9551C7FA0FC1B63C00DB481B /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
 		9551C7FB0FC1B63C00DB481B /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
@@ -1215,6 +1230,20 @@
 			path = ../../animations;
 			sourceTree = SOURCE_ROOT;
 		};
+		9551B27311DC0D6A002DD140 /* addons */ = {
+			isa = PBXGroup;
+			children = (
+				9551B27411DC0D6A002DD140 /* addons.cpp */,
+				9551B27511DC0D6A002DD140 /* addons.hpp */,
+				9551B27611DC0D6A002DD140 /* network.cpp */,
+				9551B27711DC0D6A002DD140 /* network.hpp */,
+				9551B27811DC0D6A002DD140 /* zip.cpp */,
+				9551B27911DC0D6A002DD140 /* zip.hpp */,
+			);
+			name = addons;
+			path = ../../addons;
+			sourceTree = SOURCE_ROOT;
+		};
 		956C6EC71128D3FB004336C8 /* controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -1269,6 +1298,10 @@
 			isa = PBXGroup;
 			children = (
 				95833236101243ED00C5137E /* dialogs */,
+				9551B26D11DC0D4D002DD140 /* addons_screen.cpp */,
+				9551B26E11DC0D4D002DD140 /* addons_screen.hpp */,
+				9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */,
+				9551B27011DC0D4D002DD140 /* addons_update_screen.hpp */,
 				956541B910DD5F0A00C83E99 /* arenas_screen.cpp */,
 				956541BA10DD5F0A00C83E99 /* arenas_screen.hpp */,
 				951B7D18108E52C900BC03AE /* challenges.cpp */,
@@ -1359,6 +1392,7 @@
 		95C2ABA60F29653F000D3E5D /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9551B27311DC0D6A002DD140 /* addons */,
 				954E4C240FF98B6E0047FE3E /* animations */,
 				95C2AC260F296540000D3E5D /* audio */,
 				95C2AC360F296540000D3E5D /* bullet */,
@@ -2565,6 +2599,11 @@
 				9586318411B1EC9F00B8B4AF /* grand_prix_lose.cpp in Sources */,
 				9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */,
 				9525B71411C851D30094BD96 /* CBatchingMesh.cpp in Sources */,
+				9551B27111DC0D4D002DD140 /* addons_screen.cpp in Sources */,
+				9551B27211DC0D4D002DD140 /* addons_update_screen.cpp in Sources */,
+				9551B27A11DC0D6A002DD140 /* addons.cpp in Sources */,
+				9551B27B11DC0D6A002DD140 /* network.cpp in Sources */,
+				9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

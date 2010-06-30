@@ -14,15 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#ifdef ADDONS_MANAGER
 
-#ifndef HEADER_ADDONS_SCREEN_HPP
-#define HEADER_ADDONS_SCREEN_HPP
+#ifndef HEADER_ADDONS_UPDATE_SCREEN_HPP
+#define HEADER_ADDONS_UPDATE_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "states_screens/dialogs/addons_loading.hpp"
-#include "addons/addons.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 
+class Addons;
 namespace GUIEngine { class Widget; }
 
 /**
@@ -55,4 +54,5 @@ public:
 };
 
 void * startInstall(void *);
+#endif
 #endif

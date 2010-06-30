@@ -15,16 +15,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/addons_screen.hpp"
-#include "states_screens/dialogs/addons_loading.hpp"
+#ifdef ADDONS_MANAGER
 
+#include "states_screens/addons_screen.hpp"
+
+#include "addons/addons.hpp"
+#include "addons/network.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/state_manager.hpp"
-#include "addons/network.hpp"
-#include "addons/addons.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/addons_loading.hpp"
+
 
 /*pthread aren't supported natively by windows. Here a port: http://sourceware.org/pthreads-win32/ */
 #include <pthread.h>
@@ -46,7 +50,7 @@ void AddonsUpdateScreen::loadedFromFile()
 // ------------------------------------------------------------------------------------------------------
 void AddonsUpdateScreen::download_list()
 {
-/*
+#if 0
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_karts");
     
 	this->addons = new Addons(std::string(file_manager->getConfigDir() + "/list_text"), std::string(file_manager->getConfigDir() + "/installed.xml"));
@@ -55,13 +59,14 @@ void AddonsUpdateScreen::download_list()
 	std::string first_kart = this->addons->GetName();
 	std::cout << this->addons->GetName() << std::endl;
 	w_list->addItem(std::string("list_karts" + this->addons->GetName()).c_str(), this->addons->GetName().c_str(), 0 /* icon */);
-    /*while(this->addons->Next())
+    while(this->addons->Next())
     {
         std::cout << this->addons->GetName() << std::endl;
-        w_list->addItem(std::string("list_karts" + this->addons->GetName()).c_str(), this->addons->GetName().c_str(), 0 /* icon *//*);
+        w_list->addItem(std::string("list_karts" + this->addons->GetName()).c_str(), this->addons->GetName().c_str(), 0 /* icon */);
     }
     this->addons->Select(first_kart);
-	this->loadInformations();*/
+	this->loadInformations();
+#endif
 }
 // ------------------------------------------------------------------------------------------------------
 
@@ -142,3 +147,5 @@ void * startInstall(void* pthis)
     obj->loadInformations();
     return NULL;
 }
+
+#endif
