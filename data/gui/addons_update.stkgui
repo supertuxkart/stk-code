@@ -1,0 +1,41 @@
+<stkgui>
+
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+    <header text_align="center" width="100%" text="SuperTuxKart Options"/>
+    <spacer height="15" width="10"/>
+
+    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"
+                I18N="Section in the settings menu" text="Karts"/>
+        <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"
+                I18N="Section in the settings menu" text="Tracks"/>
+    </tabs>
+    <!--<label id="info_addons" width="10%" height="10%" text_align="left" text="[none]" />-->
+
+    <box proportion="1" width="100%" layout="horizontal-row">
+
+        <div height="75%" width="40%" layout="vertical-row">
+            <spacer height="50" width="10"/>
+            <list id="list_karts" proportion="5" width="100%" align="center"/>
+        </div>    
+            <spacer height="40" width="10"/>
+        <div height="40%" width="50%" layout="vertical-row">
+            <spacer height="40" width="10"/>
+            <icon id="logo" align="center" height="50%" width="100%" icon="gui/logo.png"/>
+            <label align="center"  height="15%" width="100%" id="name_addons" />
+            <label align="center"  height="15%" width="100%" id="version_addons" />
+            <label align="center"  height="15%" width="100%" id="description_addons" />
+            <label align="center"  height="15%" width="100%" id="install_addons" />
+            <button id="install" x="20" y="-40" width="250" height="35" align="left"
+                I18N="In the addons menu" text="Install"/>
+        </div>
+
+        <spacer width="50" height="40" />
+    </box>
+</div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left"
+        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
+
+</stkgui>

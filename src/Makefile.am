@@ -278,6 +278,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/race_paused_dialog.cpp \
  states_screens/dialogs/track_info_dialog.cpp \
  states_screens/dialogs/track_info_dialog.hpp \
+ states_screens/dialogs/addons_loading.cpp \
+ states_screens/dialogs/addons_loading.hpp \
  states_screens/arenas_screen.cpp \
  states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \
@@ -306,6 +308,8 @@ supertuxkart_SOURCES = \
  states_screens/options_screen_players.hpp \
  states_screens/options_screen_video.cpp \
  states_screens/options_screen_video.hpp \
+ states_screens/addons_screen.cpp \
+ states_screens/addons_screen.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
  states_screens/race_setup_screen.cpp \
@@ -355,7 +359,13 @@ supertuxkart_SOURCES = \
  utils/translation.cpp \
  utils/translation.hpp \
  utils/vec3.cpp \
- utils/vec3.hpp
+ utils/vec3.hpp \
+ addons/network.cpp \
+ addons/network.hpp \
+ addons/addons.cpp \
+ addons/addons.hpp \
+ addons/zip.cpp \
+ addons/zip.hpp
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \

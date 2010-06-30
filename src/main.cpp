@@ -69,6 +69,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+
 void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
@@ -581,10 +582,6 @@ void cleanTuxKart()
 
 int main(int argc, char *argv[] ) 
 {
-
-#ifdef ADDONS_MANAGER
-std::cout << "Addons manager enabled." << std::endl;
-#endif
     try {
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must

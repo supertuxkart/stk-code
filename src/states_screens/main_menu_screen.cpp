@@ -27,27 +27,59 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/options_screen_video.hpp"
+#include "states_screens/addons_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "io/file_manager.hpp"
 
 // FIXME : remove, temporary test
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
+#include "addons/network.hpp"
 
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
-
+#include <iostream>
+#include <string>
+#include <pthread.h>
 
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
 // ------------------------------------------------------------------------------------------------------
-
+#ifdef ADDONS_MANAGER
+MainMenuScreen::MainMenuScreen() : Screen("mainaddons.stkgui")
+{
+}
+#else
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
 }
+#endif
+#ifdef ADDONS_MANAGER
+void MainMenuScreen::downloadRss()
+{
+    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    FILE* fichier = NULL;
+    char chaine[1000] = "";
+    fichier = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
 
+    std::string info = std::string("");
+    while (fgets(chaine, 1000, fichier) != NULL) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
+    {
+        info += std::string(chaine);
+    }
+
+	
+
+    fclose(fichier);
+    // to remove the break line.
+    //info.replace(info.size()-1,1, "");
+    std::cout << info << std::endl;
+    w->setText(std::string(info).c_str());
+}
+#endif
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
@@ -55,13 +87,17 @@ void MainMenuScreen::loadedFromFile()
 }
 
 // ------------------------------------------------------------------------------------------------------
-
+//
 void MainMenuScreen::init()
 {
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
     input_manager->setMasterPlayerOnly(false);
+#ifdef ADDONS_MANAGER
+    pthread_t nThreadID2;
+    pthread_create(&nThreadID2, NULL, &MainMenuScreen::downloadNews, this);
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -150,7 +186,24 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
     }
-    
+#ifdef ADDONS_MANAGER
+    else if (selection == "addons")
+    {
+        std::cout << "Addons" << std::endl;
+        StateManager::get()->pushScreen(AddonsScreen::getInstance());
+    }
+#endif
 }
 
+#ifdef ADDONS_MANAGER
+// ------------------------------------------------------------------------------------------------------
+void * MainMenuScreen::downloadNews( void * pthis)
+{
+    download("news");
+    MainMenuScreen * pt = (MainMenuScreen*)pthis;
+
+    pt->downloadRss();
+    return NULL;
+}
+#endif
 // ------------------------------------------------------------------------------------------------------

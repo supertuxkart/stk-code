@@ -50,6 +50,8 @@ private:
     bool                        m_is_full_path;
     /** Directory where user config files are stored. */
     std::string                 m_config_dir;
+    /** Directory where addons are stored. */
+    std::string                 m_addons_dir;
     /** Root data directory. */
     std::string                 m_root_dir;
     std::vector<std::string>    m_texture_search_path,
@@ -64,6 +66,9 @@ private:
     bool            checkAndCreateDirectory(const std::string &path);
     io::path        createAbsoluteFilename(const std::string &f);
     void            checkAndCreateConfigDir();
+#ifdef ADDONS_MANAGER
+    void            checkAndCreateAddonsDir();
+#endif
 public:
                     FileManager(char *argv[]);
                    ~FileManager();
@@ -73,6 +78,9 @@ public:
     XMLNode        *createXMLTree(const std::string &filename);
 
     std::string getConfigDir     () const;
+#ifdef ADDONS_MANAGER
+    std::string getAddonsDir     () const;
+#endif
     std::string getKartDir       () const;
     std::string getDataDir       () const;
     std::string getTranslationDir() const;

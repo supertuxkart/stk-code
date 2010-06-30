@@ -1,0 +1,40 @@
+<stkgui>
+
+    <div x="5%" y="0" width="90%" height="98%" layout="vertical-row" >
+    
+        <icon id="logo" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
+            <label width="100%" height="10%" id="info_addons"
+           I18N="In the main screen"
+           text="Loading news from stkaddons..."
+           align="center" text_align="center" />
+        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
+            <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
+                    I18N="Main menu button" text="Race"/>
+            <icon-button id="network" width="128" height="128" icon="gui/main_network.png"
+                    I18N="Main menu button" text="Networking"/>
+            <icon-button id="challenges" width="128" height="128"
+                         icon="gui/challenge.png"
+                         I18N="Main menu button"  text="Challenges"/>
+            <icon-button id="addons" width="128" height="128"
+                         icon="gui/addons.png"
+                         I18N="Main menu button"  text="Addons"/>
+        </buttonbar>
+        
+        <spacer width="10" proportion="1"/>
+        
+        <buttonbar id="menu_bottomrow" proportion="3" width="85%" align="center">
+            <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
+                    I18N="Main menu button"  text="Options"/>
+            <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
+                    I18N="Main menu button" text="Help"/>
+            <icon-button id="about" width="128" height="128" icon="gui/main_about.png"
+                    I18N="Main menu button" text="About"/>
+            <icon-button id="quit" width="128" height="128" icon="gui/main_quit.png"
+                    I18N="Main menu button" text="Quit"/>
+        </buttonbar>
+        
+        <spacer width="10" proportion="1"/>
+        
+    </div>
+
+</stkgui>

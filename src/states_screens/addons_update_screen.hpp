@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2010 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,24 +15,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MAIN_MENU_SCREEN_HPP
-#define HEADER_MAIN_MENU_SCREEN_HPP
+#ifndef HEADER_ADDONS_SCREEN_HPP
+#define HEADER_ADDONS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "states_screens/dialogs/addons_loading.hpp"
+#include "addons/addons.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 
 namespace GUIEngine { class Widget; }
 
 /**
-  * \brief Handles the main menu
+  * \brief Help screen, part 1
   * \ingroup states_screens
   */
-class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
+class AddonsUpdateScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<AddonsUpdateScreen>
 {
-    friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
-    MainMenuScreen();
-public:
+    friend class GUIEngine::ScreenSingleton<AddonsUpdateScreen>;
+    AddonsUpdateScreen();
+    Addons * addons;
+    AddonsLoading  * load;
+    void loadInformations();
     
-    void downloadRss();
+public:
+
+    void download_list();
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
@@ -44,10 +51,8 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
-
-    /** This function is used to download a text from the server to show the news. */
-    static void * downloadNews(void *);
-    
+    friend void * startInstall(void *);
 };
 
+void * startInstall(void *);
 #endif

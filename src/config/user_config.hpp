@@ -314,6 +314,9 @@ namespace UserConfigParams
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Glass.stkskin", "skin_file", "Name of the skin to use") );
+            
+    PARAM_PREFIX StringUserConfigParam      m_server_addons
+            PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
 
     PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
 

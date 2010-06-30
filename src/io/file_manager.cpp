@@ -154,6 +154,9 @@ FileManager::FileManager(char *argv[])
     fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
     checkAndCreateConfigDir();
+#ifdef ADDONS_MANAGER
+    checkAndCreateAddonsDir();
+#endif
 }  // FileManager
 
 //-----------------------------------------------------------------------------
@@ -443,6 +446,61 @@ void FileManager::checkAndCreateConfigDir()
     }
     return;
 }   // checkAndCreateConfigDir
+
+#ifdef ADDONS_MANAGER
+void FileManager::checkAndCreateAddonsDir()
+{
+#ifdef WIN32
+//TODO
+#else
+#  ifdef __APPLE__
+//TODO
+#  else
+    // Remaining unix variants. Use the new standards for config directory
+    // i.e. either XDG_CONFIG_HOME or $HOME/.config
+	if (getenv("XDG_DATA_HOME")!=NULL){
+		m_addons_dir = getenv("XDG_DATA_HOME");
+	}
+    else if (!getenv("HOME"))
+    {
+	    std::cerr << "No home directory, this should NOT happen - trying '.addons' for addons files!\n";
+        m_addons_dir = "stkaddons";
+    }
+    else
+    {
+		m_addons_dir  = getenv("HOME");
+		m_addons_dir += "/.local/share";
+        if(!checkAndCreateDirectory(m_config_dir))
+        {
+            // If $HOME/.config can not be created:
+            fprintf(stderr, "Can't create dir '%s', falling back to use '%s'.\n",
+                    m_config_dir.c_str(), getenv("HOME"));
+            m_addons_dir = getenv("HOME");
+            m_addons_dir += ".";
+        }
+    }
+#  endif
+#endif
+    const std::string CONFIGDIR("supertuxkart");
+
+    m_addons_dir += "/";
+    m_addons_dir += CONFIGDIR;
+    if(!checkAndCreateDirectory(m_addons_dir))
+    {
+        fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
+            m_addons_dir.c_str());
+        m_config_dir = ".";
+    }
+    return;
+}   // checkAndCreateAddonsDir
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getAddonsDir() const
+{
+    return m_addons_dir;
+}   // getConfigDir
+/* see l450: to avoid the compilation of unused methods. */
+#endif
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getConfigDir() const
