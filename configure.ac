@@ -399,10 +399,18 @@ ENETTREE="src/enet"
 
 # Check for gettext
 CHECK_GETTEXT(external)
-
+#disable/enable addons support
+AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
+              [This option is used to enable/disable addons support])])
+if test "x$with_addons" == "xyes" ; then
+    PKG_CHECK_MODULES(LIBCURL, libcurl >= 0.1)
+    echo "STK will compile with addons support"
+    AC_DEFINE(ADDONS_MANAGER)
+fi
 # =========================
 # subst bars in Makefile.am
 # =========================
+
 AC_SUBST(irrlicht_LIBS)
 AC_SUBST(fribidi_LIBS)
 AC_SUBST(bullet_LIBS)

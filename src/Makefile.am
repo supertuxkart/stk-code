@@ -361,5 +361,5 @@ supertuxkart_SOURCES = \
 supertuxkart_LDADD = \
         $(irrlicht_LIBS) $(fribidi_LIBS) $(bullet_LIBS) $(enet_LIBS) \
         $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
-        $(INTLLIBS)
+        $(INTLLIBS) $(LIBCURL_LIBS) $(LIBCURL_CFLAGS)
 
