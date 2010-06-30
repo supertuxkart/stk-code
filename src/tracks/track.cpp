@@ -705,7 +705,7 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
-    //m_is_arena             = false;
+    m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
     // Load the graph only now: this function is called from world, after
