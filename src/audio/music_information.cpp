@@ -32,6 +32,7 @@
 MusicInformation::MusicInformation(const std::string& filename) throw (std::runtime_error)
 {
     m_title           = "";
+    m_mode            = SOUND_NORMAL;
     m_composer        = "";
     //m_numLoops        = LOOP_FOREVER;
     m_normal_filename = "";
