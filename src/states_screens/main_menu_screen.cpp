@@ -17,6 +17,12 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
+#include <iostream>
+#include <string>
+#ifdef ADDONS_MANAGER
+#  include <pthread.h>
+#endif
+
 #include "guiengine/widgets.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
@@ -39,9 +45,6 @@
 
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
-#include <iostream>
-#include <string>
-#include <pthread.h>
 
 using namespace GUIEngine;
 

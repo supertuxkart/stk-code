@@ -19,6 +19,11 @@
 
 #include "states_screens/addons_screen.hpp"
 
+/*pthread aren't supported natively by windows. Here a port: http://sourceware.org/pthreads-win32/ */
+#  include <pthread.h>
+#  include <sstream>
+
+
 #include "addons/addons.hpp"
 #include "addons/network.hpp"
 #include "guiengine/widget.hpp"
@@ -28,11 +33,6 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
-
-
-/*pthread aren't supported natively by windows. Here a port: http://sourceware.org/pthreads-win32/ */
-#include <pthread.h>
-#include <sstream>
 
 DEFINE_SCREEN_SINGLETON( AddonsUpdateScreen );
 
@@ -147,5 +147,4 @@ void * startInstall(void* pthis)
     obj->loadInformations();
     return NULL;
 }
-
 #endif

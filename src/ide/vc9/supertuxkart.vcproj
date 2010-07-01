@@ -822,6 +822,14 @@
 				Name="states_screen"
 				>
 				<File
+					RelativePath="..\..\states_screens\addons_screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\addons_update_screen.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\arenas_screen.cpp"
 					>
 				</File>
@@ -909,6 +917,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\addons_loading.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp"
 						>
 					</File>
@@ -941,6 +953,22 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="addons"
+				>
+				<File
+					RelativePath="..\..\addons\addons.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\network.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\zip.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1636,6 +1664,14 @@
 				Name="states_screens"
 				>
 				<File
+					RelativePath="..\..\states_screens\addons_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\addons_update_screen.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\arenas_screen.hpp"
 					>
 				</File>
@@ -1723,6 +1759,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\addons_loading.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp"
 						>
 					</File>
@@ -1755,6 +1795,22 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="addons"
+				>
+				<File
+					RelativePath="..\..\addons\addons.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\network.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\zip.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
