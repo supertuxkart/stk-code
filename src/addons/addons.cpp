@@ -312,7 +312,7 @@ void Addons::Install()
 {
 
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->m_addons_list[this->index].type + "/";
+                this->m_addons_list[this->index].type + "s/";
 
     //download of the addons file
     download(std::string("file/" + this->m_addons_list[this->index].file),

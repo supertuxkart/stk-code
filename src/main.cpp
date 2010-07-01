@@ -549,6 +549,10 @@ void initRest()
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
+#ifdef ADDONS_MANAGER
+    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
+    std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
+#endif
 }
 
 //=============================================================================
