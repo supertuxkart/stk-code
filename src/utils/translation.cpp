@@ -236,9 +236,9 @@ const wchar_t* Translations::w_gettext(const char* original)
         return (const wchar_t*)fribidiOutput;
     }
     
+#endif
     return out_ptr;
     
-#endif
 }
 
 bool Translations::isRTLLanguage() const
