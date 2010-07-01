@@ -361,7 +361,6 @@ std::string FileManager::getConfigFile(const std::string& fname) const
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
-    io::path p=m_file_system->getWorkingDirectory();
     // irrlicht apparently returns true for files and directory
     // (using access/_access internally):
     if(m_file_system->existFile(io::path(path.c_str())))
