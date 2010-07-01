@@ -313,13 +313,13 @@ std::string Addons::GetInstalledVersionAsStr()
 void Addons::Install()
 {
 
-    std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->m_addons_list[this->index].type + "s/";
+
 
     //download of the addons file
     download(std::string("file/" + this->m_addons_list[this->index].file),
             this->m_addons_list[this->index].name);
-
+    file_manager->checkAndCreateDirForAddons(this->m_addons_list[this->index].name,
+        this->m_addons_list[this->index].type + "s/");
     //creating of the data folders
 #ifdef FIXME_ADDON
     // mkdir does no not exist in windows, see filemanager checkandcreatedir 
@@ -329,9 +329,12 @@ void Addons::Install()
 
     mkdir(std::string(dest_file +  this->m_addons_list[this->index].name).c_str(), 0777);
 #endif
-    //extract the zip in the addons folder called like the addons name
+    //extract the zip in the addons folder called like the addons name    
+    std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
+                this->m_addons_list[this->index].type + "s/" +
+                this->m_addons_list[this->index].name + "/" ;
     std::string from = file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name;
-    std::string to = dest_file + this->m_addons_list[this->index].name + "/";
+    std::string to = dest_file;
     const bool success = extract_zip(from, to);
     if (!success)
     {

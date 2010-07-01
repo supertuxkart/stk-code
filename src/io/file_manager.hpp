@@ -80,7 +80,7 @@ public:
     std::string getConfigDir     () const;
 #ifdef ADDONS_MANAGER
     std::string getAddonsDir     () const;
-    void checkAndCreateDirForAddons(std::string addons_path);
+    void checkAndCreateDirForAddons(std::string addons_name, std::string addons_type);
 #endif
     std::string getKartDir       () const;
     std::string getDataDir       () const;

@@ -361,6 +361,7 @@ std::string FileManager::getConfigFile(const std::string& fname) const
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
+    std::cout << "creating...:" << path << std::endl;
     // irrlicht apparently returns true for files and directory
     // (using access/_access internally):
     if(m_file_system->existFile(io::path(path.c_str())))
@@ -491,6 +492,11 @@ void FileManager::checkAndCreateAddonsDir()
             m_addons_dir.c_str());
         m_config_dir = ".";
     }
+    else
+    {
+        //we hope that there will be no problem since we created the other dir
+        checkAndCreateDirectory(m_addons_dir + "/data/");
+    }
     return;
 }   // checkAndCreateAddonsDir
 
@@ -585,8 +591,12 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 //-----------------------------------------------------------------------------
 
 #ifdef ADDONS_MANAGER
-void FileManager::checkAndCreateDirForAddons(std::string addons_path)
+void FileManager::checkAndCreateDirForAddons(std::string addons_name, std::string addons_type)
 {
-    checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_path);
+    bool success = checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type);
+    if(!success)
+        std::cout << "There is a problem with the addons dir." << std::endl;
+    checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type + addons_name);
+        
 }
 #endif
