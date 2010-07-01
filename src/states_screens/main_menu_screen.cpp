@@ -19,9 +19,9 @@
 
 #include <iostream>
 #include <string>
-#ifdef ADDONS_MANAGER
-#  include <pthread.h>
-#endif
+//#ifdef ADDONS_MANAGER
+//#  include <pthread.h>
+//#endif
 
 #include "guiengine/widgets.hpp"
 #include "karts/kart_properties_manager.hpp"
