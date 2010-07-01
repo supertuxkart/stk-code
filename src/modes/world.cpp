@@ -671,8 +671,14 @@ void World::unpause()
     sfx_manager->resumeAll();
     WorldStatus::unpause();
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController())
-            ((PlayerController*)(m_karts[i]->getController()))->resetInputState();
+    {
+        // Note that we can not test for isPlayerController here, since
+        // an EndController will also return 'isPlayerController' if the
+        // kart belonged to a player.
+        PlayerController *pc = dynamic_cast<PlayerController*>(m_karts[i]->getController());
+        if(pc)
+            pc->resetInputState();
+    }
 }   // pause
 
 /* EOF */
