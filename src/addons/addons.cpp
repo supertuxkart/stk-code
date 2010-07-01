@@ -330,8 +330,15 @@ void Addons::Install()
     mkdir(std::string(dest_file +  this->m_addons_list[this->index].name).c_str(), 0777);
 #endif
     //extract the zip in the addons folder called like the addons name
-    extract_zip(file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name,
-            dest_file + this->m_addons_list[this->index].name + "/");
+    std::string from = file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name;
+    std::string to = dest_file + this->m_addons_list[this->index].name + "/";
+    const bool success = extract_zip(from, to);
+    if (!success)
+    {
+        // TODO: show a message in the interface
+        std::cerr << "Failed to unzip " << from << " to " << to << std::endl;
+        return;
+    }
 
     this->m_addons_list[this->index].installed = true;
     this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;

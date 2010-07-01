@@ -282,6 +282,7 @@
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
 		95E246BE111A2959000C965D /* confirm_resolution_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */; };
+		95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E6A0BE11DCF37800AE088A /* addons_loading.cpp */; };
 		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
 		95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */; };
 		95ECA10210124C5000D47C5F /* icon_button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */; };
@@ -387,6 +388,7 @@
 		952A1544103F66D600B1895D /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
 		952A1552103F68D000B1895D /* profile_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profile_world.cpp; path = ../../modes/profile_world.cpp; sourceTree = SOURCE_ROOT; };
 		952A1553103F68D000B1895D /* profile_world.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = profile_world.hpp; path = ../../modes/profile_world.hpp; sourceTree = SOURCE_ROOT; };
+		953606C411DCF1A500791F01 /* SuperTuxKart-Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info copy.plist"; sourceTree = "<group>"; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
@@ -1065,6 +1067,8 @@
 		95DFC5011106933B00A043A9 /* slip_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = slip_stream.hpp; path = ../../graphics/slip_stream.hpp; sourceTree = SOURCE_ROOT; };
 		95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = confirm_resolution_dialog.cpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = confirm_resolution_dialog.hpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		95E6A0BE11DCF37800AE088A /* addons_loading.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_loading.cpp; path = ../../states_screens/dialogs/addons_loading.cpp; sourceTree = SOURCE_ROOT; };
+		95E6A0BF11DCF37800AE088A /* addons_loading.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_loading.hpp; path = ../../states_screens/dialogs/addons_loading.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EC10124C5000D47C5F /* button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = button_widget.cpp; path = ../../guiengine/widgets/button_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0ED10124C5000D47C5F /* button_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = button_widget.hpp; path = ../../guiengine/widgets/button_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_box_widget.cpp; path = ../../guiengine/widgets/check_box_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -1123,6 +1127,7 @@
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */,
 				9507E9B60FC1CCE900BD2B92 /* stk.icns */,
+				953606C411DCF1A500791F01 /* SuperTuxKart-Info copy.plist */,
 			);
 			name = STK_XCode;
 			sourceTree = "<group>";
@@ -1352,6 +1357,8 @@
 			children = (
 				956541DF10DD628C00C83E99 /* add_device_dialog.cpp */,
 				956541E010DD628C00C83E99 /* add_device_dialog.hpp */,
+				95E6A0BE11DCF37800AE088A /* addons_loading.cpp */,
+				95E6A0BF11DCF37800AE088A /* addons_loading.hpp */,
 				95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */,
 				95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */,
 				95833237101243ED00C5137E /* enter_player_name_dialog.cpp */,
@@ -2604,6 +2611,7 @@
 				9551B27A11DC0D6A002DD140 /* addons.cpp in Sources */,
 				9551B27B11DC0D6A002DD140 /* network.cpp in Sources */,
 				9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */,
+				95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2647,6 +2655,67 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
+		};
+		953606C511DCF1B900791F01 /* Debug_with_addons */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
+					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
+				);
+				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../supertuxkart2/src\"";
+				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../supertuxkart2/src/bullet/src\"";
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				ZERO_LINK = NO;
+			};
+			name = Debug_with_addons;
+		};
+		953606C611DCF1B900791F01 /* Debug_with_addons */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9551C9F80FC1B87600DB481B /* Config.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DDEBUG=1",
+					"-DADDONS_MANAGER=1",
+				);
+				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lcurl",
+				);
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				PRODUCT_NAME = SuperTuxKart;
+			};
+			name = Debug_with_addons;
 		};
 		9551C8240FC1B70000DB481B /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2729,6 +2798,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
+				953606C511DCF1B900791F01 /* Debug_with_addons */,
 				1DEB923708733DC60010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2738,6 +2808,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9551C8240FC1B70000DB481B /* Debug */,
+				953606C611DCF1B900791F01 /* Debug_with_addons */,
 				9551C8250FC1B70000DB481B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

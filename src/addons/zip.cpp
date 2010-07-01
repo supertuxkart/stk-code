@@ -45,7 +45,8 @@ s32 IFileSystem_copyFileToFile(IWriteFile* dst, IReadFile* src)
 
   return r;
 }
-void extract_zip(std::string from, std::string to)
+
+bool extract_zip(std::string from, std::string to)
 {
     //get the stk irrlicht device
     IrrlichtDevice * device = irr_driver->getDevice();
@@ -58,11 +59,29 @@ void extract_zip(std::string from, std::string to)
     IFileArchive * zipfile = pfs->getFileArchive(0);
     //extract the file where there is the others file name
     IReadFile* srcFile = pfs->createAndOpenFile("file_list");
+    if (srcFile == NULL)
+    {
+        std::cerr << "Could not open 'file_list', sorry. @" 
+                  << __FILE__ << ":" << __LINE__ << std::endl;
+        return false;
+    }
     IWriteFile* dstFile = pfs->createAndWriteFile(std::string(to + "file_list").c_str());
+    if (dstFile == NULL)
+    {
+        std::cerr << "Could not create '" << std::string(to + "file_list").c_str() << "', sorry. @" 
+                  << __FILE__ << ":" << __LINE__ << std::endl;
+        if (srcFile != NULL) srcFile->drop();
+        return false;
+    }
     std::cout << from.c_str() << std::endl;
     //....
     if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
-    ; // error
+    {
+        std::cerr << "IFileSystem_copyFileToFile failed @" << __FILE__ << ":" << __LINE__ << std::endl;
+        if (srcFile != NULL) srcFile->drop();
+        if (dstFile != NULL) dstFile->drop();
+        return false;
+    }
     srcFile->drop();
     dstFile->drop();
 
@@ -93,5 +112,7 @@ void extract_zip(std::string from, std::string to)
     }
     //remove the zip from the filesystem to save memory and avoid problem with a name conflict
     pfs->removeFileArchive(from.c_str());
+    
+    return true;
 }
 #endif

@@ -19,7 +19,7 @@
 #define HEADER_ZIP_HPP
 
 /** Extract a zip. */
-void extract_zip(std::string, std::string);
+bool extract_zip(std::string, std::string);
 
 #endif
 #endif
