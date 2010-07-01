@@ -488,14 +488,16 @@ void FileManager::checkAndCreateAddonsDir()
 
     if(!checkAndCreateDirectory(m_addons_dir))
     {
-        fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
-            m_addons_dir.c_str());
+        fprintf(stderr, "Can not create add-ons dir '%s', falling back to '.'.\n", m_addons_dir.c_str());
         m_config_dir = ".";
     }
     else
     {
         //we hope that there will be no problem since we created the other dir
-        checkAndCreateDirectory(m_addons_dir + "/data/");
+        if (!checkAndCreateDirectory(m_addons_dir + "/data/"))
+        {
+            fprintf(stderr, "Failed to create add-ons data dir at '%s'\n", (m_addons_dir + "/data/").c_str());
+        }
     }
     return;
 }   // checkAndCreateAddonsDir
