@@ -95,7 +95,7 @@ Addons::Addons()
                 }
                 addons.type = xml->getNodeName();
                 addons.installed = false;
-                this->addons_list.push_back(addons);
+                this->m_addons_list.push_back(addons);
             }
         }
     }
@@ -106,7 +106,7 @@ Addons::Addons()
 }
 void Addons::resetIndex()
 {
-this->index = -1;
+    this->index = -1;
 }
 // ----------------------------------------------------------------------------
 void Addons::GetInstalledAddons()
@@ -153,8 +153,8 @@ void Addons::GetInstalledAddons()
                     }
                     if(this->SelectId(id))
                     {
-                        this->addons_list[this->index].installed = true;
-                        this->addons_list[this->index].installed_version = version;
+                        this->m_addons_list[this->index].installed = true;
+                        this->m_addons_list[this->index].installed_version = version;
                         std::cout << "An addons is already installed: " + id << std::endl;
                     }
                     else
@@ -164,7 +164,7 @@ void Addons::GetInstalledAddons()
                         addons.name = name;
                         addons.installed_version = version;
                         addons.installed = true;
-                        this->addons_list.push_back(addons);
+                        this->m_addons_list.push_back(addons);
                     }
                 }
             }
@@ -180,7 +180,7 @@ void Addons::GetInstalledAddons()
 // ----------------------------------------------------------------------------
 bool Addons::Next()
 {
-    if(this->index + 1 < this->addons_list.size())
+    if(this->index + 1 < this->m_addons_list.size())
     {
         this->index ++;
         return true;
@@ -193,12 +193,12 @@ bool Addons::NextType(std::string type)
 {
     while(this->Next())
     {
-        if(this->addons_list[this->index].type == type)
+        if(this->m_addons_list[this->index].type == type)
             return true;
     }
     while(this->Next())
     {
-        if(this->addons_list[this->index].type == type)
+        if(this->m_addons_list[this->index].type == type)
             return false;
     }
     return false;
@@ -211,7 +211,7 @@ bool Addons::Previous()
         this->index --;
         return true;
     }
-    this->index = this->addons_list.size() - 1;
+    this->index = this->m_addons_list.size() - 1;
     return false;
 }
 // ----------------------------------------------------------------------------
@@ -219,12 +219,12 @@ bool Addons::PreviousType(std::string type)
 {
     while(this->Previous())
     {
-        if(this->addons_list[this->index].type == type)
+        if(this->m_addons_list[this->index].type == type)
             return true;
     }
     while(this->Previous())
     {
-        if(this->addons_list[this->index].type == type)
+        if(this->m_addons_list[this->index].type == type)
             return false;
     }
     return false;
@@ -233,9 +233,9 @@ bool Addons::PreviousType(std::string type)
 bool Addons::Select(std::string name)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < this->addons_list.size(); i++)
+    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
         {
-            if(this->addons_list[i].name == name)
+            if(this->m_addons_list[i].name == name)
             {
                 this->index = i;
                 return true;
@@ -247,9 +247,9 @@ bool Addons::Select(std::string name)
 bool Addons::SelectId(std::string id)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < this->addons_list.size(); i++)
+    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
         {
-            if(this->addons_list[i].id == id)
+            if(this->m_addons_list[i].id == id)
             {
                 this->index = i;
                 return true;
@@ -263,96 +263,74 @@ bool Addons::SelectId(std::string id)
 /* FIXME : remove this function */
 addons_prop Addons::GetAddons()
 {
-    return this->addons_list[this->index];
-}
-std::string Addons::GetType()
-{
-    return this->addons_list[this->index].type;
+    return this->m_addons_list[this->index];
 }
 // ----------------------------------------------------------------------------
 std::string Addons::IsInstalled()
 {
-    if(this->addons_list[this->index].installed)
+    if(this->m_addons_list[this->index].installed)
     {
         return "yes";
     }
     return "no";
 }
 // ----------------------------------------------------------------------------
-bool Addons::IsInstalledAsBool()
-{
-    return this->addons_list[this->index].installed;
-}
-// ----------------------------------------------------------------------------
-std::string Addons::GetName()
-{
-    return this->addons_list[this->index].name;
-}
-// ----------------------------------------------------------------------------
-int Addons::GetVersion()
-{
-    return this->addons_list[this->index].version;
-}
-// ----------------------------------------------------------------------------
-std::string Addons::GetIcon()
-{
-    return this->addons_list[this->index].icon;
-}
-// ----------------------------------------------------------------------------
 std::string Addons::GetVersionAsStr()
 {
     //maybe it is dirty, FIXME ?
     std::ostringstream os;
-    os << this->addons_list[this->index].version;
+    os << this->m_addons_list[this->index].version;
+    return os.str();
+}
+// ----------------------------------------------------------------------------
+std::string Addons::GetIdAsStr()
+{
+    std::ostringstream os;
+    os << this->m_addons_list[this->index].id;
     return os.str();
 }
 // ----------------------------------------------------------------------------
 int Addons::GetInstalledVersion()
 {
-    if(this->addons_list[this->index].installed)
-        return this->addons_list[this->index].installed_version;
+    if(this->m_addons_list[this->index].installed)
+        return this->m_addons_list[this->index].installed_version;
     return 0;
 }
 // ----------------------------------------------------------------------------
 std::string Addons::GetInstalledVersionAsStr()
 {
-    if(this->addons_list[this->index].installed)
+    if(this->m_addons_list[this->index].installed)
     {
         std::ostringstream os;
-        os << this->addons_list[this->index].installed_version;
+        os << this->m_addons_list[this->index].installed_version;
         return os.str();
     }
     return "";
-}
-// ----------------------------------------------------------------------------
-std::string Addons::GetDescription()
-{
-    return this->addons_list[this->index].description;
 }
 // ----------------------------------------------------------------------------
 void Addons::Install()
 {
 
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->addons_list[this->index].type + "/";
+                this->m_addons_list[this->index].type + "/";
 
     //download of the addons file
-    download(std::string("file/" + this->addons_list[this->index].file),
-            this->addons_list[this->index].name);
+    download(std::string("file/" + this->m_addons_list[this->index].file),
+            this->m_addons_list[this->index].name);
 
     //creating of the data folders
     mkdir(std::string(file_manager->getAddonsDir() + "/" + "data").c_str(), 0777);
 
     mkdir(dest_file.c_str(), 0777);
 
-    mkdir(std::string(dest_file +  this->addons_list[this->index].name).c_str(), 0777);
+    mkdir(std::string(dest_file +  this->m_addons_list[this->index].name).c_str(), 0777);
 
     //extract the zip in the addons folder called like the addons name
-    extract_zip(file_manager->getConfigDir() + "/" + this->addons_list[this->index].name,
-            dest_file + this->addons_list[this->index].name + "/");
+    extract_zip(file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name,
+            dest_file + this->m_addons_list[this->index].name + "/");
 
-    this->addons_list[this->index].installed = true;
-    this->addons_list[this->index].installed_version = this->addons_list[this->index].version;
+    this->m_addons_list[this->index].installed = true;
+    this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;
     this->SaveInstalled();
 }
 // ----------------------------------------------------------------------------
@@ -368,17 +346,17 @@ void Addons::SaveInstalled()
                     << std::endl;
 
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < this->addons_list.size(); i++)
+    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
     {
-        if(this->addons_list[i].installed)
+        if(this->m_addons_list[i].installed)
         {
             std::ostringstream os;
-            os << this->addons_list[i].installed_version;
+            os << this->m_addons_list[i].installed_version;
 
             //transform the version (int) in string
-            xml_installed << "<"+ this->addons_list[i].type +" name=\"" +
-                        this->addons_list[i].name + "\" id=\"" +
-                        this->addons_list[i].id + "\"";
+            xml_installed << "<"+ this->m_addons_list[i].type +" name=\"" +
+                        this->m_addons_list[i].name + "\" id=\"" +
+                        this->m_addons_list[i].id + "\"";
             xml_installed << " version=\"" + os.str() + "\" />" << std::endl;
         }
     }
@@ -388,20 +366,21 @@ void Addons::SaveInstalled()
 // ----------------------------------------------------------------------------
 void Addons::UnInstall()
 {
-    std::cout << "Uninstall: " << this->addons_list[this->index].name << std::endl;
+    std::cout << "Uninstall: " << this->m_addons_list[this->index].name << std::endl;
 
-    this->addons_list[this->index].installed = false;
+    this->m_addons_list[this->index].installed = false;
     //write the xml file with the informations about installed karts
     this->SaveInstalled();
     std::string dest_file = file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->addons_list[this->index].type + "/" +
-                this->addons_list[this->index].name + "/";
+                this->m_addons_list[this->index].type + "/" +
+                this->m_addons_list[this->index].name + "/";
 
     //remove the addons directory
     this->RemoveDirectory(dest_file.c_str());
 
 }
 // ----------------------------------------------------------------------------
+/*FIXME: This function is an ugly copy-paste*/
 int Addons::RemoveDirectory(char const *name)
 {
     DIR *directory;
@@ -411,15 +390,19 @@ int Addons::RemoveDirectory(char const *name)
     char buffer[1024] = {0};
 
     directory = opendir(name);
-    if ( directory == NULL ) {
+    if ( directory == NULL )
+    {
         fprintf(stderr, "cannot open directory %s\n", name);
         return 0;
     }
 
-    while ( (entry = readdir(directory)) != NULL ) {
+    while ((entry = readdir(directory)) != NULL)
+    {
 
-        if ( strcmp(entry->d_name, ".") == 0 ||
-             strcmp(entry->d_name, "..") == 0 ) {
+        /*this condition handles if it is the current directory (.) or the 
+        parent directory (..), these names work only on unix-based I think*/
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
             continue;
         }
 
@@ -427,10 +410,12 @@ int Addons::RemoveDirectory(char const *name)
 
         stat(buffer, &file_stat);
 
-        if ( S_ISREG(file_stat.st_mode) ) {
+        if (S_ISREG(file_stat.st_mode))
+        {
             remove(buffer);
         }
-        else if ( S_ISDIR(file_stat.st_mode) ) {
+        else if (S_ISDIR(file_stat.st_mode))
+        {
             this->RemoveDirectory(buffer);
         }
     }
@@ -439,12 +424,5 @@ int Addons::RemoveDirectory(char const *name)
     remove(name);
 
     return 1;
-}
-
-std::string Addons::GetIdAsStr()
-{
-    std::ostringstream os;
-    os << this->addons_list[this->index].id;
-    return os.str();
 }
 #endif

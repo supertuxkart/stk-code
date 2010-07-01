@@ -39,7 +39,7 @@ struct addons_prop
 class Addons
 {
     private:
-        std::vector<addons_prop>    addons_list;
+        std::vector<addons_prop>    m_addons_list;
         int                         index;
         std::string                 file_installed;
         void                        SaveInstalled();
@@ -64,13 +64,13 @@ class Addons
         bool SelectId(std::string);
 
         /** Get the name of the selected addon. */
-        std::string GetName();
+        std::string GetName(){ return this->m_addons_list[this->index].name; };
 
         /** Get the version of the selected addon. */
-        int GetVersion();
+        int GetVersion(){ return this->m_addons_list[this->index].version; };
 
         /** Get the path of the addon icon. */
-        std::string GetIcon();
+        std::string GetIcon(){ return this->m_addons_list[this->index].icon; };
 
         /** Get the version of the selected addon as a string. */
         std::string GetVersionAsStr();
@@ -83,8 +83,9 @@ class Addons
         std::string GetIdAsStr();
 
         /** Get the description of the selected addons. */
-        std::string GetDescription();
+        std::string GetDescription(){ return this->m_addons_list[this->index].description; };
 
+        std::string GetType(){ return this->m_addons_list[this->index].type; };
         /** Install or upgrade the selected addon. */
         void Install();
 
@@ -94,16 +95,14 @@ class Addons
         void resetIndex();
 
         /** Get the state of the addon: if it is installed or not.*/
-        /* FIXME : the return value should be a boolean, not a string. */
         std::string IsInstalled();
+
         /** Get the state of the addon: if it is installed or not.*/
-        /* FIXME : the return value should be a boolean, not a string. */
-        bool IsInstalledAsBool();
+        bool IsInstalledAsBool(){ return this->m_addons_list[this->index].installed; };
 
         bool NextType(std::string type);
         bool PreviousType(std::string type);
 
-        std::string GetType();
 
 };
 #endif
