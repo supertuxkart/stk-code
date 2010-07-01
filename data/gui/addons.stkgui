@@ -5,10 +5,10 @@
     <header text_align="center" width="100%" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
 
-    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+    <tabs id="category" height="10%" max_height="110" width="100%" align="center">
         <icon-button id="tab_addons" width="128" height="128" icon="gui/package.png"
                 I18N="Section in the addons menu" text="Addons"/>
-        <icon-button id="tab_audio" width="128" height="128" icon="gui/no-package.png"
+        <icon-button id="tab_update" width="128" height="128" icon="gui/no-package.png"
                 I18N="Section in the addons menu" text="Update"/>
     </tabs>
     <box proportion="1" width="100%" layout="vertical-row">

@@ -310,6 +310,8 @@ supertuxkart_SOURCES = \
  states_screens/options_screen_video.hpp \
  states_screens/addons_screen.cpp \
  states_screens/addons_screen.hpp \
+ states_screens/addons_update_screen.cpp \
+ states_screens/addons_update_screen.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
  states_screens/race_setup_screen.cpp \

@@ -18,6 +18,7 @@
 #ifdef ADDONS_MANAGER
 
 #include "states_screens/addons_screen.hpp"
+#include "states_screens/addons_update_screen.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 
 #include "guiengine/widget.hpp"
@@ -114,6 +115,12 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
             this->addons->SelectId(addons);
             this->load = new AddonsLoading(this->addons, 0.8f, 0.8f);
         }
+    }
+    if (name == "category")
+    {
+        std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        
+        if (selection == "tab_update") StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
     }
 }
 

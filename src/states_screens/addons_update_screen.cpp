@@ -18,6 +18,7 @@
 #ifdef ADDONS_MANAGER
 
 #include "states_screens/addons_screen.hpp"
+#include "states_screens/addons_update_screen.hpp"
 
 /*pthread aren't supported natively by windows. Here a port: http://sourceware.org/pthreads-win32/ */
 #  include <pthread.h>
@@ -48,27 +49,6 @@ void AddonsUpdateScreen::loadedFromFile()
 {
 }
 // ------------------------------------------------------------------------------------------------------
-void AddonsUpdateScreen::download_list()
-{
-#if 0
-    GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_karts");
-    
-	this->addons = new Addons(std::string(file_manager->getConfigDir() + "/list_text"), std::string(file_manager->getConfigDir() + "/installed.xml"));
-	//to have the name of the first karts and load it informatins later
-	this->addons->Next();
-	std::string first_kart = this->addons->GetName();
-	std::cout << this->addons->GetName() << std::endl;
-	w_list->addItem(std::string("list_karts" + this->addons->GetName()).c_str(), this->addons->GetName().c_str(), 0 /* icon */);
-    while(this->addons->Next())
-    {
-        std::cout << this->addons->GetName() << std::endl;
-        w_list->addItem(std::string("list_karts" + this->addons->GetName()).c_str(), this->addons->GetName().c_str(), 0 /* icon */);
-    }
-    this->addons->Select(first_kart);
-	this->loadInformations();
-#endif
-}
-// ------------------------------------------------------------------------------------------------------
 
 void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
 {
@@ -76,19 +56,11 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "install")
+    else if (name == "category")
     {
-        this->load = new AddonsLoading(0.4f, 0.4f);
-        pthread_t thread;
-        pthread_create(&thread, NULL, *startInstall, this);
-        //this->addons->Install();
-    }
-    else if (name.find("list_karts") == 0)
-    {
-        GUIEngine::ListWidget* list = this->getWidget<GUIEngine::ListWidget>("list_karts");
-        std::string kart = list->getSelectionInternalName().replace(0, 10, "");
-        this->addons->Select(kart);
-        this->loadInformations();
+        std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        
+        if (selection == "tab_addons") StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
     }
 }
 
@@ -96,55 +68,11 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
 
 void AddonsUpdateScreen::init()
 {
-    pthread_t nThreadID2;
-    pthread_create(&nThreadID2, NULL, *download_l, this);
 }
 
 // ------------------------------------------------------------------------------------------------------
 
 void AddonsUpdateScreen::tearDown()
 {
-}
-void AddonsUpdateScreen::loadInformations()
-{
-        std::cout << this->addons->GetName() << std::endl;
-        GUIEngine::LabelWidget* w = this->getWidget<GUIEngine::LabelWidget>("name_addons");
-        w->setText(std::string("Name: "+ this->addons->GetName()).c_str());
-        w = this->getWidget<GUIEngine::LabelWidget>("description_addons");
-        w->setText(std::string("Description: " + this->addons->GetDescription()).c_str());
-        w = this->getWidget<GUIEngine::LabelWidget>("version_addons");
-        std::ostringstream os;
-        os << this->addons->GetVersion();
-        w->setText(std::string("Version: " + os.str()).c_str());
-        w = this->getWidget<GUIEngine::LabelWidget>("install_addons");
-        w->setText(std::string("Installed: " + this->addons->IsInstalled()).c_str());
-        
-        GUIEngine::ButtonWidget* button = this->getWidget<GUIEngine::ButtonWidget>("install");
-        if(this->addons->IsInstalled() == "yes")
-        {
-            button->setLabel(std::string("Uninstall").c_str());
-        }
-        else
-        {
-            button->setLabel(std::string("Install").c_str());
-        }
-}
-// ------------------------------------------------------------------------------------------------------
-//I dislike this way, it is too dirty but I didn't find another way
-void * startInstall(void* pthis)
-{
-    AddonsUpdateScreen * obj = (AddonsUpdateScreen*)pthis;
-    if(obj->addons->IsInstalled() == "yes")
-    {
-    std::cout << obj->addons->IsInstalled() << std::endl;
-        obj->addons->UnInstall();
-    }
-    else
-    {
-        obj->addons->Install();
-    }
-    obj->load->close();
-    obj->loadInformations();
-    return NULL;
 }
 #endif

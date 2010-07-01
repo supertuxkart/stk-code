@@ -33,12 +33,12 @@ class AddonsUpdateScreen : public GUIEngine::Screen, public GUIEngine::ScreenSin
     friend class GUIEngine::ScreenSingleton<AddonsUpdateScreen>;
     AddonsUpdateScreen();
     Addons * addons;
+    /*uneeded*/
     AddonsLoading  * load;
     void loadInformations();
     
 public:
 
-    void download_list();
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
@@ -50,9 +50,6 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
-    friend void * startInstall(void *);
 };
-
-void * startInstall(void *);
 #endif
 #endif
