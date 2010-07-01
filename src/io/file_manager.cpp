@@ -583,3 +583,10 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 }   // listFiles
 
 //-----------------------------------------------------------------------------
+
+#ifdef ADDONS_MANAGER
+void FileManager::checkAndCreateDirForAddons(std::string addons_path)
+{
+    checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_path);
+}
+#endif

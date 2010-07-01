@@ -27,29 +27,16 @@
 #include "io/file_manager.hpp"
 
 // ------------------------------------------------------------------------------------------------------
-void download(std::string file)
+void download(std::string file, std::string save)
 {
 	CURL *session = curl_easy_init();
 	std::cout << "Downloading: " << std::string(UserConfigParams::m_server_addons.toString() + "/" + file) << std::endl;
 	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + file).c_str());
-	
-	FILE * fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fp); 
-	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-	curl_easy_perform(session);
-	fclose(fp);
-	curl_easy_cleanup(session);
-	std::cout << UserConfigParams::m_server_addons.toString() << std::endl;
-}
-
-// ------------------------------------------------------------------------------------------------------
-void download(std::string file, std::string save)
-{
-	CURL *session = curl_easy_init(); 
-	std::cout << "Downloading: " << std::string(UserConfigParams::m_server_addons.toString() + "/" + file) << std::endl;
-	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + file).c_str());
-	
-	FILE * fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
+	FILE * fp;
+	if(save != "")
+	    fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
+    else
+    	fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
 	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fp); 
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
 	curl_easy_perform(session);
