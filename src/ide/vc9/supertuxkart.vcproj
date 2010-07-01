@@ -43,7 +43,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;_CRTDBG_MAP_ALLOC;IRR_SVN"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -184,6 +184,94 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="curl-debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER"
+				GeneratePreprocessedFile="0"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurld_imp.lib"
+				OutputFile="./../../../$(ProjectName)_curl_d.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="../../../dependencies/lib"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
+				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
+				SubSystem="1"
+				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				Profile="false"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -225,6 +313,15 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+							KeepComments="false"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="curl-debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

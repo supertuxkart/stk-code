@@ -22,6 +22,8 @@
 #include "guiengine/screen.hpp"
 
 class Addons;
+class AddonsLoading;
+
 namespace GUIEngine { class Widget; }
 
 /**

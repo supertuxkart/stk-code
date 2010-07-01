@@ -18,17 +18,20 @@
 
 #ifdef ADDONS_MANAGER
 
+#include "states_screens/dialogs/addons_loading.hpp"
+
+#include <pthread.h>
+
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
-#include "states_screens/dialogs/addons_loading.hpp"
 #include "utils/translation.hpp"
 #include "addons/addons.hpp"
 #include "addons/network.hpp"
 #include "states_screens/addons_screen.hpp"
-#include <pthread.h>
 #include "utils/string_utils.hpp"
 #include "io/file_manager.hpp"
+
 using namespace GUIEngine;
 using namespace irr::gui;
 

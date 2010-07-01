@@ -30,8 +30,10 @@
 
 #include <fstream>
 #include <sys/types.h>
-#include <unistd.h>
-#include <dirent.h>
+#ifndef WIN32
+#  include <unistd.h>
+#  include <dirent.h>
+#endif
 #include <sys/stat.h>
 #include <sstream>
 #include "io/file_manager.hpp"
@@ -180,7 +182,7 @@ void Addons::GetInstalledAddons()
 // ----------------------------------------------------------------------------
 bool Addons::Next()
 {
-    if(this->index + 1 < this->m_addons_list.size())
+    if(this->index + 1 < (int)this->m_addons_list.size())
     {
         this->index ++;
         return true;
@@ -319,12 +321,14 @@ void Addons::Install()
             this->m_addons_list[this->index].name);
 
     //creating of the data folders
+#ifdef FIXME_ADDON
+    // mkdir does no not exist in windows, see filemanager checkandcreatedir 
     mkdir(std::string(file_manager->getAddonsDir() + "/" + "data").c_str(), 0777);
 
     mkdir(dest_file.c_str(), 0777);
 
     mkdir(std::string(dest_file +  this->m_addons_list[this->index].name).c_str(), 0777);
-
+#endif
     //extract the zip in the addons folder called like the addons name
     extract_zip(file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name,
             dest_file + this->m_addons_list[this->index].name + "/");
@@ -383,6 +387,11 @@ void Addons::UnInstall()
 /*FIXME: This function is an ugly copy-paste*/
 int Addons::RemoveDirectory(char const *name)
 {
+#ifdef FIXME_ADDON
+    // DIR etc. do not exist like this in windows,
+    // file system specific calls should be moved into
+    // the file manager!!
+
     DIR *directory;
     struct dirent *entry;
     struct stat file_stat;
@@ -422,7 +431,7 @@ int Addons::RemoveDirectory(char const *name)
     closedir(directory);
 
     remove(name);
-
+#endif
     return 1;
 }
 #endif

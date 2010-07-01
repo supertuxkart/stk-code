@@ -70,7 +70,7 @@ class Addons
         int GetVersion(){ return this->m_addons_list[this->index].version; };
 
         /** Get the path of the addon icon. */
-        std::string GetIcon(){ return this->m_addons_list[this->index].icon; };
+        std::string GetIcon() { return this->m_addons_list[this->index].icon; };
 
         /** Get the version of the selected addon as a string. */
         std::string GetVersionAsStr();
