@@ -449,12 +449,12 @@ void FileManager::checkAndCreateConfigDir()
 #ifdef ADDONS_MANAGER
 void FileManager::checkAndCreateAddonsDir()
 {
-#ifdef WIN32
+#if defined(WIN32)
 //TODO
+#elif defined(__APPLE__)
+    m_addons_dir  = getenv("HOME");
+    m_addons_dir += "/Library/Application Support/SuperTuxKart";
 #else
-#  ifdef __APPLE__
-//TODO
-#  else
     // Remaining unix variants. Use the new standards for config directory
     // i.e. either XDG_CONFIG_HOME or $HOME/.config
 	if (getenv("XDG_DATA_HOME")!=NULL){
@@ -478,12 +478,13 @@ void FileManager::checkAndCreateAddonsDir()
             m_addons_dir += ".";
         }
     }
-#  endif
-#endif
+    
     const std::string CONFIGDIR("supertuxkart");
-
+    
     m_addons_dir += "/";
     m_addons_dir += CONFIGDIR;
+#endif
+
     if(!checkAndCreateDirectory(m_addons_dir))
     {
         fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
