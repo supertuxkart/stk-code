@@ -380,7 +380,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 /** Checks if the config directory exists, and it not, tries to create it. */
 void FileManager::checkAndCreateConfigDir()
 {
-#ifdef WIN32
+#if defined(WIN32)
     // Try to use the APPDATA directory to store config files and highscore
     // lists. If not defined, used the current directory.
     if(getenv("APPDATA")!=NULL)
@@ -395,8 +395,11 @@ void FileManager::checkAndCreateConfigDir()
     }
     else 
         m_config_dir = ".";
-#else
-#  ifdef __APPLE__
+    const std::string CONFIGDIR("supertuxkart");
+    
+    m_config_dir += "/";
+    m_config_dir += CONFIGDIR;
+#elif defined(__APPLE__)
     if (getenv("HOME")!=NULL)
     {
         m_config_dir = getenv("HOME");
@@ -408,6 +411,8 @@ void FileManager::checkAndCreateConfigDir()
         m_config_dir = "";
 	}
     m_config_dir += "/Library/Application Support/";
+    const std::string CONFIGDIR("SuperTuxKart");
+    m_config_dir += CONFIGDIR;
 #  else
     // Remaining unix variants. Use the new standards for config directory
     // i.e. either XDG_CONFIG_HOME or $HOME/.config
@@ -432,12 +437,12 @@ void FileManager::checkAndCreateConfigDir()
             m_config_dir += ".";
         }
     }
-#  endif
-#endif
     const std::string CONFIGDIR("supertuxkart");
-
+    
     m_config_dir += "/";
     m_config_dir += CONFIGDIR;
+#endif
+
     if(!checkAndCreateDirectory(m_config_dir))
     {
         fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
