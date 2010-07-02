@@ -177,7 +177,7 @@ void FileManager::dropFileSystem()
 void FileManager::setDevice(IrrlichtDevice *device)
 {
     m_device = device;
-    
+
     //std::cout << "^^^^^^^^ GRABBING m_device (FileManager) ^^^^^^^^\n";
     m_device->grab();  // To make sure that the device still exists while
                        // file_manager has a pointer to the file system.
@@ -242,7 +242,7 @@ void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
     m_file_system->addFileArchive(createAbsoluteFilename(path),
-                                  /*ignoreCase*/false, 
+                                  /*ignoreCase*/false,
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
 }   // pushModelSearchPath
@@ -252,7 +252,7 @@ void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
     m_file_system->addFileArchive(createAbsoluteFilename(path),
-                                  /*ignoreCase*/false, 
+                                  /*ignoreCase*/false,
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
 }   // pushTextureSearchPath
@@ -376,6 +376,38 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     return !error;
 }   // checkAndCreateDirectory
 
+bool FileManager::checkAndCreateDirectoryP(const std::string &path)
+{
+    std::cout << "creating...:" << path << std::endl;
+    // irrlicht apparently returns true for files and directory
+    // (using access/_access internally):
+
+    if(m_file_system->existFile(io::path(path.c_str())))
+        return true;
+
+    for(int i = 0; i <=  path.size(); i++)
+    {
+        if(path.c_str()[i] == '/')
+        {
+            std::string current_path = path.substr(0, i + 1);
+            std::cout << "Checking for: " << current_path << std::endl;
+            if(m_file_system->existFile(io::path(current_path.c_str())))
+                std::cout << "The directory exist." << std::endl;
+            else
+            {
+                if(!checkAndCreateDirectory(current_path))
+                {
+                    fprintf(stderr, "Can't create dir '%s'",
+                            current_path.c_str());
+                    break;
+                }
+            }
+        }
+    }
+    bool error = checkAndCreateDirectory(path);
+
+    return error;
+}   // checkAndCreateDirectory
 //-----------------------------------------------------------------------------
 /** Checks if the config directory exists, and it not, tries to create it. */
 void FileManager::checkAndCreateConfigDir()
@@ -393,10 +425,10 @@ void FileManager::checkAndCreateConfigDir()
             m_config_dir = ".";
         }
     }
-    else 
+    else
         m_config_dir = ".";
     const std::string CONFIGDIR("supertuxkart");
-    
+
     m_config_dir += "/";
     m_config_dir += CONFIGDIR;
 #elif defined(__APPLE__)
@@ -438,7 +470,7 @@ void FileManager::checkAndCreateConfigDir()
         }
     }
     const std::string CONFIGDIR("supertuxkart");
-    
+
     m_config_dir += "/";
     m_config_dir += CONFIGDIR;
 #endif
@@ -484,9 +516,9 @@ void FileManager::checkAndCreateAddonsDir()
             m_addons_dir += ".";
         }
     }
-    
+
     const std::string CONFIGDIR("supertuxkart");
-    
+
     m_addons_dir += "/";
     m_addons_dir += CONFIGDIR;
 #endif
@@ -604,6 +636,6 @@ void FileManager::checkAndCreateDirForAddons(std::string addons_name, std::strin
     if(!success)
         std::cout << "There is a problem with the addons dir." << std::endl;
     checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type + addons_name);
-        
+
 }
 #endif
