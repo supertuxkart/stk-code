@@ -384,23 +384,21 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
-
-    for(int i = 0; i <=  path.size(); i++)
+    std::vector<std::string> split = StringUtils::split(path,'/');
+    std::string current_path ="";
+    for(unsigned int i=0; i<split.size(); i++)
     {
-        if(path.c_str()[i] == '/')
+        current_path += split[i] + "/";
+        std::cout << "Checking for: " << current_path << std::endl;
+        if(m_file_system->existFile(io::path(current_path.c_str())))
+            std::cout << "The directory exist." << std::endl;
+        else
         {
-            std::string current_path = path.substr(0, i + 1);
-            std::cout << "Checking for: " << current_path << std::endl;
-            if(m_file_system->existFile(io::path(current_path.c_str())))
-                std::cout << "The directory exist." << std::endl;
-            else
+            if(!checkAndCreateDirectory(current_path))
             {
-                if(!checkAndCreateDirectory(current_path))
-                {
-                    fprintf(stderr, "Can't create dir '%s'",
-                            current_path.c_str());
-                    break;
-                }
+                fprintf(stderr, "Can't create dir '%s'",
+                        current_path.c_str());
+                break;
             }
         }
     }
