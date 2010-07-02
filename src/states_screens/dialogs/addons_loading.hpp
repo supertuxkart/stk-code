@@ -37,17 +37,21 @@ private:
     GUIEngine::ButtonWidget *       m_back_button;
     GUIEngine::ButtonWidget *       install_button;
     GUIEngine::IconButtonWidget * icon;
+    GUIEngine::IconButtonWidget * m_next;
+    GUIEngine::IconButtonWidget * m_previous;
     static void * startInstall(void*);
     static void * downloadIcon(void*);
-    pthread_mutex_t         mutex;
     void loadInfo();
+    bool m_can_install;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
+    pthread_mutex_t mutex_can_install;
     Addons * addons;
     AddonsLoading(Addons * id, const float percentWidth, const float percentHeight);
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    void onUpdate(float delta);
     void close();
 };
 

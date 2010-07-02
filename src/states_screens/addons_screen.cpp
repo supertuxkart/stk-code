@@ -92,7 +92,7 @@ void AddonsScreen::loadList()
         	        this->addons->GetName().c_str(), 1 /* icon */);
     }
 
-    //remove the text from the widget : "Updating list..." (see l164)
+    //remove the text from the widget : "Updating list..."
     m_update_status->setText("");
 	this->can_load_list = false;
 }

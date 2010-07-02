@@ -41,8 +41,8 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
         ModalDialog(w, h)
 {
     this->addons = id;
-
-
+    m_can_install = false;
+    pthread_mutex_init(&mutex_can_install, NULL);
     core::rect< s32 > area_right(10, 0,  m_area.getWidth()/2, m_area.getHeight());
 
     core::rect< s32 > area_left(m_area.getWidth()/2 + 20, 0, m_area.getWidth(), m_area.getHeight());
@@ -50,27 +50,27 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, /*focusbale*/ false);
 
     /* Next and previous button*/
-    IconButtonWidget * next_previous = new IconButtonWidget();
-    next_previous->setImage("gui/next_addons.png");
-    next_previous->x = area_right.UpperLeftCorner.X + 100;
-    next_previous->y = area_right.UpperLeftCorner.Y +20 ;
-    next_previous->w = 75;
-    next_previous->m_properties[PROP_ID] = "next";
-    next_previous->h = 40;
-    next_previous->setParent(m_irrlicht_window);
-    m_children.push_back(next_previous);
-    next_previous->add();
+    m_next = new IconButtonWidget();
+    m_next->setImage("gui/next_addons.png");
+    m_next->x = area_right.UpperLeftCorner.X + 100;
+    m_next->y = area_right.UpperLeftCorner.Y +20 ;
+    m_next->w = 75;
+    m_next->m_properties[PROP_ID] = "next";
+    m_next->h = 40;
+    m_next->setParent(m_irrlicht_window);
+    m_children.push_back(m_next);
+    m_next->add();
 
-    next_previous = new IconButtonWidget();
-    next_previous->setImage("gui/back_addons.png");
-    next_previous->x = area_right.UpperLeftCorner.X + 20;
-    next_previous->y = area_right.UpperLeftCorner.Y +20 ;
-    next_previous->w = 75;
-    next_previous->m_properties[PROP_ID] = "previous";
-    next_previous->h = 40;
-    next_previous->setParent(m_irrlicht_window);
-    m_children.push_back(next_previous);
-    next_previous->add();
+    m_previous = new IconButtonWidget();
+    m_previous->setImage("gui/back_addons.png");
+    m_previous->x = area_right.UpperLeftCorner.X + 20;
+    m_previous->y = area_right.UpperLeftCorner.Y +20 ;
+    m_previous->w = 75;
+    m_previous->m_properties[PROP_ID] = "previous";
+    m_previous->h = 40;
+    m_previous->setParent(m_irrlicht_window);
+    m_children.push_back(m_previous);
+    m_previous->add();
 
     name = new LabelWidget();
     name->m_text = StringUtils::insertValues(_("Name: %i"), this->addons->GetName().c_str());
@@ -184,12 +184,26 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     if(eventSource == "install")
     {
         m_back_button->setDeactivated();
+        m_next->setDeactivated();
+        m_previous->setDeactivated();
         this->install_button->setDeactivated();
         pthread_t thread;
         pthread_create(&thread, NULL, &AddonsLoading::startInstall, this);
     }
     return GUIEngine::EVENT_LET;
 }
+// ------------------------------------------------------------------------------------------------------
+void AddonsLoading::onUpdate(float delta)
+{
+
+    pthread_mutex_lock(&(this->mutex_can_install));
+    if(m_can_install)
+    {
+        this->close();
+    }
+    pthread_mutex_unlock(&(mutex_can_install));
+}
+
 // ------------------------------------------------------------------------------------------------------
 void AddonsLoading::close()
 {
@@ -199,7 +213,6 @@ void AddonsLoading::close()
 	((AddonsScreen*)curr_screen)->can_load_list = true;
 	pthread_mutex_unlock(&(((AddonsScreen*)curr_screen)->mutex));
     dismiss();
-	std::cout << "unlock the mutex" << std::endl;
 }
 // ------------------------------------------------------------------------------------------------------
 
@@ -215,7 +228,9 @@ void * AddonsLoading::startInstall(void* pthis)
     {
         obj->addons->Install();
     }
-    obj->close();
+    pthread_mutex_lock(&(obj->mutex_can_install));
+    obj->m_can_install = true;
+    pthread_mutex_unlock(&(obj->mutex_can_install));
     return NULL;
 }
 // ------------------------------------------------------------------------------------------------------
