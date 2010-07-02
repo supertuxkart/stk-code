@@ -47,7 +47,7 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
 
     core::rect< s32 > area_left(m_area.getWidth()/2 + 20, 0, m_area.getWidth(), m_area.getHeight());
     /*Init the icon here to be able to load a single image*/
-    icon = new IconButtonWidget();
+    icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, /*focusbale*/ false);
 
     /* Next and previous button*/
     IconButtonWidget * next_previous = new IconButtonWidget();
@@ -133,20 +133,20 @@ void AddonsLoading::loadInfo()
 
 
 
-    this->back_button = new ButtonWidget();
-    /*this->back_button->setLabel(std::string("Back").c_str());*/
-    this->back_button->m_text = _("Back");
-    this->back_button->m_properties[PROP_ID] = "cancel";
-    this->back_button->x = 20;
-    this->back_button->y = m_area.getHeight()-45;
-    this->back_button->setParent(m_irrlicht_window);
-    m_children.push_back(this->back_button);
-    this->back_button->w = 150;
-    this->back_button->h = 35;
-    this->back_button->add();
+    m_back_button = new ButtonWidget();
+    /*m_back_button->setLabel(std::string("Back").c_str());*/
+    m_back_button->m_text = _("Back");
+    m_back_button->m_properties[PROP_ID] = "cancel";
+    m_back_button->x = 20;
+    m_back_button->y = m_area.getHeight()-45;
+    m_back_button->setParent(m_irrlicht_window);
+    m_children.push_back(m_back_button);
+    m_back_button->w = 150;
+    m_back_button->h = 35;
+    m_back_button->add();
 
     this->install_button = new ButtonWidget();
-    /*this->back_button->setLabel(std::string("Back").c_str());*/
+    /*m_back_button->setLabel(std::string("Back").c_str());*/
     if(this->addons->IsInstalled() == "yes")
         this->install_button->m_text = _("Uninstall");
     else
@@ -183,7 +183,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     }
     if(eventSource == "install")
     {
-        this->back_button->setDeactivated();
+        m_back_button->setDeactivated();
         this->install_button->setDeactivated();
         pthread_t thread;
         pthread_create(&thread, NULL, &AddonsLoading::startInstall, this);

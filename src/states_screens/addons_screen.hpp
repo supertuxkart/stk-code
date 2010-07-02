@@ -38,15 +38,15 @@ namespace GUIEngine { class Widget; }
 class AddonsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<AddonsScreen>
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
-    
+
     AddonsScreen();
     Addons * addons;
     AddonsLoading  * load;
     void loadInformations();
     /** For the addons list, a package when it is installed. */
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
-    GUIEngine::LabelWidget* update_status;
-    
+    GUIEngine::LabelWidget* m_update_status;
+
 public:
 
     bool can_load_list;
@@ -55,13 +55,13 @@ public:
     void loadList();
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
     friend void * startInstall(void *);

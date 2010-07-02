@@ -93,7 +93,7 @@ void AddonsScreen::loadList()
     }
 
     //remove the text from the widget : "Updating list..." (see l164)
-    this->update_status->setText("");
+    m_update_status->setText("");
 	this->can_load_list = false;
 }
 // ------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
     if (name == "category")
     {
         std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         if (selection == "tab_update") StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
     }
 }
@@ -136,7 +136,7 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 }
 void AddonsScreen::init()
 {
-    this->update_status = this->getWidget<GUIEngine::LabelWidget>("update_status");
+    m_update_status = this->getWidget<GUIEngine::LabelWidget>("update_status");
     std::cout << "Addons dir:" + file_manager->getAddonsDir() << std::endl;
     this->type = "track";
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
@@ -144,6 +144,7 @@ void AddonsScreen::init()
     //w_list->clear();
     std::cout << "icon bank" << std::endl;
 	this->can_load_list = false;
+	m_update_status->setText(_("Updating the list..."));
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsScreen::downloadList, this);
 }
@@ -157,7 +158,6 @@ void AddonsScreen::tearDown()
 void * AddonsScreen::downloadList( void * pthis)
 {
     AddonsScreen * pt = (AddonsScreen*)pthis;
-    pt->update_status->setText(_("Updating the list..."));
     //load all karts...
 	pt->addons = new Addons();
 	pthread_mutex_lock(&(pt->mutex));
