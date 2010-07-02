@@ -379,7 +379,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     
     int y;
     int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
-    int ICON_PLAYER_WIDTH=50;
+    int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
     if(UserConfigParams::m_height<600)
     {
         ICON_WIDTH        = 27;
@@ -474,11 +474,13 @@ void RaceGUI::drawEnergyMeter (const Kart *kart,
                                const core::vector2df &scaling)
 {
     float state = (float)(kart->getEnergy()) / MAX_ITEMS_COLLECTED;
-    int x = (int)((UserConfigParams::m_width-24) * scaling.X) + viewport.UpperLeftCorner.X;
     //int y = (int)(250 * scaling.Y) + viewport.UpperLeftCorner.Y;
-    int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
     int w = (int)(16 * scaling.X);
     int h = (int)(UserConfigParams::m_height/4 * scaling.Y);
+    
+    int x = viewport.LowerRightCorner.X - w - 5;
+    int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
+
     float coin_target = (float)race_manager->getCoinTarget();
     int th = (int)(h*(coin_target/MAX_ITEMS_COLLECTED));
     
