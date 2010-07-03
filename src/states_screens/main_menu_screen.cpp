@@ -64,19 +64,23 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 void MainMenuScreen::downloadRss()
 {
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-    FILE* fichier = NULL;
-    char chaine[1000] = "";
-    fichier = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
-
-    std::string info = std::string("");
-    while (fgets(chaine, 1000, fichier) != NULL) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
+    FILE* newsFile = NULL;
+    char buffer[1024] = "";
+    newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
+    if (newsFile == NULL)
     {
-        info += std::string(chaine);
+        fprintf(stderr, "Warning: cannot open new files\n");
+        return;
+    }
+    
+    std::string info = std::string("");
+    while (fgets(buffer, 1024, newsFile) != NULL)
+    {
+        info += std::string(buffer);
     }
 
-	
-
-    fclose(fichier);
+    fclose(newsFile);
+    
     // to remove the break line.
     //info.replace(info.size()-1,1, "");
     std::cout << info << std::endl;
