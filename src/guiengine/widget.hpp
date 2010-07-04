@@ -96,7 +96,7 @@ namespace GUIEngine
     
     /**
       * \brief The nearly-abstract base of all widgets
-      * (not fully abstract since a bare Widget can be created for the sore goal of containing
+      * (not fully abstract since a bare Widget can be created for the sole goal of containing
       * children widgets in a group)
       *
       * Provides basic common functionnality, as well as providing a few callbacks
