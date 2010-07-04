@@ -33,7 +33,6 @@
 
 class btRigidBody;
 class Kart;
-class SFXBase;
 class Track;
 
 /** 
