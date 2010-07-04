@@ -61,11 +61,11 @@ Widget::Widget(WidgetType type, bool reserve_id)
 {
     m_magic_number = 0xCAFEC001;
     
-    x = -1;
-    y = -1;
-    w = -1;
-    h = -1;
-    id = -1;
+    m_x = -1;
+    m_y = -1;
+    m_w = -1;
+    m_h = -1;
+    m_id = -1;
     m_element = NULL;
     m_title_font = false;
     m_type = type;
@@ -293,10 +293,10 @@ void Widget::move(const int x, const int y, const int w, const int h)
 {
     assert(m_magic_number == 0xCAFEC001);
     
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    m_x = x;
+    m_y = y;
+    m_w = w;
+    m_h = h;
     
     m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
 }
@@ -329,10 +329,10 @@ void Widget::readCoords(Widget* parent)
     }
     else
     {
-        parent_w = parent->w;
-        parent_h = parent->h;
-        parent_x = parent->x;
-        parent_y = parent->y;
+        parent_w = parent->m_w;
+        parent_h = parent->m_h;
+        parent_x = parent->m_x;
+        parent_y = parent->m_y;
     }
 
     // ---- try converting to number
@@ -341,9 +341,9 @@ void Widget::readCoords(Widget* parent)
         int abs_x = -1, percent_x = -1;
         if(convertToCoord(x, &abs_x, &percent_x ))
         {
-            if(abs_x > -1) this->x = parent_x + abs_x;
-            else if(abs_x < -1) this->x = parent_x + (parent_w + abs_x);
-            else if(percent_x > -1) this->x = parent_x + parent_w*percent_x/100;
+            if      (abs_x > -1)     m_x = parent_x + abs_x;
+            else if (abs_x < -1)     m_x = parent_x + (parent_w + abs_x);
+            else if (percent_x > -1) m_x = parent_x + parent_w*percent_x/100;
         }
     }
 
@@ -352,9 +352,9 @@ void Widget::readCoords(Widget* parent)
         int abs_y = -1, percent_y = -1;
         if(convertToCoord(y, &abs_y, &percent_y ))
         {
-            if(abs_y > -1) this->y = parent_y + abs_y;
-            else if(abs_y < -1) this->y = parent_y + (parent_h + abs_y);
-            else if(percent_y > -1) this->y = parent_y + parent_h*percent_y/100;
+            if      (abs_y > -1)     m_y = parent_y + abs_y;
+            else if (abs_y < -1)     m_y = parent_y + (parent_h + abs_y);
+            else if (percent_y > -1) m_y = parent_y + parent_h*percent_y/100;
         }
     }
 
@@ -391,54 +391,54 @@ void Widget::readCoords(Widget* parent)
         int abs_w = -1, percent_w = -1;
         if(convertToCoord(width, &abs_w, &percent_w ))
         {
-            if(abs_w > -1) this->w = abs_w;
-            else if(percent_w > -1) this->w = (int)round(parent_w*percent_w/100.0);
+            if      (abs_w > -1)     m_w = abs_w;
+            else if (percent_w > -1) m_w = (int)round(parent_w*percent_w/100.0);
         }
-        else if(texture_w > -1) this->w = texture_w;
-        else if(label_w > -1) this->w = label_w;
+        else if(texture_w > -1) m_w = texture_w;
+        else if(label_w > -1)   m_w = label_w;
     }
 
     // height
     {
         int abs_h = -1, percent_h = -1;
-        if(convertToCoord(height, &abs_h, &percent_h ))
+        if (convertToCoord(height, &abs_h, &percent_h ))
         {
-            if(abs_h > -1) this->h = abs_h;
-            else if(percent_h > -1) this->h = parent_h*percent_h/100;
+            if      (abs_h > -1)     m_h = abs_h;
+            else if (percent_h > -1) m_h = parent_h*percent_h/100;
         }
-        else if(texture_h > -1 && label_h > -1) this->h = texture_h + label_h; // label + icon
-        else if(texture_h > -1) this->h = texture_h;
-        else if(label_h > -1) this->h = label_h;
+        else if (texture_h > -1 && label_h > -1) m_h = texture_h + label_h; // label + icon
+        else if (texture_h > -1)                 m_h = texture_h;
+        else if (label_h > -1)                   m_h = label_h;
     }
 
     // ---- can't make widget bigger than parent
-    if(this->h > (int)parent_h)
+    if (m_h > (int)parent_h)
     {
-        float ratio = (float)parent_h/this->h;
+        float ratio = (float)parent_h / m_h;
 
-        this->w = (int)(this->w*ratio);
-        this->h = (int)(this->h*ratio);
+        m_w = (int)(m_w*ratio);
+        m_h = (int)(m_h*ratio);
     }
-    if(this->w > (int)parent_w)
+    if (m_w > (int)parent_w)
     {
         // scale down while keeping aspect ratio (don't do this for text widgets though...)
-        float ratio = (float)parent_w/this->w;
+        float ratio = (float)parent_w/m_w;
 
-        this->w = (int)(this->w*ratio);
-        if (m_type != WTYPE_LABEL) this->h = (int)(this->h*ratio);
+        m_w = (int)(m_w*ratio);
+        if (m_type != WTYPE_LABEL) m_h = (int)(m_h*ratio);
     }
 
     // ------ check for given max size
-    if(m_properties[PROP_MAX_WIDTH].size() > 0)
+    if (m_properties[PROP_MAX_WIDTH].size() > 0)
     {
-        const int max_width = atoi( this->m_properties[PROP_MAX_WIDTH].c_str() );
-        if(this->w > max_width) this->w = max_width;
+        const int max_width = atoi( m_properties[PROP_MAX_WIDTH].c_str() );
+        if (m_w > max_width) m_w = max_width;
     }
 
-    if(m_properties[PROP_MAX_HEIGHT].size() > 0)
+    if (m_properties[PROP_MAX_HEIGHT].size() > 0)
     {
-        const int max_height = atoi( this->m_properties[PROP_MAX_HEIGHT].c_str() );
-        if(this->h > max_height) this->h = max_height;
+        const int max_height = atoi( m_properties[PROP_MAX_HEIGHT].c_str() );
+        if (m_h > max_height) m_h = max_height;
     }    
 }
 

@@ -55,10 +55,10 @@ void PlayerInfoDialog::showRegularDialog()
         textCtrl = new TextBoxWidget();
         textCtrl->m_properties[PROP_ID] = "renameplayer";
         textCtrl->m_text = m_player->getName();
-        textCtrl->x = 50;
-        textCtrl->y = y1 - textHeight/2;
-        textCtrl->w = m_area.getWidth()-100;
-        textCtrl->h = textHeight + 5;
+        textCtrl->m_x = 50;
+        textCtrl->m_y = y1 - textHeight/2;
+        textCtrl->m_w = m_area.getWidth()-100;
+        textCtrl->m_h = textHeight + 5;
         textCtrl->setParent(m_irrlicht_window);
         m_children.push_back(textCtrl);
         textCtrl->add();
@@ -73,10 +73,10 @@ void PlayerInfoDialog::showRegularDialog()
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y2;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = y2;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
@@ -88,10 +88,10 @@ void PlayerInfoDialog::showRegularDialog()
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y3;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = y3;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
@@ -106,10 +106,10 @@ void PlayerInfoDialog::showRegularDialog()
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y4;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = y4;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
@@ -152,10 +152,10 @@ void PlayerInfoDialog::showConfirmDialog()
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = m_area.getHeight()/2;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = m_area.getHeight()/2;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
@@ -170,10 +170,10 @@ void PlayerInfoDialog::showConfirmDialog()
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = m_area.getHeight()*3/4;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = m_area.getHeight()*3/4;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();

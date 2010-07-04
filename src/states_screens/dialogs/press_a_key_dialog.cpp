@@ -33,10 +33,10 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     LabelWidget* widget = new LabelWidget();
     widget->m_text = _("Press a key");
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
-    widget->x = 0;
-    widget->y = 0;
-    widget->w = m_area.getWidth();
-    widget->h = m_area.getHeight()/2;
+    widget->m_x = 0;
+    widget->m_y = 0;
+    widget->m_w = m_area.getWidth();
+    widget->m_h = m_area.getHeight()/2;
     widget->setParent(m_irrlicht_window);
     
     m_children.push_back(widget);
@@ -49,10 +49,10 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     ButtonWidget* widget2 = new ButtonWidget();
     widget2->m_properties[PROP_ID] = "cancel";
     widget2->m_text = _("Press ESC to cancel");
-    widget2->x = 15;
-    widget2->y = m_area.getHeight() - textHeight - 12;
-    widget2->w = m_area.getWidth() - 30;
-    widget2->h = textHeight + 6;
+    widget2->m_x = 15;
+    widget2->m_y = m_area.getHeight() - textHeight - 12;
+    widget2->m_w = m_area.getWidth() - 30;
+    widget2->m_h = textHeight + 6;
     widget2->setParent(m_irrlicht_window);
     
     m_children.push_back(widget2);

@@ -68,10 +68,10 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     back_btn->m_properties[PROP_ICON] = "gui/back.png";
     //I18N: In the 'paused' screen
     back_btn->m_text = _("Back to Race");
-    back_btn->x = m_area.getWidth() / 2 - icon_size;
-    back_btn->y = text_height*2;
-    back_btn->w = icon_size*2; // width larger to leave room for text
-    back_btn->h = icon_size;
+    back_btn->m_x = m_area.getWidth() / 2 - icon_size;
+    back_btn->m_y = text_height*2;
+    back_btn->m_w = icon_size*2; // width larger to leave room for text
+    back_btn->m_h = icon_size;
     back_btn->setParent(m_irrlicht_window);
     m_children.push_back(back_btn);
     back_btn->add();
@@ -82,10 +82,10 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
     m_choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
     
-    m_choice_ribbon->x = 0;
-    m_choice_ribbon->y = text_height*2 + icon_size + 50;
-    m_choice_ribbon->w = m_area.getWidth();
-    m_choice_ribbon->h = icon_size + text_height;
+    m_choice_ribbon->m_x = 0;
+    m_choice_ribbon->m_y = text_height*2 + icon_size + 50;
+    m_choice_ribbon->m_w = m_area.getWidth();
+    m_choice_ribbon->m_h = icon_size + text_height;
     m_choice_ribbon->setParent(m_irrlicht_window);
     
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)

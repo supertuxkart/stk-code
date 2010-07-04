@@ -118,10 +118,10 @@ void GrandPrixWin::init()
         GUIEngine::LabelWidget* unlocked_label = new GUIEngine::LabelWidget();
         unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
         unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
-        unlocked_label->x = label_x_from;
-        unlocked_label->y = y_from;
-        unlocked_label->w = message_width;
-        unlocked_label->h = label_height;
+        unlocked_label->m_x = label_x_from;
+        unlocked_label->m_y = y_from;
+        unlocked_label->m_w = message_width;
+        unlocked_label->m_h = label_height;
         unlocked_label->m_text = message;
         //const irr::video::SColor orange(255, 255, 126, 21);
         //unlocked_label->setColor(orange);

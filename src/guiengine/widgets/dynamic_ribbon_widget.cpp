@@ -87,7 +87,10 @@ void DynamicRibbonWidget::add()
     if (m_has_label)
     {
         // leave room for many lines, just in case (FIXME: remove this hack)
-        rect<s32> label_size = rect<s32>(x, y + h - m_label_height, x+w, y+h+m_label_height*5);
+        rect<s32> label_size = rect<s32>(m_x,
+                                         m_y + m_h - m_label_height,
+                                         m_x + m_w,
+                                         m_y + m_h + m_label_height*5);
         m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
         m_label->setWordWrap(true);
@@ -104,14 +107,14 @@ void DynamicRibbonWidget::add()
     m_left_widget  = new Widget(WTYPE_NONE);
     m_right_widget = new Widget(WTYPE_NONE);
     
-    const int average_y = y + (h-m_label_height)/2;
+    const int average_y = m_y + (m_h - m_label_height)/2;
     m_arrows_w = 30;
     const int button_h = 50;
     
     // right arrow
-    rect<s32> right_arrow_location = rect<s32>(x + w - m_arrows_w,
+    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
                                                average_y - button_h/2,
-                                               x + w,
+                                               m_x + m_w,
                                                average_y + button_h/2);
     stringw  rmessage = ">>";
     IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID(), rmessage.c_str(), L"");
@@ -120,13 +123,13 @@ void DynamicRibbonWidget::add()
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
-    m_right_widget->id = right_arrow->getID();
+    m_right_widget->m_id = right_arrow->getID();
     m_children.push_back( m_right_widget );
     
     // left arrow
-    rect<s32> left_arrow_location = rect<s32>(x,
+    rect<s32> left_arrow_location = rect<s32>(m_x,
                                               average_y - button_h/2,
-                                              x + m_arrows_w,
+                                              m_x + m_arrows_w,
                                               average_y + button_h/2);
     stringw  lmessage = "<<";
     IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID(), lmessage.c_str(), L"");
@@ -135,7 +138,7 @@ void DynamicRibbonWidget::add()
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
-    m_left_widget->id = left_arrow->getID();
+    m_left_widget->m_id = left_arrow->getID();
     m_children.push_back( m_left_widget );
     
     // ---- Determine number of rows and columns
@@ -152,7 +155,7 @@ void DynamicRibbonWidget::add()
     }
     
     // determine row amount
-    m_row_amount = (int)round((h-m_label_height) / (float)m_child_height);
+    m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
     
     if (m_properties[PROP_MAX_ROWS].size() > 0)
     {
@@ -198,9 +201,9 @@ void DynamicRibbonWidget::buildInternalStructure()
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
     
     // ---- determine column amount
-    const float row_height = (float)(h - m_label_height)/(float)m_row_amount;
+    const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
-    m_col_amount = (int)round( w / ( m_child_width*ratio_zoom ) );
+    m_col_amount = (int)round( m_w / ( m_child_width*ratio_zoom ) );
     
     
     // ajust column amount to not add more item slots than we actually need
@@ -242,10 +245,10 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->setListener(this);
         ribbon->m_reserved_id = m_ids[n];
                 
-        ribbon->x = x + m_arrows_w;
-        ribbon->y = y + (int)(n*row_height);
-        ribbon->w = w - m_arrows_w*2;
-        ribbon->h = (int)(row_height);
+        ribbon->m_x = m_x + m_arrows_w;
+        ribbon->m_y = m_y + (int)(n*row_height);
+        ribbon->m_w = m_w - m_arrows_w*2;
+        ribbon->m_h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
 
         std::stringstream name;
@@ -264,8 +267,8 @@ void DynamicRibbonWidget::buildInternalStructure()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            icon->w = atoi(icon->m_properties[PROP_WIDTH].c_str());
-            icon->h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
+            icon->m_w = atoi(icon->m_properties[PROP_WIDTH].c_str());
+            icon->m_h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)

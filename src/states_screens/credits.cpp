@@ -207,7 +207,7 @@ void CreditsScreen::init()
     assert(w != NULL);
     
     reset();
-    setArea(w->x, w->y, w->w, w->h);
+    setArea(w->m_x, w->m_y, w->m_w, w->m_h);
 }
 
 // ---------------------------------------------------------------------------------------------------

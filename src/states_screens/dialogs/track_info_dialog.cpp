@@ -86,10 +86,10 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->setCustomAspectRatio(4.0f / 3.0f);
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     
-    screenshotWidget->x = area_right.UpperLeftCorner.X;
-    screenshotWidget->y = area_right.UpperLeftCorner.Y;
-    screenshotWidget->w = area_right.getWidth();
-    screenshotWidget->h = area_right.getHeight();
+    screenshotWidget->m_x = area_right.UpperLeftCorner.X;
+    screenshotWidget->m_y = area_right.UpperLeftCorner.Y;
+    screenshotWidget->m_w = area_right.getWidth();
+    screenshotWidget->m_h = area_right.getHeight();
     
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
@@ -109,10 +109,10 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     if (has_laps)
     {
         m_spinner = new SpinnerWidget();
-        m_spinner->x = m_area.getWidth()/2 - 200;
-        m_spinner->y = y2;
-        m_spinner->w = 400;
-        m_spinner->h = y3 - y2 - 15;
+        m_spinner->m_x = m_area.getWidth()/2 - 200;
+        m_spinner->m_y = y2;
+        m_spinner->m_w = 400;
+        m_spinner->m_h = y3 - y2 - 15;
         m_spinner->setParent(m_irrlicht_window);
         
         m_spinner->m_properties[PROP_ID] = "lapcountspinner";
@@ -137,10 +137,10 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     ButtonWidget* okBtn = new ButtonWidget();
     okBtn->m_properties[PROP_ID] = "start";
     okBtn->m_text = _("Start Race");
-    okBtn->x = m_area.getWidth()/2 - 200;
-    okBtn->y = y3;
-    okBtn->w = 400;
-    okBtn->h = m_area.getHeight() - y3 - 15;
+    okBtn->m_x = m_area.getWidth()/2 - 200;
+    okBtn->m_y = y3;
+    okBtn->m_w = 400;
+    okBtn->m_h = m_area.getHeight() - y3 - 15;
     okBtn->setParent(m_irrlicht_window);
     m_children.push_back(okBtn);
     okBtn->add();

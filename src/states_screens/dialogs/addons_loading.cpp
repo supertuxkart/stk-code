@@ -52,32 +52,32 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     /* Next and previous button*/
     m_next = new IconButtonWidget();
     m_next->setImage("gui/next_addons.png");
-    m_next->x = area_right.UpperLeftCorner.X + 100;
-    m_next->y = area_right.UpperLeftCorner.Y +20 ;
-    m_next->w = 75;
+    m_next->m_x = area_right.UpperLeftCorner.X + 100;
+    m_next->m_y = area_right.UpperLeftCorner.Y +20 ;
+    m_next->m_w = 75;
     m_next->m_properties[PROP_ID] = "next";
-    m_next->h = 40;
+    m_next->m_h = 40;
     m_next->setParent(m_irrlicht_window);
     m_children.push_back(m_next);
     m_next->add();
 
     m_previous = new IconButtonWidget();
     m_previous->setImage("gui/back_addons.png");
-    m_previous->x = area_right.UpperLeftCorner.X + 20;
-    m_previous->y = area_right.UpperLeftCorner.Y +20 ;
-    m_previous->w = 75;
+    m_previous->m_x = area_right.UpperLeftCorner.X + 20;
+    m_previous->m_y = area_right.UpperLeftCorner.Y +20 ;
+    m_previous->m_w = 75;
     m_previous->m_properties[PROP_ID] = "previous";
-    m_previous->h = 40;
+    m_previous->m_h = 40;
     m_previous->setParent(m_irrlicht_window);
     m_children.push_back(m_previous);
     m_previous->add();
 
     name = new LabelWidget();
     name->m_text = StringUtils::insertValues(_("Name: %i"), this->addons->GetName().c_str());
-    name->x = area_left.UpperLeftCorner.X;
-    name->y = area_left.UpperLeftCorner.Y;
-    name->w = area_left.getWidth();
-    name->h = area_left.getHeight()/6;
+    name->m_x = area_left.UpperLeftCorner.X;
+    name->m_y = area_left.UpperLeftCorner.Y;
+    name->m_w = area_left.getWidth();
+    name->m_h = area_left.getHeight()/6;
     name->setParent(m_irrlicht_window);
 
     m_children.push_back(name);
@@ -85,20 +85,20 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
 
     description = new LabelWidget();
     description->m_properties[PROP_WORD_WRAP] = "true";
-    description->x = area_left.UpperLeftCorner.X;
-    description->y = area_left.UpperLeftCorner.Y + area_left.getHeight()/6;
-    description->w = area_left.getWidth();
-    description->h = area_left.getHeight()/3;
+    description->m_x = area_left.UpperLeftCorner.X;
+    description->m_y = area_left.UpperLeftCorner.Y + area_left.getHeight()/6;
+    description->m_w = area_left.getWidth();
+    description->m_h = area_left.getHeight()/3;
     description->setParent(m_irrlicht_window);
     description->m_text = StringUtils::insertValues(_("Description: %i"), this->addons->GetDescription().c_str());
     description->add();
 
     version = new LabelWidget();
-    version->x = area_left.UpperLeftCorner.X;
-    version->y = area_left.UpperLeftCorner.Y + area_left.getHeight()/6 + area_left.getHeight()/3;
+    version->m_x = area_left.UpperLeftCorner.X;
+    version->m_y = area_left.UpperLeftCorner.Y + area_left.getHeight()/6 + area_left.getHeight()/3;
     version->m_text = StringUtils::insertValues(_("Version: %i"), this->addons->GetVersionAsStr().c_str());
-    version->w = area_left.getWidth();
-    version->h = area_left.getHeight()/3;
+    version->m_w = area_left.getWidth();
+    version->m_h = area_left.getHeight()/3;
     version->setParent(m_irrlicht_window);
 
     m_children.push_back(version);
@@ -117,10 +117,10 @@ void AddonsLoading::loadInfo()
     /*I think we can wait a little to have the icon ?*/
     download("icon/" + this->addons->GetIcon(), this->addons->GetName() + ".png");
     icon->setImage(std::string(file_manager->getConfigDir() + "/" +  this->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    icon->x = area_right.UpperLeftCorner.X;
-    icon->y = area_right.UpperLeftCorner.Y;
-    icon->w = m_area.getWidth()/2;
-    icon->h = m_area.getHeight();
+    icon->m_x = area_right.UpperLeftCorner.X;
+    icon->m_y = area_right.UpperLeftCorner.Y;
+    icon->m_w = m_area.getWidth()/2;
+    icon->m_h = m_area.getHeight();
     icon->setParent(m_irrlicht_window);
     m_children.push_back(icon);
     icon->add();
@@ -137,12 +137,12 @@ void AddonsLoading::loadInfo()
     /*m_back_button->setLabel(std::string("Back").c_str());*/
     m_back_button->m_text = _("Back");
     m_back_button->m_properties[PROP_ID] = "cancel";
-    m_back_button->x = 20;
-    m_back_button->y = m_area.getHeight()-45;
+    m_back_button->m_x = 20;
+    m_back_button->m_y = m_area.getHeight()-45;
     m_back_button->setParent(m_irrlicht_window);
     m_children.push_back(m_back_button);
-    m_back_button->w = 150;
-    m_back_button->h = 35;
+    m_back_button->m_w = 150;
+    m_back_button->m_h = 35;
     m_back_button->add();
 
     this->install_button = new ButtonWidget();
@@ -152,12 +152,12 @@ void AddonsLoading::loadInfo()
     else
         this->install_button->m_text = _("Install");
     this->install_button->m_properties[PROP_ID] = "install";
-    this->install_button->x = m_area.getWidth()-170;
-    this->install_button->y = m_area.getHeight()-45;
+    this->install_button->m_x = m_area.getWidth()-170;
+    this->install_button->m_y = m_area.getHeight()-45;
     this->install_button->setParent(m_irrlicht_window);
     m_children.push_back(this->install_button);
-    this->install_button->w = 150;
-    this->install_button->h = 35;
+    this->install_button->m_w = 150;
+    this->install_button->m_h = 35;
     this->install_button->add();
 
 }

@@ -33,7 +33,7 @@ LabelWidget::LabelWidget(bool title) : Widget(WTYPE_LABEL)
 
 void LabelWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
     stringw& message = m_text;
     
@@ -59,7 +59,7 @@ void LabelWidget::add()
     //irrwidget->setBackgroundColor( video::SColor(255,255,0,0) );
     //irrwidget->setDrawBackground(true);
     
-    id = m_element->getID();
+    m_id = m_element->getID();
     //m_element->setTabOrder(id);
     m_element->setTabStop(false);
     m_element->setTabGroup(false);

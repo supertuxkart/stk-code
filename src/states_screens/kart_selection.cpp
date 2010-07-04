@@ -70,10 +70,10 @@ public:
         m_parent = parent;
         m_supports_multiplayer = true;
         
-        x = 0;
-        y = 0;
-        w = 1;
-        h = 1;
+        m_x = 0;
+        m_y = 0;
+        m_w = 1;
+        m_h = 1;
         
         m_reserved_id = Widget::getNewNoFocusID();
     }
@@ -90,15 +90,15 @@ public:
     
     virtual void add()
     {
-        core::rect<s32> widget_size = core::rect<s32>(x, y, x + w, y + h);
+        core::rect<s32> widget_size = core::rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
         
         //gui::IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(L" ", widget_size, false, false, NULL, m_reserved_id);
         m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, m_reserved_id, L"Dispatcher", L"");
         
-        id = m_element->getID();
+        m_id = m_element->getID();
         m_element->setTabStop(true);
         m_element->setTabGroup(false);
-        m_element->setTabOrder(id);
+        m_element->setTabOrder(m_id);
         m_element->setVisible(false);
     }
     
@@ -142,8 +142,8 @@ public:
         m_incorrect = true;
         
         irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("red_mark.png").c_str() ) ;
-        const int mark_size = h;
-        const int mark_x = w - mark_size*2;
+        const int mark_size = m_h;
+        const int mark_x = m_w - mark_size*2;
         const int mark_y = 0;
         core::rect< s32 > red_mark_area(mark_x, mark_y, mark_x + mark_size, mark_y + mark_size);
         m_red_mark_widget = GUIEngine::getGUIEnv()->addImage( red_mark_area, /* parent */ m_element );
@@ -223,11 +223,11 @@ public:
         this->m_playerID = m_playerID;
         this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
         
-        setSize(area->x, area->y, area->w, area->h);
-        target_x = x;
-        target_y = y;
-        target_w = w;
-        target_h = h;
+        setSize(area->m_x, area->m_y, area->m_w, area->m_h);
+        target_x = m_x;
+        target_y = m_y;
+        target_w = m_w;
+        target_h = m_h;
         
         // ---- Player ID label
         if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
@@ -247,20 +247,20 @@ public:
         
         m_player_ID_label->m_properties[PROP_TEXT_ALIGN] = "center";
         m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
-        m_player_ID_label->x = player_id_x;
-        m_player_ID_label->y = player_id_y;
-        m_player_ID_label->w = player_id_w;
-        m_player_ID_label->h = player_id_h;
+        m_player_ID_label->m_x = player_id_x;
+        m_player_ID_label->m_y = player_id_y;
+        m_player_ID_label->m_w = player_id_w;
+        m_player_ID_label->m_h = player_id_h;
         
         //playerID->setParent(this);
         m_children.push_back(m_player_ID_label);
         
         // ---- Player identity spinner
         m_player_ident_spinner = new PlayerNameSpinner(parent, m_playerID);
-        m_player_ident_spinner->x = player_name_x;
-        m_player_ident_spinner->y = player_name_y;
-        m_player_ident_spinner->w = player_name_w;
-        m_player_ident_spinner->h = player_name_h;
+        m_player_ident_spinner->m_x = player_name_x;
+        m_player_ident_spinner->m_y = player_name_y;
+        m_player_ident_spinner->m_w = player_name_w;
+        m_player_ident_spinner->m_h = player_name_h;
         //m_player_ident_spinner->m_event_handler = this;
         
         if (irrlichtWidgetID == -1)
@@ -283,10 +283,10 @@ public:
         // ----- Kart model view
         m_model_view = new ModelViewWidget();
         
-        m_model_view->x = model_x;
-        m_model_view->y = model_y;
-        m_model_view->w = model_w;
-        m_model_view->h = model_h;
+        m_model_view->m_x = model_x;
+        m_model_view->m_y = model_y;
+        m_model_view->m_w = model_w;
+        m_model_view->m_h = model_h;
         m_model_view->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", m_playerID);
         //m_model_view->setParent(this);
         m_children.push_back(m_model_view);
@@ -308,10 +308,10 @@ public:
         m_kart_name->m_text = props->getName();
         m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
         m_kart_name->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
-        m_kart_name->x = kart_name_x;
-        m_kart_name->y = kart_name_y;
-        m_kart_name->w = kart_name_w;
-        m_kart_name->h = kart_name_h;
+        m_kart_name->m_x = kart_name_x;
+        m_kart_name->m_y = kart_name_y;
+        m_kart_name->m_w = kart_name_w;
+        m_kart_name->m_h = kart_name_h;
         //m_kart_name->setParent(this);
         m_children.push_back(m_kart_name);
     }
@@ -418,10 +418,10 @@ public:
         target_w = w;
         target_h = h;
         
-        x_speed = abs( this->x - x ) / 300.0f;
-        y_speed = abs( this->y - y ) / 300.0f;
-        w_speed = abs( this->w - w ) / 300.0f;
-        h_speed = abs( this->h - h ) / 300.0f;
+        x_speed = abs( m_x - x ) / 300.0f;
+        y_speed = abs( m_y - y ) / 300.0f;
+        w_speed = abs( m_w - w ) / 300.0f;
+        h_speed = abs( m_h - h ) / 300.0f;
     }
     
     /** Call when player confirmed his identity and kart */
@@ -458,58 +458,58 @@ public:
     /** Updates the animation (moving/shrinking/etc.) */
     void onUpdate(float delta)
     {
-        if (target_x == x && target_y == y && target_w == w && target_h == h) return;
+        if (target_x == m_x && target_y == m_y && target_w == m_w && target_h == m_h) return;
         
         int move_step = (int)(delta*1000.0f);
         
         // move x towards target
-        if (x < target_x)
+        if (m_x < target_x)
         {
-            x += (int)(move_step*x_speed);
-            if (x > target_x) x = target_x; // don't move to the other side of the target
+            m_x += (int)(move_step*x_speed);
+            if (m_x > target_x) m_x = target_x; // don't move to the other side of the target
         }
-        else if (x > target_x)
+        else if (m_x > target_x)
         {
-            x -= (int)(move_step*x_speed);
-            if (x < target_x) x = target_x; // don't move to the other side of the target
+            m_x -= (int)(move_step*x_speed);
+            if (m_x < target_x) m_x = target_x; // don't move to the other side of the target
         }
         
         // move y towards target
-        if (y < target_y)
+        if (m_y < target_y)
         {
-            y += (int)(move_step*y_speed);
-            if (y > target_y) y = target_y; // don't move to the other side of the target
+            m_y += (int)(move_step*y_speed);
+            if (m_y > target_y) m_y = target_y; // don't move to the other side of the target
         }
-        else if (y > target_y)
+        else if (m_y > target_y)
         {
-            y -= (int)(move_step*y_speed);
-            if (y < target_y) y = target_y; // don't move to the other side of the target
+            m_y -= (int)(move_step*y_speed);
+            if (m_y < target_y) m_y = target_y; // don't move to the other side of the target
         }
         
         // move w towards target
-        if (w < target_w)
+        if (m_w < target_w)
         {
-            w += (int)(move_step*w_speed);
-            if (w > target_w) w = target_w; // don't move to the other side of the target
+            m_w += (int)(move_step*w_speed);
+            if (m_w > target_w) m_w = target_w; // don't move to the other side of the target
         }
-        else if (w > target_w)
+        else if (m_w > target_w)
         {
-            w -= (int)(move_step*w_speed);
-            if (w < target_w) w = target_w; // don't move to the other side of the target
+            m_w -= (int)(move_step*w_speed);
+            if (m_w < target_w) m_w = target_w; // don't move to the other side of the target
         }
         // move h towards target
-        if (h < target_h)
+        if (m_h < target_h)
         {
-            h += (int)(move_step*h_speed);
-            if (h > target_h) h = target_h; // don't move to the other side of the target
+            m_h += (int)(move_step*h_speed);
+            if (m_h > target_h) m_h = target_h; // don't move to the other side of the target
         }
-        else if (h > target_h)
+        else if (m_h > target_h)
         {
-            h -= (int)(move_step*h_speed);
-            if (h < target_h) h = target_h; // don't move to the other side of the target
+            m_h -= (int)(move_step*h_speed);
+            if (m_h < target_h) m_h = target_h; // don't move to the other side of the target
         }
         
-        setSize(x, y, w, h);
+        setSize(m_x, m_y, m_w, m_h);
         
         m_player_ID_label->move(player_id_x,
                             player_id_y,
@@ -563,10 +563,10 @@ public:
     /** Sets the size of the widget as a whole, and placed children widgets inside itself */
     void setSize(const int x, const int y, const int w, const int h)
     {
-        this->x = x;
-        this->y = y;
-        this->w = w;
-        this->h = h;
+        m_x = x;
+        m_y = y;
+        m_w = w;
+        m_h = h;
         
         // -- sizes
         player_id_w = w;
@@ -892,7 +892,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
     Widget kartsArea = *this->getWidget("playerskarts"); // copy
-    kartsArea.x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
+    kartsArea.m_x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
     // ---- Create new active player
     PlayerProfile* profileToUse = UserConfigParams::m_all_players.get(0);
@@ -924,11 +924,11 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
     Widget* fullarea = this->getWidget("playerskarts");
-    const int splitWidth = fullarea->w / amount;
+    const int splitWidth = fullarea->m_w / amount;
     
     for (int n=0; n<amount; n++)
     {
-        m_kart_widgets[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
+        m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y, splitWidth, fullarea->m_h );
     }
     
     
@@ -1009,7 +1009,8 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
     // and will stop when the widget has disappeared)
     Widget* fullarea = this->getWidget("playerskarts");
-    m_removed_widget->move( m_removed_widget->x + m_removed_widget->w/2, fullarea->y + fullarea->h, 0, 0);
+    m_removed_widget->move(m_removed_widget->m_x + m_removed_widget->m_w/2, 
+                           fullarea->m_y + fullarea->m_h, 0, 0);
     
     // update selections
     
@@ -1062,7 +1063,7 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
     {
         m_removed_widget->onUpdate(delta);
        
-        if (m_removed_widget->w == 0 || m_removed_widget->h == 0)
+        if (m_removed_widget->m_w == 0 || m_removed_widget->m_h == 0)
         {
             // destruct when too small (for "disappear" effects)
             this->manualRemoveWidget(m_removed_widget);
@@ -1430,13 +1431,13 @@ void KartSelectionScreen::renumberKarts()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     Widget* fullarea = this->getWidget("playerskarts");
-    const int splitWidth = fullarea->w / m_kart_widgets.size();
+    const int splitWidth = fullarea->m_w / m_kart_widgets.size();
 
     //printf("Renumbering karts...");
     for (int n=0; n < m_kart_widgets.size(); n++)
     {
         m_kart_widgets[n].setPlayerID(n);
-        m_kart_widgets[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
+        m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y, splitWidth, fullarea->m_h );
     }
 
     w->updateItemDisplay();

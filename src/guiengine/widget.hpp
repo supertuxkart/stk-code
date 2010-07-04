@@ -193,18 +193,17 @@ namespace GUIEngine
         irr::gui::IGUIElement* m_element;
         
         
-        // FIXME... i forgot the m_ everywhere ... XD
-
         /** numerical ID used by irrLicht to identify this widget
          * (not the same as the string identificator specified in the XML file)
          */
-        int id;
+        int m_id;
         
         /** Usually, only one widget at a time can be focused. There is however a special case where all
             players can move through the screen. This variable will then be used as a bitmask to contain
             which players beyong player 1 have this widget focused. */
         bool m_player_focus[MAX_PLAYER_COUNT];
 
+        /** Whether to reserve an ID in 'm_reserved_id' when widget is added */
         bool m_reserve_id;
                
         /** When inferring widget size from its label length, this method will be called to
@@ -260,7 +259,7 @@ namespace GUIEngine
         /** Coordinates of the widget once added (the difference between those x/h and PROP_WIDTH/PROP_HEIGHT is
             that the props are read in raw form from the XML file; PROP_WIDTH can then be e.g. "10%" and w,
             once the widget is added, will be e.g. 80.) */
-        int x, y, w, h;
+        int m_x, m_y, m_w, m_h;
         
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
@@ -410,6 +409,8 @@ namespace GUIEngine
           * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
           */
         virtual void elementRemoved();
+        
+        int getID() const { return m_id; }
         
         bool searchInsideMe() const { return m_check_inside_me; }
     };

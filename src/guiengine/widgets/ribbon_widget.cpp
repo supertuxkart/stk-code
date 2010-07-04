@@ -64,7 +64,7 @@ void RibbonWidget::add()
     m_labels.clearWithoutDeleting();
     
     
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     
     int id = (m_reserved_id == -1 ? getNewID() : m_reserved_id);
     
@@ -92,20 +92,20 @@ void RibbonWidget::add()
             icon->m_tab_stop = false;
         }
         
-        total_needed_space += m_children[i].w;
+        total_needed_space += m_children[i].m_w;
     }
     
-    int free_h_space = w - total_needed_space;
+    int free_h_space = m_w - total_needed_space;
     
     //int biggest_y = 0;
     const int button_y = 10;
     float global_zoom = 1;
     
     const int min_free_space = 50;
-    global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
-    free_h_space = (int)(w - total_needed_space*global_zoom);
+    global_zoom = (float)m_w / (float)( m_w - free_h_space + min_free_space );
+    free_h_space = (int)(m_w - total_needed_space*global_zoom);
     
-    const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
+    const int one_button_space = (int)round((float)m_w / (float)subbuttons_amount);
     
     // ---- add children
     for (int i=0; i<subbuttons_amount; i++)
@@ -118,7 +118,7 @@ void RibbonWidget::add()
         {
             IGUIButton * subbtn = NULL;
             rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0,
-                                          widget_x + one_button_space/2-2,  h);
+                                          widget_x + one_button_space/2-2,  m_h);
             
             stringw& message = m_children[i].m_text;
             
@@ -189,7 +189,7 @@ void RibbonWidget::add()
             
             const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_count : 10;
             
-            float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
+            float imageRatio = (float)m_children[i].m_w / (float)m_children[i].m_h;
             
             // calculate the size of the image
             video::ITexture* image = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
@@ -199,40 +199,40 @@ void RibbonWidget::add()
             // scale to fit (FIXME: calculate the right value directly...)
             float zoom = global_zoom;
             
-            if (button_y + image_h*zoom + needed_space_under_button > h)
+            if (button_y + image_h*zoom + needed_space_under_button > m_h)
             {
                 // scale down
-                while (button_y + image_h*zoom + needed_space_under_button > h) zoom -= 0.01f;
+                while (button_y + image_h*zoom + needed_space_under_button > m_h) zoom -= 0.01f;
             }
             else
             {
                 // scale up
-                while (button_y + image_h*zoom + needed_space_under_button < h) zoom += 0.01f;
+                while (button_y + image_h*zoom + needed_space_under_button < m_h) zoom += 0.01f;
             }
             
             // ---- add bitmap button part
             // backup and restore position in case the same object is added multiple times (FIXME: unclean)
-            int old_x = m_children[i].x;
-            int old_y = m_children[i].y;
-            int old_w = m_children[i].w;
-            int old_h = m_children[i].h;
+            int old_x = m_children[i].m_x;
+            int old_y = m_children[i].m_y;
+            int old_w = m_children[i].m_w;
+            int old_h = m_children[i].m_h;
             
-            m_children[i].x = widget_x - (int)(image_w*zoom/2.0f);
-            m_children[i].y = button_y;
-            m_children[i].w = (int)(image_w*zoom);
-            m_children[i].h = (int)(image_h*zoom);
+            m_children[i].m_x = widget_x - (int)(image_w*zoom/2.0f);
+            m_children[i].m_y = button_y;
+            m_children[i].m_w = (int)(image_w*zoom);
+            m_children[i].m_h = (int)(image_h*zoom);
             
             IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
-            icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_space - icon->w);
+            icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_space - icon->m_w);
 
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();
 
             // restore backuped size and location (see above for more info)
-            m_children[i].x = old_x;
-            m_children[i].y = old_y;
-            m_children[i].w = old_w;
-            m_children[i].h = old_h;
+            m_children[i].m_x = old_x;
+            m_children[i].m_y = old_y;
+            m_children[i].m_w = old_w;
+            m_children[i].m_h = old_h;
             
             // the label itself will be added by the icon widget. since it adds the label outside of the
             // widget area it is assigned to, the label will appear in the area we want at the bottom

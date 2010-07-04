@@ -337,20 +337,20 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         LabelWidget* unlocked_label = new LabelWidget();
         unlocked_label->m_properties[PROP_ID] = "label";
         unlocked_label->m_properties[PROP_TEXT_ALIGN] = "center";
-        unlocked_label->x = button_h + 30;
-        unlocked_label->y = label_y;
-        unlocked_label->w = m_area.getWidth() - button_h*2 - 60;
-        unlocked_label->h = button_h;
+        unlocked_label->m_x = button_h + 30;
+        unlocked_label->m_y = label_y;
+        unlocked_label->m_w = m_area.getWidth() - button_h*2 - 60;
+        unlocked_label->m_h = button_h;
         unlocked_label->m_text = _("You unlocked a new feature!");
         unlocked_label->setParent(m_irrlicht_window);
         m_children.push_back(unlocked_label);
         unlocked_label->add();
         
         ButtonWidget* whats_next_btn = new ButtonWidget();
-        whats_next_btn->x = 15;
-        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
-        whats_next_btn->w = m_area.getWidth() - 30;
-        whats_next_btn->h = button_h;
+        whats_next_btn->m_x = 15;
+        whats_next_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons);
+        whats_next_btn->m_w = m_area.getWidth() - 30;
+        whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
         whats_next_btn->m_text = _("See unlocked features");
@@ -365,10 +365,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     {
         ButtonWidget* new_race_btn = new ButtonWidget();
         new_race_btn->m_properties[PROP_ID] = "newracebtn";
-        new_race_btn->x = 15;
-        new_race_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*3;
-        new_race_btn->w = m_area.getWidth() - 30;
-        new_race_btn->h = button_h;
+        new_race_btn->m_x = 15;
+        new_race_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons)*3;
+        new_race_btn->m_w = m_area.getWidth() - 30;
+        new_race_btn->m_h = button_h;
         new_race_btn->m_text = _("Setup New Race");
         new_race_btn->setParent(m_irrlicht_window);
         m_children.push_back(new_race_btn);
@@ -376,20 +376,20 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     
         ButtonWidget* race_again_btn = new ButtonWidget();
         race_again_btn->m_properties[PROP_ID] = "raceagainbtn";
-        race_again_btn->x = 15;
-        race_again_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
-        race_again_btn->w = m_area.getWidth() - 30;
-        race_again_btn->h = button_h;
+        race_again_btn->m_x = 15;
+        race_again_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        race_again_btn->m_w = m_area.getWidth() - 30;
+        race_again_btn->m_h = button_h;
         race_again_btn->m_text = _("Race in this track again");
         race_again_btn->setParent(m_irrlicht_window);
         m_children.push_back(race_again_btn);
         race_again_btn->add();
         
         ButtonWidget* whats_next_btn = new ButtonWidget();
-        whats_next_btn->x = 15;
-        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
-        whats_next_btn->w = m_area.getWidth() - 30;
-        whats_next_btn->h = button_h;
+        whats_next_btn->m_x = 15;
+        whats_next_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons);
+        whats_next_btn->m_w = m_area.getWidth() - 30;
+        whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
         whats_next_btn->m_text = _("Back to the main menu");
@@ -403,10 +403,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         ButtonWidget* whats_next_btn = new ButtonWidget();
-        whats_next_btn->x = 15;
-        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
-        whats_next_btn->w = m_area.getWidth() - 30;
-        whats_next_btn->h = button_h;
+        whats_next_btn->m_x = 15;
+        whats_next_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        whats_next_btn->m_w = m_area.getWidth() - 30;
+        whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
         whats_next_btn->m_text = _("Continue Grand Prix");
@@ -420,10 +420,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         
         ButtonWidget* abort_gp = new ButtonWidget();
         abort_gp->m_properties[PROP_ID] = "backtomenu";
-        abort_gp->x = 15;
-        abort_gp->y = m_area.getHeight() - (button_h + margin_between_buttons);
-        abort_gp->w = m_area.getWidth() - 30;
-        abort_gp->h = button_h;
+        abort_gp->m_x = 15;
+        abort_gp->m_y = m_area.getHeight() - (button_h + margin_between_buttons);
+        abort_gp->m_w = m_area.getWidth() - 30;
+        abort_gp->m_h = button_h;
         abort_gp->m_text = _("Abort Grand Prix");
         abort_gp->setParent(m_irrlicht_window);
         m_children.push_back(abort_gp);

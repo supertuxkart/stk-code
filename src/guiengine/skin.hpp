@@ -119,52 +119,52 @@ namespace GUIEngine
     class SkinWidgetContainer
     {
     public:
-        int x, y, w, h;
+        int m_skin_x, m_skin_y, m_skin_w, m_skin_h;
         
-        bool dest_areas_inited;
-        bool dest_areas_yflip_inited;
-        int dest_x, dest_y, dest_x2, dest_y2;
+        bool m_skin_dest_areas_inited;
+        bool m_skin_dest_areas_yflip_inited;
+        int m_skin_dest_x, m_skin_dest_y, m_skin_dest_x2, m_skin_dest_y2;
         
         // see comments in Skin::drawBoxFromStretchableTexture for explaination of
         // what these are
-        irr::core::rect<irr::s32> dest_area_left;
-        irr::core::rect<irr::s32> dest_area_center;
-        irr::core::rect<irr::s32> dest_area_right;
+        irr::core::rect<irr::s32> m_skin_dest_area_left;
+        irr::core::rect<irr::s32> m_skin_dest_area_center;
+        irr::core::rect<irr::s32> m_skin_dest_area_right;
         
-        irr::core::rect<irr::s32> dest_area_top;
-        irr::core::rect<irr::s32> dest_area_bottom;
+        irr::core::rect<irr::s32> m_skin_dest_area_top;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom;
         
-        irr::core::rect<irr::s32> dest_area_top_left;
-        irr::core::rect<irr::s32> dest_area_top_right;
-        irr::core::rect<irr::s32> dest_area_bottom_left;
-        irr::core::rect<irr::s32> dest_area_bottom_right;
+        irr::core::rect<irr::s32> m_skin_dest_area_top_left;
+        irr::core::rect<irr::s32> m_skin_dest_area_top_right;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom_left;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom_right;
         
         // y flip
-        irr::core::rect<irr::s32> dest_area_left_yflip;
-        irr::core::rect<irr::s32> dest_area_center_yflip;
-        irr::core::rect<irr::s32> dest_area_right_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_left_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_center_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_right_yflip;
         
-        irr::core::rect<irr::s32> dest_area_top_yflip;
-        irr::core::rect<irr::s32> dest_area_bottom_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_top_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom_yflip;
         
-        irr::core::rect<irr::s32> dest_area_top_left_yflip;
-        irr::core::rect<irr::s32> dest_area_top_right_yflip;
-        irr::core::rect<irr::s32> dest_area_bottom_left_yflip;
-        irr::core::rect<irr::s32> dest_area_bottom_right_yflip;   
+        irr::core::rect<irr::s32> m_skin_dest_area_top_left_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_top_right_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom_left_yflip;
+        irr::core::rect<irr::s32> m_skin_dest_area_bottom_right_yflip;   
         
-        short r, g, b;
+        short m_skin_r, m_skin_g, m_skin_b;
         
         SkinWidgetContainer()
         {
-            dest_areas_inited = false;
-            dest_areas_yflip_inited = false;
-            x = -1;
-            y = -1;
-            w = -1;
-            h = -1;
-            r = -1;
-            g = -1;
-            b = -1;
+            m_skin_dest_areas_inited = false;
+            m_skin_dest_areas_yflip_inited = false;
+            m_skin_x = -1;
+            m_skin_y = -1;
+            m_skin_w = -1;
+            m_skin_h = -1;
+            m_skin_r = -1;
+            m_skin_g = -1;
+            m_skin_b = -1;
         }   // SkinWidgetContainer
     };   // class SkinWidgetContainer
     

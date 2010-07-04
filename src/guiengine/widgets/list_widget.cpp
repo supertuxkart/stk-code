@@ -71,7 +71,7 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons)
 
 void ListWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     
     IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
     list->setAutoScrollEnabled(false);

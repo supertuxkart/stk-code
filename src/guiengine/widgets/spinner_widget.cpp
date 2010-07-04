@@ -103,20 +103,20 @@ void SpinnerWidget::add()
         widgetID = getNewID();
     }
     
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, widgetID, L"");
     m_element = btn;
     
     m_element->setTabOrder( m_element->getID() );
     
     // left arrow
-    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
+    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
     IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, getNewNoFocusID(), L" ");
     m_children[0].m_element = left_arrow;
     left_arrow->setTabStop(false);
     m_children[0].m_event_handler = this;
     m_children[0].m_properties[PROP_ID] = "left";
-    m_children[0].id = m_children[0].m_element->getID();
+    m_children[0].m_id = m_children[0].m_element->getID();
     
     // label
     if (m_graphical)
@@ -125,12 +125,12 @@ void SpinnerWidget::add()
         assert(texture != NULL);
         
         const int texture_width = texture->getSize().Width;
-        const int free_h_space = w-h*2-texture_width; // to center image
+        const int free_h_space = m_w - m_h*2 - texture_width; // to center image
         
-        rect<s32> subsize_label = rect<s32>(h+free_h_space/2, 0, w-h+free_h_space/2, h);
+        rect<s32> subsize_label = rect<s32>(m_h + free_h_space/2, 0, m_w - m_h+ free_h_space/2, m_h);
         IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(subsize_label, btn, getNewNoFocusID());
         m_children[1].m_element = subbtn;
-        m_children[1].id = subbtn->getID();
+        m_children[1].m_id = subbtn->getID();
         m_children[1].m_event_handler = this;
         subbtn->setUseAlphaChannel(true);
         
@@ -139,13 +139,13 @@ void SpinnerWidget::add()
     }
     else
     {
-        rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
+        rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
         IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
                                                                       false /* border */, true /* word wrap */,
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
         m_children[1].m_event_handler = this;
-        m_children[1].id = label->getID();
+        m_children[1].m_id = label->getID();
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
@@ -153,13 +153,13 @@ void SpinnerWidget::add()
     
     
     // right arrow
-    rect<s32> subsize_right_arrow = rect<s32>(w-h, 0, w, h);
+    rect<s32> subsize_right_arrow = rect<s32>(m_w - m_h, 0, m_w, m_h);
     IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, getNewNoFocusID(), L"  ");
     right_arrow->setTabStop(false);
     m_children[2].m_element = right_arrow;
     m_children[2].m_event_handler = this;
     m_children[2].m_properties[PROP_ID] = "right";
-    m_children[2].id = m_children[2].m_element->getID();
+    m_children[2].m_id = m_children[2].m_element->getID();
     
     // refresh display
     setValue(m_value);

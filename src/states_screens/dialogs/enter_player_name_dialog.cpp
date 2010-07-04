@@ -40,10 +40,10 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     m_label_ctrl->m_text = _("Enter the new player's name");
     
     m_label_ctrl->m_properties[PROP_TEXT_ALIGN] = "center";
-    m_label_ctrl->x = 0;
-    m_label_ctrl->y = 0;
-    m_label_ctrl->w = m_area.getWidth();
-    m_label_ctrl->h = m_area.getHeight()/3;
+    m_label_ctrl->m_x = 0;
+    m_label_ctrl->m_y = 0;
+    m_label_ctrl->m_w = m_area.getWidth();
+    m_label_ctrl->m_h = m_area.getHeight()/3;
     m_label_ctrl->setParent(m_irrlicht_window);
     
     m_children.push_back(m_label_ctrl);
@@ -58,10 +58,10 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     
     textCtrl = new TextBoxWidget();
     textCtrl->m_text = "";
-    textCtrl->x = 50;
-    textCtrl->y = textAreaYFrom - 10;
-    textCtrl->w = m_area.getWidth()-100;
-    textCtrl->h = textHeight + 5;
+    textCtrl->m_x = 50;
+    textCtrl->m_y = textAreaYFrom - 10;
+    textCtrl->m_w = m_area.getWidth()-100;
+    textCtrl->m_h = textHeight + 5;
     textCtrl->setParent(m_irrlicht_window);
     m_children.push_back(textCtrl);
     textCtrl->add();
@@ -72,10 +72,10 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     cancelButton = new ButtonWidget();
     cancelButton->m_properties[PROP_ID] = "cancel";
     cancelButton->m_text = _("Cancel");
-    cancelButton->x = 15;
-    cancelButton->y = m_area.getHeight() - textHeight - 12;
-    cancelButton->w = m_area.getWidth() - 30;
-    cancelButton->h = textHeight + 6;
+    cancelButton->m_x = 15;
+    cancelButton->m_y = m_area.getHeight() - textHeight - 12;
+    cancelButton->m_w = m_area.getWidth() - 30;
+    cancelButton->m_h = textHeight + 6;
     cancelButton->setParent(m_irrlicht_window);
     
     m_children.push_back(cancelButton);

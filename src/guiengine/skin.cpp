@@ -336,15 +336,15 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
                                          const core::rect<s32>* clipRect)
 {
     // check if widget moved. if so, recalculate coords
-    if (w->x != dest.UpperLeftCorner.X || w->y != dest.UpperLeftCorner.Y ||
-        w->w != dest.getWidth() || w->h != dest.getHeight())
+    if (w->m_skin_x != dest.UpperLeftCorner.X || w->m_skin_y != dest.UpperLeftCorner.Y ||
+        w->m_skin_w != dest.getWidth() || w->m_skin_h != dest.getHeight())
     {
-        w->dest_areas_inited = false;
-        w->dest_areas_yflip_inited = false;
-        w->x = dest.UpperLeftCorner.X;
-        w->y = dest.UpperLeftCorner.Y;
-        w->w = dest.getWidth();
-        w->h = dest.getHeight();
+        w->m_skin_dest_areas_inited = false;
+        w->m_skin_dest_areas_yflip_inited = false;
+        w->m_skin_x = dest.UpperLeftCorner.X;
+        w->m_skin_y = dest.UpperLeftCorner.Y;
+        w->m_skin_w = dest.getWidth();
+        w->m_skin_h = dest.getHeight();
         //std::cout << "widget moved, calculating again\n";
     }
 
@@ -377,23 +377,23 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
      +----l--------------------m----n
      */
     
-    if (!w->dest_areas_inited)
+    if (!w->m_skin_dest_areas_inited)
     {
-        w->dest_x = dest.UpperLeftCorner.X;
-        w->dest_y = dest.UpperLeftCorner.Y;
-        w->dest_x2 = dest.LowerRightCorner.X;
-        w->dest_y2 = dest.LowerRightCorner.Y;
+        w->m_skin_dest_x  = dest.UpperLeftCorner.X;
+        w->m_skin_dest_y  = dest.UpperLeftCorner.Y;
+        w->m_skin_dest_x2 = dest.LowerRightCorner.X;
+        w->m_skin_dest_y2 = dest.LowerRightCorner.Y;
         
         //const float xscale = (float)(dest_x2-dest_x)/texture_w;
-        const float yscale = (float)(w->dest_y2 - w->dest_y)/texture_h;
+        const float yscale = (float)(w->m_skin_dest_y2 - w->m_skin_dest_y)/texture_h;
         
         int dest_left_border, dest_right_border;
         
         // scale and keep aspect ratio
-        if(preserve_h_aspect_ratios)
+        if (preserve_h_aspect_ratios)
         {
-            dest_left_border   = (int)(left_border * (w->dest_y2 - w->dest_y) / texture_h );
-            dest_right_border  = (int)(right_border * (w->dest_y2 - w->dest_y) / texture_h);
+            dest_left_border   = (int)(left_border  * (w->m_skin_dest_y2 - w->m_skin_dest_y) / texture_h );
+            dest_right_border  = (int)(right_border * (w->m_skin_dest_y2 - w->m_skin_dest_y) / texture_h);
         }
         else
         {
@@ -407,17 +407,17 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         const float hborder_in_portion = 1 - hborder_out_portion;
         const float vborder_in_portion = 1 - vborder_out_portion;
         
-        const int ax = (int)(w->dest_x - dest_left_border*hborder_out_portion);
-        const int ay = (int)(w->dest_y - dest_top_border*vborder_out_portion);
+        const int ax = (int)(w->m_skin_dest_x - dest_left_border * hborder_out_portion);
+        const int ay = (int)(w->m_skin_dest_y - dest_top_border  * vborder_out_portion);
         
-        const int bx = (int)(w->dest_x + dest_left_border*hborder_in_portion);
+        const int bx = (int)(w->m_skin_dest_x + dest_left_border*hborder_in_portion);
         const int by = ay;
         
-        const int cx = (int)(w->dest_x2 - dest_right_border*hborder_in_portion);
+        const int cx = (int)(w->m_skin_dest_x2 - dest_right_border*hborder_in_portion);
         const int cy = ay;
         
         const int dx = ax;
-        const int dy = (int)(w->dest_y + dest_top_border*vborder_in_portion);
+        const int dy = (int)(w->m_skin_dest_y + dest_top_border*vborder_in_portion);
         
         const int ex = bx;
         const int ey = dy;
@@ -425,11 +425,11 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         const int fx = cx;
         const int fy = dy;
         
-        const int gx = (int)(w->dest_x2 + dest_right_border*hborder_out_portion);
+        const int gx = (int)(w->m_skin_dest_x2 + dest_right_border*hborder_out_portion);
         const int gy = dy;
         
         const int hx = ax;
-        const int hy = (int)(w->dest_y2 - dest_bottom_border*vborder_in_portion);
+        const int hy = (int)(w->m_skin_dest_y2 - dest_bottom_border*vborder_in_portion);
         
         const int ix = bx;
         const int iy = hy;
@@ -441,7 +441,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         const int ky = hy;
         
         const int lx = bx;
-        const int ly = (int)(w->dest_y2 + dest_bottom_border*vborder_out_portion);
+        const int ly = (int)(w->m_skin_dest_y2 + dest_bottom_border*vborder_out_portion);
         
         const int mx = cx;
         const int my = ly;
@@ -449,47 +449,47 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         const int nx = gx;
         const int ny = ly;
         
-        w->dest_area_left         = core::rect<s32>(dx, dy, ix, iy);
-        w->dest_area_center       = core::rect<s32>(ex, ey, jx, jy);
-        w->dest_area_right        = core::rect<s32>(fx, fy, kx, ky);
+        w->m_skin_dest_area_left         = core::rect<s32>(dx, dy, ix, iy);
+        w->m_skin_dest_area_center       = core::rect<s32>(ex, ey, jx, jy);
+        w->m_skin_dest_area_right        = core::rect<s32>(fx, fy, kx, ky);
         
-        w->dest_area_top          = core::rect<s32>(bx, by, fx, fy);
-        w->dest_area_bottom       = core::rect<s32>(ix, iy, mx, my);
+        w->m_skin_dest_area_top          = core::rect<s32>(bx, by, fx, fy);
+        w->m_skin_dest_area_bottom       = core::rect<s32>(ix, iy, mx, my);
         
-        w->dest_area_top_left     = core::rect<s32>(ax, ay, ex, ey);
-        w->dest_area_top_right    = core::rect<s32>(cx, cy, gx, gy);
-        w->dest_area_bottom_left  = core::rect<s32>(hx, hy, lx, ly);
-        w->dest_area_bottom_right = core::rect<s32>(jx, jy, nx, ny);
+        w->m_skin_dest_area_top_left     = core::rect<s32>(ax, ay, ex, ey);
+        w->m_skin_dest_area_top_right    = core::rect<s32>(cx, cy, gx, gy);
+        w->m_skin_dest_area_bottom_left  = core::rect<s32>(hx, hy, lx, ly);
+        w->m_skin_dest_area_bottom_right = core::rect<s32>(jx, jy, nx, ny);
         
-        w->dest_areas_inited = true;
+        w->m_skin_dest_areas_inited = true;
     }
     
     if (vertical_flip)
     {
-        if (!w->dest_areas_yflip_inited)
+        if (!w->m_skin_dest_areas_yflip_inited)
         {
-#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - w->dest_y; \
-const int y2 = X.LowerRightCorner.Y - w->dest_y; \
+#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - w->m_skin_dest_y; \
+const int y2 = X.LowerRightCorner.Y - w->m_skin_dest_y; \
 X##_yflip = X; \
-X##_yflip.UpperLeftCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y2;\
-X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
+X##_yflip.UpperLeftCorner.Y = w->m_skin_dest_y + (w->m_skin_dest_y2 - w->m_skin_dest_y) - y2;\
+X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + (w->m_skin_dest_y2 - w->m_skin_dest_y) - y1;}
         
-        FLIP_Y(w->dest_area_left)
-        FLIP_Y(w->dest_area_center)
-        FLIP_Y(w->dest_area_right)
+        FLIP_Y(w->m_skin_dest_area_left)
+        FLIP_Y(w->m_skin_dest_area_center)
+        FLIP_Y(w->m_skin_dest_area_right)
         
-        FLIP_Y(w->dest_area_top)
-        FLIP_Y(w->dest_area_bottom)
+        FLIP_Y(w->m_skin_dest_area_top)
+        FLIP_Y(w->m_skin_dest_area_bottom)
         
-        FLIP_Y(w->dest_area_top_left)
-        FLIP_Y(w->dest_area_top_right)
-        FLIP_Y(w->dest_area_bottom_left)
-        FLIP_Y(w->dest_area_bottom_right)
+        FLIP_Y(w->m_skin_dest_area_top_left)
+        FLIP_Y(w->m_skin_dest_area_top_right)
+        FLIP_Y(w->m_skin_dest_area_bottom_left)
+        FLIP_Y(w->m_skin_dest_area_bottom_right)
         
 #undef FLIP_Y
         }
         
-        w->dest_areas_yflip_inited = true;
+        w->m_skin_dest_areas_yflip_inited = true;
         params.calculateYFlipIfNeeded();
     }
     
@@ -507,7 +507,7 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     core::rect<s32>& GET_AREA(source_area_bottom_right); 
 #undef GET_AREA
     
-#define GET_AREA( X ) X = (vertical_flip ? w->X##_yflip : w->X)
+#define GET_AREA( X ) X = (vertical_flip ? w->m_skin_##X##_yflip : w->m_skin_##X)
     core::rect<s32>& GET_AREA(dest_area_left);
     core::rect<s32>& GET_AREA(dest_area_center);
     core::rect<s32>& GET_AREA(dest_area_right);
@@ -524,9 +524,9 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     SColor* colorptr = NULL;
     
     // create a color object
-    if ( (w->r != -1 && w->g != -1 && w->b != -1) || ID_DEBUG || deactivated)
+    if ( (w->m_skin_r != -1 && w->m_skin_g != -1 && w->m_skin_b != -1) || ID_DEBUG || deactivated)
     {
-        SColor thecolor(255, w->r, w->g, w->b);
+        SColor thecolor(255, w->m_skin_r, w->m_skin_g, w->m_skin_b);
         colorptr = new SColor[4]();
         colorptr[0] = thecolor;
         colorptr[1] = thecolor;
@@ -912,9 +912,9 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
         }
         if (focused_widget != NULL && widget->m_children.size()>2)
         {
-            if (widget->m_children[0].id == focused_widget->getID() ||
-                widget->m_children[1].id == focused_widget->getID() ||
-                widget->m_children[2].id == focused_widget->getID())
+            if (widget->m_children[0].getID() == focused_widget->getID() ||
+                widget->m_children[1].getID() == focused_widget->getID() ||
+                widget->m_children[2].getID() == focused_widget->getID())
             {
                 focused = true;
             }
@@ -975,14 +975,14 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     if (w->isGauge() && !w->m_deactivated)
     {
-        const int handle_size = (int)( widget->h*params.left_border/(float)params.getImage()->getSize().Height );
+        const int handle_size = (int)( widget->m_h*params.left_border/(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
         
         
-        const core::rect< s32 > dest_area = core::rect< s32 >(widget->x + handle_size,
-                                                              widget->y,
-                                                              widget->x + handle_size + (int)((widget->w - 2*handle_size)*value),
-                                                              widget->y + widget->h);
+        const core::rect< s32 > dest_area = core::rect< s32 >(widget->m_x + handle_size,
+                                                              widget->m_y,
+                                                              widget->m_x + handle_size + (int)((widget->m_w - 2*handle_size)*value),
+                                                              widget->m_y + widget->m_h);
         
         const ITexture* texture = SkinConfig::m_render_params["gaugefill::neutral"].getImage();
         const int texture_w = texture->getSize().Width;
@@ -1014,9 +1014,10 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         else if (widget->m_properties[PROP_ID] == "right") areas = BoxRenderParams::RIGHT;
         else return;
         
-        core::rect< s32 > rect2 = core::rect< s32 >( spinner->x, spinner->y,
-                                                     spinner->x + spinner->w,
-                                                     spinner->y + spinner->h  );
+        core::rect< s32 > rect2 = core::rect< s32 >( spinner->m_x,
+                                                     spinner->m_y,
+                                                     spinner->m_x + spinner->m_w,
+                                                     spinner->m_y + spinner->m_h  );
         
         BoxRenderParams& params = SkinConfig::m_render_params["spinner::down"];
         params.areas = areas;
@@ -1194,7 +1195,10 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
         {
             if(widget.m_show_bounding_box)
             {
-                core::rect< s32 > rect = core::rect<s32>( widget.x, widget.y, widget.x + widget.w, widget.y + widget.h );
+                core::rect< s32 > rect = core::rect<s32>(widget.m_x,
+                                                         widget.m_y,
+                                                         widget.m_x + widget.m_w,
+                                                         widget.m_y + widget.m_h );
                 drawBoxFromStretchableTexture(&widget, rect, SkinConfig::m_render_params["section::neutral"]);
             }
             else

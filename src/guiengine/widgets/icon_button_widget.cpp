@@ -76,17 +76,17 @@ void IconButtonWidget::add()
         useAspectRatio = m_custom_aspect_ratio;
     }
     
-    int suggested_h = h;
-    int suggested_w = (int)((useAspectRatio < 0 ? w : useAspectRatio*suggested_h));
+    int suggested_h = m_h;
+    int suggested_w = (int)((useAspectRatio < 0 ? m_w : useAspectRatio * suggested_h));
     
-    if (suggested_w > w)
+    if (suggested_w > m_w)
     {
-        const float needed_scale_factor = (float)w / (float)suggested_w;
+        const float needed_scale_factor = (float)m_w / (float)suggested_w;
         suggested_w = (int)(suggested_w*needed_scale_factor);
         suggested_h = (int)(suggested_h*needed_scale_factor);
     }
-    const int x_from = x + (w - suggested_w)/2; // center horizontally
-    const int y_from = y + (h - suggested_h)/2; // center vertically
+    const int x_from = m_x + (m_w - suggested_w)/2; // center horizontally
+    const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
     
     rect<s32> widget_size = rect<s32>(x_from,
                                       y_from,
@@ -99,7 +99,7 @@ void IconButtonWidget::add()
 
     btn->setTabStop(m_tab_stop);
     m_element = btn;
-    id = m_element->getID();
+    m_id = m_element->getID();
     
     // ---- label if any
     stringw& message = m_text;
@@ -108,7 +108,10 @@ void IconButtonWidget::add()
         //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = " << m_properties[PROP_EXTEND_LABEL] << std::endl;
         const int label_extra_size = ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
                                        0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
-        widget_size = rect<s32>(x - label_extra_size/2, y + h, x + w + label_extra_size/2, y + h*2);
+        widget_size = rect<s32>(m_x - label_extra_size/2,
+                                m_y + m_h,
+                                m_x + m_w + label_extra_size/2,
+                                m_y + m_h*2);
 
         m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, true /* word wrap */, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
@@ -116,8 +119,8 @@ void IconButtonWidget::add()
     }
     
     // ---- IDs
-    id = m_element->getID();
-    if (m_tab_stop) m_element->setTabOrder(id);
+    m_id = m_element->getID();
+    if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------

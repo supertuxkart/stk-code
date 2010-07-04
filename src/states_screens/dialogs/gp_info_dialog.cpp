@@ -98,10 +98,10 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
                 
         LabelWidget* widget = new LabelWidget();
         widget->m_text = lineText;
-        widget->x = 20;
-        widget->y = from_y;
-        widget->w = m_area.getWidth()/2 - 20;
-        widget->h = height_of_one_line;
+        widget->m_x = 20;
+        widget->m_y = from_y;
+        widget->m_w = m_area.getWidth()/2 - 20;
+        widget->m_h = height_of_one_line;
         widget->setParent(m_irrlicht_window);
         
         m_children.push_back(widget);
@@ -120,10 +120,10 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
     
-    m_screenshot_widget->x = m_area.getWidth()/2;
-    m_screenshot_widget->y = y1;
-    m_screenshot_widget->w = m_area.getWidth()/2;
-    m_screenshot_widget->h = y2 - y1 - 10;
+    m_screenshot_widget->m_x = m_area.getWidth()/2;
+    m_screenshot_widget->m_y = y1;
+    m_screenshot_widget->m_w = m_area.getWidth()/2;
+    m_screenshot_widget->m_h = y2 - y1 - 10;
     
     Track* track = track_manager->getTrack(tracks[0]);
     
@@ -150,10 +150,10 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         okBtn->setBadge(BAD_BADGE);
     }
     
-    okBtn->x = m_area.getWidth()/2 - 200;
-    okBtn->y = y2;
-    okBtn->w = 400;
-    okBtn->h = m_area.getHeight() - y2 - 15;
+    okBtn->m_x = m_area.getWidth()/2 - 200;
+    okBtn->m_y = y2;
+    okBtn->m_w = 400;
+    okBtn->m_h = m_area.getHeight() - y2 - 15;
     okBtn->setParent(m_irrlicht_window);
     m_children.push_back(okBtn);
     okBtn->add();

@@ -30,12 +30,12 @@ ButtonWidget::ButtonWidget() : Widget(WTYPE_BUTTON)
 
 void ButtonWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     stringw&  message = m_text;
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), message.c_str(), L"");
     
-    id = m_element->getID();
-    m_element->setTabOrder(id);
+    m_id = m_element->getID();
+    m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 }
 

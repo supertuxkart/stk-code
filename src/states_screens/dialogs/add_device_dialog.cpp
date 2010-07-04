@@ -60,10 +60,10 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y_bottom;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = y_bottom;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
@@ -75,10 +75,10 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
-        widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y_bottom + buttonHeight + 10;
-        widget->w = textWidth;
-        widget->h = buttonHeight;
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = y_bottom + buttonHeight + 10;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();

@@ -32,13 +32,13 @@ CheckBoxWidget::CheckBoxWidget() : Widget(WTYPE_CHECKBOX)
 
 void CheckBoxWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     //stringw& message = m_text;
     //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
     
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
-    id = m_element->getID();
-    m_element->setTabOrder(id);
+    m_id = m_element->getID();
+    m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------

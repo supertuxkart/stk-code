@@ -32,13 +32,13 @@ TextBoxWidget::TextBoxWidget() : Widget(WTYPE_TEXTBOX)
 
 void TextBoxWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     
     stringw& text = m_text;
     m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
                                                    true /* border */, m_parent, getNewID());
-    id = m_element->getID();
-    m_element->setTabOrder(id);
+    m_id = m_element->getID();
+    m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
     m_element->setTabStop(true);
 }
