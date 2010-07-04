@@ -39,7 +39,7 @@ class XMLNode;
  *  OpenGL library used. 
  * \ingroup karts
  */
-class KartModel
+class KartModel : public scene::IAnimationEndCallBack            
 {
 public:
     enum   AnimationFrameType
@@ -49,10 +49,12 @@ public:
             AF_STRAIGHT,           // Going straight
             AF_RIGHT,              // Steering to the right
             AF_LOSE_START,         // Begin losing animation
+            AF_LOSE_LOOP_START,    // Begin of the losing loop
             AF_LOSE_END,           // End losing animation
             AF_BEGIN_EXPLOSION,    // Begin explosion animation
             AF_END_EXPLOSION,      // End explosion animation
             AF_WIN_START,          // Begin of win animation
+            AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
             AF_END=AF_WIN_END,     // Last animation frame 
             AF_COUNT};             // Number of entries here
@@ -121,6 +123,8 @@ private:
                                        *   the karts down appropriately. */
     void  loadWheelInfo(const XMLNode &node, 
                         const std::string &wheel_name, int index);
+
+    void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
 public:
          KartModel();

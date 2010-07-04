@@ -51,7 +51,7 @@ KartModel::KartModel()
     m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
-    m_animation_speed   = 15;
+    m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
 }   // KartModel
 
@@ -69,8 +69,12 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]  );
         animation_node->get("right",          &m_animation_frame[AF_RIGHT]     );
         animation_node->get("start-winning",  &m_animation_frame[AF_WIN_START] );
+        animation_node->get("start-winning-loop",  
+                                              &m_animation_frame[AF_WIN_LOOP_START] );
         animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
         animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
+        animation_node->get("start-losing-loop", 
+                                             &m_animation_frame[AF_LOSE_LOOP_START]);
         animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
         animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
         animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
@@ -246,7 +250,7 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 
 // ----------------------------------------------------------------------------
 /** Enables- or disables the end animation. 
- *  \param status True if end animation should be played, false otherwise.
+ *  \param type The type of animation to play.
  */
 void KartModel::setAnimation(AnimationFrameType type)
 {
@@ -257,18 +261,59 @@ void KartModel::setAnimation(AnimationFrameType type)
     {
         m_animated_node->setLoopMode(false);
         m_animated_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
-                             m_animation_frame[AF_STRAIGHT] );
+                                      m_animation_frame[AF_STRAIGHT] );
+        m_animated_node->setAnimationEndCallback(NULL);
     }
 
     if(m_current_animation!=AF_DEFAULT &&  m_animation_frame[type]>-1)
     {
-        AnimationFrameType end = (AnimationFrameType)(type+1);
-        m_animated_node->setFrameLoop(m_animation_frame[type], 
-                             m_animation_frame[end]    );
-        m_animated_node->setLoopMode(true);
+        // 'type' is the start frame of the animation, type + 1 the frame 
+        // to begin the loop with, type + 2 to end the frame with
+        AnimationFrameType end = (AnimationFrameType)(type+2);
         m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[type], 
+                                      m_animation_frame[end]    );
+        // Loop mode must be set to false so that we get a callback when
+        // the first iteration is finished.
+        m_animated_node->setLoopMode(false);
+        m_animated_node->setAnimationEndCallback(this);
     }
 }   // setEndAnimation
+
+// ----------------------------------------------------------------------------
+/** Called from irrlicht when a non-looped animation ends. This is used to
+ *  implement an introductory frame sequence before the actual loop can
+ *  start: first a non-looped version from the first frame to the last
+ *  frame is being played. When this is finished, this function is called,
+ *  which then enables the actual loop.
+ *  \param node The node for which the animation ended. Should always be
+ *         m_animated_node
+ */
+void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
+{
+    // It should only be called for the animated node of this
+    // kart_model
+    assert(node==m_animated_node);
+
+    // It should be a non-default type of animation, and should have
+    // a non negative frame (i.e. the animation is indeed defined).
+    assert(m_current_animation!=AF_DEFAULT);
+    assert(m_animation_frame[m_current_animation]>-1     );
+
+    // 'type' is the start frame of the animation, type + 1 the frame 
+    // to begin the loop with, type + 2 to end the frame with
+    AnimationFrameType start = (AnimationFrameType)(m_current_animation+1);
+    // If there is no loop-start defined (i.e. no 'introductory' sequence)
+    // use the normal start frame.
+    if(m_animation_frame[start]==-1)
+        start = m_current_animation;
+    AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
+    m_animated_node->setAnimationSpeed(m_animation_speed);
+    m_animated_node->setFrameLoop(m_animation_frame[start], 
+                                  m_animation_frame[end]   );
+    m_animated_node->setLoopMode(true);
+    m_animated_node->setAnimationEndCallback(NULL);
+}   // OnAnimationEnd
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
@@ -346,13 +391,13 @@ void KartModel::update(float rotation, float visual_steer,
     // the animation speed to a negative number.
     if(begin<end)
     {
-        m_animated_node->setFrameLoop(begin, end);
         m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(begin, end);
     }
     else
     {
-        m_animated_node->setFrameLoop(begin, end);
         m_animated_node->setAnimationSpeed(-m_animation_speed);
+        m_animated_node->setFrameLoop(begin, end);
     }
 }   // update
 
