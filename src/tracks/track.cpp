@@ -77,6 +77,7 @@ Track::Track(std::string filename)
     m_quad_graph           = NULL;
     m_animation_manager    = NULL;
     m_check_manager        = NULL;
+    m_mini_map             = NULL;
     m_start_angle          = 0;
     m_sky_dx               = 0.05f;
     m_sky_dy               = 0.0f;
