@@ -706,6 +706,7 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
+    Camera::clearEndCameras();
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 

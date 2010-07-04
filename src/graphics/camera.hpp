@@ -171,6 +171,7 @@ public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();
     static void readEndCamera(const XMLNode &root);
+    static void clearEndCameras();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
     /** Returns the camera index (or player kart index, which is the same). */

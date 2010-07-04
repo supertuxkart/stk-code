@@ -68,6 +68,17 @@ Camera::~Camera()
 }   // ~Camera
 
 //-----------------------------------------------------------------------------
+/** This function clears all end camera data structure. This is necessary
+ *  since all end cameras are shared between all camera instances (i.e. are
+ *  static), otherwise (if no end camera is defined for a track) the old
+ *  end camera structure would be used.
+ */
+void Camera::clearEndCameras()
+{
+    m_end_cameras.clear();
+}   // clearEndCameras
+
+//-----------------------------------------------------------------------------
 /** Reads the information about the end camera. This information is shared
  *  between all cameras, so this is a static function.
  *  \param node The XML node containing all end camera informations
