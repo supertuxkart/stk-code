@@ -32,7 +32,7 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
     MainMenuScreen();
 public:
     
-    void downloadRss();
+    void changeNewsText(std::string action);
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     

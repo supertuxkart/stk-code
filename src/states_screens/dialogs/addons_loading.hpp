@@ -34,15 +34,17 @@ private:
     GUIEngine::LabelWidget *        description;
     GUIEngine::LabelWidget *        version;
     GUIEngine::LabelWidget *        author;
+    GUIEngine::LabelWidget *        m_progress;
     GUIEngine::ButtonWidget *       m_back_button;
     GUIEngine::ButtonWidget *       install_button;
-    GUIEngine::IconButtonWidget * icon;
-    GUIEngine::IconButtonWidget * m_next;
-    GUIEngine::IconButtonWidget * m_previous;
+    GUIEngine::IconButtonWidget *   icon;
+    GUIEngine::IconButtonWidget *   m_next;
+    GUIEngine::IconButtonWidget *   m_previous;
     static void * startInstall(void*);
     static void * downloadIcon(void*);
     void loadInfo();
     bool m_can_install;
+    bool m_percent_update;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

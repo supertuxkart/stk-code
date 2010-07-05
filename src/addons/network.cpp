@@ -27,23 +27,40 @@
 #include "io/file_manager.hpp"
 
 // ------------------------------------------------------------------------------------------------------
-bool download(std::string file, std::string save)
+bool download(std::string file, std::string save, int * progress_data)
 {
 	CURL *session = curl_easy_init();
 	std::cout << "Downloading: " << std::string(UserConfigParams::m_server_addons.toString() + "/" + file) << std::endl;
 	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + file).c_str());
-	FILE * fp;
+	FILE * fout;
 	if(save != "")
-	    fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
+	    fout = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
     else
-    	fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fp);
+    	fout = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
+	
+	
+	//from and out
+	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fout);
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
+	
+	//init the mutex for the progress function
+    pthread_mutex_init(&download_mutex, NULL);
+    
 	curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, &progressDownload);
-	curl_easy_setopt(session, CURLOPT_NOPROGRESS, 0);
+	//needed, else, the progress function doesn't work
+	curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
+	
+	//to update the progress bar
+	curl_easy_setopt(session,  CURLOPT_PROGRESSDATA, progress_data);
+	
 	int succes = curl_easy_perform(session);
-	fclose(fp);
+	
+	//close the file where we downloaded the content
+	fclose(fout);
+	
+	//stop curl
 	curl_easy_cleanup(session);
+	
 	if(succes == 0)
 	{
     	std::cout << "Download successfull" << std::endl;
@@ -60,6 +77,13 @@ int progressDownload (void *clientp, double dltotal, double dlnow, double ultota
     int progress = dlnow/dltotal*100;
     if(isnan(dlnow/dltotal*100))
         progress = 0;
+    pthread_mutex_lock(&download_mutex);
+    if(clientp != NULL)
+    {
+        int * progress_data = (int*)clientp;
+        *progress_data = progress;
+    }
+    pthread_mutex_unlock(&download_mutex);
     std::cout << "Download progress: " << progress << "%" << std::endl;
     return 0;
 }

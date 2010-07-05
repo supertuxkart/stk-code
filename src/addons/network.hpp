@@ -20,9 +20,13 @@
 #ifndef HEADER_NETWORK_HPP
 #define HEADER_NETWORK_HPP
 
-/** Download a file. The file name isn't absolute, the server in the config will be added to file. */
-bool download(std::string file, std::string save = "");
+/* * Download a file. The file name isn't absolute, the server in the config will be added to file.
+   * progress_data is used to have the state of the download (in %)*/
+bool download(std::string file, std::string save = "", int * progress_data = 0);
+
+
 int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
+static pthread_mutex_t download_mutex;
 #endif
 #endif

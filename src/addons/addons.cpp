@@ -48,6 +48,8 @@ Addons::Addons()
 {
     this->index = -1;
     std::cout << "Loading an xml file for addons: ";
+    int download_state = 0;
+    m_download_state = &download_state;
     download("list");
     std::string xml_file = file_manager->getConfigDir() + "/" + "list";
     std::cout << xml_file << std::endl;
@@ -317,18 +319,10 @@ void Addons::Install()
 
     //download of the addons file
     download(std::string("file/" + this->m_addons_list[this->index].file),
-            this->m_addons_list[this->index].name);
+            this->m_addons_list[this->index].name, m_download_state);
     file_manager->checkAndCreateDirForAddons(this->m_addons_list[this->index].name,
         this->m_addons_list[this->index].type + "s/");
-    //creating of the data folders
-#ifdef FIXME_ADDON
-    // mkdir does no not exist in windows, see filemanager checkandcreatedir 
-    mkdir(std::string(file_manager->getAddonsDir() + "/" + "data").c_str(), 0777);
 
-    mkdir(dest_file.c_str(), 0777);
-
-    mkdir(std::string(dest_file +  this->m_addons_list[this->index].name).c_str(), 0777);
-#endif
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
                 this->m_addons_list[this->index].type + "s/" +
@@ -443,5 +437,12 @@ int Addons::RemoveDirectory(char const *name)
     remove(name);
 #endif
     return 1;
+}
+int Addons::getDownloadState()
+{
+    pthread_mutex_lock(&download_mutex);
+    int value = *m_download_state;
+    pthread_mutex_unlock(&download_mutex);
+    return value;
 }
 #endif

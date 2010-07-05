@@ -61,30 +61,37 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 }
 #endif
 #ifdef ADDONS_MANAGER
-void MainMenuScreen::downloadRss()
+void MainMenuScreen::changeNewsText(std::string action)
 {
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-    FILE* newsFile = NULL;
-    char buffer[1024] = "";
-    newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
-    if (newsFile == NULL)
+    if(action == "news")
     {
-        fprintf(stderr, "Warning: cannot open new files\n");
-        return;
-    }
-    
-    std::string info = std::string("");
-    while (fgets(buffer, 1024, newsFile) != NULL)
-    {
-        info += std::string(buffer);
-    }
+        FILE* newsFile = NULL;
+        char buffer[1024] = "";
+        newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
+        if (newsFile == NULL)
+        {
+            fprintf(stderr, "Warning: cannot open news files\n");
+            return;
+        }
+        
+        std::string info = std::string("");
+        while (fgets(buffer, 1024, newsFile) != NULL)
+        {
+            info += std::string(buffer);
+        }
 
-    fclose(newsFile);
-    
-    // to remove the break line.
-    //info.replace(info.size()-1,1, "");
-    std::cout << info << std::endl;
-    w->setText(std::string(info).c_str());
+        fclose(newsFile);
+        
+        // to remove the break line.
+        //info.replace(info.size()-1,1, "");
+        std::cout << info << std::endl;
+        w->setText(std::string(info).c_str());
+    }
+    if(action == "offline")
+    {
+        w->setText(_("Can't access stkaddons server..."));
+    }
 }
 #endif
 // ------------------------------------------------------------------------------------------------------
@@ -206,10 +213,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 // ------------------------------------------------------------------------------------------------------
 void * MainMenuScreen::downloadNews( void * pthis)
 {
-    download("news");
     MainMenuScreen * pt = (MainMenuScreen*)pthis;
 
-    pt->downloadRss();
+    if(download("news"))
+        pt->changeNewsText("news");
+    else
+        pt->changeNewsText("offline");
     return NULL;
 }
 #endif
