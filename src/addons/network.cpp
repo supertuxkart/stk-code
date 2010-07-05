@@ -45,9 +45,15 @@ bool download(std::string file, std::string save)
 	fclose(fp);
 	curl_easy_cleanup(session);
 	if(succes == 0)
+	{
     	std::cout << "Download successfull" << std::endl;
+    	return true;
+	}
 	else
+	{
 	    std::cout << "Download failed... check your network connexion" << std::endl;
+	    return false;
+    }
 }
 int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {
