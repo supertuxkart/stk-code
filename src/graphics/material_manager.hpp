@@ -41,7 +41,8 @@ private:
 
     std::vector<Material*> m_materials;
 public:
-    MaterialManager();
+              MaterialManager();
+             ~MaterialManager();
     void      loadMaterial     ();
     void      reInit           ();
     void      setAllMaterialFlags(video::ITexture* t, 

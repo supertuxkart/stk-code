@@ -42,6 +42,18 @@ MaterialManager::MaterialManager()
 }
 
 //-----------------------------------------------------------------------------
+/** Frees all allocated data structures.
+ */
+MaterialManager::~MaterialManager()
+{
+    for(unsigned int i=0; i<m_materials.size(); i++)
+    {
+        delete m_materials[i];
+    }
+    m_materials.clear();
+}   // ~MaterialManager
+
+//-----------------------------------------------------------------------------
 
 void MaterialManager::setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const
 {
