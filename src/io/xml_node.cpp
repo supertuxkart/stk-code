@@ -66,6 +66,11 @@ XMLNode::XMLNode(const std::string &filename)
 /** Destructor. */
 XMLNode::~XMLNode()
 {
+    for(unsigned int i=0; i<m_nodes.size(); i++)
+    {
+        delete m_nodes[i];
+    }
+    m_nodes.clear();
 }   // ~XMLNode
 
 // ----------------------------------------------------------------------------
