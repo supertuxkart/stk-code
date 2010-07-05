@@ -21,7 +21,8 @@
 #define HEADER_NETWORK_HPP
 
 /** Download a file. The file name isn't absolute, the server in the config will be added to file. */
-void download(std::string file, std::string save = "");
+bool download(std::string file, std::string save = "");
+int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 #endif
 #endif

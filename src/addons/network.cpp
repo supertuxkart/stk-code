@@ -27,7 +27,7 @@
 #include "io/file_manager.hpp"
 
 // ------------------------------------------------------------------------------------------------------
-void download(std::string file, std::string save)
+bool download(std::string file, std::string save)
 {
 	CURL *session = curl_easy_init();
 	std::cout << "Downloading: " << std::string(UserConfigParams::m_server_addons.toString() + "/" + file) << std::endl;
@@ -39,10 +39,22 @@ void download(std::string file, std::string save)
     	fp = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
 	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fp);
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-	curl_easy_perform(session);
+	curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, &progressDownload);
+	curl_easy_setopt(session, CURLOPT_NOPROGRESS, 0);
+	int succes = curl_easy_perform(session);
 	fclose(fp);
 	curl_easy_cleanup(session);
-	std::cout << UserConfigParams::m_server_addons.toString() << std::endl;
+	if(succes == 0)
+    	std::cout << "Download successfull" << std::endl;
+	else
+	    std::cout << "Download failed... check your network connexion" << std::endl;
 }
-
+int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+{
+    int progress = dlnow/dltotal*100;
+    if(isnan(dlnow/dltotal*100))
+        progress = 0;
+    std::cout << "Download progress: " << progress << "%" << std::endl;
+    return 0;
+}
 #endif
