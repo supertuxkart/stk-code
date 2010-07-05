@@ -480,13 +480,21 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     m_all_quads->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
     core::matrix4 projection;
-    projection.buildProjectionMatrixOrthoLH(bb_max.getX()-bb_min.getX(), 
-                                            bb_max.getZ()-bb_min.getZ(),
+
+    float range;
+    if((bb_max.getX()-bb_min.getX()) > (bb_max.getZ()-bb_min.getZ())) {
+        range = bb_max.getX()-bb_min.getX();
+    } else {
+        range = bb_max.getZ()-bb_min.getZ();
+    }
+
+    projection.buildProjectionMatrixOrthoLH(range, 
+                                            range,
                                             -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
-    // Adjust z position by +1 for max, -1 for min - this helps in case that
-    // the maximum z coordinate is negative (otherwise the minimap is mirrored)
-    // and avoids problems for tracks which have a flat (max z = min z) minimap.
+    // Adjust Y position by +1 for max, -1 for min - this helps in case that
+    // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
+    // and avoids problems for tracks which have a flat (max Y = min Y) minimap.
     camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
     camera->setUpVector(core::vector3df(0, 0, 1));
     camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
@@ -498,6 +506,13 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     m_min_coord = bb_min;
     m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
     m_scaling.setZ(dimension.Width/(bb_max.getZ()-bb_min.getZ()));
+
+    if(m_scaling.getX() > m_scaling.getZ()) {
+        m_scaling.setX(m_scaling.getZ());
+    } else {
+        m_scaling.setZ(m_scaling.getX());
+    }
+
     return texture;
 }   // drawMiniMap
 
