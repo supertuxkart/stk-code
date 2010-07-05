@@ -399,7 +399,11 @@ void Camera::update(float dt)
 */
 void Camera::handleEndCamera(float dt)
 {
-    switch(m_end_cameras[m_current_end_camera].m_type)
+    EndCameraInformation::EndCameraType info 
+        = m_end_cameras.size()==0 ? EndCameraInformation::EC_AHEAD_OF_KART
+                                  : m_end_cameras[m_current_end_camera].m_type;
+
+    switch(info)
     {
     case EndCameraInformation::EC_STATIC_FOLLOW_KART:
         {

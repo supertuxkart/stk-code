@@ -106,9 +106,9 @@ private:
             EC_AHEAD_OF_KART      A camera that flies ahead of the kart 
                                   always pointing at the kart.
         */
-        enum   {EC_STATIC_FOLLOW_KART,
-                EC_AHEAD_OF_KART}
-                m_type;
+        typedef enum {EC_STATIC_FOLLOW_KART,
+                      EC_AHEAD_OF_KART} EndCameraType;
+        EndCameraType m_type;
 
         /** Position of the end camera. */
         Vec3    m_position;  
