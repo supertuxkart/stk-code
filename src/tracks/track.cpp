@@ -92,6 +92,8 @@ Track::~Track()
     if(m_quad_graph)    delete m_quad_graph;
     if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
+    delete m_track_mesh;
+    delete m_non_collision_mesh;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
