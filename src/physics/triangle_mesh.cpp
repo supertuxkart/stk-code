@@ -22,6 +22,18 @@
 #include "modes/world.hpp"
 
 // -----------------------------------------------------------------------------
+/** Constructor: Initialises all data structures with zero.
+ */
+TriangleMesh::TriangleMesh() : m_mesh()
+{
+    m_body            = NULL;
+    m_motion_state    = NULL;
+    m_collision_shape = NULL;
+}   // TriangleMesh
+
+// -----------------------------------------------------------------------------
+/** Destructor: delete all allocated data structures.
+ */
 TriangleMesh::~TriangleMesh()
 {
     if(m_body)
