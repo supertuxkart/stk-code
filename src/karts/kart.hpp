@@ -367,6 +367,7 @@ public:
     bool           isEliminated     () const {return m_eliminated;}
     void           eliminate        ();
     void           resetBrakes      ();
+    void           startEngineSFX   ();
     void           adjustSpeed      (float f);
     void           updatedWeight    ();
     /** Returns a name to be displayed for this kart. */

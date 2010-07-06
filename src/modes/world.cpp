@@ -147,7 +147,6 @@ void World::init()
     // objects need to allocate data structures depending on the number
     // of karts.
     m_track->reset();
-    m_track->startMusic();
 
     if(!history->replayHistory()) history->initRecording();
     network_manager->worldLoaded();
@@ -645,7 +644,6 @@ void World::restartRace()
     // Start music from beginning
     music_manager->stopMusic();
     m_track->reset();
-    m_track->startMusic();
 
     // Enable SFX again
     sfx_manager->resumeAll();

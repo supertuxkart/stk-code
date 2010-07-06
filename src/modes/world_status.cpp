@@ -17,25 +17,30 @@
 
 #include "modes/world_status.hpp"
 
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
-    m_clock_mode            = CLOCK_CHRONO;
-    m_time            = 0.0f;
-    m_auxiliary_timer = 0.0f;
-    m_phase           = SETUP_PHASE;
-    m_previous_phase  = UNDEFINED_PHASE;  // initialise it just in case
+    m_clock_mode        = CLOCK_CHRONO;
+    m_time              = 0.0f;
+    m_auxiliary_timer   = 0.0f;
+    m_phase             = SETUP_PHASE;
+    m_previous_phase    = UNDEFINED_PHASE;  // initialise it just in case
     
-    // FIXME - is it a really good idea to reload and delete the sound every race??
-    m_prestart_sound  = sfx_manager->createSoundSource("prestart");
-    m_start_sound     = sfx_manager->createSoundSource("start");
+    m_prestart_sound    = sfx_manager->createSoundSource("prestart");
+    m_start_sound       = sfx_manager->createSoundSource("start");
+    m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
+
+    music_manager->stopMusic();
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -45,8 +50,12 @@ void WorldStatus::reset()
 {
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
-    m_phase           = READY_PHASE; // FIXME - unsure
+    // Using SETUP_PHASE will play the track into sfx first, and has no
+    // other side effects.
+    m_phase           = SETUP_PHASE;
     m_previous_phase  = UNDEFINED_PHASE;
+    // Just in case that the game is reset during the intro phase
+    m_track_intro_sound->stop();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -112,14 +121,23 @@ void WorldStatus::update(const float dt)
         // simplifies this handling
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;  
-            m_phase = READY_PHASE;
+            m_phase = TRACK_INTRO_PHASE;
+            m_track_intro_sound->play();
+            return;
+        case TRACK_INTRO_PHASE:
+            if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING)
+                return;
             m_prestart_sound->play();
-            return;               // loading time, don't play sound yet
+            m_phase = READY_PHASE;
+            for(unsigned int i=0; i<World::getWorld()->getNumKarts(); i++)
+                World::getWorld()->getKart(i)->startEngineSFX();
+
+            break;
         case READY_PHASE:
             if(m_auxiliary_timer>1.0)
             {
-                m_phase=SET_PHASE;   
                 m_prestart_sound->play();
+                m_phase=SET_PHASE;   
             }
             m_auxiliary_timer += dt;
             return;
@@ -127,8 +145,7 @@ void WorldStatus::update(const float dt)
             if(m_auxiliary_timer>2.0) 
             {
                 // set phase is over, go to the next one
-                m_phase=GO_PHASE;
-                
+                m_phase=GO_PHASE;  
                 m_start_sound->play();
                 
                 // event
@@ -137,7 +154,9 @@ void WorldStatus::update(const float dt)
             m_auxiliary_timer += dt;
             return;
         case GO_PHASE  :
-            if(m_auxiliary_timer>3.0)    // how long to display the 'go' message  
+            if(m_auxiliary_timer>2.5f)
+                World::getWorld()->getTrack()->startMusic();
+            if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message  
                 m_phase=MUSIC_PHASE;    
             m_auxiliary_timer += dt;
             break;

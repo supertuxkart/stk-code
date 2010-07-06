@@ -46,18 +46,20 @@ private:
 public:
     static const int QUAD_NONE=-1;
 
-         QuadSet       (const std::string& filename);
-    const Quad& getQuad(int n) const {return *(m_all_quads[n]); }
-    int  getCurrentQuad(const Vec3& p, int oldQuad)        const;
+                 QuadSet       (const std::string& filename);
+    int          getCurrentQuad(const Vec3& p, int oldQuad)        const;
+    const Quad&  getQuad(int n) const {return *(m_all_quads[n]); }
+
     /** Return the minimum and maximum coordinates of this quad set. */
-    void getBoundingBox(Vec3 *min, Vec3 *max) { *min=m_min; *max=m_max;   }
+    void         getBoundingBox(Vec3 *min, Vec3 *max) 
+                               { *min=m_min; *max=m_max;   }
     /** Returns the number of quads. */
     unsigned int getNumberOfQuads() const 
                                 {return (unsigned int)m_all_quads.size(); }
     /** Returns the center of quad n. */
-    const Vec3& getCenterOfQuad(int n) const 
+    const Vec3&  getCenterOfQuad(int n) const 
                                 {return m_all_quads[n]->getCenter();      }
     /** Returns the n-th. quad. */
-    const Quad& getQuad(int n)  {return *(m_all_quads[n]);                }
+    const Quad&  getQuad(int n)  {return *(m_all_quads[n]);                }
 };   // QuadSet
 #endif

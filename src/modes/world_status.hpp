@@ -37,6 +37,9 @@ public:
     };
 
     enum Phase {
+        // Time for a camera movement, and introductory song
+        TRACK_INTRO_PHASE,
+
         // Game setup, e.g. track loading
         SETUP_PHASE,
 
@@ -75,7 +78,12 @@ public:
         UNDEFINED_PHASE
     };
 protected:
+    /** Sound to play at the beginning of a race, during which a
+     *  a camera intro of the track can be shown. */
+    SFXBase    *m_track_intro_sound;
+    /** Sound used for the first two 'beeps' in ready, set, go. */
     SFXBase    *m_prestart_sound;
+    /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
     
     /**

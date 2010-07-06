@@ -264,14 +264,20 @@ void Kart::createPhysics()
     m_uprightConstraint->setDamping(0.0f);
     World::getWorld()->getPhysics()->addKart(this);
 
-    //create the engine sound
+}   // createPhysics
+
+// ----------------------------------------------------------------------------
+/** Starts the engine sound effect. Called once the track intro phase is over.
+ */
+void Kart::startEngineSFX()
+{
     if(m_engine_sound)
     {
         m_engine_sound->speed(0.6f);
         m_engine_sound->setLoop(true);
         m_engine_sound->play();
     }
-}   // createPhysics
+}   // startEngineSFX
 
 // ----------------------------------------------------------------------------
 /** The destructor frees the memory of this kart, but note that the actual kart
@@ -413,6 +419,8 @@ void Kart::reset()
     {
         sfx_manager->deleteSFX(m_previous_terrain_sound);
     }
+    if(m_engine_sound)
+        m_engine_sound->stop();
 
     m_controls.m_steer     = 0.0f;
     m_controls.m_accel     = 0.0f;

@@ -412,6 +412,7 @@ bool UserConfig::loadConfig()
     if(!root || root->getName() != "stkconfig")
     {
         std::cerr << "Could not read user config file file " << filename.c_str() << std::endl;
+        if(root) delete root;
         return false;
     }
 
