@@ -46,7 +46,7 @@ class Addons
         int                         RemoveDirectory(char const *name);
         void                        GetInstalledAddons();
         std::string                 type;
-        int *                        m_download_state;
+        int                         m_download_state;
     public:
         Addons();
 

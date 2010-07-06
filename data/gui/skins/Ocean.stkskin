@@ -75,7 +75,15 @@ when the border that intersect at this corner are enabled.
 
 <!-- TODO : buttons could support 'pressed' state -->
 
+<element type="progress" state="fill" image="ocean/glasssgauge_fill.png"
+      left_border="20" right_border="20" top_border="0" bottom_border="0"
+      preserve_h_aspect_ratios="true" />
 
+<element type="progress" state="neutral" image="ocean/scrollbar_bg.png"
+      left_border="31" right_border="31" top_border="15" bottom_border="15"
+      preserve_h_aspect_ratios="true" />
+      
+      
 <element type="tab" state="neutral" image="ocean/glasstab.png"
       left_border="75" right_border="75" top_border="0" bottom_border="15"
       hborder_out_portion="0.2" />
