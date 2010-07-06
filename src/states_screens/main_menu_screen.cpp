@@ -86,11 +86,11 @@ void MainMenuScreen::changeNewsText(std::string action)
         // to remove the break line.
         //info.replace(info.size()-1,1, "");
         std::cout << info << std::endl;
-        w->setText(std::string(info).c_str());
+        //w->setText(std::string(info).c_str());
     }
     if(action == "offline")
     {
-        w->setText(_("Can't access stkaddons server..."));
+        //w->setText(_("Can't access stkaddons server..."));
     }
 }
 #endif

@@ -136,6 +136,7 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 }
 void AddonsScreen::init()
 {
+    pthread_mutex_init(&(this->mutex), NULL);
     m_update_status = this->getWidget<GUIEngine::LabelWidget>("update_status");
     std::cout << "Addons dir:" + file_manager->getAddonsDir() << std::endl;
     this->type = "track";
