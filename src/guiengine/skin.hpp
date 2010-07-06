@@ -250,6 +250,7 @@ namespace GUIEngine
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const bool pressed);
         void drawButton(Widget* w, const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool focused);
+        void drawProgress(Widget* w, const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool focused);
         void drawRibbon(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
         void drawRibbonChild(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
         void drawSpinnerChild(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);

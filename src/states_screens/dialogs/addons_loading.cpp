@@ -105,17 +105,6 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
 
     m_children.push_back(version);
     version->add();
-
-    m_progress = new LabelWidget();
-    m_progress->m_x = 180;
-    m_progress->m_y = m_area.getHeight()-45;
-    m_progress->m_text = "";
-    m_progress->m_w = m_area.getWidth() - 180;
-    m_progress->m_h = 25;
-    m_progress->setParent(m_irrlicht_window);
-
-    m_children.push_back(m_progress);
-    m_progress->add();
     
     this->loadInfo();
 }
@@ -195,6 +184,15 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     }
     if(eventSource == "install")
     {
+        m_progress = new ProgressBarWidget();
+        m_progress->m_x = 180;
+        m_progress->m_y = m_area.getHeight()-45;
+        m_progress->m_w = 250;
+        m_progress->m_h = 35;
+        m_progress->setParent(m_irrlicht_window);
+
+        m_children.push_back(m_progress);
+        m_progress->add();
         m_back_button->setDeactivated();
         m_next->setDeactivated();
         m_previous->setDeactivated();
@@ -216,7 +214,7 @@ void AddonsLoading::onUpdate(float delta)
     }
     if(m_percent_update)
     {
-        m_progress->setText(std::string(StringUtils::toString(addons->getDownloadState()) + "\% downloaded").c_str());
+        m_progress->setValue(addons->getDownloadState());
     }
     pthread_mutex_unlock(&(mutex_can_install));
 }

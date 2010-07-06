@@ -52,6 +52,7 @@
  \li \ref widget9
  \li \ref widget10
  \li \ref widget11
+ \li \ref widget12
  
  \ref props
  \li \ref prop1
@@ -206,6 +207,15 @@
  
  \note Contents must be set programmatically.
  
+ 
+  \subsection widget12 WTYPE_PROGRESS
+ <em> Name in XML files: </em> \c "progressbar" 
+ 
+ Display a progress bar (e.g. for downloads).
+ 
+ \note The value must be set programmatically.
+ 
+ \n
  
  \n
  \n

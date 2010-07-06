@@ -47,7 +47,8 @@ namespace GUIEngine
         WTYPE_DYNAMIC_RIBBON,
         WTYPE_MODEL_VIEW,
         WTYPE_LIST,
-        WTYPE_TEXTBOX
+        WTYPE_TEXTBOX,
+        WTYPE_PROGRESS
     };
     
     enum BadgeType
@@ -119,6 +120,7 @@ namespace GUIEngine
         friend class Skin;
         friend class RibbonWidget;
         friend class SpinnerWidget;
+        friend class ProgressBarWidget;
         friend class DynamicRibbonWidget;
         
         /** When true, this widget shall use a bigger and more colourful font */

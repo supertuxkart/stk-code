@@ -92,6 +92,10 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& 
                 {
                     append_to.push_back(new SpinnerWidget(true));
                 }
+                else if (!strcmp("progressbar", xml->getNodeName()))
+                {
+                    append_to.push_back(new ProgressBarWidget());
+                }
                 else if (!strcmp("icon-button", xml->getNodeName()))
                 {
                     append_to.push_back(new IconButtonWidget());

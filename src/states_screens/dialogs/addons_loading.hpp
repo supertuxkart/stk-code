@@ -34,7 +34,7 @@ private:
     GUIEngine::LabelWidget *        description;
     GUIEngine::LabelWidget *        version;
     GUIEngine::LabelWidget *        author;
-    GUIEngine::LabelWidget *        m_progress;
+    GUIEngine::ProgressBarWidget *        m_progress;
     GUIEngine::ButtonWidget *       m_back_button;
     GUIEngine::ButtonWidget *       install_button;
     GUIEngine::IconButtonWidget *   icon;

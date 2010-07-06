@@ -117,6 +117,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/spinner_widget.hpp \
  guiengine/widgets/text_box_widget.cpp \
  guiengine/widgets/text_box_widget.hpp \
+ guiengine/widgets/progress_bar_widget.cpp \
+ guiengine/widgets/progress_bar_widget.hpp \
  input/device_manager.cpp \
  input/device_manager.hpp \
  input/input.cpp \

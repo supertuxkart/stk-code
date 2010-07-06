@@ -642,7 +642,47 @@ void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool press
         }
     }
 }
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
+void Skin::drawProgress(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused)
+{
+    core::rect< s32 > sized_rect = rect;
+    // if within an appearing dialog, grow
+    if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL && w->m_parent->getType() == gui::EGUIET_WINDOW)
+    {
+        core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
+        sized_rect.UpperLeftCorner.X  = center.X + (int)(((int)rect.UpperLeftCorner.X - (int)center.X)*texture_size);
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)(((int)rect.UpperLeftCorner.Y - (int)center.Y)*texture_size);
+        sized_rect.LowerRightCorner.X = center.X + (int)(((int)rect.LowerRightCorner.X - (int)center.X)*texture_size);
+        sized_rect.LowerRightCorner.Y = center.Y + (int)(((int)rect.LowerRightCorner.Y - (int)center.Y)*texture_size);
+        
+        drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["progress::neutral"],
+                                          w->m_deactivated);
+    }
+    else
+    {
+        ProgressBarWidget * progress = (ProgressBarWidget*)w;
+        drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["progress::neutral"],
+                                      w->m_deactivated);
+        //the " - 10" is a dirty hack to avoid to have the right arrow before the left one
+        //FIXME
+        core::rect<s32> rect2 = rect;
+        rect2.LowerRightCorner.X -= (rect.getWidth() - 10) - progress->getValue()*rect.getWidth()/100;
+
+        drawBoxFromStretchableTexture(w, rect2,
+                                      SkinConfig::m_render_params["progress::fill"],
+                                      w->m_deactivated);
+#if 0
+          GUIEngine::getDriver()->draw2DImage(SkinConfig::m_render_params["progress::fill"].getImage(), sized_rect,
+                                              core::rect<s32>(0,0,progress->m_w, progress->m_h),
+                                              0 /* no clipping */, colors, true);
+#endif
+
+    }
+}
 void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
 }
@@ -1378,6 +1418,10 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_BUTTON)
     {
         drawButton(widget, rect, pressed, focused);
+    }
+    else if(type == WTYPE_PROGRESS)
+    {
+        drawProgress(widget, rect, pressed, focused);
     }
     else if(type == WTYPE_RIBBON)
     {
