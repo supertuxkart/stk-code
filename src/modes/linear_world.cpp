@@ -21,6 +21,8 @@
 #include <sstream>
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "network/network_manager.hpp" 
 #include "race/history.hpp"
 #include "tracks/track.hpp"
@@ -31,7 +33,9 @@
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()
 {
-    m_kart_display_info = NULL;
+    m_kart_display_info   = NULL;
+    m_last_lap_sfx        = sfx_manager->createSoundSource("lastlap");
+    m_last_lap_sfx_played = false;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -78,6 +82,8 @@ void LinearWorld::init()
 //-----------------------------------------------------------------------------
 LinearWorld::~LinearWorld()
 {
+    sfx_manager->deleteSFX(m_last_lap_sfx);
+
     // In case that a track is not found, m_kart_display info was never
     // initialised.
     if(m_kart_display_info)
@@ -258,6 +264,11 @@ void LinearWorld::newLap(unsigned int kart_index)
     {
         m_race_gui->addMessage(_("Final lap!"), m_karts[kart_index],
                                3.0f, 40, video::SColor(255, 210, 100, 50), true);
+        if(!m_last_lap_sfx_played)
+        {
+            m_last_lap_sfx->play();
+            m_last_lap_sfx_played = true;
+        }
     }
 
     // The race positions must be updated here: consider the situation where 

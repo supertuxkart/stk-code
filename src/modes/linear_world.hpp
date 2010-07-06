@@ -21,7 +21,10 @@
 #include <vector>
 
 #include "modes/world.hpp"
-#include "states_screens/race_gui.hpp"
+
+struct RaceGUI::KartIconDisplayInfo;
+class SFXBase;
+
 /*
  * A 'linear world' is a subcategory of world used in 'standard' races, i.e.
  * with a start line and a road that loops. This includes management of drivelines
@@ -30,6 +33,12 @@
  */
 class LinearWorld : public World
 {
+    /** Sfx for the final lap. */
+    SFXBase     *m_last_lap_sfx;
+
+    /** Last lap sfx should only be played once. */
+    bool         m_last_lap_sfx_played;
+
 private:
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.
@@ -48,9 +57,9 @@ private:
         int         m_last_valid_race_lap;  /* when a kart is rescued, we need to give it back the number of lap it had */
 
         Vec3        m_curr_track_coords;
+        /** True if the kart is on top of the road path drawn by the drivelines */
+        bool        m_on_road;
 
-        bool        m_on_road;             // true if the kart is on top of the
-        // road path drawn by the drivelines
     };
 
 protected:
