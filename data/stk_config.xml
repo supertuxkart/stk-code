@@ -37,7 +37,7 @@
   <near-ground distance="2"/> 
 
   <!-- How long the end animation will be shown. -->
-  <delay-finish time="4"/>
+  <delay-finish time="14"/>
 
   <!-- How long the music credits are shown. -->
   <credits music="10"/>
