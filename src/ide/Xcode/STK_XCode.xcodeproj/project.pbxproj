@@ -48,6 +48,7 @@
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
 		953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
+		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
 		954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C270FF98B6E0047FE3E /* animation_manager.cpp */; };
@@ -405,6 +406,8 @@
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
 		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
 		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
+		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
+		9545ABC911E3E38300D3C37A /* progress_bar_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = progress_bar_widget.hpp; path = ../../guiengine/widgets/progress_bar_widget.hpp; sourceTree = SOURCE_ROOT; };
 		954E486911B19C4100B1DF63 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = fribidi.framework; path = /Library/Frameworks/fribidi.framework; sourceTree = "<absolute>"; };
 		954E4C250FF98B6E0047FE3E /* animation_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_base.cpp; path = ../../animations/animation_base.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C260FF98B6E0047FE3E /* animation_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = animation_base.hpp; path = ../../animations/animation_base.hpp; sourceTree = SOURCE_ROOT; };
@@ -2260,6 +2263,8 @@
 				95ECA0F510124C5000D47C5F /* list_widget.hpp */,
 				95ECA0F610124C5000D47C5F /* model_view_widget.cpp */,
 				95ECA0F710124C5000D47C5F /* model_view_widget.hpp */,
+				9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */,
+				9545ABC911E3E38300D3C37A /* progress_bar_widget.hpp */,
 				95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */,
 				95ECA0FB10124C5000D47C5F /* ribbon_widget.hpp */,
 				95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */,
@@ -2612,6 +2617,7 @@
 				9551B27B11DC0D6A002DD140 /* network.cpp in Sources */,
 				9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */,
 				95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */,
+				9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
