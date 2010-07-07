@@ -38,14 +38,18 @@ void * NetworkHttp::checkNewServer(void * obj)
 {
     NetworkHttp * pthis = (NetworkHttp *)obj;
     std::string newserver = pthis->downloadToStr("redirect");
-    std::cout << newserver << std::endl;
     if(newserver != "")
     {
-        std::cout << "new server !" << std::endl;
+        newserver.replace(newserver.find("\n"), 1, "");
+
+        std::cout << "Current server: " << UserConfigParams::m_server_addons.toString() << std::endl;
+        UserConfigParams::m_server_addons = newserver;
+        std::cout << "New server: " << newserver << std::endl;
+        user_config->saveConfig();
     }
     else
     {
-        std::cout << "no new server :(" << std::endl;
+        std::cout << "No new server." << std::endl;
     }
     return NULL;
 }
@@ -53,15 +57,15 @@ size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::stri
 {
     static std::string str = std::string(ptr);
     *stream = str;
-    //std::cout << *stream << std::endl;
+    
+    //needed, otherwise, the download failed
     return nb_char;
 }
 
 std::string NetworkHttp::downloadToStr(std::string url)
 {
-    for(int i =0; i < 10; i++) std::cout << "stream---------------------------------------" << std::endl;
 	CURL *session = curl_easy_init();
-	
+
 	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + url).c_str());
 	
 	std::string * fout = new std::string("");
