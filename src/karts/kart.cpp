@@ -1100,6 +1100,14 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(float dt)
 {
+    // Checks for startup speed boost.
+    unsigned int num_started = World::getWorld()->getNumStartedKarts();
+    if(m_controls.m_accel>0 && num_started<stk_config->m_startup_boost.size())
+    {
+        m_zipper_time_left  = 5.0f;
+        m_vehicle->activateZipper(stk_config->m_startup_boost[num_started]);
+        World::getWorld()->incNumStartedKarts();
+    }
     m_bounce_back_time-=dt;
     float engine_power = getActualWheelForce() + handleNitro(dt)
                                                + handleSlipstream(dt);

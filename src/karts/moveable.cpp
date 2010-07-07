@@ -64,10 +64,10 @@ void Moveable::updateGraphics(const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
     Vec3 xyz=getXYZ()+offset_xyz;
+    m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
     Vec3 hpr;
     hpr.setHPR(r_all);
-    m_node->setPosition(xyz.toIrrVector());
     m_node->setRotation(hpr.toIrrHPR());
 }   // updateGraphics
 

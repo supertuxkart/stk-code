@@ -22,6 +22,10 @@
        The last values applies for all remaining karts. -->
   <follow-the-leader intervals="30 20 10"/>
 
+  <!-- Startup information. Boost: startup speed boost for
+       the first karts to press acceleration at start -->
+  <startup boost="10 5" />
+
   <!-- The title music. -->
   <music title="main_theme.music"/>
 

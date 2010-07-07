@@ -80,6 +80,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_use_highscores    = true;
     m_track             = NULL;
     m_clear_back_buffer = false;
+    m_num_started_karts = 0;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
@@ -633,6 +634,7 @@ void World::restartRace()
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
+    m_num_started_karts   = 0;
 
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {

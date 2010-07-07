@@ -92,6 +92,9 @@ public:
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
+    std::vector<float>
+          m_startup_boost;           /**< The speed boost the fastest players
+                                          pressing 'accel' at start get.     */
     std::vector<int> m_switch_items; /**< How to switch items.               */
     std::vector<int>
           m_scores;                  /**<Scores depending on position.       */
@@ -102,7 +105,6 @@ public:
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {};
     void init_defaults    ();
-//    void getAllData       (const lisp::Lisp* lisp);
     void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);
     /** Returns the default kart properties for each kart. */

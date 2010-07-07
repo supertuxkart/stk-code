@@ -82,6 +82,11 @@ void STKConfig::load(const std::string &filename)
         fprintf(stderr,"No follow leader interval(s) defined in stk_config");
         exit(-1);
     }
+    if(m_startup_boost.size()==0)
+    {
+        fprintf(stderr, "No startup speed boost defined in stk_config");
+        exit(-1);
+    }
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
         fprintf(stderr,"No item switches defined in stk_config");
@@ -151,6 +156,7 @@ void STKConfig::init_defaults()
     m_enable_networking        = true;
     m_scores.clear();
     m_leader_intervals.clear();
+    m_startup_boost.clear();
     m_switch_items.clear();
 }   // init_defaults
 
@@ -187,6 +193,9 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *leader_node= root->getNode("follow-the-leader"))
         leader_node->get("intervals", &m_leader_intervals);
+
+    if(const XMLNode *startup_boost_node= root->getNode("startup"))
+        startup_boost_node->get("boost", &m_startup_boost);
 
     if(const XMLNode *music_node = root->getNode("music"))
     {

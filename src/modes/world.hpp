@@ -85,6 +85,11 @@ public:
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
+
+    /** Counts the karts that have 'started', i.e. pressed acceleration
+     *  after 'ready-set-go'. The first two karts will get a speed boost. */
+    unsigned int  m_num_started_karts;
+
 protected:
     /** The list of all karts. */
     KartList                  m_karts;
@@ -118,7 +123,6 @@ protected:
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
                              const btTransform &init_pos);
-protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
 
@@ -250,6 +254,12 @@ public:
       */
     virtual void raceResultOrder( int order[] ) = 0;
     
+    /** Returns the number of started karts, used to determine which karts
+     *  receive a speed boost. */
+    unsigned int getNumStartedKarts() const { return m_num_started_karts; }
+
+    /** Increases the number of karts that have accelerated. */
+    void         incNumStartedKarts()       { m_num_started_karts++;      }
     bool         clearBackBuffer() const { return m_clear_back_buffer; }
     
     const irr::video::SColor& getClearColor() const { return m_clear_color; }
