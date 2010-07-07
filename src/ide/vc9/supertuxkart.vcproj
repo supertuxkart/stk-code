@@ -382,6 +382,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\progress_bar_widget.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\ribbon_widget.cpp"
 						>
 					</File>
@@ -1145,6 +1149,10 @@
 					</File>
 					<File
 						RelativePath="..\..\guiengine\widgets\model_view_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\progress_bar_widget.hpp"
 						>
 					</File>
 					<File

@@ -46,7 +46,7 @@ void ProgressBarWidget::add()
 void ProgressBarWidget::setValue(int value)
 {
     m_value = value;
-    setLabel(std::string(StringUtils::toString(value) + "\%").c_str());
+    setLabel(std::string(StringUtils::toString(value) + "%").c_str());
 }
 // -----------------------------------------------------------------------------
 
