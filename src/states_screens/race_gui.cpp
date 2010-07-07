@@ -149,9 +149,6 @@ void RaceGUI::createMarkerTexture()
         core::vector2df center((float)((m_marker_rendered_size>>1)+i*m_marker_rendered_size), 
                                (float)(m_marker_rendered_size>>1)                   );
         int count = kp->getShape();
-        //core::array<core::vector2df> vertices;
-        video::S3DVertex *vertices = new video::S3DVertex[count+1];
-        unsigned short int *index  = new unsigned short int[count+1];
         video::ITexture *t = kp->getMinimapIcon();
         if(t)
         {
@@ -169,6 +166,8 @@ void RaceGUI::createMarkerTexture()
         }
         else   // no special minimap icon defined
         {
+            video::S3DVertex *vertices = new video::S3DVertex[count+1];
+            unsigned short int *index  = new unsigned short int[count+1];
             video::SColor color        = kp->getColor();
             createRegularPolygon(count, (float)radius, center, color, 
                 vertices, index);
