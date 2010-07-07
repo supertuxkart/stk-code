@@ -69,6 +69,9 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+#ifdef ADDONS_MANAGER
+#include "addons/network.hpp"
+#endif
 
 void cmdLineHelp (char* invocation)
 {
@@ -530,6 +533,9 @@ void initRest()
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
     network_manager         = new NetworkManager       ();
+#ifdef ADDONS_MANAGER
+    network_http            = new NetworkHttp          ();
+#endif
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();

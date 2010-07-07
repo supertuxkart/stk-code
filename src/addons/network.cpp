@@ -26,6 +26,67 @@
 
 #include "io/file_manager.hpp"
 
+NetworkHttp * network_http = 0;
+NetworkHttp::NetworkHttp()
+{
+    pthread_t thread;
+    pthread_create(&thread, NULL, &NetworkHttp::checkNewServer, this);
+}
+// ---------------------------------------------------------------------------
+
+void * NetworkHttp::checkNewServer(void * obj)
+{
+    NetworkHttp * pthis = (NetworkHttp *)obj;
+    std::string newserver = pthis->downloadToStr("redirect");
+    std::cout << newserver << std::endl;
+    if(newserver != "")
+    {
+        std::cout << "new server !" << std::endl;
+    }
+    else
+    {
+        std::cout << "no new server :(" << std::endl;
+    }
+    return NULL;
+}
+size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::string * stream)
+{
+    static std::string str = std::string(ptr);
+    *stream = str;
+    //std::cout << *stream << std::endl;
+    return nb_char;
+}
+
+std::string NetworkHttp::downloadToStr(std::string url)
+{
+    for(int i =0; i < 10; i++) std::cout << "stream---------------------------------------" << std::endl;
+	CURL *session = curl_easy_init();
+	
+	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + url).c_str());
+	
+	std::string * fout = new std::string("");
+	
+	
+	//from and out
+	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fout);
+	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
+	
+	int succes = curl_easy_perform(session);
+	
+	//stop curl
+	curl_easy_cleanup(session);
+	
+	if(succes == 0)
+	{
+    	std::cout << "Download successfull" << std::endl;
+    	return *fout;
+	}
+	else
+	{
+	    std::cout << "Download failed... check your network connexion" << std::endl;
+	    return "";
+    }
+}
 // ------------------------------------------------------------------------------------------------------
 bool download(std::string file, std::string save, int * progress_data)
 {
