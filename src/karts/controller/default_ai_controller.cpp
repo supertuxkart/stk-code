@@ -91,33 +91,42 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
     switch( race_manager->getDifficulty())
     {
     case RaceManager::RD_EASY:
-        m_wait_for_players   = true;
-        m_max_handicap_accel = 0.9f;
-        m_item_tactic        = IT_TEN_SECONDS;
-        m_max_start_delay    = 0.5f;
-        m_min_steps          = 1;
-        m_nitro_level        = NITRO_NONE;
-        m_handle_bomb        = false;
+        m_wait_for_players        = true;
+        m_max_handicap_accel      = 0.9f;
+        m_item_tactic             = IT_TEN_SECONDS;
+        m_false_start_probability = 0.08f;
+        m_min_start_delay         = 0.3f;
+        m_max_start_delay         = 0.5f;
+        m_min_steps               = 1;
+        m_nitro_level             = NITRO_NONE;
+        m_handle_bomb             = false;
         setSkiddingFraction(4.0f);
         break;
     case RaceManager::RD_MEDIUM:
-        m_wait_for_players   = true;
-        m_max_handicap_accel = 0.95f;
-        m_item_tactic        = IT_CALCULATE;
-        m_max_start_delay    = 0.4f;
-        m_min_steps          = 1;
-        m_nitro_level        = NITRO_SOME;
-        m_handle_bomb        = true;
+        m_wait_for_players        = true;
+        m_max_handicap_accel      = 0.95f;
+        m_item_tactic             = IT_CALCULATE;
+        m_false_start_probability = 0.04f;
+        m_min_start_delay         = 0.25f;
+        m_max_start_delay         = 0.4f;
+        m_min_steps               = 1;
+        m_nitro_level             = NITRO_SOME;
+        m_handle_bomb             = true;
         setSkiddingFraction(3.0f);
         break;
     case RaceManager::RD_HARD:
-        m_wait_for_players   = false;
-        m_max_handicap_accel = 1.0f;
-        m_item_tactic        = IT_CALCULATE;
-        m_max_start_delay    = 0.1f;
-        m_min_steps          = 2;
-        m_nitro_level        = NITRO_ALL;
-        m_handle_bomb        = true;
+        m_wait_for_players        = false;
+        m_max_handicap_accel      = 1.0f;
+        m_item_tactic             = IT_CALCULATE;
+        m_false_start_probability = 0.01f;
+        // See http://www.humanbenchmark.com/tests/reactiontime/stats.php
+        // Average reaction time is around 0.215 s, so using .15 as minimum
+        // gives an AI average slightly above the human average
+        m_min_start_delay         = 0.15f;
+        m_max_start_delay         = 0.28f;
+        m_min_steps               = 2;
+        m_nitro_level             = NITRO_ALL;
+        m_handle_bomb             = true;
         setSkiddingFraction(2.0f);
         break;
     }
@@ -137,6 +146,34 @@ DefaultAIController::~DefaultAIController()
     irr_driver->removeNode(m_debug_sphere);
 #endif
 }   // ~DefaultAIController
+
+//-----------------------------------------------------------------------------
+void DefaultAIController::reset()
+{
+    m_time_since_last_shot       = 0.0f;
+    m_start_kart_crash_direction = 0;
+    m_curve_target_speed         = m_kart->getMaxSpeedOnTerrain();
+    m_curve_angle                = 0.0;
+    m_start_delay                = -1.0f;
+    m_crash_time                 = 0.0f;
+    m_collided                   = false;
+    m_time_since_stuck           = 0.0f;
+    m_kart_ahead                 = NULL;
+    m_distance_ahead             = 0.0f;
+    m_kart_behind                = NULL;
+    m_distance_behind            = 0.0f;
+
+    Controller::reset();
+    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
+    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+    {
+        fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
+                m_kart->getIdent().c_str());
+        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+    }
+
+}   // reset
 
 //-----------------------------------------------------------------------------
 const irr::core::stringw& DefaultAIController::getNamePostfix() const 
@@ -588,12 +625,12 @@ void DefaultAIController::computeNearestKarts()
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
-void DefaultAIController::handleAcceleration( const float DELTA )
+void DefaultAIController::handleAcceleration( const float dt)
 {
     //Do not accelerate until we have delayed the start enough
-    if( m_time_till_start > 0.0f )
+    if( m_start_delay > 0.0f )
     {
-        m_time_till_start -= DELTA;
+        m_start_delay -= dt;
         m_controls->m_accel = 0.0f;
         return;
     }
@@ -637,16 +674,19 @@ void DefaultAIController::handleAcceleration( const float DELTA )
 //-----------------------------------------------------------------------------
 void DefaultAIController::handleRaceStart()
 {
-    //FIXME: make karts able to get a penalty for accelerating too soon
-    //like players, should happen to about 20% of the karts in easy,
-    //5% in medium and less than 1% of the karts in hard.
-    if( m_time_till_start <  0.0f )
+    if( m_start_delay <  0.0f )
     {
-        srand(( unsigned ) time( 0 ));
+        // Each kart starts at a different, random time, and the time is
+        // smaller depending on the difficulty.
+        m_start_delay = m_min_start_delay 
+                      + (float) rand() / RAND_MAX * (m_max_start_delay-m_min_start_delay);
 
-        //Each kart starts at a different, random time, and the time is
-        //smaller depending on the difficulty.
-        m_time_till_start = ( float ) rand() / RAND_MAX * m_max_start_delay;
+        // Now check for a false start. If so, add 1 second penalty time.
+        if(rand() < RAND_MAX * m_false_start_probability)
+        {
+            m_start_delay+=stk_config->m_penalty_time;
+            return;
+        }
     }
 }   // handleRaceStart
 
@@ -885,34 +925,6 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
         sector = target_sector;
     }
 }   // findNonCrashingPoint
-
-//-----------------------------------------------------------------------------
-void DefaultAIController::reset()
-{
-    m_time_since_last_shot       = 0.0f;
-    m_start_kart_crash_direction = 0;
-    m_curve_target_speed         = m_kart->getMaxSpeedOnTerrain();
-    m_curve_angle                = 0.0;
-    m_time_till_start            = -1.0f;
-    m_crash_time                 = 0.0f;
-    m_collided                   = false;
-    m_time_since_stuck           = 0.0f;
-    m_kart_ahead                 = NULL;
-    m_distance_ahead             = 0.0f;
-    m_kart_behind                = NULL;
-    m_distance_behind            = 0.0f;
-
-    Controller::reset();
-    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
-    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
-    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
-    {
-        fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
-                m_kart->getIdent().c_str());
-        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
-    }
-
-}   // reset
 
 //-----------------------------------------------------------------------------
 /** calc_steps() divides the velocity vector by the lenght of the kart,

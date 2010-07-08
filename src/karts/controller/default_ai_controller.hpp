@@ -60,8 +60,15 @@ private:
     } m_crashes;
 
     /*Difficulty handling variables*/
-    float m_max_start_delay; //Delay before accelerating at the start of each
-                             //race
+    /** Chance of a false start. */
+    float m_false_start_probability;
+    /** The minimum delay time before a AI kart starts. */
+    float m_min_start_delay;
+    /** The maximum delay time before an AI kart starts. */
+    float m_max_start_delay;
+    /** The actual start delay used. */
+    float m_start_delay; 
+  
     int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
                      //even has check around the kart, if 1, it checks around
                      //the kart always, and more than that will check the
@@ -98,12 +105,7 @@ private:
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-
-    float m_time_till_start; //Used to simulate a delay at the start of the
-                             //race, since human players don't accelerate
-                             //at the same time and rarely repeat the a
-                             //previous timing.
-
+  
     float m_curve_target_speed;
     float m_curve_angle;
 
@@ -125,7 +127,7 @@ private:
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
 
-    float m_time_since_stuck;
+  float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
