@@ -22,7 +22,6 @@
 
 #include "modes/world.hpp"
 
-struct RaceGUI::KartIconDisplayInfo;
 class SFXBase;
 
 /*
