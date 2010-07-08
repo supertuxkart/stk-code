@@ -173,8 +173,8 @@ void RaceGUI::createMarkerTexture()
                 vertices, index);
             irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
                 index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-            delete vertices;
-            delete index;
+            delete [] vertices;
+            delete [] index;
         }   // if special minimap icon defined
     }
 
