@@ -23,8 +23,10 @@
   <follow-the-leader intervals="30 20 10"/>
 
   <!-- Startup information. Boost: startup speed boost for
-       the first karts to press acceleration at start -->
-  <startup boost="10 5" />
+       the first karts to press acceleration at start.
+       Penalty: Penalty time if a kart accelerates before GO. -->
+  <startup boost  ="10 5"
+           penalty="1" />
 
   <!-- The title music. -->
   <music title="main_theme.music"/>

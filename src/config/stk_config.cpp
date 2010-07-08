@@ -121,6 +121,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
+    CHECK_NEG(m_penalty_time,              "penalty-time"               );
 
     m_kart_properties.checkAllSet(filename);
     item_manager->setSwitchItems(m_switch_items);
@@ -142,7 +143,8 @@ void STKConfig::init_defaults()
         m_zipper_max_speed_fraction = m_music_credit_time    =
         m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
-        m_near_ground          = m_item_switch_time          = UNDEFINED;
+        m_near_ground          = m_item_switch_time          = 
+      m_penalty_time                                         = UNDEFINED;
     m_bubble_gum_counter       = -100;
     m_max_karts                = -100;
     m_gp_order                 = -100;
@@ -194,8 +196,11 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *leader_node= root->getNode("follow-the-leader"))
         leader_node->get("intervals", &m_leader_intervals);
 
-    if(const XMLNode *startup_boost_node= root->getNode("startup"))
-        startup_boost_node->get("boost", &m_startup_boost);
+    if(const XMLNode *startup_node= root->getNode("startup"))
+    {
+        startup_node->get("boost",   &m_startup_boost);
+        startup_node->get("penalty", &m_penalty_time );
+    }
 
     if(const XMLNode *music_node = root->getNode("music"))
     {

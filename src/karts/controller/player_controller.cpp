@@ -282,7 +282,7 @@ void PlayerController::update(float dt)
                 m_bzzt_sound->play();
             }   // if penalty_time = 0
             
-            m_penalty_time      = 1.0;
+            m_penalty_time      = stk_config->m_penalty_time;
             m_controls->m_accel = 0.0f;
             
         }   // if key pressed
