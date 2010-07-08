@@ -55,6 +55,8 @@ QuadGraph::~QuadGraph()
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         delete m_all_nodes[i];
     }
+    if(UserConfigParams::m_track_debug)
+        cleanupDebugMesh();
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
@@ -276,7 +278,7 @@ void QuadGraph::createDebugMesh()
         c.setBlue(i%2 ? 0 : 255);
         v[i].Color = c;
     }
-    m_node           = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh);
 }   // createDebugMesh
 
 // -----------------------------------------------------------------------------
@@ -285,7 +287,11 @@ void QuadGraph::createDebugMesh()
 void QuadGraph::cleanupDebugMesh()
 {
     irr_driver->removeNode(m_node);
-    irr_driver->removeMesh(m_mesh);
+    m_node = NULL;
+    // No need to call irr_driber->removeMesh, since the mesh
+    // was manually made and so never added to the mesh cache.
+    m_mesh->drop();
+    m_mesh = NULL;
 }   // cleanupDebugMesh
 
 // -----------------------------------------------------------------------------

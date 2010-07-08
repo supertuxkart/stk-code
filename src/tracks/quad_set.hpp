@@ -47,6 +47,7 @@ public:
     static const int QUAD_NONE=-1;
 
                  QuadSet       (const std::string& filename);
+                ~QuadSet       ();
     int          getCurrentQuad(const Vec3& p, int oldQuad)        const;
     const Quad&  getQuad(int n) const {return *(m_all_quads[n]); }
 

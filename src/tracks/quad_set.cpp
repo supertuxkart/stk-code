@@ -33,6 +33,18 @@ QuadSet::QuadSet(const std::string& filename) {
 }   // QuadSet
 
 // -----------------------------------------------------------------------------
+/** Destructor, frees all memory.
+ */
+QuadSet::~QuadSet()
+{
+    for(unsigned int i=0; i<m_all_quads.size(); i++)
+    {
+        delete m_all_quads[i];
+    }
+    m_all_quads.clear();
+}   // ~QuadSet
+
+// -----------------------------------------------------------------------------
 /** This function interprets a point specification as an attribute in the 
     xml quadset file. It understands two different specifications:
     p1="n:p"      : get point p from square n (n, p integers)

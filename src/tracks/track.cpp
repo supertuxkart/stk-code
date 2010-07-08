@@ -118,8 +118,11 @@ void Track::reset()
  */
 void Track::cleanup()
 {
-    if(UserConfigParams::m_track_debug)
-        m_quad_graph->cleanupDebugMesh();
+    if(m_quad_graph)    
+    {
+        delete m_quad_graph;
+        m_quad_graph = NULL;
+    }
 
     item_manager->cleanup();
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
