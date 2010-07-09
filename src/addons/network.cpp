@@ -26,6 +26,8 @@
 
 #include "io/file_manager.hpp"
 
+pthread_mutex_t download_mutex;
+
 NetworkHttp * network_http = 0;
 NetworkHttp::NetworkHttp()
 {

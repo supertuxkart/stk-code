@@ -41,6 +41,6 @@ bool download(std::string file, std::string save = "", int * progress_data = 0);
 
 int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
-static pthread_mutex_t download_mutex;
+extern pthread_mutex_t download_mutex;
 #endif
 #endif
