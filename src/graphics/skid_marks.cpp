@@ -196,8 +196,8 @@ void SkidMarks::update(float dt)
         irr_driver->removeNode(m_nodes[m_current]);
         // Not necessary to delete m_nodes: removeNode
         // deletes the node since its refcount reaches zero.
-        delete m_left  [m_current];
-        delete m_right [m_current];
+        m_left[m_current]->drop();
+        m_right[m_current]->drop();
 
         m_left  [m_current] = smq_left;
         m_right [m_current] = smq_right;
