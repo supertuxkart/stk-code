@@ -59,9 +59,12 @@ void SkidMarks::reset()
     for(unsigned int i=0; i<m_nodes.size(); i++)
     {
         irr_driver->removeNode(m_nodes[i]);
-        irr_driver->removeMesh(m_meshes[i]);
-        delete m_left[i];
-        delete m_right[i];
+        // No need to call irr_driver->removeMesh, since this only
+        // removes the mesh from the mesh cache (if it exists in it),
+        // and this ('manual') mesh was never added to the cash.
+        m_meshes[i]->drop();
+        m_left[i]->drop();
+        m_right[i]->drop();
     }
     m_left.clear();
     m_right.clear();
