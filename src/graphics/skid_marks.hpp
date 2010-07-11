@@ -76,11 +76,8 @@ private:
     /** Two skidmark objects for the left and right wheel. */
     std::vector<SkidMarkQuads *>     m_left, m_right;
 
-    /** The meshes - each mesh containing two mesh buffers (left/right). */
-    std::vector<scene::IMesh *>      m_meshes;
-
     /** The nodes where each left/right pair is attached to. */
-    std::vector<scene::ISceneNode *> m_nodes;
+    std::vector<scene::IMeshSceneNode *> m_nodes;
 
     /** Shared static so that consecutive skidmarks are at a slightly
      *  different height. */

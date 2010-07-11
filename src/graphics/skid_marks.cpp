@@ -59,17 +59,12 @@ void SkidMarks::reset()
     for(unsigned int i=0; i<m_nodes.size(); i++)
     {
         irr_driver->removeNode(m_nodes[i]);
-        // No need to call irr_driver->removeMesh, since this only
-        // removes the mesh from the mesh cache (if it exists in it),
-        // and this ('manual') mesh was never added to the cash.
-        m_meshes[i]->drop();
         m_left[i]->drop();
         m_right[i]->drop();
     }
     m_left.clear();
     m_right.clear();
     m_nodes.clear();
-    m_meshes.clear();
     m_skid_marking = false;
     m_current      = -1;
 }   // reset
@@ -130,10 +125,10 @@ void SkidMarks::update(float dt)
                                 raycast_right.m_contactPointWS);
         // Adjust the boundary box of the mesh to include the 
         // adjusted aabb of its buffers.
-        core::aabbox3df aabb=m_meshes[m_current]->getBoundingBox();
+        core::aabbox3df aabb=m_nodes[m_current]->getMesh()->getBoundingBox();
         aabb.addInternalBox(m_left[m_current]->getAABB());
         aabb.addInternalBox(m_right[m_current]->getAABB());
-        m_meshes[m_current]->setBoundingBox(aabb);
+        m_nodes[m_current]->getMesh()->setBoundingBox(aabb);
         return;
     }
 
@@ -182,8 +177,11 @@ void SkidMarks::update(float dt)
                                                   m_material,
                                                   m_avoid_z_fighting);
     new_mesh->addMeshBuffer(smq_right);
-    scene::ISceneNode *new_node = irr_driver->addMesh(new_mesh);
-
+    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+    // We don't keep a reference to the mesh here, so we have to decrement
+    // the reference count (which is set to 1 when doing "new SMesh()".
+    // The scene node will keep the mesh alive.
+    new_mesh->drop();
     m_current++;
     if(m_current>=stk_config->m_max_skidmarks)
         m_current = 0;
@@ -191,7 +189,6 @@ void SkidMarks::update(float dt)
     {
         m_left. push_back (smq_left );
         m_right.push_back (smq_right);
-        m_meshes.push_back(new_mesh);
         m_nodes.push_back (new_node);
     }
     else
@@ -199,13 +196,11 @@ void SkidMarks::update(float dt)
         irr_driver->removeNode(m_nodes[m_current]);
         // Not necessary to delete m_nodes: removeNode
         // deletes the node since its refcount reaches zero.
-        delete m_meshes[m_current];
         delete m_left  [m_current];
         delete m_right [m_current];
 
         m_left  [m_current] = smq_left;
         m_right [m_current] = smq_right;
-        m_meshes[m_current] = new_mesh;
         m_nodes [m_current] = new_node;
     }
 
