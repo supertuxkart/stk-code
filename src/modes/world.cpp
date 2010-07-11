@@ -32,6 +32,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -154,7 +155,7 @@ void World::init()
     
     powerup_manager->updateWeightsForRace(num_karts);
     // erase messages left over
-    RaceGUI* m = World::getWorld()->getRaceGUI();
+    RaceGUIBase* m = World::getWorld()->getRaceGUI();
     if (m) m->clearAllMessages();
 }   // init
 
@@ -293,7 +294,7 @@ void World::terminateRace()
     updateHighscores();
     unlock_manager->raceFinished();
     
-    RaceGUI* m = World::getWorld()->getRaceGUI();
+    RaceGUIBase* m = World::getWorld()->getRaceGUI();
     if (m) m->clearAllMessages();
     
     WorldStatus::terminateRace();

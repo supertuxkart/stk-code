@@ -244,7 +244,7 @@ void RaceGUI::renderGlobal(float dt)
     }
 
     drawGlobalMiniMap();
-    RaceGUI::KartIconDisplayInfo* info = world->getKartsDisplayInfo();
+    KartIconDisplayInfo* info = world->getKartsDisplayInfo();
     drawGlobalPlayerIcons(info);
 }   // renderGlobal
 

@@ -21,7 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
 
@@ -134,7 +134,7 @@ std::string FollowTheLeaderRace::getIdent() const
     return FTL_IDENT;
 }
 //-----------------------------------------------------------------------------
-RaceGUI::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
+RaceGUIBase::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 {
     LinearWorld::getKartsDisplayInfo();
     m_kart_display_info[0].special_title = _("Leader");

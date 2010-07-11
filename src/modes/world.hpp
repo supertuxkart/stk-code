@@ -28,7 +28,7 @@
 #include "network/network_kart.hpp"
 #include "physics/physics.hpp"
 #include "race/highscores.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "utils/random_generator.hpp"
 
 class btRigidBody;
@@ -127,7 +127,7 @@ protected:
     Track* m_track;
 
     /** Pointer to the race GUI. The race GUI is handedl by world. */
-    RaceGUI *m_race_gui;
+    RaceGUIBase *m_race_gui;
 
     bool     m_clear_back_buffer;
     
@@ -170,10 +170,10 @@ public:
     /** Put race into limbo phase */
     void            disableRace();
     
-    /** Returns a pointer to the race gui. */
-    RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     Kart           *getPlayerKart(unsigned int player) const;
     Kart           *getLocalPlayerKart(unsigned int n) const;
+    /** Returns a pointer to the race gui. */
+    RaceGUIBase    *getRaceGUI()                const { return m_race_gui;                  }
     unsigned int    getNumKarts()               const { return m_karts.size();              }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
                                                             kartId < int(m_karts.size()));
@@ -227,7 +227,7 @@ public:
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode
       */
-    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
+    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
     
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.

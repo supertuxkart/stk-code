@@ -62,7 +62,7 @@ private:
     };
 
 protected:
-    RaceGUI::KartIconDisplayInfo* m_kart_display_info;
+    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
 
     /** This vector contains an 'KartInfo' struct for every kart in the race.
       * This member is not strictly private but try not to use it directly outside
@@ -95,7 +95,7 @@ public:
     void          setTimeAtLapForKart(float t, const int kart_id);
     float         getTimeAtLapForKart(const int kart_id) const;
 
-    virtual  RaceGUI::KartIconDisplayInfo* 
+    virtual  RaceGUIBase::KartIconDisplayInfo* 
                   getKartsDisplayInfo();
     virtual void  moveKartAfterRescue(Kart* kart);
     

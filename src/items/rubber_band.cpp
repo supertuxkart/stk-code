@@ -234,7 +234,7 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
 
-        RaceGUI* gui = World::getWorld()->getRaceGUI();
+        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
         hit_message += StringUtils::insertValues(getPlungerString(),
                                                  kart_hit->getName().c_str(),

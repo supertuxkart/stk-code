@@ -45,7 +45,7 @@ using namespace irr;
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_graph.hpp"

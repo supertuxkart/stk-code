@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "audio/music_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -45,7 +45,7 @@ void ThreeStrikesBattle::init()
     }
  
     const unsigned int kart_amount = m_karts.size();
-    m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
+    m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -213,12 +213,12 @@ void ThreeStrikesBattle::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
-RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
+RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 {
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         
         // reset color
         rank_info.lap = -1;

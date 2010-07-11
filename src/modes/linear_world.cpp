@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 
 #include <sstream>
 
@@ -44,7 +44,7 @@ void LinearWorld::init()
     World::init();
     const unsigned int kart_amount = m_karts.size();
 
-    m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
+    m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -389,7 +389,7 @@ float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
-RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
+RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 {
     int   laps_of_leader       = -1;
     float time_of_leader       = -1;
@@ -399,7 +399,7 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         Kart* kart = m_karts[i];
 
         // reset color
@@ -428,7 +428,7 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     // we now know the best time of the lap. fill the remaining bits of info
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         KartInfo& kart_info = m_kart_info[i];
         Kart* kart = m_karts[i];
 

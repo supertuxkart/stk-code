@@ -19,7 +19,7 @@
 #define _follow_the_leader_hpp_
 
 #include "modes/linear_world.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 
 /**
   * \brief An implementation of World, based on LinearWorld, to provide the Follow-the-leader game mode
@@ -42,7 +42,7 @@ public:
     virtual void restartRace();
     virtual std::string getIdent() const;
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
     
     virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }

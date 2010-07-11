@@ -29,7 +29,7 @@
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
@@ -274,7 +274,7 @@ void PlayerController::update(float dt)
         {
             if (m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
-                RaceGUI* m=World::getWorld()->getRaceGUI();
+                RaceGUIBase* m=World::getWorld()->getRaceGUI();
                 if(m)
                 {
                     m->addMessage(_("Penalty time!!"), m_kart, 2.0f, 60);

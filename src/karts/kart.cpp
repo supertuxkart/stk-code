@@ -492,7 +492,7 @@ void Kart::finishedRace(float time)
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_FINAL);
         
-        RaceGUI* m = World::getWorld()->getRaceGUI();
+        RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
             m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
@@ -511,7 +511,7 @@ void Kart::finishedRace(float time)
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
         
-        RaceGUI* m = World::getWorld()->getRaceGUI();
+        RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
             m->addMessage((getPosition() == 2 ? _("You won the race!") : _("You finished the race!")) ,

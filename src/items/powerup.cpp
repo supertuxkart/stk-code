@@ -205,7 +205,7 @@ void Powerup::use()
     
     m_number--;
     World *world = World::getWorld();
-    RaceGUI* gui = world->getRaceGUI();
+    RaceGUIBase* gui = world->getRaceGUI();
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:   m_owner->handleZipper();

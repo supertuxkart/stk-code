@@ -165,7 +165,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return;
 
-    RaceGUI* gui = World::getWorld()->getRaceGUI();
+    RaceGUIBase* gui = World::getWorld()->getRaceGUI();
     irr::core::stringw hit_message;
 
     // pulling back makes no sense in battle mode, since this mode is not a race.

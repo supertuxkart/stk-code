@@ -392,7 +392,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 
     if (kart_hit != NULL)
     {
-        RaceGUI* gui = World::getWorld()->getRaceGUI();
+        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
         switch(m_type)
         {

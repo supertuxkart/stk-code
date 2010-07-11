@@ -811,7 +811,7 @@ void IrrDriver::update(float dt)
 
         if (inRace)
         {
-            RaceGUI *rg = world->getRaceGUI();
+            RaceGUIBase *rg = world->getRaceGUI();
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
                 Kart *kart=world->getKart(i);

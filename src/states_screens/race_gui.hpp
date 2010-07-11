@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACEGUI_HPP
-#define HEADER_RACEGUI_HPP
+#ifndef HEADER_RACE_GUI_HPP
+#define HEADER_RACE_GUI_HPP
 
 #include <string>
 #include <vector>
@@ -27,8 +27,8 @@
 #include "irrlicht.h"
 using namespace irr;
 
-
 #include "config/player.hpp"
+#include "states_screens/race_gui_base.hpp"
 
 class InputMap;
 class Kart;
@@ -39,28 +39,8 @@ class RaceSetup;
   * \brief Handles the in-race GUI (messages, mini-map, rankings, timer, etc...)
   * \ingroup states_screens
   */
-class RaceGUI
+class RaceGUI : public RaceGUIBase
 {
-public:
-    /**
-      * Used to display the list of karts and their times or
-      * whatever other info is relevant to the current mode.
-      */
-    struct KartIconDisplayInfo
-    {
-        /** text to display next to icon, if any */
-        irr::core::stringw m_text;
-        
-        /** text color, if any text */
-        float r, g, b;
-        
-        /** if this kart has a special title, e.g. "leader" in follow-the-leader */
-        irr::core::stringw special_title;
-        
-        /** Current lap of this kart, or -1 if irrelevant */
-        int lap;
-    };   // KartIconDisplayInfo
-
 private:
     class TimedMessage
     {
@@ -191,19 +171,20 @@ public:
 
          RaceGUI();
         ~RaceGUI();
-    void renderGlobal(float dt);
-    void renderPlayerView(const Kart *kart);
+    virtual void renderGlobal(float dt);
+    virtual void renderPlayerView(const Kart *kart);
     
-    void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
-                    int fonst_size, 
-                    const video::SColor &color=video::SColor(255, 255, 0, 255),
-                    bool important=true);
+    virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
+                            float time, int fonst_size, 
+                            const video::SColor &color=
+                                video::SColor(255, 255, 0, 255),
+                            bool important=true);
 
-    void clearAllMessages() { m_messages.clear(); }
+    virtual void clearAllMessages() { m_messages.clear(); }
     
     /** Returns the size of the texture on which to render the minimap to. */
-    const core::dimension2du getMiniMapSize() const 
+    virtual const core::dimension2du getMiniMapSize() const 
                   { return core::dimension2du(m_map_width, m_map_height); }
-};
+};   // RaceGUI
 
 #endif

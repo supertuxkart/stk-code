@@ -23,7 +23,7 @@
 #include <string>
 
 #include "modes/world.hpp"
-#include "states_screens/race_gui.hpp"
+#include "states_screens/race_gui_base.hpp"
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
@@ -37,7 +37,7 @@ private:
         int m_lives;
     };
 
-    RaceGUI::KartIconDisplayInfo* m_kart_display_info;
+    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
     
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
@@ -67,7 +67,7 @@ public:
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart);
     
@@ -80,7 +80,7 @@ public:
     virtual void raceResultOrder( int* order );
     
     void updateKartRanks();
-};
+};   // ThreeStrikesBattles
 
 
 #endif
