@@ -565,7 +565,7 @@ Kart *World::getPlayerKart(unsigned int n) const
  */
 Kart *World::getLocalPlayerKart(unsigned int n) const
 {
-    unsigned int count=-1;
+    int count=-1;
     for(unsigned int i=0; i<m_karts.size(); i++)
     {
         if(m_karts[i]->getCamera() && m_karts[i]->getController()->isPlayerController())
