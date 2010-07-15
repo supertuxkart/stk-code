@@ -321,16 +321,19 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
-void ThreeStrikesBattle::raceResultOrder( int* order )
+void ThreeStrikesBattle::raceResultOrder(std::vector<int> *order)
 {
     updateKartRanks();
-    
+
     const unsigned int num_karts = getNumKarts();
+    order->resize(num_karts);
+    for (unsigned int i=0; i < num_karts; i++) (*order)[i] = -1;
+
     for( unsigned int kart_id    = 0; kart_id < num_karts; ++kart_id )
     {
         const int pos = m_karts[kart_id]->getPosition() - 1;
         assert(pos >= 0);
         assert(pos < (int)num_karts);
-        order[pos] = kart_id;
+        (*order)[pos] = kart_id;
     }
 }   // raceResultOrder

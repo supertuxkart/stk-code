@@ -108,7 +108,7 @@ public:
     
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
-    virtual void  raceResultOrder( int order[] );
+    virtual void  raceResultOrder(std::vector<int> *order);
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart.
      */

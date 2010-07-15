@@ -42,6 +42,7 @@
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -123,6 +124,17 @@ void EndController::reset()
         m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
     }
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** The end controller must forward 'fire' presses to the race gui.
+ */
+void EndController::action(PlayerAction action, int value)
+{
+    if(action!=PA_FIRE) return;
+    RaceResultGUI *race_result_gui = dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
+    if(!race_result_gui) return;
+    race_result_gui->nextPhase();
+}   // action
 
 //-----------------------------------------------------------------------------
 void EndController::update(float dt)

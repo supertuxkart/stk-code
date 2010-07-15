@@ -920,7 +920,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="states_screen"
+				Name="states_screens"
 				>
 				<File
 					RelativePath="..\..\states_screens\addons_screen.cpp"
@@ -996,6 +996,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\race_gui.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_result_gui.cpp"
 					>
 				</File>
 				<File
@@ -1846,6 +1850,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\race_gui_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_result_gui.hpp"
 					>
 				</File>
 				<File

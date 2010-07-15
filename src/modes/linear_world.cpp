@@ -478,14 +478,15 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 // ----------------------------------------------------------------------------
 /** Sets up the mapping from kart position to kart index.
  */
-void LinearWorld::raceResultOrder( int order[] )
+void LinearWorld::raceResultOrder(std::vector<int> *order)
 {
     const unsigned int NUM_KARTS = getNumKarts();
+    order->resize(NUM_KARTS);
     
 #ifndef NDEBUG
     for (unsigned int i=0; i < NUM_KARTS; i++)
     {
-        order[i] = -1;
+        (*order)[i] = -1;
     }
     
     bool positions_ok = true;
@@ -497,18 +498,18 @@ void LinearWorld::raceResultOrder( int order[] )
         
 #ifndef NDEBUG
         // sanity checks
-        if (order[position] != -1)
+        if ((*order)[position] != -1)
         {
             std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
             for (unsigned int j=0; j < NUM_KARTS; j++)
             {
-                if (order[j] == -1)
+                if ((*order)[j] == -1)
                 {
                     std::cout << "    No kart is yet set at position " << j << std::endl;
                 }
                 else
                 {
-                    std::cout << "    Kart " << order[j] << " is at position " << j << std::endl;
+                    std::cout << "    Kart " << (*order)[j] << " is at position " << j << std::endl;
                 }
             }
             std::cout << "Kart " << i << " is being given posiiton " << (getKart(i)->getPosition()-1)
@@ -518,7 +519,7 @@ void LinearWorld::raceResultOrder( int order[] )
 #endif
         
         // actually assign the position
-        order[position] = i; // even for eliminated karts
+        (*order)[position] = i; // even for eliminated karts
     }
     
 #ifndef NDEBUG

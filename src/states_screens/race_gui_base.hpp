@@ -20,13 +20,16 @@
 #ifndef HEADER_RACE_GUI_BASE_HPP
 #define HEADER_RACE_GUI_BASE_HPP
 
+#include "irrlicht.h"
+using namespace irr;
+
+class Kart;
+
 /**
   * \brief An abstract base class for the two race guis (race_gui and 
   *  race_result gui)
   * \ingroup states_screens
   */
-class Kart;
-
 class RaceGUIBase
 {
 public:
@@ -37,7 +40,7 @@ public:
     struct KartIconDisplayInfo
     {
         /** text to display next to icon, if any */
-        irr::core::stringw m_text;
+        core::stringw m_text;
         
         /** text color, if any text */
         float r, g, b;

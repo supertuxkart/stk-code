@@ -26,14 +26,11 @@
 #include <ctime>
 
 #include "audio/music_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/race_gui_base.hpp"
-#include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/default_ai_controller.hpp"
@@ -47,6 +44,10 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/state_manager.hpp"
+#include "states_screens/race_gui_base.hpp"
+#include "states_screens/race_gui.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -294,8 +295,9 @@ void World::terminateRace()
     updateHighscores();
     unlock_manager->raceFinished();
     
-    RaceGUIBase* m = World::getWorld()->getRaceGUI();
-    if (m) m->clearAllMessages();
+    if (m_race_gui) m_race_gui->clearAllMessages();
+    delete m_race_gui;
+    m_race_gui = new RaceResultGUI();
     
     WorldStatus::terminateRace();
 }   // terminateRace

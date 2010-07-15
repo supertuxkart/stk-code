@@ -252,7 +252,7 @@ public:
       *                   the first kart, order[1] the ID of the second kart, etc...
       *                   Array dimension must be the number of karts.
       */
-    virtual void raceResultOrder( int order[] ) = 0;
+    virtual void raceResultOrder(std::vector<int> *order ) = 0;
     
     /** Returns the number of started karts, used to determine which karts
      *  receive a speed boost. */

@@ -179,7 +179,6 @@ void WorldStatus::update(const float dt)
             {
                 m_phase = RESULT_DISPLAY_PHASE;
                 terminateRace();
-                new RaceOverDialog(0.6f, 0.9f);
             }
             break;
         }

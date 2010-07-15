@@ -106,9 +106,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     
     World *world = World::getWorld();
     const unsigned int num_karts = world->getNumKarts();
-    int*  order  = new int [num_karts];
-    for (unsigned int n=0; n<num_karts; n++) order[n] = -1;
-    world->raceResultOrder(order);
+    std::vector<int> order;
+    world->raceResultOrder(&order);
         
     const bool display_time = (world->getClockMode() == WorldStatus::CLOCK_CHRONO);
 
@@ -207,8 +206,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         
         kart_id++;
     }
-
-    delete[] order;
     
     // ---- Highscores
     if (show_highscores)

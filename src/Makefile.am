@@ -317,6 +317,8 @@ supertuxkart_SOURCES = \
  states_screens/race_gui_base.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
+ states_screens/race_result_gui.cpp \
+ states_screens/race_result_gui.hpp \
  states_screens/race_setup_screen.cpp \
  states_screens/race_setup_screen.hpp \
  states_screens/state_manager.cpp  \
