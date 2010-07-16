@@ -2,23 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>supertuxkart</string>
-	<key>CFBundleIconFile</key>
-	<string>stk.icns</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>SuperTuxKart</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.7</string>
-	<key>CFBundleVersion</key>
-	<string>0.7</string>
-	<key>CSResourcesFileMapped</key>
-	<true/>
+	<key>CFBundleDevelopmentRegion</key>     <string>English</string>
+	<key>CFBundleExecutable</key>            <string>supertuxkart</string>
+	<key>CFBundleIconFile</key>              <string>stk.icns</string>
+	<key>CFBundleInfoDictionaryVersion</key> <string>6.0</string>
+	<key>CFBundleName</key>                  <string>SuperTuxKart</string>
+	<key>CFBundlePackageType</key>           <string>APPL</string>
+	<key>CFBundleShortVersionString</key>    <string>0.7</string>
+	<key>CFBundleVersion</key>               <string>0.7</string>
+	<key>CSResourcesFileMapped</key>         <true/>
+	<key>CFBundleIdentifier</key>            <string>net.sourceforge.supertuxkart</string>
+	<key>CFBundleSignature</key>             <string>SPTK</string>
 </dict>
 </plist>
