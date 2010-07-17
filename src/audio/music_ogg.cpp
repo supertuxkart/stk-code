@@ -61,18 +61,45 @@ bool MusicOggStream::load(const std::string& filename)
 
     if(!m_oggFile)
     {
-        printf("Loading Music: %s failed\n", m_fileName.c_str());
+        printf("Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
         return false;
     }
-
+    
 #if defined( WIN32 ) || defined( WIN64 )
-    if( ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT) < 0)
+    const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT);
 #else
-    if (ov_open(m_oggFile, &m_oggStream, NULL, 0) < 0)
+    const int result = ov_open(m_oggFile, &m_oggStream, NULL, 0);
 #endif
+    
+    if (result < 0)
     {
         fclose(m_oggFile);
-        printf("Loading Music: %s failed\n", m_fileName.c_str());
+        
+        
+        const char* errorMessage;
+        switch (result)
+        {
+            case OV_EREAD:
+                errorMessage = "OV_EREAD";
+                break;
+            case OV_ENOTVORBIS:
+                errorMessage = "OV_ENOTVORBIS";
+                break;
+            case OV_EVERSION:
+                errorMessage = "OV_EVERSION";
+                break;
+            case OV_EBADHEADER:
+                errorMessage = "OV_EBADHEADER";
+                break;
+            case OV_EFAULT:
+                errorMessage = "OV_EFAULT";
+                break;
+            default:
+                errorMessage = "Unknown Error";
+        }
+        
+        printf("Loading Music: %s failed : ov_open returned error code %i (%s)\n",
+               m_fileName.c_str(), result, errorMessage);
         return false;
     }
     
