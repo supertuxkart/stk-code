@@ -234,6 +234,7 @@
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
 		9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */; };
 		9553823A10FD4FEC00737979 /* constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9553823910FD4FEC00737979 /* constants.cpp */; };
+		9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9554C4A411F1188000906416 /* race_result_gui.cpp */; };
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
@@ -437,6 +438,8 @@
 		9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_over_dialog.hpp; path = ../../states_screens/dialogs/race_over_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_over_dialog.cpp; path = ../../states_screens/dialogs/race_over_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		9553823910FD4FEC00737979 /* constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = constants.cpp; path = ../../utils/constants.cpp; sourceTree = SOURCE_ROOT; };
+		9554C4A411F1188000906416 /* race_result_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_result_gui.cpp; path = ../../states_screens/race_result_gui.cpp; sourceTree = SOURCE_ROOT; };
+		9554C4A511F1188000906416 /* race_result_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_result_gui.hpp; path = ../../states_screens/race_result_gui.hpp; sourceTree = SOURCE_ROOT; };
 		9556A87C119EF976009C558F /* options_screen_audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_audio.cpp; path = ../../states_screens/options_screen_audio.cpp; sourceTree = SOURCE_ROOT; };
 		9556A87D119EF976009C558F /* options_screen_audio.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_audio.hpp; path = ../../states_screens/options_screen_audio.hpp; sourceTree = SOURCE_ROOT; };
 		9556A87E119EF976009C558F /* options_screen_video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_video.cpp; path = ../../states_screens/options_screen_video.cpp; sourceTree = SOURCE_ROOT; };
@@ -466,6 +469,7 @@
 		956C6ED21128D3FB004336C8 /* player_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player_controller.hpp; path = ../../karts/controller/player_controller.hpp; sourceTree = SOURCE_ROOT; };
 		9574F17A11206881008D202E /* world_status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_status.cpp; path = ../../modes/world_status.cpp; sourceTree = SOURCE_ROOT; };
 		9574F17B11206881008D202E /* world_status.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_status.hpp; path = ../../modes/world_status.hpp; sourceTree = SOURCE_ROOT; };
+		957BF97811EA96720018118A /* race_gui_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui_base.hpp; path = ../../states_screens/race_gui_base.hpp; sourceTree = SOURCE_ROOT; };
 		957ED47E1163FF18002AB42C /* ai_base_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ai_base_controller.cpp; path = ../../karts/controller/ai_base_controller.cpp; sourceTree = SOURCE_ROOT; };
 		957ED47F1163FF18002AB42C /* ai_base_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ai_base_controller.hpp; path = ../../karts/controller/ai_base_controller.hpp; sourceTree = SOURCE_ROOT; };
 		958330B210122B4A00C5137E /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../guiengine/engine.cpp; sourceTree = SOURCE_ROOT; };
@@ -1342,8 +1346,11 @@
 				9522F1EC107961560067ECF5 /* options_screen_players.hpp */,
 				9556A87E119EF976009C558F /* options_screen_video.cpp */,
 				9556A87F119EF976009C558F /* options_screen_video.hpp */,
+				957BF97811EA96720018118A /* race_gui_base.hpp */,
 				958330C810122B4A00C5137E /* race_gui.cpp */,
 				958330C910122B4A00C5137E /* race_gui.hpp */,
+				9554C4A411F1188000906416 /* race_result_gui.cpp */,
+				9554C4A511F1188000906416 /* race_result_gui.hpp */,
 				9522F15A107949780067ECF5 /* race_setup_screen.cpp */,
 				9522F159107949780067ECF5 /* race_setup_screen.hpp */,
 				958330CA10122B4A00C5137E /* state_manager.cpp */,
@@ -2618,6 +2625,7 @@
 				9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */,
 				95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */,
 				9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */,
+				9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
