@@ -441,19 +441,16 @@ void RaceManager::exitRace()
         {
             StateManager::get()->pushScreen( GrandPrixLose::getInstance()  );
             
-            if (humanLosers.size() > 1)
+            if (humanLosers.size() >= 1)
             {
-                // TODO: support multiplayer GPs!!
-                GrandPrixLose::getInstance()->setKart( humanLosers[0] );
-            }
-            else if (humanLosers.size() == 1)
-            {
-                GrandPrixLose::getInstance()->setKart( humanLosers[0] );
+                GrandPrixLose::getInstance()->setKarts( humanLosers );
             }
             else
             {
                 std::cerr << "RaceManager::exitRace() : what's going on?? no winners and no losers??\n";
-                GrandPrixLose::getInstance()->setKart( "nolok" );
+                std::vector<std::string> karts;
+                karts.push_back(UserConfigParams::m_default_kart);
+                GrandPrixLose::getInstance()->setKarts( karts );
             }
         }
     }

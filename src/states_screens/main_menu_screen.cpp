@@ -171,7 +171,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         {
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             StateManager::get()->pushScreen(scene);
-            scene->setKart( "nolok" );
+            std::vector<std::string> losers;
+            losers.push_back("nolok");
+            scene->setKarts( losers );
         }
     }
     

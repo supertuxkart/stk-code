@@ -220,11 +220,14 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::setKart(const std::string ident_arg)
+void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
 {    
     scene::ISceneNode* kart_main_node = NULL;
     
-    const KartProperties* kart = kart_properties_manager->getKart(ident_arg);
+    assert(ident_arg.size() > 0);
+    
+    // TODO: allow displaying more than one losers
+    const KartProperties* kart = kart_properties_manager->getKart(ident_arg[0]);
     if (kart != NULL)
     {
         KartModel* kartModel = kart->getKartModel();

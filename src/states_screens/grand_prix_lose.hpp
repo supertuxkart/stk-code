@@ -3,6 +3,9 @@
 
 #include "guiengine/screen.hpp"
 
+#include <vector>
+#include <string>
+
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
 
@@ -59,7 +62,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
-    void setKart(const std::string ident);
+    /** \brief set which karts lost this GP */
+    void setKarts(const std::vector<std::string> ident);
 
     virtual MusicInformation* getMusic() const { return m_music; }
 
