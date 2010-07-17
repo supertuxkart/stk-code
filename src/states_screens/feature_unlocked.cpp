@@ -147,6 +147,7 @@ void FeatureUnlockedCutScene::init()
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
+    irr_driver->getSceneManager()->setActiveCamera(m_camera);
     
     scene::IAnimatedMesh* model_chest = irr_driver->getAnimatedMesh( file_manager->getModelFile("chest.b3d") );
     assert(model_chest != NULL);

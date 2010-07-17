@@ -78,7 +78,8 @@ void GrandPrixLose::init()
     m_camera_z = CAMERA_START_Z;
     m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    
+    irr_driver->getSceneManager()->setActiveCamera(m_camera);
+
     m_camera_target_x = 0.0f;
     m_camera_target_z = -2.0f;
     m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
