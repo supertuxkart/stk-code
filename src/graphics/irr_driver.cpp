@@ -161,8 +161,9 @@ void IrrDriver::initDevice()
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
-
-
+    
+    m_device->setResizable(false);
+    
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
