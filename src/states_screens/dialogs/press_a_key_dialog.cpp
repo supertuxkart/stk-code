@@ -18,8 +18,10 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
+#include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
+#include "states_screens/options_screen_input2.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -46,29 +48,49 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     //IGUIFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
         
-    ButtonWidget* widget2 = new ButtonWidget();
-    widget2->m_properties[PROP_ID] = "cancel";
-    widget2->m_text = _("Press ESC to cancel");
-    widget2->m_x = 15;
-    widget2->m_y = m_area.getHeight() - textHeight - 12;
-    widget2->m_w = m_area.getWidth() - 30;
-    widget2->m_h = textHeight + 6;
-    widget2->setParent(m_irrlicht_window);
+    ButtonWidget* assignToEsc = new ButtonWidget();
+    assignToEsc->m_properties[PROP_ID] = "assignEsc";
+    // I18N: In the "press a key" dialog, in the options to edit the key bindings
+    assignToEsc->m_text = _("Assign to ESC key");
+    assignToEsc->m_x = 15;
+    assignToEsc->m_y = m_area.getHeight() - (textHeight + 15)*2;
+    assignToEsc->m_w = m_area.getWidth() - 30;
+    assignToEsc->m_h = textHeight + 6;
+    assignToEsc->setParent(m_irrlicht_window);
     
-    m_children.push_back(widget2);
-    widget2->add();
+    m_children.push_back(assignToEsc);
+    assignToEsc->add();
+    
+    ButtonWidget* cancelBtn = new ButtonWidget();
+    cancelBtn->m_properties[PROP_ID] = "cancel";
+    cancelBtn->m_text = _("Press ESC to cancel");
+    cancelBtn->m_x = 15;
+    cancelBtn->m_y = m_area.getHeight() - textHeight - 15;
+    cancelBtn->m_w = m_area.getWidth() - 30;
+    cancelBtn->m_h = textHeight + 6;
+    cancelBtn->setParent(m_irrlicht_window);
+    
+    m_children.push_back(cancelBtn);
+    cancelBtn->add();
 }
 
 // ------------------------------------------------------------------------------------------------------
 
 GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eventSource)
 {
-    if(eventSource == "cancel")
+    if (eventSource == "cancel")
     {
         input_manager->setMode(InputManager::MENU);
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "assignEsc")
+    {
+        Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */, KEY_ESCAPE);
+        OptionsScreenInput2::getInstance()->gotSensedInput(&simulatedInput);
+        return GUIEngine::EVENT_BLOCK;
+    }
+    
     return GUIEngine::EVENT_LET;
 }
 
