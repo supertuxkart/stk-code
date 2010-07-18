@@ -185,8 +185,10 @@ int Widget::getNewNoFocusID()
 
 bool Widget::isFocusableId(const int id)
 {
-    if (id >= unfocusableIdsBase) return false;
-    else                          return true;
+    if (id < 0) return false;
+    
+    if ((unsigned int)id >= unfocusableIdsBase) return false;
+    else                                        return true;
 }
 
 // -----------------------------------------------------------------------------
