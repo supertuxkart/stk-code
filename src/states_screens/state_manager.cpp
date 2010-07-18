@@ -165,7 +165,7 @@ void StateManager::escapePressed()
     else if(m_game_mode == GAME)
     {
         if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE)
-            RacePausedDialog(0.8f, 0.6f);
+            new RacePausedDialog(0.8f, 0.6f);
         //resetAndGoToMenu("main.stkgui");
         //input_manager->setMode(InputManager::MENU);
     }
