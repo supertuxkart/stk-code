@@ -296,6 +296,10 @@ void World::terminateRace()
     unlock_manager->raceFinished();
     
     if (m_race_gui) m_race_gui->clearAllMessages();
+    //FIXME: we can't delete the race gui here, since it is needed in case of 
+    // a restart (the constructor creates some textures which assume that no
+    // scene nodes exist. In case of a restart there are scene nodes, so we
+    // can't create the race gui again :(
     delete m_race_gui;
     m_race_gui = new RaceResultGUI();
     
