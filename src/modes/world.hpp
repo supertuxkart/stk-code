@@ -126,8 +126,15 @@ protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
 
-    /** Pointer to the race GUI. The race GUI is handedl by world. */
+    /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
+
+    /** The actual race gui needs to be saved when the race result gui is 
+        displayed since it is still needed in case of a restart, and it
+        can't simply be created again (since it assumes that it can render
+        to texture without having any scene nodes, but in case of a restart
+        there are scene nodes). */
+    RaceGUIBase *m_saved_race_gui;
 
     bool     m_clear_back_buffer;
     
