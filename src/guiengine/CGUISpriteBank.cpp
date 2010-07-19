@@ -16,35 +16,35 @@ namespace gui
 {
 
 STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
-	Environment(env), Driver(0)
+    Environment(env), Driver(0)
 {
     m_magic_number = 0xCAFEC001;
     
-	#ifdef _DEBUG
-	setDebugName("STKModifiedSpriteBank");
-	#endif
+    #ifdef _DEBUG
+    setDebugName("STKModifiedSpriteBank");
+    #endif
 
     m_scale = 1.0f;
     
-	if (Environment)
-	{
-		Driver = Environment->getVideoDriver();
-		if (Driver)
-			Driver->grab();
-	}
+    if (Environment)
+    {
+        Driver = Environment->getVideoDriver();
+        if (Driver)
+            Driver->grab();
+    }
 }
 
 
 STKModifiedSpriteBank::~STKModifiedSpriteBank()
 {
-	// drop textures
-	for (u32 i=0; i<Textures.size(); ++i)
-		if (Textures[i])
-			Textures[i]->drop();
+    // drop textures
+    for (u32 i=0; i<Textures.size(); ++i)
+        if (Textures[i])
+            Textures[i]->drop();
 
-	// drop video driver
-	if (Driver)
-		Driver->drop();
+    // drop video driver
+    if (Driver)
+        Driver->drop();
     
     m_magic_number = 0xDEADBEEF;
 }
@@ -67,57 +67,57 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
                        );
     }
     
-	return copy;
+    return copy;
 }
 
 
 core::array< SGUISprite >& STKModifiedSpriteBank::getSprites()
 {
     assert( m_magic_number == 0xCAFEC001 );
-	return Sprites;
+    return Sprites;
 }
 
 
 u32 STKModifiedSpriteBank::getTextureCount() const
 {
     assert( m_magic_number == 0xCAFEC001 );
-	return Textures.size();
+    return Textures.size();
 }
 
 
 video::ITexture* STKModifiedSpriteBank::getTexture(u32 index) const
 {
     assert( m_magic_number == 0xCAFEC001 );
-	if (index < Textures.size())
-		return Textures[index];
-	else
-		return 0;
+    if (index < Textures.size())
+        return Textures[index];
+    else
+        return 0;
 }
 
 
 void STKModifiedSpriteBank::addTexture(video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
-	if (texture)
-		texture->grab();
+    if (texture)
+        texture->grab();
 
-	Textures.push_back(texture);
+    Textures.push_back(texture);
 }
 
 
 void STKModifiedSpriteBank::setTexture(u32 index, video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
-	while (index >= Textures.size())
-		Textures.push_back(0);
+    while (index >= Textures.size())
+        Textures.push_back(0);
 
-	if (texture)
-		texture->grab();
+    if (texture)
+        texture->grab();
 
-	if (Textures[index])
-		Textures[index]->drop();
+    if (Textures[index])
+        Textures[index]->drop();
 
-	Textures[index] = texture;
+    Textures[index] = texture;
 }
 
 
@@ -125,78 +125,78 @@ void STKModifiedSpriteBank::setTexture(u32 index, video::ITexture* texture)
 void STKModifiedSpriteBank::clear()
 {
     assert( m_magic_number == 0xCAFEC001 );
-	// drop textures
-	for (u32 i=0; i<Textures.size(); ++i)
-		if (Textures[i])
-			Textures[i]->drop();
-	Textures.clear();
-	Sprites.clear();
-	Rectangles.clear();
+    // drop textures
+    for (u32 i=0; i<Textures.size(); ++i)
+        if (Textures[i])
+            Textures[i]->drop();
+    Textures.clear();
+    Sprites.clear();
+    Rectangles.clear();
 }
 
 //! Add the texture and use it for a single non-animated sprite.
 s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
-	if ( !texture )
-		return -1;
+    if ( !texture )
+        return -1;
 
-	addTexture(texture);
-	u32 textureIndex = getTextureCount() - 1;
+    addTexture(texture);
+    u32 textureIndex = getTextureCount() - 1;
 
-	u32 rectangleIndex = Rectangles.size();
-	Rectangles.push_back( core::rect<s32>(0,0, texture->getOriginalSize().Width, texture->getOriginalSize().Height) );
+    u32 rectangleIndex = Rectangles.size();
+    Rectangles.push_back( core::rect<s32>(0,0, texture->getOriginalSize().Width, texture->getOriginalSize().Height) );
 
-	SGUISprite sprite;
-	sprite.frameTime = 0;
+    SGUISprite sprite;
+    sprite.frameTime = 0;
 
-	SGUISpriteFrame frame;
-	frame.textureNumber = textureIndex;
-	frame.rectNumber = rectangleIndex;
-	sprite.Frames.push_back( frame );
+    SGUISpriteFrame frame;
+    frame.textureNumber = textureIndex;
+    frame.rectNumber = rectangleIndex;
+    sprite.Frames.push_back( frame );
 
-	Sprites.push_back( sprite );
+    Sprites.push_back( sprite );
 
-	return Sprites.size() - 1;
+    return Sprites.size() - 1;
 }
 
 //! draws a sprite in 2d with scale and color
 void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos,
-		const core::rect<s32>* clip, const video::SColor& color,
-		u32 starttime, u32 currenttime, bool loop, bool center)
+        const core::rect<s32>* clip, const video::SColor& color,
+        u32 starttime, u32 currenttime, bool loop, bool center)
 {
     assert( m_magic_number == 0xCAFEC001 );
-	if (index >= Sprites.size() || Sprites[index].Frames.empty() )
-		return;
+    if (index >= Sprites.size() || Sprites[index].Frames.empty() )
+        return;
 
-	// work out frame number
-	u32 frame = 0;
-	if (Sprites[index].frameTime)
-	{
-		u32 f = ((currenttime - starttime) / Sprites[index].frameTime);
-		if (loop)
-			frame = f % Sprites[index].Frames.size();
-		else
-			frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
-	}
+    // work out frame number
+    u32 frame = 0;
+    if (Sprites[index].frameTime)
+    {
+        u32 f = ((currenttime - starttime) / Sprites[index].frameTime);
+        if (loop)
+            frame = f % Sprites[index].Frames.size();
+        else
+            frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
+    }
 
-	const video::ITexture* tex = Textures[Sprites[index].Frames[frame].textureNumber];
-	if (!tex)
-		return;
+    const video::ITexture* tex = Textures[Sprites[index].Frames[frame].textureNumber];
+    if (!tex)
+        return;
 
-	const u32 rn = Sprites[index].Frames[frame].rectNumber;
-	if (rn >= Rectangles.size())
-		return;
+    const u32 rn = Sprites[index].Frames[frame].rectNumber;
+    if (rn >= Rectangles.size())
+        return;
 
-	const core::rect<s32>& r = Rectangles[rn];
+    const core::rect<s32>& r = Rectangles[rn];
 
     const core::dimension2d<s32>& dim = r.getSize();
     
     core::rect<s32> dest( pos, core::dimension2d<s32>((int)(dim.Width*m_scale), 
                                                       (int)(dim.Height*m_scale)) );
-	if (center)
-	{
-		dest -= dest.getSize() / 2;
+    if (center)
+    {
+        dest -= dest.getSize() / 2;
     }
     
     /*
@@ -209,73 +209,73 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos
 }
 
 
-void STKModifiedSpriteBank::draw2DSpriteBatch(	const core::array<u32>& indices,
-										const core::array<core::position2di>& pos,
-										const core::rect<s32>* clip,
-										const video::SColor& color,
-										u32 starttime, u32 currenttime,
-										bool loop, bool center)
+void STKModifiedSpriteBank::draw2DSpriteBatch(  const core::array<u32>& indices,
+                                        const core::array<core::position2di>& pos,
+                                        const core::rect<s32>* clip,
+                                        const video::SColor& color,
+                                        u32 starttime, u32 currenttime,
+                                        bool loop, bool center)
 {
     assert( m_magic_number == 0xCAFEC001 );
-	const irr::u32 drawCount = core::min_<u32>(indices.size(), pos.size());
+    const irr::u32 drawCount = core::min_<u32>(indices.size(), pos.size());
 
-	core::array<SDrawBatch> drawBatches(Textures.size());
-	for(u32 i = 0;i < Textures.size();i++)
-	{
-		drawBatches.push_back(SDrawBatch());
-		drawBatches[i].positions.reallocate(drawCount);
-		drawBatches[i].sourceRects.reallocate(drawCount);
-	}
+    core::array<SDrawBatch> drawBatches(Textures.size());
+    for(u32 i = 0;i < Textures.size();i++)
+    {
+        drawBatches.push_back(SDrawBatch());
+        drawBatches[i].positions.reallocate(drawCount);
+        drawBatches[i].sourceRects.reallocate(drawCount);
+    }
 
-	for(u32 i = 0;i < drawCount;i++)
-	{
-		const u32 index = indices[i];
+    for(u32 i = 0;i < drawCount;i++)
+    {
+        const u32 index = indices[i];
 
-		if (index >= Sprites.size() || Sprites[index].Frames.empty() )
-			continue;
+        if (index >= Sprites.size() || Sprites[index].Frames.empty() )
+            continue;
 
-		// work out frame number
-		u32 frame = 0;
-		if (Sprites[index].frameTime)
-		{
-			u32 f = ((currenttime - starttime) / Sprites[index].frameTime);
-			if (loop)
-				frame = f % Sprites[index].Frames.size();
-			else
-				frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
-		}
+        // work out frame number
+        u32 frame = 0;
+        if (Sprites[index].frameTime)
+        {
+            u32 f = ((currenttime - starttime) / Sprites[index].frameTime);
+            if (loop)
+                frame = f % Sprites[index].Frames.size();
+            else
+                frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
+        }
 
-		const u32 texNum = Sprites[index].Frames[frame].textureNumber;
+        const u32 texNum = Sprites[index].Frames[frame].textureNumber;
 
-		SDrawBatch& currentBatch = drawBatches[texNum];
+        SDrawBatch& currentBatch = drawBatches[texNum];
 
-		const u32 rn = Sprites[index].Frames[frame].rectNumber;
-		if (rn >= Rectangles.size())
-			return;
+        const u32 rn = Sprites[index].Frames[frame].rectNumber;
+        if (rn >= Rectangles.size())
+            return;
 
-		const core::rect<s32>& r = Rectangles[rn];
+        const core::rect<s32>& r = Rectangles[rn];
 
-		if (center)
-		{
-			core::position2di p = pos[i];
-			p -= r.getSize() / 2;
+        if (center)
+        {
+            core::position2di p = pos[i];
+            p -= r.getSize() / 2;
 
-			currentBatch.positions.push_back(p);
-			currentBatch.sourceRects.push_back(r);
-		}
-		else
-		{
-			currentBatch.positions.push_back(pos[i]);
-			currentBatch.sourceRects.push_back(r);
-		}
-	}
+            currentBatch.positions.push_back(p);
+            currentBatch.sourceRects.push_back(r);
+        }
+        else
+        {
+            currentBatch.positions.push_back(pos[i]);
+            currentBatch.sourceRects.push_back(r);
+        }
+    }
 
-	for(u32 i = 0;i < drawBatches.size();i++)
-	{
-		if(!drawBatches[i].positions.empty() && !drawBatches[i].sourceRects.empty())
-			Driver->draw2DImageBatch(Textures[i], drawBatches[i].positions,
-				drawBatches[i].sourceRects, clip, color, true);
-	}
+    for(u32 i = 0;i < drawBatches.size();i++)
+    {
+        if(!drawBatches[i].positions.empty() && !drawBatches[i].sourceRects.empty())
+            Driver->draw2DImageBatch(Textures[i], drawBatches[i].positions,
+                drawBatches[i].sourceRects, clip, color, true);
+    }
 }
 
 } // namespace gui

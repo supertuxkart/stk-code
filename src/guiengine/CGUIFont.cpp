@@ -22,7 +22,7 @@ namespace gui
 //! constructor
 ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 : Driver(0), SpriteBank(0), Environment(env), WrongCharacter(0),
-	MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
+    MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
 {
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
@@ -32,27 +32,27 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 
     m_black_border = false;
     
-	#ifdef _DEBUG
-	setDebugName("ScalableFont");
-	#endif
+    #ifdef _DEBUG
+    setDebugName("ScalableFont");
+    #endif
     
     m_scale = 1.0f;
     m_shadow = false;
 
-	if (Environment)
-	{
-		// don't grab environment, to avoid circular references
-		Driver = Environment->getVideoDriver();
+    if (Environment)
+    {
+        // don't grab environment, to avoid circular references
+        Driver = Environment->getVideoDriver();
 
-		SpriteBank = Environment->addEmptySpriteBank(filename);
-		if (SpriteBank)
-			SpriteBank->grab();
-	}
+        SpriteBank = Environment->addEmptySpriteBank(filename);
+        if (SpriteBank)
+            SpriteBank->grab();
+    }
 
-	if (Driver)
-		Driver->grab();
+    if (Driver)
+        Driver->grab();
 
-	setInvisibleCharacters ( L" " );
+    setInvisibleCharacters ( L" " );
     
     load( file_manager->createXMLReader(filename.c_str()) );
     assert(Areas.size() > 0);
@@ -78,33 +78,33 @@ void ScalableFont::setShadow(irr::video::SColor col)
 //! loads a font file from xml
 bool ScalableFont::load(io::IXMLReader* xml)
 {
-	if (!SpriteBank)
-		return false;
+    if (!SpriteBank)
+        return false;
 
-	while (xml->read())
-	{
-		if (io::EXN_ELEMENT == xml->getNodeType())
-		{
-			if (core::stringw(L"Texture") == xml->getNodeName())
-			{
-				// add a texture
+    while (xml->read())
+    {
+        if (io::EXN_ELEMENT == xml->getNodeType())
+        {
+            if (core::stringw(L"Texture") == xml->getNodeName())
+            {
+                // add a texture
                 core::stringc filename = xml->getAttributeValue(L"filename");
-				core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
-				u32 i = (u32)xml->getAttributeValueAsInt(L"index");
+                core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
+                u32 i = (u32)xml->getAttributeValueAsInt(L"index");
                 
                 float scale = xml->getAttributeValueAsFloat(L"scale");
                 if (scale < 0.01f) scale = 1.0f; // FIXME: how do you check if some property exists in a cleaner way?
                 //std::cout  << "scale = " << scale << std::endl;
                 
-				core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
+                core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
 
                 //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
 
                 
                 // make sure the sprite bank has enough textures in it
-				while (i+1 > SpriteBank->getTextureCount())
+                while (i+1 > SpriteBank->getTextureCount())
                 {
-					SpriteBank->addTexture(NULL);
+                    SpriteBank->addTexture(NULL);
                 }
 
                 TextureInfo info;
@@ -112,123 +112,123 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 info.m_has_alpha = (alpha == core::stringw("true"));
                 info.m_scale = scale;
                 
-				// disable mipmaps+filtering
-				//bool mipmap = Driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
-				//Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
+                // disable mipmaps+filtering
+                //bool mipmap = Driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
+                //Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
 
                 m_texture_files[i] = info;
                 
                 /*
-				// load texture
-				SpriteBank->setTexture(i, Driver->getTexture(fn));
+                // load texture
+                SpriteBank->setTexture(i, Driver->getTexture(fn));
 
-				// set previous mip-map+filter state
-				//Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, mipmap);
+                // set previous mip-map+filter state
+                //Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, mipmap);
 
-				// couldn't load texture, abort.
-				if (!SpriteBank->getTexture(i))
-				{
+                // couldn't load texture, abort.
+                if (!SpriteBank->getTexture(i))
+                {
                     std::cerr << "!!!!! Unable to load all textures in the font, aborting" << std::endl;
-					_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
-					return false;
-				}
-				else
-				{
-					// colorkey texture rather than alpha channel?
-					if (alpha == core::stringw("false"))
-						Driver->makeColorKeyTexture(SpriteBank->getTexture(i), core::position2di(0,0));
-				}
+                    _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+                    return false;
+                }
+                else
+                {
+                    // colorkey texture rather than alpha channel?
+                    if (alpha == core::stringw("false"))
+                        Driver->makeColorKeyTexture(SpriteBank->getTexture(i), core::position2di(0,0));
+                }
                  */
-			}
-			else if (core::stringw(L"c") == xml->getNodeName())
-			{
-				// adding a character to this font
-				SFontArea a;
-				SGUISpriteFrame f;
-				SGUISprite s;
-				core::rect<s32> rectangle;
+            }
+            else if (core::stringw(L"c") == xml->getNodeName())
+            {
+                // adding a character to this font
+                SFontArea a;
+                SGUISpriteFrame f;
+                SGUISprite s;
+                core::rect<s32> rectangle;
 
-				a.underhang		= xml->getAttributeValueAsInt(L"u");
-				a.overhang		= xml->getAttributeValueAsInt(L"o");
-				a.spriteno		= SpriteBank->getSprites().size();
-				s32 texno		= xml->getAttributeValueAsInt(L"i");
+                a.underhang     = xml->getAttributeValueAsInt(L"u");
+                a.overhang      = xml->getAttributeValueAsInt(L"o");
+                a.spriteno      = SpriteBank->getSprites().size();
+                s32 texno       = xml->getAttributeValueAsInt(L"i");
 
-				// parse rectangle
-				core::stringc rectstr	= xml->getAttributeValue(L"r");
-				wchar_t ch		= xml->getAttributeValue(L"c")[0];
+                // parse rectangle
+                core::stringc rectstr   = xml->getAttributeValue(L"r");
+                wchar_t ch      = xml->getAttributeValue(L"c")[0];
 
-				const c8 *c = rectstr.c_str();
-				s32 val;
-				val = 0;
-				while (*c >= '0' && *c <= '9')
-				{
-					val *= 10;
-					val += *c - '0';
-					c++;
-				}
-				rectangle.UpperLeftCorner.X = val;
-				while (*c == L' ' || *c == L',') c++;
+                const c8 *c = rectstr.c_str();
+                s32 val;
+                val = 0;
+                while (*c >= '0' && *c <= '9')
+                {
+                    val *= 10;
+                    val += *c - '0';
+                    c++;
+                }
+                rectangle.UpperLeftCorner.X = val;
+                while (*c == L' ' || *c == L',') c++;
 
-				val = 0;
-				while (*c >= '0' && *c <= '9')
-				{
-					val *= 10;
-					val += *c - '0';
-					c++;
-				}
-				rectangle.UpperLeftCorner.Y = val;
-				while (*c == L' ' || *c == L',') c++;
+                val = 0;
+                while (*c >= '0' && *c <= '9')
+                {
+                    val *= 10;
+                    val += *c - '0';
+                    c++;
+                }
+                rectangle.UpperLeftCorner.Y = val;
+                while (*c == L' ' || *c == L',') c++;
 
-				val = 0;
-				while (*c >= '0' && *c <= '9')
-				{
-					val *= 10;
-					val += *c - '0';
-					c++;
-				}
-				rectangle.LowerRightCorner.X = val;
-				while (*c == L' ' || *c == L',') c++;
+                val = 0;
+                while (*c >= '0' && *c <= '9')
+                {
+                    val *= 10;
+                    val += *c - '0';
+                    c++;
+                }
+                rectangle.LowerRightCorner.X = val;
+                while (*c == L' ' || *c == L',') c++;
 
-				val = 0;
-				while (*c >= '0' && *c <= '9')
-				{
-					val *= 10;
-					val += *c - '0';
-					c++;
-				}
-				rectangle.LowerRightCorner.Y = val;
+                val = 0;
+                while (*c >= '0' && *c <= '9')
+                {
+                    val *= 10;
+                    val += *c - '0';
+                    c++;
+                }
+                rectangle.LowerRightCorner.Y = val;
 
-				CharacterMap[ch] = Areas.size();
+                CharacterMap[ch] = Areas.size();
                 
                 //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
 
-				// make frame
-				f.rectNumber = SpriteBank->getPositions().size();
-				f.textureNumber = texno;
+                // make frame
+                f.rectNumber = SpriteBank->getPositions().size();
+                f.textureNumber = texno;
 
-				// add frame to sprite
-				s.Frames.push_back(f);
-				s.frameTime = 0;
+                // add frame to sprite
+                s.Frames.push_back(f);
+                s.frameTime = 0;
 
-				// add rectangle to sprite bank
-				SpriteBank->getPositions().push_back(rectangle);
-				a.width = rectangle.getWidth();
+                // add rectangle to sprite bank
+                SpriteBank->getPositions().push_back(rectangle);
+                a.width = rectangle.getWidth();
 
-				// add sprite to sprite bank
-				SpriteBank->getSprites().push_back(s);
+                // add sprite to sprite bank
+                SpriteBank->getSprites().push_back(s);
 
-				// add character to font
-				Areas.push_back(a);
-			}
-		}
-	}
+                // add character to font
+                Areas.push_back(a);
+            }
+        }
+    }
 
-	// set bad character
-	WrongCharacter = getAreaFromCharacter(L' ', NULL);
+    // set bad character
+    WrongCharacter = getAreaFromCharacter(L' ', NULL);
 
-	setMaxHeight();
+    setMaxHeight();
 
-	return true;
+    return true;
 }
 void ScalableFont::setScale(const float scale)
 {
@@ -238,17 +238,17 @@ void ScalableFont::setScale(const float scale)
 void ScalableFont::setMaxHeight()
 {
     // FIXME: should consider per-texture scaling
-	MaxHeight = 0;
-	s32 t;
+    MaxHeight = 0;
+    s32 t;
 
-	core::array< core::rect<s32> >& p = SpriteBank->getPositions();
+    core::array< core::rect<s32> >& p = SpriteBank->getPositions();
 
-	for (u32 i=0; i<p.size(); ++i)
-	{
-		t = p[i].getHeight();
-		if (t>MaxHeight)
-			MaxHeight = t;
-	}
+    for (u32 i=0; i<p.size(); ++i)
+    {
+        t = p[i].getHeight();
+        if (t>MaxHeight)
+            MaxHeight = t;
+    }
 
 
 }
@@ -258,9 +258,9 @@ void ScalableFont::setMaxHeight()
     /*
 bool ScalableFont::load(io::IReadFile* file)
 {
-	if (!Driver) return false;
+    if (!Driver) return false;
 
-	return loadTexture(Driver->createImageFromFile(file), file->getFileName());
+    return loadTexture(Driver->createImageFromFile(file), file->getFileName());
 }
 */
 
@@ -268,9 +268,9 @@ bool ScalableFont::load(io::IReadFile* file)
     /*
 bool ScalableFont::load(const io::path& filename)
 {
-	if (!Driver) return false;
+    if (!Driver) return false;
 
-	return loadTexture(Driver->createImageFromFile( filename ), filename);
+    return loadTexture(Driver->createImageFromFile( filename ), filename);
 }
 */
 
@@ -278,186 +278,186 @@ bool ScalableFont::load(const io::path& filename)
 #if 0
 bool ScalableFont::loadTexture(video::IImage* image, const io::path& name)
 {
-	if (!image) return false;
+    if (!image) return false;
 
-	s32 lowerRightPositions = 0;
+    s32 lowerRightPositions = 0;
 
-	video::IImage* tmpImage=image;
+    video::IImage* tmpImage=image;
     /*
-	bool deleteTmpImage=false;
-	switch(image->getColorFormat())
-	{
-	case video::ECF_R5G6B5:
-		tmpImage =  new video::CImage(video::ECF_A1R5G5B5,image);
-		deleteTmpImage=true;
-		break;
-	case video::ECF_A1R5G5B5:
-	case video::ECF_A8R8G8B8:
-		break;
-	case video::ECF_R8G8B8:
-		tmpImage = new video::CImage(video::ECF_A8R8G8B8,image);
-		deleteTmpImage=true;
-		break;
-	}*/
-	readPositions(tmpImage, lowerRightPositions);
+    bool deleteTmpImage=false;
+    switch(image->getColorFormat())
+    {
+    case video::ECF_R5G6B5:
+        tmpImage =  new video::CImage(video::ECF_A1R5G5B5,image);
+        deleteTmpImage=true;
+        break;
+    case video::ECF_A1R5G5B5:
+    case video::ECF_A8R8G8B8:
+        break;
+    case video::ECF_R8G8B8:
+        tmpImage = new video::CImage(video::ECF_A8R8G8B8,image);
+        deleteTmpImage=true;
+        break;
+    }*/
+    readPositions(tmpImage, lowerRightPositions);
 
-	WrongCharacter = getAreaFromCharacter(L' ', NULL);
+    WrongCharacter = getAreaFromCharacter(L' ', NULL);
 
-	// output warnings
-	if (!lowerRightPositions || !SpriteBank->getSprites().size())
-		std::cerr << "Either no upper or lower corner pixels in the font file. If this font was made using the new font tool, please load the XML file instead. If not, the font may be corrupted.\n";
-	else
-	if (lowerRightPositions != (s32)SpriteBank->getPositions().size())
-		std::cerr << "The amount of upper corner pixels and the lower corner pixels is not equal, font file may be corrupted.\n";
+    // output warnings
+    if (!lowerRightPositions || !SpriteBank->getSprites().size())
+        std::cerr << "Either no upper or lower corner pixels in the font file. If this font was made using the new font tool, please load the XML file instead. If not, the font may be corrupted.\n";
+    else
+    if (lowerRightPositions != (s32)SpriteBank->getPositions().size())
+        std::cerr << "The amount of upper corner pixels and the lower corner pixels is not equal, font file may be corrupted.\n";
 
-	bool ret = ( !SpriteBank->getSprites().empty() && lowerRightPositions );
+    bool ret = ( !SpriteBank->getSprites().empty() && lowerRightPositions );
 
-	if ( ret )
-	{
-		bool flag[2];
-		flag[0] = Driver->getTextureCreationFlag ( video::ETCF_ALLOW_NON_POWER_2 );
-		flag[1] = Driver->getTextureCreationFlag ( video::ETCF_CREATE_MIP_MAPS );
+    if ( ret )
+    {
+        bool flag[2];
+        flag[0] = Driver->getTextureCreationFlag ( video::ETCF_ALLOW_NON_POWER_2 );
+        flag[1] = Driver->getTextureCreationFlag ( video::ETCF_CREATE_MIP_MAPS );
 
-		Driver->setTextureCreationFlag(video::ETCF_ALLOW_NON_POWER_2, true);
-		Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true );
+        Driver->setTextureCreationFlag(video::ETCF_ALLOW_NON_POWER_2, true);
+        Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true );
 
-		SpriteBank->addTexture(Driver->addTexture(name, tmpImage));
+        SpriteBank->addTexture(Driver->addTexture(name, tmpImage));
 
-		Driver->setTextureCreationFlag(video::ETCF_ALLOW_NON_POWER_2, flag[0] );
-		Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, flag[1] );
-	}
-	//if (deleteTmpImage)
-	//	tmpImage->drop();
-	image->drop();
+        Driver->setTextureCreationFlag(video::ETCF_ALLOW_NON_POWER_2, flag[0] );
+        Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, flag[1] );
+    }
+    //if (deleteTmpImage)
+    //  tmpImage->drop();
+    image->drop();
 
-	setMaxHeight();
+    setMaxHeight();
 
-	return ret;
+    return ret;
 }
 #endif
 
 /*
 void ScalableFont::readPositions(video::IImage* image, s32& spriteID)
 {
-	const core::dimension2d<u32> size = image->getDimension();
+    const core::dimension2d<u32> size = image->getDimension();
 
-	video::SColor colorTopLeft = image->getPixel(0,0);
-	colorTopLeft.setAlpha(255);
-	image->setPixel(0,0,colorTopLeft);
-	video::SColor colorLowerRight = image->getPixel(1,0);
-	video::SColor colorBackGround = image->getPixel(2,0);
-	video::SColor colorBackGroundTransparent = 0;
+    video::SColor colorTopLeft = image->getPixel(0,0);
+    colorTopLeft.setAlpha(255);
+    image->setPixel(0,0,colorTopLeft);
+    video::SColor colorLowerRight = image->getPixel(1,0);
+    video::SColor colorBackGround = image->getPixel(2,0);
+    video::SColor colorBackGroundTransparent = 0;
 
-	image->setPixel(1,0,colorBackGround);
+    image->setPixel(1,0,colorBackGround);
 
-	// start parsing
+    // start parsing
 
-	core::position2d<s32> pos(0,0);
-	for (pos.Y=0; pos.Y<(s32)size.Height; ++pos.Y)
-	{
-		for (pos.X=0; pos.X<(s32)size.Width; ++pos.X)
-		{
-			const video::SColor c = image->getPixel(pos.X, pos.Y);
-			if (c == colorTopLeft)
-			{
-				image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
-				SpriteBank->getPositions().push_back(core::rect<s32>(pos, pos));
-			}
-			else
-			if (c == colorLowerRight)
-			{
-				// too many lower right points
-				if (SpriteBank->getPositions().size()<=(u32)spriteID)
-				{
-					spriteID = 0;
-					return;
-				}
+    core::position2d<s32> pos(0,0);
+    for (pos.Y=0; pos.Y<(s32)size.Height; ++pos.Y)
+    {
+        for (pos.X=0; pos.X<(s32)size.Width; ++pos.X)
+        {
+            const video::SColor c = image->getPixel(pos.X, pos.Y);
+            if (c == colorTopLeft)
+            {
+                image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
+                SpriteBank->getPositions().push_back(core::rect<s32>(pos, pos));
+            }
+            else
+            if (c == colorLowerRight)
+            {
+                // too many lower right points
+                if (SpriteBank->getPositions().size()<=(u32)spriteID)
+                {
+                    spriteID = 0;
+                    return;
+                }
 
-				image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
-				SpriteBank->getPositions()[spriteID].LowerRightCorner = pos;
-				// add frame to sprite bank
-				SGUISpriteFrame f;
-				f.rectNumber = spriteID;
-				f.textureNumber = 0;
-				SGUISprite s;
-				s.Frames.push_back(f);
-				s.frameTime = 0;
-				SpriteBank->getSprites().push_back(s);
-				// add character to font
-				SFontArea a;
-				a.overhang = 0;
-				a.underhang = 0;
-				a.spriteno = spriteID;
-				a.width = SpriteBank->getPositions()[spriteID].getWidth();
-				Areas.push_back(a);
-				// map letter to character
-				wchar_t ch = (wchar_t)(spriteID + 32);
-				CharacterMap[ch] = spriteID;
+                image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
+                SpriteBank->getPositions()[spriteID].LowerRightCorner = pos;
+                // add frame to sprite bank
+                SGUISpriteFrame f;
+                f.rectNumber = spriteID;
+                f.textureNumber = 0;
+                SGUISprite s;
+                s.Frames.push_back(f);
+                s.frameTime = 0;
+                SpriteBank->getSprites().push_back(s);
+                // add character to font
+                SFontArea a;
+                a.overhang = 0;
+                a.underhang = 0;
+                a.spriteno = spriteID;
+                a.width = SpriteBank->getPositions()[spriteID].getWidth();
+                Areas.push_back(a);
+                // map letter to character
+                wchar_t ch = (wchar_t)(spriteID + 32);
+                CharacterMap[ch] = spriteID;
 
-				++spriteID;
-			}
-			else
-			if (c == colorBackGround)
-				image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
-		}
-	}
+                ++spriteID;
+            }
+            else
+            if (c == colorBackGround)
+                image->setPixel(pos.X, pos.Y, colorBackGroundTransparent);
+        }
+    }
 }
 */
 
 //! set an Pixel Offset on Drawing ( scale position on width )
 void ScalableFont::setKerningWidth(s32 kerning)
 {
-	GlobalKerningWidth = kerning;
+    GlobalKerningWidth = kerning;
 }
 
 
 //! set an Pixel Offset on Drawing ( scale position on width )
 s32 ScalableFont::getKerningWidth(const wchar_t* thisLetter, const wchar_t* previousLetter) const
 {
-	s32 ret = GlobalKerningWidth;
+    s32 ret = GlobalKerningWidth;
 
-	if (thisLetter)
-	{
-		ret += Areas[getAreaFromCharacter(*thisLetter, NULL)].overhang;
+    if (thisLetter)
+    {
+        ret += Areas[getAreaFromCharacter(*thisLetter, NULL)].overhang;
 
-		if (previousLetter)
-		{
-			ret += Areas[getAreaFromCharacter(*previousLetter, NULL)].underhang;
-		}
-	}
+        if (previousLetter)
+        {
+            ret += Areas[getAreaFromCharacter(*previousLetter, NULL)].underhang;
+        }
+    }
 
-	return ret;
+    return ret;
 }
 
 
 //! set an Pixel Offset on Drawing ( scale position on height )
 void ScalableFont::setKerningHeight(s32 kerning)
 {
-	GlobalKerningHeight = kerning;
+    GlobalKerningHeight = kerning;
 }
 
 
 //! set an Pixel Offset on Drawing ( scale position on height )
 s32 ScalableFont::getKerningHeight () const
 {
-	return GlobalKerningHeight;
+    return GlobalKerningHeight;
 }
 
 
 //! returns the sprite number from a given character
 u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
 {
-	return Areas[getAreaFromCharacter(*c, NULL)].spriteno;
+    return Areas[getAreaFromCharacter(*c, NULL)].spriteno;
 }
 
 
 s32 ScalableFont::getAreaFromCharacter(const wchar_t c, bool* fallback_font) const
 {
-	std::map<wchar_t, s32>::const_iterator n = CharacterMap.find(c);
-	if (n != CharacterMap.end())
+    std::map<wchar_t, s32>::const_iterator n = CharacterMap.find(c);
+    if (n != CharacterMap.end())
     {
         if (fallback_font != NULL) *fallback_font = false;
-		return (*n).second;
+        return (*n).second;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
@@ -465,17 +465,17 @@ s32 ScalableFont::getAreaFromCharacter(const wchar_t c, bool* fallback_font) con
         *fallback_font = true;
         return m_fallback_font->getAreaFromCharacter(c, NULL);
     }
-	else
+    else
     {
         //std::cout << "The font does not have this character : <" << (int)c << ">" << std::endl;
         if (fallback_font != NULL) *fallback_font = false;
-		return WrongCharacter;
+        return WrongCharacter;
     }
 }
 
 void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 {
-	Invisible = s;
+    Invisible = s;
 }
 
 
@@ -484,50 +484,50 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
     assert(Areas.size() > 0);
     
-	core::dimension2d<u32> dim(0, 0);
-	core::dimension2d<u32> thisLine(0, (int)(MaxHeight*m_scale));
+    core::dimension2d<u32> dim(0, 0);
+    core::dimension2d<u32> thisLine(0, (int)(MaxHeight*m_scale));
 
-	for (const wchar_t* p = text; *p; ++p)
-	{
-		bool lineBreak=false;
-		if (*p == L'\r') // Windows breaks
-		{
-			lineBreak = true;
-			if (p[1] == L'\n') // Windows breaks
-				++p;
-		}
-		else if (*p == L'\n') // Unix breaks
-		{
-			lineBreak = true;
-		}
-		if (lineBreak)
-		{
-			dim.Height += thisLine.Height;
-			if (dim.Width < thisLine.Width)
-				dim.Width = thisLine.Width;
-			thisLine.Width = 0;
-			continue;
-		}
+    for (const wchar_t* p = text; *p; ++p)
+    {
+        bool lineBreak=false;
+        if (*p == L'\r') // Windows breaks
+        {
+            lineBreak = true;
+            if (p[1] == L'\n') // Windows breaks
+                ++p;
+        }
+        else if (*p == L'\n') // Unix breaks
+        {
+            lineBreak = true;
+        }
+        if (lineBreak)
+        {
+            dim.Height += thisLine.Height;
+            if (dim.Width < thisLine.Width)
+                dim.Width = thisLine.Width;
+            thisLine.Width = 0;
+            continue;
+        }
 
         bool fallback = false;
         const int areaID = getAreaFromCharacter(*p, &fallback);
         assert(areaID < (int)Areas.size());
-		const SFontArea &area = (fallback ? m_fallback_font->Areas[areaID] : Areas[areaID]);
+        const SFontArea &area = (fallback ? m_fallback_font->Areas[areaID] : Areas[areaID]);
 
         
         //const TextureInfo& info = (*(m_texture_files.find(area.spriteno))).second;
         //const float char_scale = info.m_scale;
         
-		thisLine.Width += area.underhang;
+        thisLine.Width += area.underhang;
         
         thisLine.Width += getCharWidth(area, fallback);
         
         //if (fallback) thisLine.Width += (area.width + area.overhang)*m_fallback_font_scale*char_scale*m_scale + m_fallback_kerning_width;
-		//else          thisLine.Width += (area.width + area.overhang)*m_scale*char_scale + GlobalKerningWidth;
-	}
+        //else          thisLine.Width += (area.width + area.overhang)*m_scale*char_scale + GlobalKerningWidth;
+    }
 
-	dim.Height += thisLine.Height;
-	if (dim.Width < thisLine.Width) dim.Width = thisLine.Width;
+    dim.Height += thisLine.Height;
+    if (dim.Width < thisLine.Width) dim.Width = thisLine.Width;
 
    // std::cout << "ScalableFont::getDimension returns : " << dim.Width << ", " << dim.Height << " --> ";
 
@@ -536,14 +536,14 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
     //std::cout << dim.Width << ", " << dim.Height << std::endl;
     
-	return dim;
+    return dim;
 }
 
 //! draws some text and clips it to the specified rectangle if wanted
 void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& position,
-					video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip)
+                    video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip)
 {
-	if (!Driver) return;
+    if (!Driver) return;
         
     if (m_shadow)
     {
@@ -560,41 +560,41 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
     
     //color = video::SColor(255,255,255,255);
 
-	core::dimension2d<s32> textDimension;
-	core::position2d<s32> offset = position.UpperLeftCorner;
+    core::dimension2d<s32> textDimension;
+    core::position2d<s32> offset = position.UpperLeftCorner;
 
-	if (m_rtl || hcenter || vcenter || clip) textDimension = getDimension(text.c_str());
+    if (m_rtl || hcenter || vcenter || clip) textDimension = getDimension(text.c_str());
 
-	if (hcenter)
+    if (hcenter)
     {
-		offset.X += (position.getWidth() - textDimension.Width) / 2;
+        offset.X += (position.getWidth() - textDimension.Width) / 2;
     }
     else if (m_rtl)
     {
         offset.X += (position.getWidth() - textDimension.Width);
     }
 
-	if (vcenter)
+    if (vcenter)
     {
-		offset.Y += (position.getHeight() - textDimension.Height) / 2;
+        offset.Y += (position.getHeight() - textDimension.Height) / 2;
     }
 
-	if (clip)
-	{
-		core::rect<s32> clippedRect(offset, textDimension);
-		clippedRect.clipAgainst(*clip);
-		if (!clippedRect.isValid()) return;
-	}
+    if (clip)
+    {
+        core::rect<s32> clippedRect(offset, textDimension);
+        clippedRect.clipAgainst(*clip);
+        if (!clippedRect.isValid()) return;
+    }
     
     // ---- collect character locations
     const unsigned int text_size = text.size();
-	core::array<s32> indices(text_size);
-	core::array<core::position2di> offsets(text_size);
+    core::array<s32> indices(text_size);
+    core::array<core::position2di> offsets(text_size);
     std::vector<bool> fallback(text_size);
     
-	for (u32 i = 0; i<text_size; i++)
-	{
-		wchar_t c = text[i];
+    for (u32 i = 0; i<text_size; i++)
+    {
+        wchar_t c = text[i];
 
         //hack: one tab character is supported, it moves the cursor to the middle of the area
         if (c == L'\t')
@@ -603,45 +603,45 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
             continue;
         }
         
-		bool lineBreak=false;
-		if (c == L'\r') // Windows breaks
-		{
-			lineBreak = true;
-			if (text[i + 1] == L'\n') c = text[++i];
-		}
-		else if ( c == L'\n') // Unix breaks
-		{
-			lineBreak = true;
-		}
+        bool lineBreak=false;
+        if (c == L'\r') // Windows breaks
+        {
+            lineBreak = true;
+            if (text[i + 1] == L'\n') c = text[++i];
+        }
+        else if ( c == L'\n') // Unix breaks
+        {
+            lineBreak = true;
+        }
 
-		if (lineBreak)
-		{
-			offset.Y += MaxHeight;
-			offset.X = position.UpperLeftCorner.X;
+        if (lineBreak)
+        {
+            offset.Y += MaxHeight;
+            offset.X = position.UpperLeftCorner.X;
 
-			if ( hcenter )
-			{
-				core::dimension2d<u32> lineDim = getDimension(text.c_str());
-				offset.X += (position.getWidth() - lineDim.Width) >> 1;
-			}
-			continue;
-		}
+            if ( hcenter )
+            {
+                core::dimension2d<u32> lineDim = getDimension(text.c_str());
+                offset.X += (position.getWidth() - lineDim.Width) >> 1;
+            }
+            continue;
+        }
 
 
         bool fallback_font = false;
         const int areaID = getAreaFromCharacter(c, &fallback_font);
         //std::cout << "Char " << c << " has area " << areaID << std::endl;
-		SFontArea& area = (fallback_font ? m_fallback_font->Areas[areaID] : Areas[areaID]);
+        SFontArea& area = (fallback_font ? m_fallback_font->Areas[areaID] : Areas[areaID]);
         
         //float char_scale = m_texture_files[area.spriteno].m_scale;
         
-		offset.X += area.underhang;
-		if ( Invisible.findFirst ( c ) < 0 )
-		{
-			indices.push_back(area.spriteno);
-			offsets.push_back(offset);
+        offset.X += area.underhang;
+        if ( Invisible.findFirst ( c ) < 0 )
+        {
+            indices.push_back(area.spriteno);
+            offsets.push_back(offset);
             fallback[i] = fallback_font;
-		}
+        }
         else
         {
             // invisible character. add something to the array anyway so that indices from
@@ -667,7 +667,7 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
         offset.X += getCharWidth(area, fallback[i]);
     }
 
-	//SpriteBank->draw2DSpriteBatch(indices, offsets, clip, color);
+    //SpriteBank->draw2DSpriteBatch(indices, offsets, clip, color);
     
     // ---- do the actual rendering
     const int indiceAmount = indices.size();
@@ -871,28 +871,28 @@ int ScalableFont::getCharWidth(const SFontArea& area, const bool fallback) const
 //! Calculates the index of the character in the text which is on a specific position.
 s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
 {
-	s32 x = 0;
-	s32 idx = 0;
+    s32 x = 0;
+    s32 idx = 0;
 
-	while (text[idx])
-	{
-		const SFontArea& a = Areas[getAreaFromCharacter(text[idx], NULL)];
+    while (text[idx])
+    {
+        const SFontArea& a = Areas[getAreaFromCharacter(text[idx], NULL)];
 
-		x += a.width + a.overhang + a.underhang + GlobalKerningWidth;
+        x += a.width + a.overhang + a.underhang + GlobalKerningWidth;
 
-		if (x >= pixel_x)
-			return idx;
+        if (x >= pixel_x)
+            return idx;
 
-		++idx;
-	}
+        ++idx;
+    }
 
-	return -1;
+    return -1;
 }
 
 
 IGUISpriteBank* ScalableFont::getSpriteBank() const
 {
-	return SpriteBank;
+    return SpriteBank;
 }
 
 } // end namespace gui
