@@ -79,6 +79,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
 {
     m_physics           = NULL;
     m_race_gui          = NULL;
+    m_saved_race_gui    = NULL;
     m_use_highscores    = true;
     m_track             = NULL;
     m_clear_back_buffer = false;
@@ -296,12 +297,14 @@ void World::terminateRace()
     unlock_manager->raceFinished();
     
     if (m_race_gui) m_race_gui->clearAllMessages();
-    //FIXME: we can't delete the race gui here, since it is needed in case of 
-    // a restart (the constructor creates some textures which assume that no
-    // scene nodes exist. In case of a restart there are scene nodes, so we
-    // can't create the race gui again :(
-    delete m_race_gui;
-    m_race_gui = new RaceResultGUI();
+    // we can't delete the race gui here, since it is needed in case of 
+    // a restart: the constructor of it creates some textures which assume 
+    // that no scene nodes exist. In case of a restart there are scene nodes, 
+    // so we can't create the race gui again, so we keep it around 
+    // and save the pointer.
+    assert(m_saved_race_gui==NULL);
+    m_saved_race_gui = m_race_gui;
+    m_race_gui       = new RaceResultGUI();
     
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -638,6 +641,15 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
+    // If m_saved_race_gui is set, it means that the restart was done
+    // when the race result gui was being shown. In this case delete
+    // the race result gui and restore the race gui.
+    if(m_saved_race_gui)
+    {
+        delete m_race_gui;
+        m_race_gui       = m_saved_race_gui;
+        m_saved_race_gui = NULL;
+    }
     WorldStatus::reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
