@@ -34,6 +34,9 @@ class ScalableFont : public IGUIFontBitmap
 {
     float m_scale;
     bool m_shadow;
+    /** True if digits should be mono spaced. */
+
+    bool m_mono_space_digits;
     irr::video::SColor m_shadow_color;
     
     struct TextureInfo
@@ -84,12 +87,6 @@ public:
     //! destructor
     virtual ~ScalableFont();
 
-    //! loads a font from a texture file
-    //bool load(const io::path& filename);
-
-    //! loads a font from a texture file
-    //bool load(io::IReadFile* file);
-
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
 
@@ -115,6 +112,9 @@ public:
     virtual s32 getKerningWidth(const wchar_t* thisLetter=0, const wchar_t* previousLetter=0) const;
     virtual s32 getKerningHeight() const;
 
+    /** Sets if digits are to be mono-spaced. */
+    void    setMonospaceDigits(bool mono) {m_mono_space_digits = mono; }
+    bool    getMonospaceDigits() const { return m_mono_space_digits;   }
     void setShadow(irr::video::SColor col);
 
     //! gets the sprite bank
@@ -140,16 +140,13 @@ private:
     };
     
     int getCharWidth(const SFontArea& area, const bool fallback) const;
-
-    //! load & prepare font from ITexture
-    //bool loadTexture(video::IImage * image, const io::path& name);
-
-    //void readPositions(video::IImage* texture, s32& lowerRightPositions);
-
-    s32 getAreaFromCharacter (const wchar_t c, bool* fallback_font) const;
+    s32 getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) const;
+    const SFontArea &getAreaFromCharacter(const wchar_t c, bool* fallback_font) const;
     void setMaxHeight();
 
     core::array<SFontArea>      Areas;
+    /** The maximum values of all digits, used in monospace_digits. */
+    mutable SFontArea           m_max_digit_area;
     std::map<wchar_t, s32>      CharacterMap;
     video::IVideoDriver*        Driver;
     IGUISpriteBank*         SpriteBank;
