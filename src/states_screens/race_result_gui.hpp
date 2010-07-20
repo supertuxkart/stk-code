@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "states_screens/race_gui_base.hpp"
+#include "guiengine/CGUIFont.h"
 
 /**
   * \brief Displays the results (while the end animation is shown).
@@ -32,14 +33,64 @@
 class RaceResultGUI : public RaceGUIBase
 {
 private:
+    /** Timer variable for animations. */
     float                      m_timer;
+
+    /** Finite state machine for the animations:
+        BEGIN_FIRST_TABLE: The rows scroll into place.
+        INCREASE_POINTS:   The overall points are added up
+        RESORT_TABLE:      Resort the table so that it is now sorted by 
+                           GP points.
+        WAIT_TILL_END      Some delay to wait for end, after a period it
+                           wii automatically end. */
+    enum                       {RR_BEGIN_FIRST_TABLE,
+                                RR_INCREASE_POINTS,
+                                RR_RESORT_TABLE,
+                                RR_WAIT_TILL_END}
+                               m_animation_state;
+
+    /** Start time for each line of the animation. */
     std::vector<float>         m_start_at;
+
+    /** Currenct X position. */
     std::vector<float>         m_x_pos;
+
+    /** Currenct Y position. */
     std::vector<int>           m_y_pos;
-    std::vector<core::stringw> m_entry;
+
+    /** The order in which to display the karts. */
+    std::vector<int>           m_order;
+
+    /** The names of all karts in the right order. */
+    std::vector<core::stringw> m_kart_names;
+
+    /** Points earned in this race. */
+    std::vector<int>           m_new_points;
+
+    /** When updating the number of points in the display, this is the
+        currently displayed number of points, so
+        m_old_overall_points <= m_current_displayed_points<=
+                                         m_old_overall_points+m_new_points. */
+    std::vector<int>           m_current_displayed_points;
+
+    /** Overall points before this race. */
+    std::vector<int>           m_old_overall_points;
+
+    /** The kart icons. */
+    std::vector<video::ITexture*> m_kart_icons;
+
+    /** The times of all karts in the right order. */
+    std::vector<core::stringw> m_time_strings;
 
     /** Time to wait till the next row starts to be animated. */
     float                      m_time_between_rows;
+
+    /** The time a single line scrolls into place. */
+    float                      m_time_single_scroll;
+
+    /** The overall time the first phase (scrolling) is displayed.
+        This includes a small waiting time at the end. */
+    float                      m_time_overall_scroll;
 
     /** Distance between each row of the race results */
     unsigned int               m_distance_between_rows;
@@ -50,26 +101,31 @@ private:
     /** The width of the time column. */
     unsigned int               m_time_width;
 
+    /** Width of the kart name column. */
+    unsigned int               m_max_kart_name_width;
+
     /** The width of the point column. */
     unsigned int               m_column_width;
 
-    /** The order in which to display the karts. */
-    std::vector<int>           m_order;
-
     /** The width of the largest digit (not all digits 
      *  have the same font size) */
-    unsigned int m_max_digit_width ;
+    unsigned int               m_max_digit_width ;
+
+    /** The width of a ":" (used in time display mm:ss:hh). */
+    unsigned int               m_colon_width;
 
     /** Size of space between columns. */
     unsigned int               m_column_space_size;
     
     /** The font to use. */
-    gui::IGUIFont* m_font;
+    gui::ScalableFont* m_font;
 
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
     void determineLayout();
-
+    void drawNumber(const core::stringw &number_string, 
+                    unsigned int *x, unsigned int y,
+                    const video::SColor &color);
 public:
 
                  RaceResultGUI();
