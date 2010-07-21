@@ -29,7 +29,7 @@
  */
 RaceResultGUI::RaceResultGUI()
 {
-#define USE_NEW_RACE_RESULT
+#undef USE_NEW_RACE_RESULT
 
 #ifndef USE_NEW_RACE_RESULT
     // FIXME: for now disable the new race result display
