@@ -29,6 +29,13 @@
 
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
+namespace irr
+{
+    namespace gui
+    {
+        class ScalableFont;
+    }
+}
 
 /**
  * \ingroup guiengine
@@ -73,9 +80,9 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
-        extern irr::gui::IGUIFont* g_small_font;
-        extern irr::gui::IGUIFont* g_font;
-        extern irr::gui::IGUIFont* g_title_font;
+        extern irr::gui::ScalableFont* g_small_font;
+        extern irr::gui::ScalableFont* g_font;
+        extern irr::gui::ScalableFont* g_title_font;
 
         extern irr::IrrlichtDevice* g_device;
         extern irr::video::IVideoDriver* g_driver;
@@ -120,17 +127,17 @@ namespace GUIEngine
     /**
       * \return the smaller font (useful for less important messages)
       */
-    inline irr::gui::IGUIFont*        getSmallFont()     { return Private::g_small_font;     }
+    inline irr::gui::ScalableFont*    getSmallFont()     { return Private::g_small_font;     }
     
     /**
       * \return the "normal" font (useful for text)
       */
-    inline irr::gui::IGUIFont*        getFont()          { return Private::g_font;           }
+    inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
     
     /**
       * \return the "title" font (it's bigger and orange, useful for headers/captions)
       */
-    inline irr::gui::IGUIFont*        getTitleFont()     { return Private::g_title_font;     }
+    inline irr::gui::ScalableFont*    getTitleFont()     { return Private::g_title_font;     }
     
     /**
       * \return the currently shown screen, or NULL if none

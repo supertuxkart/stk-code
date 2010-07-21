@@ -15,11 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/player_info_dialog.hpp"
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/dialogs/player_info_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -47,7 +48,7 @@ void PlayerInfoDialog::showRegularDialog()
     const int y3 = m_area.getHeight()*3/6;
     const int y4 = m_area.getHeight()*5/6;
     
-    IGUIFont* font = GUIEngine::getFont();
+    ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     

@@ -24,6 +24,7 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"

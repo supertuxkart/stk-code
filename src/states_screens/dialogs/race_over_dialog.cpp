@@ -15,8 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/race_over_dialog.hpp"
+
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
@@ -26,7 +29,6 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"

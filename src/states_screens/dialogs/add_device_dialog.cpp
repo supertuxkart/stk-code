@@ -15,14 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/add_device_dialog.hpp"
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "states_screens/dialogs/add_device_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
@@ -37,7 +38,7 @@ using namespace irr::core;
 
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
 {    
-    IGUIFont* font = GUIEngine::getFont();
+    ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     

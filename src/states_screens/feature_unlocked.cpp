@@ -1,8 +1,11 @@
 
 #include "states_screens/feature_unlocked.hpp"
 
+#include <SColor.h>
+
 #include "challenges/challenge.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart.hpp"
@@ -14,8 +17,6 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
-
-#include <SColor.h>
 
 using namespace irr::core;
 using namespace irr::gui;

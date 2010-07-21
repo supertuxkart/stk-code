@@ -20,6 +20,7 @@
 #include "states_screens/race_result_gui.hpp"
 
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "utils/string_utils.hpp"
@@ -28,7 +29,7 @@
  */
 RaceResultGUI::RaceResultGUI()
 {
-#undef USE_NEW_RACE_RESULT
+#define USE_NEW_RACE_RESULT
 
 #ifndef USE_NEW_RACE_RESULT
     // FIXME: for now disable the new race result display
@@ -67,7 +68,7 @@ void RaceResultGUI::nextPhase()
  */
 void RaceResultGUI::determineLayout()
 {
-    m_font       = dynamic_cast<gui::ScalableFont*>(GUIEngine::getFont());
+    m_font       = GUIEngine::getFont();
     assert(m_font);
     World *world = World::getWorld();
     world->raceResultOrder(&m_order);

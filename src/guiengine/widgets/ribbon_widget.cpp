@@ -17,16 +17,16 @@
 
 #include "guiengine/widgets/ribbon_widget.hpp"
 
+#include <cmath>
+
 #include "graphics/irr_driver.hpp"
-#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
-
-#include <cmath>
-
 
 using namespace GUIEngine;
 using namespace irr::core;

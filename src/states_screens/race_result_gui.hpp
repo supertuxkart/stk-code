@@ -20,11 +20,18 @@
 #ifndef HEADER_RACE_RESULT_GUI_HPP
 #define HEADER_RACE_RESULT_GUI_HPP
 
+#include "states_screens/race_gui_base.hpp"
+
 #include <assert.h>
 #include <vector>
 
-#include "states_screens/race_gui_base.hpp"
-#include "guiengine/CGUIFont.h"
+namespace irr
+{
+    namespace gui
+    {
+        class ScalableFont;
+    }
+}
 
 /**
   * \brief Displays the results (while the end animation is shown).

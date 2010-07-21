@@ -17,7 +17,10 @@
 
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 
+#include <string>
+
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -31,7 +34,6 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <string>
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -43,7 +45,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
 {
     World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
     
-    IGUIFont* font = GUIEngine::getTitleFont();
+    ScalableFont* font = GUIEngine::getTitleFont();
     const int text_height = GUIEngine::getFontHeight();
     
     IGUIFont* titlefont = GUIEngine::getTitleFont();

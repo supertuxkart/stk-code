@@ -2,14 +2,15 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#include "CGUIFont.h"
+#include "guiengine/scalable_font.hpp"
+
+#include <iostream>
 
 #include "IGUIEnvironment.h"
 #include "IXMLReader.h"
 #include "IReadFile.h"
 #include "IVideoDriver.h"
 #include "IGUISpriteBank.h"
-#include <iostream>
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
@@ -340,19 +341,11 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
     for (const wchar_t* p = text; *p; ++p)
     {
-        bool lineBreak=false;
-        if (*p == L'\r') // Windows breaks
+        if (*p == L'\r'  ||      // Windows breaks
+            *p == L'\n'      )   // Unix breaks
         {
-            lineBreak = true;
-            if (p[1] == L'\n') // Windows breaks
+            if (*p==L'\r' && p[1] == L'\n') // Windows breaks
                 ++p;
-        }
-        else if (*p == L'\n') // Unix breaks
-        {
-            lineBreak = true;
-        }
-        if (lineBreak)
-        {
             dim.Height += thisLine.Height;
             if (dim.Width < thisLine.Width)
                 dim.Width = thisLine.Width;
@@ -437,7 +430,6 @@ void ScalableFont::draw(const core::stringw& text,
             continue;
         }
         
-        bool lineBreak=false;
         if (c == L'\r' ||          // Windows breaks
             c == L'\n'    )        // Unix breaks
         {

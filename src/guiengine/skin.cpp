@@ -15,19 +15,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/skin.hpp"
+
+#include <cassert>
+#include <stdexcept>
+#include <iostream>
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/skin.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include <cassert>
-#include <stdexcept>
-#include <iostream>
 
 using namespace GUIEngine;
 using namespace irr;

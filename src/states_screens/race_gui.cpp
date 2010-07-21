@@ -30,6 +30,7 @@ using namespace irr;
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
@@ -316,7 +317,7 @@ void RaceGUI::drawGlobalTimer()
         pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
     }
     
-    gui::IGUIFont* font = GUIEngine::getFont();
+    gui::ScalableFont* font = GUIEngine::getFont();
     font->draw(sw.c_str(), pos, time_color);
 }   // DRAWGLOBALTimer
 
@@ -385,8 +386,8 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         ICON_PLAYER_WIDTH = 35;
     }
     
-    gui::IGUIFont* font = GUIEngine::getFont();
-    World *world        = World::getWorld();
+    gui::ScalableFont* font = GUIEngine::getFont();
+    World *world            = World::getWorld();
     const unsigned int kart_amount = world->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -646,9 +647,8 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
         pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.05f*UserConfigParams::m_width);
     }
     
-    gui::IGUIFont* font    = GUIEngine::getFont();
-    
-    int font_height        = (int)(font->getDimension(L"X").Height);
+    gui::ScalableFont* font = GUIEngine::getFont(); 
+    int font_height         = (int)(font->getDimension(L"X").Height);
     
     if (kart->hasFinishedRace())
     {

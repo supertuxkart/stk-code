@@ -15,10 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
 #include "states_screens/credits.hpp"
-#include "states_screens/state_manager.hpp"
 
 #include <fstream>
 
@@ -28,11 +25,13 @@ using irr::core::stringc;
 
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
 
 DEFINE_SCREEN_SINGLETON( CreditsScreen );
-
-
 
 using namespace GUIEngine;
 const float TIME_SECTION_FADE = 0.8f;

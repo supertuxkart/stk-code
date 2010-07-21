@@ -297,10 +297,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\guiengine\CGUIFont.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\guiengine\CGUISpriteBank.cpp"
 					>
 				</File>
@@ -332,6 +328,10 @@
 				</File>
 				<File
 					RelativePath="..\..\guiengine\modaldialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\guiengine\scalable_font.cpp"
 					>
 				</File>
 				<File
@@ -1093,10 +1093,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\guiengine\CGUIFont.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\guiengine\engine.hpp"
 					>
 				</File>
@@ -1106,6 +1102,10 @@
 				</File>
 				<File
 					RelativePath="..\..\guiengine\modaldialog.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\guiengine\scalable_font.hpp"
 					>
 				</File>
 				<File

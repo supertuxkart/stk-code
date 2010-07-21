@@ -1,11 +1,15 @@
 
 #include "states_screens/grand_prix_win.hpp"
 
+#include <SColor.h>
+#include <iostream>
+
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -13,9 +17,6 @@
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
-
-#include <SColor.h>
-#include <iostream>
 
 using namespace irr::core;
 using namespace irr::gui;

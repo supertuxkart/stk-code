@@ -409,9 +409,9 @@
 
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
-#include "guiengine/CGUIFont.h"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
@@ -427,9 +427,9 @@ namespace GUIEngine
     {
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
-        IGUIFont* g_font;
-        IGUIFont* g_title_font;
-        IGUIFont* g_small_font;
+        ScalableFont* g_font;
+        ScalableFont* g_title_font;
+        ScalableFont* g_small_font;
         
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;

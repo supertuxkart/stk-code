@@ -77,8 +77,6 @@ supertuxkart_SOURCES = \
  graphics/stars.hpp \
  graphics/water_splash.hpp \
  graphics/water_splash.cpp \
- guiengine/CGUIFont.cpp \
- guiengine/CGUIFont.h \
  guiengine/CGUISpriteBank.cpp \
  guiengine/CGUISpriteBank.h \
  guiengine/abstract_state_manager.cpp \
@@ -89,6 +87,8 @@ supertuxkart_SOURCES = \
  guiengine/event_handler.hpp \
  guiengine/modaldialog.cpp \
  guiengine/modaldialog.hpp \
+ guiengine/scalable_font.cpp \
+ guiengine/scalable_font.hpp \
  guiengine/screen_loader.cpp \
  guiengine/screen.cpp \
  guiengine/screen.hpp \
