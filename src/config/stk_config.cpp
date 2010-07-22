@@ -189,7 +189,7 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         gp_node->get("scores", &m_scores);
         std::string order;
-        gp_node->get("grid-order", &order);
+        gp_node->get("order", &order);
         m_gp_order = (order=="most-points-first");
     }
 
