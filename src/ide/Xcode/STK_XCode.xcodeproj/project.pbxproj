@@ -46,7 +46,7 @@
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
-		953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */; };
+		953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F8B1F11F7C13C00205E66 /* scalable_font.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
@@ -395,14 +395,14 @@
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
 		953789810FC7831400DD1F8E /* quad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad.cpp; path = ../../tracks/quad.cpp; sourceTree = SOURCE_ROOT; };
-		953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CGUIFont.cpp; path = ../../guiengine/CGUIFont.cpp; sourceTree = SOURCE_ROOT; };
-		953C3CCD10CAF4150025F78A /* CGUIFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CGUIFont.h; path = ../../guiengine/CGUIFont.h; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = ../../physics/triangle_mesh.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = ../../physics/triangle_mesh.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = ../../utils/translation.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
+		953F8B1F11F7C13C00205E66 /* scalable_font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scalable_font.cpp; path = ../../guiengine/scalable_font.cpp; sourceTree = SOURCE_ROOT; };
+		953F8B2011F7C13C00205E66 /* scalable_font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scalable_font.hpp; path = ../../guiengine/scalable_font.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../utils/ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
 		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
@@ -1280,8 +1280,6 @@
 		958330B110122B4A00C5137E /* guiengine */ = {
 			isa = PBXGroup;
 			children = (
-				953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */,
-				953C3CCD10CAF4150025F78A /* CGUIFont.h */,
 				950D448A118DEE3C006CFC41 /* CGUISpriteBank.cpp */,
 				950D448B118DEE3C006CFC41 /* CGUISpriteBank.h */,
 				9583319810123B0200C5137E /* abstract_state_manager.cpp */,
@@ -1292,6 +1290,8 @@
 				958330B510122B4A00C5137E /* event_handler.hpp */,
 				958330B610122B4A00C5137E /* modaldialog.cpp */,
 				958330B710122B4A00C5137E /* modaldialog.hpp */,
+				953F8B1F11F7C13C00205E66 /* scalable_font.cpp */,
+				953F8B2011F7C13C00205E66 /* scalable_font.hpp */,
 				958330BA10122B4A00C5137E /* screen.cpp */,
 				958330BB10122B4A00C5137E /* screen.hpp */,
 				958330BC10122B4A00C5137E /* screen_loader.cpp */,
@@ -2591,7 +2591,6 @@
 				9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */,
 				9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */,
 				951B7D19108E52C900BC03AE /* challenges.cpp in Sources */,
-				953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */,
 				956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */,
 				956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */,
 				95C9C97210E93456005A418D /* stars.cpp in Sources */,
@@ -2626,6 +2625,7 @@
 				95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */,
 				9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */,
 				9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */,
+				953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
