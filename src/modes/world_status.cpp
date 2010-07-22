@@ -85,10 +85,11 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
  */
 void WorldStatus::enterRaceOverState()
 {
-    // Don't
+    // Don't enter race over if it's already race over
     if(    m_phase == DELAY_FINISH_PHASE
         || m_phase == RESULT_DISPLAY_PHASE
-        || m_phase == FINISH_PHASE          ) return;
+        || m_phase == FINISH_PHASE          ) 
+        return;
     
     m_phase = DELAY_FINISH_PHASE;
     m_auxiliary_timer = 0.0f;
@@ -183,11 +184,17 @@ void WorldStatus::update(const float dt)
             break;
         }
         case RESULT_DISPLAY_PHASE : 
-            if(((RaceOverDialog*)GUIEngine::ModalDialog::getCurrent())->menuIsFinished())
             {
-                m_phase = FINISH_PHASE;
-            }
+                // Wait for the race over GUI/modal dialog to appear
+                // Previously the in race race over results are shown,
+                // and getCurrent() returns NULL.
+                GUIEngine::ModalDialog *m = GUIEngine::ModalDialog::getCurrent();
+                if( m && ( (RaceOverDialog*)m)->menuIsFinished() )
+                {
+                    m_phase = FINISH_PHASE;
+                }
             break;
+            }
         case FINISH_PHASE:
             // Nothing to do here.
             break;
