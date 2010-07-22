@@ -74,26 +74,32 @@ private:
     /** Points earned in this race. */
     std::vector<int>           m_new_points;
 
+    /** New overall points after this race. */
+    std::vector<int>           m_new_overall_points;
+
     /** When updating the number of points in the display, this is the
         currently displayed number of points, so
         m_old_overall_points <= m_current_displayed_points<=
-                                         m_old_overall_points+m_new_points. */
-    std::vector<int>           m_current_displayed_points;
-
-    /** Overall points before this race. */
-    std::vector<int>           m_old_overall_points;
+                                         m_old_overall_points+m_new_points.
+        This is a floating point number since it stores the increments
+        during increasing the points. */
+    std::vector<float>         m_current_displayed_points;
 
     /** The kart icons. */
     std::vector<video::ITexture*> m_kart_icons;
 
     /** The times of all karts in the right order. */
-    std::vector<core::stringw> m_time_strings;
+    std::vector<core::stringw> m_finish_time_string;
 
     /** Time to wait till the next row starts to be animated. */
     float                      m_time_between_rows;
 
     /** The time a single line scrolls into place. */
     float                      m_time_single_scroll;
+
+    /** The time for inreasing the points by one during the
+        point update phase. */
+    float                      m_time_for_points;
 
     /** The overall time the first phase (scrolling) is displayed.
         This includes a small waiting time at the end. */
@@ -103,36 +109,34 @@ private:
     unsigned int               m_distance_between_rows;
 
     /** The size of the kart icons. */
-    unsigned int               m_icon_width;
-
-    /** The width of the time column. */
-    unsigned int               m_time_width;
+    unsigned int               m_width_icon;
 
     /** Width of the kart name column. */
-    unsigned int               m_max_kart_name_width;
+    unsigned int               m_width_kart_name;
 
-    /** The width of the point column. */
-    unsigned int               m_column_width;
+    /** Width of the finish time column. */
+    unsigned int               m_width_finish_time;
 
-    /** The width of the largest digit (not all digits 
-     *  have the same font size) */
-    unsigned int               m_max_digit_width ;
+    /** Width of the new points columns. */
+    unsigned int               m_width_new_points;
 
-    /** The width of a ":" (used in time display mm:ss:hh). */
-    unsigned int               m_colon_width;
+    /** Position of left end of table (so that the whole
+        table is aligned. */
+    unsigned int               m_leftmost_column;
 
     /** Size of space between columns. */
-    unsigned int               m_column_space_size;
+    unsigned int               m_width_column_space;
     
     /** The font to use. */
-    gui::ScalableFont* m_font;
+    gui::ScalableFont         *m_font;
+
+    /** The previous monospace state of the font. */
+    bool                       m_was_monospace;
 
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
     void determineLayout();
-    void drawNumber(const core::stringw &number_string, 
-                    unsigned int *x, unsigned int y,
-                    const video::SColor &color);
+
 public:
 
                  RaceResultGUI();

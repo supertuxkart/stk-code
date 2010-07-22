@@ -111,7 +111,7 @@ int RaceManager::getLocalPlayerGPRank(const int playerID) const
         }
     }
     return -1;
-}
+}   // getLocalPlayerGPRank
 
 //-----------------------------------------------------------------------------
 /** Sets the number of local players playing on this computer (including
