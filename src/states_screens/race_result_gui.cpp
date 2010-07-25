@@ -29,7 +29,7 @@
  */
 RaceResultGUI::RaceResultGUI()
 {
-#undef USE_NEW_RACE_RESULT
+#define USE_NEW_RACE_RESULT
 
 #ifndef USE_NEW_RACE_RESULT
     // FIXME: for now disable the new race result display
@@ -77,21 +77,18 @@ void RaceResultGUI::determineLayout()
 
     assert(m_font);
     World *world = World::getWorld();
-    world->raceResultOrder(&m_order);
-    if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
-        race_manager->computeGPRanks();
+    std::vector<int> order;
+    world->raceResultOrder(&order);
 
     // Determine the kart to display in the right order, 
     // and the maximum width for the kart name column
     // -------------------------------------------------
     m_width_kart_name     = 0;
     float max_finish_time = 0;
-    for(unsigned int i=0; i<m_order.size(); i++)
+    for(unsigned int i=0; i<order.size(); i++)
     {
-        if(m_order[i]==-1) continue;
-        Kart *kart = world->getKart(m_order[i]);
-        //JH: work in progress  printf("%s: %d\n", 
-        //    kart->getIdent().c_str(), race_manager->getKartGPRank(m_order[i]));
+        if(order[i]==-1) continue;
+        Kart *kart = world->getKart(order[i]);
         m_kart_names.push_back(kart->getName());
 
         video::ITexture *icon = 
@@ -107,10 +104,10 @@ void RaceResultGUI::determineLayout()
         if(rect.Width > m_width_kart_name)
             m_width_kart_name = rect.Width;
         m_new_points.push_back(race_manager->getPositionScore(i+1));
-        int p = race_manager->getKartPrevScore(m_order[i]);
+        int p = race_manager->getKartPrevScore(order[i]);
         m_new_overall_points.push_back(p+m_new_points[i]);
         m_current_displayed_points.push_back((float)p);
-    }   // for i < m_order.size()
+    }   // for i < order.size()
 
     std::string max_time    = StringUtils::timeToString(max_finish_time);
     core::stringw string_max_time(max_time.c_str());
@@ -134,6 +131,9 @@ void RaceResultGUI::determineLayout()
 
     // How long it takes for one line to scroll from right to left
     m_time_single_scroll    = 0.2f;
+
+    // Time to rotate the entries to the proper GP position.
+    m_time_rotation         = 2.0f;
 
     // The time the first phase is being displayed: add the start time 
     // of the last kart to the duration of the scroll plus some time
@@ -177,12 +177,23 @@ void RaceResultGUI::determineLayout()
                      + 2 * m_width_column_space;
 
     m_leftmost_column = (UserConfigParams::m_width  - table_width)/2;
+    if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        race_manager->computeGPRanks();
     m_start_at.clear();
     for(unsigned int i=0; i<num_karts; i++)
     {
         m_start_at.push_back(m_time_between_rows * i);
         m_x_pos.push_back((float)UserConfigParams::m_width);
         m_y_pos.push_back(top+i*m_distance_between_rows);
+        
+        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            int gp_position = race_manager->getKartGPRank(order[i]);
+            if(gp_position<(int)i)
+                printf("X");
+            m_radius.push_back( (gp_position-(int)i)*(int)m_distance_between_rows*0.5f);
+            m_centre_point.push_back(top+(gp_position+i)*m_distance_between_rows*0.5f);
+        }
     }   // i < num_karts
 
 
@@ -200,54 +211,64 @@ void RaceResultGUI::renderGlobal(float dt)
     assert(world->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = world->getNumKarts();
 
+
     switch(m_animation_state)
     {
-    case RR_BEGIN_FIRST_TABLE: 
-        {
-            // Animate the table to move in from the left
-            // ------------------------------------------
-            if(m_timer > m_time_overall_scroll)
-            {
-                m_animation_state = RR_INCREASE_POINTS;
-                m_timer           = 0;
-            }
-            float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
-            for(unsigned int i=0; i<num_karts; i++)
-            {
-                if(m_start_at[i]>m_timer) continue;
-                m_x_pos[i] -= dt*v;
-                if(m_x_pos[i]<m_leftmost_column)
-                    m_x_pos[i] = (float)m_leftmost_column;
-            }
-            break;
-        }
-    case RR_INCREASE_POINTS:
-        {
-            // Animate the increase of points
-            // ------------------------------
-            if(m_timer > 5)
-            {
-                m_animation_state = RR_RESORT_TABLE;
-                m_timer           = 0;
-            }
-            for(unsigned int i=0; i<num_karts; i++)
-            {
-                m_current_displayed_points[i] += dt*m_time_for_points;
-                if(m_current_displayed_points[i]>m_new_overall_points[i])
-                    m_current_displayed_points[i] = (float)m_new_overall_points[i];
-            }
-            break;
-        }
-    case RR_RESORT_TABLE:
-        break;
-    case RR_WAIT_TILL_END:
-        break;
+    case RR_BEGIN_FIRST_TABLE:  if(m_timer > m_time_overall_scroll)
+                                {
+                                    m_animation_state = RR_INCREASE_POINTS;
+                                    m_timer           = 0;
+                                }
+                                break;
+    case RR_INCREASE_POINTS:    if(m_timer > 5)
+                                {
+                                    m_animation_state = RR_RESORT_TABLE;
+                                    m_timer           = 0;
+                                }
+                                break;
+    case RR_RESORT_TABLE:       if(m_timer > m_time_rotation)
+                                {
+                                    m_animation_state = RR_WAIT_TILL_END;
+                                    // Make the new row permanent.
+                                    for(unsigned int i=0; i<num_karts; i++)
+                                        m_y_pos[i] = m_centre_point[i]
+                                                   + m_radius[i];
+                                }
+                                break;
+    case RR_WAIT_TILL_END:      break;
     }   // switch
 
+    float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
     for(unsigned int i=0; i<m_kart_names.size(); i++)
     {
-        displayOneEntry((unsigned int)(m_x_pos[i]), m_y_pos[i], 
-                         i, true);
+        float x = m_x_pos[i];
+        float y = (float)m_y_pos[i];
+        switch(m_animation_state)
+        {
+        case RR_BEGIN_FIRST_TABLE:
+             if(m_timer > m_start_at[i])
+             {   // if active
+                 m_x_pos[i] -= dt*v;
+                 if(m_x_pos[i]<m_leftmost_column)
+                     m_x_pos[i] = (float)m_leftmost_column;
+                 x = m_x_pos[i];
+             }
+             break;
+        case RR_INCREASE_POINTS:    
+            m_current_displayed_points[i] += dt*m_time_for_points;
+            if(m_current_displayed_points[i]>m_new_overall_points[i])
+                m_current_displayed_points[i] = (float)m_new_overall_points[i];
+            break;
+        case RR_RESORT_TABLE:
+            x = m_x_pos[i]       +m_radius[i]*sin(m_timer/m_time_rotation*M_PI);
+            y = m_centre_point[i]+m_radius[i]*cos(m_timer/m_time_rotation*M_PI);
+            break;
+        case RR_WAIT_TILL_END:
+            x = m_x_pos[i];
+            y = (float)m_y_pos[i];
+            break;
+        }   // switch
+        displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
     }
 }   // renderGlobal
 

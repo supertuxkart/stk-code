@@ -65,8 +65,12 @@ private:
     /** Currenct Y position. */
     std::vector<int>           m_y_pos;
 
-    /** The order in which to display the karts. */
-    std::vector<int>           m_order;
+    /** The center point when sorting the entries. */
+    std::vector<float>         m_centre_point;
+
+    /** The radius to use when sorting the entries. Positive values
+        will rotate downwards, negatives are upwards. */
+    std::vector<float>         m_radius;
 
     /** The names of all karts in the right order. */
     std::vector<core::stringw> m_kart_names;
@@ -79,8 +83,8 @@ private:
 
     /** When updating the number of points in the display, this is the
         currently displayed number of points, so
-        m_old_overall_points <= m_current_displayed_points<=
-                                         m_old_overall_points+m_new_points.
+        m_new_overall_points-m_new_points <= m_current_displayed_points <=
+                                             m_new_overall_points.
         This is a floating point number since it stores the increments
         during increasing the points. */
     std::vector<float>         m_current_displayed_points;
@@ -96,6 +100,9 @@ private:
 
     /** The time a single line scrolls into place. */
     float                      m_time_single_scroll;
+
+    /** Time to rotate the GP entries. */
+    float                      m_time_rotation;
 
     /** The time for inreasing the points by one during the
         point update phase. */
