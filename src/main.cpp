@@ -82,6 +82,7 @@ void cmdLineHelp (char* invocation)
     "Options:\n"
     "  -N,  --no-start-screen  Immediatgely start race without showing a menu.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
+    "  --gp name               Start the specified Grand Prix."
     "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
     "  -l,  --list-tracks      Show available tracks.\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
@@ -332,6 +333,13 @@ int handleCmdLine(int argc, char **argv)
                 fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
                 return 0;
             }
+            i++;
+        }
+        else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
+        {
+            race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+            const GrandPrixData *gp = grand_prix_manager->getGrandPrix(argv[i+1]);
+            race_manager->setGrandPrix(*gp);
             i++;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
