@@ -52,6 +52,8 @@ Addons::Addons()
     std::cout << "Loading an xml file for addons: ";
     int download_state = 0;
     m_download_state = download_state;
+    pthread_mutex_init(&m_str_mutex, NULL);
+
     download("list");
     std::string xml_file = file_manager->getConfigDir() + "/" + "list";
     std::cout << xml_file << std::endl;
@@ -316,10 +318,12 @@ std::string Addons::GetInstalledVersionAsStr()
 // ----------------------------------------------------------------------------
 void Addons::Install()
 {
-
-
-
     //download of the addons file
+    
+    pthread_mutex_lock(&m_str_mutex);
+    m_str_state = "Downloading...";
+    pthread_mutex_unlock(&m_str_mutex);
+
     download(std::string("file/" + this->m_addons_list[this->index].file),
             this->m_addons_list[this->index].name, &m_download_state);
     file_manager->checkAndCreateDirForAddons(this->m_addons_list[this->index].name,
@@ -331,6 +335,11 @@ void Addons::Install()
                 this->m_addons_list[this->index].name + "/" ;
     std::string from = file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name;
     std::string to = dest_file;
+    
+    pthread_mutex_lock(&m_str_mutex);
+    m_str_state = "Unzip the addons...";
+    pthread_mutex_unlock(&m_str_mutex);
+
     const bool success = extract_zip(from, to);
     if (!success)
     {
@@ -341,6 +350,10 @@ void Addons::Install()
 
     this->m_addons_list[this->index].installed = true;
     this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;
+    
+    pthread_mutex_lock(&m_str_mutex);
+    m_str_state = "Writing XML...";
+    pthread_mutex_unlock(&m_str_mutex);
     this->SaveInstalled();
 }
 // ----------------------------------------------------------------------------
@@ -355,7 +368,6 @@ void Addons::SaveInstalled()
     xml_installed << "<addons  xmlns='http://stkaddons.tuxfamily.org/'>"
                     << std::endl;
 
-    //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
     for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
     {
         if(this->m_addons_list[i].installed)
@@ -447,6 +459,13 @@ int Addons::getDownloadState()
     pthread_mutex_lock(&download_mutex);
     int value = m_download_state;
     pthread_mutex_unlock(&download_mutex);
+    return value;
+}
+std::string Addons::getDownloadStateAsStr()
+{
+    pthread_mutex_lock(&m_str_mutex);
+    std::string value = m_str_state;
+    pthread_mutex_unlock(&m_str_mutex);
     return value;
 }
 #endif

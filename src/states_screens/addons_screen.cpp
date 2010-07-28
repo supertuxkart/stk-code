@@ -64,8 +64,8 @@ void AddonsScreen::loadList()
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
     this->addons->resetIndex();
-	w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
-    while(this->addons->NextType("kart"))
+	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
+    while(this->addons->NextType(this->type))
     {
         std::cout << this->addons->GetName() << std::endl;
 	    if(this->addons->IsInstalledAsBool())
@@ -77,24 +77,13 @@ void AddonsScreen::loadList()
         	        this->addons->GetName().c_str(), 1 /* icon unsinstalled*/);
     }
 
-    //load all tracks...
-	w_list->addItem("track", _("Tracks:"), -1 /* no icon */);
-	this->addons->resetIndex();
-    while(this->addons->NextType("track"))
-    {
-        std::cout << this->addons->GetName() << std::endl;
-	    if(this->addons->IsInstalledAsBool())
-        	w_list->addItem(this->addons->GetIdAsStr().c_str(),
-        	        this->addons->GetName().c_str(), 0 /* icon */);
-
-	    else
-        	w_list->addItem(this->addons->GetIdAsStr().c_str(),
-        	        this->addons->GetName().c_str(), 1 /* icon */);
-    }
-
-    //remove the text from the widget : "Updating list..."
-    m_update_status->setText("");
 	this->can_load_list = false;
+	this->getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
+	this->getWidget<GUIEngine::LabelWidget>("update_status")->setText("");
+	if(type == "kart")
+    	this->getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart", PLAYER_ID_GAME_MASTER);
+	else if(type == "track")
+    	this->getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track", PLAYER_ID_GAME_MASTER);
 }
 // ------------------------------------------------------------------------------------------------------
 
@@ -119,8 +108,18 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
     if (name == "category")
     {
         std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-
+        std::cout << selection << std::endl;
         if (selection == "tab_update") StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
+        else if (selection == "tab_track")
+        {
+            this->type = "track";
+            loadList();
+        }
+        else if (selection == "tab_kart")
+        {
+            this->type = "kart";
+            loadList();
+        }
     }
 }
 
@@ -136,16 +135,18 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 }
 void AddonsScreen::init()
 {
+	this->getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
+    this->type = "kart";
+
     pthread_mutex_init(&(this->mutex), NULL);
-    m_update_status = this->getWidget<GUIEngine::LabelWidget>("update_status");
     std::cout << "Addons dir:" + file_manager->getAddonsDir() << std::endl;
-    this->type = "track";
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setIcons(m_icon_bank);
     //w_list->clear();
     std::cout << "icon bank" << std::endl;
 	this->can_load_list = false;
-	m_update_status->setText(_("Updating the list..."));
+
+    this->getWidget<GUIEngine::LabelWidget>("update_status")->setText(_("Updating the list..."));
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsScreen::downloadList, this);
 }
@@ -161,10 +162,11 @@ void * AddonsScreen::downloadList( void * pthis)
     AddonsScreen * pt = (AddonsScreen*)pthis;
     //load all karts...
 	pt->addons = new Addons();
+	
 	pthread_mutex_lock(&(pt->mutex));
 	pt->can_load_list = true;
 	pthread_mutex_unlock(&(pt->mutex));
-    //pt->loadList();
+	
     return NULL;
 }
 #endif

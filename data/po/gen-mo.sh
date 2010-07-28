@@ -22,4 +22,5 @@ msgfmt zh_CN.po -o zh_CN/LC_MESSAGES/supertuxkart.mo
 msgfmt he.po -o he/LC_MESSAGES/supertuxkart.mo
 msgfmt ko.po -o ko/LC_MESSAGES/supertuxkart.mo
 msgfmt sk.po -o sk/LC_MESSAGES/supertuxkart.mo
+msgfmt zh_TW.po -o zh_TW/LC_MESSAGES/supertuxkart.mo
 

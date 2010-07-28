@@ -30,16 +30,17 @@ class AddonsLoading : public GUIEngine::ModalDialog
 {
 //virtual void escapePressed() {};
 private:
-    GUIEngine::LabelWidget *        name;
-    GUIEngine::LabelWidget *        description;
-    GUIEngine::LabelWidget *        version;
-    GUIEngine::LabelWidget *        author;
-    GUIEngine::ProgressBarWidget *        m_progress;
-    GUIEngine::ButtonWidget *       m_back_button;
-    GUIEngine::ButtonWidget *       install_button;
-    GUIEngine::IconButtonWidget *   icon;
-    GUIEngine::IconButtonWidget *   m_next;
-    GUIEngine::IconButtonWidget *   m_previous;
+    GUIEngine::LabelWidget *            name;
+    GUIEngine::LabelWidget *            description;
+    GUIEngine::LabelWidget *            version;
+    GUIEngine::LabelWidget *            author;
+    GUIEngine::LabelWidget *            m_state;
+    GUIEngine::ProgressBarWidget *      m_progress;
+    GUIEngine::ButtonWidget *           m_back_button;
+    GUIEngine::ButtonWidget *           install_button;
+    GUIEngine::IconButtonWidget *       icon;
+    GUIEngine::IconButtonWidget *       m_next;
+    GUIEngine::IconButtonWidget *       m_previous;
     static void * startInstall(void*);
     static void * downloadIcon(void*);
     void loadInfo();
@@ -49,7 +50,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    pthread_mutex_t mutex_can_install;
+    pthread_mutex_t m_mutex_can_install;
     Addons * addons;
     AddonsLoading(Addons * id, const float percentWidth, const float percentHeight);
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

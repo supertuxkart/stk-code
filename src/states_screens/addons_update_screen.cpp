@@ -60,7 +60,18 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
     {
         std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
-        if (selection == "tab_addons") StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
+        if (selection == "tab_track")
+        {
+            StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
+            AddonsScreen::getInstance()->type = "track";
+            AddonsScreen::getInstance()->loadList();
+        }
+        else if (selection == "tab_kart")
+        {
+            StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
+            AddonsScreen::getInstance()->type = "kart";
+            AddonsScreen::getInstance()->loadList();
+        }
     }
 }
 
@@ -68,6 +79,7 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
 
 void AddonsUpdateScreen::init()
 {
+this->getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update", PLAYER_ID_GAME_MASTER);
 }
 
 // ------------------------------------------------------------------------------------------------------

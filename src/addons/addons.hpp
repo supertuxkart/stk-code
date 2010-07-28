@@ -47,6 +47,8 @@ class Addons
         void                        GetInstalledAddons();
         std::string                 type;
         int                         m_download_state;
+        pthread_mutex_t             m_str_mutex;
+        std::string m_str_state;
     public:
         Addons();
 
@@ -105,6 +107,8 @@ class Addons
         bool PreviousType(std::string type);
         int getDownloadState();
 
+        /** Get the install state (if it is the download, unzip...)*/
+        std::string getDownloadStateAsStr();
 
 };
 #endif

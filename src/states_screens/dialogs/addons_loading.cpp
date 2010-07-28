@@ -43,7 +43,7 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     this->addons = id;
     m_can_install = false;
     m_percent_update = false;
-    pthread_mutex_init(&mutex_can_install, NULL);
+    pthread_mutex_init(&m_mutex_can_install, NULL);
     core::rect< s32 > area_right(10, 0,  m_area.getWidth()/2, m_area.getHeight());
 
     core::rect< s32 > area_left(m_area.getWidth()/2 + 20, 0, m_area.getWidth(), m_area.getHeight());
@@ -193,6 +193,17 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 
         m_children.push_back(m_progress);
         m_progress->add();
+
+        m_state = new LabelWidget();
+        m_state->m_x = 180;
+        m_state->m_y = m_area.getHeight()-95;
+        m_state->m_w = 250;
+        m_state->m_h = 35;
+        m_state->setParent(m_irrlicht_window);
+
+        m_children.push_back(m_state);
+        m_state->add();
+
         m_back_button->setDeactivated();
         m_next->setDeactivated();
         m_previous->setDeactivated();
@@ -207,7 +218,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 void AddonsLoading::onUpdate(float delta)
 {
 
-    pthread_mutex_lock(&(this->mutex_can_install));
+    pthread_mutex_lock(&(m_mutex_can_install));
     if(m_can_install)
     {
         this->close();
@@ -215,8 +226,9 @@ void AddonsLoading::onUpdate(float delta)
     if(m_percent_update)
     {
         m_progress->setValue(addons->getDownloadState());
+        m_state->setText(addons->getDownloadStateAsStr().c_str());
     }
-    pthread_mutex_unlock(&(mutex_can_install));
+    pthread_mutex_unlock(&(m_mutex_can_install));
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -236,17 +248,16 @@ void * AddonsLoading::startInstall(void* pthis)
     AddonsLoading * obj = (AddonsLoading*)pthis;
     if(obj->addons->IsInstalled() == "yes")
     {
-    std::cout << obj->addons->IsInstalled() << std::endl;
         obj->addons->UnInstall();
     }
     else
     {
         obj->addons->Install();
     }
-    pthread_mutex_lock(&(obj->mutex_can_install));
+    pthread_mutex_lock(&(obj->m_mutex_can_install));
     obj->m_can_install = true;
     obj->m_percent_update = false;
-    pthread_mutex_unlock(&(obj->mutex_can_install));
+    pthread_mutex_unlock(&(obj->m_mutex_can_install));
     return NULL;
 }
 // ------------------------------------------------------------------------------------------------------

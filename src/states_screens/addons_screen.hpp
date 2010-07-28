@@ -52,7 +52,10 @@ public:
     bool can_load_list;
     pthread_mutex_t         mutex;
     std::string type;
+
+    /** Load the addons into the main list.*/
     void loadList();
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
 
@@ -65,8 +68,11 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
     friend void * startInstall(void *);
+
     /** This function is used to download a text from the server to show the news. */
     static void * downloadList(void *);
+
+    /** This function is used to handle the thread (load the new list, etc...). */
     virtual void onUpdate(float delta,  irr::video::IVideoDriver*);
 };
 
