@@ -188,20 +188,23 @@ private:
         std::string m_player_name;      // for networked karts
         int         m_score;            // score for this kart
         int         m_last_score;       // needed for restart race, and for race results GUI.
-        double      m_overall_time;     // sum of times of all races
-        double      m_last_time;        // needed for restart
+        float       m_overall_time;     // sum of times of all races
+        float       m_last_time;        // needed for restart
         int         m_prev_finish_pos;  // previous finished position
         KartType    m_kart_type;        // Kart type: AI, player, network player etc.
         int         m_local_player_id;  // player controling the kart, for AI: -1
         int         m_global_player_id; // global ID of player
-        int         m_gp_rank;    // In GPs, at the end, will hold the overall rank of this kart.
+        int         m_gp_rank;    // In GPs, at the end, will hold the overall
+                                  // rank of this kart (0<=m_gp_rank < num_karts-1)
         
         KartStatus(const std::string& ident, const int& prev_finish_pos, 
-                   int local_player_id, int global_player_id, KartType kt) :
+                   int local_player_id, int global_player_id, 
+                   int init_gp_rank, KartType kt) :
                    m_ident(ident), m_score(0), m_last_score(0), 
                    m_overall_time(0.0f), m_last_time(0.0f),
                    m_prev_finish_pos(prev_finish_pos), m_kart_type(kt),
                    m_local_player_id(local_player_id),
+                   m_gp_rank(init_gp_rank),
                    m_global_player_id(global_player_id)
                 {}
         
@@ -283,7 +286,7 @@ public:
     void         computeGPRanks();
     int          getKartGPRank(const int kart_id)
                                           const { return m_kart_status[kart_id].m_gp_rank; }
-    
+    const Kart*  getKartWithGPRank(unsigned int n);
     /** \return the GP rank of a local player, or -1 if the given player ID doesn't exist */
     int          getLocalPlayerGPRank(const int playerID) const;
     
@@ -295,7 +298,7 @@ public:
                                           const { return m_kart_status[k].m_local_player_id; }
     int          getKartGlobalPlayerId(int k)
                                           const { return m_kart_status[k].m_global_player_id; }
-    double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
+    float        getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
     KartType     getKartType(int kart)    const { return m_kart_status[kart].m_kart_type;}
     int          getCoinTarget()          const { return m_coin_target;                  }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }

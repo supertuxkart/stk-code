@@ -44,13 +44,18 @@ private:
     float                      m_timer;
 
     /** Finite state machine for the animations:
-        BEGIN_FIRST_TABLE: The rows scroll into place.
-        INCREASE_POINTS:   The overall points are added up
-        RESORT_TABLE:      Resort the table so that it is now sorted by 
-                           GP points.
-        WAIT_TILL_END      Some delay to wait for end, after a period it
-                           wii automatically end. */
-    enum                       {RR_BEGIN_FIRST_TABLE,
+        INIT:            Set up data structures.
+        RACE_RESULT:     The rows scroll into place.
+        OLD_GP_TABLE:    Scroll new table into place, sorted by previous
+                         GP ranks
+        INCREASE_POINTS: The overall points are added up
+        RESORT_TABLE:    Resort the table so that it is now sorted by 
+                         GP points.
+        WAIT_TILL_END    Some delay to wait for end, after a period it
+                         wii automatically end. */
+    enum                       {RR_INIT,
+                                RR_RACE_RESULT,
+                                RR_OLD_GP_RESULTS,
                                 RR_INCREASE_POINTS,
                                 RR_RESORT_TABLE,
                                 RR_WAIT_TILL_END}
@@ -63,7 +68,7 @@ private:
     std::vector<float>         m_x_pos;
 
     /** Currenct Y position. */
-    std::vector<int>           m_y_pos;
+    std::vector<float>         m_y_pos;
 
     /** The center point when sorting the entries. */
     std::vector<float>         m_centre_point;
@@ -131,6 +136,9 @@ private:
         table is aligned. */
     unsigned int               m_leftmost_column;
 
+    /** Top-most pixel for first row. */
+    unsigned int               m_top;
+
     /** Size of space between columns. */
     unsigned int               m_width_column_space;
     
@@ -142,7 +150,8 @@ private:
 
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
-    void determineLayout();
+    void determineTableLayout();
+    void determineGPLayout();
 
 public:
 

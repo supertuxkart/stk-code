@@ -99,7 +99,18 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
+/** Returns the kart with a given GP rank (or NULL if no such kart exists).
+ *  \param n Rank (0<=n<num_karts) to look for.
+ */
+const Kart *RaceManager::getKartWithGPRank(unsigned int n)
+{
+    for(unsigned int i=0; i<m_kart_status.size(); i++)
+        if(m_kart_status[i].m_gp_rank == n)
+            return World::getWorld()->getKart(i);
+    return NULL;
+}   // getKLartWithGPRank
 
+//-----------------------------------------------------------------------------
 int RaceManager::getLocalPlayerGPRank(const int playerID) const
 {
     const int amount = m_kart_status.size();
@@ -199,8 +210,13 @@ void RaceManager::startNew()
 
     // First add the AI karts (randomly chosen)
     // ----------------------------------------
+    int init_gp_rank = 0;
     for(unsigned int i=0; i<m_random_kart_list.size(); i++)
-        m_kart_status.push_back(KartStatus(m_random_kart_list[i], i, -1, -1, KT_AI));
+    {
+        m_kart_status.push_back(KartStatus(m_random_kart_list[i], i, -1, -1, 
+                                           init_gp_rank, KT_AI));
+        init_gp_rank ++;
+    }
 
     // Then the players, which start behind the AI karts
     // -------------------------------------------------
@@ -211,8 +227,9 @@ void RaceManager::startNew()
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
-                                           kt
+                                           init_gp_rank, kt
                                            ) );
+        init_gp_rank ++;
     }
 
     // Then start the race with the first track
@@ -322,12 +339,11 @@ void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
     const unsigned int NUM_KARTS = getNumberOfKarts();
-    
-    int *scores   = new int[NUM_KARTS];
-    int *position = new int[NUM_KARTS];
-    double *race_time = new double[NUM_KARTS];
+    int *scores                  = new int[NUM_KARTS];
+    int *position                = new int[NUM_KARTS];
+    double *race_time            = new double[NUM_KARTS];
     // Ignore the first kart if it's a follow-the-leader race.
-    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
+    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
     for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
     {
         position[kart_id]  = kart_id;
@@ -394,7 +410,6 @@ void RaceManager::exitRace()
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
-        computeGPRanks();        
         unlock_manager->grandPrixFinished();
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
