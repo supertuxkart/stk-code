@@ -342,10 +342,15 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     // First draw the icon
     // -------------------
-    core::recti source_rect(core::vector2di(0,0), m_kart_icons[n]->getSize());
-    core::recti dest_rect(x, y, x+m_width_icon, y+m_width_icon);
-    irr_driver->getVideoDriver()->draw2DImage(m_kart_icons[n], dest_rect, 
-                                              source_rect, NULL, NULL, true);
+    if(m_kart_icons[n])
+    {
+        core::recti source_rect(core::vector2di(0,0), 
+                                m_kart_icons[n]->getSize());
+        core::recti dest_rect(x, y, x+m_width_icon, y+m_width_icon);
+        irr_driver->getVideoDriver()->draw2DImage(m_kart_icons[n], dest_rect, 
+                                                  source_rect, NULL, NULL, 
+                                                  true);
+    }
     // Draw the name
     // -------------
     core::recti pos_name(x+m_width_icon+m_width_column_space, y,
@@ -359,7 +364,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                         + m_width_kart_name + m_width_column_space;
 
     bool mono = m_font->getMonospaceDigits();
-    dest_rect = core::recti(x_time, y, x_time+100, y+10);
+    core::recti dest_rect = core::recti(x_time, y, x_time+100, y+10);
     m_font->draw(m_finish_time_string[n], dest_rect, color);
     m_font->setMonospaceDigits(mono);
 
