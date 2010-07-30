@@ -265,7 +265,7 @@ void RaceResultGUI::renderGlobal(float dt)
                 m_current_displayed_points[i] = (float)m_new_overall_points[i];
             break;
         case RR_RESORT_TABLE:
-            x = m_x_pos[i]       +m_radius[i]*sin(m_timer/m_time_rotation*M_PI);
+            x = m_x_pos[i]       -m_radius[i]*sin(m_timer/m_time_rotation*M_PI);
             y = m_centre_point[i]+m_radius[i]*cos(m_timer/m_time_rotation*M_PI);
             break;
         case RR_WAIT_TILL_END:
