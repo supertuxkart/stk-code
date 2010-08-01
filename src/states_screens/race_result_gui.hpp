@@ -70,6 +70,9 @@ private:
     /** Currenct Y position. */
     std::vector<float>         m_y_pos;
 
+    /** True if kart is a player kart. */
+    std::vector<bool>          m_is_player_kart;
+
     /** The center point when sorting the entries. */
     std::vector<float>         m_centre_point;
 
@@ -81,17 +84,14 @@ private:
     std::vector<core::stringw> m_kart_names;
 
     /** Points earned in this race. */
-    std::vector<int>           m_new_points;
+    std::vector<float>         m_new_points;
 
     /** New overall points after this race. */
     std::vector<int>           m_new_overall_points;
 
     /** When updating the number of points in the display, this is the
-        currently displayed number of points, so
-        m_new_overall_points-m_new_points <= m_current_displayed_points <=
-                                             m_new_overall_points.
-        This is a floating point number since it stores the increments
-        during increasing the points. */
+        currently displayed number of points. This is a floating point number 
+        since it stores the increments during increasing the points. */
     std::vector<float>         m_current_displayed_points;
 
     /** The kart icons. */

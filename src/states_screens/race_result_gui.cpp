@@ -90,6 +90,7 @@ void RaceResultGUI::determineTableLayout()
     {
         if(order[i]==-1) continue;
         Kart *kart = world->getKart(order[i]);
+        m_is_player_kart.push_back(kart->getController()->isPlayerController());
         m_kart_names.push_back(kart->getName());
 
         video::ITexture *icon = 
@@ -188,9 +189,8 @@ void RaceResultGUI::renderGlobal(float dt)
     assert(world->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = world->getNumKarts();
     
-    // First: Update the finite state machine, and set 
-    //        the current X and Y positions.
-    // ===============================================
+    // First: Update the finite state machine
+    // ======================================
     switch(m_animation_state)
     {
     case RR_INIT:        
@@ -241,11 +241,13 @@ void RaceResultGUI::renderGlobal(float dt)
     case RR_WAIT_TILL_END:      break;
     }   // switch
 
+    // Second phase: update X and Y positions for the various animations
+    // =================================================================
     float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
     for(unsigned int i=0; i<m_kart_names.size(); i++)
     {
         float x = m_x_pos[i];
-        float y = (float)m_y_pos[i];
+        float y = m_y_pos[i];
         switch(m_animation_state)
         {
         // Both states use the same scrolling:
@@ -263,14 +265,15 @@ void RaceResultGUI::renderGlobal(float dt)
             m_current_displayed_points[i] += dt*m_time_for_points;
             if(m_current_displayed_points[i]>m_new_overall_points[i])
                 m_current_displayed_points[i] = (float)m_new_overall_points[i];
+            m_new_points[i] -= dt*m_time_for_points;
+            if(m_new_points[i]<0)
+                m_new_points[i] = 0;
             break;
         case RR_RESORT_TABLE:
             x = m_x_pos[i]       -m_radius[i]*sin(m_timer/m_time_rotation*M_PI);
             y = m_centre_point[i]+m_radius[i]*cos(m_timer/m_time_rotation*M_PI);
             break;
         case RR_WAIT_TILL_END:
-            x = m_x_pos[i];
-            y = (float)m_y_pos[i];
             break;
         }   // switch
         displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
@@ -295,6 +298,8 @@ void RaceResultGUI::determineGPLayout()
         m_kart_icons[rank] = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
         m_kart_names[rank] = kart->getName();
+        m_is_player_kart[rank] = kart->getController()->isPlayerController();
+
         float time         = race_manager->getOverallTime(kart_id);
         m_finish_time_string[rank]
                            = StringUtils::timeToString(time).c_str();
@@ -303,7 +308,7 @@ void RaceResultGUI::determineGPLayout()
         m_y_pos[rank]      = (float)(m_top+rank*m_distance_between_rows);
         int p              = race_manager->getKartPrevScore(kart_id);
         m_current_displayed_points[rank] = (float)p;
-        m_new_points[rank] = race_manager->getPositionScore(kart->getPosition());
+        m_new_points[rank] = (float)race_manager->getPositionScore(kart->getPosition());
     }
 
     // Now update the GP ranks, and determine the new position
@@ -332,13 +337,8 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                     unsigned int n, bool display_points)
 {
     World *world = World::getWorld();
-    video::SColor color;
-    // Display player karts in red
-    Kart *kart = world->getKart(n);
-    if(kart->getController()->isPlayerController())
-        color = video::SColor(255, 255, 0, 0);
-    else
-        color = video::SColor(255, 255, 255, 255);
+    video::SColor color = m_is_player_kart[n] ? video::SColor(255,255,0,  0  )
+                                              : video::SColor(255,255,255,255);
 
     // First draw the icon
     // -------------------
@@ -381,12 +381,16 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                          + m_width_kart_name   + m_width_column_space
                          + m_width_finish_time + m_width_column_space;
     dest_rect = core::recti(x_point, y, x_point+100, y+10);
-    core::stringw point_string = core::stringw("+")+core::stringw(m_new_points[n]);
-    // With mono-space digits space has the same width as each character, so
-    // we can simply fill up the string with spaces to get the right aligned.
-    while(point_string.size()<3)
-        point_string = core::stringw(" ")+point_string;
-    m_font->draw(point_string, dest_rect, color);
+    if(m_new_points[n]>0)
+    {
+        core::stringw point_string = core::stringw("+")
+                                   + core::stringw((int)m_new_points[n]);
+        // With mono-space digits space has the same width as each character, so
+        // we can simply fill up the string with spaces to get the right aligned.
+        while(point_string.size()<3)
+            point_string = core::stringw(" ")+point_string;
+        m_font->draw(point_string, dest_rect, color);
+    }
 
     // Draw the old_points plus increase value
     // ---------------------------------------
