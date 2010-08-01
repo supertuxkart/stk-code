@@ -630,11 +630,16 @@ void LinearWorld::updateRacePosition()
     std::vector<bool> rank_used;
     for (unsigned int n=0; n<=kart_amount; n++) 
         rank_used.push_back(false);
+    bool rank_changed = false;
 #endif
     
+    // NOTE: if you do any changes to this loop, the next loop (see
+    // DEBUG_KART_RANK below) needs to have the same changes applied
+    // so that debug output is still correct!!!!!!!!!!!
     for (unsigned int i=0; i<kart_amount; i++)
     {
         Kart* kart          = m_karts[i];
+        printf("%s: %d\n", kart->getIdent().c_str(), m_kart_info[i].m_race_lap);
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
@@ -653,12 +658,7 @@ void LinearWorld::updateRacePosition()
 
         const int my_id                = kart->getWorldKartId();
         const int my_laps              = getLapForKart(my_id);
-        const float my_progression     = getDistanceDownTrackForKart(my_id);
-        
-#if _DEBUG_PRINTS_LIKE_MAD_
-        std::cout << "counting karts ahead of " << kart->getIdent() << "\n";
-#endif
-        
+        const float my_progression     = getDistanceDownTrackForKart(my_id);        
         // Count karts ahead of the current kart, i.e. kart that are already finished,
         // have done more laps, or the same number of laps, but a greater distance.
         for (unsigned int j = 0 ; j < kart_amount ; j++)
@@ -670,9 +670,6 @@ void LinearWorld::updateRacePosition()
             if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
             {
                 p++;
-#if _DEBUG_PRINTS_LIKE_MAD_
-                std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has finished.\n";
-#endif
                 continue;
             }
 
@@ -684,9 +681,6 @@ void LinearWorld::updateRacePosition()
                 if(other_laps > my_laps)
                 {
                     p++; // Other kart has more lapses
-#if _DEBUG_PRINTS_LIKE_MAD_
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has more laps than me.\n";
-#endif
                 }
                 continue;
             }
@@ -736,9 +730,10 @@ void LinearWorld::updateRacePosition()
             history->Save();
             assert(false);
         }
-        rank_used[p] = true;
+        rank_used[p]  = true;
+        rank_changed |= kart->getPosition()!=p;
 #endif
-        
+
         kart->setPosition(p);
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated
@@ -754,7 +749,61 @@ void LinearWorld::updateRacePosition()
             m_faster_music_active=true;
         }
     }   // for i<kart_amount
-    
+
+    // Define this to get a detailled analyses each time a race position 
+    // changes.
+#undef DEBUG_KART_RANK
+#ifdef DEBUG_KART_RANK
+    if(rank_changed)
+    {
+        std::cout << "Counting laps at "<<getTime()<<" seconds.\n";
+        for (unsigned int i=0; i<kart_amount; i++)
+        {
+            Kart* kart          = m_karts[i];
+            if(kart->isEliminated() || kart->hasFinishedRace()) continue;
+            KartInfo& kart_info = m_kart_info[i];
+            int p = 1 ;
+            const int my_id                = kart->getWorldKartId();
+            const int my_laps              = getLapForKart(my_id);
+            const float my_progression     = getDistanceDownTrackForKart(my_id);
+            std::cout << "counting karts ahead of " << kart->getIdent() 
+                << " (laps "<<m_kart_info[i].m_race_lap<<", progress "
+                << my_progression<<").\n";
+            for (unsigned int j = 0 ; j < kart_amount ; j++)
+            {
+                if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
+                if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
+                {
+                    p++;
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has finished.\n";
+                    continue;
+                }
+                int other_laps = getLapForKart(j);
+                if (other_laps !=  my_laps)
+                {
+                    if(other_laps > my_laps)
+                    {
+                        p++; // Other kart has more lapses
+                        std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has more laps than me.\n";
+                    }
+                    continue;
+                }
+                float other_progression = getDistanceDownTrackForKart(j);
+                if(other_progression > my_progression ||
+                    (other_progression == my_progression &&
+                    m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
+                {
+                    p++;
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() <<
+                        " because he is further within the track (my progression is " <<
+                        my_progression << ", his progression is " << other_progression << ")\n";
+                }
+            } //next kart
+        }   // for i<kart_amount
+        std::cout << "-------------------------------------------\n";
+    }   // if rank_changed
+#endif
+
 }   // updateRacePosition
 
 //-----------------------------------------------------------------------------
