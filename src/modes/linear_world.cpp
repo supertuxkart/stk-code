@@ -639,7 +639,6 @@ void LinearWorld::updateRacePosition()
     for (unsigned int i=0; i<kart_amount; i++)
     {
         Kart* kart          = m_karts[i];
-        printf("%s: %d\n", kart->getIdent().c_str(), m_kart_info[i].m_race_lap);
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
