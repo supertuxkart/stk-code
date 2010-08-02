@@ -92,6 +92,12 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
         // checklines are a bit off in Z direction.
         result = new_pos.getY()-m_min_height<4.0f   && 
                  new_pos.getY()-m_min_height>-1.0f;
+        if(UserConfigParams::m_check_debug && !result)
+        {
+            printf("CHECK: Kart %s crosses line, but wrong height (%f vs %f).\n",
+                    World::getWorld()->getKart(indx)->getIdent().c_str(),
+                    new_pos.getY(), m_min_height);
+        }
     }
     else
         result = false;
