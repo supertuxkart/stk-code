@@ -204,8 +204,8 @@ private:
                    m_overall_time(0.0f), m_last_time(0.0f),
                    m_prev_finish_pos(prev_finish_pos), m_kart_type(kt),
                    m_local_player_id(local_player_id),
-                   m_gp_rank(init_gp_rank),
-                   m_global_player_id(global_player_id)
+                   m_global_player_id(global_player_id),
+                   m_gp_rank(init_gp_rank)
                 {}
         
     };   // KartStatus
