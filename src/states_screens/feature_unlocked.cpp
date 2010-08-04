@@ -171,18 +171,9 @@ void FeatureUnlockedCutScene::init()
     {
         if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
-            KartModel* kartModel = m_unlocked_stuff[n].m_unlocked_kart->getKartModel();
-            
-            scene::ISceneNode* kart_node = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getModel());
-
-            for (int w=0; w<4; w++)
-            {
-                scene::ISceneNode* wheel = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getWheelModel(w), kart_node);
-                wheel->setPosition( kartModel->getWheelGraphicsPosition(w).toIrrVector() );
-                wheel->updateAbsolutePosition();
-            }
-            
-            m_unlocked_stuff[n].m_root_gift_node = kart_node;
+            KartModel* kart_model = 
+                m_unlocked_stuff[n].m_unlocked_kart->getKartModel();
+            kart_model->attachModel(&(m_unlocked_stuff[n].m_root_gift_node));
         }
         else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
