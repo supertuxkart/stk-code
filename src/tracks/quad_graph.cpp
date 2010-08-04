@@ -469,7 +469,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                         const video::SColor &fill_color)
 {
     IrrDriver::RTTProvider rttProvider(dimension, name);
-    createMesh(false);
+    createMesh(/*show_invisible part of the track*/false);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
@@ -485,15 +485,41 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     Vec3 bb_min, bb_max;
     m_all_quads->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
-    core::matrix4 projection;
 
-    float range;
-    if((bb_max.getX()-bb_min.getX()) > (bb_max.getZ()-bb_min.getZ())) {
-        range = bb_max.getX()-bb_min.getX();
-    } else {
-        range = bb_max.getZ()-bb_min.getZ();
+    float dx = bb_max.getX()-bb_min.getX();
+    float dz = bb_max.getZ()-bb_min.getZ();
+
+    // Set the scaling correctly. Also the center point (which is used 
+    // as the camera position) needs to be adjusted: the track must
+    // be aligned to the left/top of the texture which is used (otherwise
+    // mapPoint2MiniMap doesn't work), so adjust the camera position
+    // that the track is properly aligned (view from the side):
+    //          c        camera
+    //         / \
+    //        /   \     <--- camera angle
+    //       /     \
+    //      {  [-]  }   <--- track flat (viewed from the side)
+    // If [-] is the shorter side of the track, then the camera will 
+    // actually render the area in { } - which is the length of the
+    // longer side of the track.
+    // To align the [-] side to the left, the camera must be moved
+    // the distance betwwen '{' and '[' to the right. This distance
+    // is exacly (longer_side - shorter_side) / 2.
+    // So, adjust the center point by this amount:
+    if(dz > dx)
+    {
+        center.setX(center.getX() + (dz-dx)*0.5f);
+        m_scaling = dimension.Width / dz;
+    }
+    else 
+    {
+        center.setZ(center.getZ() + (dx-dz)*0.5f);
+        m_scaling = dimension.Width / dx;
     }
 
+    float range = (dx>dz) ? dx : dz;
+
+    core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH(range, 
                                             range,
                                             -1, bb_max.getY()-bb_min.getY()+1);
@@ -510,17 +536,9 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
-    m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
-    m_scaling.setZ(dimension.Width/(bb_max.getZ()-bb_min.getZ()));
-
-    if(m_scaling.getX() > m_scaling.getZ()) {
-        m_scaling.setX(m_scaling.getZ());
-    } else {
-        m_scaling.setZ(m_scaling.getX());
-    }
 
     return texture;
-}   // drawMiniMap
+}   // makeMiniMap
 
 //-----------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map 
@@ -531,7 +549,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
      */
 void QuadGraph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 {
-    draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling.getX());
-    draw_at->setY((xyz.getZ()-m_min_coord.getZ())*m_scaling.getZ());
+    draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling);
+    draw_at->setY((xyz.getZ()-m_min_coord.getZ())*m_scaling);
 
 }   // mapPoint

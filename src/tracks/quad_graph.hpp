@@ -53,8 +53,8 @@ private:
     /** The minimum coordinates of the quad graph. */
     Vec3                     m_min_coord;
 
-    /** Scaling for mini map, only x and y components are used. */
-    Vec3                     m_scaling;
+    /** Scaling for mini map. */
+    float                    m_scaling;
 
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
