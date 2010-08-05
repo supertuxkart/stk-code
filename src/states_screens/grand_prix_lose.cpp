@@ -231,29 +231,20 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
     const KartProperties* kart = kart_properties_manager->getKart(ident_arg[0]);
     if (kart != NULL)
     {
-        KartModel* kartModel = kart->getKartModel();
+        KartModel* kart_model = kart->getKartModel();
         
         m_kart_x = KART_START_X;
         m_kart_y = KART_Y;
         m_kart_z = KART_Z;
         
-        kart_main_node = irr_driver->addMesh(kartModel->getModel());
+        kart_model->attachModel(&kart_main_node);
         kart_main_node->setPosition( core::vector3df(m_kart_x, m_kart_y, m_kart_z) );
         //kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
         kart_main_node->updateAbsolutePosition();
-        
-        for (int wheel=0; wheel<4; wheel++)
-        {
-            scene::ISceneNode* wheel_model = irr_driver->getSceneManager()->addMeshSceneNode(
-                                             kartModel->getWheelModel(wheel),
-                                             kart_main_node);
-            wheel_model->setPosition( kartModel->getWheelGraphicsPosition(wheel).toIrrVector() );
-            wheel_model->updateAbsolutePosition();
-        }
         kart_main_node->setRotation(vector3df(0, 90, 0));
-    }
+    }   // if kart !=NULL
     
     m_kart_node = kart_main_node;
-}
+}   // setKarts
 
 // -------------------------------------------------------------------------------------

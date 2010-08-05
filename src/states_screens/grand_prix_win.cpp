@@ -390,27 +390,18 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         const KartProperties* kart = kart_properties_manager->getKart(idents[n]);
         if (kart != NULL)
         {
-            KartModel* kartModel = kart->getKartModel();
-            assert(kartModel != NULL);
+            KartModel* kart_model = kart->getKartModel();
+            assert(kart_model != NULL);
             
             m_kart_x[n] = m_podium_x[n];
             m_kart_y[n] = INITIAL_Y;
             m_kart_z[n] = -4;
             m_kart_rotation[n] = 0.0f;
             
-            kart_main_node = irr_driver->addMesh(kartModel->getModel());
+            kart_model->attachModel(&kart_main_node);
             assert(kart_main_node != NULL);
             kart_main_node->setPosition( core::vector3df(m_kart_x[n], m_kart_y[n], m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
-            
-            for (int wheel=0; wheel<4; wheel++)
-            {
-                scene::ISceneNode* wheel_model = irr_driver->getSceneManager()->addMeshSceneNode(
-                                                 kartModel->getWheelModel(wheel),
-                                                 kart_main_node);
-                wheel_model->setPosition( kartModel->getWheelGraphicsPosition(wheel).toIrrVector() );
-                wheel_model->updateAbsolutePosition();
-            }
         }
         else
         {
