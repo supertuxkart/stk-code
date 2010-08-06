@@ -37,7 +37,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart, irr:
     m_unlocked_kart = kart;
     m_unlock_message = msg;
     m_curr_image = -1;
-}
+}   // UnlockedThing::UnlockedThing
 
 // -------------------------------------------------------------------------------------
 
@@ -51,9 +51,9 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict
     m_h = h;
     m_unlock_message = msg;
     m_curr_image = -1;
-}
+}   // UnlockedThing::UnlockedThing
 
-// -------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::ITexture*> picts,
                                                       float w, float h, irr::core::stringw msg)
@@ -64,18 +64,17 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
     m_h = h;
     m_unlock_message = msg;
     m_curr_image = 0;
-}
+}   // UnlockedThing::UnlockedThing
 
-// -------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
 {
     if (m_root_gift_node != NULL) irr_driver->removeNode(m_root_gift_node);
     m_root_gift_node = NULL;
-}
+}   // UnlockedThing::~UnlockedThing
 
-// -------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark -
@@ -87,13 +86,13 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
     setNeeds3D(true);
     
     m_throttle_FPS = false;
-}
+}  // FeatureUnlockedCutScene
 
 // -------------------------------------------------------------------------------------
 
 void FeatureUnlockedCutScene::loadedFromFile()
 {
-}
+}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
@@ -101,7 +100,7 @@ void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, irr
 {
     assert(unlocked_kart != NULL);
     m_unlocked_stuff.push_back( new UnlockedThing(unlocked_kart, msg) );
-}
+}  // addUnlockedKart
 
 // -------------------------------------------------------------------------------------
 
@@ -111,7 +110,7 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
     assert(picture != NULL);
 
     m_unlocked_stuff.push_back( new UnlockedThing(picture, w, h, msg) );
-}
+}   // addUnlockedPicture
 
 // -------------------------------------------------------------------------------------
 
@@ -121,7 +120,7 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
     assert(!pictures.empty());
     
     m_unlocked_stuff.push_back( new UnlockedThing(pictures, w, h, msg) );
-}
+}   // addUnlockedPictures
 
 // -------------------------------------------------------------------------------------
 
@@ -191,9 +190,10 @@ void FeatureUnlockedCutScene::init()
             
             m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
             m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-            scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m,
-                                                                    m_unlocked_stuff[n].m_w,
-                                                                    m_unlocked_stuff[n].m_h);
+            scene::IMesh* mesh = 
+                irr_driver->createTexturedQuadMesh(&m,
+                                                   m_unlocked_stuff[n].m_w,
+                                                   m_unlocked_stuff[n].m_h);
             m_unlocked_stuff[n].m_root_gift_node   = irr_driver->addMesh(mesh);
 
         }
@@ -202,7 +202,9 @@ void FeatureUnlockedCutScene::init()
             std::cerr << "Malformed unlocked goody!!!\n";
         }
     }
-}
+
+    
+}   // init
 
 // -------------------------------------------------------------------------------------
 
@@ -346,10 +348,10 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                     node->setMesh(mesh);
                     
                     m_unlocked_stuff[n].m_curr_image = textureID;
-                }
-            }
-        }
-    }
+                }   // textureID != previousTextureID
+            }   // if pictureCount>1
+        }   // if !m_unlocked_stuff[n].m_pictures.empty()
+    }   // for n<unlockedStuffCount
     
     assert(m_unlocked_stuff.size() > 0);
     if (m_unlocked_stuff[0].m_root_gift_node != NULL)
