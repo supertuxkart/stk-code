@@ -72,12 +72,21 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     /** Angle of the key (from 0 to 1, simply traces progression) */
     float m_key_angle;
     
-    irr::scene::ISceneNode* m_sky;
-    irr::scene::ICameraSceneNode* m_camera;
-    irr::scene::IAnimatedMeshSceneNode* m_chest;
-    //irr::scene::ISceneNode* m_chest_top;
-    //irr::scene::ISceneNode* m_key;
+    /** The scene node for the sky box. */
+    irr::scene::ISceneNode             *m_sky;
+
+    /** The scene node for the camera. */
+    irr::scene::ICameraSceneNode       *m_camera;
+
+    /** The scene node for the animated mesh. */
+    irr::scene::IAnimatedMeshSceneNode *m_chest;
+
+    /** The scene node for the light. */
     irr::scene::ILightSceneNode* m_light;
+#define USE_IRRLICHT_BUG_WORKAROUND
+#ifdef USE_IRRLICHT_BUG_WORKAROUND
+    scene::IMeshSceneNode *m_avoid_irrlicht_bug;
+#endif
     
     void continueButtonPressed();
     
