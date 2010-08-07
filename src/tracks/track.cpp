@@ -81,6 +81,7 @@ Track::Track(std::string filename)
     m_start_angle          = 0;
     m_sky_dx               = 0.05f;
     m_sky_dy               = 0.0f;
+    m_max_kart_count       = 8;
     m_start_transform.setIdentity();
     loadTrackInfo();
 }   // Track
@@ -265,6 +266,9 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
+    
+    root->get("maxKartCount",          &m_max_kart_count);
+        
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *mode=root->getNode(i);

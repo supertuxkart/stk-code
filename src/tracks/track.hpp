@@ -155,6 +155,9 @@ private:
     /** List of all modes for a track. */
     std::vector<TrackMode> m_all_modes;
 
+    /** Maximum number of karts that this track can sustain without them starting off-track */
+    int m_max_kart_count;
+    
     /** Name of the track to display. */
     irr::core::stringw  m_name;
     bool                m_use_fog;
@@ -294,6 +297,10 @@ public:
     const Vec3 &getStartPosition(unsigned int i) {return m_start_positions[i];}
     /** Returns the heading of the i-th. start position. */
     const float getStartHeading(unsigned int i) {return m_start_heading[i]; }
+    
+    /** \return the maximum number of karts that this track can sustain without them starting off-track */
+    int getMaxKartCount() const { return m_max_kart_count; }
+    
 };   // class Track
 
 #endif
