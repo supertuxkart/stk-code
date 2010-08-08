@@ -29,6 +29,10 @@
 Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
 {
     m_node = irr_driver->addParticleNode();
+#ifdef DEBUG
+    std::string debug_name = m_kart->getIdent()+" (smoke)";
+    m_node->setName(debug_name.c_str());
+#endif
     // Note: the smoke system is NOT child of the kart, since bullet
     // gives the position of the wheels on the ground in world coordinates.
     // So it's easier not to move the particle system with the kart, and set 

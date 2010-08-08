@@ -42,6 +42,12 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                         : -1 ;
     m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
+#ifdef DEBUG
+    std::string debug_name("item: ");
+    debug_name += m_type;
+    m_node->setName(debug_name.c_str());
+#endif
+
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     m_node->setRotation(hpr.toIrrHPR());

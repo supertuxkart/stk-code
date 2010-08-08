@@ -34,6 +34,9 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
 {
     m_remaining_time = burst_time; // short emision time, explosion, not constant flame
     m_node = irr_driver->addParticleNode();
+#ifdef DEBUG
+    m_node->setName("explosion");
+#endif
     m_node->setPosition(coord.toIrrVector());
     Material* m = material_manager->getMaterial("explode.png");
     m_node->setMaterialTexture(0, m->getTexture());

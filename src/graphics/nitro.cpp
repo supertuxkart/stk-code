@@ -29,6 +29,10 @@ Nitro::Nitro(Kart* kart) : m_kart(kart)
 {
     const float particle_size = 0.25f;
     m_node = irr_driver->addParticleNode();
+#ifdef DEBUG
+    std::string debug_name = m_kart->getIdent()+" (nitro)";
+    m_node->setName(debug_name.c_str());
+#endif
     m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, particle_size*0.25f, -m_kart->getKartLength()*0.5f));
     Material *m= material_manager->getMaterial("nitro-particle.png");

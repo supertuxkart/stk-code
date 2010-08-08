@@ -118,11 +118,19 @@ void KartModel::attachModel(scene::ISceneNode **node)
                            : 0;
         *node = irr_driver->addMesh(m_mesh->getMesh(straight_frame));
     }
+#ifdef DEBUG
+    std::string debug_name = m_model_filename+" (kart-model)";
+    (*node)->setName(debug_name.c_str());
+#endif
 
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
         m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+#ifdef DEBUG
+        std::string debug_name = m_wheel_filename[i]+" (wheel)";
+        m_wheel_node[i]->setName(debug_name.c_str());
+#endif
         (*node)->addChild(m_wheel_node[i]);
     }
 }   // attachModel

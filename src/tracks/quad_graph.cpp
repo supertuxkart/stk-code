@@ -279,6 +279,10 @@ void QuadGraph::createDebugMesh()
         v[i].Color = c;
     }
     m_node = irr_driver->addMesh(m_mesh);
+#ifdef DEBUG
+    m_node->setName("track-debug-mesh");
+#endif
+
 }   // createDebugMesh
 
 // -----------------------------------------------------------------------------
@@ -477,6 +481,10 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     }
 
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
+#ifdef DEBUG
+    m_node->setName("minimap-mesh");
+#endif
+
     m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 
     // Add the camera:

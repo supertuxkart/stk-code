@@ -54,6 +54,10 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         }   // if(!m_animated_mesh)
     }
     m_animated_node = irr_driver->addAnimatedMesh(m_animated_mesh);
+#ifdef DEBUG
+    std::string debug_name = model_name+" (track-object)";
+    m_animated_node->setName(debug_name.c_str());
+#endif
 
     // Get the information from the xml node.
     m_enabled = true;

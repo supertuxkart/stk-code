@@ -108,6 +108,12 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
 
     // Add the graphical model
     setNode(irr_driver->addMesh(m_st_model[type]));
+#ifdef DEBUG
+    std::string debug_name("flyable: ");
+    debug_name += type;
+    getNode()->setName(debug_name.c_str());
+#endif
+
 }   // Flyable
 
 // ----------------------------------------------------------------------------

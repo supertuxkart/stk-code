@@ -40,6 +40,10 @@ Attachment::Attachment(Kart* kart)
     // have to attach some kind of mesh, but make it invisible.
     m_node           = irr_driver->addAnimatedMesh(
                             attachment_manager->getMesh(ATTACH_BOMB));
+#ifdef DEBUG
+    std::string debug_name = kart->getIdent()+" (attachment)";
+    m_node->setName(debug_name.c_str());
+#endif
     m_node->setParent(m_kart->getNode());
     m_node->setVisible(false);
 }   // Attachment

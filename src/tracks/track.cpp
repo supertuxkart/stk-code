@@ -526,6 +526,10 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_all_meshes.push_back(merged_mesh);
     //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
     scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+#ifdef DEBUG
+    std::string debug_name=model_name+" (main track, octtree)";
+    scene_node->setName(debug_name.c_str());
+#endif
     //merged_mesh->setHardwareMappingHint(scene::EHM_STATIC);
 
     core::vector3df xyz(0,0,0);
@@ -564,6 +568,11 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         m_all_meshes.push_back(a_mesh);
         scene::ISceneNode *scene_node = irr_driver->addAnimatedMesh(a_mesh);
+#ifdef DEBUG
+        std::string debug_name = model_name+" (static track-object)";
+        scene_node->setName(debug_name.c_str());
+#endif
+
         //core::vector3df xyz(0,0,0);
         Vec3 xyz(0,0,0);
         n->get("xyz", &xyz);
@@ -687,7 +696,10 @@ void Track::createWater(const XMLNode &node)
                                                              wave_height, 
                                                              wave_speed,
                                                              wave_length);
-
+#ifdef DEBUG
+    std::string debug_name = model_name+"(water node)";
+    scene_node->setName(debug_name.c_str());
+#endif
     if(!mesh || !scene_node)
     {
         fprintf(stderr, "Warning: Water model '%s' in '%s' not found, ignored.\n",

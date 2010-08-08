@@ -45,6 +45,10 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
 
     createMesh(m);
     m_node = irr_driver->addMesh(m_mesh);
+#ifdef DEBUG
+    std::string debug_name = m_kart->getIdent()+" (slip-stream)";
+    m_node->setName(debug_name.c_str());
+#endif
     //m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, 
                                         0*0.25f+2.5,

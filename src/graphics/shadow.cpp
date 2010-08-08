@@ -48,6 +48,10 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node)
     buffer->recalculateBoundingBox();
     
     m_node   = irr_driver->addMesh(m_mesh);
+#ifdef DEBUG
+    m_node->setName("shadow");
+#endif
+
     m_mesh->drop();   // the node grabs the mesh, so we can drop this reference
     m_node->setAutomaticCulling(scene::EAC_OFF);
     m_parent_kart_node = node;

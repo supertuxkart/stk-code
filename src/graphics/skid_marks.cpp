@@ -178,6 +178,11 @@ void SkidMarks::update(float dt)
                                                   m_avoid_z_fighting);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+#ifdef DEBUG
+    std::string debug_name = m_kart.getIdent()+" (skid-mark)";
+    new_node->setName(debug_name.c_str());
+#endif
+    
     // We don't keep a reference to the mesh here, so we have to decrement
     // the reference count (which is set to 1 when doing "new SMesh()".
     // The scene node will keep the mesh alive.

@@ -74,6 +74,11 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
 
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
+#ifdef DEBUG
+    std::string debug_name = m_owner.getIdent()+" (rubber-band)";
+    m_node->setName(debug_name.c_str());
+#endif
+
 }   // RubberBand
 
 // ----------------------------------------------------------------------------

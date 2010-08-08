@@ -44,6 +44,9 @@ Stars::Stars(scene::ISceneNode* parentKart)
         scene::ISceneNode* billboard = irr_driver->addBillboard(core::dimension2d< f32 >(STAR_SIZE, STAR_SIZE),
                                                                 texture,
                                                                 parentKart);
+#ifdef DEBUG
+        billboard->setName("star");
+#endif
         star_material->setMaterialProperties(&(billboard->getMaterial(0)));
         //billboard->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         billboard->setMaterialTexture(0, star_material->getTexture());
