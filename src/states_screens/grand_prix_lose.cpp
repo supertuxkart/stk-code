@@ -91,12 +91,19 @@ void GrandPrixLose::init()
     scene::IAnimatedMesh* model_garage_door = irr_driver->getAnimatedMesh( file_manager->getModelFile("gplose_door.b3d") );
     assert(model_garage_door!= NULL);
     m_garage_door = irr_driver->addAnimatedMesh(model_garage_door);
+#ifdef DEBUG
+    m_garage_door->setName("garage-door");
+#endif
     m_garage_door->setPosition( core::vector3df(2, INITIAL_Y, 0) );
     m_garage_door->setAnimationSpeed(0);
     
     scene::IMesh* model_garage = irr_driver->getMesh( file_manager->getModelFile("gplose.b3d") );
     assert(model_garage!= NULL);
     m_garage = irr_driver->addMesh(model_garage);
+#ifdef DEBUG
+    m_garage->setName("garage");
+#endif
+
     m_garage->setPosition( core::vector3df(2, INITIAL_Y, 0) );    
     
     scene::ISceneManager* sceneManager = irr_driver->getSceneManager();

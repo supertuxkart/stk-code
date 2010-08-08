@@ -158,6 +158,9 @@ void GrandPrixWin::init()
     scene::IMesh* model_village = irr_driver->getMesh( file_manager->getModelFile("village.b3d") );
     assert(model_village != NULL);
     m_village = irr_driver->addMesh(model_village);
+#ifdef DEBUG
+    m_village->setName("village");
+#endif
     m_village->setPosition( core::vector3df(2, INITIAL_Y, 0) );
     
     
@@ -166,12 +169,21 @@ void GrandPrixWin::init()
     
     
     m_podium_step[0] = irr_driver->addMesh(podium_model);
+#ifdef DEBUG
+    m_podium_step[0]->setName("Podium 0");
+#endif
     m_podium_step[0]->setPosition( core::vector3df(m_podium_x[0], INITIAL_PODIUM_Y, m_podium_z[0]) );
     
     m_podium_step[1] = irr_driver->addMesh(podium_model);
+#ifdef DEBUG
+    m_podium_step[1]->setName("Podium 1");
+#endif
     m_podium_step[1]->setPosition( core::vector3df(m_podium_x[1], INITIAL_PODIUM_Y, m_podium_z[1]) );
     
     m_podium_step[2] = irr_driver->addMesh(podium_model);
+#ifdef DEBUG
+    m_podium_step[2]->setName("Podium 2");
+#endif
     m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
     
     scene::ISceneManager* sceneManager = irr_driver->getSceneManager();
