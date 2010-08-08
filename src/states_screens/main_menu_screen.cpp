@@ -215,6 +215,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 // ------------------------------------------------------------------------------------------------------
 void * MainMenuScreen::downloadNews( void * pthis)
 {
+    // FIXME: this code is wrong, "pt" might have been deleted by the
+    // time the download is done (by having switched to another screen,
+    // or exiting the game, etc...)
     MainMenuScreen * pt = (MainMenuScreen*)pthis;
 
     if(download("news"))
