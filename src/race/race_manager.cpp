@@ -20,6 +20,7 @@
 #include "race/race_manager.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
@@ -417,18 +418,24 @@ void RaceManager::exitRace()
 
         bool someHumanPlayerWon = false;
         const unsigned int kartStatusCount = m_kart_status.size();
+        
+        /** The rank from which players are considered losers - you are behind half the players OR
+            behind the first 3 (the first condition handles cases where there are 3 karts or less).
+            However this rank may not be 0, since at least one player must win, hence the std::max call. */
+        const int loserThreshold = std::max(1, std::min(3, int(kartStatusCount)/2));
+        
         std::string winners[3];
         std::vector<std::string> humanLosers; // because we don't care about AIs that lost
         for (unsigned int i=0; i < kartStatusCount; ++i)
         {
-            if(UserConfigParams::m_verbosity>=5)
+            if(UserConfigParams::m_verbosity >= 5)
             {
                 std::cout << m_kart_status[i].m_ident << " has GP final rank "
                           << m_kart_status[i].m_gp_rank << std::endl;
             }
 
             const int rank = m_kart_status[i].m_gp_rank;
-            if (rank >= 0 && rank < 3)
+            if (rank >= 0 && rank < loserThreshold)
             {
                 winners[rank] = m_kart_status[i].m_ident;
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
@@ -437,7 +444,7 @@ void RaceManager::exitRace()
                     someHumanPlayerWon = true;
                 }
             }
-            else if (rank >= 3)
+            else if (rank >= loserThreshold)
             {
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
                     m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
