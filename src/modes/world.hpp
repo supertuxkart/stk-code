@@ -98,8 +98,6 @@ protected:
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;
-    /** Used during the race popup menu. */
-    Phase       m_previous_phase;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
     /** Number of eliminated players. */
