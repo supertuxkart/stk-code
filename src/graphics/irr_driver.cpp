@@ -106,7 +106,16 @@ void IrrDriver::initDevice()
         }
         //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
         m_device->closeDevice();
-        
+        // In some circumstances it would happen that a WM_QUIT message
+        // (apparently sent for this NULL device) is later received by
+        // the actual window, causing it to immediately quit.
+        // Following advise on the irrlicht forums I added the following
+        // two calles - the first one didn't make a difference (but 
+        // certainly can't hurt), but the second one apparenlty solved
+        // the problem for now.
+        m_device->clearSystemMessages();  
+        m_device->run();
+
         firstTime = false;
     } // end if firstTime
     
