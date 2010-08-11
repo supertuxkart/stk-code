@@ -32,7 +32,7 @@ const char* RACE_STATE_NAME = "race";
 AbstractStateManager::AbstractStateManager()
 {
     m_game_mode = MENU;
-}
+}   // AbstractStateManager
 
 #if 0
 #pragma mark -
@@ -48,15 +48,14 @@ void AbstractStateManager::enterGameState()
     m_menu_stack.push_back(RACE_STATE_NAME);
     setGameState(GAME);
     GUIEngine::cleanForGame();
-    
-}
+}   // enterGameState
 
 // -----------------------------------------------------------------------------
 
 GameState AbstractStateManager::getGameState()
 {
     return m_game_mode;
-}
+}   // getGameState
 
 // -----------------------------------------------------------------------------
 
@@ -68,17 +67,15 @@ void AbstractStateManager::setGameState(GameState state)
     m_game_mode = state;
     
     onGameStateChange(previous, state);
-}
+}   // setGameState
 
 
-// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
 #pragma mark Push/pop menus
 #endif
-
 
 void AbstractStateManager::pushMenu(std::string name)
 {
@@ -100,7 +97,7 @@ void AbstractStateManager::pushMenu(std::string name)
     switchToScreen(name.c_str());
     
     onTopMostScreenChanged();
-}
+}   // pushMenu
 
 
 // -----------------------------------------------------------------------------
@@ -112,7 +109,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
     screen->init();
     
     onTopMostScreenChanged();
-}
+}   // pushScreen
 
 // -----------------------------------------------------------------------------
 
@@ -135,7 +132,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     getCurrentScreen()->init();
     
     onTopMostScreenChanged();
-}
+}   // replaceTopMostScreen
 
 // -----------------------------------------------------------------------------
 
@@ -158,7 +155,7 @@ void AbstractStateManager::reshowTopMostMenu()
     screen->init();
     
     onTopMostScreenChanged();
-}
+}   // reshowTopMostMenu
 
 // -----------------------------------------------------------------------------
 
@@ -194,7 +191,7 @@ void AbstractStateManager::popMenu()
     }
     
     onTopMostScreenChanged();
-}
+}   // popMenu
 
 // -----------------------------------------------------------------------------
 
@@ -212,7 +209,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     getCurrentScreen()->init();
     
     onTopMostScreenChanged();
-}
+}   // resetAndGoToScreen
 
 // -----------------------------------------------------------------------------
 
@@ -235,6 +232,7 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     getCurrentScreen()->init();
     
     onTopMostScreenChanged();
-}
+}   // resetAndSetStack
 
 
+ 

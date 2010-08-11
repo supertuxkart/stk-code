@@ -37,12 +37,12 @@ StateManager* state_manager_singleton = NULL;
 
 StateManager* StateManager::get()
 {
-    if (state_manager_singleton == NULL) state_manager_singleton = new StateManager();
+    if (state_manager_singleton == NULL) 
+        state_manager_singleton = new StateManager();
     return state_manager_singleton;
-}
+}   // get
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark -
@@ -68,7 +68,7 @@ StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
     assert( returnPlayer->m_id == id );
     
     return returnPlayer;
-}
+}   // getActivePlayer
 
 // ----------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ const PlayerProfile* StateManager::getActivePlayerProfile(const int id)
     ActivePlayer* a = getActivePlayer(id);
     if (a == NULL) return NULL;
     return a->getProfile();
-}
+}   // getActivePlayerProfile
 
 // ----------------------------------------------------------------------------
 
@@ -88,7 +88,7 @@ void StateManager::updateActivePlayerIDs()
     {
         m_active_players[n].m_id = n;
     }
-}
+}   // updateActivePlayerIDs
 
 // ----------------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device
     updateActivePlayerIDs();
     
     return i;
-}
+}   // createActivePlayer
 
 // ----------------------------------------------------------------------------
 
@@ -111,14 +111,14 @@ void StateManager::removeActivePlayer(int id)
 {
     m_active_players.erase(id);
     updateActivePlayerIDs();
-}
+}   // removeActivePlayer
 
 // ----------------------------------------------------------------------------
 
 int StateManager::activePlayerCount()
 {
     return m_active_players.size();
-}
+}   // activePlayerCount
 
 // ----------------------------------------------------------------------------
 
@@ -130,9 +130,8 @@ void StateManager::resetActivePlayers()
         m_active_players[i].setDevice(NULL);
     }
     m_active_players.clearAndDeleteAll();
-}
+}   // resetActivePlayers
 
-// ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
 #if 0
@@ -143,7 +142,7 @@ void StateManager::resetActivePlayers()
 bool StateManager::throttleFPS()
 {
     return m_game_mode != GUIEngine::GAME  &&  GUIEngine::getCurrentScreen()->throttleFPS();
-}
+}   // throttleFPS
 
 // ----------------------------------------------------------------------------
 
@@ -174,7 +173,7 @@ void StateManager::escapePressed()
     {
         if (getCurrentScreen()->onEscapePressed()) popMenu();
     }
-}
+}   // escapePressed
 
 // ----------------------------------------------------------------------------
 
@@ -212,7 +211,7 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
                 World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
         }
     }    
-}
+}   // onGameStateChange
 
 // ----------------------------------------------------------------------------
 
@@ -222,17 +221,16 @@ void StateManager::onTopMostScreenChanged()
     {
         music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
     }
-}
+}   // onTopMostScreenChanged
 
 // ----------------------------------------------------------------------------
 
 void StateManager::onStackEmptied()
 {
     main_loop->abort();
-}
+}   // onStackEmptied
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark -
