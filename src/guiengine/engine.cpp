@@ -29,7 +29,7 @@
  or, for widgets of "spawn" type, with children :
  
  \code
- <widget_name property1="value1" property2="value2" />
+ <widget_name property1="value1" property2="value2" >
  <child1 />
  <child2 />
  </widget_name>
