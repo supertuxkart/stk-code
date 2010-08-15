@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2010 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -44,83 +44,12 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
+    loadFromFile("race_paused_dialog.stkgui");
+    
     World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
-    
-    ScalableFont* font = GUIEngine::getTitleFont();
-    const int text_height = GUIEngine::getFontHeight();
-    
-    IGUIFont* titlefont = GUIEngine::getTitleFont();
-    const int title_height = font->getDimension(L"X").Height;
-    
-    
-    const int icon_size = (m_area.getHeight() - text_height - 150) / 2;
-    
-    // ---- Caption
-    core::rect< s32 > area(0, 0, m_area.getWidth(), title_height);
-    IGUIStaticText* caption = 
-        GUIEngine::getGUIEnv()->addStaticText( _("Paused"),
-                                               area, /*border*/false,
-                                               /*word wrap*/ false,
-                                               m_irrlicht_window);
-    caption->setTabStop(false);
-    caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    caption->setOverrideFont(titlefont);
-    caption->setOverrideColor(video::SColor(255,255,255,255));
 
-    // ---- Back button
-    IconButtonWidget* back_btn = new IconButtonWidget();
-    back_btn->m_properties[PROP_ID] = "backbtn";
-    back_btn->m_properties[PROP_ICON] = "gui/back.png";
-    //I18N: In the 'paused' screen
-    back_btn->m_text = _("Back to Race");
-    back_btn->m_x = m_area.getWidth() / 2 - icon_size;
-    back_btn->m_y = text_height*2;
-    back_btn->m_w = icon_size*2; // width larger to leave room for text
-    back_btn->m_h = icon_size;
-    back_btn->setParent(m_irrlicht_window);
-    m_children.push_back(back_btn);
-    back_btn->add();
-    
+    ButtonWidget* back_btn = (ButtonWidget*)Screen::getWidget("backbtn", &m_children);
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    
-    // ---- Choice ribbon
-    m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
-    m_choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
-    
-    m_choice_ribbon->m_x = 0;
-    m_choice_ribbon->m_y = text_height*2 + icon_size + 50;
-    m_choice_ribbon->m_w = m_area.getWidth();
-    m_choice_ribbon->m_h = icon_size + text_height;
-    m_choice_ribbon->setParent(m_irrlicht_window);
-    
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
-    {
-        //I18N: In the 'paused' screen
-        m_choice_ribbon->addIconChild(_("Setup New Race"), "newrace", 
-                                      128, 128, "gui/main_race.png");
-    }
-    
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
-    {
-        //I18N: In the 'paused' screen
-        m_choice_ribbon->addIconChild(_("Restart Race"), "restart",
-                                      128, 128, "gui/restart.png");
-    }
-
-    //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Options"), "options", 
-                                  128, 128, "gui/main_options.png");
-
-    //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Help"), "help", 128, 128, 
-                                  "gui/main_help.png");
-
-    //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Exit Race"), "exit", 128, 128, 
-                                  "gui/main_quit.png");
-
-    m_children.push_back(m_choice_ribbon);
-    m_choice_ribbon->add();   
 }   // RacePausedDialog
 
 // ----------------------------------------------------------------------------
@@ -130,17 +59,43 @@ RacePausedDialog::~RacePausedDialog()
 }   // ~RacePausedDialog
 
 // ----------------------------------------------------------------------------
+
+void RacePausedDialog::loadedFromFile()
+{
+    printf("==== RacePausedDialog::loadedFromFile() ====\n");
+
+    // disable the "restart" button in GPs
+    if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_SINGLE)
+    {
+        printf("==== REMOVING restart button ====\n");
+        GUIEngine::RibbonWidget* choice_ribbon = (GUIEngine::RibbonWidget*)
+                Screen::getWidget("choiceribbon", &m_children);
+        
+        
+        const bool success = choice_ribbon->deleteChild("restart");
+        assert(success);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void RacePausedDialog::onEnterPressedInternal()
 {
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
+
 GUIEngine::EventPropagation 
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
-    if(UserConfigParams::m_verbosity>=5)
+    GUIEngine::RibbonWidget* chocie_ribbon = (GUIEngine::RibbonWidget*)
+            Screen::getWidget("choiceribbon", &m_children);
+    
+    if (UserConfigParams::m_verbosity>=5)
+    {
        std::cout << "RacePausedDialog::processEvent(" 
                  << eventSource.c_str() << ")\n";
+    }
     
     if (eventSource == "backbtn")
     {
@@ -151,7 +106,7 @@ GUIEngine::EventPropagation
     else if (eventSource == "choiceribbon")
     {
         const std::string& selection = 
-            m_choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if(UserConfigParams::m_verbosity>=5)
             std::cout << "RacePausedDialog::processEvent(" 

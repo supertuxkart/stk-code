@@ -378,6 +378,13 @@ namespace GUIEngine
         const ptr_vector<Widget>& getChildren() const { return m_children; }
         
         /**
+          * \brief removes and deletes the child with the given PROP_ID
+          * \param id PROP_ID property of the child to remove
+          * \return whether deletion was successful
+          */
+        bool deleteChild(const char* id);
+        
+        /**
          * Override in children to possibly receive updates (you may need to register to
          * them first)
          */

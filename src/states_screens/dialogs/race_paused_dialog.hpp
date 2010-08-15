@@ -27,7 +27,11 @@ namespace GUIEngine
 
 class RacePausedDialog : public GUIEngine::ModalDialog
 {
-    GUIEngine::RibbonWidget* m_choice_ribbon;
+    //GUIEngine::RibbonWidget* m_choice_ribbon;
+    
+protected:
+    virtual void loadedFromFile();
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

@@ -161,6 +161,22 @@ void Widget::setDeactivated()
 }
 
 // -----------------------------------------------------------------------------
+
+bool Widget::deleteChild(const char* id)
+{
+    const int count = m_children.size();
+    for (int n=0; n<count; n++)
+    {
+        if (m_children[n].m_properties[PROP_ID] == id)
+        {
+            m_children.erase(n);
+            return true;
+        }
+    }
+    return false;
+}
+
+// -----------------------------------------------------------------------------
 namespace GUIEngine
 {
     // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values

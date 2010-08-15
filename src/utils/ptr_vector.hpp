@@ -115,13 +115,13 @@ TYPE* remove(const int ID)
     return out;
 }
 
-bool contains( TYPE* instance ) const
+bool contains( const TYPE* instance ) const
 {
     const unsigned int amount = contentsVector.size();
-    for(unsigned int n=0; n<amount; n++)
+    for (unsigned int n=0; n<amount; n++)
     {
-        TYPE * pointer = contentsVector[n];
-        if(pointer == instance) return true;
+        const TYPE * pointer = contentsVector[n];
+        if (pointer == instance) return true;
     }
     
     return false;

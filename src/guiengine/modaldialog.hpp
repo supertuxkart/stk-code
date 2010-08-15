@@ -59,18 +59,18 @@ namespace GUIEngine
          * \brief Creates a modal dialog with given percentage of screen width and height
          */
         ModalDialog(const float percentWidth, const float percentHeight);
-        
-        /**
-         * \brief Creates a modal dialog with given percentage of screen width and height
-         */
-        ModalDialog(const char* xmlFile, const float percentWidth, const float percentHeight);
-        
-        
+
+        void loadFromFile(const char* xmlFile);
+
         virtual void onEnterPressedInternal();
         void clearWindow();
         
         void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-
+        
+        /** \brief Callback invoked when the dialog was loaded from the XML file (if the constructor
+          *        that takes a XML file as argument is used)
+          */
+        virtual void loadedFromFile() {}
         
     public:
         ptr_vector<Widget> m_children;
@@ -80,7 +80,7 @@ namespace GUIEngine
         /** Returns whether to block event propagation (usually, you will want to block events you processed) */
         virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
         
-        bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
+        bool isMyChild(Widget* widget) const;
         bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
         
         Widget* getFirstWidget();

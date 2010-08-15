@@ -52,29 +52,13 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 
 // ----------------------------------------------------------------------------
 
-void traceChildren(const ptr_vector<Widget>& widgets, int indent=0)
+void ModalDialog::loadFromFile(const char* xmlFile)
 {
-    for (int n=0; n<widgets.size(); n++)
-    {
-        for (int i=0; i<indent; i++) std::cout << "    ";
-        std::cout << "    Type " << widgets[n].getType() << " : "
-                  << const_cast<Widget*>(widgets.getConst(n))->m_properties[PROP_ID].c_str() << "\n";
-        traceChildren (widgets[n].getChildren(), indent+1);
-    }
-}
-
-ModalDialog::ModalDialog(const char* xmlFile, const float percentWidth, const float percentHeight)
-{
-    // FIXME: dialog are destroyed when dismissed, this means the disk
-    // will be seeked everytime the same dialog is opened to read its
-    // XML file... cache loaded dialogs somehow maybe?
-    doInit(percentWidth, percentHeight);
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + xmlFile).c_str() );
     Screen::parseScreenFileDiv(xml, m_children, m_irrlicht_window);
     delete xml;
-
-    std::cout << "Dialog children :\n";
-    traceChildren(m_children);
+    
+    loadedFromFile();
     
     LayoutManager::calculateLayout( m_children, this );
     
@@ -282,3 +266,30 @@ void ModalDialog::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* par
 }   // addWidgetsRecursively
 
 // ----------------------------------------------------------------------------
+
+bool isMyChildHelperFunc(const ptr_vector<Widget>* within, const Widget* widget)
+{
+    if (within->size() == 0) return false;
+    
+    if (within->contains(widget))
+    {
+        return true;
+    }
+    
+    const int count = within->size();
+    for (int n=0; n<count; n++)
+    {
+        if (isMyChildHelperFunc(&within->getConst(n)->getChildren(), widget))
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool ModalDialog::isMyChild(Widget* widget) const
+{
+    return isMyChildHelperFunc(&m_children, widget);
+}
+

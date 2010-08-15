@@ -479,7 +479,10 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             // notify modal dialog too
             if (ModalDialog::isADialogActive())
             {
-                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
+                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK)
+                {
+                    return EVENT_BLOCK;
+                }
             }
             
             sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
@@ -521,25 +524,29 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 //else break;
             }    
             case EGET_ELEMENT_HOVERED:
-            {
+            {                
                 Widget* w = GUIEngine::getWidget(id);
+                                
                 if (w == NULL) break;
-                
+                                
                 if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
-                
+                                
                 // When a modal dialog is shown, don't select widgets out of the dialog
                 if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
                 {
                     // check for parents too before discarding event
                     if (w->m_event_handler != NULL)
                     {
-                        if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler)) break;
+                        if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler))
+                        {
+                            break;
+                        }
                     }
                 }
-                
+                                
                 // select ribbons on hover
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
-                {
+                {                    
                     RibbonWidget* ribbon = (RibbonWidget*)(w->m_event_handler);
                     if (ribbon == NULL) break;
                     

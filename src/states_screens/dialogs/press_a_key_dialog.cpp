@@ -30,8 +30,9 @@ using namespace irr::gui;
 // ------------------------------------------------------------------------------------------------------
 
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
-        ModalDialog("press_a_key_dialog.stkgui", w, h)
+        ModalDialog(w, h)
 {
+    loadFromFile("press_a_key_dialog.stkgui");
 }
 
 // ------------------------------------------------------------------------------------------------------
