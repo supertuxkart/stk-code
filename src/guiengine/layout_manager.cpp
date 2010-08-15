@@ -139,6 +139,15 @@ void LayoutManager::readCoords(Widget* self, ITopLevelWidgetContainer* topLevelC
         // lines are required, we need to specify a height explicitely
         label_h = dim.Height + self->getHeightNeededAroundLabel();
     }
+    if (self->getType() == WTYPE_TEXTBOX)
+    {
+        IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
+
+        // get text height, a text box is always as high as the text it could contain
+        core::dimension2d< u32 > dim = font->getDimension( L"X" );
+        label_h = dim.Height + self->getHeightNeededAroundLabel();
+
+    }
     
     // ---- read dimension
     // width

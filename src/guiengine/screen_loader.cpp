@@ -145,9 +145,14 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& 
                 {
                     append_to.push_back(new ListWidget());
                 }
+                else if (!strcmp("textbox", xml->getNodeName()))
+                {
+                    append_to.push_back(new TextBoxWidget());
+                }
                 else
                 {
-                    std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '" << xml->getNodeName()  << "'" << std::endl;
+                    std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '"
+                              << xml->getNodeName()  << "'" << std::endl;
                     continue;
                 }
                 

@@ -34,59 +34,19 @@ using namespace irr::gui;
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    m_label_ctrl = new LabelWidget();
+    loadFromFile("enter_player_name_dialog.stkgui");
     
-    //I18N: In the 'add new player' dialog
-    m_label_ctrl->m_text = _("Enter the new player's name");
-    
-    m_label_ctrl->m_properties[PROP_TEXT_ALIGN] = "center";
-    m_label_ctrl->m_x = 0;
-    m_label_ctrl->m_y = 0;
-    m_label_ctrl->m_w = m_area.getWidth();
-    m_label_ctrl->m_h = m_area.getHeight()/3;
-    m_label_ctrl->setParent(m_irrlicht_window);
-    
-    m_children.push_back(m_label_ctrl);
-    m_label_ctrl->add();
-    
-    // ----
-    
-    //IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = GUIEngine::getFontHeight();
-    
-    const int textAreaYFrom = m_area.getHeight()/2 - textHeight/2;
-    
-    textCtrl = new TextBoxWidget();
-    textCtrl->m_text = "";
-    textCtrl->m_x = 50;
-    textCtrl->m_y = textAreaYFrom - 10;
-    textCtrl->m_w = m_area.getWidth()-100;
-    textCtrl->m_h = textHeight + 5;
-    textCtrl->setParent(m_irrlicht_window);
-    m_children.push_back(textCtrl);
-    textCtrl->add();
+    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
+    assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
-    // TODO : add Ok button
-
-    cancelButton = new ButtonWidget();
-    cancelButton->m_properties[PROP_ID] = "cancel";
-    cancelButton->m_text = _("Cancel");
-    cancelButton->m_x = 15;
-    cancelButton->m_y = m_area.getHeight() - textHeight - 12;
-    cancelButton->m_w = m_area.getWidth() - 30;
-    cancelButton->m_h = textHeight + 6;
-    cancelButton->setParent(m_irrlicht_window);
-    
-    m_children.push_back(cancelButton);
-    cancelButton->add();
-
 }
 
 // -----------------------------------------------------------------------------
 
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
+    // FIXME: what is this code for?
+    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
     textCtrl->getIrrlichtElement()->remove();
 }
 
@@ -94,7 +54,7 @@ EnterPlayerNameDialog::~EnterPlayerNameDialog()
 
 GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::string& eventSource)
 {
-    if(eventSource == "cancel")
+    if (eventSource == "cancel")
     {
         dismiss();
         return GUIEngine::EVENT_BLOCK;
@@ -108,6 +68,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
     const int playerID = 0; // FIXME: don't hardcode player 0?
+    ButtonWidget* cancelButton = (ButtonWidget*)Screen::getWidget("cancel", &m_children);
     if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
     {
         std::string fakeEvent = "cancel";
@@ -116,13 +77,15 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     }
         
     // ---- Otherwise, accept entered name
+    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
     stringw playerName = textCtrl->getText();
     if (playerName.size() > 0)
     {
         const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
         if (!success)
         {
-            m_label_ctrl->setText(_("Cannot add a player with this name."));
+            LabelWidget* label = (LabelWidget*)Screen::getWidget("title", &m_children);
+            label->setText(_("Cannot add a player with this name."));
             sfx_manager->quickSound( "use_anvil" );
             return;
         }

@@ -54,6 +54,7 @@
  \li \ref widget10
  \li \ref widget11
  \li \ref widget12
+ \li \ref widget13
  
  \ref props
  \li \ref prop1
@@ -239,6 +240,11 @@
  \note The value must be set programmatically.
  
  \n
+ 
+ \subsection widget13 WTYPE_TEXTBOX
+ <em> Name in XML files: </em> \c "textbox" 
+
+ A text field where the user can type text
  
  \n
  \n

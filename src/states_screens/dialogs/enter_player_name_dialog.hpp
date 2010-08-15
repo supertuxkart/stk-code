@@ -30,9 +30,9 @@ namespace GUIEngine
 
 class EnterPlayerNameDialog : public GUIEngine::ModalDialog
 {
-    GUIEngine::LabelWidget*   m_label_ctrl;
-    GUIEngine::TextBoxWidget* textCtrl;
-    GUIEngine::ButtonWidget*  cancelButton;
+    //GUIEngine::LabelWidget*   m_label_ctrl;
+    //GUIEngine::TextBoxWidget* textCtrl;
+    //GUIEngine::ButtonWidget*  cancelButton;
     
 public:
     /**
