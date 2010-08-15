@@ -202,17 +202,12 @@ void CreditsScreen::loadedFromFile()
 
 void CreditsScreen::init()
 {
+    Screen::init();
     Widget* w = getWidget<Widget>("animated_area");
     assert(w != NULL);
     
     reset();
     setArea(w->m_x, w->m_y, w->m_w, w->m_h);
-}
-
-// ---------------------------------------------------------------------------------------------------
-
-void CreditsScreen::tearDown()
-{
 }
 
 // ---------------------------------------------------------------------------------------------------

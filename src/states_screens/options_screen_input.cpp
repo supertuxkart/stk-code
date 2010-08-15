@@ -16,10 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_input2.hpp"
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_players.hpp"
-#include "states_screens/options_screen_video.hpp"
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
@@ -31,6 +27,10 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -48,7 +48,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
 
 OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 {
-}
+}   // OptionsScreenInput
 
 // -----------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ void OptionsScreenInput::loadedFromFile()
     const int screen_width = irr_driver->getFrameSize().Width;
     const float scale = 0.3f + 0.2f*std::max(0, screen_width - 640)/564.0f;
     m_icon_bank->setScale(scale);
-}
+}   // loadFromFile
 
 // -----------------------------------------------------------------------------
 
@@ -110,13 +110,14 @@ void OptionsScreenInput::buildDeviceList()
             const std::string internal_name = gpname.str();
             
             devices->addItem(internal_name, name, 1 /* icon */);
-        }
-    }    
-}
+        }   // if config->isPlugged
+    }   // for i<gpad_config_count
+}   // buildDeviceList
 
 // -----------------------------------------------------------------------------
 void OptionsScreenInput::init()
 {
+    Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
     
@@ -135,7 +136,7 @@ void OptionsScreenInput::init()
     const std::string name2("devices");
     eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
      */
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
@@ -155,14 +156,7 @@ void OptionsScreenInput::rebuildDeviceList()
     
     devices->clear();
     buildDeviceList();        
-}
-
-
-// -----------------------------------------------------------------------------
-
-void OptionsScreenInput::tearDown()
-{
-}
+}   // rebuildDeviceList
 
 // -----------------------------------------------------------------------------
 
@@ -229,7 +223,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         }
     }
     
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 
@@ -237,5 +231,5 @@ void OptionsScreenInput::unloaded()
 {
     delete m_icon_bank;
     m_icon_bank = NULL;
-}
+}   // unloaded
 

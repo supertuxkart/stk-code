@@ -141,7 +141,8 @@ void StateManager::resetActivePlayers()
 
 bool StateManager::throttleFPS()
 {
-    return m_game_mode != GUIEngine::GAME  &&  GUIEngine::getCurrentScreen()->throttleFPS();
+    return m_game_mode != GUIEngine::GAME  &&
+           GUIEngine::getCurrentScreen()->throttleFPS();
 }   // throttleFPS
 
 // ----------------------------------------------------------------------------
@@ -165,8 +166,6 @@ void StateManager::escapePressed()
     {
         if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE)
             new RacePausedDialog(0.8f, 0.6f);
-        //resetAndGoToMenu("main.stkgui");
-        //input_manager->setMode(InputManager::MENU);
     }
     // In menus
     else
@@ -177,18 +176,12 @@ void StateManager::escapePressed()
 
 // ----------------------------------------------------------------------------
 
-void StateManager::onGameStateChange(GameState previousState, GameState newState)
+void StateManager::onGameStateChange(GameState new_state)
 {
-    if (newState == GAME)
+    if (new_state == GAME)
     {
         irr_driver->hidePointer();
         input_manager->setMode(InputManager::INGAME);
-
-        if (previousState == INGAME_MENU)
-        {
-            // unpause the world
-            if (World::getWorld() != NULL) World::getWorld()->unpause();
-        }
     }
     else  // menu (including in-game menu)
     {
@@ -196,19 +189,14 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
         input_manager->setMode(InputManager::MENU);
         sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
         
-        if (newState == MENU)
+        if (new_state == MENU)
         {
             Screen* screen = GUIEngine::getCurrentScreen();
             if (screen != NULL)
             {
-                music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+                music_manager->startMusic(
+                    GUIEngine::getCurrentScreen()->getMusic());
             }
-        }
-        else if (newState == INGAME_MENU)
-        {
-            // pause game when an in-game menu is shown
-            if (World::getWorld() != NULL) 
-                World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
         }
     }    
 }   // onGameStateChange
@@ -237,7 +225,8 @@ void StateManager::onStackEmptied()
 #pragma mark ActivePlayer
 #endif
 
-StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player, InputDevice *device)
+StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player, 
+                                         InputDevice *device)
 {
     m_player = player;
     m_device = NULL;
@@ -270,5 +259,3 @@ void StateManager::ActivePlayer::setDevice(InputDevice* device)
     // inform the devce of its new owner
     if (device != NULL) device->setPlayer(this);
 }   // setDevice
-
-

@@ -38,9 +38,10 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) :
+RacePausedDialog::RacePausedDialog(const float percentWidth, 
+                                   const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
     World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
@@ -56,9 +57,11 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     
     // ---- Caption
     core::rect< s32 > area(0, 0, m_area.getWidth(), title_height);
-    IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Paused"),
-                                                                    area, false, false, // border, word warp
-                                                                    m_irrlicht_window);
+    IGUIStaticText* caption = 
+        GUIEngine::getGUIEnv()->addStaticText( _("Paused"),
+                                               area, /*border*/false,
+                                               /*word wrap*/ false,
+                                               m_irrlicht_window);
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     caption->setOverrideFont(titlefont);
@@ -93,36 +96,47 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
         //I18N: In the 'paused' screen
-        m_choice_ribbon->addIconChild(_("Setup New Race"), "newrace", 128, 128, "gui/main_race.png");
+        m_choice_ribbon->addIconChild(_("Setup New Race"), "newrace", 
+                                      128, 128, "gui/main_race.png");
     }
     
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
         //I18N: In the 'paused' screen
-        m_choice_ribbon->addIconChild(_("Restart Race"), "restart", 128, 128, "gui/restart.png");
+        m_choice_ribbon->addIconChild(_("Restart Race"), "restart",
+                                      128, 128, "gui/restart.png");
     }
 
     //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Options"), "options", 128, 128, "gui/main_options.png");
+    m_choice_ribbon->addIconChild(_("Options"), "options", 
+                                  128, 128, "gui/main_options.png");
 
     //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Help"), "help", 128, 128, "gui/main_help.png");
+    m_choice_ribbon->addIconChild(_("Help"), "help", 128, 128, 
+                                  "gui/main_help.png");
 
     //I18N: In the 'paused' screen
-    m_choice_ribbon->addIconChild(_("Exit Race"), "exit", 128, 128, "gui/main_quit.png");
+    m_choice_ribbon->addIconChild(_("Exit Race"), "exit", 128, 128, 
+                                  "gui/main_quit.png");
 
     m_children.push_back(m_choice_ribbon);
     m_choice_ribbon->add();   
-}
-// ------------------------------------------------------------------------------------------------------
+}   // RacePausedDialog
 
+// ----------------------------------------------------------------------------
+RacePausedDialog::~RacePausedDialog()
+{
+    World::getWorld()->unpause();
+}   // ~RacePausedDialog
+
+// ----------------------------------------------------------------------------
 void RacePausedDialog::onEnterPressedInternal()
 {
-}
+}   // onEnterPressedInternal
 
-// ------------------------------------------------------------------------------------------------------
-
-GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& eventSource)
+// ----------------------------------------------------------------------------
+GUIEngine::EventPropagation 
+           RacePausedDialog::processEvent(const std::string& eventSource)
 {
     if(UserConfigParams::m_verbosity>=5)
        std::cout << "RacePausedDialog::processEvent(" 
@@ -136,7 +150,8 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& ev
     }
     else if (eventSource == "choiceribbon")
     {
-        const std::string& selection = m_choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection = 
+            m_choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if(UserConfigParams::m_verbosity>=5)
             std::cout << "RacePausedDialog::processEvent(" 
@@ -171,32 +186,18 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& ev
         }
         else if (selection == "newrace")
         {
-            /*
             ModalDialog::dismiss();
             World::getWorld()->unpause();
             race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
-            return GUIEngine::EVENT_BLOCK;
-             */
-            ModalDialog::dismiss();
-            World::getWorld()->unpause();
-            race_manager->exitRace();
-            Screen* newStack[] = {MainMenuScreen::getInstance(), RaceSetupScreen::getInstance(), NULL};
+            Screen* newStack[] = {MainMenuScreen::getInstance(), 
+                                  RaceSetupScreen::getInstance(), NULL};
             StateManager::get()->resetAndSetStack( newStack );
             return GUIEngine::EVENT_BLOCK;
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
-// ------------------------------------------------------------------------------------------------------
-
-RacePausedDialog::~RacePausedDialog()
-{
-    World::getWorld()->unpause();
-}
-
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 

@@ -42,9 +42,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
-
     /** This function is used to download a text from the server to show the news. */
     static void * downloadNews(void *);
     

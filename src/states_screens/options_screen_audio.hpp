@@ -48,9 +48,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
-    
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
 };

@@ -63,10 +63,9 @@ void AbstractStateManager::setGameState(GameState state)
 {
     if (m_game_mode == state) return; // no change
     
-    GameState previous = m_game_mode;
     m_game_mode = state;
     
-    onGameStateChange(previous, state);
+    onGameStateChange(state);
 }   // setGameState
 
 

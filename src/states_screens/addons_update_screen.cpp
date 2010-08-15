@@ -79,12 +79,8 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
 
 void AddonsUpdateScreen::init()
 {
-this->getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update", PLAYER_ID_GAME_MASTER);
+    Screen::init();
+    getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update", PLAYER_ID_GAME_MASTER);
 }
 
-// ------------------------------------------------------------------------------------------------------
-
-void AddonsUpdateScreen::tearDown()
-{
-}
 #endif

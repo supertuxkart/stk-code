@@ -767,6 +767,7 @@ void KartSelectionScreen::loadedFromFile()
 
 void KartSelectionScreen::init()
 {
+    Screen::init();
     Widget* placeholder = this->getWidget("playerskarts");
     assert(placeholder != NULL);
     
@@ -844,15 +845,15 @@ void KartSelectionScreen::init()
     }
     std::cout << "==========================\n";
      */
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
 void KartSelectionScreen::tearDown()
 {
-    //g_player_karts.clearWithoutDeleting();
+    Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
-}
+}   // tearDown
 
 // -----------------------------------------------------------------------------
 

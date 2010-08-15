@@ -28,6 +28,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -42,27 +43,29 @@ using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-Screen::Screen(const char* file)
+Screen::Screen(const char* file, bool pause_race)
 {
     m_magic_number   = 0xCAFEC001;
 
-    this->m_filename = file;
+    m_filename       = file;
     m_throttle_FPS   = true;
     m_render_3d      = false;
     m_loaded         = false;
     m_first_widget   = NULL;
     m_last_widget    = NULL;
-}
+    m_pause_race     = pause_race;
+}   // Screen
 
 // -----------------------------------------------------------------------------
 
-Screen::Screen()
+Screen::Screen(bool pause_race)
 {
     m_magic_number = 0xCAFEC001;
 
     m_loaded       = false;
     m_render_3d    = false;
-}
+    m_pause_race   = pause_race;
+}   // Screen
 
 // -----------------------------------------------------------------------------
 
@@ -73,6 +76,30 @@ Screen::~Screen()
 }
 
 // -----------------------------------------------------------------------------
+/** Initialisation before the object is displayed. If necessary this function
+ *  will pause the race if it is running (i.e. world exists). While only some
+ *  of the screen can be shown during the race (via the in-game menu you
+ *  can get the options screen and the help screens only). This is used by
+ *  the RaceResultGUI to leave the race running (for the end animation) while
+ *  the results are being shown.
+ */
+void Screen::init()
+{
+    if(m_pause_race && World::getWorld())
+        World::getWorld()->pause(World::IN_GAME_MENU_PHASE);
+}   // init
+
+// -----------------------------------------------------------------------------
+/** Prepares removal of this screen. If necessary this will unpause the
+ *  race (so this means that if you have several consecutive screens while
+ *  the race is running the race will be unpaused and paused when switching
+ *  from one screen to the next. */
+void Screen::tearDown()
+{
+    if(m_pause_race && World::getWorld())
+        World::getWorld()->unpause();
+}   // tearDown
+
 // -----------------------------------------------------------------------------
 
 #if 0
@@ -94,7 +121,7 @@ void Screen::loadFromFile()
     loadedFromFile();
     
     delete xml;
-}
+}   // loadFromFile
 
 // -----------------------------------------------------------------------------
 
@@ -111,7 +138,7 @@ void Screen::unload()
     
     // invoke callback so that the class deriving from Screen is aware of this event
     unloaded();
-}
+}   // unload
 
 // -----------------------------------------------------------------------------
 
@@ -120,7 +147,7 @@ void Screen::calculateLayout()
     assert(m_magic_number == 0xCAFEC001);
     // build layout
     calculateLayout( m_widgets );
-}
+}   // calculateLayout
 
 // -----------------------------------------------------------------------------
 
@@ -304,7 +331,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
     {
         if(widgets[n].m_type == WTYPE_DIV) calculateLayout(widgets[n].m_children, &widgets[n]);
     }
-}
+}   // calculateLayout
 
 // -----------------------------------------------------------------------------
 #if 0
@@ -327,7 +354,7 @@ void Screen::addWidgets()
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     else std::cerr << "Couldn't select first widget, NULL was returned\n";
-}
+}   // addWidgets
 
 // -----------------------------------------------------------------------------
 
@@ -364,7 +391,7 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
         
     } // next widget
     
-}
+}   // addWidgetsRecursively
 
 // -----------------------------------------------------------------------------
 
@@ -389,7 +416,7 @@ void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
             elementsWereDeleted( &(widget.m_children) );
         }
     }
-}
+}   // elementsWereDeleted
 
 // -----------------------------------------------------------------------------
 
@@ -397,7 +424,7 @@ void Screen::manualAddWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
     m_widgets.push_back(w);
-}
+}   // manualAddWidget
 
 // -----------------------------------------------------------------------------
 
@@ -405,9 +432,8 @@ void Screen::manualRemoveWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
     m_widgets.remove(w);
-}
+}   // manualRemoveWidget
 
-// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
 #if 0
@@ -418,14 +444,14 @@ void Screen::manualRemoveWidget(Widget* w)
 Widget* Screen::getWidget(const char* name)
 {
     return getWidget(name, &m_widgets);
-}
+}   // getWidget
 
 // -----------------------------------------------------------------------------
 
 Widget* Screen::getWidget(const int id)
 {
     return getWidget(id, &m_widgets);
-}
+}   // getWidget
 
 // -----------------------------------------------------------------------------
 
@@ -447,7 +473,7 @@ Widget* Screen::getWidget(const char* name, ptr_vector<Widget>* within_vector)
     } // next
     
     return NULL;
-}
+}   // getWidget
 // -----------------------------------------------------------------------------
 Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
 {
@@ -469,7 +495,7 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
     } // next
     
     return NULL;
-}
+}   // getWidget
 
 // -----------------------------------------------------------------------------
 
@@ -503,7 +529,7 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
         return item;
     }
     return NULL;
-}
+}   // getFirstWidget
 
 // -----------------------------------------------------------------------------
 
@@ -537,6 +563,6 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
         return item;
     }
     return NULL;
-}
+}   // getLastWidget
 
 

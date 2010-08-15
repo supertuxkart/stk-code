@@ -43,7 +43,8 @@ namespace GUIEngine
 const static int PLAYER_ID_GAME_MASTER = 0;
 
 /**
-  * \brief A concrete scene manager, derived from GUIEngine's AbastractSceneManager
+  * \brief A concrete scene manager, derived from GUIEngine's 
+  * AbastractSceneManager
   * \ingroup states_screens
   */
 class StateManager : public GUIEngine::AbstractStateManager
@@ -87,13 +88,15 @@ public:
         /** \return the identity of this active player */
         const PlayerProfile* getConstProfile() const { return m_player; }
 
-        /** Call to change the identity of this player (useful when player is selecting his identity) */
+        /** Call to change the identity of this player (useful when player is
+         *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
         
         /** ID of this player within the list of active players */
         int getID() const { return m_id; }
         
-        /** \return Which input device this player is using, or NULL if none is set yet */
+        /** \return Which input device this player is using, or NULL if none 
+         *  is set yet */
         InputDevice* getDevice() const { return m_device; }
          
         void setDevice(InputDevice* device);
@@ -106,19 +109,14 @@ public:
     };
 
 
-    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers() { return m_active_players; }
+    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers() 
+                                 { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);
     
     /** \return    the PlayerProfile of a given ActivePlayer.
       * \param id  the ID of the active player for whichyou want the profile
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
-
-    /**
-      * Adds a new player to the list of active players. StateManager takes ownership of the object
-      * so no need to delete it yourself.
-      */
-//    void addActivePlayer(ActivePlayer* p);
     
     int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
@@ -127,8 +125,9 @@ public:
     void resetActivePlayers();
     
     /** \return whether to reduce FPS at the moment
-      * \note   this can be useful to avoid being too CPU/GPU intensive in parts of the
-      *         game that don't require high framerates, like menus
+      * \note   this can be useful to avoid being too CPU/GPU intensive in 
+      *         parts of the game that don't require high framerates, like 
+      *         menus
       */
     bool throttleFPS();
     
@@ -136,7 +135,7 @@ public:
     void escapePressed();
 
     /** \brief implementing callback from base class AbstractStateManager */
-    virtual void onGameStateChange(GUIEngine::GameState previousState, GUIEngine::GameState newState);
+    virtual void onGameStateChange(GUIEngine::GameState new_state);
 
     /** \brief implementing callback from base class AbstractStateManager */
     virtual void onStackEmptied();

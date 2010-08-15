@@ -16,9 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
-#include "states_screens/options_screen_video.hpp"
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -30,8 +27,10 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-
 
 #include <iostream>
 #include <sstream>
@@ -44,18 +43,19 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenAudio );
 
 OptionsScreenAudio::OptionsScreenAudio() : Screen("options_audio.stkgui")
 {
-}
+}   // OptionsScreenAudio
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenAudio::loadedFromFile()
 {
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenAudio::init()
 {
+    Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
     
@@ -79,7 +79,7 @@ void OptionsScreenAudio::init()
     sfx->setState( UserConfigParams::m_sfx );
     music->setState( UserConfigParams::m_music );
     
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
@@ -145,20 +145,13 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         
         UserConfigParams::m_sfx = w->getState();
     }
-        
-}
-
-// -----------------------------------------------------------------------------
-
-void OptionsScreenAudio::tearDown()
-{
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenAudio::unloaded()
 {
-}
+}   // unloaded
 
 // -----------------------------------------------------------------------------
 

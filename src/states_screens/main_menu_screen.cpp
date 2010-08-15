@@ -104,6 +104,7 @@ void MainMenuScreen::loadedFromFile()
 //
 void MainMenuScreen::init()
 {
+    Screen::init();
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
@@ -112,12 +113,6 @@ void MainMenuScreen::init()
     pthread_t nThreadID2;
     pthread_create(&nThreadID2, NULL, &MainMenuScreen::downloadNews, this);
 #endif
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void MainMenuScreen::tearDown()
-{
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -133,13 +128,13 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
-        static int i = 2;
+        static int i = 3;
         i++;
         
         if (i % 4 == 0)
         {
             // the passed kart will not be modified, that's why I allow myself to use const_cast
-            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),
+            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("tux")),
                                    L"Unlocked");
             StateManager::get()->pushScreen(scene);
         }

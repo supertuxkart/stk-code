@@ -89,6 +89,7 @@ void ArenasScreen::loadedFromFile()
 
 void ArenasScreen::init()
 {
+    Screen::init();
     buildTrackList();
     
     // select something by default for the game master
@@ -96,12 +97,6 @@ void ArenasScreen::init()
     assert( w != NULL );
     w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
 }   // init
-
-// ------------------------------------------------------------------------------------------------------
-
-void ArenasScreen::tearDown()
-{
-}   // tearDown
 
 // ------------------------------------------------------------------------------------------------------
 

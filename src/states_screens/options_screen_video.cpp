@@ -15,9 +15,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 
 #include "audio/music_manager.hpp"
@@ -31,6 +28,9 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -46,7 +46,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui")
 {
     m_inited = false;
-}
+}   // OptionsScreenVideo
 
 // -----------------------------------------------------------------------------
 
@@ -92,12 +92,13 @@ void OptionsScreenVideo::loadedFromFile()
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
 
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenVideo::init()
 {
+    Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
     
@@ -209,7 +210,7 @@ void OptionsScreenVideo::init()
         GUIEngine::reloadSkin();
     }
     
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
@@ -260,22 +261,23 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         GUIEngine::reloadSkin();
     }
     
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenVideo::tearDown()
 {
+    Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
-}
+}   // tearDown
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenVideo::unloaded()
 {
     m_inited = false;
-}
+}   // unloaded
 
 // -----------------------------------------------------------------------------
 

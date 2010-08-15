@@ -247,6 +247,7 @@ void FeatureUnlockedCutScene::init()
 
 void FeatureUnlockedCutScene::tearDown()
 {
+    Screen::tearDown();
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
     
@@ -266,7 +267,7 @@ void FeatureUnlockedCutScene::tearDown()
 #endif
 
     m_unlocked_stuff.clearAndDeleteAll();
-}
+}   // tearDown
 
 // ----------------------------------------------------------------------------
 
@@ -277,7 +278,7 @@ T keepInRange(T from, T to, T value)
     if (value < from) return from;
     if (value > to  ) return to;
     return value;
-}
+}   // keepInRange
 
 // ----------------------------------------------------------------------------
 
@@ -438,7 +439,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
             message_y -= (fontH + MARGIN);
         }
     }
-}
+}   // onUpdate
 
 // ----------------------------------------------------------------------------
 
@@ -537,7 +538,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
             
         } // next feature
     } // next challenge
-}
+}   // addUnlockedThings
 
 // ----------------------------------------------------------------------------
 
@@ -545,7 +546,7 @@ bool FeatureUnlockedCutScene::onEscapePressed()
 {
     continueButtonPressed();
     return false; // continueButtonPressed already pop'ed the menu
-}
+}   // onEscapePressed
 
 // -------------------------------------------------------------------------------------
 
@@ -564,7 +565,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
     }
     
-}
+}   // continueButtonPressed
 
 // -------------------------------------------------------------------------------------
 
@@ -572,12 +573,10 @@ void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget,
                                             const std::string& name,
                                             const int playerID)
 {
-    
     if (name == "continue")
     {
         continueButtonPressed();
-    }
-    
-}
+    }   
+}   // eventCallback
 
 // -------------------------------------------------------------------------------------

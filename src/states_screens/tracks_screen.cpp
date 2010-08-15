@@ -173,6 +173,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 
 void TracksScreen::init()
 {
+    Screen::init();
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
     assert( gps_widget != NULL );
     
@@ -231,12 +232,6 @@ void TracksScreen::init()
        
     // select something for the game master
     tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
-}
-
-// -----------------------------------------------------------------------------------------------
-
-void TracksScreen::tearDown()
-{
 }
 
 // -----------------------------------------------------------------------------------------------

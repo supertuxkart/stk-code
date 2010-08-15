@@ -45,9 +45,6 @@ public:
     void init();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown();
-    
-    /** \brief implement callback from parent class GUIEngine::Screen */
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
 };
 

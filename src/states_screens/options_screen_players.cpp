@@ -15,10 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_players.hpp"
-#include "states_screens/options_screen_video.hpp"
 
 #include "config/player.hpp"
 #include "config/device_config.hpp"
@@ -30,6 +27,9 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
+#include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
 
@@ -46,18 +46,20 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenPlayers );
 
 OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 {
-}
+}   // OptionsScreenPlayers
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenPlayers::loadedFromFile()
 {
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenPlayers::init()
 {
+    Screen::init();
+
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL) tabBar->select( "tab_players", PLAYER_ID_GAME_MASTER );
     
@@ -70,7 +72,7 @@ void OptionsScreenPlayers::init()
         players->addItem( UserConfigParams::m_all_players[n].getName(),
                           UserConfigParams::m_all_players[n].getName() );
     }
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
@@ -110,7 +112,7 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         
     }
     return true;
-}
+}   // gotNewPlayerName
 
 // -----------------------------------------------------------------------------
 
@@ -129,15 +131,15 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
         players->addItem(UserConfigParams::m_all_players[n].getName(),
                          UserConfigParams::m_all_players[n].getName());
     }
-}
-
+}   // deletePlayer
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenPlayers::tearDown()
 {
+    Screen::tearDown();
     user_config->saveConfig();
-}
+}   // tearDown
 
 // -----------------------------------------------------------------------------
 
@@ -179,8 +181,8 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
                 return;
             }
         } // end for
-    }
+    }   // name=="players"
     
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------

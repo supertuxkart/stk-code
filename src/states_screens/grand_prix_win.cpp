@@ -37,7 +37,7 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
     m_throttle_FPS = false;
     
     m_music = music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music"));
-}
+}   // GrandPrixWin
 
 // -------------------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ void GrandPrixWin::loadedFromFile()
     
     m_podium_x[2] = 3.0f;
     m_podium_z[2] = 0.0f;
-}
+}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
@@ -75,13 +75,13 @@ void traverse(scene::ISceneNode* curr, int level=0)
     {
         traverse(*it, level+1);
     }
-    
-}
+}   // traverse
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixWin::init()
 {
+    Screen::init();
     if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -197,12 +197,13 @@ void GrandPrixWin::init()
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
     
     sfx_manager->quickSound("winner");
-}
+}   // init
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixWin::tearDown()
 {
+    Screen::tearDown();
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
     
@@ -222,8 +223,7 @@ void GrandPrixWin::tearDown()
         if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
         m_kart_node[n] = NULL;
     }
-
-}
+}   // tearDown
 
 // -------------------------------------------------------------------------------------
 
@@ -350,7 +350,7 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
                                     core::rect< s32 >( 0, test_y, w, h/10 ),
                                     color,
                                     true/* center h */, true /* center v */ );
-}
+}   // onUpdate
 
 // -------------------------------------------------------------------------------------
 
@@ -381,7 +381,7 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
             StateManager::get()->popMenu();
         }
     }
-}
+}   // eventCallback
 
 // -------------------------------------------------------------------------------------
 
@@ -424,6 +424,6 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
     } // end for
     
     assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
-}
+}   // setKarts
 
 // -------------------------------------------------------------------------------------

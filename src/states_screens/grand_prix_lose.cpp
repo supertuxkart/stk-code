@@ -50,19 +50,20 @@ GrandPrixLose::GrandPrixLose() : Screen("grand_prix_lose.stkgui")
     m_throttle_FPS = false;
     
     m_music = music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music"));
-}
+}   // GrandPrixLose
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixLose::loadedFromFile()
 {
     m_kart_node = NULL;
-}
+}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixLose::init()
 {
+    Screen::init();
     //music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music")));
 
     m_phase = 1;
@@ -115,12 +116,13 @@ void GrandPrixLose::init()
                                                                300.0f /* radius */);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
-}
+}   // init
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixLose::tearDown()
 {
+    Screen::tearDown();
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
     
@@ -136,7 +138,7 @@ void GrandPrixLose::tearDown()
     irr_driver->removeNode(m_kart_node);
     
     irr_driver->removeNode(m_garage_door);
-}
+}   // tearDown
 
 // -------------------------------------------------------------------------------------
 
@@ -193,7 +195,7 @@ void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
                                     core::rect< s32 >( 0, test_y, w, h ),
                                     color,
                                     true/* center h */, false /* center v */ );
-}
+}   // onUpdate
 
 // -------------------------------------------------------------------------------------
 
@@ -224,7 +226,7 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
             StateManager::get()->popMenu();
         }
     }
-}
+}   // eventCallback
 
 // -------------------------------------------------------------------------------------
 

@@ -59,9 +59,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
-    
     /** 
      * \brief invoke if the list of devices changed after the creation of this screen.
      * This will cause the displayed list to be updated accordingly with the data in the device manager.

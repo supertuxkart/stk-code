@@ -15,11 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_input2.hpp"
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_players.hpp"
-#include "states_screens/options_screen_video.hpp"
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
@@ -33,8 +29,11 @@
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
+#include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -50,19 +49,19 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenInput2 );
 OptionsScreenInput2::OptionsScreenInput2() : Screen("options_device.stkgui")
 {
     m_config = NULL;
-    
-}
+}   // OptionsScreenInput2
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput2::loadedFromFile()
 {    
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput2::init()
 {
+    Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
     
@@ -99,7 +98,7 @@ void OptionsScreenInput2::init()
     actions->addItem(KartActionStrings[PA_MENU_CANCEL], L"" );
     
     updateInputButtons();
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 
@@ -111,7 +110,7 @@ irr::core::stringw OptionsScreenInput2::makeLabel(const irr::core::stringw trans
     
     out += m_config->getBindingAsString(action);
     return out;
-}
+}   // makeLabel
 
 // -----------------------------------------------------------------------------
 
@@ -236,7 +235,7 @@ void OptionsScreenInput2::updateInputButtons()
             //actions->renameItem( KartActionStrings[action], _("Binding Conflict!") ); 
         }
     }
-}
+}   // updateInputButtons
 
 // -----------------------------------------------------------------------------
 
@@ -308,13 +307,8 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
     
     // save new binding to file
     input_manager->getDeviceList()->serialize();
-}
+}   // gotSensedInput
 
-// -----------------------------------------------------------------------------
-
-void OptionsScreenInput2::tearDown()
-{
-}
 
 // -----------------------------------------------------------------------------
 
@@ -451,13 +445,13 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
         }
     }*/
 
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput2::unloaded()
 {
-}
+}   // unloaded
 
 // -----------------------------------------------------------------------------
 
@@ -465,6 +459,6 @@ bool OptionsScreenInput2::onEscapePressed()
 {
     StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     return false; // don't use standard escape key handler, we handled it differently
-}
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------

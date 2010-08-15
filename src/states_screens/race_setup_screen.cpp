@@ -162,6 +162,7 @@ void RaceSetupScreen::onGameModeChanged()
 
 void RaceSetupScreen::init()
 {
+    Screen::init();
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
     w->setSelection( race_manager->getDifficulty(), PLAYER_ID_GAME_MASTER );
@@ -218,18 +219,6 @@ void RaceSetupScreen::init()
     //FIXME: it's unclear to me whether I must add a listener everytime init is called or not
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
-}
-
-// -----------------------------------------------------------------------------
-
-void RaceSetupScreen::tearDown()
-{
-    //delete m_mode_listener;
-    //m_mode_listener = NULL;
-    
-    //DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
-    //assert( w2 != NULL );
-    // w2->setListener(NULL);
 }
 
 // -----------------------------------------------------------------------------

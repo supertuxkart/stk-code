@@ -64,6 +64,7 @@ void ChallengesScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
 
 void ChallengesScreen::init()
 {
+    Screen::init();
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
     assert( w != NULL );
     
@@ -104,12 +105,6 @@ void ChallengesScreen::init()
         return;
     }
     w->setSelection(0 /* whatever is first */, PLAYER_ID_GAME_MASTER, true /* focus it */);
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void ChallengesScreen::tearDown()
-{
 }
 
 // ------------------------------------------------------------------------------------------------------

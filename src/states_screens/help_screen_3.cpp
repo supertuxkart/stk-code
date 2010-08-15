@@ -15,12 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_1.hpp"
-#include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_3.hpp"
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "modes/world.hpp"
+#include "states_screens/help_screen_1.hpp"
+#include "states_screens/help_screen_2.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -31,13 +32,13 @@ DEFINE_SCREEN_SINGLETON( HelpScreen3 );
 
 HelpScreen3::HelpScreen3() : Screen("help3.stkgui")
 {
-}
+}   // HelpSCreen3
 
 // ------------------------------------------------------------------------------------------------------
 
 void HelpScreen3::loadedFromFile()
 {
-}
+}   // loadedFromFile
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -55,21 +56,16 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
     {
         StateManager::get()->escapePressed();
     }
-}
+}   // eventCallback
 
 // ------------------------------------------------------------------------------------------------------
 
 void HelpScreen3::init()
 {
+    Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     
     if (w != NULL) w->select( "page3", PLAYER_ID_GAME_MASTER );
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void HelpScreen3::tearDown()
-{
-}
+}   // init
 
 // ------------------------------------------------------------------------------------------------------

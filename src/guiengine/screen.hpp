@@ -36,13 +36,14 @@
  */
 namespace GUIEngine
 {
-#define DEFINE_SCREEN_SINGLETON( ClassName )  template<> ClassName* GUIEngine::ScreenSingleton< ClassName >::singleton = NULL
+#define DEFINE_SCREEN_SINGLETON( ClassName )  \
+    template<> ClassName* GUIEngine::ScreenSingleton< ClassName >::singleton = NULL
     
     /**
      * \brief Declares a class to be a singleton.
      * Normally, all screens will be singletons.
-     * Note that you need to use the 'DEFINE_SCREEN_SINGLETON' macro in a .cpp file to
-     * actually define the instance (as this can't be done in a .h)
+     * Note that you need to use the 'DEFINE_SCREEN_SINGLETON' macro in a .
+     * cpp file to actually define the instance (as this can't be done in a .h)
      * \ingroup guiengine
      */
     template<typename SCREEN>
@@ -81,25 +82,19 @@ namespace GUIEngine
      */
     class Screen
     {
-    protected:
+    private:
+        /** True if the race (if it is running) should be paused when this 
+         *  screen is shown. The RaceResultGUI uses this to leave the race
+         *  running while it is being shown. */
+        bool m_pause_race;
+
+    private:
         friend class Skin;
         
         bool m_loaded;
         std::string m_filename;
         
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-        
-        /**
-          * Screen is generally able to determine its first widget just fine, but in highly complex screens
-          * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
-          */
-        Widget* m_first_widget;
-        
-        /**
-         * Screen is generally able to determine its last widget just fine, but in highly complex screens
-         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
-         */
-        Widget* m_last_widget;
         
         /**
           * @brief Recursive call that lays out children widget within parent (or screen if none).
@@ -115,11 +110,6 @@ namespace GUIEngine
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
         
-        /** the widgets in this screen */
-        ptr_vector<Widget, HOLD> m_widgets;
-        
-        bool m_throttle_FPS;
-
         /**
          * \ingroup guiengine
          * \brief Loads a GUI screen from its XML file.
@@ -128,18 +118,36 @@ namespace GUIEngine
          */
         static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
         
+    protected:
+        bool m_throttle_FPS;
+
+        /**
+          * Screen is generally able to determine its first widget just fine, but in highly complex screens
+          * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+          */
+        Widget* m_first_widget;
+
+        /**
+         * Screen is generally able to determine its last widget just fine, but in highly complex screens
+         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+         */
+        Widget* m_last_widget;
+
+        /** the widgets in this screen */
+        ptr_vector<Widget, HOLD> m_widgets;
+        
     public:
         
         
         /** \brief creates a dummy incomplete object; only use to override behaviour in sub-class */
-        Screen();
+        Screen(bool pause_race=true);
         
         /** 
           * \brief          creates a screen populated by the widgets described in a STK GUI file
           * \param filename name of the XML file describing the screen. this is NOT a path.
           *                 The passed file name will be searched for in the STK data/gui directory
           */
-        Screen(const char* filename);
+        Screen(const char* filename, bool pause_race=true);
         
         virtual ~Screen();
         
@@ -255,7 +263,7 @@ namespace GUIEngine
           * one instance of your object can be used several times if the same screen is visited several
           * times.
           */
-        virtual void init() = 0;
+        virtual void init();
         
         /** 
           * \brief callback invoked before leaving this menu
@@ -264,7 +272,7 @@ namespace GUIEngine
           * one instance of your object can be used several times if the same screen is visited several
           * times.
           */
-        virtual void tearDown() = 0;
+        virtual void tearDown();
         
         /** 
           * \brief  Called when escape is pressed.

@@ -135,6 +135,7 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 }
 void AddonsScreen::init()
 {
+    Screen::init();
 	this->getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
     this->type = "kart";
 
@@ -151,11 +152,6 @@ void AddonsScreen::init()
     pthread_create(&thread, NULL, &AddonsScreen::downloadList, this);
 }
 
-// ------------------------------------------------------------------------------------------------------
-
-void AddonsScreen::tearDown()
-{
-}
 // ------------------------------------------------------------------------------------------------------
 void * AddonsScreen::downloadList( void * pthis)
 {
