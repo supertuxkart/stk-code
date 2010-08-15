@@ -233,5 +233,3 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     onTopMostScreenChanged();
 }   // resetAndSetStack
 
-
- 

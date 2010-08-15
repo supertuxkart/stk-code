@@ -96,14 +96,6 @@ namespace GUIEngine
         
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         
-        /**
-          * @brief Recursive call that lays out children widget within parent (or screen if none).
-          *
-          * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
-          * of the remaining children, as well as absolute sizes and locations.
-          */
-        void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-        
         /** Will be called to determine if the 3D scene must be rendered when at this screen. */
         bool m_render_3d;
         

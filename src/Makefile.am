@@ -85,6 +85,8 @@ supertuxkart_SOURCES = \
  guiengine/engine.hpp \
  guiengine/event_handler.cpp \
  guiengine/event_handler.hpp \
+ guiengine/layout_manager.cpp \
+ guiengine/layout_manager.hpp \
  guiengine/modaldialog.cpp \
  guiengine/modaldialog.hpp \
  guiengine/scalable_font.cpp \

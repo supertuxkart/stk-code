@@ -115,6 +115,7 @@ namespace GUIEngine
     protected:        
         unsigned int m_magic_number;
 
+        // FIXME: find better ways than hackish "friend"?
         friend class EventHandler;
         friend class Screen;
         friend class Skin;
@@ -122,6 +123,7 @@ namespace GUIEngine
         friend class SpinnerWidget;
         friend class ProgressBarWidget;
         friend class DynamicRibbonWidget;
+        friend class LayoutManager;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
@@ -168,27 +170,10 @@ namespace GUIEngine
         virtual void unfocused(const int playerID) { }
         
         /**
-          * The XML loader stored coords in their raw string form inside this widget.
-          * This method parses the strings. Most notably, expands coords relative to parent
-          * and calculates percentages.
-          */
-        void readCoords(Widget* parent=NULL);
-        
-        /**
          * An irrlicht parent (most often used to put widgets in dialogs)
          */
         irr::gui::IGUIElement* m_parent;
-        
-        /**
-         * Receives as string the raw property value retrieved from XML file.
-         * Will try to make sense of it, as an absolute value or a percentage.
-         *
-         * Return values :
-         *     Will write to either absolute or percentage, depending on the case.
-         *     Returns false if couldn't convert to either
-         */
-        static bool convertToCoord(std::string& x, int* absolute, int* percentage);
-        
+
         /**
          * IrrLicht widget created to represent this object.
          */

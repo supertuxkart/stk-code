@@ -239,6 +239,7 @@
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
+		9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9560368A12187EFB00EB96C4 /* layout_manager.cpp */; };
 		95634EF21126272C009C145D /* gp_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95634EF01126272C009C145D /* gp_info_dialog.cpp */; };
 		956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541B910DD5F0A00C83E99 /* arenas_screen.cpp */; };
 		956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541DF10DD628C00C83E99 /* add_device_dialog.cpp */; };
@@ -448,6 +449,8 @@
 		955DE88210042701006A4F3C /* check_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_manager.hpp; path = ../../tracks/check_manager.hpp; sourceTree = SOURCE_ROOT; };
 		955DE8871004273B006A4F3C /* check_structure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_structure.cpp; path = ../../tracks/check_structure.cpp; sourceTree = SOURCE_ROOT; };
 		955DE8881004273B006A4F3C /* check_structure.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_structure.hpp; path = ../../tracks/check_structure.hpp; sourceTree = SOURCE_ROOT; };
+		9560368A12187EFB00EB96C4 /* layout_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layout_manager.cpp; path = ../../guiengine/layout_manager.cpp; sourceTree = SOURCE_ROOT; };
+		9560368B12187EFB00EB96C4 /* layout_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = layout_manager.hpp; path = ../../guiengine/layout_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95634EF01126272C009C145D /* gp_info_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gp_info_dialog.cpp; path = ../../states_screens/dialogs/gp_info_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		95634EF11126272C009C145D /* gp_info_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = gp_info_dialog.hpp; path = ../../states_screens/dialogs/gp_info_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		956541B910DD5F0A00C83E99 /* arenas_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arenas_screen.cpp; path = ../../states_screens/arenas_screen.cpp; sourceTree = SOURCE_ROOT; };
@@ -1288,6 +1291,8 @@
 				958330B310122B4A00C5137E /* engine.hpp */,
 				958330B410122B4A00C5137E /* event_handler.cpp */,
 				958330B510122B4A00C5137E /* event_handler.hpp */,
+				9560368A12187EFB00EB96C4 /* layout_manager.cpp */,
+				9560368B12187EFB00EB96C4 /* layout_manager.hpp */,
 				958330B610122B4A00C5137E /* modaldialog.cpp */,
 				958330B710122B4A00C5137E /* modaldialog.hpp */,
 				953F8B1F11F7C13C00205E66 /* scalable_font.cpp */,
@@ -2626,6 +2631,7 @@
 				9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */,
 				9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */,
 				953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */,
+				9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

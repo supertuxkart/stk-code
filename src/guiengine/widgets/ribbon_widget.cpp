@@ -21,6 +21,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/layout_manager.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "input/input_manager.hpp"
@@ -58,7 +59,9 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
     
     updateSelection();
 }
+
 // -----------------------------------------------------------------------------
+
 void RibbonWidget::add()
 {
     m_labels.clearWithoutDeleting();
@@ -77,11 +80,13 @@ void RibbonWidget::add()
     int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
     {
-        m_children[i].readCoords(this);
+        // FIXME: a little unclean to invoke layout code here?
+        LayoutManager::readCoords(m_children.get(i), this);
         
         if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {
-            std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children " << std::endl;
+            std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children "
+                      << std::endl;
             continue;
         }
         
