@@ -87,7 +87,7 @@ bool getWideLine(std::ifstream& file, stringw* out)
 {
     if (!file.good())
     {
-        //std::cout << "File is not good!\n";
+        std::cerr << "getWideLine : File is not good!\n";
         return false;
     }
     wchar_t wide_char;
@@ -153,18 +153,39 @@ void CreditsScreen::loadedFromFile()
     std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
     
     std::ifstream file( creditsfile.c_str() ) ;
+    
+    if (file.fail() || !file.is_open() || file.eof())
+    {
+        fprintf(stderr, "\n/!\\ Failed to open file at '%s'\n\n", creditsfile.c_str());
+        return;
+    }
+    
     stringw line;
     
     // skip Unicode header
     file.get();
     file.get();
     
+    if (file.fail() || !file.is_open() || file.eof())
+    {
+        fprintf(stderr, "\n/!\\ Failed to read file at '%s', unexpected EOF\n\n", creditsfile.c_str());
+        assert(false);
+        return;
+    }
+    
+    int lineCount = 0;
+    
     // let's assume the file is encoded as UTF-16
     while (getWideLine( file, &line ))
-    {
+    {        
+        stringc cversion = line.c_str();
+        printf("CREDITS line : %s\n", cversion.c_str());
+        
         line = line.trim();
         
         if (line.size() < 1) continue; // empty line
+        
+        lineCount++;
         
         if ((line[0] & 0xFF) == '=' && (line[line.size()-1] & 0xFF) == '=')
         {
@@ -194,6 +215,15 @@ void CreditsScreen::loadedFromFile()
             getCurrentSection()->addEntry( entry );
         }
     } // end while
+    
+    
+    if (lineCount == 0)
+    {
+        fprintf(stderr, "\n/!\\ Could not read anything from CREDITS file!\n\n");
+        assert(false);
+        return;
+    }
+    
     assert(m_sections.size() > 0);
     
 }
