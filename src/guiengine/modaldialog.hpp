@@ -21,6 +21,7 @@
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/layout_manager.hpp"
 #include "guiengine/skin.hpp"
 #include "input/input_manager.hpp"
 
@@ -42,8 +43,12 @@ namespace GUIEngine
      * need to keep track of instances yourself)
      * \ingroup guiengine
      */
-    class ModalDialog : public SkinWidgetContainer
+    class ModalDialog : public SkinWidgetContainer, public ITopLevelWidgetContainer
     {
+    private:
+        /** Because C++ doesn't support constructor delegation... */
+        void doInit(const float percentWidth, const float percentHeight);
+        
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
@@ -51,12 +56,21 @@ namespace GUIEngine
         InputManager::InputDriverMode m_previous_mode;
     
         /**
-         * Creates a modal dialog with given percentage of screen width and height
+         * \brief Creates a modal dialog with given percentage of screen width and height
          */
         ModalDialog(const float percentWidth, const float percentHeight);
         
+        /**
+         * \brief Creates a modal dialog with given percentage of screen width and height
+         */
+        ModalDialog(const char* xmlFile, const float percentWidth, const float percentHeight);
+        
+        
         virtual void onEnterPressedInternal();
         void clearWindow();
+        
+        void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+
         
     public:
         ptr_vector<Widget> m_children;
@@ -87,6 +101,16 @@ namespace GUIEngine
         
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }
+        
+        /**
+          * \brief Implementing callback from ITopLevelWidgetContainer
+          */
+        virtual int getWidth()  { return m_area.getWidth(); }
+        
+        /**
+          * \brief Implementing callback from ITopLevelWidgetContainer
+          */
+        virtual int getHeight() { return m_area.getHeight(); }
     };  
     
 }

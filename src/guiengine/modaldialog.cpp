@@ -17,11 +17,20 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 
+#include "irrlicht.h"
 using namespace irr;
+using namespace core;
+using namespace scene;
+using namespace video;
+using namespace io;
+using namespace gui;
 
 namespace GUIEngine
 {
@@ -34,13 +43,53 @@ namespace GUIEngine
 
 using namespace GUIEngine;
 
+// ----------------------------------------------------------------------------
+
 ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
+{
+    doInit(percentWidth, percentHeight);
+}
+
+// ----------------------------------------------------------------------------
+
+void traceChildren(const ptr_vector<Widget>& widgets, int indent=0)
+{
+    for (int n=0; n<widgets.size(); n++)
+    {
+        for (int i=0; i<indent; i++) std::cout << "    ";
+        std::cout << "    Type " << widgets[n].getType() << " : "
+                  << const_cast<Widget*>(widgets.getConst(n))->m_properties[PROP_ID].c_str() << "\n";
+        traceChildren (widgets[n].getChildren(), indent+1);
+    }
+}
+
+ModalDialog::ModalDialog(const char* xmlFile, const float percentWidth, const float percentHeight)
+{
+    // FIXME: dialog are destroyed when dismissed, this means the disk
+    // will be seeked everytime the same dialog is opened to read its
+    // XML file... cache loaded dialogs somehow maybe?
+    doInit(percentWidth, percentHeight);
+    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + xmlFile).c_str() );
+    Screen::parseScreenFileDiv(xml, m_children, m_irrlicht_window);
+    delete xml;
+
+    std::cout << "Dialog children :\n";
+    traceChildren(m_children);
+    
+    LayoutManager::calculateLayout( m_children, this );
+    
+    addWidgetsRecursively(m_children);
+}
+
+// ----------------------------------------------------------------------------
+
+void ModalDialog::doInit(const float percentWidth, const float percentHeight)
 {
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
     
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-
+    
     const int w = (int)(frame_size.Width*percentWidth);
     const int h = (int)(frame_size.Height*percentHeight);
     
@@ -51,12 +100,12 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     
     assert(w > 0);
     assert(h > 0);
-
+    
     assert((unsigned int)w <= frame_size.Width);
     assert((unsigned int)h <= frame_size.Height);
     
     m_area = core::rect< s32 >( core::position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
-                                core::dimension2d< s32 >(w, h) );
+                               core::dimension2d< s32 >(w, h) );
     
     if (modalWindow != NULL) delete modalWindow;
     modalWindow = this;
@@ -69,6 +118,8 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
 }
+
+// ----------------------------------------------------------------------------
 
 ModalDialog::~ModalDialog()
 {
@@ -89,6 +140,8 @@ ModalDialog::~ModalDialog()
 
     input_manager->setMode(m_previous_mode);
 }
+
+// ----------------------------------------------------------------------------
 
 void ModalDialog::clearWindow()
 {
@@ -111,6 +164,8 @@ void ModalDialog::clearWindow()
     }
      */
 }
+
+// ----------------------------------------------------------------------------
     
 void ModalDialog::dismiss()
 {
@@ -118,24 +173,35 @@ void ModalDialog::dismiss()
     modalWindow = NULL;
 }
 
+// ----------------------------------------------------------------------------
+
 void ModalDialog::onEnterPressed()
 {
     if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
 }
 
+// ----------------------------------------------------------------------------
+
 bool ModalDialog::isADialogActive()
 {
     return modalWindow != NULL;
 }
+
+// ----------------------------------------------------------------------------
+
 ModalDialog* ModalDialog::getCurrent()
 {
     return modalWindow;
 }
 
+// ----------------------------------------------------------------------------
+
 void ModalDialog::onEnterPressedInternal()
 {
 }
-    
+
+// ----------------------------------------------------------------------------
+
 Widget* ModalDialog::getLastWidget()
 {
     // FIXME: don't duplicate this code from 'Screen.cpp'
@@ -155,6 +221,9 @@ Widget* ModalDialog::getLastWidget()
     }
     return NULL;
 }
+
+// ----------------------------------------------------------------------------
+
 Widget* ModalDialog::getFirstWidget()
 {
     // FIXME: don't duplicate this code from 'Screen.cpp'
@@ -174,3 +243,42 @@ Widget* ModalDialog::getFirstWidget()
     return NULL;
 }
     
+// ----------------------------------------------------------------------------
+
+// FIXME: this code was duplicated from Screen, find a way to share instead of duplicating
+void ModalDialog::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
+{
+    const unsigned short widgets_amount = widgets.size();
+    
+    // ------- add widgets
+    for (int n=0; n<widgets_amount; n++)
+    {
+        if (widgets[n].getType() == WTYPE_DIV)
+        {
+            widgets[n].add(); // Will do nothing, but will maybe reserve an ID
+            addWidgetsRecursively(widgets[n].m_children, &widgets[n]);
+        }
+        else
+        {
+            // warn if widget has no dimensions (except for ribbons and icons, where it is normal since it
+            // adjusts to its contents)
+            if ((widgets[n].m_w < 1 || widgets[n].m_h < 1) &&
+                widgets[n].getType() != WTYPE_RIBBON &&
+                widgets[n].getType() != WTYPE_ICON_BUTTON)
+            {
+                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no dimensions" << std::endl;
+            }
+            
+            if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
+            {
+                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no position" << std::endl;
+            }
+            
+            widgets[n].add();
+        }
+        
+    } // next widget
+    
+}   // addWidgetsRecursively
+
+// ----------------------------------------------------------------------------

@@ -61,7 +61,7 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
 
 // ----------------------------------------------------------------------------
 
-void LayoutManager::readCoords(Widget* self, Widget* parent)
+void LayoutManager::readCoords(Widget* self, ITopLevelWidgetContainer* topLevelContainer, Widget* parent)
 {    
     // determine widget position and size if not already done by sizers
     std::string x      = self->m_properties[PROP_X];
@@ -74,9 +74,11 @@ void LayoutManager::readCoords(Widget* self, Widget* parent)
     unsigned int parent_w, parent_h, parent_x, parent_y;
     if(parent == NULL)
     {
-        core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-        parent_w = frame_size.Width;
-        parent_h = frame_size.Height;
+        //core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        //parent_w = frame_size.Width;
+        //parent_h = frame_size.Height;
+        parent_w = topLevelContainer->getWidth();
+        parent_h = topLevelContainer->getHeight();
         parent_x = 0;
         parent_y = 0;
     }
@@ -197,14 +199,15 @@ void LayoutManager::readCoords(Widget* self, Widget* parent)
 
 // ----------------------------------------------------------------------------
 
-void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
+void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, ITopLevelWidgetContainer* topLevelContainer,
+                                    Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
     
     // ----- read x/y/size parameters
     for (unsigned short n=0; n<widgets_amount; n++)
     {
-        readCoords(widgets.get(n), parent);
+        readCoords(widgets.get(n), topLevelContainer, parent);
     }//next widget        
     
     // ----- manage 'layout's if relevant
@@ -374,7 +377,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
     // ----- also deal with containers' children
     for(int n=0; n<widgets_amount; n++)
     {
-        if(widgets[n].m_type == WTYPE_DIV) calculateLayout(widgets[n].m_children, &widgets[n]);
+        if(widgets[n].m_type == WTYPE_DIV) calculateLayout(widgets[n].m_children, topLevelContainer, &widgets[n]);
     }
 }   // calculateLayout
 

@@ -81,7 +81,7 @@ void RibbonWidget::add()
     for (int i=0; i<subbuttons_amount; i++)
     {
         // FIXME: a little unclean to invoke layout code here?
-        LayoutManager::readCoords(m_children.get(i), this);
+        LayoutManager::readCoords(m_children.get(i), NULL, this);
         
         if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {

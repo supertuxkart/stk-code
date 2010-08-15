@@ -27,6 +27,7 @@
 
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/layout_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
@@ -80,7 +81,7 @@ namespace GUIEngine
      *
      * \ingroup guiengine
      */
-    class Screen
+    class Screen : public ITopLevelWidgetContainer
     {
     private:
         /** True if the race (if it is running) should be paused when this 
@@ -102,14 +103,6 @@ namespace GUIEngine
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
         
-        /**
-         * \ingroup guiengine
-         * \brief Loads a GUI screen from its XML file.
-         * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
-         * with little analysis or layout performed on them.
-         */
-        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
-        
     protected:
         bool m_throttle_FPS;
 
@@ -129,6 +122,15 @@ namespace GUIEngine
         ptr_vector<Widget, HOLD> m_widgets;
         
     public:
+        
+        /**
+         * \ingroup guiengine
+         * \brief Loads a GUI screen from its XML file.
+         * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
+         * with little analysis or layout performed on them.
+         */
+        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to,
+                                       irr::gui::IGUIElement* parent = NULL);
         
         
         /** \brief creates a dummy incomplete object; only use to override behaviour in sub-class */
@@ -286,7 +288,19 @@ namespace GUIEngine
           */
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
         
+        /**
+          * \return which music to play at this screen
+          */
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
+        
+        /**
+          * \brief Implementing method from ITopLevelWidgetContainer
+          */
+        virtual int getWidth();
+        /**
+          * \brief Implementing method from ITopLevelWidgetContainer
+          */
+        virtual int getHeight();
     };
     
 }

@@ -25,6 +25,15 @@ namespace GUIEngine
 {
     class Widget;
     
+    class ITopLevelWidgetContainer
+    {
+    public:
+        virtual ~ITopLevelWidgetContainer() {}
+        
+        virtual int getWidth() = 0;
+        virtual int getHeight() = 0;
+    };
+    
     class LayoutManager
     {
     
@@ -43,7 +52,7 @@ namespace GUIEngine
          * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
          * Most notably, expands coords relative to parent and percentages.
          */
-        static void readCoords(Widget* self, Widget* parent);
+        static void readCoords(Widget* self, ITopLevelWidgetContainer* topLevelContainer, Widget* parent);
         
         /**
          * \brief Recursive call that lays out children widget within parent (or screen if none).
@@ -51,7 +60,8 @@ namespace GUIEngine
          * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
          * of the remaining children, as well as absolute sizes and locations.
          */
-        static void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        static void calculateLayout(ptr_vector<Widget>& widgets, ITopLevelWidgetContainer* topLevelContainer,
+                                    Widget* parent=NULL);
         
     };
 }

@@ -34,16 +34,20 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to)
+void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to,
+                                irr::gui::IGUIElement* parent)
 {
     // parse XML file
-    while(xml && xml->read())
+    while (xml && xml->read())
     {
         
-        switch(xml->getNodeType())
+        switch (xml->getNodeType())
         {
             case irr::io::EXN_TEXT:
+            {
                 break;
+            }
+            
             case irr::io::EXN_ELEMENT:
             {
                 /* find which type of widget is specified by the current tag, and instanciate it */
@@ -188,10 +192,15 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                     widget.m_text = _(text);
                 }
                 
+                if (parent != NULL)
+                {
+                    widget.setParent(parent);
+                }
+                
                 /* a new div starts here, continue parsing with this new div as new parent */
                 if (widget.getType() == WTYPE_DIV || widget.getType() == WTYPE_RIBBON)
                 {
-                    parseScreenFileDiv( xml, append_to[append_to.size()-1].m_children );
+                    parseScreenFileDiv( xml, append_to[append_to.size()-1].m_children, parent );
                 }
             }// end case EXN_ELEMENT
                 

@@ -124,6 +124,7 @@ namespace GUIEngine
         friend class ProgressBarWidget;
         friend class DynamicRibbonWidget;
         friend class LayoutManager;
+        friend class ModalDialog;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
@@ -373,6 +374,8 @@ namespace GUIEngine
         static int getNewNoFocusID();
         
         static bool isFocusableId(const int id);
+        
+        const ptr_vector<Widget>& getChildren() const { return m_children; }
         
         /**
          * Override in children to possibly receive updates (you may need to register to

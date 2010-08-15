@@ -147,7 +147,7 @@ void Screen::calculateLayout()
 {
     assert(m_magic_number == 0xCAFEC001);
     // build layout
-    LayoutManager::calculateLayout( m_widgets );
+    LayoutManager::calculateLayout( m_widgets, this );
 }   // calculateLayout
 
 // -----------------------------------------------------------------------------
@@ -382,4 +382,21 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
     return NULL;
 }   // getLastWidget
 
+// -----------------------------------------------------------------------------
+
+int Screen::getWidth()
+{
+    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    return frame_size.Width;
+}
+
+// -----------------------------------------------------------------------------
+
+int Screen::getHeight()
+{
+    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    return frame_size.Height;
+}
+
+// -----------------------------------------------------------------------------
 

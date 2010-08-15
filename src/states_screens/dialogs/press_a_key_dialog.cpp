@@ -30,48 +30,8 @@ using namespace irr::gui;
 // ------------------------------------------------------------------------------------------------------
 
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
-        ModalDialog(w, h)
+        ModalDialog("press_a_key_dialog.stkgui", w, h)
 {
-    LabelWidget* widget = new LabelWidget();
-    widget->m_text = _("Press a key");
-    widget->m_properties[PROP_TEXT_ALIGN] = "center";
-    widget->m_x = 0;
-    widget->m_y = 0;
-    widget->m_w = m_area.getWidth();
-    widget->m_h = m_area.getHeight()/2;
-    widget->setParent(m_irrlicht_window);
-    
-    m_children.push_back(widget);
-    widget->add();
-    
-    
-    //IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = GUIEngine::getFontHeight();
-        
-    ButtonWidget* assignToEsc = new ButtonWidget();
-    assignToEsc->m_properties[PROP_ID] = "assignEsc";
-    // I18N: In the "press a key" dialog, in the options to edit the key bindings
-    assignToEsc->m_text = _("Assign to ESC key");
-    assignToEsc->m_x = 15;
-    assignToEsc->m_y = m_area.getHeight() - (textHeight + 15)*2;
-    assignToEsc->m_w = m_area.getWidth() - 30;
-    assignToEsc->m_h = textHeight + 6;
-    assignToEsc->setParent(m_irrlicht_window);
-    
-    m_children.push_back(assignToEsc);
-    assignToEsc->add();
-    
-    ButtonWidget* cancelBtn = new ButtonWidget();
-    cancelBtn->m_properties[PROP_ID] = "cancel";
-    cancelBtn->m_text = _("Press ESC to cancel");
-    cancelBtn->m_x = 15;
-    cancelBtn->m_y = m_area.getHeight() - textHeight - 15;
-    cancelBtn->m_w = m_area.getWidth() - 30;
-    cancelBtn->m_h = textHeight + 6;
-    cancelBtn->setParent(m_irrlicht_window);
-    
-    m_children.push_back(cancelBtn);
-    cancelBtn->add();
 }
 
 // ------------------------------------------------------------------------------------------------------
