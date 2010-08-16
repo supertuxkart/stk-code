@@ -957,9 +957,7 @@ namespace GUIEngine
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
-            Widget* widgetWithinDialog = 
-                Screen::getWidget(name, 
-                                  &(ModalDialog::getCurrent()->m_children));
+            Widget* widgetWithinDialog = ModalDialog::getCurrent()->getWidget(name);
             if (widgetWithinDialog != NULL) return widgetWithinDialog;
         }
         
@@ -976,9 +974,7 @@ namespace GUIEngine
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {        
-            Widget* widgetWithinDialog = 
-                Screen::getWidget(id, 
-                                  &(ModalDialog::getCurrent()->m_children));
+            Widget* widgetWithinDialog = ModalDialog::getCurrent()->getWidget(id);
             if (widgetWithinDialog != NULL) return widgetWithinDialog;
         }
         

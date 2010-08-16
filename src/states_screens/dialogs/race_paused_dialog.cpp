@@ -48,7 +48,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     
     World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
 
-    ButtonWidget* back_btn = (ButtonWidget*)Screen::getWidget("backbtn", &m_children);
+    IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }   // RacePausedDialog
 
@@ -68,8 +68,8 @@ void RacePausedDialog::loadedFromFile()
     if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_SINGLE)
     {
         printf("==== REMOVING restart button ====\n");
-        GUIEngine::RibbonWidget* choice_ribbon = (GUIEngine::RibbonWidget*)
-                Screen::getWidget("choiceribbon", &m_children);
+        GUIEngine::RibbonWidget* choice_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("choiceribbon");
         
         
         const bool success = choice_ribbon->deleteChild("restart");
@@ -88,8 +88,8 @@ void RacePausedDialog::onEnterPressedInternal()
 GUIEngine::EventPropagation 
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
-    GUIEngine::RibbonWidget* chocie_ribbon = (GUIEngine::RibbonWidget*)
-            Screen::getWidget("choiceribbon", &m_children);
+    GUIEngine::RibbonWidget* chocie_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("choiceribbon");
     
     if (UserConfigParams::m_verbosity>=5)
     {

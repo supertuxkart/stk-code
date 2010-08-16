@@ -64,27 +64,17 @@ namespace GUIEngine
 
         virtual void onEnterPressedInternal();
         void clearWindow();
-        
-        void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-        
+                
         /** \brief Callback invoked when the dialog was loaded from the XML file (if the constructor
           *        that takes a XML file as argument is used)
           */
         virtual void loadedFromFile() {}
         
-    public:
-        ptr_vector<Widget> m_children;
-        
+    public:        
         virtual ~ModalDialog();
         
         /** Returns whether to block event propagation (usually, you will want to block events you processed) */
         virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
-        
-        bool isMyChild(Widget* widget) const;
-        bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
-        
-        Widget* getFirstWidget();
-        Widget* getLastWidget();
         
         irr::gui::IGUIWindow* getIrrlichtElement()
         {
@@ -111,6 +101,8 @@ namespace GUIEngine
           * \brief Implementing callback from ITopLevelWidgetContainer
           */
         virtual int getHeight() { return m_area.getHeight(); }
+        
+        bool isMyIrrChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
     };  
     
 }

@@ -94,9 +94,7 @@ namespace GUIEngine
         
         bool m_loaded;
         std::string m_filename;
-        
-        static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-        
+                
         /** Will be called to determine if the 3D scene must be rendered when at this screen. */
         bool m_render_3d;
         
@@ -106,21 +104,6 @@ namespace GUIEngine
     protected:
         bool m_throttle_FPS;
 
-        /**
-          * Screen is generally able to determine its first widget just fine, but in highly complex screens
-          * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
-          */
-        Widget* m_first_widget;
-
-        /**
-         * Screen is generally able to determine its last widget just fine, but in highly complex screens
-         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
-         */
-        Widget* m_last_widget;
-
-        /** the widgets in this screen */
-        ptr_vector<Widget, HOLD> m_widgets;
-        
     public:
         
         /**
@@ -152,35 +135,8 @@ namespace GUIEngine
         
         /** \return whether this screen is currently loaded */
         bool isLoaded() const { return m_loaded; }
-        
-        /** returns an object by name, or NULL if not found */
-        Widget* getWidget(const char* name);
-        
-        /** returns an object by irrlicht ID, or NULL if not found */
-        Widget* getWidget(const int id);
 
         bool throttleFPS() const { return m_throttle_FPS; }
-        
-        /** returns an object by name, casted to specified type, or NULL if not found/wrong type */
-        template <typename T> T* getWidget(const char* name)
-        {
-            Widget* out = getWidget(name);
-            T* outCasted = dynamic_cast<T*>( out );
-            if (out != NULL && outCasted == NULL)
-            {
-                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
-                        "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
-                abort();
-            }
-            return outCasted;
-        }
-        
-        static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
-        static Widget* getWidget(const int id, ptr_vector<Widget>* within_vector);
-        
-        
-        Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
-        Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
         
         /** \brief adds the irrLicht widgets corresponding to this screen to the IGUIEnvironment */
         void addWidgets();

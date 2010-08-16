@@ -61,7 +61,7 @@ void PlayerInfoDialog::showRegularDialog()
         textCtrl->m_w = m_area.getWidth()-100;
         textCtrl->m_h = textHeight + 5;
         textCtrl->setParent(m_irrlicht_window);
-        m_children.push_back(textCtrl);
+        m_widgets.push_back(textCtrl);
         textCtrl->add();
     }
     
@@ -79,7 +79,7 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
     }
     {
@@ -94,7 +94,7 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
     }
     
@@ -112,7 +112,7 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
     }
     
@@ -158,7 +158,7 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
     }
     
@@ -176,7 +176,7 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
         
         widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );

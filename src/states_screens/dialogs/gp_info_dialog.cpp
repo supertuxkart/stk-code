@@ -104,7 +104,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         widget->m_h = height_of_one_line;
         widget->setParent(m_irrlicht_window);
         
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
         
         // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
@@ -132,7 +132,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
                                                     file_manager->getDataDir() + "gui/main_help.png");
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
-    m_children.push_back(m_screenshot_widget);
+    m_widgets.push_back(m_screenshot_widget);
     
     
     // ---- Start button
@@ -155,7 +155,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->m_w = 400;
     okBtn->m_h = m_area.getHeight() - y2 - 15;
     okBtn->setParent(m_irrlicht_window);
-    m_children.push_back(okBtn);
+    m_widgets.push_back(okBtn);
     okBtn->add();
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);

@@ -21,17 +21,66 @@
 #include <cstring> // for NULL
 #include "utils/ptr_vector.hpp"
 
+#include "guiengine/widget.hpp"
+
 namespace GUIEngine
 {
     class Widget;
     
     class ITopLevelWidgetContainer
     {
+    protected:
+        /** the widgets in this screen */
+        ptr_vector<Widget, HOLD> m_widgets;
+        
+        /**
+         * Screen is generally able to determine its first widget just fine, but in highly complex screens
+         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+         */
+        Widget* m_first_widget;
+        
+        /**
+         * Screen is generally able to determine its last widget just fine, but in highly complex screens
+         * (e.g. multiplayer kart selection) you can help it by providing the first widget manually.
+         */
+        Widget* m_last_widget;
+        
+        void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+
+    
     public:
         virtual ~ITopLevelWidgetContainer() {}
         
         virtual int getWidth() = 0;
         virtual int getHeight() = 0;
+        
+        /** \return an object by name, or NULL if not found */
+        Widget* getWidget(const char* name);
+        
+        /** \return an object by irrlicht ID, or NULL if not found */
+        Widget* getWidget(const int id);
+        
+        /** \return an object by name, casted to specified type, or NULL if not found/wrong type */
+        template <typename T> T* getWidget(const char* name)
+        {
+            Widget* out = getWidget(name);
+            T* outCasted = dynamic_cast<T*>( out );
+            if (out != NULL && outCasted == NULL)
+            {
+                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
+                        "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
+                abort();
+            }
+            return outCasted;
+        }
+        
+        static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
+        static Widget* getWidget(const int id, ptr_vector<Widget>* within_vector);
+      
+        Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
+        Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
+        
+        bool isMyChild(Widget* widget) const;
     };
     
     class LayoutManager
@@ -46,7 +95,7 @@ namespace GUIEngine
          *     Returns false if couldn't convert to either
          */
         static bool convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */);
-            
+        
     public:
         /**
          * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.

@@ -36,7 +36,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
 {
     loadFromFile("enter_player_name_dialog.stkgui");
     
-    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
@@ -46,7 +46,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
     // FIXME: what is this code for?
-    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     textCtrl->getIrrlichtElement()->remove();
 }
 
@@ -67,8 +67,8 @@ GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::strin
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
-    const int playerID = 0; // FIXME: don't hardcode player 0?
-    ButtonWidget* cancelButton = (ButtonWidget*)Screen::getWidget("cancel", &m_children);
+    const int playerID = PLAYER_ID_GAME_MASTER;
+    ButtonWidget* cancelButton = getWidget<ButtonWidget>("cancel");
     if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
     {
         std::string fakeEvent = "cancel";
@@ -77,14 +77,14 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     }
         
     // ---- Otherwise, accept entered name
-    TextBoxWidget* textCtrl = (TextBoxWidget*)Screen::getWidget("textfield", &m_children);
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     stringw playerName = textCtrl->getText();
     if (playerName.size() > 0)
     {
         const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
         if (!success)
         {
-            LabelWidget* label = (LabelWidget*)Screen::getWidget("title", &m_children);
+            LabelWidget* label = getWidget<LabelWidget>("title");
             label->setText(_("Cannot add a player with this name."));
             sfx_manager->quickSound( "use_anvil" );
             return;

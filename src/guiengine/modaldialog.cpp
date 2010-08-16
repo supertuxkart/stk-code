@@ -62,14 +62,14 @@ void ModalDialog::loadFromFile(const char* xmlFile)
         return;
     }
     
-    Screen::parseScreenFileDiv(xml, m_children, m_irrlicht_window);
+    Screen::parseScreenFileDiv(xml, m_widgets, m_irrlicht_window);
     delete xml;
     
     loadedFromFile();
     
-    LayoutManager::calculateLayout( m_children, this );
+    LayoutManager::calculateLayout( m_widgets, this );
     
-    addWidgetsRecursively(m_children);
+    addWidgetsRecursively(m_widgets);
 }
 
 // ----------------------------------------------------------------------------
@@ -136,12 +136,13 @@ ModalDialog::~ModalDialog()
 
 void ModalDialog::clearWindow()
 {
-    const int children_amount = m_children.size();
+    // TODO: extract this code and its eqauivalent from Screen into the common base class?
+    const int children_amount = m_widgets.size();
     for(int i=0; i<children_amount; i++)
     {
-        m_irrlicht_window->removeChild( m_children[i].getIrrlichtElement() );
+        m_irrlicht_window->removeChild( m_widgets[i].getIrrlichtElement() );
     }
-    m_children.clearAndDeleteAll();   
+    m_widgets.clearAndDeleteAll();   
     
     m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
@@ -190,113 +191,7 @@ ModalDialog* ModalDialog::getCurrent()
 void ModalDialog::onEnterPressedInternal()
 {
 }
-
-// ----------------------------------------------------------------------------
-
-Widget* ModalDialog::getLastWidget()
-{
-    // FIXME: don't duplicate this code from 'Screen.cpp'
-    const int childrenCount = m_children.size();
-    
-    for (int i=childrenCount-1; i>=0; i--)
-    {
-        if (m_children[i].getIrrlichtElement() == NULL ||
-            m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
-            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
-            !m_children[i].m_focusable)
-        {
-            continue;
-        }
-        return m_children.get(i);
-
-    }
-    return NULL;
-}
-
-// ----------------------------------------------------------------------------
-
-Widget* ModalDialog::getFirstWidget()
-{
-    // FIXME: don't duplicate this code from 'Screen.cpp'
-    const int childrenCount = m_children.size();
-    
-    for (int i=0; i<childrenCount; i++)
-    {
-        if (m_children[i].getIrrlichtElement() == NULL ||
-            m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
-            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
-            !m_children[i].m_focusable)
-        {
-            continue;
-        }
-        return m_children.get(i);
-    }
-    return NULL;
-}
     
 // ----------------------------------------------------------------------------
 
-// FIXME: this code was duplicated from Screen, find a way to share instead of duplicating
-void ModalDialog::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
-{
-    const unsigned short widgets_amount = widgets.size();
-    
-    // ------- add widgets
-    for (int n=0; n<widgets_amount; n++)
-    {
-        if (widgets[n].getType() == WTYPE_DIV)
-        {
-            widgets[n].add(); // Will do nothing, but will maybe reserve an ID
-            addWidgetsRecursively(widgets[n].m_children, &widgets[n]);
-        }
-        else
-        {
-            // warn if widget has no dimensions (except for ribbons and icons, where it is normal since it
-            // adjusts to its contents)
-            if ((widgets[n].m_w < 1 || widgets[n].m_h < 1) &&
-                widgets[n].getType() != WTYPE_RIBBON &&
-                widgets[n].getType() != WTYPE_ICON_BUTTON)
-            {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no dimensions" << std::endl;
-            }
-            
-            if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
-            {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no position" << std::endl;
-            }
-            
-            widgets[n].add();
-        }
-        
-    } // next widget
-    
-}   // addWidgetsRecursively
-
-// ----------------------------------------------------------------------------
-
-bool isMyChildHelperFunc(const ptr_vector<Widget>* within, const Widget* widget)
-{
-    if (within->size() == 0) return false;
-    
-    if (within->contains(widget))
-    {
-        return true;
-    }
-    
-    const int count = within->size();
-    for (int n=0; n<count; n++)
-    {
-        if (isMyChildHelperFunc(&within->getConst(n)->getChildren(), widget))
-        {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-bool ModalDialog::isMyChild(Widget* widget) const
-{
-    return isMyChildHelperFunc(&m_children, widget);
-}
 

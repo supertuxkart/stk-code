@@ -66,7 +66,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
     }
     {
@@ -81,7 +81,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
-        m_children.push_back(widget);
+        m_widgets.push_back(widget);
         widget->add();
         
         widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );    

@@ -125,6 +125,7 @@ namespace GUIEngine
         friend class DynamicRibbonWidget;
         friend class LayoutManager;
         friend class ModalDialog;
+        friend class ITopLevelWidgetContainer;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;

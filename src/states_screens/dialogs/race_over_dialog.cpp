@@ -342,7 +342,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         unlocked_label->m_h = button_h;
         unlocked_label->m_text = _("You unlocked a new feature!");
         unlocked_label->setParent(m_irrlicht_window);
-        m_children.push_back(unlocked_label);
+        m_widgets.push_back(unlocked_label);
         unlocked_label->add();
         
         ButtonWidget* whats_next_btn = new ButtonWidget();
@@ -355,7 +355,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_text = _("See unlocked features");
         whats_next_btn->m_properties[PROP_ID] = "seeunlocked";
         
-        m_children.push_back(whats_next_btn);
+        m_widgets.push_back(whats_next_btn);
         whats_next_btn->add();
         
         whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
@@ -370,7 +370,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         new_race_btn->m_h = button_h;
         new_race_btn->m_text = _("Setup New Race");
         new_race_btn->setParent(m_irrlicht_window);
-        m_children.push_back(new_race_btn);
+        m_widgets.push_back(new_race_btn);
         new_race_btn->add();
     
         ButtonWidget* race_again_btn = new ButtonWidget();
@@ -381,7 +381,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         race_again_btn->m_h = button_h;
         race_again_btn->m_text = _("Race in this track again");
         race_again_btn->setParent(m_irrlicht_window);
-        m_children.push_back(race_again_btn);
+        m_widgets.push_back(race_again_btn);
         race_again_btn->add();
         
         ButtonWidget* whats_next_btn = new ButtonWidget();
@@ -394,7 +394,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_text = _("Back to the main menu");
         whats_next_btn->m_properties[PROP_ID] = "backtomenu";
         
-        m_children.push_back(whats_next_btn);
+        m_widgets.push_back(whats_next_btn);
         whats_next_btn->add();
         
         whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
@@ -411,7 +411,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_text = _("Continue Grand Prix");
         whats_next_btn->m_properties[PROP_ID] = "continuegp";
         
-        m_children.push_back(whats_next_btn);
+        m_widgets.push_back(whats_next_btn);
         whats_next_btn->add();
         
         whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
@@ -425,7 +425,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         abort_gp->m_h = button_h;
         abort_gp->m_text = _("Abort Grand Prix");
         abort_gp->setParent(m_irrlicht_window);
-        m_children.push_back(abort_gp);
+        m_widgets.push_back(abort_gp);
         abort_gp->add();
         
 

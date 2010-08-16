@@ -100,7 +100,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     {
         screenshotWidget->setImage(screenshot);
     }
-    m_children.push_back(screenshotWidget);
+    m_widgets.push_back(screenshotWidget);
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
@@ -122,7 +122,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
         m_spinner->m_text = _("%i laps");
         
-        m_children.push_back(m_spinner);
+        m_widgets.push_back(m_spinner);
         m_spinner->add();
         m_spinner->setValue(3);
         m_spinner->getIrrlichtElement()->setTabStop(true);
@@ -142,7 +142,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     okBtn->m_w = 400;
     okBtn->m_h = m_area.getHeight() - y3 - 15;
     okBtn->setParent(m_irrlicht_window);
-    m_children.push_back(okBtn);
+    m_widgets.push_back(okBtn);
     okBtn->add();
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);

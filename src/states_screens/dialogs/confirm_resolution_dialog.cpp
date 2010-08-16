@@ -73,7 +73,7 @@ void ConfirmResolutionDialog::updateMessage()
                                             (int)m_remaining_time);
     //std::cout << stringc(msg.c_str()).c_str() << std::endl;
     
-    LabelWidget* countdown_message = (LabelWidget*)Screen::getWidget("title", &m_children);
+    LabelWidget* countdown_message = getWidget<LabelWidget>("title");
     countdown_message->setText( msg.c_str() );
 }
 

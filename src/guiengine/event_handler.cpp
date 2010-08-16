@@ -262,7 +262,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     }
 
     // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
-    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(el))
+    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyIrrChild(el))
     {
         el = NULL;
     }
@@ -381,7 +381,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     }
 
     // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
-    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(el))
+    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyIrrChild(el))
     {
         el = NULL;
     }
