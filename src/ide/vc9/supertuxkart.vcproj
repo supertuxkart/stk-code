@@ -297,6 +297,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\guiengine\abstract_top_level_container.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\guiengine\CGUISpriteBank.cpp"
 					>
 				</File>
@@ -325,6 +329,10 @@
 							KeepComments="false"
 						/>
 					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\guiengine\layout_manager.cpp"
+					>
 				</File>
 				<File
 					RelativePath="..\..\guiengine\modaldialog.cpp"
@@ -1093,11 +1101,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\guiengine\abstract_top_level_container.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\guiengine\engine.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\guiengine\event_handler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\guiengine\layout_manager.hpp"
 					>
 				</File>
 				<File

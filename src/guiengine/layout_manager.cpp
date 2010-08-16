@@ -15,17 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
-#include "guiengine/abstract_top_level_container.hpp"
-#include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
-#include "guiengine/scalable_font.hpp"
-#include "guiengine/widget.hpp"
-#include "io/file_manager.hpp"
-#include "utils/ptr_vector.hpp"
-#include <sstream>
 
-using namespace GUIEngine;
+#include <sstream>
 
 #include "irrlicht.h"
 using namespace irr;
@@ -35,6 +27,19 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+#include "graphics/irr_driver.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "guiengine/widget.hpp"
+#include "io/file_manager.hpp"
+#include "utils/ptr_vector.hpp"
+
+using namespace GUIEngine;
+
+#ifndef round
+# define round(x)  (floor(x+0.5f))
+#endif
 
 // ----------------------------------------------------------------------------
 
