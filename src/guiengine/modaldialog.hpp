@@ -20,6 +20,7 @@
 
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/skin.hpp"
@@ -43,7 +44,7 @@ namespace GUIEngine
      * need to keep track of instances yourself)
      * \ingroup guiengine
      */
-    class ModalDialog : public SkinWidgetContainer, public ITopLevelWidgetContainer
+    class ModalDialog : public SkinWidgetContainer, public AbstractTopLevelContainer
     {
     private:
         /** Because C++ doesn't support constructor delegation... */
@@ -93,12 +94,12 @@ namespace GUIEngine
         virtual void onUpdate(float dt) { }
         
         /**
-          * \brief Implementing callback from ITopLevelWidgetContainer
+          * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getWidth()  { return m_area.getWidth(); }
         
         /**
-          * \brief Implementing callback from ITopLevelWidgetContainer
+          * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getHeight() { return m_area.getHeight(); }
         

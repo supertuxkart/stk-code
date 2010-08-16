@@ -26,6 +26,7 @@
 #include "irrlicht.h"
 
 #include "config/stk_config.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/widget.hpp"
@@ -81,7 +82,7 @@ namespace GUIEngine
      *
      * \ingroup guiengine
      */
-    class Screen : public ITopLevelWidgetContainer
+    class Screen : public AbstractTopLevelContainer
     {
     private:
         /** True if the race (if it is running) should be paused when this 
@@ -250,11 +251,11 @@ namespace GUIEngine
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
         
         /**
-          * \brief Implementing method from ITopLevelWidgetContainer
+          * \brief Implementing method from AbstractTopLevelContainer
           */
         virtual int getWidth();
         /**
-          * \brief Implementing method from ITopLevelWidgetContainer
+          * \brief Implementing method from AbstractTopLevelContainer
           */
         virtual int getHeight();
     };

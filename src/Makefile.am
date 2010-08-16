@@ -81,6 +81,8 @@ supertuxkart_SOURCES = \
  guiengine/CGUISpriteBank.h \
  guiengine/abstract_state_manager.cpp \
  guiengine/abstract_state_manager.hpp \
+ guiengine/abstract_top_level_container.cpp \
+ guiengine/abstract_top_level_container.hpp \
  guiengine/engine.cpp \
  guiengine/engine.hpp \
  guiengine/event_handler.cpp \
