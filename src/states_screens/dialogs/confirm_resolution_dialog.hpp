@@ -27,9 +27,7 @@ class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 {
     /** number of seconds left before resolution is considered unplayable */
     float m_remaining_time;
-    
-    irr::gui::IGUIStaticText* m_countdown_message;
-    
+        
     /** updates countdown message */
     void updateMessage();
 public:

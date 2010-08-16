@@ -451,10 +451,8 @@
  You can also explore the various methods in GUIEngine::Screen to discover 
  more optional callbacks you can use.
  
- You can also create dialogs by deriving from GUIEngine::ModalDialog. 
- Unfortunately, it is currently not possible to specify modal dialogs through
- XML files (FIXME), so you will need to simulate the init sequence of a GUI 
- screen, which I admit is not too easy. This is to improve in the future.
+ You can also create dialogs by deriving from GUIEngine::ModalDialog in a very
+ similar way.
  
  */
 

@@ -1,0 +1,21 @@
+<stkgui>
+
+<div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+
+    <label id="title" width="100%" text_align="center" proportion="1" />
+
+    <spacer height="25" width="10" />
+
+    <button id="accept" I18N="In the 'confirm resolution' dialog, that's shown when switching resoluton"
+            text="Keep this resolution" align="center"/>
+    
+    <spacer height="15" width="10" />
+    
+    <button id="cancel" I18N="In the 'confirm resolution' dialog, that's shown when switching resoluton"
+            text="Cancel" align="center"/>
+
+    <spacer height="10" width="10" />
+    
+</div>
+
+</stkgui>
