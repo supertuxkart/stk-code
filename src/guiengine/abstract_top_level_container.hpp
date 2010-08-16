@@ -19,6 +19,7 @@
 #define __TOP_LEVEL_CONT_HPP__
 
 #include <cstring> // for NULL
+#include <typeinfo> // for typeid
 #include "utils/ptr_vector.hpp"
 
 #include "guiengine/widget.hpp"
