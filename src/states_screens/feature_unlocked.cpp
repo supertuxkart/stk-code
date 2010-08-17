@@ -85,6 +85,7 @@ FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() 
                        : Screen("feature_unlocked.stkgui")
 {
+    m_key_angle = 0;
     setNeeds3D(true);
     
     m_throttle_FPS = false;
