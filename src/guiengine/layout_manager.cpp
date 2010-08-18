@@ -289,9 +289,14 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     if (align.size() < 1)
                     {        
                         if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                        {
+                            // FIXME: percentages won't work here
                             widgets[n].m_y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                        }
                         else
+                        {
                             widgets[n].m_y = y;
+                        }
                     }
                     else if (align == "top")     widgets[n].m_y = y;
                     else if (align == "center")  widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
@@ -323,9 +328,14 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     if (align.size() < 1)
                     {                        
                         if (widgets[n].m_properties[ PROP_X ].size() > 0)
+                        {
+                            // FIXME: percentages won't work here
                             widgets[n].m_x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
+                        }
                         else
+                        {
                             widgets[n].m_x = x;
+                        }
                     }
                     else if (align == "left")   widgets[n].m_x = x;
                     else if (align == "center") widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
@@ -351,9 +361,14 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     if (align.size() < 1)
                     {
                         if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                        {
+                            // FIXME: percentages won't work here
                             widgets[n].m_y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                        }
                         else
+                        {
                             widgets[n].m_y = y;
+                        }
                     }
                     else if (align == "top")    widgets[n].m_y = y;
                     else if (align == "center") widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
@@ -371,9 +386,14 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     if (align.size() < 1)
                     {
                         if (widgets[n].m_properties[ PROP_X ].size() > 0)
+                        {
+                            // FIXME: percentages won't work here
                             widgets[n].m_x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
+                        }
                         else
+                        {
                             widgets[n].m_x = x;
+                        }
                     }
                     else if (align == "left")   widgets[n].m_x = x;
                     else if (align == "center") widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
