@@ -448,11 +448,75 @@
  be unloaded then loaded back at will, this is why it's important to not rely
  on the constructor to perform set-up).
  
+ Do not delete a Screen manually, since the GUIEngine caches them; deleting
+ a Screen will only result in dangling pointers in the GUIEngine. Instead, let
+ the GUIEngine do the cleanup itself on shutdown, or on e.g. resolution change.
+ 
  You can also explore the various methods in GUIEngine::Screen to discover 
  more optional callbacks you can use.
  
  You can also create dialogs by deriving from GUIEngine::ModalDialog in a very
  similar way.
+ 
+ \n
+ \section Inside the GUI Engine
+ 
+ \subsection Widget Widget
+ 
+ SuperTuxKart's Widget class is a wrapper for the underlying irrlicht classes.
+ This is needed for a couple reasons :
+ - irrlicht widgets do not do everything we want; so many STK widgets act as
+   composite widgets (create multiple irrlicht widgets and adds logic so they
+   behave as a whole to the end-user)
+ - STK widgets have a longer life-span than their underlying irrlicht counterparts.
+   This is simply an optimisation measure to prevent having to seek the file to disk
+   everytime a screen switch occurs.
+ 
+ Each widget contains one (or several) irr::gui::IGUIElement instances that represent
+ the irrlicht widget that is added to the IGUIEnvironment if the widget is currently
+ shown; if a widget is not currently shown on screen (in irrlicht's IGUIEnvironment),
+ then its underlying IGUIElement pointer will be NULL but the widget continues to exist
+ and remains ready to re-create its underlying irrlicht widget when the screen it is
+ part of is added again. The method add() is used to tell a widget to create its irrlicht
+ counterpart in the IGUIEnvironment - but note that unless you start handling stuff manually
+ you do NOT need to invoke add() on each widget manually, since the Screen object the
+ widget is added to will do it automatically when it is shown. When the irrlicht IGUIEnvironment
+ is cleared (when irrlicht widgets are removed), it is very important to tell the Widgets
+ that their pointer to their IGUIElement counterpart is no more valid; this is done by calling
+ elementRemoved() - but again unless you do manual manipulation of the widget tree, the Screen
+ object will take care of this for you.
+ 
+ 
+ \subsection Screen Screen
+ 
+ This class holds a tree of Widget instances. It takes care of creating the tree from a
+ XML file upon loading (with the help of others, for instane the LayoutManager); it handles
+ calling add() on each of its Widget children when being added so that the corresponding
+ IGUIElement irrlicht widgets are added to the irrlicht scene; it also takes care of telling
+ its Widget children when their irrlicht IGUIElement counterpart was removed from the
+ IGUIEnvironment so that they don't carry dangling pointers.
+ 
+ Before trying to access the underlying irrlicht element of a Widget, it is thus important to
+ check if the Widget is currently added to the irr IGUIEnvironment. This can be done by
+ calling ->getIrrlichtElement() and checking if the result is NULL (if non-null, the widget is
+ currently added to the screen)
+ 
+ The default behavior of the Screen object will be just fine for most basic purposes, but
+ if you want to build highly dynamic screens, you may need to get your hands dirty. Take a
+ look at Screen::manualRemoveWidget() and Screen::manualAddWidget() if you wish to dynamically
+ modify the STK widget tree at runtime. If you get into this, be very careful about the relationship
+ between the STK widget tree and the irrlicht widget tree. If you manualRemoveWidget() a STK
+ widget that is currently visible on screen, this does not remove its associated irrlicht widget;
+ call widget->getIrrlichtElement()->remove() for that. When you removed a widget from a Screen you
+ are also responsible to call Widget::elementRemoved() on them to avoid dangling pointers.
+ Similarly, a Widget that is not inside a Screen when the Screen is added will not have its add()
+ method be called automatically (so, for instance, if you manualAddWidget() a widget after a Screen
+ was shown, you will also need to call ->add() on the widget so that it is added to the irrlicht
+ GUI environment).
+ As a final note, note that the Skin depends on both the irrlicht widget and the STK widget to
+ render widgets properly. So adding an irrlicht IGUIElement without having its SuperTuxKart
+ Widget accessible through the current Screen may result in rendering glitches.
+ 
  
  */
 
