@@ -218,6 +218,14 @@ void Screen::manualAddWidget(Widget* w)
 void Screen::manualRemoveWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
+#ifdef DEBUG
+    if(!m_widgets.contains(w))
+    {
+        fprintf(stderr, "Widget '%d' not found in screen when removing.\n",
+                w->m_id);
+        fprintf(stderr, "This can be ignored, but is probably wrong.\n");
+    }
+#endif
     m_widgets.remove(w);
 }   // manualRemoveWidget
 
