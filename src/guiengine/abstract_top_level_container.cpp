@@ -113,7 +113,8 @@ Widget* AbstractTopLevelContainer::getWidget(const int id)
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getWidget(const char* name, ptr_vector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getWidget(const char* name, 
+                                             ptr_vector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
     
@@ -135,7 +136,8 @@ Widget* AbstractTopLevelContainer::getWidget(const char* name, ptr_vector<Widget
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getWidget(const int id, ptr_vector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getWidget(const int id, 
+                                             ptr_vector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
     
