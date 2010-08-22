@@ -30,6 +30,7 @@ using irr::core::stringc;
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
 
 DEFINE_SCREEN_SINGLETON( CreditsScreen );
 
@@ -224,6 +225,13 @@ void CreditsScreen::loadedFromFile()
         return;
     }
     
+    std::vector<irr::core::stringw> translator  = StringUtils::split(_("translator-credits"), '\n');
+    m_sections.push_back( new CreditsSection("Launchpad translations"));
+    for(int i = 0; i < translator.size(); i++)
+    {
+        CreditsEntry entry(translator[i]);
+        getCurrentSection()->addEntry(entry);
+    }
     assert(m_sections.size() > 0);
     
 }
