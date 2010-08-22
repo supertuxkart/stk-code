@@ -32,7 +32,12 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
     MainMenuScreen();
 public:
     
+#ifdef ADDONS_MANAGER
     void changeNewsText(std::string action);
+    pthread_mutex_t m_mutex_news_text;
+    std::string m_news_text;
+    void onUpdate(float delta,  irr::video::IVideoDriver* driver);
+#endif
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     

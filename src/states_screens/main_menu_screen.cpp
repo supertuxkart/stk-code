@@ -63,7 +63,6 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 #ifdef ADDONS_MANAGER
 void MainMenuScreen::changeNewsText(std::string action)
 {
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     if(action == "news")
     {
         FILE* newsFile = NULL;
@@ -85,12 +84,16 @@ void MainMenuScreen::changeNewsText(std::string action)
         
         // to remove the break line.
         //info.replace(info.size()-1,1, "");
-        std::cout << info << std::endl;
-        //w->setText(std::string(info).c_str());
+        //std::cout << info << std::endl;
+        pthread_mutex_lock(&(this->m_mutex_news_text));
+        m_news_text = std::string(info).c_str();
+	    pthread_mutex_unlock(&(this->m_mutex_news_text));
     }
     if(action == "offline")
     {
-        //w->setText(_("Can't access stkaddons server..."));
+	    pthread_mutex_lock(&(this->m_mutex_news_text));
+        m_news_text = "offline";
+	    pthread_mutex_unlock(&(this->m_mutex_news_text));
     }
 }
 #endif
@@ -110,11 +113,28 @@ void MainMenuScreen::init()
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
     input_manager->setMasterPlayerOnly(false);
 #ifdef ADDONS_MANAGER
+    pthread_mutex_init(&(this->m_mutex_news_text), NULL);
     pthread_t nThreadID2;
     pthread_create(&nThreadID2, NULL, &MainMenuScreen::downloadNews, this);
 #endif
 }
 
+#ifdef ADDONS_MANAGER
+// ------------------------------------------------------------------------------------------------------
+void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+{
+    //FIXME:very bad for performance
+    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+	pthread_mutex_lock(&(this->m_mutex_news_text));
+	if(m_news_text == "offline")
+	{
+	    w->setText("Can't access stkaddons server...");
+	}
+	else
+        w->setText(m_news_text.c_str());
+	pthread_mutex_unlock(&(this->m_mutex_news_text));
+}
+#endif
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
