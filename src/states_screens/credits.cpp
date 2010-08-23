@@ -234,12 +234,10 @@ void CreditsScreen::loadedFromFile()
         CreditsEntry entry(line);
         getCurrentSection()->addEntry( entry );
         
-        for(int j = 1; i + j < translator.size() && j < 4; j ++)
+        for(int j = 0; i + j < translator.size() && j < 4; j ++)
         {
-            translator[i].append('\n');
-            translator[i].append(translator[i+j]);
+            getCurrentSection()->addSubEntry(translator[i + j]);
         }
-            getCurrentSection()->addSubEntry(translator[i]);
     }
     assert(m_sections.size() > 0);
     
