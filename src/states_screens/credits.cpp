@@ -71,6 +71,7 @@ public:
     }
     void addSubEntry(stringw& subEntryString)
     {
+        std::cout << subEntryString.c_str() << std::endl;
         m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
     }
 };
@@ -227,10 +228,22 @@ void CreditsScreen::loadedFromFile()
     
     std::vector<irr::core::stringw> translator  = StringUtils::split(_("translator-credits"), '\n');
     m_sections.push_back( new CreditsSection("Launchpad translations"));
-    for(int i = 0; i < translator.size(); i++)
+    for(int i = 1; i < translator.size(); i = i +3)
     {
-        CreditsEntry entry(translator[i]);
-        getCurrentSection()->addEntry(entry);
+        line = stringw("Translations");
+        CreditsEntry entry(line);
+        getCurrentSection()->addEntry( entry );
+        if(i + 1 < translator.size())
+        {
+            translator[i].append('\n');
+            translator[i].append(translator[i+1]);
+        }
+        if(i + 2 < translator.size())
+        {
+            translator[i].append('\n');
+            translator[i].append(translator[i+2]);
+        }
+            getCurrentSection()->addSubEntry(translator[i]);
     }
     assert(m_sections.size() > 0);
     
