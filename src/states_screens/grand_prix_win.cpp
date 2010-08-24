@@ -123,7 +123,7 @@ void GrandPrixWin::init()
         unlocked_label->m_y = y_from;
         unlocked_label->m_w = message_width;
         unlocked_label->m_h = label_height;
-        unlocked_label->m_text = message;
+        unlocked_label->setText(message);
         //const irr::video::SColor orange(255, 255, 126, 21);
         //unlocked_label->setColor(orange);
         

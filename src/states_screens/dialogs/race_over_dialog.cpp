@@ -340,7 +340,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         unlocked_label->m_y = label_y;
         unlocked_label->m_w = m_area.getWidth() - button_h*2 - 60;
         unlocked_label->m_h = button_h;
-        unlocked_label->m_text = _("You unlocked a new feature!");
+        unlocked_label->setText( _("You unlocked a new feature!") );
         unlocked_label->setParent(m_irrlicht_window);
         m_widgets.push_back(unlocked_label);
         unlocked_label->add();
@@ -352,7 +352,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
-        whats_next_btn->m_text = _("See unlocked features");
+        whats_next_btn->setText( _("See unlocked features") );
         whats_next_btn->m_properties[PROP_ID] = "seeunlocked";
         
         m_widgets.push_back(whats_next_btn);
@@ -368,7 +368,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         new_race_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons)*3;
         new_race_btn->m_w = m_area.getWidth() - 30;
         new_race_btn->m_h = button_h;
-        new_race_btn->m_text = _("Setup New Race");
+        new_race_btn->setText( _("Setup New Race") );
         new_race_btn->setParent(m_irrlicht_window);
         m_widgets.push_back(new_race_btn);
         new_race_btn->add();
@@ -379,7 +379,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         race_again_btn->m_y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
         race_again_btn->m_w = m_area.getWidth() - 30;
         race_again_btn->m_h = button_h;
-        race_again_btn->m_text = _("Race in this track again");
+        race_again_btn->setText( _("Race in this track again") );
         race_again_btn->setParent(m_irrlicht_window);
         m_widgets.push_back(race_again_btn);
         race_again_btn->add();
@@ -391,7 +391,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
-        whats_next_btn->m_text = _("Back to the main menu");
+        whats_next_btn->setText( _("Back to the main menu") );
         whats_next_btn->m_properties[PROP_ID] = "backtomenu";
         
         m_widgets.push_back(whats_next_btn);
@@ -408,7 +408,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
-        whats_next_btn->m_text = _("Continue Grand Prix");
+        whats_next_btn->setText( _("Continue Grand Prix") );
         whats_next_btn->m_properties[PROP_ID] = "continuegp";
         
         m_widgets.push_back(whats_next_btn);
@@ -423,7 +423,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         abort_gp->m_y = m_area.getHeight() - (button_h + margin_between_buttons);
         abort_gp->m_w = m_area.getWidth() - 30;
         abort_gp->m_h = button_h;
-        abort_gp->m_text = _("Abort Grand Prix");
+        abort_gp->setText( _("Abort Grand Prix") );
         abort_gp->setParent(m_irrlicht_window);
         m_widgets.push_back(abort_gp);
         abort_gp->add();

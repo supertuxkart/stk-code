@@ -120,7 +120,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
         m_spinner->m_properties[PROP_MAX_VALUE] = "99";
         
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
-        m_spinner->m_text = _("%i laps");
+        m_spinner->setText( _("%i laps") );
         
         m_widgets.push_back(m_spinner);
         m_spinner->add();
@@ -136,7 +136,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
     okBtn->m_properties[PROP_ID] = "start";
-    okBtn->m_text = _("Start Race");
+    okBtn->setText( _("Start Race") );
     okBtn->m_x = m_area.getWidth()/2 - 200;
     okBtn->m_y = y3;
     okBtn->m_w = 400;

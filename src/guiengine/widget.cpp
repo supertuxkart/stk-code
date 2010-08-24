@@ -114,6 +114,14 @@ Widget::~Widget()
 }
     
 // -----------------------------------------------------------------------------
+void Widget::setText(const wchar_t *s)
+{
+    m_text = s;
+    if(m_element)
+        m_element->setText(s);
+}   // setText
+
+// -----------------------------------------------------------------------------
 
 void Widget::elementRemoved()
 {

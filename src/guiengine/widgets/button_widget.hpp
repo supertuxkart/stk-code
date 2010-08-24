@@ -52,7 +52,7 @@ namespace GUIEngine
         void add();
         
         /**  Change the label on the button */
-        void setLabel(const irr::core::stringw label);
+        void setLabel(const irr::core::stringw &label);
     }; 
 }
 

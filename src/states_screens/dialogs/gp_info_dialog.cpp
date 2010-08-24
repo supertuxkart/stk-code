@@ -97,7 +97,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         }
                 
         LabelWidget* widget = new LabelWidget();
-        widget->m_text = lineText;
+        widget->setText(lineText);
         widget->m_x = 20;
         widget->m_y = from_y;
         widget->m_w = m_area.getWidth()/2 - 20;
@@ -141,12 +141,12 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     if (gp_ok)
     {
         okBtn->m_properties[PROP_ID] = "start";
-        okBtn->m_text = _("Start Grand Prix");
+        okBtn->setText(_("Start Grand Prix"));
     }
     else
     {
         okBtn->m_properties[PROP_ID] = "cannot_start";
-        okBtn->m_text = _("This Grand Prix is broken!");
+        okBtn->setText(_("This Grand Prix is broken!"));
         okBtn->setBadge(BAD_BADGE);
     }
     

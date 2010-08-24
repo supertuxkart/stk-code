@@ -32,23 +32,22 @@ namespace GUIEngine
       */
     class LabelWidget : public Widget
     {
-        bool m_has_color;
+        bool               m_has_color;
         irr::video::SColor m_color;
 
     public:
-        LabelWidget(bool title=false);
+                 LabelWidget(bool title=false);
         virtual ~LabelWidget() {}
         
-        void add();
-        
-        /** Change the text in the label */
-        void setText(irr::core::stringw newText);
-        
-        void setColor(const irr::video::SColor& color)
+        void     add();
+                
+        /** Sets the color of the widget. 
+         *  \param color The color to use for this widget. */
+        void     setColor(const irr::video::SColor& color)
         {
-            m_color = color;
+            m_color     = color;
             m_has_color = true;
-        }
+        }   // setColor
 
     };
 }

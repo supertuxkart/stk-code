@@ -440,6 +440,10 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
             message_y -= (fontH + MARGIN);
         }
     }
+    printf("camera: %f %f %f\n",
+        m_camera->getPosition().X,
+        m_camera->getPosition().Y,
+        m_camera->getPosition().Z);
 }   // onUpdate
 
 // ----------------------------------------------------------------------------

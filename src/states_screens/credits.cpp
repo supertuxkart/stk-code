@@ -228,13 +228,13 @@ void CreditsScreen::loadedFromFile()
     
     std::vector<irr::core::stringw> translator  = StringUtils::split(_("translator-credits"), '\n');
     m_sections.push_back( new CreditsSection("Launchpad translations"));
-    for(int i = 1; i < translator.size(); i = i + 4)
+    for(unsigned int i = 1; i < translator.size(); i = i + 4)
     {
         line = stringw("Translations");
         CreditsEntry entry(line);
         getCurrentSection()->addEntry( entry );
         
-        for(int j = 0; i + j < translator.size() && j < 4; j ++)
+        for(unsigned int j = 0; i + j < translator.size() && j < 4; j ++)
         {
             getCurrentSection()->addSubEntry(translator[i + j]);
         }

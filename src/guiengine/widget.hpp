@@ -112,6 +112,11 @@ namespace GUIEngine
       */
     class Widget : public SkinWidgetContainer
     {
+    private:
+        /** PROP_TEXT is a special case : since it can be translated it can't
+         *  go in the map above, which uses narrow strings */
+        irr::core::stringw m_text;
+
     protected:        
         unsigned int m_magic_number;
 
@@ -335,9 +340,17 @@ namespace GUIEngine
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
         
-        /** PROP_TEXT is a special case : since it can be transalted it can't go in the map above, which
-            uses narrow strings */
-        irr::core::stringw m_text;
+        /** Sets the text of a widget from a wchar_t. Handy for many constant
+         *  strings used in stk. */
+        virtual void setText(const wchar_t *s);
+  
+        /** Sets the text of a widget from a stringw. This uses the virtual 
+         * setText(wchar_t*) function, so only that function needs to be 
+         *  overwritten by other classes. */
+        void setText(const irr::core::stringw &s) { setText(s.c_str()); }
+
+        /** Returns the text of a widget. */
+        const irr::core::stringw &getText() const {return m_text; }
         
         static void resetIDCounters();
         

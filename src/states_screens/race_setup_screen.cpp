@@ -146,14 +146,14 @@ void RaceSetupScreen::onGameModeChanged()
         kartamount->setDeactivated();
         
         // dirty trick to hide the number inside the spinner (FIXME)
-        kartamount->m_text = L"-";
+        kartamount->setText(L"-");
         kartamount->setValue( kartamount->getValue() );
     }
     else
     {
         kartamount->setActivated();
         
-        kartamount->m_text = L"";
+        kartamount->setText(L"");
         kartamount->setValue( kartamount->getValue() );
     }
 }
@@ -169,7 +169,7 @@ void RaceSetupScreen::init()
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
-    kartamount->m_text = L""; // FIXME: dirty trick (see below)
+    kartamount->setText(L""); // FIXME: dirty trick (see below)
     kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");

@@ -31,7 +31,7 @@ ButtonWidget::ButtonWidget() : Widget(WTYPE_BUTTON)
 void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    stringw&  message = m_text;
+    const stringw&  message = getText();
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), message.c_str(), L"");
     
     m_id = m_element->getID();
@@ -41,10 +41,10 @@ void ButtonWidget::add()
 
 // -----------------------------------------------------------------------------
 
-void ButtonWidget::setLabel(irr::core::stringw label)
+void ButtonWidget::setLabel(const irr::core::stringw &label)
 {
     m_element->setText( label.c_str() );
-    m_text = label;
+    setText(label);
 }
 
 // -----------------------------------------------------------------------------

@@ -24,21 +24,24 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-// -----------------------------------------------------------------------------
-
+// ----------------------------------------------------------------------------
+/** Constructs the label widget. Parameter:
+ *  \param title True if the special title font should be used.
+ */
 LabelWidget::LabelWidget(bool title) : Widget(WTYPE_LABEL)
 {
     m_title_font = title;
     m_has_color  = false;
-}
+}   // LabelWidget
 
-// -----------------------------------------------------------------------------
-
+// ----------------------------------------------------------------------------
+/** Adds the stk widget to the irrlicht widget set.
+ */
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
-    stringw& message = m_text;
+    const stringw& message = getText();
     
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
@@ -66,12 +69,6 @@ void LabelWidget::add()
     //m_element->setTabOrder(id);
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
-}
-// -----------------------------------------------------------------------------
-void LabelWidget::setText(stringw newText)
-{
-    IGUIStaticText* irrwidget = Widget::getIrrlichtElement<IGUIStaticText>();   
-    irrwidget->setText(newText.c_str());
-    
-    m_text = newText;
-}
+}   // add
+
+// ----------------------------------------------------------------------------

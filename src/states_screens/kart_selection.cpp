@@ -241,9 +241,10 @@ public:
         
         m_player_ID_label = new LabelWidget();
         
-        m_player_ID_label->m_text = 
+        m_player_ID_label->setText(
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-            StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str()); 
+            StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str())
+                                   );
         
         m_player_ID_label->m_properties[PROP_TEXT_ALIGN] = "center";
         m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
@@ -305,7 +306,7 @@ public:
         
         // ---- Kart name label
         m_kart_name = new LabelWidget();
-        m_kart_name->m_text = props->getName();
+        m_kart_name->setText(props->getName());
         m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
         m_kart_name->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
         m_kart_name->m_x = kart_name_x;

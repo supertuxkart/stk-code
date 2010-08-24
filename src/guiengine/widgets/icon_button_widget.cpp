@@ -102,7 +102,7 @@ void IconButtonWidget::add()
     m_id = m_element->getID();
     
     // ---- label if any
-    stringw& message = m_text;
+    const stringw& message = getText();
     if (message.size() > 0)
     {
         //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = " << m_properties[PROP_EXTEND_LABEL] << std::endl;

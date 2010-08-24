@@ -57,9 +57,10 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         widget->m_properties[PROP_ID] = "addkeyboard";
         
         //I18N: In the 'add new input device' dialog
-        widget->m_text = _("Add Keyboard Configuration");
+        widget->setText( _("Add Keyboard Configuration") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y_bottom;
@@ -72,9 +73,10 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancel";
-        widget->m_text = _("Cancel");
+        widget->setText( _("Cancel") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y_bottom + buttonHeight + 10;

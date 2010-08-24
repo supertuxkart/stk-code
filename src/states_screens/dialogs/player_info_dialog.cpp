@@ -55,7 +55,7 @@ void PlayerInfoDialog::showRegularDialog()
     {
         textCtrl = new TextBoxWidget();
         textCtrl->m_properties[PROP_ID] = "renameplayer";
-        textCtrl->m_text = m_player->getName();
+        textCtrl->setText(m_player->getName());
         textCtrl->m_x = 50;
         textCtrl->m_y = y1 - textHeight/2;
         textCtrl->m_w = m_area.getWidth()-100;
@@ -70,9 +70,9 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_properties[PROP_ID] = "renameplayer";
         
         //I18N: In the player info dialog
-        widget->m_text = _("Rename");
+        widget->setText( _("Rename") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y2;
@@ -85,9 +85,10 @@ void PlayerInfoDialog::showRegularDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancel";
-        widget->m_text = _("Cancel");
+        widget->setText( _("Cancel") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension(widget->getText().c_str()).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y3;
@@ -103,9 +104,10 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_properties[PROP_ID] = "removeplayer";
         
         //I18N: In the player info dialog
-        widget->m_text = _("Remove");
+        widget->setText( _("Remove"));
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension(widget->getText().c_str()).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y4;
@@ -149,9 +151,10 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->m_properties[PROP_ID] = "confirmremove";
         
         //I18N: In the player info dialog (when deleting)
-        widget->m_text = _("Confirm Remove");
+        widget->setText( _("Confirm Remove") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension(widget->getText().c_str()).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = m_area.getHeight()/2;
@@ -167,9 +170,10 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->m_properties[PROP_ID] = "cancelremove";
         
         //I18N: In the player info dialog (when deleting)
-        widget->m_text = _("Cancel Remove");
+        widget->setText( _("Cancel Remove") );
         
-        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
+        const int textWidth = 
+            font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = m_area.getHeight()*3/4;

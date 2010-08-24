@@ -34,7 +34,7 @@ void TextBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     
-    stringw& text = m_text;
+    const stringw& text = getText();
     m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
                                                    true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
