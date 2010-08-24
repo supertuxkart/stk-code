@@ -297,3 +297,19 @@ void Widget::setParent(IGUIElement* parent)
     m_parent = parent;
 }
 
+// -----------------------------------------------------------------------------
+
+void Widget::setVisible(bool visible)
+{
+    if (m_element != NULL)
+    {
+        m_element->setVisible(visible);
+    }
+    
+    const int childrenCount = m_children.size();
+    for (int n=0; n<childrenCount; n++)
+    {
+        m_children[n].setVisible(visible);
+    }
+}
+

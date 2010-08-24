@@ -386,7 +386,7 @@ namespace GUIEngine
         bool deleteChild(const char* id);
         
         /**
-         * Override in children to possibly receive updates (you may need to register to
+         * \brief Override in children to possibly receive updates (you may need to register to
          * them first)
          */
         virtual void update(float delta) { }
@@ -398,17 +398,22 @@ namespace GUIEngine
         virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID) { return EVENT_LET; }
         
         /**
-         * Create and add the irrLicht widget(s) associated with this object.
+         * \brief Create and add the irrLicht widget(s) associated with this object.
          * Call after Widget was read from XML file and laid out.
          */
         virtual void add();
         
         /**
-          * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
+          * \brief Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
           */
         virtual void elementRemoved();
         
         int getID() const { return m_id; }
+        
+        /**
+          * \brief Sets the widget (and its children, if any) visible or not
+          */
+        void setVisible(bool visible);
         
         bool searchInsideMe() const { return m_check_inside_me; }
     };
