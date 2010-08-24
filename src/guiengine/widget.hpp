@@ -411,7 +411,10 @@ namespace GUIEngine
         int getID() const { return m_id; }
         
         /**
-          * \brief Sets the widget (and its children, if any) visible or not
+          * \brief Sets the widget (and its children, if any) visible or not.
+          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+          * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
+          * undefined behavior may ensue (like invisible but clickable buttons).
           */
         void setVisible(bool visible);
         

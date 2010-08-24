@@ -305,6 +305,7 @@ void Widget::setVisible(bool visible)
     {
         m_element->setVisible(visible);
     }
+    m_deactivated = !visible;
     
     const int childrenCount = m_children.size();
     for (int n=0; n<childrenCount; n++)

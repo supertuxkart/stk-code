@@ -181,6 +181,7 @@ void EventHandler::processGUIAction(const PlayerAction action, const unsigned in
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;
+                
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
             }
@@ -451,14 +452,19 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
+    if (w->m_deactivated) return EVENT_BLOCK;
+
     if (ModalDialog::isADialogActive())
     {
-        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
+        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)
+        {
+            return EVENT_BLOCK;
+        }
         if (w->m_event_handler == NULL) return EVENT_LET;
     }
     
     //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
-    
+        
     Widget* parent = w->m_event_handler;
     if (w->m_event_handler != NULL)
     {
@@ -471,6 +477,8 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             
             parent = parent->m_event_handler;
         }
+        
+        if (parent->m_deactivated) return EVENT_BLOCK;
         
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
@@ -488,7 +496,11 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
         }
     }
-    else sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+    else
+    {
+        printf("sendEventToUser : '%s' is disabled = '%i'\n", w->m_properties[PROP_ID].c_str(), w->m_deactivated);
+        sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+    }
     
     return EVENT_BLOCK;
 }
