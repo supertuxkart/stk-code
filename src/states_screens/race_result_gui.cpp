@@ -66,8 +66,6 @@ void RaceResultGUI::init()
 
     m_timer           = 0;
 
-    GUIEngine::Widget *div_widget = getWidget("div");
-
     getWidget("top")->setVisible(false);
     getWidget("middle")->setVisible(false);
     getWidget("bottom")->setVisible(false);
@@ -220,7 +218,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     }
     else
     {
-        fprintf(stderr, "Incorrect event '%s' for normal race '%s'.\n",
+        fprintf(stderr, "Incorrect event '%s' for normal race.\n",
                 name.c_str());
     }
 }   // eventCallback
@@ -445,6 +443,7 @@ void RaceResultGUI::renderGlobal(float dt)
         switch(m_animation_state)
         {
         // Both states use the same scrolling:
+        case RR_INIT: break;   // Remove compiler warning
         case RR_RACE_RESULT:
         case RR_OLD_GP_RESULTS:
              if(m_timer > ri->m_start_at)
@@ -528,7 +527,6 @@ void RaceResultGUI::determineGPLayout()
 void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y, 
                                     unsigned int n, bool display_points)
 {
-    World *world = World::getWorld();
     RowInfo *ri = &(m_all_row_infos[n]);
     video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
                                                : video::SColor(255,255,255,255);
