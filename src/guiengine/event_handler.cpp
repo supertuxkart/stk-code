@@ -498,7 +498,6 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     }
     else
     {
-        printf("sendEventToUser : '%s' is disabled = '%i'\n", w->m_properties[PROP_ID].c_str(), w->m_deactivated);
         sendEventToUser(w, w->m_properties[PROP_ID], playerID);
     }
     
