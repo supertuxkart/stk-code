@@ -102,7 +102,9 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
-    pause(RESULT_DISPLAY_PHASE);
+// FIXME JH: this is not necessary anymore,
+// since registering the gui with the state manager 
+// does the same.        pause(RESULT_DISPLAY_PHASE);
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
         network_manager->sendRaceResults();
 }   // terminateRace

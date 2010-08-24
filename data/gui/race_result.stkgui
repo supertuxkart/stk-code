@@ -1,0 +1,21 @@
+<stkgui>
+    <div x="2%" y="5%" width="96%" height="95%" layout="vertical-row" id="div">
+        <placeholder id="result-table" width="90%" proportion="1">
+        <!-- Contents is added programatically -->
+        </placeholder>
+        <spacer height="10" height="2%" width="96%"/>
+        <!-- The actual button texts will vary depending on what type of race
+             was being run, and if something was unlocked etc. So we don't
+             specify a text here, and label the buttons :
+             top   : 'See unlocked feature(s)', 'Continue', 'Setup new race'
+             middle: 'Restart' (or invisible)
+             bottom: 'Abort GP', 'Back to the menu' (or invisible)
+             Setting text=" " is important, otherwise the height of the
+             widget is incorrect.                             -->
+        <button id="top"    align="center" width="60%" text=" "/>
+        <spacer height="10" height="2%"    width="96%"/>
+        <button id="middle" align="center" width="60%" text=" "/>
+        <spacer height="10" height="2%"    width="96%"/>
+        <button id="bottom" align="center" width="60%" text=" "/>
+    </div>
+</stkgui>

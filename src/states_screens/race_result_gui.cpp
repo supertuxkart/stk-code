@@ -19,39 +19,211 @@
 
 #include "states_screens/race_result_gui.hpp"
 
+#include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widget.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_setup_Screen.hpp"
 #include "utils/string_utils.hpp"
+
+DEFINE_SCREEN_SINGLETON( RaceResultGUI );
+
+// FIXME: debug only!!!!!!!!!
+#include "karts/kart_properties_manager.hpp"
+#include "states_screens/feature_unlocked.hpp"
+// FIXME: debug end
 
 /** Constructor, initialises internal data structures.
  */
-RaceResultGUI::RaceResultGUI()
+RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui", /*pause race*/ false)
 {
-#undef USE_NEW_RACE_RESULT
-
-#ifndef USE_NEW_RACE_RESULT
-    // FIXME: for now disable the new race result display
-    // by just firing up the old display (which will make sure
-    // that the rendering for this object is not called anymore).
-    new RaceOverDialog(0.6f, 0.9f);
-    return;
-#else
-    determineTableLayout();
-    m_timer    = 0;
-    m_animation_state = RR_INIT;
-#endif
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
 /** Destructor. */
 RaceResultGUI::~RaceResultGUI()
 {
-#ifdef USE_NEW_RACE_RESULT
-    m_font->setMonospaceDigits(m_was_monospace);
-#endif
 }   // ~Racegui
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::loadedFromFile()
+{
+}   // loadedFromFile
+
+//-----------------------------------------------------------------------------
+/** Besides calling init in the base class this removes all buttons from the
+ *  screen. The buttons will only displayed once the animation is over. The
+ *  order in which these buttons
+ */
+void RaceResultGUI::init()
+{
+    Screen::init();
+    determineTableLayout();
+    m_animation_state = RR_INIT;
+
+    m_timer           = 0;
+
+    GUIEngine::Widget *div_widget = getWidget("div");
+
+    getWidget("top")->setVisible(false);
+    getWidget("middle")->setVisible(false);
+    getWidget("bottom")->setVisible(false);
+}   // init
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::tearDown()
+{
+    Screen::tearDown();
+    m_font->setMonospaceDigits(m_was_monospace);
+}   // tearDown
+    
+//-----------------------------------------------------------------------------
+/** Makes the correct buttons visible again, and gives them the right label.
+ *  1) If something was unlocked, only a 'next' button is displayed.
+ */
+void RaceResultGUI::enableAllButtons()
+{
+    // If something was unlocked
+    // -------------------------
+    int n = unlock_manager->getRecentlyUnlockedFeatures().size();
+    if(n>0)
+    {
+        GUIEngine::Widget *top = getWidget("top");
+        top->setText(n==1 ? _("See unlocked feature") 
+                          : _("See unlocked features"));
+        top->setVisible(true);
+        return;
+    }
+
+    // In case of a GP:
+    // ----------------
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        GUIEngine::Widget *top = getWidget("top");
+        top->setText( _("Continue") );
+        top->setVisible(true);
+
+        GUIEngine::Widget *middle = getWidget("middle");
+        middle->setText( _("Restart") );
+        middle->setVisible(true);
+
+        GUIEngine::Widget *bottom = getWidget("bottom");
+        bottom->setText( _("Abort Grand Prix") );
+        bottom->setVisible(true);
+        return;
+    }
+
+    // Normal race
+    // -----------
+    GUIEngine::Widget *top = getWidget("top");
+    top->setText( _("Setup New Race") );
+    top->setVisible(true);
+
+    GUIEngine::Widget *middle = getWidget("middle");
+    middle->setText( _("Restart") );
+    middle->setVisible(true);
+
+    GUIEngine::Widget *bottom = getWidget("bottom");
+    bottom->setText( _("Back to the menu") );
+    bottom->setVisible(true);
+
+}   // enableAllButtons
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::eventCallback(GUIEngine::Widget* widget, 
+                                  const std::string& name, const int playerID)
+{
+
+    // If something was unlocked, the 'continue' button was 
+    // actually used to display "Show unlocked feature(s)" text.
+    // ---------------------------------------------------------
+    int n = unlock_manager->getRecentlyUnlockedFeatures().size();
+    if(n>0)
+    {
+        if(name=="top")
+        {
+            std::vector<const Challenge*> unlocked = 
+                unlock_manager->getRecentlyUnlockedFeatures();
+            unlock_manager->clearUnlocked();
+            FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("tux")),
+                L"Unlocked");
+            //scene->addUnlockedThings(unlocked);
+            StateManager::get()->popMenu();
+            StateManager::get()->pushScreen(scene);
+            World::deleteWorld();
+            return;
+        }
+        fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n", 
+                name.c_str());
+        assert(false);
+    }
+
+    // Next check for GP
+    // -----------------
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        if(name=="top")             // Next GP
+        {
+            StateManager::get()->popMenu();
+            race_manager->next();
+            return;
+        }
+        else if (name=="middle")        // Restart
+        {
+            StateManager::get()->popMenu();
+            race_manager->rerunRace();
+            return;
+        }
+        else if (name=="bottom")   // Abort
+        {
+            StateManager::get()->popMenu();
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            return;
+        }
+        else
+        {
+            fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n",
+                            name.c_str());
+            assert(false);
+        }
+    }
+
+    // This is a normal race, nothing was unlocked
+    // -------------------------------------------
+    if(name=="top")             // Setup new race
+    {
+        StateManager::get()->popMenu();
+        race_manager->exitRace();
+        Screen* newStack[] = {MainMenuScreen::getInstance(), 
+                              RaceSetupScreen::getInstance(), 
+                              NULL};
+        StateManager::get()->resetAndSetStack( newStack );
+        return;
+    }
+    else if (name=="middle")        // Restart
+    {
+        StateManager::get()->popMenu();
+        race_manager->rerunRace();
+        return;
+    }
+    else if (name=="bottom")   // Back to main
+    {
+        StateManager::get()->popMenu();
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
+    }
+    else
+    {
+        fprintf(stderr, "Incorrect event '%s' for normal race '%s'.\n",
+                name.c_str());
+    }
+}   // eventCallback
 
 //-----------------------------------------------------------------------------
 /** This function is called when one of the player presses 'fire'. The next
@@ -63,8 +235,8 @@ RaceResultGUI::~RaceResultGUI()
  */
 void RaceResultGUI::nextPhase()
 {
-    // FIXME: make sure that computeGPRanks is called here!!
-    new RaceOverDialog(0.6f, 0.9f);
+    // This will trigger the next phase in the next render call.
+    // FIXME ... work in progress m_timer = 9999;
 }   // nextPhase
 
 //-----------------------------------------------------------------------------
@@ -72,6 +244,8 @@ void RaceResultGUI::nextPhase()
  */
 void RaceResultGUI::determineTableLayout()
 {
+    GUIEngine::Widget *table_area = getWidget("result-table");
+
     m_font          = GUIEngine::getFont();
     assert(m_font);
     m_was_monospace = m_font->getMonospaceDigits();
@@ -81,26 +255,37 @@ void RaceResultGUI::determineTableLayout()
     std::vector<int> order;
     world->raceResultOrder(&order);
 
+    m_all_row_infos.resize(order.size());
+
+
     // Determine the kart to display in the right order, 
     // and the maximum width for the kart name column
     // -------------------------------------------------
     m_width_kart_name     = 0;
     float max_finish_time = 0;
+
+    // Use only the karts that are supposed to be displayed (and
+    // ignore e.g. the leader in a FTL race).
+    unsigned int num_karts  = 0;
+
     for(unsigned int i=0; i<order.size(); i++)
     {
         if(order[i]==-1) continue;
-        Kart *kart = world->getKart(order[i]);
-        m_is_player_kart.push_back(kart->getController()->isPlayerController());
-        m_kart_names.push_back(kart->getName());
+        // Save a pointer to the current row_info entry
+        RowInfo *ri              = &(m_all_row_infos[num_karts]);
+        num_karts++;
+        Kart *kart               = world->getKart(order[i]);
+        ri->m_is_player_kart     = kart->getController()->isPlayerController();
+        ri->m_kart_name          = kart->getName();
 
-        video::ITexture *icon = 
+        video::ITexture *icon    = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        m_kart_icons.push_back(icon);
+        ri->m_kart_icon          = icon;
 
-        const float time  = kart->getFinishTime();
+        const float time         = kart->getFinishTime();
         if(time > max_finish_time) max_finish_time = time;
-        std::string time_string = StringUtils::timeToString(time);
-        m_finish_time_string.push_back(time_string.c_str());
+        std::string time_string  = StringUtils::timeToString(time);
+        ri->m_finish_time_string = time_string.c_str();
 
         core::dimension2d<u32> rect = m_font->getDimension(kart->getName().c_str());
         if(rect.Width > m_width_kart_name)
@@ -112,15 +297,11 @@ void RaceResultGUI::determineTableLayout()
     core::dimension2du r    = m_font->getDimension(string_max_time.c_str());
     m_width_finish_time     = r.Width;
 
-    // Use only the karts that are supposed to be displayed (and
-    // ignore e.g. the leader in a FTL race).
-    unsigned int num_karts  = m_finish_time_string.size();
-
     // Top pixel where to display text
-    m_top                   = (int)(0.15f*UserConfigParams::m_height);
+    m_top                   = table_area->m_y;
 
     // Height of the result display
-    unsigned int height     = (int)(0.7f *UserConfigParams::m_height);
+    unsigned int height     = table_area->m_h;
 
     // Setup different timing information for the different phases
     // -----------------------------------------------------------
@@ -152,9 +333,9 @@ void RaceResultGUI::determineTableLayout()
     if(m_distance_between_rows * num_karts > height)
         m_distance_between_rows = height / num_karts;
 
-    m_width_icon = UserConfigParams::m_height<600 
+    m_width_icon = table_area->m_h<600 
                  ? 27 
-                 : (int)(40*(UserConfigParams::m_width/800.0f));
+                 : (int)(40*(table_area->m_w/800.0f));
 
     m_width_column_space  = 20;
 
@@ -174,8 +355,14 @@ void RaceResultGUI::determineTableLayout()
         table_width += m_width_new_points + width_all_points
                      + 2 * m_width_column_space;
 
-    m_leftmost_column = (UserConfigParams::m_width  - table_width)/2;
+    m_leftmost_column = table_area->m_x + (table_area->m_w - table_width)/2;
 }   // determineTableLayout
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
+{
+    renderGlobal(dt);
+}   // onUpdate
 
 //-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only 
@@ -196,9 +383,10 @@ void RaceResultGUI::renderGlobal(float dt)
     case RR_INIT:        
         for(unsigned int i=0; i<num_karts; i++)
         {
-            m_start_at.push_back(m_time_between_rows * i);
-            m_x_pos.push_back((float)UserConfigParams::m_width);
-            m_y_pos.push_back((float)(m_top+i*m_distance_between_rows));
+            RowInfo *ri    = &(m_all_row_infos[i]);
+            ri->m_start_at = m_time_between_rows * i;
+            ri->m_x_pos    = (float)UserConfigParams::m_width;
+            ri->m_y_pos    = (float)(m_top+i*m_distance_between_rows);
         }
         m_animation_state = RR_RACE_RESULT;
         break;
@@ -208,6 +396,7 @@ void RaceResultGUI::renderGlobal(float dt)
             if(race_manager->getMajorMode()!=RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
                 m_animation_state = RR_WAIT_TILL_END;
+                enableAllButtons();
                 break;
             }
 
@@ -235,7 +424,11 @@ void RaceResultGUI::renderGlobal(float dt)
             m_animation_state = RR_WAIT_TILL_END;
             // Make the new row permanent.
             for(unsigned int i=0; i<num_karts; i++)
-                m_y_pos[i] = m_centre_point[i] - m_radius[i];
+            {
+                RowInfo *ri = &(m_all_row_infos[i]);
+                ri->m_y_pos = ri->m_centre_point - ri->m_radius;
+            }
+            enableAllButtons();
         }
         break;
     case RR_WAIT_TILL_END:      break;
@@ -244,34 +437,35 @@ void RaceResultGUI::renderGlobal(float dt)
     // Second phase: update X and Y positions for the various animations
     // =================================================================
     float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
-    for(unsigned int i=0; i<m_kart_names.size(); i++)
+    for(unsigned int i=0; i<m_all_row_infos.size(); i++)
     {
-        float x = m_x_pos[i];
-        float y = m_y_pos[i];
+        RowInfo *ri = &(m_all_row_infos[i]);
+        float x = ri->m_x_pos;
+        float y = ri->m_y_pos;
         switch(m_animation_state)
         {
         // Both states use the same scrolling:
         case RR_RACE_RESULT:
         case RR_OLD_GP_RESULTS:
-             if(m_timer > m_start_at[i])
+             if(m_timer > ri->m_start_at)
              {   // if active
-                 m_x_pos[i] -= dt*v;
-                 if(m_x_pos[i]<m_leftmost_column)
-                     m_x_pos[i] = (float)m_leftmost_column;
-                 x = m_x_pos[i];
+                 ri->m_x_pos -= dt*v;
+                 if(ri->m_x_pos<m_leftmost_column)
+                     ri->m_x_pos = (float)m_leftmost_column;
+                 x = ri->m_x_pos;
              }
              break;
         case RR_INCREASE_POINTS:    
-            m_current_displayed_points[i] += dt*m_time_for_points;
-            if(m_current_displayed_points[i]>m_new_overall_points[i])
-                m_current_displayed_points[i] = (float)m_new_overall_points[i];
-            m_new_points[i] -= dt*m_time_for_points;
-            if(m_new_points[i]<0)
-                m_new_points[i] = 0;
+            ri->m_current_displayed_points += dt*m_time_for_points;
+            if(ri->m_current_displayed_points>ri->m_new_overall_points)
+                ri->m_current_displayed_points = (float)ri->m_new_overall_points;
+            ri->m_new_points -= dt*m_time_for_points;
+            if(ri->m_new_points<0)
+                ri->m_new_points = 0;
             break;
         case RR_RESORT_TABLE:
-            x = m_x_pos[i]       -m_radius[i]*sin(m_timer/m_time_rotation*M_PI);
-            y = m_centre_point[i]+m_radius[i]*cos(m_timer/m_time_rotation*M_PI);
+            x = ri->m_x_pos       -ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
+            y = ri->m_centre_point+ri->m_radius*cos(m_timer/m_time_rotation*M_PI);
             break;
         case RR_WAIT_TILL_END:
             break;
@@ -286,45 +480,43 @@ void RaceResultGUI::renderGlobal(float dt)
  */
 void RaceResultGUI::determineGPLayout()
 {
-    unsigned int num_karts = m_kart_icons.size();
-    m_current_displayed_points.resize(num_karts);
-    m_new_points.resize(num_karts);
+    unsigned int num_karts = m_all_row_infos.size();
     std::vector<int> old_rank(num_karts, 0);
     for(unsigned int kart_id=0; kart_id<num_karts; kart_id++)
     {
-        int rank           = race_manager->getKartGPRank(kart_id);
-        old_rank[kart_id]  = rank;
-        const Kart *kart   = World::getWorld()->getKart(kart_id);
-        m_kart_icons[rank] = 
+        int rank             = race_manager->getKartGPRank(kart_id);
+        old_rank[kart_id]    = rank;
+        const Kart *kart     = World::getWorld()->getKart(kart_id);
+        RowInfo *ri          = &(m_all_row_infos[rank]);
+        ri->m_kart_icon      = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        m_kart_names[rank] = kart->getName();
-        m_is_player_kart[rank] = kart->getController()->isPlayerController();
+        ri->m_kart_name      = kart->getName();
+        ri->m_is_player_kart = kart->getController()->isPlayerController();
 
-        float time         = race_manager->getOverallTime(kart_id);
-        m_finish_time_string[rank]
-                           = StringUtils::timeToString(time).c_str();
-        m_start_at[rank]   = m_time_between_rows * rank;
-        m_x_pos[rank]      = (float)UserConfigParams::m_width;
-        m_y_pos[rank]      = (float)(m_top+rank*m_distance_between_rows);
-        int p              = race_manager->getKartPrevScore(kart_id);
-        m_current_displayed_points[rank] = (float)p;
-        m_new_points[rank] = (float)race_manager->getPositionScore(kart->getPosition());
+        float time           = race_manager->getOverallTime(kart_id);
+        ri->m_finish_time_string
+                             = StringUtils::timeToString(time).c_str();
+        ri->m_start_at       = m_time_between_rows * rank;
+        ri->m_x_pos          = (float)UserConfigParams::m_width;
+        ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
+        int p                = race_manager->getKartPrevScore(kart_id);
+        ri->m_current_displayed_points = (float)p;
+        ri->m_new_points     = 
+            (float)race_manager->getPositionScore(kart->getPosition());
     }
 
     // Now update the GP ranks, and determine the new position
     // -------------------------------------------------------
-    m_radius.resize(num_karts);
-    m_centre_point.resize(num_karts);
-    m_new_overall_points.resize(num_karts);
     race_manager->computeGPRanks();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        int j                   = old_rank[i];
-        int gp_position         = race_manager->getKartGPRank(i);
-        m_radius[j]             = (j-gp_position)*(int)m_distance_between_rows*0.5f;
-        m_centre_point[j]       = m_top+(gp_position+j)*m_distance_between_rows*0.5f;
-        int p                   = race_manager->getKartScore(i);
-        m_new_overall_points[j] = p;
+        int j                    = old_rank[i];
+        int gp_position          = race_manager->getKartGPRank(i);
+        RowInfo *ri              = &(m_all_row_infos[j]);
+        ri->m_radius             = (j-gp_position)*(int)m_distance_between_rows*0.5f;
+        ri->m_centre_point       = m_top+(gp_position+j)*m_distance_between_rows*0.5f;
+        int p                    = race_manager->getKartScore(i);
+        ri->m_new_overall_points = p;
     }   // i < num_karts
 }   // determineGPLayout
 
@@ -337,17 +529,18 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                     unsigned int n, bool display_points)
 {
     World *world = World::getWorld();
-    video::SColor color = m_is_player_kart[n] ? video::SColor(255,255,0,  0  )
-                                              : video::SColor(255,255,255,255);
+    RowInfo *ri = &(m_all_row_infos[n]);
+    video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
+                                               : video::SColor(255,255,255,255);
 
     // First draw the icon
     // -------------------
-    if(m_kart_icons[n])
+    if(ri->m_kart_icon)
     {
         core::recti source_rect(core::vector2di(0,0), 
-                                m_kart_icons[n]->getSize());
+                                ri->m_kart_icon->getSize());
         core::recti dest_rect(x, y, x+m_width_icon, y+m_width_icon);
-        irr_driver->getVideoDriver()->draw2DImage(m_kart_icons[n], dest_rect, 
+        irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
                                                   source_rect, NULL, NULL, 
                                                   true);
     }
@@ -356,7 +549,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     core::recti pos_name(x+m_width_icon+m_width_column_space, y,
                          UserConfigParams::m_width, y+m_distance_between_rows);
 
-    m_font->draw(m_kart_names[n], pos_name, color);
+    m_font->draw(ri->m_kart_name, pos_name, color);
 
     // Draw the time
     // -------------
@@ -365,7 +558,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     bool mono = m_font->getMonospaceDigits();
     core::recti dest_rect = core::recti(x_time, y, x_time+100, y+10);
-    m_font->draw(m_finish_time_string[n], dest_rect, color);
+    m_font->draw(ri->m_finish_time_string, dest_rect, color);
     m_font->setMonospaceDigits(mono);
 
 
@@ -381,10 +574,10 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                          + m_width_kart_name   + m_width_column_space
                          + m_width_finish_time + m_width_column_space;
     dest_rect = core::recti(x_point, y, x_point+100, y+10);
-    if(m_new_points[n]>0)
+    if(ri->m_new_points>0)
     {
         core::stringw point_string = core::stringw("+")
-                                   + core::stringw((int)m_new_points[n]);
+                                   + core::stringw((int)ri->m_new_points);
         // With mono-space digits space has the same width as each character, so
         // we can simply fill up the string with spaces to get the right aligned.
         while(point_string.size()<3)
@@ -399,7 +592,8 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                              + m_width_finish_time + m_width_column_space
                              + m_width_new_points   +m_width_column_space;
     dest_rect = core::recti(x_point_inc, y, x_point_inc+100, y+10);
-    core::stringw point_inc_string = core::stringw((int)(m_current_displayed_points[n]));
+    core::stringw point_inc_string = 
+        core::stringw((int)(ri->m_current_displayed_points));
     while(point_inc_string.size()<3)
         point_inc_string = core::stringw(" ")+point_inc_string;
     m_font->draw(point_inc_string, dest_rect, color);

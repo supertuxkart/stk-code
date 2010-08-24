@@ -240,7 +240,21 @@ Controller* World::loadAIController(Kart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
-    delete m_race_gui;
+    // Delete the in-race-gui:
+    if(m_saved_race_gui)
+    {
+        // If there is a save race gui, this means that the result gui is
+        // currently being shown. The race result gui is a screen and so
+        // is deleted by the state manager. So we only have to delete
+        // the actual race gui:
+        delete m_saved_race_gui;
+    }
+    else
+    {
+        // No race result gui is shown, so m_race_gui is the in-race
+        // gui and this must be deleted.
+        delete m_race_gui;
+    }
     delete race_state;
     // In case that a race is aborted (e.g. track not found) m_track is 0.
     if(m_track)
@@ -304,8 +318,8 @@ void World::terminateRace()
     // and save the pointer.
     assert(m_saved_race_gui==NULL);
     m_saved_race_gui = m_race_gui;
-    m_race_gui       = new RaceResultGUI();
-    
+    m_race_gui       = RaceResultGUI::getInstance();
+    StateManager::get()->pushScreen(RaceResultGUI::getInstance());
     WorldStatus::terminateRace();
 }   // terminateRace
 
@@ -642,11 +656,11 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 void World::restartRace()
 {
     // If m_saved_race_gui is set, it means that the restart was done
-    // when the race result gui was being shown. In this case delete
-    // the race result gui and restore the race gui.
+    // when the race result gui was being shown. In this case restore the 
+    // race gui (not that the race result gui is cached and so never really
+    // destroyed).
     if(m_saved_race_gui)
     {
-        delete m_race_gui;
         m_race_gui       = m_saved_race_gui;
         m_saved_race_gui = NULL;
     }

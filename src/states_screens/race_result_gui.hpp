@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <vector>
 
+#include "guiengine/screen.hpp"
+
 namespace irr
 {
     namespace gui
@@ -37,7 +39,9 @@ namespace irr
   * \brief Displays the results (while the end animation is shown).
   * \ingroup states_screens
   */
-class RaceResultGUI : public RaceGUIBase
+class RaceResultGUI : public RaceGUIBase, 
+                      public GUIEngine::Screen,
+                      public GUIEngine::ScreenSingleton<RaceResultGUI>
 {
 private:
     /** Timer variable for animations. */
@@ -61,44 +65,39 @@ private:
                                 RR_WAIT_TILL_END}
                                m_animation_state;
 
-    /** Start time for each line of the animation. */
-    std::vector<float>         m_start_at;
+    class RowInfo
+    {
+    public:
+        /** Start time for each line of the animation. */
+        float            m_start_at;
+        /** Currenct X position. */
+        float            m_x_pos;
+        /** Currenct Y position. */
+        float            m_y_pos;
+        /** True if kart is a player kart. */
+        bool             m_is_player_kart;
+        /** The radius to use when sorting the entries. Positive values
+            will rotate downwards, negatives are upwards. */
+        float            m_radius;
+        /** The center point when sorting the entries. */
+        float            m_centre_point;
+        /** The names of all karts in the right order. */
+        core::stringw    m_kart_name;
+        /** Points earned in this race. */
+        float            m_new_points;
+        /** New overall points after this race. */
+        int              m_new_overall_points;
+        /** When updating the number of points in the display, this is the
+            currently displayed number of points. This is a floating point number 
+            since it stores the increments during increasing the points. */
+        float            m_current_displayed_points;
+        /** The kart icons. */
+        video::ITexture *m_kart_icon;
+        /** The times of all karts in the right order. */
+        core::stringw    m_finish_time_string;
+    };   // Rowinfo
 
-    /** Currenct X position. */
-    std::vector<float>         m_x_pos;
-
-    /** Currenct Y position. */
-    std::vector<float>         m_y_pos;
-
-    /** True if kart is a player kart. */
-    std::vector<bool>          m_is_player_kart;
-
-    /** The center point when sorting the entries. */
-    std::vector<float>         m_centre_point;
-
-    /** The radius to use when sorting the entries. Positive values
-        will rotate downwards, negatives are upwards. */
-    std::vector<float>         m_radius;
-
-    /** The names of all karts in the right order. */
-    std::vector<core::stringw> m_kart_names;
-
-    /** Points earned in this race. */
-    std::vector<float>         m_new_points;
-
-    /** New overall points after this race. */
-    std::vector<int>           m_new_overall_points;
-
-    /** When updating the number of points in the display, this is the
-        currently displayed number of points. This is a floating point number 
-        since it stores the increments during increasing the points. */
-    std::vector<float>         m_current_displayed_points;
-
-    /** The kart icons. */
-    std::vector<video::ITexture*> m_kart_icons;
-
-    /** The times of all karts in the right order. */
-    std::vector<core::stringw> m_finish_time_string;
+    std::vector<RowInfo>       m_all_row_infos;
 
     /** Time to wait till the next row starts to be animated. */
     float                      m_time_between_rows;
@@ -152,6 +151,7 @@ private:
                          unsigned int n, bool display_points);
     void determineTableLayout();
     void determineGPLayout();
+    void enableAllButtons();
 
 public:
 
@@ -159,13 +159,30 @@ public:
     virtual     ~RaceResultGUI();
     virtual void renderGlobal(float dt);
 
+    /** \brief Implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    void init();
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    void tearDown();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
+                       const int playerID);
+
+    friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
+
     /** Should not be called anymore.  */
     const core::dimension2du getMiniMapSize() const 
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
     virtual void renderPlayerView(const Kart *kart) {}
-    
+
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
+
     /** No more messages need to be displayed, so this function shouldn't
      *  be called at all. */
     virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
