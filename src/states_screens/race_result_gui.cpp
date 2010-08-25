@@ -291,10 +291,8 @@ void RaceResultGUI::determineTableLayout()
     m_time_overall_scroll   = (num_karts-1)*m_time_between_rows 
                             + m_time_single_scroll + 2.0f;
 
-    // The time to increase the number of points. Take the
-    // overall time for this phase (1 second atm) divided
-    // by the maximum number of points increase.
-    m_time_for_points       = stk_config->m_scores[0]/1.0f;
+    // The time to increase the number of points. 
+    m_time_for_points       = 1.0f;
 
     // Determine text height
     r                            = m_font->getDimension(L"Y");
@@ -409,11 +407,28 @@ void RaceResultGUI::renderGlobal(float dt)
             m_animation_state = RR_INCREASE_POINTS;
             m_timer           = 0;
         }
+        break;
     case RR_INCREASE_POINTS: 
-        if(m_timer > 5)
+        // Have one second delay before the resorting starts.
+        if(m_timer > 1+m_time_for_points)
         {
             m_animation_state = RR_RESORT_TABLE;
-            m_timer           = 0;
+            if(m_gp_position_was_changed)
+                m_timer       = 0;
+            else
+                // This causes the phase to go to RESORT_TABLE once, and then
+                // immediately wait till end. This has the advantage that any
+                // phase change settings will be processed properly.
+                m_timer       = m_time_rotation+1;
+            // Make the new row permanent; necessary in case
+            // that the animation is skipped.
+            for(unsigned int i=0; i<num_karts; i++)
+            {
+                RowInfo *ri                    = &(m_all_row_infos[i]);
+                ri->m_new_points               = 0;
+                ri->m_current_displayed_points = (float)ri->m_new_overall_points;
+            }
+
         }
         break;
     case RR_RESORT_TABLE:
@@ -455,10 +470,11 @@ void RaceResultGUI::renderGlobal(float dt)
              }
              break;
         case RR_INCREASE_POINTS:    
-            ri->m_current_displayed_points += dt*m_time_for_points;
+            ri->m_current_displayed_points += 
+                dt*stk_config->m_scores[0]/m_time_for_points;
             if(ri->m_current_displayed_points>ri->m_new_overall_points)
                 ri->m_current_displayed_points = (float)ri->m_new_overall_points;
-            ri->m_new_points -= dt*m_time_for_points;
+            ri->m_new_points -= dt*stk_config->m_scores[0]/m_time_for_points;
             if(ri->m_new_points<0)
                 ri->m_new_points = 0;
             break;
@@ -507,10 +523,12 @@ void RaceResultGUI::determineGPLayout()
     // Now update the GP ranks, and determine the new position
     // -------------------------------------------------------
     race_manager->computeGPRanks();
+    m_gp_position_was_changed = false;
     for(unsigned int i=0; i<num_karts; i++)
     {
         int j                    = old_rank[i];
         int gp_position          = race_manager->getKartGPRank(i);
+        m_gp_position_was_changed |= j!=gp_position;
         RowInfo *ri              = &(m_all_row_infos[j]);
         ri->m_radius             = (j-gp_position)*(int)m_distance_between_rows*0.5f;
         ri->m_centre_point       = m_top+(gp_position+j)*m_distance_between_rows*0.5f;

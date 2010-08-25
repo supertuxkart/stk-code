@@ -144,6 +144,10 @@ private:
     /** The font to use. */
     gui::ScalableFont         *m_font;
 
+    /** True if a GP position was changed. If not, the point increase
+     *  animation can be skipped. */
+    bool                       m_gp_position_was_changed;
+
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
