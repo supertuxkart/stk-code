@@ -54,9 +54,9 @@ void RaceResultGUI::loadedFromFile()
 }   // loadedFromFile
 
 //-----------------------------------------------------------------------------
-/** Besides calling init in the base class this removes all buttons from the
- *  screen. The buttons will only displayed once the animation is over. The
- *  order in which these buttons
+/** Besides calling init in the base class this makes all buttons of this 
+ *  screen invisible. The buttons will only displayed once the animation is 
+ *  over.
  */
 void RaceResultGUI::init()
 {
@@ -147,9 +147,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 unlock_manager->getRecentlyUnlockedFeatures();
             unlock_manager->clearUnlocked();
             FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
-            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("tux")),
-                L"Unlocked");
-            //scene->addUnlockedThings(unlocked);
+            scene->addUnlockedThings(unlocked);
             StateManager::get()->popMenu();
             StateManager::get()->pushScreen(scene);
             World::deleteWorld();
