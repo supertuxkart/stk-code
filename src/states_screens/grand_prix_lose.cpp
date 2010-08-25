@@ -241,7 +241,6 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
     if (kart != NULL)
     {
         KartModel* kart_model = kart->getKartModel();
-        
         m_kart_x = KART_START_X;
         m_kart_y = KART_Y;
         m_kart_z = KART_Z;
@@ -251,6 +250,7 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
         //kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
         kart_main_node->updateAbsolutePosition();
         kart_main_node->setRotation(vector3df(0, 90, 0));
+        kart_model->setAnimation(KartModel::AF_DEFAULT);
     }   // if kart !=NULL
     
     m_kart_node = kart_main_node;
