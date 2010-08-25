@@ -62,12 +62,9 @@ RacePausedDialog::~RacePausedDialog()
 
 void RacePausedDialog::loadedFromFile()
 {
-    printf("==== RacePausedDialog::loadedFromFile() ====\n");
-
     // disable the "restart" button in GPs
     if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_SINGLE)
     {
-        printf("==== REMOVING restart button ====\n");
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
         
