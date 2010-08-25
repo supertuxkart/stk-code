@@ -156,19 +156,14 @@ private:
 public:
 
                  RaceResultGUI();
-    virtual     ~RaceResultGUI();
     virtual void renderGlobal(float dt);
 
     /** \brief Implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() {};
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void init();
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown();
-    
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    virtual void tearDown();    
+    virtual bool onEscapePressed();
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
                        const int playerID);
 

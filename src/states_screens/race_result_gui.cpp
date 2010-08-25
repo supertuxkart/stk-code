@@ -43,17 +43,6 @@ RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui", /*pause race*/ fal
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
-/** Destructor. */
-RaceResultGUI::~RaceResultGUI()
-{
-}   // ~Racegui
-
-//-----------------------------------------------------------------------------
-void RaceResultGUI::loadedFromFile()
-{
-}   // loadedFromFile
-
-//-----------------------------------------------------------------------------
 /** Besides calling init in the base class this makes all buttons of this 
  *  screen invisible. The buttons will only displayed once the animation is 
  *  over.
@@ -222,20 +211,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
-/** This function is called when one of the player presses 'fire'. The next
- *  phase of the animation will be displayed. E.g. 
- *  in a GP: pressing fire while/after showing the latest race result will
- *           start the animation for the current GP result
- *  in a normal race: when pressing fire while an animation is played, 
- *           start the menu showing 'rerun, new race, back to main' etc.
- */
-void RaceResultGUI::nextPhase()
-{
-    // This will trigger the next phase in the next render call.
-    // FIXME ... work in progress m_timer = 9999;
-}   // nextPhase
-
-//-----------------------------------------------------------------------------
 /** This determines the layout, i.e. the size of all columns, font size etc.
  */
 void RaceResultGUI::determineTableLayout()
@@ -355,6 +330,33 @@ void RaceResultGUI::determineTableLayout()
 }   // determineTableLayout
 
 //-----------------------------------------------------------------------------
+/** This function is called when one of the player presses 'fire'. The next
+ *  phase of the animation will be displayed. E.g. 
+ *  in a GP: pressing fire while/after showing the latest race result will
+ *           start the animation for the current GP result
+ *  in a normal race: when pressing fire while an animation is played, 
+ *           start the menu showing 'rerun, new race, back to main' etc.
+ */
+void RaceResultGUI::nextPhase()
+{
+    // This will trigger the next phase in the next render call.
+    m_timer = 9999;
+}   // nextPhase
+
+//-----------------------------------------------------------------------------
+/** If escape is pressed, don't do the default option (close the screen), but
+ *  advance to the next animation phase.
+ */
+bool RaceResultGUI::onEscapePressed()
+{
+    nextPhase();
+    return false;   // indicates 'do not close'
+}   // onEscapePressed
+
+//-----------------------------------------------------------------------------
+/** Called once a frame, this now triggers the rendering of the actual
+ *  race result gui.
+ */
 void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
 {
     renderGlobal(dt);
