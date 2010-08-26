@@ -95,9 +95,19 @@ bool EventHandler::OnEvent (const SEvent &event)
 
 // -----------------------------------------------------------------------------
 
-void EventHandler::processGUIAction(const PlayerAction action, const unsigned int value,
-                                    Input::InputType type, const int playerID)
+void EventHandler::processGUIAction(const PlayerAction action,
+                                    const unsigned int value,
+                                    Input::InputType type,
+                                    const int playerID)
 {
+    Screen* screen = GUIEngine::getCurrentScreen();
+    if (screen != NULL)
+    {
+        EventPropagation propg = screen->filterActions(action, value,
+                                                       type, playerID);
+        if (propg == EVENT_BLOCK) return;
+    }
+    
     const bool pressedDown = value > Input::MAX_VALUE*2/3;
     
     if (!pressedDown && type == Input::IT_STICKMOTION) return;

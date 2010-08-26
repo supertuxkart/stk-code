@@ -28,6 +28,7 @@
 #include "config/stk_config.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/event_handler.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
@@ -254,10 +255,18 @@ namespace GUIEngine
           * \brief Implementing method from AbstractTopLevelContainer
           */
         virtual int getWidth();
+        
         /**
           * \brief Implementing method from AbstractTopLevelContainer
           */
         virtual int getHeight();
+        
+        /**
+          * \brief override this if you need to be notified of player actions in subclasses
+          */
+        virtual EventPropagation filterActions(PlayerAction action, const unsigned int value,
+                                               Input::InputType type, int playerId) { return EVENT_LET; }
+        
     };
     
 }
