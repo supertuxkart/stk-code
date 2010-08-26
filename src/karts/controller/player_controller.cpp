@@ -270,7 +270,7 @@ void PlayerController::update(float dt)
     if(World::getWorld()->isStartPhase())
     {
         if(m_controls->m_accel || m_controls->m_brake ||
-           m_controls->m_fire  || m_controls->m_nitro  || m_controls->m_drift)
+           m_controls->m_fire  || m_controls->m_nitro || m_controls->m_drift)
         {
             if (m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
@@ -283,6 +283,7 @@ void PlayerController::update(float dt)
             }   // if penalty_time = 0
             
             m_penalty_time      = stk_config->m_penalty_time;
+            m_controls->m_brake = false;
             m_controls->m_accel = 0.0f;
             
         }   // if key pressed
