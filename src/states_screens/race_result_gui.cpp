@@ -84,11 +84,10 @@ void RaceResultGUI::enableAllButtons()
         top->setVisible(true);
         return;
     }
-
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
     // In case of a GP:
     // ----------------
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
         GUIEngine::Widget *top = getWidget("top");
         top->setText( _("Continue") );
         top->setVisible(true);
@@ -102,20 +101,32 @@ void RaceResultGUI::enableAllButtons()
         bottom->setVisible(true);
         return;
     }
+    else
+    {
+        // Normal race
+        // -----------
+        GUIEngine::Widget *top = getWidget("top");
+        top->setText( _("Setup New Race") );
+        top->setVisible(true);
 
-    // Normal race
-    // -----------
-    GUIEngine::Widget *top = getWidget("top");
-    top->setText( _("Setup New Race") );
-    top->setVisible(true);
+        GUIEngine::Widget *middle = getWidget("middle");
+        middle->setText( _("Restart") );
+        middle->setVisible(true);
 
-    GUIEngine::Widget *middle = getWidget("middle");
-    middle->setText( _("Restart") );
-    middle->setVisible(true);
+        GUIEngine::Widget *bottom = getWidget("bottom");
+        bottom->setText( _("Back to the menu") );
+        bottom->setVisible(true);
+    }
 
-    GUIEngine::Widget *bottom = getWidget("bottom");
-    bottom->setText( _("Back to the menu") );
-    bottom->setVisible(true);
+    // FIXME: what happens if e.g. the 'abort' button has the focus (e.g.
+    // because the mouse cursors was at exactly that spot before it was
+    // hidden)? So if someone presses repeatedly 'fire', this might select
+    // the abort button here. Is this good enough to prevent this?
+    // Or should we have a way of setting the players focus (e.g. to
+    // the 'top' bottom, which should be the default)? The code below
+    // actually appears not to do anything(?)
+    for(unsigned int i=0; i<MAX_PLAYER_COUNT; i++)
+        GUIEngine::focusNothingForPlayer(i);
 
 }   // enableAllButtons
 
@@ -352,6 +363,27 @@ bool RaceResultGUI::onEscapePressed()
 }   // onEscapePressed
 
 //-----------------------------------------------------------------------------
+/** This is called before an event is sent to a widget. Since in this case
+ *  no widget is active, the event would be lost, so we act on fire events
+ *  here and trigger the next phase.
+ */
+GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action, 
+                                              const unsigned int value,
+                                              Input::InputType type, 
+                                              int playerId)
+{
+    if(action!=PA_FIRE) return GUIEngine::EVENT_LET;
+
+    // If the buttons are already visible, let the event go through since
+    // it will be triggering eventCallback where this is handles.
+
+    if(m_animation_state == RR_WAIT_TILL_END) return GUIEngine::EVENT_LET;
+
+    nextPhase();
+    return GUIEngine::EVENT_BLOCK;
+}   // filterActions
+
+//-----------------------------------------------------------------------------
 /** Called once a frame, this now triggers the rendering of the actual
  *  race result gui.
  */
@@ -406,6 +438,11 @@ void RaceResultGUI::renderGlobal(float dt)
         {
             m_animation_state = RR_INCREASE_POINTS;
             m_timer           = 0;
+            for(unsigned int i=0; i<num_karts; i++)
+            {
+                RowInfo *ri = &(m_all_row_infos[i]);
+                ri->m_x_pos = (float)m_leftmost_column;
+            }
         }
         break;
     case RR_INCREASE_POINTS: 
@@ -469,7 +506,7 @@ void RaceResultGUI::renderGlobal(float dt)
                  x = ri->m_x_pos;
              }
              break;
-        case RR_INCREASE_POINTS:    
+        case RR_INCREASE_POINTS: 
             ri->m_current_displayed_points += 
                 dt*stk_config->m_scores[0]/m_time_for_points;
             if(ri->m_current_displayed_points>ri->m_new_overall_points)
