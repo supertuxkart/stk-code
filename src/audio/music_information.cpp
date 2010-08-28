@@ -63,7 +63,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     {
         throw std::runtime_error("Can open music XML file");
     }
-    
+        
     const int amount = root->getNumNodes();
     for (int i=0; i<amount; i++)
     {
@@ -103,7 +103,8 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
         }
         else if (node->getName() == "gain")
         {
-            node->get("gain", &m_gain);
+            node->get("value", &m_gain);
+            m_adjustedGain = m_gain;
         }
         else
         {
@@ -180,8 +181,8 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
-    std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">\n";
-
+    std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">, gain="
+              << m_adjustedGain << "\n";
     
     if (m_normal_filename== "") return;
 
@@ -317,6 +318,8 @@ void MusicInformation::resumeMusic()
 //-----------------------------------------------------------------------------
 void MusicInformation::volumeMusic(float gain)
 {
+    // printf("Setting master volume %f\n", gain);
+    
     m_adjustedGain = m_gain * gain;
     if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjustedGain);
     if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjustedGain);
