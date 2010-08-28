@@ -121,37 +121,6 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     //TODO: not implemented back (is this used in any way?)
     m_enable_fast = false;
     
-    /*
-    lisp::Parser parser;
-    const lisp::Lisp* const ROOT = parser.parse(filename);
-
-    const lisp::Lisp* const LISP = ROOT->getLisp("music-information");
-    if(!LISP)
-    {
-        delete ROOT;
-        std::ostringstream msg;
-        msg << "Couldn't load music information '" << filename 
-            << "': no music-information node.";
-        throw std::runtime_error(msg.str());
-    }
-    LISP->get      ("title",       m_title          );
-    LISP->get      ("composer",    m_composer       );
-    LISP->get      ("loop",        m_numLoops       );
-    LISP->get      ("music",       m_normal_filename);
-    LISP->get      ("enable-fast", m_enable_fast    );
-    LISP->get      ("fast-music",  m_fast_filename  );
-    // m_faster_time is used for twice: either as time to fade in faster music
-    // (if available), or the time to increase the pitch (if no faster music 
-    // is available). We allow each .music file to use any of the two names. 
-    // LISP->get doesn't change the value if the item is not found.
-    LISP->get      ("fade-time",   m_faster_time    );
-    LISP->get      ("faster-time", m_faster_time    );
-    LISP->get      ("max-pitch",   m_max_pitch      );
-    LISP->getVector("tracks",      m_all_tracks     );
-    LISP->get      ("gain",        m_gain           );
-    m_adjustedGain = m_gain;
-     */
-    
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
     m_normal_filename = path + "/" + m_normal_filename;
