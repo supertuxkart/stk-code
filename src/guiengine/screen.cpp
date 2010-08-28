@@ -52,8 +52,6 @@ Screen::Screen(const char* file, bool pause_race)
     m_throttle_FPS   = true;
     m_render_3d      = false;
     m_loaded         = false;
-    m_first_widget   = NULL;
-    m_last_widget    = NULL;
     m_pause_race     = pause_race;
 }   // Screen
 

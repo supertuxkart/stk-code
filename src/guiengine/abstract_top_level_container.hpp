@@ -52,6 +52,7 @@ namespace GUIEngine
 
     
     public:
+        AbstractTopLevelContainer();
         virtual ~AbstractTopLevelContainer() {}
         
         virtual int getWidth() = 0;

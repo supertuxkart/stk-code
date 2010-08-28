@@ -34,6 +34,12 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+AbstractTopLevelContainer::AbstractTopLevelContainer()
+{
+    m_first_widget = NULL;
+    m_last_widget = NULL;
+}
+
 void AbstractTopLevelContainer::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
