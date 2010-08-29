@@ -1,6 +1,6 @@
 <stkgui>
-    <div x="2%" y="5%" width="96%" height="95%" layout="vertical-row" id="div">
-        <placeholder id="result-table" width="90%" proportion="1">
+    <div x="2%" y="5%" width="100%" height="95%" layout="vertical-row" id="div">
+        <placeholder id="result-table" width="96%" proportion="1">
         <!-- Contents is added programatically -->
         </placeholder>
         <spacer height="10" height="2%" width="96%"/>
