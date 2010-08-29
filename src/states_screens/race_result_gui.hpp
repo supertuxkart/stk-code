@@ -186,13 +186,15 @@ public:
 
     virtual void onUpdate(float dt, irr::video::IVideoDriver*);
 
-    /** No more messages need to be displayed, so this function shouldn't
-     *  be called at all. */
+    /** No more messages need to be displayed, but the function might still be
+     *  called (e.g. 'new lap' message if the end controller is used for more
+     *  than one lap). So do nothing in this case.
+    */
     virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
                             float time, int fonst_size, 
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { assert(false); }
+                            bool important=true) { }
 
     /** Should not be called anymore. */
     virtual void clearAllMessages() {assert(false); }
