@@ -540,17 +540,17 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
-    core::vector2di offset = viewport.UpperLeftCorner;
-    offset.X              += viewport.getWidth() - meter_width - (int)(10*scaling.X);
-    offset.Y               = viewport.LowerRightCorner.Y-(int)(10*scaling.Y);
+    core::vector2df offset;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 10.0f*scaling.X;
+    offset.Y = viewport.LowerRightCorner.Y-10*scaling.Y;
     
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
     video::IVideoDriver *video = irr_driver->getVideoDriver();
-    const core::rect<s32> meter_pos(offset.X,
-                                    offset.Y-meter_height, 
-                                    offset.X+meter_width, 
-                                    offset.Y);
+    const core::rect<s32> meter_pos((int)offset.X,
+                                    (int)(offset.Y-meter_height),
+                                    (int)(offset.X+meter_width),
+                                    (int)offset.Y);
     video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0), 
                                                meter_texture->getOriginalSize());
@@ -566,37 +566,65 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
     core::dimension2du bar_size    = bar_texture->getOriginalSize();
-    video::S3DVertex vertices[4];
-
-    vertices[0].TCoords = core::vector2df(1.0f, 1.0f);
-    vertices[0].Pos = core::vector3df((float)meter_pos.LowerRightCorner.X,
-                                      (float)meter_pos.LowerRightCorner.Y,
-                                      0);
-    vertices[1].TCoords = core::vector2df(0, 1.0f);
-    vertices[1].Pos = core::vector3df((float)meter_pos.UpperLeftCorner.X, 
-                                      (float)meter_pos.LowerRightCorner.Y, 0);
+    video::S3DVertex vertices[5];
     unsigned int count;
-    if(speed_ratio<=0.5f)
+
+    // There are three different polygons used, depending on 
+    // the speed ratio. Consider the speed-display texture:
+    //
+    //   C----x----D       (position of v,w,x,y vary depending on  
+    //   |         |        speed)
+    //   w         y
+    //   |         |
+    //   B----A----E
+    // For speed ratio <= r1 the triangle ABw is used, with w between B and C.
+    // For speed ratio <= r2 the quad ABCx is used, with x between C and D.
+    // For speed ratio >  r2 the poly ABCDy is used, with y between D and E.
+
+    vertices[0].TCoords = core::vector2df(0.5f, 1.0f);
+    vertices[0].Pos     = core::vector3df(offset.X+meter_width/2, offset.Y, 0);
+    vertices[1].TCoords = core::vector2df(0, 1.0f);
+    vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+    // The speed ratios at which different triangles must be used.
+    // These values should be adjusted in case that the speed display
+    // is not linear enough. Mostly the speed values are below 0.7, it
+    // needs some zipper to get closer to 1.
+    const float r1 = 0.4f;
+    const float r2 = 0.8f;
+    if(speed_ratio<=r1)
     {
-        count = 3;
-        vertices[2].TCoords = core::vector2df(0, 1-2*speed_ratio);
-        vertices[2].Pos = core::vector3df((float)meter_pos.UpperLeftCorner.X, 
-                                          (float)meter_pos.LowerRightCorner.Y-speed_ratio*2*meter_height,
-                                          0);
+        count   = 3;
+        float f = speed_ratio/r1;
+        vertices[2].TCoords = core::vector2df(0, 1.0f-f);
+        vertices[2].Pos = core::vector3df(offset.X, offset.Y-f*meter_height,0);
+    }
+    else if(speed_ratio<=r2)
+    {
+        count   = 4;
+        float f = (speed_ratio - r1)/(r2-r1);
+        vertices[2].TCoords = core::vector2df(0,0);
+        vertices[2].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
+        vertices[3].TCoords = core::vector2df(f, 0);
+        vertices[3].Pos     = core::vector3df(offset.X+f*meter_width,
+                                              offset.Y-meter_height,
+                                              0);
     }
     else
     {
-        count = 4;
+        count   = 5;
+        float f = (speed_ratio - r2)/(1-r2);
         vertices[2].TCoords = core::vector2df(0,0);
-        vertices[2].Pos = core::vector3df((float)offset.X, 
-            (float)(offset.Y-meter_height),
-            0);
-        vertices[3].TCoords = core::vector2df(2*speed_ratio-1.0f, 0);
-        vertices[3].Pos = core::vector3df(offset.X+2*(speed_ratio-0.5f)*meter_width, 
-            (float)(offset.Y-meter_height),
-            0);
+        vertices[2].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
+        vertices[3].TCoords = core::vector2df(1, 0);
+        vertices[3].Pos     = core::vector3df(offset.X+meter_width,
+                                              offset.Y-meter_height,
+                                              0);
+        vertices[4].TCoords = core::vector2df(1.0f, f);
+        vertices[4].Pos     = core::vector3df(offset.X+meter_width,
+                                              offset.Y - (1-f)*meter_height,
+                                              0);
     }
-    short int index[4];
+    short int index[5];
     for(unsigned int i=0; i<count; i++)
     {
         index[i]=i;
