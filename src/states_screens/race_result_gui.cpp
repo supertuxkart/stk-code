@@ -73,60 +73,51 @@ void RaceResultGUI::tearDown()
  */
 void RaceResultGUI::enableAllButtons()
 {
+    GUIEngine::Widget *top    = getWidget("top");
+    GUIEngine::Widget *middle = getWidget("middle");
+    GUIEngine::Widget *bottom = getWidget("bottom");
+
     // If something was unlocked
     // -------------------------
     int n = unlock_manager->getRecentlyUnlockedFeatures().size();
     if(n>0)
     {
-        GUIEngine::Widget *top = getWidget("top");
         top->setText(n==1 ? _("See unlocked feature") 
                           : _("See unlocked features"));
         top->setVisible(true);
-        return;
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-    // In case of a GP:
-    // ----------------
-        GUIEngine::Widget *top = getWidget("top");
+        // In case of a GP:
+        // ----------------
         top->setText( _("Continue") );
         top->setVisible(true);
 
-        GUIEngine::Widget *middle = getWidget("middle");
         middle->setText( _("Restart") );
         middle->setVisible(true);
 
-        GUIEngine::Widget *bottom = getWidget("bottom");
         bottom->setText( _("Abort Grand Prix") );
         bottom->setVisible(true);
-        return;
     }
     else
     {
         // Normal race
         // -----------
-        GUIEngine::Widget *top = getWidget("top");
         top->setText( _("Setup New Race") );
         top->setVisible(true);
 
-        GUIEngine::Widget *middle = getWidget("middle");
         middle->setText( _("Restart") );
         middle->setVisible(true);
 
-        GUIEngine::Widget *bottom = getWidget("bottom");
         bottom->setText( _("Back to the menu") );
         bottom->setVisible(true);
     }
 
-    // FIXME: what happens if e.g. the 'abort' button has the focus (e.g.
-    // because the mouse cursors was at exactly that spot before it was
-    // hidden)? So if someone presses repeatedly 'fire', this might select
-    // the abort button here. Is this good enough to prevent this?
-    // Or should we have a way of setting the players focus (e.g. to
-    // the 'top' bottom, which should be the default)? The code below
-    // actually appears not to do anything(?)
+    // Make sure that when 'fire' is pressed accidentally (e.g. pressing fire
+    // very often to skip all results) that a good default is chosen (to
+    // avoid aborting a GP by accident).
     for(unsigned int i=0; i<MAX_PLAYER_COUNT; i++)
-        GUIEngine::focusNothingForPlayer(i);
+        top->setFocusForPlayer(i);
 
 }   // enableAllButtons
 
@@ -162,24 +153,19 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // -----------------
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        if(name=="top")             // Next GP
+        StateManager::get()->popMenu();
+        if(name=="top")                 // Next GP
         {
-            StateManager::get()->popMenu();
             race_manager->next();
-            return;
         }
         else if (name=="middle")        // Restart
         {
-            StateManager::get()->popMenu();
             race_manager->rerunRace();
-            return;
         }
-        else if (name=="bottom")   // Abort
+        else if (name=="bottom")        // Abort
         {
-            StateManager::get()->popMenu();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            return;
         }
         else
         {
@@ -187,38 +173,35 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                             name.c_str());
             assert(false);
         }
+        return;
     }
 
     // This is a normal race, nothing was unlocked
     // -------------------------------------------
-    if(name=="top")             // Setup new race
+    StateManager::get()->popMenu();
+    if(name=="top")                 // Setup new race
     {
-        StateManager::get()->popMenu();
         race_manager->exitRace();
         Screen* newStack[] = {MainMenuScreen::getInstance(), 
                               RaceSetupScreen::getInstance(), 
                               NULL};
         StateManager::get()->resetAndSetStack( newStack );
-        return;
     }
     else if (name=="middle")        // Restart
     {
-        StateManager::get()->popMenu();
         race_manager->rerunRace();
-        return;
     }
-    else if (name=="bottom")   // Back to main
+    else if (name=="bottom")        // Back to main
     {
-        StateManager::get()->popMenu();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        return;
     }
     else
     {
         fprintf(stderr, "Incorrect event '%s' for normal race.\n",
                 name.c_str());
     }
+    return;
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
@@ -324,7 +307,7 @@ void RaceResultGUI::determineTableLayout()
     m_width_new_points         = r_new_p.Width;
 
     // Determine width of overall points column
-    core::dimension2du r_all_p    = m_font->getDimension(L"9999");
+    core::dimension2du r_all_p    = m_font->getDimension(L"999");
     unsigned int width_all_points = r_all_p.Width;
 
     unsigned int table_width = m_width_icon        +   m_width_kart_name 
@@ -609,11 +592,8 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     unsigned int x_time = x + m_width_icon  + m_width_column_space
                         + m_width_kart_name + m_width_column_space;
 
-    bool mono = m_font->getMonospaceDigits();
     core::recti dest_rect = core::recti(x_time, y, x_time+100, y+10);
     m_font->draw(ri->m_finish_time_string, dest_rect, color);
-    m_font->setMonospaceDigits(mono);
-
 
     // Only display points in GP mode and when the GP results are displayed.
     // =====================================================================
@@ -631,7 +611,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     {
         core::stringw point_string = core::stringw("+")
                                    + core::stringw((int)ri->m_new_points);
-        // With mono-space digits space has the same width as each character, so
+        // With mono-space digits space has the same width as each digit, so
         // we can simply fill up the string with spaces to get the right aligned.
         while(point_string.size()<3)
             point_string = core::stringw(" ")+point_string;
