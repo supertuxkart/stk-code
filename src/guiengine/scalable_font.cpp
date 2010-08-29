@@ -88,8 +88,6 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 // FIXME: need to delete the created XML reader?
                 io::IXMLReader* included = file_manager->createXMLReader(
                     file_manager->getFontFile(filename.c_str()));
-                printf("FONT: including '%s'\n", file_manager->getFontFile(filename.c_str()).c_str());
-                if (included == NULL) printf("Include not found :( :(\n");
                 if (included != NULL)
                 {
                     doReadXmlFile(included);
