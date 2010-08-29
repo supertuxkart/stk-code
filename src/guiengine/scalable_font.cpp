@@ -54,6 +54,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 
     setInvisibleCharacters ( L" " );
     
+    // FIXME: need to delete the created XML reader?
     load( file_manager->createXMLReader(filename.c_str()) );
     assert(Areas.size() > 0);
 }
@@ -75,39 +76,48 @@ void ScalableFont::setShadow(irr::video::SColor col)
     m_shadow_color = col;
 }
     
-//! loads a font file from xml
-bool ScalableFont::load(io::IXMLReader* xml)
+void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 {
-    if (!SpriteBank)
-        return false;
-
     while (xml->read())
     {
         if (io::EXN_ELEMENT == xml->getNodeType())
         {
-            if (core::stringw(L"Texture") == xml->getNodeName())
+            if (core::stringw(L"include") == xml->getNodeName())
+            {
+                core::stringc filename = xml->getAttributeValue(L"file");
+                // FIXME: need to delete the created XML reader?
+                io::IXMLReader* included = file_manager->createXMLReader(
+                    file_manager->getFontFile(filename.c_str()));
+                printf("FONT: including '%s'\n", file_manager->getFontFile(filename.c_str()).c_str());
+                if (included == NULL) printf("Include not found :( :(\n");
+                if (included != NULL)
+                {
+                    doReadXmlFile(included);
+                }
+            }
+            else if (core::stringw(L"Texture") == xml->getNodeName())
             {
                 // add a texture
                 core::stringc filename = xml->getAttributeValue(L"filename");
                 core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
                 u32 i = (u32)xml->getAttributeValueAsInt(L"index");
-
+                
                 float scale=1.0f;
                 if(xml->getAttributeValue(L"scale"))
                     scale = xml->getAttributeValueAsFloat(L"scale");
-                //std::cout  << "scale = " << scale << std::endl;
-                
+                    //std::cout  << "scale = " << scale << std::endl;
+                    
                 core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
-
+                
                 //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
-
+                
                 
                 // make sure the sprite bank has enough textures in it
                 while (i+1 > SpriteBank->getTextureCount())
                 {
                     SpriteBank->addTexture(NULL);
                 }
-
+            
                 TextureInfo info;
                 info.m_file_name   = fn;
                 info.m_has_alpha   = (alpha == core::stringw("true"));
@@ -121,16 +131,16 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 SGUISpriteFrame f;
                 SGUISprite s;
                 core::rect<s32> rectangle;
-
+                
                 a.underhang     = xml->getAttributeValueAsInt(L"u");
                 a.overhang      = xml->getAttributeValueAsInt(L"o");
                 a.spriteno      = SpriteBank->getSprites().size();
                 s32 texno       = xml->getAttributeValueAsInt(L"i");
-
+                
                 // parse rectangle
                 core::stringc rectstr   = xml->getAttributeValue(L"r");
                 wchar_t ch      = xml->getAttributeValue(L"c")[0];
-
+                
                 const c8 *c = rectstr.c_str();
                 s32 val;
                 val = 0;
@@ -142,7 +152,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 }
                 rectangle.UpperLeftCorner.X = val;
                 while (*c == L' ' || *c == L',') c++;
-
+                
                 val = 0;
                 while (*c >= '0' && *c <= '9')
                 {
@@ -152,7 +162,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 }
                 rectangle.UpperLeftCorner.Y = val;
                 while (*c == L' ' || *c == L',') c++;
-
+                
                 val = 0;
                 while (*c >= '0' && *c <= '9')
                 {
@@ -162,7 +172,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 }
                 rectangle.LowerRightCorner.X = val;
                 while (*c == L' ' || *c == L',') c++;
-
+                
                 val = 0;
                 while (*c >= '0' && *c <= '9')
                 {
@@ -171,32 +181,42 @@ bool ScalableFont::load(io::IXMLReader* xml)
                     c++;
                 }
                 rectangle.LowerRightCorner.Y = val;
-
+                
                 CharacterMap[ch] = Areas.size();
                 
                 //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
-
+                
                 // make frame
                 f.rectNumber = SpriteBank->getPositions().size();
                 f.textureNumber = texno;
-
+                
                 // add frame to sprite
                 s.Frames.push_back(f);
                 s.frameTime = 0;
-
+                
                 // add rectangle to sprite bank
                 SpriteBank->getPositions().push_back(rectangle);
                 a.width = rectangle.getWidth();
-
+                
                 // add sprite to sprite bank
                 SpriteBank->getSprites().push_back(s);
-
+                
                 // add character to font
                 Areas.push_back(a);
             }
         }
     }
+    
+}
+    
+//! loads a font file from xml
+bool ScalableFont::load(io::IXMLReader* xml)
+{
+    if (!SpriteBank)
+        return false;
 
+    doReadXmlFile(xml);
+    
     // set bad character
     WrongCharacter = getAreaIDFromCharacter(L' ', NULL);
 
@@ -289,17 +309,18 @@ s32 ScalableFont::getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) c
     if (n != CharacterMap.end())
     {
         if (fallback_font != NULL) *fallback_font = false;
+        // std::cout << "Character " << (int)c << " found in font\n";
         return (*n).second;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
-        //std::wcout << L"Font does not have this character : <" << c << L">, trying fallback font" << std::endl;
+        // std::cout << "Font does not have this character : <" << (int)c << ">, trying fallback font" << std::endl;
         *fallback_font = true;
         return m_fallback_font->getAreaIDFromCharacter(c, NULL);
     }
     else
     {
-        //std::cout << "The font does not have this character : <" << (int)c << ">" << std::endl;
+        // std::cout << "The font does not have this character : <" << (int)c << ">" << std::endl;
         if (fallback_font != NULL) *fallback_font = false;
         return WrongCharacter;
     }
@@ -309,7 +330,8 @@ const ScalableFont::SFontArea &ScalableFont::getAreaFromCharacter(const wchar_t 
                                                     bool* fallback_font) const
 {
     const int area_id = getAreaIDFromCharacter(c, fallback_font);
-    assert(area_id < (int)Areas.size());
+    
+    
     if(m_mono_space_digits && ( (c>=L'0' && c<=L'9') || c==L' ' ) )
     {
         const SFontArea &area = (fallback_font && *fallback_font) 
@@ -319,9 +341,19 @@ const ScalableFont::SFontArea &ScalableFont::getAreaFromCharacter(const wchar_t 
         return m_max_digit_area;
     }
 
+    const bool use_fallback_font = (fallback_font && *fallback_font);
+    
+    if (use_fallback_font)
+    {
+        assert(area_id < (int)m_fallback_font->Areas.size());
+    }
+    else
+    {
+        assert(area_id < (int)Areas.size());
+    }
+    
     // Note: fallback_font can be NULL
-    return ( (fallback_font && *fallback_font) ? m_fallback_font->Areas[area_id]
-                                               : Areas[area_id]);
+    return ( use_fallback_font ? m_fallback_font->Areas[area_id] : Areas[area_id]);
 }   // getAreaFromCharacter
 
 

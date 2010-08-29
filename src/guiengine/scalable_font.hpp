@@ -56,6 +56,8 @@ class ScalableFont : public IGUIFontBitmap
     
     void lazyLoadTexture(int texID);
     
+    void doReadXmlFile(io::IXMLReader* xml);
+    
     bool m_is_hollow_copy;
     bool m_rtl;
 public:
