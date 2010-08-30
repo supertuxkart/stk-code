@@ -43,7 +43,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;
-    m_adjustedGain    = 1.0f;
+    m_adjusted_gain   = 1.0f;
 
     if (StringUtils::getExtension(filename) != "music")
     {
@@ -53,73 +53,51 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
         m_normal_filename = filename;
         return;
     }
-   
 
     // Otherwise read config file
     // --------------------------
-    
     XMLNode* root = file_manager->createXMLTree(filename);
     if (!root)
     {
-        throw std::runtime_error("Can open music XML file");
+        std::ostringstream msg;
+        msg << "Could not open music XML file '"<<filename<<"'.";;
+        throw std::runtime_error(msg.str());
     }
-        
-    const int amount = root->getNumNodes();
-    for (int i=0; i<amount; i++)
+    if(root->getName()!="music")
     {
-        const XMLNode* node = root->getNode(i);
-        
-        if (node->getName() == "music")
-        {
-            // outer node, ignore
-        }
-        else if (node->getName() == "title")
-        {
-            if (node->get("value", &m_title) == 0)
-            {
-                fprintf(stderr, "/!\\ The '<title value=' attribute is mandatory in the music XML file!\n");
-                throw std::runtime_error("Incomplete or corrupt music XML file");
-                return;
-            }
-        }
-        else if (node->getName() == "composer")
-        {
-            if (node->get("value", &m_composer) == 0)
-            {
-                fprintf(stderr, "/!\\ The '<composer value=' attribute is mandatory in the music XML file!\n");
-                throw std::runtime_error("Incomplete or corrupt music XML file");
-                return;
-            }
-        }
-        else if (node->getName() == "file")
-        {
-            if (node->get("value", &m_normal_filename) == 0)
-            {
-                fprintf(stderr, "/!\\ The '<file value=' attribute is mandatory in the music XML file!\n");
-                throw std::runtime_error("Incomplete or corrupt music XML file");
-                return;
-            }
-            assert(m_normal_filename.size() > 0);
-        }
-        else if (node->getName() == "gain")
-        {
-            node->get("value", &m_gain);
-            m_adjustedGain = m_gain;
-        }
-        else
-        {
-            std::cerr << "Unknown node in music XML file : " << node->getName().c_str() << std::endl;
-            throw std::runtime_error("Unknown node in music XML file");
-        }
-    }// nend for
-    
+        std::ostringstream msg;
+        msg << "Music XML file '"<<filename<<"' does not contain music node.";;
+        throw std::runtime_error(msg.str());
+    }
+    if(!root->get("title", &m_title))
+    {
+        fprintf(stderr, 
+            "The 'title' attribute is missing in the music XML file '%s'!\n",
+            filename.c_str());
+        throw std::runtime_error("Incomplete or corrupt music XML file");
+        return;
+    }
+    if(!root->get("composer", &m_composer))
+    {
+        fprintf(stderr, 
+            "The 'composer' attribute is missing in the music XML file '%s'!\n",
+            filename.c_str());
+        throw std::runtime_error("Incomplete or corrupt music XML file");
+        return;
+    }
+    if(!root->get("file", &m_normal_filename))
+    {
+        fprintf(stderr, 
+            "The 'file' attribute is mandatory in the music XML file '%s'!\n",
+            filename.c_str());
+        throw std::runtime_error("Incomplete or corrupt music XML file");
+        return;
+    }
+    root->get("gain",          &m_adjusted_gain);
+    root->get("tracks",        &m_all_tracks   );
+    root->get("fast",          &m_enable_fast  );
+    root->get("fast-filename", &m_fast_filename);
     delete root;
-    
-    //TODO: not implemented back (is this useful in any way?)
-    // LISP->getVector("tracks",      m_all_tracks     );
-    
-    //TODO: not implemented back (is this used in any way?)
-    m_enable_fast = false;
     
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
@@ -130,7 +108,6 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     {
         m_fast_filename = path + "/" + m_fast_filename;
     }
-
 
 }   // MusicInformation
 
@@ -151,7 +128,7 @@ void MusicInformation::startMusic()
     m_mode               = SOUND_NORMAL;
 
     std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">, gain="
-              << m_adjustedGain << "\n";
+              << m_adjusted_gain << "\n";
     
     if (m_normal_filename== "") return;
 
@@ -173,7 +150,7 @@ void MusicInformation::startMusic()
                 m_normal_filename.c_str());
         return;
     }
-    m_normal_music->volumeMusic(m_adjustedGain);
+    m_normal_music->volumeMusic(m_adjusted_gain);
     m_normal_music->playMusic();
 
     // Then (if available) load the music for the last track
@@ -201,7 +178,7 @@ void MusicInformation::startMusic()
                 m_fast_filename.c_str());
         return;
     }
-    m_fast_music->volumeMusic(m_adjustedGain);
+    m_fast_music->volumeMusic(m_adjusted_gain);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
@@ -289,9 +266,9 @@ void MusicInformation::volumeMusic(float gain)
 {
     // printf("Setting master volume %f\n", gain);
     
-    m_adjustedGain = m_gain * gain;
-    if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjustedGain);
-    if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjustedGain);
+    m_adjusted_gain = m_gain * gain;
+    if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
+    if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
 } // volumeMusic
 
 //-----------------------------------------------------------------------------

@@ -47,7 +47,7 @@ private:
     bool                     m_enable_fast;    
                                                 
     float                    m_gain;
-    float                    m_adjustedGain;
+    float                    m_adjusted_gain;
     
     /** Either time for fading faster music in, or time to change pitch */
     float                    m_faster_time;
