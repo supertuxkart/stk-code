@@ -508,8 +508,6 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         m_controls->m_fire = (m_distance_behind < 15.0f &&
                                m_distance_behind > 3.0f   ) || 
                             m_time_since_last_shot>10.0f;
-        if(m_distance_behind < 10.0f && m_distance_behind > 2.0f   )
-            m_distance_behind *= 1.0f;
         break;
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead. And some of them can fire backwards, too - which
