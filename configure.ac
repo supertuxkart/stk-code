@@ -397,7 +397,9 @@ esac
 SUMMARY="$SUMMARY\nUsing enet network support."
 ENETTREE="src/enet"
 
+# =================
 # Check for gettext
+# =================
 CHECK_GETTEXT(external)
 #disable/enable addons support
 AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
@@ -407,6 +409,18 @@ if test "x$with_addons" == "xyes" ; then
     echo "STK will compile with addons support"
     AC_DEFINE(ADDONS_MANAGER)
 fi
+# ==========================================
+# Check for a known compiler bug, details in 
+# src/bullet/src/Makefile.am
+# ==========================================
+ORIGCXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -fno-elide-constructors"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+                  AC_MSG_RESULT(yes); NOELIDE=-fno-elide-constructors,
+                  AC_MSG_RESULT(no); NOELIDE="")
+CXXFLAGS="$ORIGCXXFLAGS"
+AC_SUBST(NOELIDE) 
+
 # =========================
 # subst bars in Makefile.am
 # =========================

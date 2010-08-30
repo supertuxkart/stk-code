@@ -16,6 +16,14 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btVector3.h			LinearMath/btHashMap.h		 \
 	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h
 
+# Certain g++ versions causes stk to crash if btVoronoiSimplexSolver.cpp is
+# compiled with optimisations. Since it's rather difficult to specify certain
+# flags for one file only with auto-tools (you can only specify flags per
+# library, so you have to put this one file into a separate library) we compile
+# the whole libbulletcollision with the modified flags - i.e. by adding 
+# -fno-elide-constructors to the flags. The overall performance impact is
+# quite low anyway.
+libbulletcollision_a_CXXFLAGS = @NOELIDE@ 
 libbulletcollision_a_SOURCES = \
 	btBulletCollisionCommon.h						 \
 	BulletCollision/BroadphaseCollision/btAxisSweep3.cpp			 \
