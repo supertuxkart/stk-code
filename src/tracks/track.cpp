@@ -303,11 +303,11 @@ void Track::loadTrackInfo()
 //-----------------------------------------------------------------------------
 void Track::loadCurves(const XMLNode &node)
 {
-        for(unsigned int i=0; i<node.getNumNodes(); i++)
-        {
-                const XMLNode *curve = node.getNode(i);
-                m_all_curves.push_back(new BezierCurve(*curve));
-        }   // for i<node.getNumNodes
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *curve = node.getNode(i);
+        m_all_curves.push_back(new BezierCurve(*curve));
+    }   // for i<node.getNumNodes
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
