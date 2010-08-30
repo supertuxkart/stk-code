@@ -135,6 +135,19 @@ public:
      *  be removed when the game is reset. */
     bool          canBeUsedUp()  const {return m_disappear_counter>-1; }
     // ------------------------------------------------------------------------
+    /** Sets how long an item should be disabled. While item itself sets
+     *  a default, this time is too short in case that a kart that has a bomb
+     *  hits a banana: by the time the explosion animation is ended and the
+     *  kart is back at its original position, the banana would be back again
+     *  and therefore hit the kart again. See Attachment::hitBanana for more
+     *  details. 
+     *  \param f Time till the item can be used again. 
+     */
+    void          setDisableTime(float f) { m_time_till_return = f; }
+    // ------------------------------------------------------------------------
+    /** Returns the time the item is disabled for. */
+    float         getDisableTime() const { return m_time_till_return; }
+    // ------------------------------------------------------------------------
     void          setParent(Kart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh);

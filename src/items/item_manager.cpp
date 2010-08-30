@@ -169,7 +169,7 @@ void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
     Item *item=m_all_items[item_id];
     assert(item);
     item->collected(kart);
-    kart->collectedItem(*item, add_info);
+    kart->collectedItem(item, add_info);
 }   // collectedItem
 
 //-----------------------------------------------------------------------------

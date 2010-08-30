@@ -375,7 +375,7 @@ public:
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
-    virtual void   collectedItem    (const Item &item, int random_attachment);
+    virtual void   collectedItem    (Item *item, int random_attachment);
     virtual void   reset            ();
     virtual void   handleZipper     ();
     virtual void   crashed          (Kart *k);

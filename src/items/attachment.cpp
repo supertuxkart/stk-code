@@ -19,6 +19,7 @@
 
 #include "items/attachment.hpp"
 
+#include <algorithm>
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -92,19 +93,28 @@ void Attachment::clear()
 }   // clear
 
 // -----------------------------------------------------------------------------
-void Attachment::hitBanana(const Item &item, int new_attachment)
+void Attachment::hitBanana(Item *item, int new_attachment)
 {
     float leftover_time   = 0.0f;
     
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:
+        {
         projectile_manager->newExplosion(m_kart->getXYZ());
         m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
         clear();
         if(new_attachment==-1) 
             new_attachment = m_random.get(3);
+        // Disable the banana on which the kart just is for more than the 
+        // default time. This is necessary to avoid that a kart lands on the 
+        // same banana again once the explosion animation is finished, giving 
+        // the kart the same penalty twice.
+        float f = std::max(item->getDisableTime(), 
+                           m_kart->getKartProperties()->getExplosionTime()+2.0f);
+        item->setDisableTime(f);
         break;
+        }
     case ATTACH_ANVIL:
         // if the kart already has an anvil, attach a new anvil, 
         // and increase the overall time 
@@ -129,7 +139,7 @@ void Attachment::hitBanana(const Item &item, int new_attachment)
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
         race_state->itemCollected(m_kart->getWorldKartId(),
-                                  item.getItemId(),
+                                  item->getItemId(),
                                   new_attachment);
     }
 

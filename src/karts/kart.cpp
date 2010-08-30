@@ -532,10 +532,10 @@ void Kart::finishedRace(float time)
  *         a specific item to be used (instead of a random item) to keep
  *         all karts in synch.
  */
-void Kart::collectedItem(const Item &item, int add_info)
+void Kart::collectedItem(Item *item, int add_info)
 {
     float old_energy          = m_collected_energy;
-    const Item::ItemType type = item.getType();
+    const Item::ItemType type = item->getType();
 
     switch (type)
     {
@@ -550,7 +550,7 @@ void Kart::collectedItem(const Item &item, int add_info)
             // In wheelie style, karts get more items depending on energy,
             // in nitro mode it's only one item.
             int n = 1;
-            m_powerup.hitBonusBox(n, item, add_info);
+            m_powerup.hitBonusBox(n, *item, add_info);
             break;
         }
     case Item::ITEM_BUBBLEGUM:
@@ -570,12 +570,12 @@ void Kart::collectedItem(const Item &item, int add_info)
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
         (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
     {
-        race_state->itemCollected(getWorldKartId(), item.getItemId());
+        race_state->itemCollected(getWorldKartId(), item->getItemId());
     }
 
     if ( m_collected_energy > MAX_ITEMS_COLLECTED )
         m_collected_energy = MAX_ITEMS_COLLECTED;
-    m_controller->collectedItem(item, add_info, old_energy);
+    m_controller->collectedItem(*item, add_info, old_energy);
 
 }   // collectedItem
 

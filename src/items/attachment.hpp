@@ -89,7 +89,7 @@ public:
      *  \param new_attachment Optional: only used on the clients, it
      *                        specifies the new attachment to use
      */
-    void  hitBanana(const Item &item, int new_attachment=-1);
+    void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
 };
