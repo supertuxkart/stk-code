@@ -106,7 +106,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
-        if(m_kart_status[i].m_gp_rank == n)
+        if(m_kart_status[i].m_gp_rank == (int)n)
             return World::getWorld()->getKart(i);
     return NULL;
 }   // getKLartWithGPRank
