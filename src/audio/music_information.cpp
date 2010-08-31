@@ -59,15 +59,16 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     XMLNode* root = file_manager->createXMLTree(filename);
     if (!root)
     {
-        std::ostringstream msg;
-        msg << "Could not open music XML file '"<<filename<<"'.";;
-        throw std::runtime_error(msg.str());
+        fprintf(stderr, "Could not open music XML file '%s'.\n", 
+                filename.c_str());
+        throw std::runtime_error("Could not open music XML file");
     }
     if(root->getName()!="music")
     {
         std::ostringstream msg;
-        msg << "Music XML file '"<<filename<<"' does not contain music node.";;
-        throw std::runtime_error(msg.str());
+        fprintf(stderr, "Music XML file '%s' does not contain music node.",
+                filename.c_str());
+        throw std::runtime_error("No music node found");
     }
     if(!root->get("title", &m_title))
     {
