@@ -719,7 +719,7 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if((fabs(getHPR().getRoll())>60 && fabs(getSpeed())<3.0f) )
+    if((fabs(getRoll())>60*DEGREE_TO_RAD && fabs(getSpeed())<3.0f) )
     {
         forceRescue();
     }
@@ -1330,7 +1330,7 @@ void Kart::updatePhysics(float dt)
        ,m_body->getAngularVelocity().getX()
        ,m_body->getAngularVelocity().getY()
        ,m_body->getAngularVelocity().getZ()
-       ,getHPR().getHeading()
+       ,getHeading()
        );
 #endif
     
