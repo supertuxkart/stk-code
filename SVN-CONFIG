@@ -7,7 +7,7 @@
 # with a new config file inside).
 
 [miscellany]
-global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store
+global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* ._* .DS_Store
 enable-auto-props = yes
 
 [auto-props]
