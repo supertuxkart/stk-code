@@ -44,9 +44,7 @@ class Moveable
 private:
     btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */
     btTransform            m_transform;
-    Vec3                   m_hpr;
-    /** The heading in m_hpr is between -90 and 90 degrees only. The 'real'
-    *  heading between -180 to 180 degrees is stored in this variable. */
+    /** The 'real' heading between -180 to 180 degrees. */
     float                  m_heading;
     /** The pitch between -90 and 90 degrees. */
     float                  m_pitch;
@@ -73,8 +71,6 @@ public:
                  &getVelocityLC() const        {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
-    /** Return the rotation, but heading is restricted to -90 and 90 degrees. */
-    const Vec3&   getHPR()        const        {return m_hpr;                      }
     /** Returns the heading between -180 and 180 degrees. Note that using 
      *  getHPR().getHeading() can result a different heading  (e.g. a heading
      *  of 180 degrees is the same as a roll and pitch around 180).*/

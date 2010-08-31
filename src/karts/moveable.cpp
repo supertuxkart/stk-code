@@ -83,7 +83,6 @@ void Moveable::reset()
     }
     m_node->setVisible(true);  // In case that the objects was eliminated
 
-    m_hpr.setHPR(m_transform.getRotation());
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
@@ -100,7 +99,6 @@ void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
     m_velocityLC  = getVelocity()*m_transform.getBasis();
-    m_hpr.setHPR(m_transform.getRotation());
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
     m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
 
@@ -138,7 +136,6 @@ void Moveable::createBody(float mass, btTransform& trans,
     // functions are not called correctly. So only init the pointer to zero.
     m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);
-    m_hpr.setHPR(m_body->getWorldTransform().getRotation());
 }   // createBody
 
 //-----------------------------------------------------------------------------
