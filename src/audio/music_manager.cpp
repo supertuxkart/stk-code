@@ -111,7 +111,14 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
         if(StringUtils::getExtension(*i)!="music") continue;
-        m_allMusic[StringUtils::getBasename(*i)] = new MusicInformation(*i);
+        try
+        {
+            m_allMusic[StringUtils::getBasename(*i)] = new MusicInformation(*i);
+        }
+        catch (std::exception& e)
+        {
+            continue;
+        }
     }   // for i
 } // loadMusicFromOneDir
 
