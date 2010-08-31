@@ -114,8 +114,7 @@ void MainMenuScreen::init()
     input_manager->setMasterPlayerOnly(false);
 #ifdef ADDONS_MANAGER
     pthread_mutex_init(&(this->m_mutex_news_text), NULL);
-    pthread_t nThreadID2;
-    pthread_create(&nThreadID2, NULL, &MainMenuScreen::downloadNews, this);
+    pthread_create(&m_thread_news_text, NULL, &MainMenuScreen::downloadNews, this);
 #endif
 }
 
@@ -243,3 +242,10 @@ void * MainMenuScreen::downloadNews( void * pthis)
 }
 #endif
 // ------------------------------------------------------------------------------------------------------
+#ifdef ADDONS_MANAGER
+MainMenuScreen::~MainMenuScreen()
+{
+    fprintf(stdout, "canceling the thread");
+    pthread_cancel(m_thread_news_text);
+}
+#endif
