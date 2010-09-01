@@ -392,7 +392,6 @@
 		952A1544103F66D600B1895D /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
 		952A1552103F68D000B1895D /* profile_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profile_world.cpp; path = ../../modes/profile_world.cpp; sourceTree = SOURCE_ROOT; };
 		952A1553103F68D000B1895D /* profile_world.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = profile_world.hpp; path = ../../modes/profile_world.hpp; sourceTree = SOURCE_ROOT; };
-		953606C411DCF1A500791F01 /* SuperTuxKart-Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info copy.plist"; sourceTree = "<group>"; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
@@ -1140,7 +1139,6 @@
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */,
 				9507E9B60FC1CCE900BD2B92 /* stk.icns */,
-				953606C411DCF1A500791F01 /* SuperTuxKart-Info copy.plist */,
 			);
 			name = STK_XCode;
 			sourceTree = "<group>";
