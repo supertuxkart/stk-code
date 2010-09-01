@@ -180,9 +180,6 @@ void TracksScreen::init()
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
     
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
-       
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
     
