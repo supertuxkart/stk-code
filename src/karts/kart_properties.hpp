@@ -269,7 +269,7 @@ public:
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
 
     /** Returns the engine type (used to change sfx depending on kart size). */
-    const char* getEngineSfxType    () const {return m_engine_sfx_type.c_str();  }
+    const std::string& getEngineSfxType    () const {return m_engine_sfx_type;   }
 
     // Bullet physics get functions
     //-----------------------------
