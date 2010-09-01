@@ -12,10 +12,10 @@
              bottom: 'Abort GP', 'Back to the menu' (or invisible)
              Setting text=" " is important, otherwise the height of the
              widget is incorrect.                             -->
-        <button id="top"    align="center" width="60%" text=" "/>
+        <button id="top"    align="center" width="60%"/>
         <spacer height="10" width="96%"/>
-        <button id="middle" align="center" width="60%" text=" "/>
+        <button id="middle" align="center" width="60%"/>
         <spacer height="10" width="96%"/>
-        <button id="bottom" align="center" width="60%" text=" "/>
+        <button id="bottom" align="center" width="60%"/>
     </div>
 </stkgui>

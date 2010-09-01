@@ -145,14 +145,18 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
         // lines are required, we need to specify a height explicitely
         label_h = dim.Height + self->getHeightNeededAroundLabel();
     }
-    if (self->getType() == WTYPE_TEXTBOX)
+    if (label_h == -1)
     {
-        IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
+        if (self->getType() == WTYPE_TEXTBOX ||
+            self->getType() == WTYPE_BUTTON ||
+            self->getType() == WTYPE_LABEL)
+        {
+            IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
 
-        // get text height, a text box is always as high as the text it could contain
-        core::dimension2d< u32 > dim = font->getDimension( L"X" );
-        label_h = dim.Height + self->getHeightNeededAroundLabel();
-
+            // get text height, a text box, button or label is always as high as the text it could contain
+            core::dimension2d< u32 > dim = font->getDimension( L"X" );
+            label_h = dim.Height + self->getHeightNeededAroundLabel();
+        }
     }
     
     // ---- read dimension

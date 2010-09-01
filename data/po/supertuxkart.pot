@@ -8,19 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-01 11:53-0400\n"
+"POT-Creation-Date: 2010-09-01 12:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#. I18N: ./data/gui/race_result.stkgui
-#: data/po/gui_strings.h:536 data/po/gui_strings.h:539
-#: data/po/gui_strings.h:542
-msgid " "
-msgstr ""
 
 #: src/states_screens/options_screen_input.cpp:92
 #, c-format
@@ -633,7 +627,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:93
+#: src/states_screens/race_gui.cpp:89
 msgid "Finished"
 msgstr ""
 
@@ -725,7 +719,7 @@ msgstr ""
 msgid "Gnu"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:98
+#: src/states_screens/race_gui.cpp:94
 msgid "Go!"
 msgstr ""
 
@@ -822,7 +816,7 @@ msgstr ""
 msgid "Keep this resolution"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:94
+#: src/states_screens/race_gui.cpp:90
 msgid "Lap"
 msgstr ""
 
@@ -1126,7 +1120,7 @@ msgid "Random Track"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:96
+#: src/states_screens/race_gui.cpp:92
 msgid "Ready!"
 msgstr ""
 
@@ -1201,7 +1195,7 @@ msgstr ""
 msgid "Select a game mode"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:97
+#: src/states_screens/race_gui.cpp:93
 msgid "Set!"
 msgstr ""
 
@@ -1426,7 +1420,7 @@ msgid "Weapons"
 msgstr ""
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:719
+#: data/po/gui_strings.h:716
 msgid "Wilber"
 msgstr ""
 
