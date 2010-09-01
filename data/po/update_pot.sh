@@ -5,7 +5,7 @@
 CPP_FILE_LIST="`find ./src -name '*.cpp' -print` `find ./src -name '*.hpp' -print`"
 LISP_FILE_LIST="`find ./data -name '*.track' -print` `find ./data -name '*.challenge' -print` `find ./data -name '*.grandprix' -print`"
 #XML_FILE_LIST=`find ./data -name '*.xml' -print`
-OTHER_XML_FILES=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print && find ./data -name '*.grandprix' -print`
+OTHER_XML_FILES=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print && find ./data -name '*.grandprix' -print && find ./data -name 'kart.xml' -print`
 
 echo "--------------------"
 echo "    Source Files :"
@@ -13,14 +13,10 @@ echo "--------------------"
 echo $CPP_FILE_LIST
 
 echo "--------------------"
-echo "    Data Files :"
+echo "    XML Files :"
 echo "--------------------"
 echo $LISP_FILE_LIST
-
-echo "--------------------"
-echo "    XMl Files :"
-echo "--------------------"
-echo $OTHER_XML_FILES # $XML_FILE_LIST
+echo $OTHER_XML_FILES
 
 # XML Files
 python ./data/po/extract_strings_from_XML.py $OTHER_XML_FILES

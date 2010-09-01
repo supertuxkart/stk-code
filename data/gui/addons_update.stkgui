@@ -13,12 +13,12 @@
         <icon-button id="tab_update" width="128" height="128" icon="gui/package.png"
                 I18N="Section in the addons menu" text="Update"/>
     </tabs>
+    
     <box proportion="1" width="100%" layout="vertical-row">
-
-    <label id="update_status" width="100%" height="10%" text_align="left" text="" />
-            <spacer height="5%" width="100%"/>
-            <list id="list_addons" height="50%" proportion="5" width="100%" align="center"/>
-            <spacer height="15%" width="100%"/>
+        <label id="update_status" width="100%" height="10%" text_align="left" />
+        <spacer height="5%" width="100%"/>
+        <list id="list_addons" height="50%" proportion="5" width="100%" align="center"/>
+        <spacer height="15%" width="100%"/>
     </box>
     
     <spacer width="50" height="45" /> 

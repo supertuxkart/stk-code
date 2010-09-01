@@ -3,7 +3,7 @@
         <placeholder id="result-table" width="96%" proportion="1">
         <!-- Contents is added programatically -->
         </placeholder>
-        <spacer height="10" height="2%" width="96%"/>
+        <spacer height="10" width="96%"/>
         <!-- The actual button texts will vary depending on what type of race
              was being run, and if something was unlocked etc. So we don't
              specify a text here, and label the buttons :
@@ -13,9 +13,9 @@
              Setting text=" " is important, otherwise the height of the
              widget is incorrect.                             -->
         <button id="top"    align="center" width="60%" text=" "/>
-        <spacer height="10" height="2%"    width="96%"/>
+        <spacer height="10" width="96%"/>
         <button id="middle" align="center" width="60%" text=" "/>
-        <spacer height="10" height="2%"    width="96%"/>
+        <spacer height="10" width="96%"/>
         <button id="bottom" align="center" width="60%" text=" "/>
     </div>
 </stkgui>

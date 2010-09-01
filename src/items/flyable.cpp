@@ -51,7 +51,7 @@ const wchar_t* getCakeString()
         case 1: return _("%0 is dubious of %1's cooking skills");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
         case 2: return _("%0 should not play with %1's lunch");
-        default: assert(false); return _("");   // avoid compiler warning
+        default: assert(false); return L"";   // avoid compiler warning
     }
 }
 
@@ -71,7 +71,7 @@ const wchar_t* getBowlingString()
         case 1 : return _("%1 strikes %0");
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
         case 2 : return _("%0 is bowled over by %1");
-        default: assert(false); return _("");  //  avoid compiler warning
+        default: assert(false); return L"";  //  avoid compiler warning
     }
 }
 

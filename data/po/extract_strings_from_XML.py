@@ -3,7 +3,7 @@ import sys
 
 f = open('./data/po/gui_strings.h', 'w')
 
-def traverse(file, node, isChallenge, isGP, level=0):
+def traverse(file, node, isChallenge, isGP, isKart, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -15,7 +15,7 @@ def traverse(file, node, isChallenge, isGP, level=0):
         if e.hasAttribute("I18N"):
            comment = e.getAttribute("I18N")
          
-        if isChallenge or isGP:
+        if isChallenge or isGP or isKart:
            if e.hasAttribute("name"):
                # print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
@@ -25,7 +25,8 @@ def traverse(file, node, isChallenge, isGP, level=0):
                    line += "//I18N: File : " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("name") + "\");\n\n"
                
                f.write( line )
-               
+           
+           # challenges and GPs can have a description file; karts don't
            if e.hasAttribute("description"):
                # print "Label=", e.getAttribute("description"), " Comment=", comment
                line = ""
@@ -46,8 +47,9 @@ def traverse(file, node, isChallenge, isGP, level=0):
                
                f.write( line )
 
-        
-        traverse(file, e, isChallenge, isGP, level+1)
+        # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
+        if not isKart:
+            traverse(file, e, isChallenge, isGP, isKart, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
@@ -55,18 +57,21 @@ for file in filenames:
     
     isChallenge = False
     isGP = False
+    isKart = False
     
     if file.endswith(".challenge"):
         isChallenge = True
     if file.endswith(".grandprix"):
         isGP = True 
+    if file.endswith("kart.xml"):
+        isKart = True
         
     try:
         doc = xml.dom.minidom.parse(file)
-    except:
+    except Exception as ex:
         print "============================================"
-        print "/!\\ Expat doesn't like ", file, "!"
+        print "/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")"
         print "============================================"
 
-    traverse(file, doc, isChallenge, isGP)
+    traverse(file, doc, isChallenge, isGP, isKart)
     

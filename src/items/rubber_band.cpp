@@ -45,7 +45,7 @@ const wchar_t* getPlungerString()
         case 1: return _("%1 latches onto %0 for a free ride");
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
         case 2: return _("%1 tests a tractor beam on %0");
-        default: assert(false); return _("");  // avoid warning about no return value
+        default: assert(false); return L"";  // avoid warning about no return value
     }
 }
 

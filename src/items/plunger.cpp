@@ -47,7 +47,7 @@ const wchar_t* getPlungerInFaceString()
         case 0: return _("%0 gets a fancy mask from %1");
         //I18N: shown when a player receives a plunger in his face
         case 1: return _("%1 merges %0's face with a plunger");
-        default:assert(false); return _("");   // avoid compiler warning
+        default:assert(false); return L"";   // avoid compiler warning
     }
 }
 

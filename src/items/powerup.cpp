@@ -46,7 +46,7 @@ const wchar_t* getAnchorString()
         case 0: return _("Arrr, the %s dropped anchor, Captain!");
         case 1: return _("%s pays the next round of grog!");
         case 2: return _("%s is a mighty pirate!");
-        default: assert(false); return _("");   // avoid compiler warning.
+        default: assert(false); return L"";   // avoid compiler warning.
     }
 }
 
@@ -63,7 +63,7 @@ const wchar_t* getParachuteString()
         case 0: return _("Geronimo!!!"); // Parachutist shout
         case 1: return _("The Space Shuttle has landed!");
         case 2: return _("Do you want to fly kites?");
-        default: assert(false); return _("");  // avoid compiler warning
+        default: assert(false); return  L"";  // avoid compiler warning
     }
 }
 
@@ -80,7 +80,7 @@ const wchar_t* getSwapperString()
         case 0: return _("Magic, son. Nothing else in the world smells like that.");
         case 1: return _("A wizard did it!");
         case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
-        default: assert(false); return _("");  // avoid compiler warning
+        default: assert(false); return L"";  // avoid compiler warning
     }
 }
 
