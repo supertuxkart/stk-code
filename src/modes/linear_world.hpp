@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 
 class SFXBase;
 
@@ -30,7 +30,7 @@ class SFXBase;
  * and lap counting.
  * \ingroup modes
  */
-class LinearWorld : public World
+class LinearWorld : public WorldWithRank
 {
     /** Sfx for the final lap. */
     SFXBase     *m_last_lap_sfx;
@@ -61,9 +61,6 @@ private:
 
     };
 
-    /** This contains a mapping from race position to kart index. */
-    std::vector<int> m_position_index;
-
 protected:
     RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
 
@@ -84,11 +81,12 @@ protected:
 
 public:
                   LinearWorld();
-    /** call just after instanciating. can't be moved to the contructor as child
-        classes must be instanciated, otherwise polymorphism will fail and the
-        results will be incorrect */
-    void          init();
+   /** call just after instanciating. can't be moved to the contructor as child
+       classes must be instanciated, otherwise polymorphism will fail and the
+       results will be incorrect */
+    virtual void  init();
     virtual      ~LinearWorld();
+
     virtual void  update(float delta);
     int           getSectorForKart(const int kart_id) const;
     float         getDistanceDownTrackForKart(const int kart_id) const;
@@ -101,9 +99,6 @@ public:
     virtual  RaceGUIBase::KartIconDisplayInfo* 
                   getKartsDisplayInfo();
     virtual void  moveKartAfterRescue(Kart* kart);
-    /** Returns the kart with position p, 1<=p<=num_karts). */
-    const Kart*   getKartAtPosition(unsigned int p) const 
-                  { return m_karts[m_position_index[p-1]]; }
     virtual void  restartRace();
     
     virtual bool  raceHasLaps(){ return true; }
@@ -111,9 +106,6 @@ public:
 
     virtual bool  haveBonusBoxes(){ return true; }
     
-    /** Called by the race result GUI at the end of the race to know the final order
-        (fill in the 'order' array) */
-    virtual void  raceResultOrder(std::vector<int> *order);
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart.
      */

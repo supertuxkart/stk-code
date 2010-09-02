@@ -502,6 +502,10 @@
 					RelativePath="..\..\modes\world_status.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\modes\world_with_rank.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="items"
@@ -1378,6 +1382,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\world_status.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\world_with_rank.hpp"
 					>
 				</File>
 			</Filter>

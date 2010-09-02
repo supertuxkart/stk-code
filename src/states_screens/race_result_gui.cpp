@@ -23,7 +23,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
-#include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
@@ -215,10 +215,10 @@ void RaceResultGUI::determineTableLayout()
     assert(m_font);
     m_was_monospace = m_font->getMonospaceDigits();
     m_font->setMonospaceDigits(true);
-    World *world = World::getWorld();
+    WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
     std::vector<int> order;
-    world->raceResultOrder(&order);
+    rank_world->getRaceResultOrder(&order);
 
     m_all_row_infos.resize(order.size());
 
@@ -239,7 +239,7 @@ void RaceResultGUI::determineTableLayout()
         // Save a pointer to the current row_info entry
         RowInfo *ri              = &(m_all_row_infos[num_karts]);
         num_karts++;
-        Kart *kart               = world->getKart(order[i]);
+        Kart *kart               = rank_world->getKart(order[i]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
         ri->m_kart_name          = kart->getName();
 

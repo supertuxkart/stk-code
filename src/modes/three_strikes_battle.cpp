@@ -25,17 +25,17 @@
 
 //-----------------------------------------------------------------------------
 
-ThreeStrikesBattle::ThreeStrikesBattle() : World()
+ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
-}
+}   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
 
 void ThreeStrikesBattle::init()
 {
-    World::init();
+    WorldWithRank::init();
     
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
@@ -163,6 +163,7 @@ void ThreeStrikesBattle::updateKartRanks()
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
         m_karts[ karts_list[n] ]->setPosition( n+1 );
+        setKartPosition(karts_list[n], n+1);
     }
     delete [] karts_list;
 }   // updateKartRank
@@ -183,13 +184,13 @@ bool ThreeStrikesBattle::isRaceOver()
 void ThreeStrikesBattle::terminateRace()
 {
     updateKartRanks();   
-    World::terminateRace();
+    WorldWithRank::terminateRace();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()
 {
-    World::restartRace();
+    WorldWithRank::restartRace();
     
     const unsigned int kart_amount = m_karts.size();
     
@@ -319,21 +320,3 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
     //add hit to kart
     kartHit(kart->getWorldKartId());
 }   // moveKartAfterRescue
-
-//-----------------------------------------------------------------------------
-void ThreeStrikesBattle::raceResultOrder(std::vector<int> *order)
-{
-    updateKartRanks();
-
-    const unsigned int num_karts = getNumKarts();
-    order->resize(num_karts);
-    for (unsigned int i=0; i < num_karts; i++) (*order)[i] = -1;
-
-    for( unsigned int kart_id    = 0; kart_id < num_karts; ++kart_id )
-    {
-        const int pos = m_karts[kart_id]->getPosition() - 1;
-        assert(pos >= 0);
-        assert(pos < (int)num_karts);
-        (*order)[pos] = kart_id;
-    }
-}   // raceResultOrder

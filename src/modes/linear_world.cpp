@@ -34,7 +34,7 @@
 /** Constructs the linear world. Note that here no functions can be called
  *  that use World::getWorld(), since it is not yet defined.
  */
-LinearWorld::LinearWorld() : World()
+LinearWorld::LinearWorld() : WorldWithRank()
 {
     m_kart_display_info   = NULL;
     m_last_lap_sfx        = sfx_manager->createSoundSource("lastlap");
@@ -48,15 +48,13 @@ LinearWorld::LinearWorld() : World()
  */
 void LinearWorld::init()
 {
-    World::init();
+    WorldWithRank::init();
     m_last_lap_sfx_played           = false;
     const unsigned int kart_amount  = m_karts.size();
-    m_position_index.resize(kart_amount);
     m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        m_position_index[n]         = n;
         KartInfo info;
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
@@ -102,7 +100,7 @@ LinearWorld::~LinearWorld()
 //-----------------------------------------------------------------------------
 void LinearWorld::restartRace()
 {
-    World::restartRace();
+    WorldWithRank::restartRace();
     //if(m_last_lap_sfx->getStatus()== SFXManager::SFX_PLAYING)
     //    m_last_lap_sfx->stop();
     m_last_lap_sfx_played = false;
@@ -169,7 +167,7 @@ void LinearWorld::update(float delta)
 {
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
-    World::update(delta);
+    WorldWithRank::update(delta);
 
     const unsigned int kart_amount = getNumKarts();
 
@@ -487,60 +485,6 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     return m_kart_display_info;
 }   // getKartsDisplayInfo
 
-// ----------------------------------------------------------------------------
-/** Sets up the mapping from kart position to kart index.
- */
-void LinearWorld::raceResultOrder(std::vector<int> *order)
-{
-    const unsigned int NUM_KARTS = getNumKarts();
-    order->resize(NUM_KARTS);
-    
-#ifndef NDEBUG
-    for (unsigned int i=0; i < NUM_KARTS; i++)
-    {
-        (*order)[i] = -1;
-    }
-    
-    bool positions_ok = true;
-#endif
-    
-    for (unsigned int i=0; i < NUM_KARTS; i++)
-    {
-        const int position = getKart(i)->getPosition()-1;
-        
-#ifndef NDEBUG
-        // sanity checks
-        if ((*order)[position] != -1)
-        {
-            std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
-            for (unsigned int j=0; j < NUM_KARTS; j++)
-            {
-                if ((*order)[j] == -1)
-                {
-                    std::cout << "    No kart is yet set at position " << j << std::endl;
-                }
-                else
-                {
-                    std::cout << "    Kart " << (*order)[j] << " is at position " << j << std::endl;
-                }
-            }
-            std::cout << "Kart " << i << " is being given posiiton " << (getKart(i)->getPosition()-1)
-                      << ", but this position is already taken\n";
-            positions_ok = false;
-        }
-#endif
-        
-        // actually assign the position
-        (*order)[position] = i; // even for eliminated karts
-    }
-    
-#ifndef NDEBUG
-    if (!positions_ok) history->Save();
-    assert(positions_ok);
-#endif
-    
-}   // raceResultOrder
-
 //-----------------------------------------------------------------------------
 /** Estimate the arrival time of any karts that haven't arrived yet by using 
  *  their average speed up to now and the distance still to race. This 
@@ -746,7 +690,7 @@ void LinearWorld::updateRacePosition()
 #endif
 
         kart->setPosition(p);
-        m_position_index[p-1] = i;
+        setKartPosition(i, p);
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated
         // remaining time is less than 30 seconds.

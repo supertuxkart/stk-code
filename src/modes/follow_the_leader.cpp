@@ -141,19 +141,20 @@ RaceGUIBase::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
     return m_kart_display_info;
 }
 //-----------------------------------------------------------------------------
-void FollowTheLeaderRace::raceResultOrder( int* order )
+void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
 {
-    const unsigned int NUM_KARTS = getNumKarts();
-    
-    int *scores       = new int[NUM_KARTS];
-    double *race_time = new double[NUM_KARTS];
+    const unsigned int num_karts = getNumKarts();
+    order->resize(num_karts);
+
+    int *scores       = new int[num_karts];
+    double *race_time = new double[num_karts];
     World *world      = World::getWorld();
 
     // Ignore kart 0, since it was the leader
-    order[0] = -1;
-    for( unsigned int kart_id = 1; kart_id < NUM_KARTS; ++kart_id )
+    (*order)[0] = -1;
+    for( unsigned int kart_id = 1; kart_id < num_karts; ++kart_id )
     {
-        order[kart_id]     = kart_id;
+        (*order)[kart_id]  = kart_id;
         scores[kart_id]    = race_manager->getKartScore(kart_id);
         race_time[kart_id] = race_manager->getOverallTime(kart_id);
         
@@ -172,22 +173,25 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     do
     {
         sorted = true;
-        for( unsigned int i = 1; i < NUM_KARTS - 1; ++i )
+        for( unsigned int i = 1; i < num_karts - 1; ++i )
         {
-            if( scores[order[i]] < scores[order[i+1]] || 
-                (scores[order[i]] == scores[order[i+1]] 
-                 && race_time[order[i]] > race_time[order[i+1]]) )
+            if( scores[(*order)[i]] < scores[(*order)[i+1]] || 
+                (scores[(*order)[i]] == scores[(*order)[i+1]] 
+                 && race_time[(*order)[i]] > race_time[(*order)[i+1]]) )
             {
-                int tmp     = order[i];
-                order[i]    = order[i+1];
-                order[i+1]  = tmp;
-                sorted      = false;
+                int tmp       = (*order)[i];
+                (*order)[i]   = (*order)[i+1];
+                (*order)[i+1] = tmp;
+                sorted        = false;
             }
         }
     } while(!sorted);
     
-    for(unsigned int i=1; i<NUM_KARTS; i++)
-        world->getKart(order[i])->setPosition(i);
+    for(unsigned int i=1; i<num_karts; i++)
+    {
+        world->getKart((*order)[i])->setPosition(i);
+        setKartPosition((*order)[i], i);
+    }
     
     delete []scores;
     delete []race_time;

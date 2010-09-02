@@ -1,4 +1,4 @@
-//  $Id: world.hpp 2326 2008-10-04 18:50:45Z auria $
+//  $Id: three_strikes_battle.hpp 2326 2008-10-04 18:50:45Z auria $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 SuperTuxKart-Team
@@ -22,14 +22,14 @@
 
 #include <string>
 
-#include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
  * \ingroup modes
  */
-class ThreeStrikesBattle : public World
+class ThreeStrikesBattle : public WorldWithRank
 {
 private:
     struct BattleInfo
@@ -74,11 +74,7 @@ public:
     virtual std::string getIdent() const;
     
     virtual void kartHit(const int kart_id);
-    
-    /** Called by the race result GUI at the end of the race to know the final order
-        (fill in the 'order' array) */
-    virtual void raceResultOrder(std::vector<int> *order);
-    
+        
     void updateKartRanks();
 };   // ThreeStrikesBattles
 

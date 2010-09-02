@@ -27,6 +27,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
@@ -106,10 +107,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
-    World *world = World::getWorld();
+    WorldWithRank *world = (WorldWithRank*)World::getWorld();
     const unsigned int num_karts = world->getNumKarts();
     std::vector<int> order;
-    world->raceResultOrder(&order);
+    world->getRaceResultOrder(&order);
         
     const bool display_time = (world->getClockMode() == WorldStatus::CLOCK_CHRONO);
 
