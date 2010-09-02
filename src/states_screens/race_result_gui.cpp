@@ -257,6 +257,9 @@ void RaceResultGUI::determineTableLayout()
             m_width_kart_name = rect.Width;
     }   // for i < order.size()
 
+    // Make sure the empty rows (due to deleted karts) are not used anymore
+    m_all_row_infos.resize(num_karts);
+
     std::string max_time    = StringUtils::timeToString(max_finish_time);
     core::stringw string_max_time(max_time.c_str());
     core::dimension2du r    = m_font->getDimension(string_max_time.c_str());
@@ -385,7 +388,7 @@ void RaceResultGUI::renderGlobal(float dt)
     m_timer               += dt;
     World *world           = World::getWorld();
     assert(world->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
-    unsigned int num_karts = world->getNumKarts();
+    unsigned int num_karts = m_all_row_infos.size();
     
     // First: Update the finite state machine
     // ======================================
