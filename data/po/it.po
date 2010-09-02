@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-22 20:14+0200\n"
-"PO-Revision-Date: 2010-08-22 19:12+0000\n"
+"PO-Revision-Date: 2010-08-23 21:20+0000\n"
 "Last-Translator: Launchpad Translations Administrators "
 "<rosetta@launchpad.net>\n"
 "Language-Team: STK italian <pvinci26@hotmail.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-08-23 04:20+0000\n"
+"X-Launchpad-Export-Date: 2010-08-24 04:02+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: Italian\n"
 
@@ -222,7 +222,7 @@ msgstr "Add-Ons"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:202
 msgid "Addons"
-msgstr ""
+msgstr "Aggiungi"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -277,7 +277,7 @@ msgstr "Arrr, %s ha gettato l'ancora, Capitano!"
 #. I18N: When configuring input
 #: data/po/gui_strings.h:104
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "Assegna"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:647
@@ -371,7 +371,7 @@ msgstr "Banana? Scatola? Banana? Scatola? Banana? Scatola?"
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:194
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Avrai miglior fortuna la prossima volta!"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -531,12 +531,12 @@ msgstr "Crediti"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:562
 msgid "Description:"
-msgstr ""
+msgstr "Descrizione"
 
 #: src/states_screens/dialogs/addons_loading.cpp:71
 #, c-format
 msgid "Description: %i"
-msgstr ""
+msgstr "Descrizione: %i"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:136
@@ -790,7 +790,7 @@ msgstr "Ignoro '%s', devi entrare prima per giocare!"
 #. I18N: Addons
 #: data/po/gui_strings.h:569
 msgid "Install"
-msgstr ""
+msgstr "Installa"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -804,7 +804,7 @@ msgstr "Intermedia"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:115 data/po/gui_strings.h:167
 msgid "Karts"
-msgstr ""
+msgstr "Karts"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
@@ -833,7 +833,7 @@ msgstr "Caricamento"
 #. I18N: In the main screen
 #: data/po/gui_strings.h:186
 msgid "Loading news from stkaddons..."
-msgstr ""
+msgstr "Aggiornamento novità da  stkaddons..."
 
 #: src/states_screens/arenas_screen.cpp:188
 #: src/states_screens/arenas_screen.cpp:211
@@ -891,12 +891,12 @@ msgstr "Musica"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:559
 msgid "Name:"
-msgstr ""
+msgstr "Nome"
 
 #: src/states_screens/dialogs/addons_loading.cpp:70
 #, c-format
 msgid "Name: %i"
-msgstr ""
+msgstr "Nome: %i"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: Main menu button
@@ -1257,11 +1257,13 @@ msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
 msgstr ""
+"scatole regalo Swapper - si trasformano in banane e viceversa per un breve "
+"periodo"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:638
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -1349,7 +1351,7 @@ msgstr "Pista di %s"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:171
 msgid "Tracks"
-msgstr ""
+msgstr "Giri"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:159
@@ -1362,21 +1364,21 @@ msgstr "Su"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:123 data/po/gui_strings.h:175
 msgid "Update"
-msgstr ""
+msgstr "Aggiornamenti"
 
 #: src/states_screens/addons_screen.cpp:150
 msgid "Updating the list..."
-msgstr ""
+msgstr "Aggiorna la lista"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:565
 msgid "Version:"
-msgstr ""
+msgstr "Versione"
 
 #: src/states_screens/dialogs/addons_loading.cpp:72
 #, c-format
 msgid "Version: %i"
-msgstr ""
+msgstr "Versione: %i"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1481,7 +1483,7 @@ msgstr "Hai sbloccato una nuova caratteristica!"
 
 #: src/states_screens/grand_prix_win.cpp:349
 msgid "You won the Grand Prix!"
-msgstr ""
+msgstr "Vuoi partecipare al Grand Prix!"
 
 #: src/karts/kart.cpp:498 src/karts/kart.cpp:517
 msgid "You won the race!"

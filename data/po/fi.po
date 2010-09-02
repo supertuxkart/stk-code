@@ -3,14 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-22 20:14+0200\n"
-"PO-Revision-Date: 2010-08-22 19:12+0000\n"
-"Last-Translator: Launchpad Translations Administrators "
-"<rosetta@launchpad.net>\n"
+"PO-Revision-Date: 2010-08-25 20:37+0000\n"
+"Last-Translator: Kristian Laakkonen <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-08-23 04:20+0000\n"
+"X-Launchpad-Export-Date: 2010-08-26 04:18+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Language: finnish\n"
 
@@ -220,7 +219,7 @@ msgstr "Lisäosat"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:202
 msgid "Addons"
-msgstr ""
+msgstr "Lisäosat"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -275,7 +274,7 @@ msgstr "Arrr, kapteeni, %s laski ankkurin!"
 #. I18N: When configuring input
 #: data/po/gui_strings.h:104
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "Aseta näppäimelle ESC"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:647
@@ -369,7 +368,7 @@ msgstr "Banaani? Laatikko? Banaani? Laatikko? Banaani? Laatikko?"
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:194
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Parempi onni ensi kerralla!"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -529,12 +528,12 @@ msgstr "Tekijät"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:562
 msgid "Description:"
-msgstr ""
+msgstr "Kuvaus:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:71
 #, c-format
 msgid "Description: %i"
-msgstr ""
+msgstr "Kuvaus: %i"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:136
@@ -790,7 +789,7 @@ msgstr ""
 #. I18N: Addons
 #: data/po/gui_strings.h:569
 msgid "Install"
-msgstr ""
+msgstr "Asenna"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -804,7 +803,7 @@ msgstr "Keskitaso"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:115 data/po/gui_strings.h:167
 msgid "Karts"
-msgstr ""
+msgstr "Autot"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
@@ -833,7 +832,7 @@ msgstr "Ladataan"
 #. I18N: In the main screen
 #: data/po/gui_strings.h:186
 msgid "Loading news from stkaddons..."
-msgstr ""
+msgstr "Ladataan uutisia stkaddonsista..."
 
 #: src/states_screens/arenas_screen.cpp:188
 #: src/states_screens/arenas_screen.cpp:211
@@ -893,12 +892,12 @@ msgstr "Musiikki"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:559
 msgid "Name:"
-msgstr ""
+msgstr "Nimi:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:70
 #, c-format
 msgid "Name: %i"
-msgstr ""
+msgstr "Nimi: %i"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: Main menu button
@@ -1260,11 +1259,13 @@ msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
 msgstr ""
+"Vaihtaja - lahjapaketit muutetaan banaaneiksi ja banaanit lahjapaketeiksi "
+"lyhyeksi aikaa"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:638
 msgid "Test"
-msgstr ""
+msgstr "Testi"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -1352,7 +1353,7 @@ msgstr "Radan tekijä: %s"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:171
 msgid "Tracks"
-msgstr ""
+msgstr "Radat"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:159
@@ -1365,21 +1366,21 @@ msgstr "Yläs"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:123 data/po/gui_strings.h:175
 msgid "Update"
-msgstr ""
+msgstr "Päivitä"
 
 #: src/states_screens/addons_screen.cpp:150
 msgid "Updating the list..."
-msgstr ""
+msgstr "Päivitetään listaa..."
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:565
 msgid "Version:"
-msgstr ""
+msgstr "Versio:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:72
 #, c-format
 msgid "Version: %i"
-msgstr ""
+msgstr "Versio: %i"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1488,7 +1489,7 @@ msgstr "Uusi ominaisuus on nyt käytössä!"
 
 #: src/states_screens/grand_prix_win.cpp:349
 msgid "You won the Grand Prix!"
-msgstr ""
+msgstr "Voitit Grand Prixin!"
 
 #: src/karts/kart.cpp:498 src/karts/kart.cpp:517
 msgid "You won the race!"

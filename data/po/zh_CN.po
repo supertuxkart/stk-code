@@ -3,14 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-22 20:14+0200\n"
-"PO-Revision-Date: 2010-08-22 19:12+0000\n"
-"Last-Translator: Launchpad Translations Administrators "
-"<rosetta@launchpad.net>\n"
+"PO-Revision-Date: 2010-08-30 15:49+0000\n"
+"Last-Translator: acme_pjz <Unknown>\n"
 "Language-Team: acme_pjz <acme_pjz@hotmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-08-23 04:21+0000\n"
+"X-Launchpad-Export-Date: 2010-08-31 04:17+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-Language: Chinese\n"
@@ -58,7 +57,7 @@ msgstr "%0 不会再和 %1 一起玩保龄球了"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr "%1 揣上了 %0，哈哈，自由地驾驶吧"
+msgstr "%1 揣上了 %0，哈哈，搭了顺风车"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
@@ -73,7 +72,7 @@ msgstr "%1 打中了 %0"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr "%1 把 %0 揣成了一台拖拉机"
+msgstr "%1 在 %0 上面测试了牵引光线!"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:123
@@ -108,7 +107,7 @@ msgstr "%s 准备好了"
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s 被锚了，因为要付下一次的酒钱！"
 
 #: src/modes/world.cpp:609
 #, c-format
@@ -170,7 +169,7 @@ msgstr "== 最高纪录 =="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr "一个天才做到了！"
+msgstr "一个巫师干的--所有道具和香蕉暂时颠倒!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:426
 msgid "Abort Grand Prix"
@@ -198,7 +197,7 @@ msgstr "添加键盘按键设置"
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:301
 msgid "Add Player"
-msgstr "新增玩家"
+msgstr "添加玩家"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -216,7 +215,7 @@ msgstr "附加"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:202
 msgid "Addons"
-msgstr ""
+msgstr "附加组件"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -270,7 +269,7 @@ msgstr "哇呀呀呀，%s 吃到了一个锚！"
 #. I18N: When configuring input
 #: data/po/gui_strings.h:104
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "设置为ESC键"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:647
@@ -359,12 +358,12 @@ msgstr "回到主菜单"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr "香蕉皮？宝箱？香蕉皮？宝箱？香蕉皮？宝箱？"
+msgstr "香蕉皮？宝箱？香蕉皮？宝箱？…@#^$…香蕉皮？宝箱？"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:194
 msgid "Better luck next time!"
-msgstr ""
+msgstr "希望你下次运气好一些！"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:30
@@ -381,7 +380,7 @@ msgstr "刹车"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:21
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr "口香糖 - 在你身后留下一坨粘糊糊的、 粉红色的恶心东西……"
+msgstr "泡泡糖 - 在你身后留下一坨粘糊糊的、 粉红色的恶心东西……"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:24
@@ -409,7 +408,7 @@ msgstr "取消/返回"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:88
 msgid "Cannot add a player with this name."
-msgstr "无法用这个名字添加一个玩家"
+msgstr "不能以此名字添加玩家。"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: Main menu button
@@ -514,12 +513,12 @@ msgstr "致谢"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:562
 msgid "Description:"
-msgstr ""
+msgstr "描述："
 
 #: src/states_screens/dialogs/addons_loading.cpp:71
 #, c-format
 msgid "Description: %i"
-msgstr ""
+msgstr "描述： %i"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:136
@@ -529,7 +528,7 @@ msgstr "你确定要删除玩家“%s”？"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr "你想放风筝吗？"
+msgstr "放个风筝怎么样?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:162
@@ -640,7 +639,7 @@ msgid ""
 "Follow the leader: run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr "跟紧老大 - 你至多只能跑到第二名，每隔一定时间最后一名会被淘汰掉。注意：如果你超过了老大，你也会被淘汰！"
+msgstr "跟紧老大 - 你至多只能跑到第二名， 每隔一定时间最后一名会被淘汰掉。 注意：如果你超过了老大，你也会被淘汰！"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -760,7 +759,7 @@ msgstr "忽略了“%s”，您应该早点加入！"
 #. I18N: Addons
 #: data/po/gui_strings.h:569
 msgid "Install"
-msgstr ""
+msgstr "安装"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -774,7 +773,7 @@ msgstr "中级"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:115 data/po/gui_strings.h:167
 msgid "Karts"
-msgstr ""
+msgstr "赛车"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
@@ -803,7 +802,7 @@ msgstr "正在读取"
 #. I18N: In the main screen
 #: data/po/gui_strings.h:186
 msgid "Loading news from stkaddons..."
-msgstr ""
+msgstr "正在从stkaddons下载新闻..."
 
 #: src/states_screens/arenas_screen.cpp:188
 #: src/states_screens/arenas_screen.cpp:211
@@ -861,12 +860,12 @@ msgstr "音乐"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:559
 msgid "Name:"
-msgstr ""
+msgstr "名称："
 
 #: src/states_screens/dialogs/addons_loading.cpp:70
 #, c-format
 msgid "Name: %i"
-msgstr ""
+msgstr "名称： %i"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: Main menu button
@@ -961,7 +960,7 @@ msgstr "抢跑罚时!!!"
 #. I18N: ./data/grandprix/penguinplayground.grandprix
 #: data/po/gui_strings.h:641
 msgid "Penguin Playground"
-msgstr "企鹅运动场"
+msgstr "企鹅游乐场"
 
 #. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
 #: src/states_screens/kart_selection.cpp:246
@@ -1219,12 +1218,12 @@ msgstr "SuperTuxKart 有多种游戏模式："
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
-msgstr ""
+msgstr "魔法箱子 - 使得箱子和香蕉皮、 氮气和泡泡糖在短时间内暂时颠倒。"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:638
 msgid "Test"
-msgstr ""
+msgstr "测试"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -1236,7 +1235,7 @@ msgstr "“漂移”可以使你更好地拐急弯，在窄的弯道上更好地
 
 #: src/items/powerup.cpp:64
 msgid "The Space Shuttle has landed!"
-msgstr "航天飞机降落啦！"
+msgstr "航天飞机降落啦，正在减速！"
 
 #: src/race/highscore_manager.cpp:96
 msgid ""
@@ -1261,7 +1260,7 @@ msgstr "竞速模式"
 #. I18N: In the help menu
 #: data/po/gui_strings.h:448
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "竞速模式 - 该模式下没有道具，因此该模式将考验你的驾驶技术！"
+msgstr "竞速模式 - 该模式下没有道具， 因此该模式将考验你的驾驶技术！"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:49
 msgid ""
@@ -1302,7 +1301,7 @@ msgstr "%s 设计的地图"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:171
 msgid "Tracks"
-msgstr ""
+msgstr "赛道"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:159
@@ -1315,21 +1314,21 @@ msgstr "上"
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:123 data/po/gui_strings.h:175
 msgid "Update"
-msgstr ""
+msgstr "更新"
 
 #: src/states_screens/addons_screen.cpp:150
 msgid "Updating the list..."
-msgstr ""
+msgstr "正在更新列表..."
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:565
 msgid "Version:"
-msgstr ""
+msgstr "版本："
 
 #: src/states_screens/dialogs/addons_loading.cpp:72
 #, c-format
 msgid "Version: %i"
-msgstr ""
+msgstr "版本： %i"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1357,12 +1356,12 @@ msgstr "道具"
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:632
 msgid "Win Penguin Playground Grand Prix"
-msgstr "赢得“企鹅运动场”锦标赛"
+msgstr "赢得“企鹅游乐场”锦标赛"
 
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:635
 msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
-msgstr "战胜三个专家级电脑玩家，赢得“企鹅运动场”锦标赛。"
+msgstr "战胜三个专家级电脑玩家，赢得“企鹅游乐场”锦标赛。"
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:584
@@ -1426,7 +1425,7 @@ msgstr "你解锁了一个新功能！"
 
 #: src/states_screens/grand_prix_win.cpp:349
 msgid "You won the Grand Prix!"
-msgstr ""
+msgstr "恭喜你赢得了锦标赛！"
 
 #: src/karts/kart.cpp:498 src/karts/kart.cpp:517
 msgid "You won the race!"
@@ -1446,7 +1445,7 @@ msgstr "你的配置文件太老了，新的配置文件已经创建。"
 
 #: src/input/device_manager.cpp:353
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "你的输入配置文件与这个版本的 STK 不兼容。"
+msgstr "你的按键设置与当前版本的 SuperTuxKart 不兼容。"
 
 #. I18N: Unbound key binding
 #. I18N: ./data/gui/options_device.stkgui
