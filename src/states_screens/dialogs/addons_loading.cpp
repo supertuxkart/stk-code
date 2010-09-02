@@ -116,10 +116,13 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         m_widgets.push_back(m_state);
         m_state->add();
 
-        m_back_button->setDeactivated();
+        this->getWidget<ButtonWidget>("back")->setDeactivated();
+        //FIXME : re-implement this buttons
+        /*
         m_next->setDeactivated();
         m_previous->setDeactivated();
-        this->install_button->setDeactivated();
+        */
+        this->getWidget<ButtonWidget>("install")->setDeactivated();
         m_percent_update = true;
         pthread_t thread;
         pthread_create(&thread, NULL, &AddonsLoading::startInstall, this);

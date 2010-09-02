@@ -3,7 +3,7 @@
 <div x="2%" y="10%" width="96%" height="80%" layout="horizontal-row" >
     <div width="50%" height="100%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
-    <button id="cancel"    I18N="Addons" text="Back" align="center"/>
+    <button id="back"    I18N="Addons" text="Back" align="center"/>
     </div>
     <div width="50%" height="100%" layout="vertical-row" >
         <label id="name" width="100%" text="Name:" proportion="1" />
