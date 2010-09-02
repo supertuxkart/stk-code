@@ -663,6 +663,9 @@ void World::restartRace()
         m_race_gui       = m_saved_race_gui;
         m_saved_race_gui = NULL;
     }
+
+    m_race_gui->clearAllMessages();
+
     WorldStatus::reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
