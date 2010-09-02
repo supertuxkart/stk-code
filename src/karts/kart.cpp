@@ -926,6 +926,9 @@ float Kart::handleSlipstream(float dt)
     unsigned int num_karts = world->getNumKarts();
     bool is_sstreaming     = false;
     Kart *target_kart;
+    // Note that this loop can not be simply replaced with a shorter loop
+    // using only the karts with a better position - since a kart might
+    // be a lap behind
     for(unsigned int i=0; i<num_karts; i++)
     {
         target_kart = world->getKart(i);
@@ -974,12 +977,13 @@ float Kart::handleSlipstream(float dt)
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
         m_slipstream_mode = SS_USE;
-        //handleZipper(); // FIXME(/REMOVE?) Zipper gives a sharp push, maybe too sharp
-        //return 0;       // see below about abusing m_zipper_time_left without zipper
-        return m_kart_properties->getSlipstreamAddPower();
+        handleZipper(); // FIXME(/REMOVE?) Zipper gives a sharp push, maybe too sharp
+        return 0;       // see below about abusing m_zipper_time_left without zipper
+        //return m_kart_properties->getSlipstreamAddPower();
     }
-    m_zipper_time_left = 5.0f; // FIXME, this is a hack to test higher speed limit without zipper, better would be own counter
-    return m_kart_properties->getSlipstreamAddPower();
+    //m_zipper_time_left = 5.0f; // FIXME, this is a hack to test higher speed limit without zipper, better would be own counter
+    return 0;
+    //return m_kart_properties->getSlipstreamAddPower();
 }   // handleSlipstream
 
 
@@ -1470,6 +1474,11 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
         // become a huge unsigned number in the particle scene node!
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
                                  ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
+
+    // For testing purposes mis-use the nitro graphical effects to show
+    // then the slipstream becomes usable.
+    if(m_slipstream_mode == SS_USE)
+        m_nitro->setCreationRate(20.0f);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
