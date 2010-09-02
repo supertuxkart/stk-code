@@ -49,7 +49,8 @@ LinearWorld::LinearWorld() : World()
 void LinearWorld::init()
 {
     World::init();
-    const unsigned int kart_amount = m_karts.size();
+    m_last_lap_sfx_played           = false;
+    const unsigned int kart_amount  = m_karts.size();
     m_position_index.resize(kart_amount);
     m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
@@ -102,6 +103,9 @@ LinearWorld::~LinearWorld()
 void LinearWorld::restartRace()
 {
     World::restartRace();
+    //if(m_last_lap_sfx->getStatus()== SFXManager::SFX_PLAYING)
+    //    m_last_lap_sfx->stop();
+    m_last_lap_sfx_played = false;
 
     const unsigned int kart_amount = m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
