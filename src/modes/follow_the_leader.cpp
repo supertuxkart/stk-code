@@ -76,7 +76,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     {
         // In case that the kart on position 1 was removed, we have to set
         // the correct position (which equals the remaining number of karts).
-        m_karts[kart_number]->setPosition(getCurrentNumKarts());
+        setKartPosition(kart_number, getCurrentNumKarts());
         removeKart(kart_number);
     }
     
@@ -148,7 +148,6 @@ void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
 
     int *scores       = new int[num_karts];
     double *race_time = new double[num_karts];
-    World *world      = World::getWorld();
 
     // Ignore kart 0, since it was the leader
     (*order)[0] = -1;
@@ -159,9 +158,9 @@ void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
         race_time[kart_id] = race_manager->getOverallTime(kart_id);
         
         // check this kart is not in front of leader. If it is, give a score of 0
-        if(   getLapForKart(kart_id) * world->getTrack()->getTrackLength() 
+        if(   getLapForKart(kart_id) * getTrack()->getTrackLength() 
               + getDistanceDownTrackForKart(kart_id)
-            > getLapForKart(0)       * world->getTrack()->getTrackLength() 
+            > getLapForKart(0)       * getTrack()->getTrackLength() 
               + getDistanceDownTrackForKart(0))
         {
             scores[kart_id] = 0;
@@ -189,7 +188,6 @@ void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
     
     for(unsigned int i=1; i<num_karts; i++)
     {
-        world->getKart((*order)[i])->setPosition(i);
         setKartPosition((*order)[i], i);
     }
     

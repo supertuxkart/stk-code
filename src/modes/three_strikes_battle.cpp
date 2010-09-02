@@ -162,7 +162,6 @@ void ThreeStrikesBattle::updateKartRanks()
     
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
-        m_karts[ karts_list[n] ]->setPosition( n+1 );
         setKartPosition(karts_list[n], n+1);
     }
     delete [] karts_list;

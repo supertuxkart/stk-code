@@ -689,7 +689,6 @@ void LinearWorld::updateRacePosition()
         rank_changed |= kart->getPosition()!=p;
 #endif
 
-        kart->setPosition(p);
         setKartPosition(i, p);
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated

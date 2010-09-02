@@ -31,6 +31,7 @@ void WorldWithRank::setKartPosition(unsigned int kart_id,
                                     unsigned int position)
 {
     m_position_index[position-1] = kart_id;
+    m_karts[kart_id]->setPosition(position);
 }   // setKartPosition
 
 // ----------------------------------------------------------------------------
