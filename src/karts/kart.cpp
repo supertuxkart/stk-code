@@ -403,6 +403,7 @@ void Kart::reset()
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
+    m_has_started          = false;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
@@ -1100,14 +1101,16 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(float dt)
 {
-    // Checks for startup speed boost.
-    unsigned int num_started = World::getWorld()->getNumStartedKarts();
-    if(m_controls.m_accel>0 && num_started<stk_config->m_startup_boost.size())
+    // Check if accel is pressed for the first time.
+    if(!m_has_started && m_controls.m_accel)
     {
-        m_zipper_time_left  = 5.0f;
-        m_vehicle->activateZipper(stk_config->m_startup_boost[num_started]);
-        World::getWorld()->incNumStartedKarts();
+        m_has_started = true;
+        m_zipper_time_left = 5.0f;
+        float f       = m_kart_properties->getStartupBoost();
+        m_vehicle->activateZipper(f);
+
     }
+
     m_bounce_back_time-=dt;
     float engine_power = getActualWheelForce() + handleNitro(dt)
                                                + handleSlipstream(dt);

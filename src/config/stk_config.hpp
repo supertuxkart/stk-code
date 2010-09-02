@@ -94,9 +94,6 @@ public:
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
-    std::vector<float>
-          m_startup_boost;           /**< The speed boost the fastest players
-                                          pressing 'accel' at start get.     */
     std::vector<int> m_switch_items; /**< How to switch items.               */
     std::vector<int>
           m_scores;                  /**<Scores depending on position.       */

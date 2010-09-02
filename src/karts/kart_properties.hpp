@@ -199,6 +199,14 @@ private:
     std::vector<float> m_gear_switch_ratio,
                        m_gear_power_increase;
 
+    /** If the kart starts within the specified time at index I after 'go', 
+     *  it receives the speed boost from m_startup_boost[I]. */
+    std::vector<float> m_startup_times;
+
+    /** The startup boost is the kart starts fast enough. */
+    std::vector<float> m_startup_boost;
+
+
     void  load              (const std::string &filename,
                              const std::string &node);
 
@@ -412,6 +420,7 @@ public:
 
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                     }
+    float getStartupBoost() const;
 };
 
 #endif

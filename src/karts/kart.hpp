@@ -93,14 +93,19 @@ protected:       // Used by the AI atm
     KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
     Powerup      m_powerup;
     float        m_zipper_time_left;   /**<Zipper time left. */
-    Attachment   *m_attachment;
+    Attachment  *m_attachment;
     /** Easier access for player_kart. */
-    Camera       *m_camera;
+    Camera      *m_camera;
 private:
-    float        m_max_speed;          // maximum speed of the kart, computed from
+    /** Maximum speed of the kart. */
+    float        m_max_speed;
     /** Depending on terrain a certain reduction to the maximum speed applies.
      *  This reduction is accumulated in m_max_speed_reduction. */
     float        m_max_speed_reduction;
+    /** True if the kart hasn't moved since 'ready-set-go' - used to 
+     *  determine startup boost. */
+    bool         m_has_started;
+
     float        m_power_reduction;
     float        m_max_gear_rpm;       /**<Maximum engine rpm's for the current gear*/
     float        m_max_speed_reverse_ratio;

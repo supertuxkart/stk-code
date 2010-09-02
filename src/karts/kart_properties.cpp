@@ -29,6 +29,7 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
+#include "modes/world.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -380,6 +381,12 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *camera_node= root->getNode("camera"))
         camera_node->get("distance", &m_camera_distance);
 
+    if(const XMLNode *startup_node= root->getNode("startup"))
+    {
+        startup_node->get("time", &m_startup_times);
+        startup_node->get("boost", &m_startup_boost);
+    }
+
     if(const XMLNode *sounds_node= root->getNode("sounds"))
     {
         std::string s;
@@ -435,8 +442,14 @@ void KartProperties::checkAllSet(const std::string &filename)
         exit(-1);
     }
     if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
-        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase");
+        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase\n");
         fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
+        exit(-1);
+    }
+    if(m_startup_boost.size()!=m_startup_times.size())
+    {
+        fprintf(stderr, "Number of entried for 'startup times' and 'startup-boost\n");
+        fprintf(stderr, "must be identical.\n");
         exit(-1);
     }
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
@@ -506,5 +519,20 @@ float KartProperties::getMaxSteerAngle(float speed) const
     return m_angle_at_min - (speed-m_min_speed_turn)*m_speed_angle_increase;
 }   // getMaxSteerAngle
 
-
+// ----------------------------------------------------------------------------
+/** Called the first time a kart accelerates after 'ready-set-go'. It searches
+ *  through m_startup_times to find the appropriate slot, and returns the
+ *  speed-boost from the corresponding entry in m_startup_boost.
+ *  If the kart started too slow (i.e. slower than the longest time in
+ *  m_startup_times, it returns 0.
+ */
+float KartProperties::getStartupBoost() const
+{
+    float t = World::getWorld()->getTime();
+    for(unsigned int i=0; i<m_startup_times.size(); i++)
+    {
+        if(t<=m_startup_times[i]) return m_startup_boost[i];
+    }
+    return 0;
+}   // getStartupBoost
 /* EOF */

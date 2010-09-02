@@ -22,11 +22,9 @@
        The last values applies for all remaining karts. -->
   <follow-the-leader intervals="30 20 10"/>
 
-  <!-- Startup information. Boost: startup speed boost for
-       the first karts to press acceleration at start.
+  <!-- Startup information. 
        Penalty: Penalty time if a kart accelerates before GO. -->
-  <startup boost  ="10 5"
-           penalty="1" />
+  <startup penalty="1" />
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -43,7 +41,7 @@
   <near-ground distance="2"/> 
 
   <!-- How long the end animation will be shown. -->
-  <delay-finish time="14"/>
+  <delay-finish time="0.5"/>
 
   <!-- How long the music credits are shown. -->
   <credits music="10"/>
@@ -104,6 +102,13 @@
 
     <!-- Camera: Distance between kart and camera. -->
     <camera distance="1.5"/>
+
+    <!-- If a kart starts within the specified time after 'go',
+         it receives the corresponding bonus from 'boost'. Those
+         fields must have the same size, and must be sorted by
+         increasing times. -->
+    <startup time   = "0.3 0.5"
+             boost  = "10 5"  />
 
     <!-- Rescue: time: How long it takes the kart to be raised.
          height: how height the kart will be raised before it is
