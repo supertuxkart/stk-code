@@ -29,12 +29,6 @@
 #include "addons/zip.hpp"
 
 #include <fstream>
-#include <sys/types.h>
-#ifndef WIN32
-#  include <unistd.h>
-#  include <dirent.h>
-#endif
-#include <sys/stat.h>
 #include <sstream>
 #include "io/file_manager.hpp"
 
@@ -400,60 +394,10 @@ void Addons::UnInstall()
                 this->m_addons_list[this->index].name + "/";
 
     //remove the addons directory
-    this->RemoveDirectory(dest_file.c_str());
+    file_manager->removeDirectory(dest_file.c_str());
 
 }
 // ----------------------------------------------------------------------------
-/*FIXME: This function is an ugly copy-paste*/
-int Addons::RemoveDirectory(char const *name)
-{
-#ifdef FIXME_ADDON
-    // DIR etc. do not exist like this in windows,
-    // file system specific calls should be moved into
-    // the file manager!!
-
-    DIR *directory;
-    struct dirent *entry;
-    struct stat file_stat;
-
-    char buffer[1024] = {0};
-
-    directory = opendir(name);
-    if ( directory == NULL )
-    {
-        fprintf(stderr, "cannot open directory %s\n", name);
-        return 0;
-    }
-
-    while ((entry = readdir(directory)) != NULL)
-    {
-
-        /*this condition handles if it is the current directory (.) or the 
-        parent directory (..), these names work only on unix-based I think*/
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-        {
-            continue;
-        }
-
-        snprintf(buffer, 1024, "%s/%s", name, entry->d_name);
-
-        stat(buffer, &file_stat);
-
-        if (S_ISREG(file_stat.st_mode))
-        {
-            remove(buffer);
-        }
-        else if (S_ISDIR(file_stat.st_mode))
-        {
-            this->RemoveDirectory(buffer);
-        }
-    }
-    closedir(directory);
-
-    remove(name);
-#endif
-    return 1;
-}
 int Addons::getDownloadState()
 {
     pthread_mutex_lock(&download_mutex);

@@ -35,8 +35,15 @@
 #  include <direct.h>
 #endif
 
+/*Needed by the remove directory function */
+
+#ifndef WIN32
+#  include <dirent.h>
+#endif
 
 #ifdef WIN32
+/* FIXME : for the remove directory function*/
+#  include <shellapi.h>
 #  include <io.h>
 #  include <stdio.h>
 #  ifndef __CYGWIN__
@@ -57,9 +64,12 @@
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
+
 #ifdef __APPLE__
 // dynamic data path detection onmac
 #  include <CoreFoundation/CoreFoundation.h>
+
+
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
@@ -636,4 +646,68 @@ void FileManager::checkAndCreateDirForAddons(std::string addons_name, std::strin
     checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type + addons_name);
 
 }
+bool FileManager::removeDirectory(char const *name)
+{
+#ifndef WIN32
+    // DIR etc. do not exist like this in windows,
+    // file system specific calls should be moved into
+    // the file manager!!
+
+    DIR *directory;
+    struct dirent *entry;
+    struct stat file_stat;
+
+    char buffer[1024] = {0};
+
+    directory = opendir(name);
+    if ( directory == NULL )
+    {
+        fprintf(stderr, "cannot open directory %s\n", name);
+        return false;
+    }
+
+    while ((entry = readdir(directory)) != NULL)
+    {
+
+        /*this condition handles if it is the current directory (.) or the 
+        parent directory (..), these names work only on unix-based I think*/
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+
+        snprintf(buffer, 1024, "%s/%s", name, entry->d_name);
+
+        stat(buffer, &file_stat);
+
+        if (S_ISREG(file_stat.st_mode))
+        {
+            remove(buffer);
+        }
+        else if (S_ISDIR(file_stat.st_mode))
+        {
+            this->removeDirectory(buffer);
+        }
+    }
+    closedir(directory);
+
+    remove(name);
+    return true;
+
+#else
+//FIXME : check this function, it is only for windows, but I'm on linux.
+	SHFILEOPSTRUCT sh;
+	sh.hwnd = NULL;
+	sh.wFunc = FO_DELETE;
+	sh.pFrom = repertoire;
+	sh.pTo = NULL;
+	sh.fFlags = FOF_NOCONFIRMATION|FOF_SILENT;
+	sh.fAnyOperationsAborted = FALSE;
+	sh.lpszProgressTitle = NULL;
+	sh.hNameMappings = NULL;
+	
+	return (SHFileOperation(&sh)==0);
+#endif
+}
+
 #endif

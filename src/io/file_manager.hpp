@@ -81,7 +81,9 @@ public:
     bool            checkAndCreateDirectoryP(const std::string &path);
 #ifdef ADDONS_MANAGER
     std::string getAddonsDir     () const;
-    void checkAndCreateDirForAddons(std::string addons_name, std::string addons_type);
+    void checkAndCreateDirForAddons(std::string addons_name,
+                                    std::string addons_type);
+    bool removeDirectory(char const *name);
 #endif
     std::string getKartDir       () const;
     std::string getDataDir       () const;
@@ -105,7 +107,8 @@ public:
                                   bool is_full_path=false,
                                   bool make_full_path=false) const;
 
-    bool       fileExists           (const std::string& path)   { return m_file_system->existFile(path.c_str()); }
+    bool       fileExists           (const std::string& path)
+        { return m_file_system->existFile(path.c_str()); }
 
     void       pushTextureSearchPath(const std::string& path);
     void       pushModelSearchPath  (const std::string& path);
