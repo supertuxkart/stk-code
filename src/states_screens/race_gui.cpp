@@ -432,27 +432,37 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 
         //x,y is the target position
         int lap = info[kart->getWorldKartId()].lap;
-        float distance=
-              world->getDistanceDownTrackForKart(kart_id)
-             +world->getTrack()->getTrackLength()*lap;
-        if (previous_distance-distance<m_dist_show_overlap)
+
+        // In battle mode there is no distance along track etc.
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
         {
-            //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
-            // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
-            x=(int)(x_base+(1-(previous_distance-distance)
-                /m_dist_show_overlap)
-                *(previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2));
-            y=(int)(previous_y+(previous_distance-distance)
-                /m_dist_show_overlap*(ICON_PLAYER_WIDTH+2));
+            x = x_base;
+            y = previous_y+ICON_PLAYER_WIDTH+2;
         }
         else
         {
-            x=x_base;
-            y=previous_y+ICON_PLAYER_WIDTH+2;
-        }
+            float distance = world->getDistanceDownTrackForKart(kart_id)
+                           + world->getTrack()->getTrackLength()*lap;
+            if (previous_distance-distance<m_dist_show_overlap)
+            {
+                //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
+                // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
+                x=(int)(x_base+(1-(previous_distance-distance)
+                    /m_dist_show_overlap)
+                    *(previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2));
+                y=(int)(previous_y+(previous_distance-distance)
+                    /m_dist_show_overlap*(ICON_PLAYER_WIDTH+2));
+            }
+            else
+            {
+                x=x_base;
+                y=previous_y+ICON_PLAYER_WIDTH+2;
+            }
+            previous_distance=distance;
+        }   // not three-strike-battle
         previous_x=x;//save coord of the previous kart in list
         previous_y=y;
-        previous_distance=distance;
+
 
         //initialize m_previous_icons_position
         if (m_previous_icons_position.size()<kart_amount)
