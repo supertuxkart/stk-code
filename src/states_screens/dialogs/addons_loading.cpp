@@ -55,6 +55,9 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     
     version = this->getWidget<LabelWidget>("version");
     
+    if(this->addons->IsInstalledAsBool())
+        this->getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
+    
     this->loadInfo();
 }
 void AddonsLoading::loadInfo()
@@ -106,10 +109,13 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         m_widgets.push_back(m_progress);
         m_progress->add();
 
+        /*This widget will show some text as "downloading..." or "installing".*/
         m_state = new LabelWidget();
-        m_state->m_x = 180;
-        m_state->m_y = m_area.getHeight()-95;
-        m_state->m_w = 250;
+        m_state->m_properties[PROP_TEXT_ALIGN] = "center";
+        /* Center the widget*/
+        m_state->m_x = 10;
+        m_state->m_y = getHeight()-125;
+        m_state->m_w = getWidth() - 20;
         m_state->m_h = 35;
         m_state->setParent(m_irrlicht_window);
 
