@@ -71,7 +71,6 @@ public:
     }
     void addSubEntry(stringw& subEntryString)
     {
-        std::cout << subEntryString.c_str() << std::endl;
         m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
     }
 };
