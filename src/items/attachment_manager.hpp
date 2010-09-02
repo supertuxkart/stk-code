@@ -29,6 +29,7 @@ class AttachmentManager
 {
 private:
     scene::IAnimatedMesh *m_attachments[ATTACH_MAX];
+    Material             *m_all_icons [ATTACH_MAX];
 public:
     AttachmentManager() {};
     /** Returns the mest for a certain attachment.
@@ -36,6 +37,10 @@ public:
     scene::IAnimatedMesh *getMesh(attachmentType type) const {return m_attachments[type]; }
     void       removeTextures   ();
     void       loadModels       ();
+    /** Returns the icon to display in the race gui if a kart 
+     *  has an attachment. */
+    const Material* 
+               getIcon          (int type) const {return m_all_icons [type];}
 };
 
 extern AttachmentManager *attachment_manager;

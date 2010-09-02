@@ -31,6 +31,9 @@
 #include "utils/translation.hpp"
 
 //-----------------------------------------------------------------------------
+/** Constructs the linear world. Note that here no functions can be called
+ *  that use World::getWorld(), since it is not yet defined.
+ */
 LinearWorld::LinearWorld() : World()
 {
     m_kart_display_info   = NULL;
@@ -39,15 +42,20 @@ LinearWorld::LinearWorld() : World()
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
+/** Actually initialises the world, i.e. creates all data structures to
+ *  for all karts etc. In init functions can be called that use
+ *  World::getWorld().
+ */
 void LinearWorld::init()
 {
     World::init();
     const unsigned int kart_amount = m_karts.size();
-
+    m_position_index.resize(kart_amount);
     m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
+        m_position_index[n]         = n;
         KartInfo info;
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
@@ -98,7 +106,7 @@ void LinearWorld::restartRace()
     const unsigned int kart_amount = m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
     {
-        KartInfo& info = m_kart_info[i];
+        KartInfo& info              = m_kart_info[i];
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
         info.m_lap_start_time       = 0;
@@ -734,6 +742,7 @@ void LinearWorld::updateRacePosition()
 #endif
 
         kart->setPosition(p);
+        m_position_index[p-1] = i;
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated
         // remaining time is less than 30 seconds.

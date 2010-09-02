@@ -139,6 +139,12 @@ private:
     int              m_max_font_height;
     int              m_small_font_max_height;
     
+    /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
+    float            m_dist_show_overlap;///can be zero
+    float            m_icons_inertia;///can be zero
+    /** previous position of icons */
+    std::vector< core::vector2d<s32> > m_previous_icons_position;
+    
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
                               const core::vector2df &center,

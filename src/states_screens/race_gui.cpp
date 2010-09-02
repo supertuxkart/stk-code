@@ -34,7 +34,11 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "items/attachment.hpp"
+#include "items/attachment_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -92,6 +96,9 @@ RaceGUI::RaceGUI()
     m_string_ready    = _("Ready!");
     m_string_set      = _("Set!");
     m_string_go       = _("Go!");
+    
+    m_dist_show_overlap=2;
+    m_icons_inertia=2;
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -113,13 +120,15 @@ void RaceGUI::createMarkerTexture()
     while(npower2<num_karts) npower2*=2;
 
     int radius     = (m_marker_rendered_size>>1)-1;
-    IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size * npower2, 
-                                                          m_marker_rendered_size), 
+    IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size
+                                                          *npower2,
+                                                          m_marker_rendered_size),
                                      "RaceGUI::markers");
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH((float)(m_marker_rendered_size*npower2), 
-                                            (float)(m_marker_rendered_size), -1.0f, 1.0f);
+                                            (float)(m_marker_rendered_size), 
+                                            -1.0f, 1.0f);
     camera->setProjectionMatrix(projection, true);
     core::vector3df center( (float)(m_marker_rendered_size*npower2>>1),
                             (float)(m_marker_rendered_size>>1), 0.0f);
@@ -144,11 +153,12 @@ void RaceGUI::createMarkerTexture()
         const std::string& kart_ident = race_manager->getKartIdent(i);
         assert(kart_ident.size() > 0);
         
-        const KartProperties *kp = kart_properties_manager->getKart(kart_ident);
+        const KartProperties *kp=kart_properties_manager->getKart(kart_ident);
         assert(kp != NULL);
         
-        core::vector2df center((float)((m_marker_rendered_size>>1)+i*m_marker_rendered_size), 
-                               (float)(m_marker_rendered_size>>1)                   );
+        core::vector2df center((float)((m_marker_rendered_size>>1)
+                                +i*m_marker_rendered_size), 
+                               (float)(m_marker_rendered_size>>1)  );
         int count = kp->getShape();
         video::ITexture *t = kp->getMinimapIcon();
         if(t)
@@ -172,8 +182,10 @@ void RaceGUI::createMarkerTexture()
             video::SColor color        = kp->getColor();
             createRegularPolygon(count, (float)radius, center, color, 
                 vertices, index);
-            irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
-                index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+            irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, 
+                                            count, index, count-2,
+                                            video::EVT_STANDARD, 
+                                            scene::EPT_TRIANGLE_FAN);
             delete [] vertices;
             delete [] index;
         }   // if special minimap icon defined
@@ -193,13 +205,15 @@ void RaceGUI::createMarkerTexture()
 void RaceGUI::createRegularPolygon(unsigned int n, float radius, 
                                    const core::vector2df &center,
                                    const video::SColor &color,
-                                   video::S3DVertex *v, unsigned short int *index)
+                                   video::S3DVertex *v, 
+                                   unsigned short int *index)
 {
     float f = 2*M_PI/(float)n;
     for (unsigned int i=0; i<n; i++)
     {
         float p = i*f;
-        core::vector2df X = center + core::vector2df(sin(p)*radius, -cos(p)*radius);
+        core::vector2df X = center + core::vector2df( sin(p)*radius, 
+                                                     -cos(p)*radius);
         v[i].Pos.X = X.X;
         v[i].Pos.Y = X.Y;
         v[i].Color = color;
@@ -217,13 +231,18 @@ void RaceGUI::renderGlobal(float dt)
 {
     cleanupMessages(dt);
 
-    // Special case : when 3 players play, use 4th window to display such stuff (but we must clear it)
-    if (race_manager->getNumLocalPlayers() == 3 && !GUIEngine::ModalDialog::isADialogActive())
+    // Special case : when 3 players play, use 4th window to display such 
+    // stuff (but we must clear it)
+    if (race_manager->getNumLocalPlayers() == 3 && 
+        !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
-        irr_driver->getVideoDriver()->draw2DRectangle(black,
-                                                      core::rect<s32>(UserConfigParams::m_width/2, UserConfigParams::m_height/2,
-                                                                      UserConfigParams::m_width, UserConfigParams::m_height));
+        irr_driver->getVideoDriver()
+            ->draw2DRectangle(black,
+                              core::rect<s32>(UserConfigParams::m_width/2, 
+                                              UserConfigParams::m_height/2,
+                                              UserConfigParams::m_width, 
+                                              UserConfigParams::m_height));
     }
     
     World *world = World::getWorld();
@@ -268,19 +287,25 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     {
         int offset_y = viewport.UpperLeftCorner.Y;
         
-        const int screen_width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
-        const int plunger_size = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 - plunger_size/2;
+        const int screen_width = viewport.LowerRightCorner.X 
+                               - viewport.UpperLeftCorner.X;
+        const int plunger_size = viewport.LowerRightCorner.Y 
+                               - viewport.UpperLeftCorner.Y;
+        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
+                      - plunger_size/2;
         
         video::ITexture *t=m_plunger_face->getTexture();
         core::rect<s32> dest(plunger_x,              offset_y, 
                              plunger_x+plunger_size, offset_y+plunger_size);
-        const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
+        const core::rect<s32> source(core::position2d<s32>(0,0), 
+                                     t->getOriginalSize());
         
         //static const video::SColor white = video::SColor(255, 255, 255, 255);
         
-        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL /* clip */, 
-                                                  NULL /* color */, true /* alpha */);
+        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 
+                                                  NULL /* clip */, 
+                                                  NULL /* color */, 
+                                                  true /* alpha */);
     }
 
     
@@ -349,8 +374,10 @@ void RaceGUI::drawGlobalMiniMap()
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         // int marker_height = m_marker->getOriginalSize().Height;
-        core::rect<s32> source(i    *m_marker_rendered_size, 0, 
-                               (i+1)*m_marker_rendered_size, m_marker_rendered_size);
+        core::rect<s32> source(i    *m_marker_rendered_size,
+                               0, 
+                               (i+1)*m_marker_rendered_size, 
+                               m_marker_rendered_size);
         int marker_half_size = (kart->getController()->isPlayerController() 
                                 ? m_marker_player_size 
                                 : m_marker_ai_size                        )>>1;
@@ -358,7 +385,8 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size), 
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, NULL, NULL, true);
+        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
+                                                  NULL, NULL, true);
     }   // for i<getNumKarts
 }   // drawGlobalMiniMap
 
@@ -366,18 +394,21 @@ void RaceGUI::drawGlobalMiniMap()
 // Draw players icons and their times (if defined in the current mode).
 void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 {
-    int x = 5;
+    int x_base = 15;
     int y_base = 20;
     
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
     {
-        x = UserConfigParams::m_width/2 + 5;
+        x_base = UserConfigParams::m_width/2 + 15;
         y_base = UserConfigParams::m_height/2 + 20;
     }
 
-    
+    int x;
     int y;
+    float previous_distance=10000.0;//far ahead
+    
+    
     int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
     int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
     if(UserConfigParams::m_height<600)
@@ -386,51 +417,179 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         ICON_PLAYER_WIDTH = 35;
     }
     
+    int previous_x=x_base;
+    int previous_y=y_base-ICON_PLAYER_WIDTH-2;
+    
     gui::ScalableFont* font = GUIEngine::getFont();
-    World *world            = World::getWorld();
+    LinearWorld *world      = (LinearWorld*)(World::getWorld());
     const unsigned int kart_amount = world->getNumKarts();
-    for(unsigned int i = 0; i < kart_amount ; i++)
+    
+    for(int position = 1; position <= (int)kart_amount ; position++)
     {
-        Kart* kart   = world->getKart(i);
+        const Kart *kart = world->getKartAtPosition(position);
         if(kart->isEliminated()) continue;
-        const int position = kart->getPosition();
+        unsigned int kart_id = kart->getWorldKartId();
 
-        y = y_base + ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
-
-        if (info[i].m_text.size() > 0)
+        //x,y is the target position
+        int lap = info[kart->getWorldKartId()].lap;
+        float distance=
+              world->getDistanceDownTrackForKart(kart_id)
+             +world->getTrack()->getTrackLength()*lap;
+        if (previous_distance-distance<m_dist_show_overlap)
         {
-            video::SColor color = video::SColor(255, (int)(255*info[i].r),
-                                                     (int)(255*info[i].g), 
-                                                     (int)(255*info[i].b)      );
-            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
-            core::stringw s=info[i].m_text.c_str();
+            //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
+            // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
+            x=(int)(x_base+(1-(previous_distance-distance)
+                /m_dist_show_overlap)
+                *(previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2));
+            y=(int)(previous_y+(previous_distance-distance)
+                /m_dist_show_overlap*(ICON_PLAYER_WIDTH+2));
+        }
+        else
+        {
+            x=x_base;
+            y=previous_y+ICON_PLAYER_WIDTH+2;
+        }
+        previous_x=x;//save coord of the previous kart in list
+        previous_y=y;
+        previous_distance=distance;
+
+        //initialize m_previous_icons_position
+        if (m_previous_icons_position.size()<kart_amount)
+        {
+            core::vector2d<s32> pos(x,y);
+            m_previous_icons_position.push_back(pos);
+        }
+
+        //soft movement using previous position:
+        x=(int)((x+m_previous_icons_position[kart_id].X*m_icons_inertia)
+            /(m_icons_inertia+1));
+        y=(int)((y+m_previous_icons_position[kart_id].Y*m_icons_inertia)
+            /(m_icons_inertia+1));
+
+        //save position for next time
+        m_previous_icons_position[kart_id].X=x;
+        m_previous_icons_position[kart_id].Y=y;
+
+        if (info[kart_id].m_text.size() > 0)
+        {
+            video::SColor color = video::SColor(255,
+                (int)(255*info[kart_id].r),
+                (int)(255*info[kart_id].g), 
+                (int)(255*info[kart_id].b)   );
+            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
+                x+ICON_PLAYER_WIDTH, y+5);
+            core::stringw s=info[kart_id].m_text.c_str();
             font->draw(s.c_str(), pos, color);
         }
-        
-        if (info[i].special_title.size() > 0)
+
+        if (info[kart_id].special_title.size() > 0)
         {
             static video::SColor color = video::SColor(255, 255, 0, 0);
-            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
-            core::stringw s(info[i].special_title.c_str());
+            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
+                x+ICON_PLAYER_WIDTH, y+5);
+            core::stringw s(info[kart_id].special_title.c_str());
             font->draw(s.c_str(), pos, color);
         }
 
         // draw icon
         video::ITexture *icon = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        int w = kart->getController()->isPlayerController() ? ICON_PLAYER_WIDTH
-                                                            : ICON_WIDTH;
+        int w =
+            kart->getController()->isPlayerController() ? ICON_PLAYER_WIDTH
+            : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
 
         // Fixes crash bug, why are certain icons not showing up?
-        if (icon != NULL)
+        if ((icon != NULL) && (!kart->playingEmergencyAnimation()))
         {
-            const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, NULL, NULL, true);
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                icon->getOriginalSize());
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, 
+                NULL, NULL, true);
         }
 
-    } // next kart
-    
+        //draw status info
+
+        if ((icon != NULL) && (kart->playingRescueAnimation()))
+        {
+            //icon fades to the left
+            float t_anim=100*sin(0.5f*M_PI*kart->getAnimationTimer());
+            const core::rect<s32> rect1(core::position2d<s32>(0,0), 
+                icon->getOriginalSize());
+            const core::rect<s32> pos1((int)(x-t_anim), y, 
+                (int)(x+w-t_anim), y+w);
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos1, rect1, 
+                NULL, NULL, true);
+        }
+
+        if ((icon != NULL) && (kart->playingExplosionAnimation()))
+        {
+            //exploses into 4 parts
+            float t_anim=50.0f*sin(0.5f*M_PI*kart->getAnimationTimer());
+            u16 icon_size_x=icon->getOriginalSize().Width;
+            u16 icon_size_y=icon->getOriginalSize().Height;
+
+            const core::rect<s32> rect1(0, 0, icon_size_x/2,icon_size_y/2);
+            const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim), 
+                (int)(x+w/2-t_anim),
+                (int)(y+w/2-t_anim));
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos1, rect1, 
+                NULL, NULL, true);
+
+            const core::rect<s32> rect2(icon_size_x/2,0,
+                icon_size_x,icon_size_y/2);
+            const core::rect<s32> pos2((int)(x+w/2+t_anim),
+                (int)(y-t_anim), 
+                (int)(x+w+t_anim),
+                (int)(y+w/2-t_anim));
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos2, rect2,
+                NULL, NULL, true);
+
+            const core::rect<s32> rect3(0, icon_size_y/2, icon_size_x/2,icon_size_y);
+            const core::rect<s32> pos3((int)(x-t_anim), (int)(y+w/2+t_anim), 
+                (int)(x+w/2-t_anim), (int)(y+w+t_anim));
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos3, rect3, NULL, NULL, true);
+
+            const core::rect<s32> rect4(icon_size_x/2,icon_size_y/2,icon_size_x,icon_size_y);
+            const core::rect<s32> pos4((int)(x+w/2+t_anim), (int)(y+w/2+t_anim), 
+                (int)(x+w+t_anim), (int)(y+w+t_anim));
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos4, rect4, NULL, NULL, true);
+        }
+
+        //Plunger
+        if (kart->hasViewBlockedByPlunger())
+        {
+            video::ITexture *icon_plunger = 
+                powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
+            if (icon_plunger != NULL)
+            {
+                const core::rect<s32> rect(core::position2d<s32>(0,0), 
+                    icon_plunger->getOriginalSize());
+                const core::rect<s32> pos1(x+10, y-10, x+w+10, y+w-10);
+                irr_driver->getVideoDriver()->draw2DImage(icon_plunger, pos1, 
+                    rect, NULL, NULL, 
+                    true);
+            }
+        }
+        //attachment
+        if (kart->getAttachment()->getType() != ATTACH_NOTHING)
+        {
+            video::ITexture *icon_attachment = 
+                attachment_manager->getIcon(kart->getAttachment()->getType())
+                                 ->getTexture();
+            if (icon_attachment != NULL)
+            {
+                const core::rect<s32> rect(core::position2d<s32>(0,0), 
+                                           icon_attachment->getOriginalSize());
+                const core::rect<s32> pos1(x-20, y-10, x+w-20, y+w-10);
+                irr_driver->getVideoDriver()->draw2DImage(icon_attachment, 
+                                                          pos1, rect, NULL, 
+                                                          NULL, true);
+            }
+        }
+
+    } //next position
 }   // drawGlobalPlayerIcons
 
 //-----------------------------------------------------------------------------
@@ -449,7 +608,8 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
         
     int itemSpacing = (int)(std::min(scaling.X, scaling.Y)*30);
     
-    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2 - (n * itemSpacing)/2;
+    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2 
+           - (n * itemSpacing)/2;
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     assert(powerup != NULL);
@@ -656,23 +816,30 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
     if (m_minimap_on_left)
     {
         // check if mini-map is within Y coords of this player.
-        // if the mini-map is not even in the viewport of this player, don't bother placing
-        // the lap text at the right of the minimap.
-        if (UserConfigParams::m_height - m_map_bottom - m_map_height > viewport.LowerRightCorner.Y)
+        // if the mini-map is not even in the viewport of this player, don't 
+        // bother placing the lap text at the right of the minimap.
+        if (UserConfigParams::m_height - m_map_bottom - m_map_height 
+            > viewport.LowerRightCorner.Y)
         {
-            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.1f*UserConfigParams::m_width);
+            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
+                                   + (int)(0.1f*UserConfigParams::m_width);
         }
         else
         {
             // place lap text at the right of the mini-map
-            const int calculated_x = viewport.UpperLeftCorner.X + (int)(0.05f*UserConfigParams::m_width);
-            pos.UpperLeftCorner.X  = std::max(calculated_x, m_map_right_side_x + 15); // don't overlap minimap
+            const int calculated_x = viewport.UpperLeftCorner.X 
+                                   + (int)(0.05f*UserConfigParams::m_width);
+            // don't overlap minimap
+            pos.UpperLeftCorner.X  = std::max(calculated_x, 
+                                              m_map_right_side_x + 15);
         }
     }
     else
     {
-        // mini-map is on the right, and lap text on right, so no overlap possible
-        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.05f*UserConfigParams::m_width);
+        // mini-map is on the right, and lap text on right,
+        // so no overlap possible
+        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
+                               + (int)(0.05f*UserConfigParams::m_width);
     }
     
     gui::ScalableFont* font = GUIEngine::getFont(); 
@@ -735,7 +902,8 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
     
     // draw less important first, at the very top of the screen
-    for (AllMessageType::const_iterator i = m_messages.begin(); i != m_messages.end(); ++i)
+    for (AllMessageType::const_iterator i = m_messages.begin(); 
+         i != m_messages.end(); ++i)
     {
         TimedMessage const &msg = *i;
         if (!msg.m_important)
@@ -744,8 +912,9 @@ void RaceGUI::drawAllMessages(const Kart* kart,
             if (msg.m_kart && msg.m_kart!=kart) continue;
             
             core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-            GUIEngine::getSmallFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                                            pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+            GUIEngine::getSmallFont()->draw(
+                core::stringw(msg.m_message.c_str()).c_str(),
+                pos, msg.m_color, true /* hcenter */, true /* vcenter */);
             y -= m_small_font_max_height;                    
         }
     }
@@ -756,18 +925,21 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
-    for (AllMessageType::const_iterator i = m_messages.begin(); i != m_messages.end(); ++i)
+    for (AllMessageType::const_iterator i = m_messages.begin(); 
+         i != m_messages.end(); ++i)
     {
         TimedMessage const &msg = *i;
 
-        if (!msg.m_important) continue; // less important messages were already displayed
+         // less important messages were already displayed
+        if (!msg.m_important) continue;
         
         // Display only messages for all karts, or messages for this kart
         if (msg.m_kart && msg.m_kart!=kart) continue;
 
         core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
         GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                                   pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+                                   pos, msg.m_color, true /* hcenter */, 
+                                   true /* vcenter */);
         y += m_max_font_height;        
     }   // for i in all messages
 }   // drawAllMessages
@@ -777,10 +949,12 @@ void RaceGUI::drawAllMessages(const Kart* kart,
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
  **/
-void RaceGUI::addMessage(const core::stringw &msg, const Kart *kart, float time, 
-                         int font_size, const video::SColor &color, bool important)
+void RaceGUI::addMessage(const core::stringw &msg, const Kart *kart, 
+                         float time, int font_size, 
+                         const video::SColor &color, bool important)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color, important));
+    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color,
+                                      important));
 }   // addMessage
 
 //-----------------------------------------------------------------------------
@@ -788,7 +962,8 @@ void RaceGUI::addMessage(const core::stringw &msg, const Kart *kart, float time,
 // usually the title and composer.
 void RaceGUI::drawGlobalMusicDescription()
 {
-    if (!UserConfigParams::m_music) return; // show no music description when it's off
+     // show no music description when it's off
+    if (!UserConfigParams::m_music) return;
     
     gui::IGUIFont*       font = GUIEngine::getFont();
 
@@ -813,7 +988,7 @@ void RaceGUI::drawGlobalMusicDescription()
     
     const float resize3 = resize*resize*resize;
     
-    // ---- Get song name, and calculate its size, allowing us to position stuff
+    // Get song name, and calculate its size, allowing us to position stuff
     const MusicInformation* mi = music_manager->getCurrentMusic();
     if (!mi) return;
     
@@ -838,14 +1013,18 @@ void RaceGUI::drawGlobalMusicDescription()
     const int ICON_SIZE = 64;
     const int y         = UserConfigParams::m_height - 80;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int noteX     = (UserConfigParams::m_width / 2) - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - 20;
+    const int noteX     = (UserConfigParams::m_width / 2) 
+                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - 20;
     const int noteY     = y;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int textXFrom = (UserConfigParams::m_width / 2) - std::max(textWidth, textWidth2)/2 + 20;
-    const int textXTo   = (UserConfigParams::m_width / 2) + std::max(textWidth, textWidth2)/2 + 20;
+    const int textXFrom = (UserConfigParams::m_width / 2) 
+                        - std::max(textWidth, textWidth2)/2 + 20;
+    const int textXTo   = (UserConfigParams::m_width / 2) 
+                        + std::max(textWidth, textWidth2)/2 + 20;
 
     // ---- Draw "by" text
-    const int text_y = (int)(UserConfigParams::m_height - 80*(resize3) + 40*(1-resize));
+    const int text_y = (int)(UserConfigParams::m_height - 80*(resize3) 
+                     + 40*(1-resize));
     
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     if(mi->getComposer()!="")
@@ -853,27 +1032,31 @@ void RaceGUI::drawGlobalMusicDescription()
         core::rect<s32> pos_by(textXFrom, text_y+40,
                                textXTo,   text_y+40);
         std::string s="by "+mi->getComposer();
-        font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, true, true);
+        font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, 
+                   true, true);
     }
     
     // ---- Draw "song name" text
     core::rect<s32> pos(textXFrom, text_y,
                         textXTo,   text_y);
     
-    font->draw(thetext.c_str(), pos, white, true /* hcenter */, true /* vcenter */);
+    font->draw(thetext.c_str(), pos, white, true /* hcenter */, 
+               true /* vcenter */);
  
     // Draw music icon
     int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
     int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
     
     video::ITexture *t = m_music_icon->getTexture();
-    core::rect<s32> dest(noteX-iconSizeX/2+20,    noteY-iconSizeY/2+ICON_SIZE/2, 
-                         noteX+iconSizeX/2+20,    noteY+iconSizeY/2+ICON_SIZE/2);
-    const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
+    core::rect<s32> dest(noteX-iconSizeX/2+20,    
+                         noteY-iconSizeY/2+ICON_SIZE/2,
+                         noteX+iconSizeX/2+20,
+                         noteY+iconSizeY/2+ICON_SIZE/2);
+    const core::rect<s32> source(core::position2d<s32>(0,0), 
+                                 t->getOriginalSize());
     
-    irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL, NULL, true);
-    
-
+    irr_driver->getVideoDriver()->draw2DImage(t, dest, source,
+                                              NULL, NULL, true);
 }   // drawGlobalMusicDescription
 
 // ----------------------------------------------------------------------------
@@ -885,20 +1068,22 @@ void RaceGUI::drawGlobalReadySetGo()
     {
     case WorldStatus::READY_PHASE:
         {
-            //static video::SColor color = video::SColor(255, 230, 168, 158);
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, 
+                                UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1,
+                                UserConfigParams::m_height>>1);
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
     case WorldStatus::SET_PHASE:
         {
-            //static video::SColor color = video::SColor(255, 230, 230, 158);
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, 
+                                UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1, 
+                                UserConfigParams::m_height>>1);
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
             font->draw(m_string_set.c_str(), pos, color, true, true);
@@ -906,10 +1091,11 @@ void RaceGUI::drawGlobalReadySetGo()
         break;
     case WorldStatus::GO_PHASE:
         {
-            //static video::SColor color = video::SColor(255, 100, 209, 100);
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, 
+                                UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1, 
+                                UserConfigParams::m_height>>1);
             //gui::IGUIFont* font = irr_driver->getRaceFont();
             gui::IGUIFont* font = GUIEngine::getTitleFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race

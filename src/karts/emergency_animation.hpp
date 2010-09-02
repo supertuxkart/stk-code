@@ -75,8 +75,16 @@ public:
     void  forceRescue();
     void  update(float dt);
     // ------------------------------------------------------------------------
-    /** Returns true if an emergency animation is being played.
-     */
+    /** Returns true if an emergency animation is being played. */
     bool  playingEmergencyAnimation() const {return m_kart_mode!=EA_NONE; }
+    
+    /** Returns if a rescue animation is being shown. */
+    bool  playingRescueAnimation() const {return m_kart_mode==EA_RESCUE; }
+
+    /** Returns if an explosion animation is being shown. */
+    bool  playingExplosionAnimation() const {return m_kart_mode==EA_EXPLOSION; }
+
+    /** Returns the timer for the currently played animation. */
+    const float getAnimationTimer() const {return m_timer;}
 };   // EmergencyAnimation
 #endif

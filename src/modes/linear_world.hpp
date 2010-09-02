@@ -61,6 +61,9 @@ private:
 
     };
 
+    /** This contains a mapping from race position to kart index. */
+    std::vector<int> m_position_index;
+
 protected:
     RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
 
@@ -98,7 +101,9 @@ public:
     virtual  RaceGUIBase::KartIconDisplayInfo* 
                   getKartsDisplayInfo();
     virtual void  moveKartAfterRescue(Kart* kart);
-    
+    /** Returns the kart with position p, 1<=p<=num_karts). */
+    const Kart*   getKartAtPosition(unsigned int p) const 
+                  { return m_karts[m_position_index[p-1]]; }
     virtual void  restartRace();
     
     virtual bool  raceHasLaps(){ return true; }

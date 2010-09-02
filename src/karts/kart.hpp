@@ -250,11 +250,10 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
-    Attachment *getAttachment() 
-    {
-        return m_attachment;          
-    }   // getAttachment
-
+    const Attachment* getAttachment() const {return m_attachment; }
+    // ------------------------------------------------------------------------
+    /** Returns the current attachment, non-const version. */
+    Attachment*    getAttachment() {return m_attachment; }
     // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
      *  to this kart). */

@@ -17,5 +17,8 @@
   <material name="anchor-icon.png" clampU="Y" clampV="Y" transparency="Y" light="N" ignore="Y"/>
   <material name="plunger-icon.png" transparency="Y"  light="N"/>
   <material name="parachute-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
+  <material name="anchor-attach-icon.png" clampU="Y" clampV="Y" transparency="Y" light="N" ignore="Y"/>
+  <material name="parachute-attach-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
+  <material name="bomb-attach-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
 </materials>
 
