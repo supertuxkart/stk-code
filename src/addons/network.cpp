@@ -139,6 +139,8 @@ bool download(std::string file, std::string save, int * progress_data)
 	    return false;
     }
 }
+//FIXME : this way is a bit ugly but the simpliesst at the moment
+int time_last_print = 0;
 int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {
     int progress = dlnow/dltotal*100;
@@ -151,7 +153,15 @@ int progressDownload (void *clientp, double dltotal, double dlnow, double ultota
         *progress_data = progress;
     }
     pthread_mutex_unlock(&download_mutex);
-    std::cout << "Download progress: " << progress << "%" << std::endl;
+    if(time_last_print > 10)
+    {
+        std::cout << "Download progress: " << progress << "%" << std::endl;
+        time_last_print = 0;
+    }
+    else
+    {
+        time_last_print += 1;
+    }
     return 0;
 }
 #endif
