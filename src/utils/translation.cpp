@@ -64,41 +64,6 @@ Translations::Translations()
     setlocale(LC_MESSAGES, "");
 #endif
     
-    // FIXME: I couldn't find a way to ask gettext what language it currently uses xD that's the closest I found
-    const char* language = getenv("LANGUAGE");
-    const char* lc_all = getenv("LC_ALL");
-    const char* lc_type = getenv("LC_CTYPE");
-    const char* lc_msg = getenv("LC_MESSAGES");
-    const char* lang = getenv("LANG");
-
-    const char* firstNonNull = NULL;
-    if (language != NULL)      firstNonNull = language;
-    else if (lc_all != NULL)   firstNonNull = lc_all;
-    else if (lc_type != NULL)  firstNonNull = lc_type;
-    else if (lc_msg != NULL)   firstNonNull = lc_msg;
-    else if (lang != NULL)     firstNonNull = lang;
-
-    if (firstNonNull != NULL)
-    {
-        if (strcmp(firstNonNull, "he") == 0 || strcmp(firstNonNull, "yi") == 0)
-        {
-            // Hebrew
-            m_rtl = true;
-        }
-        else if (strcmp(firstNonNull, "ar") == 0 || strcmp(firstNonNull, "az") == 0)
-        {
-            // Arabic
-            m_rtl = true;
-        }
-        else
-        {
-            m_rtl = false;
-        }
-    }
-    else
-    {
-        m_rtl = false;
-    }
     
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
     
@@ -119,6 +84,19 @@ Translations::Translations()
     }
     
     textdomain (PACKAGE);
+    
+    // This is a silly but working hack I added to determine whether the current language is RTL or
+    // not, since gettext doesn't seem to provide this information
+    
+    // This one is just for the xgettext parser to pick up
+#define ignore(X)
+    
+    ignore(_("   Is this a RTL language?"));
+    
+    //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+    const char* isRtl = gettext("   Is this a RTL language?");
+    m_rtl = (isRtl[0] == 'Y');
+    
 #endif
         
 }   // Translations
