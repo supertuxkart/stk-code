@@ -92,10 +92,11 @@ void IconButtonWidget::add()
                                       y_from,
                                       x_from + suggested_w,
                                       y_from + suggested_h);
-    //std::cout << "Creating a IGUIButton " << widget_size.UpperLeftCorner.X << ", " << widget_size.UpperLeftCorner.Y <<
-    //" : " << widget_size.getWidth() << "x" << widget_size.getHeight() << std::endl;
     
-    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, (m_tab_stop ? getNewID() : getNewNoFocusID()), L"");
+    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size,
+                                                        m_parent,
+                                                        (m_tab_stop ? getNewID() : getNewNoFocusID()),
+                                                        L"");
 
     btn->setTabStop(m_tab_stop);
     m_element = btn;
@@ -105,15 +106,19 @@ void IconButtonWidget::add()
     const stringw& message = getText();
     if (message.size() > 0)
     {
-        //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = " << m_properties[PROP_EXTEND_LABEL] << std::endl;
+        //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = "
+        //          << m_properties[PROP_EXTEND_LABEL] << std::endl;
         const int label_extra_size = ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
                                        0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
+        
+        // leave enough room for two lines of text
         widget_size = rect<s32>(m_x - label_extra_size/2,
                                 m_y + m_h,
                                 m_x + m_w + label_extra_size/2,
-                                m_y + m_h*2);
+                                m_y + m_h + GUIEngine::getFontHeight()*2);
 
-        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, true /* word wrap */, m_parent);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
+                                                        false, true /* word wrap */, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
     }

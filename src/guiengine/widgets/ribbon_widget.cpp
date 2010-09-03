@@ -100,15 +100,15 @@ void RibbonWidget::add()
         total_needed_space += m_children[i].m_w;
     }
     
-    int free_h_space = m_w - total_needed_space;
+    int free_w_space = m_w - total_needed_space;
     
     //int biggest_y = 0;
     const int button_y = 10;
     float global_zoom = 1;
     
     const int min_free_space = 50;
-    global_zoom = (float)m_w / (float)( m_w - free_h_space + min_free_space );
-    free_h_space = (int)(m_w - total_needed_space*global_zoom);
+    global_zoom = (float)m_w / (float)( m_w - free_w_space + min_free_space );
+    //free_w_space = (int)(m_w - total_needed_space*global_zoom);
     
     const int one_button_space = (int)round((float)m_w / (float)subbuttons_amount);
     
