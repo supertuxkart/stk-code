@@ -165,12 +165,13 @@
  
  \n
  \subsection widget6 WTYPE_LABEL
- <em> Names in XML files: </em> \c "label", \c "header" 
+ <em> Names in XML files: </em> \c "label", \c "header" , \c "bright"
  
  A plain label.
  
  Supports properties PROP_WORD_WRAP and PROP_TEXT_ALIGN.
- \note The "Header" variant uses a bigger and more colourful font.
+ \note The "header" variant uses a bigger and more colourful font.
+ \note The "bright" variant uses a more colourful font but is not bigger.
  
  \n
  \subsection widget7 WTYPE_SPACER

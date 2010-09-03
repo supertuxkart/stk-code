@@ -19,6 +19,7 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/skin.hpp"
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -28,10 +29,17 @@ using namespace irr::gui;
 /** Constructs the label widget. Parameter:
  *  \param title True if the special title font should be used.
  */
-LabelWidget::LabelWidget(bool title) : Widget(WTYPE_LABEL)
+LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
 {
     m_title_font = title;
     m_has_color  = false;
+    
+    if (bright)
+    {
+        m_has_color = true;
+        m_color = Skin::getColor("brighttext::neutral");
+    }
+    
 }   // LabelWidget
 
 // ----------------------------------------------------------------------------

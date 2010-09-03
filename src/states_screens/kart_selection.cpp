@@ -239,7 +239,7 @@ public:
             deviceName += "gamepad";
         }
         
-        m_player_ID_label = new LabelWidget();
+        m_player_ID_label = new LabelWidget(false, true);
         
         m_player_ID_label->setText(
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')

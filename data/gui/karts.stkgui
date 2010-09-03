@@ -7,10 +7,10 @@
            text="Choose a Kart"
            align="center" text_align="center" />
     
-    <label width="100%" height="25"
-           I18N="In the kart selection (player setup) screen"
-           text="(more players can join by pressing 'fire' now)"
-           align="center" text_align="center" />
+    <bright width="100%" height="25"
+            I18N="In the kart selection (player setup) screen"
+            text="(more players can join by pressing 'fire' now)"
+            align="center" text_align="center" />
            
     <placeholder id="playerskarts" width="100%" proportion="4">
         <!-- Contents is added programatically -->

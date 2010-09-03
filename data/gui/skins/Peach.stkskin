@@ -175,6 +175,7 @@ when the border that intersect at this corner are enabled.
           
 <!--                   Colors                  -->
 <color type="text" state="neutral" r="0" g="0" b="0" />
+<color type="brighttext" state="neutral" r="243" g="173" b="6" />
 
 <!-- For highlighted items, e.g. in list -->
 <color type="text" state="focused" r="255" g="255" b="255" />

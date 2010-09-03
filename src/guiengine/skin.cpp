@@ -49,7 +49,6 @@ namespace SkinConfig
     static std::map<std::string, BoxRenderParams> m_render_params;
     static std::map<std::string, SColor> m_colors;
     
-    
     static void parseElement(const XMLNode* node)
     {
         std::string type;
@@ -685,6 +684,12 @@ void Skin::drawProgress(Widget* w, const core::rect< s32 > &rect, const bool pre
 
     }
 }
+
+SColor Skin::getColor(const std::string name)
+{
+    return SkinConfig::m_colors[name];
+}
+
 void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
 }

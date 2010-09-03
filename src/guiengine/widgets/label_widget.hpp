@@ -36,7 +36,7 @@ namespace GUIEngine
         irr::video::SColor m_color;
 
     public:
-                 LabelWidget(bool title=false);
+                 LabelWidget(bool title=false, bool bright=false);
         virtual ~LabelWidget() {}
         
         void     add();

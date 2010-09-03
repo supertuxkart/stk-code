@@ -315,6 +315,8 @@ namespace GUIEngine
         virtual void    setSize (irr::gui::EGUI_DEFAULT_SIZE which, irr::s32 size);
         virtual void    setSpriteBank (irr::gui::IGUISpriteBank *bank);
         
+        static irr::video::SColor getColor(const std::string name);
+
     };
 }
 #endif
