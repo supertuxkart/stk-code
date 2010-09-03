@@ -185,14 +185,7 @@ void RibbonWidget::add()
             // consider font size, whether the label is multiline, etc...
             const bool has_label = m_children[i].m_text.size() > 0;
             
-            int line_count = 1;
-            core::dimension2d< u32 > dim = GUIEngine::getFont()->getDimension( m_children[i].m_text.c_str() );
-            if ((int)dim.Width > one_button_space)
-            {
-                line_count = (int)(std::ceil((float)dim.Width/(float)one_button_space));
-            }
-            
-            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_count : 10;
+            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight() : 10;
             
             float imageRatio = (float)m_children[i].m_w / (float)m_children[i].m_h;
             

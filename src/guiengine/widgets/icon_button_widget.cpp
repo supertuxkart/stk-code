@@ -121,6 +121,7 @@ void IconButtonWidget::add()
                                                         false, true /* word wrap */, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
+        m_label->setNotClipped(true);
     }
     
     // ---- IDs

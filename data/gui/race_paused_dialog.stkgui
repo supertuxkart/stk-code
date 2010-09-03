@@ -30,7 +30,7 @@
         
         </buttonbar>
         
-        <spacer width="20" height="20" />
+        <spacer width="20" height="35" />
     </div>
 
 </stkgui>

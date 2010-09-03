@@ -115,6 +115,11 @@
  \note Ribbons (e.g. tabs) can have their elements dynamically added at 
        runtime, too. Just add no children to the ribbon in the XML file, and 
        add them at runtime through the method for this.
+ \note The layout algorithm will reserve space for at most one line of text
+       (if needed) for ribbon elements. If you have ribbon elements will
+       long texts that spawn many lines, expect that the extra lines will
+       not be accounted for in the sizing algorithms (i.e. extra lines will
+       just expand over whatever is located under the ribbon)
  
  \n
  \subsection widget2 WTYPE_SPINNER
