@@ -233,6 +233,7 @@
 		9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
 		9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */; };
+		9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9552C1F91231249000347B6C /* world_with_rank.cpp */; };
 		9553823A10FD4FEC00737979 /* constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9553823910FD4FEC00737979 /* constants.cpp */; };
 		9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9554C4A411F1188000906416 /* race_result_gui.cpp */; };
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
@@ -438,6 +439,8 @@
 		9551CBD90FC1BB9200DB481B /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_over_dialog.hpp; path = ../../states_screens/dialogs/race_over_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_over_dialog.cpp; path = ../../states_screens/dialogs/race_over_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		9552C1F91231249000347B6C /* world_with_rank.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_with_rank.cpp; path = ../../modes/world_with_rank.cpp; sourceTree = SOURCE_ROOT; };
+		9552C1FA1231249000347B6C /* world_with_rank.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_with_rank.hpp; path = ../../modes/world_with_rank.hpp; sourceTree = SOURCE_ROOT; };
 		9553823910FD4FEC00737979 /* constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = constants.cpp; path = ../../utils/constants.cpp; sourceTree = SOURCE_ROOT; };
 		9554C4A411F1188000906416 /* race_result_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_result_gui.cpp; path = ../../states_screens/race_result_gui.cpp; sourceTree = SOURCE_ROOT; };
 		9554C4A511F1188000906416 /* race_result_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_result_gui.hpp; path = ../../states_screens/race_result_gui.hpp; sourceTree = SOURCE_ROOT; };
@@ -1922,6 +1925,8 @@
 				95C2B1510F296545000D3E5D /* three_strikes_battle.hpp */,
 				9574F17A11206881008D202E /* world_status.cpp */,
 				9574F17B11206881008D202E /* world_status.hpp */,
+				9552C1F91231249000347B6C /* world_with_rank.cpp */,
+				9552C1FA1231249000347B6C /* world_with_rank.hpp */,
 				95C2B1520F296545000D3E5D /* world.cpp */,
 				95C2B1530F296545000D3E5D /* world.hpp */,
 			);
@@ -2636,6 +2641,7 @@
 				953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */,
 				9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */,
 				956039BA1218C09E00EB96C4 /* abstract_top_level_container.cpp in Sources */,
+				9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
