@@ -78,6 +78,7 @@ Kart::Kart (const std::string& ident, int position,
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_slipstream_time      = 0.0f;
+    m_eliminated           = false;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
@@ -376,7 +377,14 @@ void Kart::updatedWeight()
  */
 void Kart::reset()
 {
+    // Only add the physics body back if the kart is eliminated
+    // and no emergency animations is being played. Since if
+    // an emergency animation is being played, the physics body
+    // will be added back in EMergencyAnimation::reset
+    if(m_eliminated && !playingEmergencyAnimation())
+        World::getWorld()->getPhysics()->addKart(this);
     EmergencyAnimation::reset();
+
     if (m_camera)
     {
         m_camera->reset();
