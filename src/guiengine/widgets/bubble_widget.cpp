@@ -52,8 +52,7 @@ void BubbleWidget::add()
     m_expanded_size = m_shrinked_size;
     const int additionalNeededSize = std::max(0, text_height - m_shrinked_size.getHeight());
 
-    // the '5' here is a bit arbitrary...
-    if (additionalNeededSize > 5)
+    if (additionalNeededSize > 0)
     {
         m_expanded_size.UpperLeftCorner.Y  -= additionalNeededSize/2 + 10;
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;

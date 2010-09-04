@@ -1638,7 +1638,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
         core::rect< s32 > rect2 = rect;
 
         // minor adjustments...
-        rect2.UpperLeftCorner.X -= 15;
+        rect2.UpperLeftCorner.X -= 7;
         //rect2.LowerRightCorner.X -= 15;
 
         if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
