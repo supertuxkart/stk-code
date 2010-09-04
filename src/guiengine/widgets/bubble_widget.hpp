@@ -50,6 +50,8 @@ namespace GUIEngine
         
         virtual void add();
         
+        virtual EventPropagation focused(const int playerID);
+        
         void updateSize();
     };
 

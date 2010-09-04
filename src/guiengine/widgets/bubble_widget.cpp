@@ -106,21 +106,26 @@ void BubbleWidget::updateSize()
 }
 
 // ----------------------------------------------------------------------------
-/*
+
 EventPropagation BubbleWidget::focused(const int playerID)
 {
     if (m_element != NULL)
     {
-        IGUIStaticText* widget = getIrrlichtElement<IGUIStaticText>();
-        //widget->setDrawBorder(true);
-        widget->setRelativePosition(m_expanded_size);
-        widget->setText(getText().c_str());
+        // bring element to top (with a hack because irrlicht does not appear to offer a built-in way to do this)
+        m_element->grab();
+        
+        IGUIElement* parent = m_parent;
+        if (parent == NULL) parent = GUIEngine::getGUIEnv()->getRootGUIElement();
+        
+        parent->removeChild(m_element);
+        parent->addChild(m_element);
+        m_element->drop();
     }
     return EVENT_LET;
 }
 
 // ----------------------------------------------------------------------------
-
+/*
 void BubbleWidget::unfocused(const int playerID)
 {
     if (m_element != NULL)
