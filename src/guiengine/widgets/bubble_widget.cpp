@@ -36,7 +36,7 @@ void BubbleWidget::add()
 {
     m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     stringw message = getText();
-    
+        
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
@@ -51,15 +51,20 @@ void BubbleWidget::add()
 
     m_expanded_size = m_shrinked_size;
     const int additionalNeededSize = std::max(0, text_height - m_shrinked_size.getHeight());
-    m_expanded_size.UpperLeftCorner.Y  -= additionalNeededSize/2;
-    m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2;
 
-    // reduce text to fit in the available space if it's too long
-    while (text_height > m_shrinked_size.getHeight())
+    // the '5' here is a bit arbitrary...
+    if (additionalNeededSize > 5)
     {
-        message = message.subString(0, message.size() - 10) + "...";
-        irrwidget->setText(message.c_str());
-        text_height = irrwidget->getTextHeight();
+        m_expanded_size.UpperLeftCorner.Y  -= additionalNeededSize/2 + 10;
+        m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
+        
+        // reduce text to fit in the available space if it's too long
+        while (text_height > m_shrinked_size.getHeight())
+        {
+            message = message.subString(0, message.size() - 10) + "...";
+            irrwidget->setText(message.c_str());
+            text_height = irrwidget->getTextHeight();
+        }
     }
     m_shrinked_text = message;
     
@@ -75,8 +80,33 @@ void BubbleWidget::add()
     irrwidget->setDrawBorder(true);
 }
 
-// ----------------------------------------------------------------------------
+void BubbleWidget::updateSize()
+{
+    core::rect<s32> currsize = m_shrinked_size;
+    
+    const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;
+    const int y1_bottom = m_shrinked_size.LowerRightCorner.Y;
+    
+    const int y2_top    = m_expanded_size.UpperLeftCorner.Y;
+    const int y2_bottom = m_expanded_size.LowerRightCorner.Y;
+    
+    currsize.UpperLeftCorner.Y  = y1_top + (y2_top - y1_top)*m_zoom;
+    currsize.LowerRightCorner.Y = y1_bottom + (y2_bottom - y1_bottom)*m_zoom;
 
+    m_element->setRelativePosition(currsize);
+    
+    if (m_zoom > 0.5f)
+    {
+        getIrrlichtElement<IGUIStaticText>()->setText(getText().c_str());
+    }
+    else
+    {
+        getIrrlichtElement<IGUIStaticText>()->setText(m_shrinked_text.c_str());
+    }
+}
+
+// ----------------------------------------------------------------------------
+/*
 EventPropagation BubbleWidget::focused(const int playerID)
 {
     if (m_element != NULL)
@@ -101,5 +131,5 @@ void BubbleWidget::unfocused(const int playerID)
         widget->setText(m_shrinked_text.c_str());
     }
 }
-
+*/
 // ----------------------------------------------------------------------------

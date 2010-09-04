@@ -77,7 +77,11 @@ when the border that intersect at this corner are enabled.
 
 <element type="textbubble" state="neutral" image="ocean/textbubble.png"
       left_border="28" right_border="28" top_border="28" bottom_border="28"
-      preserve_h_aspect_ratios="false" hborder_out_portion="1.0" />
+      hborder_out_portion="0.1" vborder_out_portion="0.1" />
+
+<element type="textbubble" state="focused" image="ocean/textbubble2.png"
+      left_border="28" right_border="28" top_border="28" bottom_border="28"
+      hborder_out_portion="0.1" vborder_out_portion="0.1" />
       
 <element type="progress" state="fill" image="ocean/glasssgauge_fill.png"
       left_border="20" right_border="20" top_border="0" bottom_border="0"

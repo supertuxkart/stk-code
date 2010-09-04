@@ -26,6 +26,8 @@ namespace GUIEngine
     
     class BubbleWidget : public Widget
     {
+        friend class Skin;
+        
         /** shrinked size of this widget (size allowed in layout; internal text may be bigger than that).
           * If the text all fits in the allowed layout space, m_shrinked_size == m_expanded_size.
           */
@@ -38,20 +40,17 @@ namespace GUIEngine
         
         /** Text shrinked to fit into the allowed layout space (will be same as m_text if all text fits) */
         irr::core::stringw m_shrinked_text;
-    public:
         
-        // For the skin
+        /** For the skin to create the zooming effect */
         float m_zoom;
+        
+    public:
         
         BubbleWidget();
         
         virtual void add();
         
-        /** \brief overriding event form base class */
-        virtual EventPropagation focused(const int playerID);
-        
-        /** \brief overriding event form base class */
-        virtual void unfocused(const int playerID);
+        void updateSize();
     };
 
 }

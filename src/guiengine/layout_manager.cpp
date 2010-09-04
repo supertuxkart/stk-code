@@ -199,7 +199,12 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
         float ratio = (float)parent_w / self->m_w;
         
         self->m_w = (int)(self->m_w * ratio);
-        if (self->m_type != WTYPE_LABEL) self->m_h = (int)(self->m_h * ratio);
+        
+        // FIXME: ugly to hardcode widgets types here
+        if (self->m_type != WTYPE_LABEL && self->m_type != WTYPE_BUBBLE)
+        {
+            self->m_h = (int)(self->m_h * ratio);
+        }
     }
     
     // ------ check for given max size
@@ -213,7 +218,7 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
     {
         const int max_height = atoi( self->m_properties[PROP_MAX_HEIGHT].c_str() );
         if (self->m_h > max_height) self->m_h = max_height;
-    }    
+    }
 }
 
 // ----------------------------------------------------------------------------

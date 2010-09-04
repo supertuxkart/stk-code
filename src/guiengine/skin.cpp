@@ -1621,6 +1621,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             {
                 bubble->m_zoom += GUIEngine::getLatestDt()*10.0f;
                 if (bubble->m_zoom > 1.0f) bubble->m_zoom = 1.0f;
+                
+                bubble->updateSize();
             }
         }
         else
@@ -1628,38 +1630,22 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (bubble->m_zoom > 0.0f)
             {
                 bubble->m_zoom -= GUIEngine::getLatestDt()*10.0f;
+                
+                bubble->updateSize();
             }
         }
         
-        if (bubble->m_zoom > 0.0f)
-        {
-            core::rect< s32 > rect2 = rect;
+        core::rect< s32 > rect2 = rect;
 
-            // minor adjustments...
-            rect2.UpperLeftCorner.Y  += 13;
-            rect2.LowerRightCorner.X -= 15;
-            rect2.LowerRightCorner.Y -= 8;
-            
-            // apply zoom effect
-            const int centerX = (rect2.UpperLeftCorner.X + rect2.LowerRightCorner.X)/2;
-            const int centerY = (rect2.UpperLeftCorner.Y + rect2.LowerRightCorner.Y)/2;
-            const int width = rect2.getWidth();
-            const int height = rect2.getHeight();
-            rect2.UpperLeftCorner.X = (int)(centerX - width*bubble->m_zoom/2.0f);
-            rect2.UpperLeftCorner.Y = (int)(centerY - height*bubble->m_zoom/2.0f);
-            rect2.LowerRightCorner.X = (int)(centerX + width*bubble->m_zoom/2.0f);
-            rect2.LowerRightCorner.Y = (int)(centerY + height*bubble->m_zoom/2.0f);
+        // minor adjustments...
+        rect2.UpperLeftCorner.X -= 15;
+        //rect2.LowerRightCorner.X -= 15;
 
+        if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["textbubble::focused"]);
+        else
             drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["textbubble::neutral"]);
-        }
-        
-        //ITexture* texture;
-        //texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].getImage();
-        //const int texture_w = texture->getSize().Width;
-        //const int texture_h = texture->getSize().Height;
-        //const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
-        //GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
-        //                                    0 /* no clipping */, 0, true /* alpha */);
+    
         return;
     }
     
