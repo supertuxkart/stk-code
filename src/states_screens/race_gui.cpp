@@ -99,6 +99,10 @@ RaceGUI::RaceGUI()
     
     m_dist_show_overlap=2;
     m_icons_inertia=2;
+    
+    //read icon frame picture
+    m_icons_frame=material_manager->getMaterial("icons-frame.png");
+     
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -509,7 +513,23 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             kart->getController()->isPlayerController() ? ICON_PLAYER_WIDTH
             : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
-
+        
+        //to bring to light the player's icon: add a background
+        if (kart->getController()->isPlayerController())
+        {
+            video::SColor colors[4];
+            for (unsigned int i=0;i<4;i++)
+            {
+                colors[i]=kart->getKartProperties()->getColor();
+                colors[i].setAlpha(
+                    100+100*cos(M_PI/2*i+World::getWorld()->getTime()*2));
+            }
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                m_icons_frame->getTexture()->getOriginalSize());
+            irr_driver->getVideoDriver()->draw2DImage(
+                m_icons_frame->getTexture(), pos, rect,NULL, colors, true);
+        }
+        
         // Fixes crash bug, why are certain icons not showing up?
         if ((icon != NULL) && (!kart->playingEmergencyAnimation()))
         {

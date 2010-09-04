@@ -144,6 +144,7 @@ private:
     float            m_icons_inertia;///can be zero
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
+    Material         *m_icons_frame;
     
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
