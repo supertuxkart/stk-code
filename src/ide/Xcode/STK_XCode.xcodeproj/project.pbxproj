@@ -246,6 +246,7 @@
 		956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541B910DD5F0A00C83E99 /* arenas_screen.cpp */; };
 		956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541DF10DD628C00C83E99 /* add_device_dialog.cpp */; };
 		956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */; };
+		956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956B0A9E1232D2E900767CCD /* bubble_widget.cpp */; };
 		956C6ED31128D3FB004336C8 /* controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6EC81128D3FB004336C8 /* controller.cpp */; };
 		956C6ED41128D3FB004336C8 /* default_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */; };
 		956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECC1128D3FB004336C8 /* end_controller.cpp */; };
@@ -464,6 +465,8 @@
 		956541E010DD628C00C83E99 /* add_device_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = add_device_dialog.hpp; path = ../../states_screens/dialogs/add_device_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_debug_drawer.cpp; path = ../../physics/irr_debug_drawer.cpp; sourceTree = SOURCE_ROOT; };
 		956830DF1132EC9E00088D14 /* irr_debug_drawer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_debug_drawer.hpp; path = ../../physics/irr_debug_drawer.hpp; sourceTree = SOURCE_ROOT; };
+		956B0A9E1232D2E900767CCD /* bubble_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bubble_widget.cpp; path = ../../guiengine/widgets/bubble_widget.cpp; sourceTree = SOURCE_ROOT; };
+		956B0AA21232D45D00767CCD /* bubble_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bubble_widget.hpp; path = ../../guiengine/widgets/bubble_widget.hpp; sourceTree = SOURCE_ROOT; };
 		956C6EC81128D3FB004336C8 /* controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controller.cpp; path = ../../karts/controller/controller.cpp; sourceTree = SOURCE_ROOT; };
 		956C6EC91128D3FB004336C8 /* controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = controller.hpp; path = ../../karts/controller/controller.hpp; sourceTree = SOURCE_ROOT; };
 		956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = default_ai_controller.cpp; path = ../../karts/controller/default_ai_controller.cpp; sourceTree = SOURCE_ROOT; };
@@ -2269,6 +2272,8 @@
 		95ECA0EB10124C5000D47C5F /* widgets */ = {
 			isa = PBXGroup;
 			children = (
+				956B0A9E1232D2E900767CCD /* bubble_widget.cpp */,
+				956B0AA21232D45D00767CCD /* bubble_widget.hpp */,
 				95ECA0EC10124C5000D47C5F /* button_widget.cpp */,
 				95ECA0ED10124C5000D47C5F /* button_widget.hpp */,
 				95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */,
@@ -2642,6 +2647,7 @@
 				9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */,
 				956039BA1218C09E00EB96C4 /* abstract_top_level_container.cpp in Sources */,
 				9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */,
+				956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,8 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
 
+#include <assert.h>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -39,7 +41,6 @@ LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
         m_has_color = true;
         m_color = Skin::getColor("brighttext::neutral");
     }
-    
 }   // LabelWidget
 
 // ----------------------------------------------------------------------------
@@ -49,14 +50,17 @@ void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
-    const stringw& message = getText();
+    stringw message = getText();
     
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
     
-    IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, m_parent, -1);
+    IGUIStaticText* irrwidget;    
+    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
+                                                      false, word_wrap, m_parent, -1);
+    
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
     
@@ -74,9 +78,11 @@ void LabelWidget::add()
     //irrwidget->setDrawBackground(true);
     
     m_id = m_element->getID();
-    //m_element->setTabOrder(id);
+    
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
+    
+    m_element->setNotClipped(true);
 }   // add
 
 // ----------------------------------------------------------------------------

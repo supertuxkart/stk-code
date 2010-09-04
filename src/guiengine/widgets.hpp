@@ -1,6 +1,7 @@
 
 // A shortcut header to get all widgets
 
+#include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"

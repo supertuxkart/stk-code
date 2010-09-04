@@ -20,36 +20,36 @@
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/mode_normal.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   I18N="In the help menu" 
-                   text="Regular Race - all blows allowed, so catch weapons and make clever use of them!"/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu" 
+                    text="Regular Race - all blows allowed, so catch weapons and make clever use of them!"/>
         </div>
         
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/mode_tt.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Time Trial: Contains no powerups, so only your driving skills matter!"/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu"
+                    text="Time Trial: Contains no powerups, so only your driving skills matter!"/>
         </div>
         
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/mode_ftl.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Follow the leader: run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu"
+                    text="Follow the leader: run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"/>
         </div>
         
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/mode_3strikes.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu"
+                    text="3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."/>
         </div>
     
-       <label proportion="3" width="100%" word_wrap="true" I18N="In the help menu"
+       <bubble proportion="3" width="100%" I18N="In the help menu"
             text="* Most of these game modes can also be played in a Grand Prix fashion : instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
 
     </box>

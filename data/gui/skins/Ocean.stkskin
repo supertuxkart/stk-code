@@ -75,6 +75,10 @@ when the border that intersect at this corner are enabled.
 
 <!-- TODO : buttons could support 'pressed' state -->
 
+<element type="textbubble" state="neutral" image="ocean/textbubble.png"
+      left_border="28" right_border="28" top_border="28" bottom_border="28"
+      preserve_h_aspect_ratios="false" hborder_out_portion="1.0" />
+      
 <element type="progress" state="fill" image="ocean/glasssgauge_fill.png"
       left_border="20" right_border="20" top_border="0" bottom_border="0"
       preserve_h_aspect_ratios="true" />

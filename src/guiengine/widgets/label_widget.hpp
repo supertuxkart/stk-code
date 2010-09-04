@@ -39,7 +39,7 @@ namespace GUIEngine
                  LabelWidget(bool title=false, bool bright=false);
         virtual ~LabelWidget() {}
         
-        void     add();
+        virtual void add();
                 
         /** Sets the color of the widget. 
          *  \param color The color to use for this widget. */
@@ -48,7 +48,7 @@ namespace GUIEngine
             m_color     = color;
             m_has_color = true;
         }   // setColor
-
+        
     };
 }
 

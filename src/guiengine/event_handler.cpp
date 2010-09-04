@@ -564,10 +564,12 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                         }
                     }
                 }
-                                
+                
                 // select ribbons on hover
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
-                {                    
+                {
+                    // FIXME: don't make a special case for ribbon here, there should be a generic callback
+                    //        that all widgets may hook onto
                     RibbonWidget* ribbon = (RibbonWidget*)(w->m_event_handler);
                     if (ribbon == NULL) break;
                     

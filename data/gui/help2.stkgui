@@ -20,45 +20,45 @@
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/bubblegum-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true" text="BubbleGum - leave a sticky pink puddle behind you"/>
+            <bubble proportion="1" height="100%" text="BubbleGum - leave a sticky pink puddle behind you"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/cake-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   text="Cake - thrown at the closest rival, best on short ranges and long straights"/>
+            <bubble proportion="1" height="100%"
+                    text="Cake - thrown at the closest rival, best on short ranges and long straights"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/plunger-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true" text="Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight!"/>
+            <bubble proportion="1" height="100%" text="Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight!"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/bowling-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true"
-                   text="Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."/>
+            <bubble proportion="1" height="100%"
+                    text="Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true" text="Parachute - slows down all karts in a better position!"/>
+            <bubble proportion="1" height="100%" text="Parachute - slows down all karts in a better position!"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/anchor-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true" text="Anchor - slows down greatly the kart in the first position"/>
+            <bubble proportion="1" height="100%" text="Anchor - slows down greatly the kart in the first position"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="models/swap-icon.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="1" height="100%" word_wrap="true" text="Swapper - gift boxes are transformed into bananas and vice versa for a short time"/>
+            <bubble proportion="1" height="100%" text="Swapper - gift boxes are transformed into bananas and vice versa for a short time"/>
         </div>
         
     </box>

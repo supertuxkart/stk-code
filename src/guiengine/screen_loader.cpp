@@ -121,6 +121,10 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& 
                 {
                     append_to.push_back(new LabelWidget(false, true));
                 }
+                else if (!strcmp("bubble", xml->getNodeName()))
+                {
+                    append_to.push_back(new BubbleWidget());
+                }
                 else if (!strcmp("header", xml->getNodeName()))
                 {
                     append_to.push_back(new LabelWidget(true));

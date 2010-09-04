@@ -178,6 +178,12 @@
  \note The "header" variant uses a bigger and more colourful font.
  \note The "bright" variant uses a more colourful font but is not bigger.
  
+ 
+ \c WTYPE_BUBBLE is a variation of the plain label; the difference with a
+ bubble widget is that it can be focused, and when focused it will expand
+ to show more text, if the label is too long to be displayed in the allocated
+ space.
+ 
  \n
  \subsection widget7 WTYPE_SPACER
  <em> Name in XML files: </em> \c "spacer" 

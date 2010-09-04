@@ -42,6 +42,7 @@ namespace GUIEngine
         WTYPE_ICON_BUTTON,
         WTYPE_CHECKBOX,
         WTYPE_LABEL,
+        WTYPE_BUBBLE,
         WTYPE_SPACER,
         WTYPE_DIV,
         WTYPE_DYNAMIC_RIBBON,
@@ -289,7 +290,7 @@ namespace GUIEngine
             return m_badges;
         }
         
-        /** Set to false if widget is something that should not receieve focus */
+        /** Set to false if widget is something that should not receive focus */
         bool m_focusable;
         
         /** \brief undos setDeactivated() */
