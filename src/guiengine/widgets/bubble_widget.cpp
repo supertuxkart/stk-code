@@ -89,8 +89,9 @@ void BubbleWidget::updateSize()
     const int y2_top    = m_expanded_size.UpperLeftCorner.Y;
     const int y2_bottom = m_expanded_size.LowerRightCorner.Y;
     
-    currsize.UpperLeftCorner.Y  = y1_top + (y2_top - y1_top)*m_zoom;
-    currsize.LowerRightCorner.Y = y1_bottom + (y2_bottom - y1_bottom)*m_zoom;
+    currsize.UpperLeftCorner.Y  = (int)(y1_top + (y2_top - y1_top)*m_zoom);
+    currsize.LowerRightCorner.Y = (int)(y1_bottom 
+                                        +(y2_bottom - y1_bottom)*m_zoom);
 
     m_element->setRelativePosition(currsize);
     

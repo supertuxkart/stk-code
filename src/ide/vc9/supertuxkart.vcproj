@@ -362,6 +362,10 @@
 					Name="widgets"
 					>
 					<File
+						RelativePath="..\..\guiengine\widgets\bubble_widget.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\button_widget.cpp"
 						>
 					</File>
@@ -1147,6 +1151,10 @@
 				<Filter
 					Name="widgets"
 					>
+					<File
+						RelativePath="..\..\guiengine\widgets\bubble_widget.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\guiengine\widgets\button_widget.hpp"
 						>

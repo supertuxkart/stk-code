@@ -43,7 +43,7 @@
 
 #ifdef WIN32
 /* FIXME : for the remove directory function*/
-#  include <shellapi.h>
+// FIXME: doesn't work, many errors  #  include <shellapi.h>
 #  include <io.h>
 #  include <stdio.h>
 #  ifndef __CYGWIN__
