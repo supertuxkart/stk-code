@@ -522,7 +522,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             {
                 colors[i]=kart->getKartProperties()->getColor();
                 colors[i].setAlpha(
-                    100+100*cos(M_PI/2*i+World::getWorld()->getTime()*2));
+                    100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
             }
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                 m_icons_frame->getTexture()->getOriginalSize());
