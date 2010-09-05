@@ -21,7 +21,8 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"

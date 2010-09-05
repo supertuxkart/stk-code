@@ -19,8 +19,9 @@
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"

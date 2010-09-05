@@ -23,11 +23,11 @@
 //#  include <pthread.h>
 //#endif
 
-#include "guiengine/widgets.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "main_loop.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "main_loop.hpp"
 #include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/kart_selection.hpp"
