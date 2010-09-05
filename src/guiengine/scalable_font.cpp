@@ -411,7 +411,11 @@ void ScalableFont::draw(const core::stringw& text,
                         const core::rect<s32>* clip)
 {
     if (!Driver) return;
-        
+    
+    // FIXME? simple hack to never clip the text. I don't think we use that anywhere, but we DO have
+    //        bits of letters getting clipped (e.g. the bottom of a "g")
+    clip = NULL;
+    
     if (m_shadow)
     {
         m_shadow = false; // avoid infinite recursion
