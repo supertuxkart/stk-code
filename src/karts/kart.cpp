@@ -74,6 +74,7 @@ Kart::Kart (const std::string& ident, int position,
     m_kart_properties      = kart_properties_manager->getKart(ident);
     assert(m_kart_properties != NULL);
     m_initial_position     = position;
+    m_race_position        = position;
     m_collected_energy     = 0;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -92,7 +93,6 @@ Kart::Kart (const std::string& ident, int position,
     m_saved_controller     = NULL;
 
     m_view_blocked_by_plunger = 0;
-    m_race_position           = -1;
 
     // Initialize custom sound vector (TODO: add back when properly done)
     // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
@@ -405,7 +405,7 @@ void Kart::reset()
     m_attachment->clear();
     m_powerup.reset();
 
-    m_race_position        = 9;
+    m_race_position        = m_initial_position;
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;

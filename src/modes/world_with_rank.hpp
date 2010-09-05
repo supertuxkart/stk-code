@@ -43,10 +43,7 @@ public:
 
     void          setKartPosition(unsigned int kart_id,
                                  unsigned int position);
-
-    /** Returns the kart with position p, 1<=p<=num_karts). */
-    const Kart*   getKartAtPosition(unsigned int p) const 
-                  { return m_karts[m_position_index[p-1]]; }
+    const Kart*   getKartAtPosition(unsigned int p) const;
     
     /** Called by the race result GUI at the end of the race to know the 
      *  final order (fill in the 'order' array) */

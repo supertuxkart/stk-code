@@ -217,10 +217,16 @@ void RaceResultGUI::determineTableLayout()
     m_font->setMonospaceDigits(true);
     WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
-    std::vector<int> order;
-    rank_world->getRaceResultOrder(&order);
+    unsigned int first_position = 1;
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        first_position = 2;
 
-    m_all_row_infos.resize(order.size());
+    // Use only the karts that are supposed to be displayed (and
+    // ignore e.g. the leader in a FTL race).
+    unsigned int num_karts =race_manager->getNumberOfKarts()-first_position+1;
+
+    // In FTL races the leader kart is not displayed
+    m_all_row_infos.resize(num_karts);
 
 
     // Determine the kart to display in the right order, 
@@ -229,17 +235,14 @@ void RaceResultGUI::determineTableLayout()
     m_width_kart_name     = 0;
     float max_finish_time = 0;
 
-    // Use only the karts that are supposed to be displayed (and
-    // ignore e.g. the leader in a FTL race).
-    unsigned int num_karts  = 0;
 
-    for(unsigned int i=0; i<order.size(); i++)
+    for(unsigned int position=first_position; 
+        position<=race_manager->getNumberOfKarts(); position++)
     {
-        if(order[i]==-1) continue;
+        const Kart *kart = rank_world->getKartAtPosition(position);
+
         // Save a pointer to the current row_info entry
-        RowInfo *ri              = &(m_all_row_infos[num_karts]);
-        num_karts++;
-        Kart *kart               = rank_world->getKart(order[i]);
+        RowInfo *ri              = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
         ri->m_kart_name          = kart->getName();
 
@@ -255,10 +258,8 @@ void RaceResultGUI::determineTableLayout()
         core::dimension2d<u32> rect = m_font->getDimension(kart->getName().c_str());
         if(rect.Width > m_width_kart_name)
             m_width_kart_name = rect.Width;
-    }   // for i < order.size()
+    }   // for position
 
-    // Make sure the empty rows (due to deleted karts) are not used anymore
-    m_all_row_infos.resize(num_karts);
 
     std::string max_time    = StringUtils::timeToString(max_finish_time);
     core::stringw string_max_time(max_time.c_str());

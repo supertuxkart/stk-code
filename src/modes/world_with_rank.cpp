@@ -27,6 +27,18 @@ void WorldWithRank::init()
 }   // init
 
 //-----------------------------------------------------------------------------
+/** Returns the kart with a given position.
+ *  \param p The position of the kart, 1<=p<=num_karts).
+ */
+const Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
+{
+    if(p<1 || p>m_position_index.size())
+        return NULL;
+
+    return m_karts[m_position_index[p-1]];
+}   // getKartAtPosition
+
+//-----------------------------------------------------------------------------
 void WorldWithRank::setKartPosition(unsigned int kart_id,
                                     unsigned int position)
 {
@@ -64,7 +76,7 @@ void WorldWithRank::getRaceResultOrder(std::vector<int> *order)
             std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
             for (unsigned int j=0; j < num_karts; j++)
             {
-                if ((*order)[j] == -1)
+                if ((*order)[j] == -1)      
                 {
                     std::cout << "    No kart is yet set at position " << j << std::endl;
                 }

@@ -50,34 +50,40 @@ void FollowTheLeaderRace::countdownReachedZero()
     if(m_leader_intervals.size()>1)
         m_leader_intervals.erase(m_leader_intervals.begin());
     WorldStatus::setTime(m_leader_intervals[0]);
-    int kart_number;
+
     // If the leader kart is not the first kart, remove the first
     // kart, otherwise remove the last kart.
     int position_to_remove = m_karts[0]->getPosition()==1 
                            ? getCurrentNumKarts() : 1;
-    const int kart_amount = m_karts.size();
-    for (kart_number=0; kart_number<kart_amount; kart_number++)
-    {
-        if(m_karts[kart_number]->isEliminated()) continue;
-        if(m_karts[kart_number]->getPosition()==position_to_remove)
-            break;
-    }
-    if(kart_number==kart_amount)
+    const Kart *kart = getKartAtPosition(position_to_remove);
+    if(!kart || kart->isEliminated())
     {
         fprintf(stderr,"Problem with removing leader: position %d not found\n",
                 position_to_remove);
-        for(int i=0; i<kart_amount; i++)
+        for(unsigned int i=0; i<m_karts.size(); i++)
         {
             fprintf(stderr,"kart %d: eliminated %d position %d\n",
                     i,m_karts[i]->isEliminated(), m_karts[i]->getPosition());
         }   // for i
-    }  // kart_number==m_kart.size()
+    }  // 
     else
     {
-        // In case that the kart on position 1 was removed, we have to set
-        // the correct position (which equals the remaining number of karts).
-        setKartPosition(kart_number, getCurrentNumKarts());
-        removeKart(kart_number);
+        removeKart(kart->getWorldKartId());
+
+        // In case that the kart on position 1 was removed, we have 
+        // to set the correct position (which equals the remaining 
+        // number of karts) for the removed kart, as well as recompute
+        // the position for all other karts
+        if(position_to_remove==1)
+        {
+            // We have to add 1 to the number of karts to get the correct
+            // position, since the eliminated kart was already removed
+            // from the value returned by getCurrentNumKarts (and we have
+            // to remove the kart before we can call updateRacePosition).
+            setKartPosition(kart->getWorldKartId(),
+                            getCurrentNumKarts()+1);
+            updateRacePosition();
+        }
     }
     
     // almost over, use fast music
@@ -98,8 +104,6 @@ void FollowTheLeaderRace::countdownReachedZero()
                  m_karts[n]->getController()->getPlayer() != NULL) // if player kart
             {
                 m_karts[n]->finishedRace(getTime());
-                //irr::core::stringw message(_("You won the race!"));
-                //getRaceGUI()->addMessage( message, m_karts[n], 2.0f, 60 );
             }
         }
     }
@@ -188,7 +192,7 @@ void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
     
     for(unsigned int i=1; i<num_karts; i++)
     {
-        setKartPosition((*order)[i], i);
+  //FIXME JOERGH      setKartPosition((*order)[i], i);
     }
     
     delete []scores;

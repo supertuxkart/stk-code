@@ -620,7 +620,7 @@ void LinearWorld::updateRacePosition()
         {
             if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
             
-            //if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
+            if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
 
             if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
             {
