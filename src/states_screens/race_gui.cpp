@@ -400,6 +400,23 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 {
     int x_base = 15;
     int y_base = 20;
+    int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
+    int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
+    if(UserConfigParams::m_height<600)
+    {
+        ICON_WIDTH        = 27;
+        ICON_PLAYER_WIDTH = 35;
+    }
+
+    //initialize m_previous_icons_position
+    if(m_previous_icons_position.size()==0)
+    {
+        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        {
+            core::vector2d<s32> pos(x_base,y_base+i*(ICON_PLAYER_WIDTH+2));
+            m_previous_icons_position.push_back(pos);
+        }
+    }
     
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
@@ -413,13 +430,6 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     float previous_distance=10000.0;//far ahead
     
     
-    int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
-    int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
-    if(UserConfigParams::m_height<600)
-    {
-        ICON_WIDTH        = 27;
-        ICON_PLAYER_WIDTH = 35;
-    }
     
     int previous_x=x_base;
     int previous_y=y_base-ICON_PLAYER_WIDTH-2;
@@ -466,14 +476,6 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         }   // not three-strike-battle
         previous_x=x;//save coord of the previous kart in list
         previous_y=y;
-
-
-        //initialize m_previous_icons_position
-        if (m_previous_icons_position.size()<kart_amount)
-        {
-            core::vector2d<s32> pos(x,y);
-            m_previous_icons_position.push_back(pos);
-        }
 
         //soft movement using previous position:
         x=(int)((x+m_previous_icons_position[kart_id].X*m_icons_inertia)
