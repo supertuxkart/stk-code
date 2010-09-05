@@ -34,6 +34,18 @@ class WorldWithRank : public World
 private:
     /** This contains a mapping from race position to kart index. */
     std::vector<int> m_position_index;
+
+#ifdef DEBUG
+    /** Used for debugging to help detect if the same kart position
+     *  is used more than once. */
+    std::vector<bool> m_position_used;
+
+    /** True if beginSetKartPositions was called, false after 
+     *  endSetKartPositions. Used to make sure the sequence of calls
+     *  is correct. */
+    bool              m_position_setting_initialised;
+#endif
+
 public:
                   WorldWithRank() : World() {}
     /** call just after instanciating. can't be moved to the contructor as child
@@ -41,13 +53,12 @@ public:
         results will be incorrect */
     virtual void  init();
 
-    void          setKartPosition(unsigned int kart_id,
+    void          beginSetKartPositions();
+    bool          setKartPosition(unsigned int kart_id,
                                  unsigned int position);
-    const Kart*   getKartAtPosition(unsigned int p) const;
-    
-    /** Called by the race result GUI at the end of the race to know the 
-     *  final order (fill in the 'order' array) */
-    virtual void  getRaceResultOrder(std::vector<int> *order);
-};   // WorldWithRank
+    void          endSetKartPositions();
+
+    Kart*         getKartAtPosition(unsigned int p) const;
+    };   // WorldWithRank
 
 #endif

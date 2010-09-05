@@ -55,7 +55,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     // kart, otherwise remove the last kart.
     int position_to_remove = m_karts[0]->getPosition()==1 
                            ? getCurrentNumKarts() : 1;
-    const Kart *kart = getKartAtPosition(position_to_remove);
+    Kart *kart = getKartAtPosition(position_to_remove);
     if(!kart || kart->isEliminated())
     {
         fprintf(stderr,"Problem with removing leader: position %d not found\n",
@@ -80,8 +80,13 @@ void FollowTheLeaderRace::countdownReachedZero()
             // position, since the eliminated kart was already removed
             // from the value returned by getCurrentNumKarts (and we have
             // to remove the kart before we can call updateRacePosition).
-            setKartPosition(kart->getWorldKartId(),
-                            getCurrentNumKarts()+1);
+            // Note that we can not call WorldWithRank::setKartPosition
+            // here, since it would not properly support debugging kart
+            // ranks (since this kart would get its position set again
+            // in updateRacePosition). We only set the rank of the eliminated
+            // kart, and updateRacePosition will then call setKartPosition
+            // for the now eliminated kart.
+            kart->setPosition(getCurrentNumKarts()+1);
             updateRacePosition();
         }
     }
@@ -136,66 +141,15 @@ void FollowTheLeaderRace::restartRace()
 std::string FollowTheLeaderRace::getIdent() const
 {
     return FTL_IDENT;
-}
+}   // getIdent
+
 //-----------------------------------------------------------------------------
+/** Sets the title for all karts that is displayed in the icon list. In
+ *  this mode the title for the first kart is set to 'leader'.
+ */
 RaceGUIBase::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 {
     LinearWorld::getKartsDisplayInfo();
     m_kart_display_info[0].special_title = _("Leader");
     return m_kart_display_info;
-}
-//-----------------------------------------------------------------------------
-void FollowTheLeaderRace::getRaceResultOrder(std::vector<int> *order)
-{
-    const unsigned int num_karts = getNumKarts();
-    order->resize(num_karts);
-
-    int *scores       = new int[num_karts];
-    double *race_time = new double[num_karts];
-
-    // Ignore kart 0, since it was the leader
-    (*order)[0] = -1;
-    for( unsigned int kart_id = 1; kart_id < num_karts; ++kart_id )
-    {
-        (*order)[kart_id]  = kart_id;
-        scores[kart_id]    = race_manager->getKartScore(kart_id);
-        race_time[kart_id] = race_manager->getOverallTime(kart_id);
-        
-        // check this kart is not in front of leader. If it is, give a score of 0
-        if(   getLapForKart(kart_id) * getTrack()->getTrackLength() 
-              + getDistanceDownTrackForKart(kart_id)
-            > getLapForKart(0)       * getTrack()->getTrackLength() 
-              + getDistanceDownTrackForKart(0))
-        {
-            scores[kart_id] = 0;
-        }
-    }
-    
-    //Bubblesort
-    bool sorted;
-    do
-    {
-        sorted = true;
-        for( unsigned int i = 1; i < num_karts - 1; ++i )
-        {
-            if( scores[(*order)[i]] < scores[(*order)[i+1]] || 
-                (scores[(*order)[i]] == scores[(*order)[i+1]] 
-                 && race_time[(*order)[i]] > race_time[(*order)[i+1]]) )
-            {
-                int tmp       = (*order)[i];
-                (*order)[i]   = (*order)[i+1];
-                (*order)[i+1] = tmp;
-                sorted        = false;
-            }
-        }
-    } while(!sorted);
-    
-    for(unsigned int i=1; i<num_karts; i++)
-    {
-  //FIXME JOERGH      setKartPosition((*order)[i], i);
-    }
-    
-    delete []scores;
-    delete []race_time;
-}
-
+}   // getKartsDisplayInfo

@@ -123,6 +123,7 @@ std::string ThreeStrikesBattle::getIdent() const
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::updateKartRanks()
 {
+    beginSetKartPositions();
     // sort karts by their times then give each one its position.
     // in battle-mode, long time = good (meaning he survived longer)
     
@@ -165,6 +166,7 @@ void ThreeStrikesBattle::updateKartRanks()
         setKartPosition(karts_list[n], n+1);
     }
     delete [] karts_list;
+    endSetKartPositions();
 }   // updateKartRank
 
 //-----------------------------------------------------------------------------

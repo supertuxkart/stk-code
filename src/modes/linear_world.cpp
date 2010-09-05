@@ -580,12 +580,11 @@ void LinearWorld::moveKartAfterRescue(Kart* kart)
   */
 void LinearWorld::updateRacePosition()
 {
+    // Mostly for debugging:
+    beginSetKartPositions();
     const unsigned int kart_amount = m_karts.size();
 
 #ifdef DEBUG
-    std::vector<bool> rank_used;
-    for (unsigned int n=0; n<=kart_amount; n++) 
-        rank_used.push_back(false);
     bool rank_changed = false;
 #endif
     
@@ -602,9 +601,9 @@ void LinearWorld::updateRacePosition()
         // crossing the finishing line and become second!
         if(kart->isEliminated() || kart->hasFinishedRace())
         {
-#ifdef DEBUG
-            rank_used[kart->getPosition()] = true;
-#endif
+            // This is only necessary to support debugging inconsistencies
+            // in kart position parameters.
+            setKartPosition(i, kart->getPosition());
             continue;
         }
         KartInfo& kart_info = m_kart_info[i];
@@ -655,9 +654,11 @@ void LinearWorld::updateRacePosition()
 #endif
             }
         } //next kart
-        
-#ifdef DEBUG
-        if (rank_used[p])
+
+#ifndef DEBUG
+        setKartPosition(i, p);
+#else
+        if (!setKartPosition(i,p))
         {
             std::cerr << "ERROR, same rank used twice!!\n";
 
@@ -668,13 +669,7 @@ void LinearWorld::updateRacePosition()
                           << "), is at lap (" << getLapForKart(d) << "), is at distance("
                           << getDistanceDownTrackForKart(d) << "), is eliminated(" << m_karts[d]->isEliminated() << ")" << std::endl;
             }
-            
-            std::cerr <<  "Used ranks:\n";
-            for (unsigned int d=1; d<=kart_amount; d++)
-            {
-                std::cerr << "   rank " << d << " used : " << rank_used[d] << std::endl;
-            }
-            
+                        
             std::cerr <<  "Who has each ranking so far :\n";
             for (unsigned int d=0; d<i; d++)
             {
@@ -685,11 +680,9 @@ void LinearWorld::updateRacePosition()
             history->Save();
             assert(false);
         }
-        rank_used[p]  = true;
         rank_changed |= kart->getPosition()!=p;
 #endif
 
-        setKartPosition(i, p);
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated
         // remaining time is less than 30 seconds.
@@ -759,6 +752,7 @@ void LinearWorld::updateRacePosition()
     }   // if rank_changed
 #endif
 
+    endSetKartPositions();
 }   // updateRacePosition
 
 //-----------------------------------------------------------------------------

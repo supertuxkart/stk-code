@@ -109,8 +109,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     
     WorldWithRank *world = (WorldWithRank*)World::getWorld();
     const unsigned int num_karts = world->getNumKarts();
-    std::vector<int> order;
-    world->getRaceResultOrder(&order);
         
     const bool display_time = (world->getClockMode() == WorldStatus::CLOCK_CHRONO);
 
@@ -126,13 +124,11 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     m_rankings_y_bottom = -1;
     
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
-    for (unsigned int i = 0; i < num_karts; ++i)
+    for (unsigned int position = 1; position <= num_karts; position++)
     {
-        if (order[i] == -1) continue;
-        
+        const Kart* current_kart = world->getKartAtPosition(position);        
         stringw kart_results_line;
         
-        const Kart *current_kart = world->getKart(order[i]);
         const stringw& kart_name = current_kart->getName();
 
         std::string time_string;
@@ -147,8 +143,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         //This shows position + driver name + time + points earned + total points
         if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
-            const int prev_score = race_manager->getKartPrevScore(order[i]);
-            const int new_score = race_manager->getKartScore(order[i]);
+            const int prev_score = race_manager->getKartPrevScore(current_kart->getWorldKartId());
+            const int new_score = race_manager->getKartScore(current_kart->getWorldKartId());
             
             if (display_time)
             {
@@ -191,6 +187,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         const int entry_width = (show_highscores?  m_area.getWidth()*2/3 :  m_area.getWidth());
         
         const int icon_size = text_height;
+        unsigned int i = current_kart->getWorldKartId();
         core::rect< s32 > entry_area(10 + icon_size, lines_from_y + line_h*i,
                                      entry_width   , lines_from_y + line_h*(i+1));
         core::rect< s32 > icon_area (5             , lines_from_y + line_h*i,

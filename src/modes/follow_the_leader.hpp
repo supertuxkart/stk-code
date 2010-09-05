@@ -47,9 +47,6 @@ public:
     virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }
     
-    /** Called by the race result GUI at the end of the race to know the final order
-        (fill in the 'order' array) */
-    virtual void getRaceResultOrder(std::vector<int> *order);
 };
 
 

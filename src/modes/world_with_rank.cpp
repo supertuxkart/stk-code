@@ -24,13 +24,15 @@ void WorldWithRank::init()
 {
     World::init();
     m_position_index.resize(m_karts.size());
+    m_position_used.resize(m_karts.size());
+    m_position_setting_initialised = false;
 }   // init
 
 //-----------------------------------------------------------------------------
 /** Returns the kart with a given position.
  *  \param p The position of the kart, 1<=p<=num_karts).
  */
-const Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
+Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
 {
     if(p<1 || p>m_position_index.size())
         return NULL;
@@ -39,66 +41,71 @@ const Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
 }   // getKartAtPosition
 
 //-----------------------------------------------------------------------------
-void WorldWithRank::setKartPosition(unsigned int kart_id,
+/** This function must be called before starting to set all kart positions 
+ *  again. It's mainly used to add some debug support, i.e. detect if the
+ *  same position is set in different karts.
+ */
+void WorldWithRank::beginSetKartPositions()
+{
+#ifdef DEBUG
+    assert(!m_position_setting_initialised);
+    m_position_setting_initialised = true;
+
+    for(unsigned int i=0; i<m_position_used.size(); i++)
+        m_position_used[i] = false;
+#endif
+}   // beginSetKartPositions
+
+//-----------------------------------------------------------------------------
+/** Sets the position of a kart. This will be saved in this object to allow
+ *  quick lookup of which kart is on a given position, but also in the
+ *  kart objects.
+ *  \param kart_id The index of the kart to set the position for.
+ *  \param position The position of the kart (1<=position<=num karts).
+ *  \return false if this position was already set, i.e. an inconsistency in
+ *          kart positions has occurred. This is used in debug mode only to
+ *          allow the calling function to print debug information.
+ */
+bool WorldWithRank::setKartPosition(unsigned int kart_id,
                                     unsigned int position)
 {
     m_position_index[position-1] = kart_id;
     m_karts[kart_id]->setPosition(position);
+#ifdef DEBUG
+    assert(m_position_setting_initialised);
+    if(m_position_used[position-1])
+    {
+        std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
+        for (unsigned int j=0; j < m_position_index.size(); j++)
+        {
+            if (!m_position_used[j])
+            {
+                std::cout << "    No kart is yet set at position " << j << std::endl;
+            }
+            else
+            {
+                std::cout << "    Kart " << m_position_index[j] 
+                          << " is at position " << j << std::endl;
+            }
+        }
+        std::cout << "Kart " << kart_id << " is being given position " 
+                  << position << ", but this position is already taken\n";
+        return false;
+    }
+    m_position_used[position-1] = true;
+#endif
+    return true;
 }   // setKartPosition
 
-// ----------------------------------------------------------------------------
-/** Called by the race result GUI at the end of the race to know the final 
- *  order. 
- * \param[out] order returns the order of karts. order[0] will contain the ID 
- *                   of the first kart, order[1] the ID of the second kart, 
- *                   etc... Array dimension will be adjusted to the number of 
- *                   karts.
+//-----------------------------------------------------------------------------
+/** Called once the last position was set. Note that we should not test
+ *  if all positions were set, since e.g. for eliminated and finished karts
+ *  the position won't be set anymore.
  */
-void WorldWithRank::getRaceResultOrder(std::vector<int> *order)
+void WorldWithRank::endSetKartPositions()
 {
-    const unsigned int num_karts = getNumKarts();
-    order->resize(num_karts);
-    
-#ifndef NDEBUG
-    for (unsigned int i=0; i < num_karts; i++) (*order)[i] = -1;
-    
-    bool positions_ok = true;
-#endif
-    
-    for (unsigned int i=0; i < num_karts; i++)
-    {
-        const int position = getKart(i)->getPosition()-1;
-        
-#ifndef NDEBUG
-        // sanity checks
-        if ((*order)[position] != -1)
-        {
-            std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
-            for (unsigned int j=0; j < num_karts; j++)
-            {
-                if ((*order)[j] == -1)      
-                {
-                    std::cout << "    No kart is yet set at position " << j << std::endl;
-                }
-                else
-                {
-                    std::cout << "    Kart " << (*order)[j] << " is at position " << j << std::endl;
-                }
-            }
-            std::cout << "Kart " << i << " is being given posiiton " << (getKart(i)->getPosition()-1)
-                      << ", but this position is already taken\n";
-            positions_ok = false;
-        }
-#endif
-        
-        // actually assign the position
-        (*order)[position] = i; // even for eliminated karts
-    }
-    
-#ifndef NDEBUG
-    if (!positions_ok) history->Save();
-    assert(positions_ok);
-#endif
-    
-}   // getRaceResultOrder
+    assert(m_position_setting_initialised);
+    m_position_setting_initialised = false;
+}   // endSetKartPositions
+
 
