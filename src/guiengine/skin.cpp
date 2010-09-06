@@ -1639,7 +1639,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 
         // minor adjustments...
         rect2.UpperLeftCorner.X -= 7;
-        //rect2.LowerRightCorner.X -= 15;
+        rect2.LowerRightCorner.X += BUBBLE_MARGIN_ON_RIGHT;
 
         if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["textbubble::focused"]);

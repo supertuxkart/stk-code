@@ -23,6 +23,7 @@
 
 namespace GUIEngine
 {
+    const int BUBBLE_MARGIN_ON_RIGHT = 15;
     
     class BubbleWidget : public Widget
     {
