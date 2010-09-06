@@ -180,9 +180,6 @@ private:
     float         m_view_blocked_by_plunger;
     float         m_speed;
 
-    /** True if this kart has been eliminated. */
-    bool          m_eliminated;
-
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
     SFXBase      *m_engine_sound;
@@ -363,9 +360,6 @@ public:
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
-    /** Returns true if the kart is eliminated. */
-    bool           isEliminated     () const {return m_eliminated;}
-    void           eliminate        ();
     void           resetBrakes      ();
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);

@@ -64,6 +64,9 @@ private:
     /** A pointer to the class to which this object belongs. */
     Kart *m_kart;
 
+    /** True if this kart has been eliminated. */
+    bool          m_eliminated;
+
     /** For stars rotating around head effect */
     Stars        *m_stars_effect;
     
@@ -90,5 +93,9 @@ public:
 
     /** Returns the timer for the currently played animation. */
     const float getAnimationTimer() const {return m_timer;}
+    /** Returns true if the kart is eliminated. */
+    bool        isEliminated     () const {return m_eliminated;}
+    void        eliminate        ();
+
 };   // EmergencyAnimation
 #endif

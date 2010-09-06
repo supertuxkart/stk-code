@@ -40,7 +40,7 @@ EmergencyAnimation::EmergencyAnimation(Kart *kart)
     // reset() is also called at the very start, it must be guaranteed that 
     // rescue is not set.
     m_kart_mode    = EA_NONE;
-
+    m_eliminated   = false;
 };   // EmergencyAnimation
 
 //-----------------------------------------------------------------------------
@@ -55,6 +55,7 @@ EmergencyAnimation::~EmergencyAnimation()
  */
 void EmergencyAnimation::reset()
 {
+
     // Create the stars effect in the first reset
     if(!m_stars_effect)
         m_stars_effect = new Stars(m_kart->getNode());
@@ -64,13 +65,29 @@ void EmergencyAnimation::reset()
 
     // If the kart was eliminated or rescued, the body was removed from the
     // physics world. Add it again.
-    if(playingEmergencyAnimation())
+    if(m_eliminated || playingEmergencyAnimation())
     {
         World::getWorld()->getPhysics()->addKart(m_kart);
     }
-    m_timer     = 0;
-    m_kart_mode = EA_NONE;
+    m_timer      = 0;
+    m_kart_mode  = EA_NONE;
+    m_eliminated = false;
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Eliminates a kart from the race. It removes the kart from the physics
+ *  world, and makes the scene node invisible.
+ */
+void EmergencyAnimation::eliminate()
+{
+    if (!playingEmergencyAnimation())
+    {
+        World::getWorld()->getPhysics()->removeKart(m_kart);
+    }
+    m_eliminated = true;
+
+    m_kart->getNode()->setVisible(false);
+}   // eliminate
 
 //-----------------------------------------------------------------------------
 /** Sets the mode of the kart to being rescued, attaches the rescue model
@@ -168,7 +185,12 @@ void EmergencyAnimation::update(float dt)
         World::getWorld()->getPhysics()->addKart(m_kart);
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        m_kart_mode = EA_NONE;
+        m_kart_mode  = EA_NONE;
+        // We have to make sure that m_kart_mode and m_eliminated are in 
+        // synch, otherwise it can happen that a kart is entered in world
+        // here, and again in reset (e.g. when restarting the race) if
+        // m_eliminated is still true.
+        m_eliminated = false;
         return;
     }
 

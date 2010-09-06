@@ -78,7 +78,6 @@ Kart::Kart (const std::string& ident, int position,
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_slipstream_time      = 0.0f;
-    m_eliminated           = false;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
@@ -322,21 +321,6 @@ Kart::~Kart()
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
-/** Eliminates a kart from the race. It removes the kart from the physics
- *  world, and makes the scene node invisible.
- */
-void Kart::eliminate()
-{
-    if (!playingEmergencyAnimation())
-    {
-        World::getWorld()->getPhysics()->removeKart(this);
-    }
-    m_eliminated = true;
-
-    getNode()->setVisible(false);
-}   // eliminate
-
-//-----------------------------------------------------------------------------
 /** Returns true if the kart is 'resting', i.e. (nearly) not moving.
  */
 bool Kart::isInRest() const
@@ -374,12 +358,6 @@ void Kart::updatedWeight()
  */
 void Kart::reset()
 {
-    // Only add the physics body back if the kart is eliminated
-    // and no emergency animations is being played. Since if
-    // an emergency animation is being played, the physics body
-    // will be added back in EMergencyAnimation::reset
-    if(m_eliminated && !playingEmergencyAnimation())
-        World::getWorld()->getPhysics()->addKart(this);
     EmergencyAnimation::reset();
 
     if (m_camera)
@@ -403,7 +381,6 @@ void Kart::reset()
     m_powerup.reset();
 
     m_race_position        = m_initial_position;
-    m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
