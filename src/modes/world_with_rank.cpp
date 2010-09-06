@@ -23,9 +23,12 @@
 void WorldWithRank::init()
 {
     World::init();
+    
+#ifdef DEBUG
     m_position_index.resize(m_karts.size());
     m_position_used.resize(m_karts.size());
     m_position_setting_initialised = false;
+#endif
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -104,8 +107,10 @@ bool WorldWithRank::setKartPosition(unsigned int kart_id,
  */
 void WorldWithRank::endSetKartPositions()
 {
+#ifdef DEBUG
     assert(m_position_setting_initialised);
     m_position_setting_initialised = false;
+#endif
 }   // endSetKartPositions
 
 
