@@ -116,7 +116,7 @@ void RaceResultGUI::enableAllButtons()
     // Make sure that when 'fire' is pressed accidentally (e.g. pressing fire
     // very often to skip all results) that a good default is chosen (to
     // avoid aborting a GP by accident).
-    for(unsigned int i=0; i<MAX_PLAYER_COUNT; i++)
+    for(int i=0; i<MAX_PLAYER_COUNT; i++)
         top->setFocusForPlayer(i);
 
 }   // enableAllButtons
