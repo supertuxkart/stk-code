@@ -334,7 +334,7 @@ void Flyable::update(float dt)
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
     if(xyz[0]<(*min)[0] || xyz[2]<(*min)[2] || xyz[1]<(*min)[1] ||
-       xyz[0]>(*max)[0] || xyz[2]>(*max)[2]                         )
+       xyz[0]>(*max)[0] || xyz[2]>(*max)[2] || xyz[1]>(*max)[1]    )
     {
         hit(NULL);    // flyable out of track boundary
         return;
