@@ -408,6 +408,13 @@ void RaceResultGUI::renderGlobal(float dt)
     case RR_RACE_RESULT: 
         if(m_timer > m_time_overall_scroll)
         {
+            // Make sure that all lines are aligned to the left
+            // (in case that the animation was skipped).
+            for(unsigned int i=0; i<num_karts; i++)
+            {
+                RowInfo *ri    = &(m_all_row_infos[i]);
+                ri->m_x_pos    = (float)m_leftmost_column;
+            }
             if(race_manager->getMajorMode()!=RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
                 m_animation_state = RR_WAIT_TILL_END;
@@ -510,7 +517,7 @@ void RaceResultGUI::renderGlobal(float dt)
             break;
         }   // switch
         displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
-    }
+    }   // for i
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
