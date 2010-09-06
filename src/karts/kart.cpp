@@ -34,7 +34,6 @@
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/smoke.hpp"
-#include "graphics/stars.hpp"
 #include "graphics/water_splash.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
@@ -83,7 +82,6 @@ Kart::Kart (const std::string& ident, int position,
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
-    m_stars_effect         = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_slip_stream          = NULL;
@@ -307,7 +305,6 @@ Kart::~Kart()
     if(m_slip_stream)         delete m_slip_stream;
 
     delete m_shadow;
-    delete m_stars_effect;
 
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -438,8 +435,6 @@ void Kart::reset()
     m_controls.m_drift     = false;
     m_controls.m_fire      = false;
     m_controls.m_look_back = false;
-    // Reset star effect in case that it is currently being shown.
-    m_stars_effect->reset();
     m_slip_stream->reset();
     m_vehicle->deactivateZipper();
 
@@ -708,9 +703,6 @@ void Kart::update(float dt)
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
         m_slip_stream->update(dt);
-        // update star effect (call will do nothing if stars are not activated)
-        m_stars_effect->update(dt);
-
     }  // UserConfigParams::m_graphical_effects
 
     updatePhysics(dt);
@@ -1377,8 +1369,6 @@ void Kart::loadData()
        
     m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
                           m_node);
-
-    m_stars_effect = new Stars(m_node);
 }   // loadData
 
 //-----------------------------------------------------------------------------

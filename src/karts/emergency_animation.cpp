@@ -19,6 +19,7 @@
 
 #include "karts/emergency_animation.hpp"
 
+#include "graphics/stars.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
@@ -31,21 +32,36 @@
  */
 EmergencyAnimation::EmergencyAnimation(Kart *kart)
 {
-    m_kart  = kart;
+    m_stars_effect = NULL;
+    m_kart         = kart;
     // Setting kart mode here is important! If the mode should be rescue when 
     // reset() is called, it is assumed that this was triggered by a restart, 
     // and that the vehicle must be added back to the physics world. Since 
     // reset() is also called at the very start, it must be guaranteed that 
     // rescue is not set.
-    m_kart_mode = EA_NONE;
+    m_kart_mode    = EA_NONE;
 
 };   // EmergencyAnimation
+
+//-----------------------------------------------------------------------------
+EmergencyAnimation::~EmergencyAnimation()
+{
+    if(m_stars_effect)
+        delete m_stars_effect;
+}   // ~EmergencyAnimation
 
 //-----------------------------------------------------------------------------
 /** Resets all data at the beginning of a race.
  */
 void EmergencyAnimation::reset()
 {
+    // Create the stars effect in the first reset
+    if(!m_stars_effect)
+        m_stars_effect = new Stars(m_kart->getNode());
+
+    // Reset star effect in case that it is currently being shown.
+    m_stars_effect->reset();
+
     // If the kart was eliminated or rescued, the body was removed from the
     // physics world. Add it again.
     if(playingEmergencyAnimation())
@@ -124,6 +140,7 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     m_add_rotation.setHeading( (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setPitch(   (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
+    m_stars_effect->showFor(6.0f);
 
 }   // handleExplosion
 
@@ -134,6 +151,12 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
  */
 void EmergencyAnimation::update(float dt)
 {
+    if ( UserConfigParams::m_graphical_effects )
+    {
+        // update star effect (call will do nothing if stars are not activated)
+        m_stars_effect->update(dt);
+    }
+
     if(!playingEmergencyAnimation()) return;
 
     // See if the timer expires, if so return the kart to normal game play

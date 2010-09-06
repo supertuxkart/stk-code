@@ -23,6 +23,7 @@
 #include "utils/vec3.hpp"
 
 class Kart;
+class Stars;
 
 /** 
  * \brief This class is a 'mixin' for kart, and handles the animated explosion.
@@ -63,13 +64,16 @@ private:
     /** A pointer to the class to which this object belongs. */
     Kart *m_kart;
 
+    /** For stars rotating around head effect */
+    Stars        *m_stars_effect;
+    
     /** Different kart modes: normal racing, being rescued, showing end
      *  animation, explosions, kart eliminated. */
     enum {EA_NONE, EA_RESCUE, EA_EXPLOSION}
           m_kart_mode;
 public:
           EmergencyAnimation(Kart *kart);
-         ~EmergencyAnimation() {};
+         ~EmergencyAnimation();
     void  reset();
     void  handleExplosion(const Vec3& pos, bool direct_hit);
     void  forceRescue();

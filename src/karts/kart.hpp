@@ -47,7 +47,6 @@ class SFXBase;
 class SkidMarks;
 class SlipStream;
 class Smoke;
-class Stars;
 class WaterSplash;
 
 /** The main kart class. All type of karts are of this object, but with 
@@ -140,9 +139,6 @@ private:
     /** Water splash when driving in water. */
     WaterSplash  *m_water_splash_system;
 
-    /** For stars rotating around head effect */
-    Stars        *m_stars_effect;
-    
     /** Graphical effect when using a nitro. */
     Nitro        *m_nitro;
 
