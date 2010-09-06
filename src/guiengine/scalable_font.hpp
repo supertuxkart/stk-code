@@ -97,6 +97,10 @@ public:
             video::SColor color, bool hcenter=false,
             bool vcenter=false, const core::rect<s32>* clip=0);
 
+    virtual void draw(const core::stringw& text, const core::rect<s32>& position,
+                      video::SColor color, bool hcenter,
+                      bool vcenter, const core::rect<s32>* clip, bool ignoreRTL);
+    
     //! returns the dimension of a text
     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
 

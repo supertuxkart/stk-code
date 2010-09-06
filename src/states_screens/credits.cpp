@@ -180,7 +180,7 @@ void CreditsScreen::loadedFromFile()
     while (getWideLine( file, &line ))
     {        
         stringc cversion = line.c_str();
-        printf("CREDITS line : %s\n", cversion.c_str());
+        //printf("CREDITS line : %s\n", cversion.c_str());
         
         line = line.trim();
         
@@ -347,7 +347,7 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
         
         GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_name.c_str(),
                                    core::rect< s32 >( x + text_offset, y+h/6, x+w+text_offset, y+h/3 ), color,
-                                   false /* center h */, true /* center v */ );
+                                   false /* center h */, true /* center v */, NULL, true /* ignore RTL */ );
         
         const int subamount = m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
         int suby = y+h/3;
@@ -357,7 +357,7 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
             GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_subentries[i].c_str(),
                                        core::rect< s32 >( x + 32, suby + text_offset/(1+1), x+w+32, suby+h/8 + text_offset/(1+1) ),
                                        color,
-                                       false/* center h */, true /* center v */ );
+                                       false/* center h */, true /* center v */, NULL, true /* ignore RTL */ );
             suby += inc;
         }
         
@@ -380,11 +380,14 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
             // move on
             m_curr_element++;
             
-            if(m_curr_element >= (int)m_sections[m_curr_section].m_entries.size())
+            if (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size())
+            {
                 time_before_next_step = TIME_SECTION_FADE;
+            }
             else
             {
-                m_time_element = 1.6f + (int)m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size()*0.5f;
+                const int count = (int)m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
+                m_time_element = 2.0f + count*0.6f;
                 time_before_next_step = m_time_element;
             }
         }

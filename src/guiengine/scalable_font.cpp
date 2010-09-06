@@ -403,7 +403,20 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
     
     return dim;
 }
+    
+void ScalableFont::draw(const core::stringw& text, 
+                        const core::rect<s32>& position, video::SColor color, 
+                        bool hcenter, bool vcenter, 
+                        const core::rect<s32>* clip, bool ignoreRTL)
+{
+    bool previousRTL = m_rtl;
+    if (ignoreRTL) m_rtl = false;
 
+    draw(text, position, color, hcenter, vcenter, clip);
+    
+    if (ignoreRTL) m_rtl = previousRTL;
+}
+    
 //! draws some text and clips it to the specified rectangle if wanted
 void ScalableFont::draw(const core::stringw& text, 
                         const core::rect<s32>& position, video::SColor color, 
