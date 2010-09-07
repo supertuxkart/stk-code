@@ -29,7 +29,9 @@ subject to the following restrictions:
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedAllocator.h"
 
-
+#ifdef BT_DEBUG
+#  include <iostream>
+#endif
 //http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclang/html/vclrf__m128.asp
 
 
@@ -351,7 +353,23 @@ public:
 	{
 
 		btAssert(m_useQuantization);
-
+#ifdef BT_DEBUG
+		if( (point.getX() > m_bvhAabbMax.getX() ) ||
+		    (point.getY() > m_bvhAabbMax.getY() ) ||
+            (point.getZ() > m_bvhAabbMax.getZ() ) ||
+		    (point.getX() < m_bvhAabbMin.getX() ) ||
+		    (point.getY() < m_bvhAabbMin.getY() ) ||
+		    (point.getZ() < m_bvhAabbMin.getZ() )    )
+        {
+            std::cout << "Bullet Assertion error " 
+                << point.getX() << " "<<point.getY()<<" "<<point.getZ()
+                << "  "<<m_bvhAabbMax.getX()<<" "<< m_bvhAabbMax.getY()
+                << " " <<m_bvhAabbMax.getZ()<<"  "
+                << m_bvhAabbMin.getX()<<" "<< m_bvhAabbMin.getX()
+                << " "<< m_bvhAabbMin.getX()<<" "
+                << isMax;
+        }
+#endif
 		btAssert(point.getX() <= m_bvhAabbMax.getX());
 		btAssert(point.getY() <= m_bvhAabbMax.getY());
 		btAssert(point.getZ() <= m_bvhAabbMax.getZ());
