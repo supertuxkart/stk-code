@@ -122,7 +122,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         m_widgets.push_back(m_state);
         m_state->add();
 
-        this->getWidget<ButtonWidget>("back")->setDeactivated();
+        this->getWidget<ButtonWidget>("cancel")->setDeactivated();
         //FIXME : re-implement this buttons
         /*
         m_next->setDeactivated();
