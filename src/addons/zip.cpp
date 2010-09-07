@@ -56,7 +56,7 @@ bool extract_zip(std::string from, std::string to)
     //Add the zip to the file system
     pfs->addZipFileArchive(from.c_str());
 
-    IFileArchive * zipfile = pfs->getFileArchive(0);
+    //IFileArchive * zipfile = pfs->getFileArchive(0);
     //extract the file where there is the others file name
     IReadFile* srcFile = pfs->createAndOpenFile("file_list");
     if (srcFile == NULL)
