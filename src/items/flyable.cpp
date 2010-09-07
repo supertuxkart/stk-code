@@ -333,8 +333,18 @@ void Flyable::update(float dt)
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
-    if(xyz[0]<(*min)[0] || xyz[2]<(*min)[2] || xyz[1]<(*min)[1] ||
-       xyz[0]>(*max)[0] || xyz[2]>(*max)[2] || xyz[1]>(*max)[1]    )
+
+    // I have seen that the bullet AABB can be slightly different from the 
+    // one computed here - I assume due to minor floating point errors
+    // (e.g. 308.25842 instead of 308.25845). To avoid a crash with a bullet
+    // assertion (see bug 3058932) I add an epsilon here - but admittedly
+    // that does not really explain the bullet crash, since bullet tests
+    // against its own AABB, and should therefore not cause the assertion.
+    // But since we couldn't reproduce the problem, and the epsilon used
+    // here does not hurt, I'll leave it in.
+    float eps = 0.1f;
+    if(xyz[0]<(*min)[0]+eps || xyz[2]<(*min)[2]+eps || xyz[1]<(*min)[1]+eps ||
+       xyz[0]>(*max)[0]-eps || xyz[2]>(*max)[2]-eps || xyz[1]>(*max)[1]-eps   )
     {
         hit(NULL);    // flyable out of track boundary
         return;
