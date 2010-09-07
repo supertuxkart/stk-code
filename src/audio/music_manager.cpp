@@ -117,6 +117,7 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid compiler warning
             continue;
         }
     }   // for i
