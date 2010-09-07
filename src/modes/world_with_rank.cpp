@@ -24,8 +24,8 @@ void WorldWithRank::init()
 {
     World::init();
     
-#ifdef DEBUG
     m_position_index.resize(m_karts.size());
+#ifdef DEBUG
     m_position_used.resize(m_karts.size());
     m_position_setting_initialised = false;
 #endif
