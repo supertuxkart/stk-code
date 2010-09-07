@@ -408,16 +408,6 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         ICON_PLAYER_WIDTH = 35;
     }
 
-    //initialize m_previous_icons_position
-    if(m_previous_icons_position.size()==0)
-    {
-        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
-        {
-            core::vector2d<s32> pos(x_base,y_base+i*(ICON_PLAYER_WIDTH+2));
-            m_previous_icons_position.push_back(pos);
-        }
-    }
-    
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
     {
@@ -425,6 +415,19 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         y_base = UserConfigParams::m_height/2 + 20;
     }
 
+    LinearWorld *world      = (LinearWorld*)(World::getWorld());
+    //initialize m_previous_icons_position
+    if(m_previous_icons_position.size()==0)
+    {
+        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        {
+            const Kart *kart = world->getKart(i);
+            int position = kart->getPosition();
+            core::vector2d<s32> pos(x_base,y_base+(position-1)*(ICON_PLAYER_WIDTH+2));
+            m_previous_icons_position.push_back(pos);
+        }
+    }
+    
     int x;
     int y;
     float previous_distance=10000.0;//far ahead
@@ -435,7 +438,6 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     int previous_y=y_base-ICON_PLAYER_WIDTH-2;
     
     gui::ScalableFont* font = GUIEngine::getFont();
-    LinearWorld *world      = (LinearWorld*)(World::getWorld());
     const unsigned int kart_amount = world->getNumKarts();
     
     for(int position = 1; position <= (int)kart_amount ; position++)
@@ -457,7 +459,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         {
             float distance = world->getDistanceDownTrackForKart(kart_id)
                            + world->getTrack()->getTrackLength()*lap;
-            if (previous_distance-distance<m_dist_show_overlap)
+            if ((previous_distance-distance<m_dist_show_overlap) && (!kart->hasFinishedRace()))
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
                 // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
