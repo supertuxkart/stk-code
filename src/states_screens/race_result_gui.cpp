@@ -314,8 +314,11 @@ void RaceResultGUI::determineTableLayout()
     core::dimension2du r_all_p    = m_font->getDimension(L"999");
     unsigned int width_all_points = r_all_p.Width;
 
-    unsigned int table_width = m_width_icon        +   m_width_kart_name 
-                             + m_width_finish_time + 2*m_width_column_space;
+    unsigned int table_width = m_width_icon + m_width_column_space
+                             + m_width_kart_name;
+
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        table_width += m_width_finish_time + m_width_column_space;
 
     // Only in GP mode are the points displayed.
     if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -580,31 +583,36 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
                                                : video::SColor(255,255,255,255);
 
+    unsigned int current_x = x;
+
     // First draw the icon
     // -------------------
     if(ri->m_kart_icon)
     {
         core::recti source_rect(core::vector2di(0,0), 
                                 ri->m_kart_icon->getSize());
-        core::recti dest_rect(x, y, x+m_width_icon, y+m_width_icon);
+        core::recti dest_rect(current_x, y, 
+                              current_x+m_width_icon, y+m_width_icon);
         irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
                                                   source_rect, NULL, NULL, 
                                                   true);
+        current_x += m_width_icon + m_width_column_space;
     }
     // Draw the name
     // -------------
-    core::recti pos_name(x+m_width_icon+m_width_column_space, y,
+    core::recti pos_name(current_x, y,
                          UserConfigParams::m_width, y+m_distance_between_rows);
-
     m_font->draw(ri->m_kart_name, pos_name, color);
+    current_x += m_width_kart_name + m_width_column_space;
 
-    // Draw the time
-    // -------------
-    unsigned int x_time = x + m_width_icon  + m_width_column_space
-                        + m_width_kart_name + m_width_column_space;
-
-    core::recti dest_rect = core::recti(x_time, y, x_time+100, y+10);
-    m_font->draw(ri->m_finish_time_string, dest_rect, color);
+    // Draw the time except in FTL mode
+    // --------------------------------
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+    {
+        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
+        m_font->draw(ri->m_finish_time_string, dest_rect, color);
+        current_x += m_width_finish_time + m_width_column_space;
+    }
 
     // Only display points in GP mode and when the GP results are displayed.
     // =====================================================================
@@ -614,28 +622,23 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     // Draw the new points
     // -------------------
-    unsigned int x_point = x + m_width_icon    + m_width_column_space
-                         + m_width_kart_name   + m_width_column_space
-                         + m_width_finish_time + m_width_column_space;
-    dest_rect = core::recti(x_point, y, x_point+100, y+10);
     if(ri->m_new_points>0)
     {
+        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
         core::stringw point_string = core::stringw("+")
                                    + core::stringw((int)ri->m_new_points);
         // With mono-space digits space has the same width as each digit, so
-        // we can simply fill up the string with spaces to get the right aligned.
+        // we can simply fill up the string with spaces to get the right 
+        // aligned.
         while(point_string.size()<3)
             point_string = core::stringw(" ")+point_string;
         m_font->draw(point_string, dest_rect, color);
     }
+    current_x += m_width_new_points   +m_width_column_space;
 
     // Draw the old_points plus increase value
     // ---------------------------------------
-    unsigned int x_point_inc = x + m_width_icon    + m_width_column_space
-                             + m_width_kart_name   + m_width_column_space
-                             + m_width_finish_time + m_width_column_space
-                             + m_width_new_points   +m_width_column_space;
-    dest_rect = core::recti(x_point_inc, y, x_point_inc+100, y+10);
+    core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
     core::stringw point_inc_string = 
         core::stringw((int)(ri->m_current_displayed_points));
     while(point_inc_string.size()<3)
