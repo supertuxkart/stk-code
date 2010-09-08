@@ -56,7 +56,7 @@ class PlayerProfile;
 /**
   * The base of a set of small utilities to enable quickly adding/removing stuff to/from config painlessly.
   */
-class UserConfigParam : public NoCopy
+class UserConfigParam
 {
     friend class GroupUserConfigParam;
 protected:
