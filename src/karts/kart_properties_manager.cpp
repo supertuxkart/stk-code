@@ -369,7 +369,20 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
                    !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
                     karts.push_back(i);
             }
-            assert(karts.size() > 0);
+            // If there are no unused karts, use used karts again.
+            // This means that e.g. if only one kart is availabe, which is
+            // used by the player, it will still be used by AI karts (which
+            // can be useful for debugging).
+            if(karts.size()==0)
+            {
+                for(unsigned int i=0; i<getNumberOfKarts(); i++)
+                {
+                    std::cout << "Refill : i=" << i << ", used[i]=" << used[i] << ", m_kart_available[i]=" << m_kart_available[i] << std::endl;
+                    if(m_kart_available[i] &&
+                        !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
+                        karts.push_back(i);
+                }
+            }
             std::random_shuffle(karts.begin(), karts.end());
         }
         
