@@ -105,11 +105,8 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
         GUIEngine::ListWidget* list = this->getWidget<GUIEngine::ListWidget>("list_addons");
         std::string addons = list->getSelectionInternalName();
 
-        if(addons != "track" && addons != "kart")
-        {
-            addons_manager->SelectId(addons);
-            this->load = new AddonsLoading(addons_manager, 0.8f, 0.8f);
-        }
+        addons_manager->SelectId(addons);
+        this->load = new AddonsLoading(addons_manager, 0.8f, 0.8f);
     }
     if (name == "category")
     {
