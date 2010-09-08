@@ -18,14 +18,19 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
     
+        <!-- Configuration name -->
         <spacer height="6" width="10"/>
-        <label id="title" width="100%" text_align="center" text="[none]" />
+        <label id="title" width="100%" text_align="center" />
         <spacer height="16" width="10"/>
         
+        <!-- List of key bindings -->
         <list id="actions" proportion="5" width="75%" align="center"/>
          
+         <!-- Bottom buttons -->
         <spacer width="50" height="20" /> 
- 
+        <button id="delete"
+                I18N="To delete a keyboard configuration"  text="Delete Configuration"/>
+        <spacer width="50" height="10" /> 
         <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
         
         <spacer width="50" height="10" /> 

@@ -102,7 +102,10 @@ public:
     KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
 
 
-
+    /**
+      * \brief Delete the given config and removes DeviceManager references to it.
+      */
+    bool deleteConfig(DeviceConfig* config);
        
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
       * maps this input to the corresponding player and game action. 

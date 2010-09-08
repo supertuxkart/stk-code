@@ -179,21 +179,22 @@ void remove(TYPE* obj)
 }
 
 /**
-  * Removes and deletes
+  * \brief Removes and deletes the given object.
+  * \return whether this object was found in the vector and deleted
   */
-void erase(TYPE* obj)
+bool erase(void* obj)
 {
     for(unsigned int n=0; n<contentsVector.size(); n++)
     {
         TYPE * pointer = contentsVector[n];
-        if(pointer == obj)
+        if((void*)pointer == obj)
         {
             contentsVector.erase(contentsVector.begin()+n);
             delete pointer;
-            return;
+            return true;
         }
     }
-    
+    return false;
 }
 
 };

@@ -191,10 +191,46 @@ void DeviceManager::addEmptyKeyboard()
 }
 
 // -----------------------------------------------------------------------------
+
 void DeviceManager::addGamepad(GamePadDevice* d)
 {
     m_gamepads.push_back(d);
 }
+
+// -----------------------------------------------------------------------------
+
+bool DeviceManager::deleteConfig(DeviceConfig* config)
+{
+    for (int n=0; n<m_keyboards.size(); n++)
+    {
+        if (m_keyboards[n].getConfiguration() == config)
+        {
+            m_keyboards.erase(n);
+            n--;
+        }
+    }
+    for (int n=0; n<m_gamepads.size(); n++)
+    {
+        if (m_gamepads[n].getConfiguration() == config)
+        {
+            m_gamepads.erase(n);
+            n--;
+        }
+    }
+    
+    if (m_keyboard_configs.erase(config))
+    {
+        return true;
+    }
+    
+    if (m_gamepad_configs.erase(config))
+    {
+        return true;
+    }
+    
+    return false;
+}
+
 // -----------------------------------------------------------------------------
 
 InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriverMode mode,

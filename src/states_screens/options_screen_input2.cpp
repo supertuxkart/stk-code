@@ -65,6 +65,21 @@ void OptionsScreenInput2::init()
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
     
+    ButtonWidget* deleteBtn = this->getWidget<ButtonWidget>("delete");
+    if (m_config->getType() != DEVICE_CONFIG_TYPE_KEYBOARD)
+    {
+        deleteBtn->setDeactivated();
+    }
+    else if (input_manager->getDeviceList()->getKeyboardAmount() < 2)
+    {
+        // don't allow deleting the last config
+        deleteBtn->setDeactivated();
+    }
+    else
+    {
+        deleteBtn->setActivated();
+    }
+
     
     LabelWidget* label = this->getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str() );
@@ -373,6 +388,16 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
             }
         }
     }
+    else if (name == "delete")
+    {
+        // TODO: ask for confirmation before deleting
+        const bool success = input_manager->getDeviceList()->deleteConfig(m_config);
+        assert(success);
+        m_config = NULL;
+        input_manager->getDeviceList()->serialize();
+        StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+    }
+    
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
