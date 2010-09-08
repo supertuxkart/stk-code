@@ -213,7 +213,7 @@ public:
     std::string m_kartInternalName;
     
     PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
-                     Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
+                     Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;
@@ -224,8 +224,8 @@ public:
         
         m_irrlicht_widget_ID = irrlichtWidgetID;
 
-        this->m_playerID = m_playerID;
-        this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
+        m_playerID = playerID;
+        m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
         
         setSize(area->m_x, area->m_y, area->m_w, area->m_h);
         target_x = m_x;
@@ -299,14 +299,20 @@ public:
         // Init kart model
         std::string& default_kart = UserConfigParams::m_default_kart;
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
+        if(!props)
+        {
+            fprintf(stderr, "Can't find default kart '%s' - aborting.\n", 
+                    default_kart.c_str());
+        }
+
         KartModel* kartModel = props->getKartModel();
         
-        this->m_model_view->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
-        this->m_model_view->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-        this->m_model_view->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-        this->m_model_view->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-        this->m_model_view->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-        this->m_model_view->setRotateContinuously( 35.0f );
+        m_model_view->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
+        m_model_view->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+        m_model_view->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+        m_model_view->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+        m_model_view->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+        m_model_view->setRotateContinuously( 35.0f );
         
         // ---- Kart name label
         m_kart_name = new LabelWidget();
@@ -731,7 +737,7 @@ void KartSelectionScreen::loadedFromFile()
     m_player_confirmed = false;
     
     // Dynamically add tabs
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     
     m_last_widget = tabs;
@@ -773,7 +779,7 @@ void KartSelectionScreen::loadedFromFile()
 void KartSelectionScreen::init()
 {
     Screen::init();
-    Widget* placeholder = this->getWidget("playerskarts");
+    Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
     
     g_dispatcher->setRootID(placeholder->m_reserved_id);
@@ -790,7 +796,7 @@ void KartSelectionScreen::init()
     
     m_player_confirmed = false;
     
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     tabs->setActivated();
     
@@ -799,7 +805,7 @@ void KartSelectionScreen::init()
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
     
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     
 
@@ -826,7 +832,7 @@ void KartSelectionScreen::init()
         {
             PlayerKartWidget *pkw;
             pkw = m_kart_widgets.get(n);
-            this->manualAddWidget(pkw);
+            manualAddWidget(pkw);
             pkw->add();
         }
         
@@ -876,7 +882,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 
     assert (g_dispatcher != NULL);
     
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
         std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
@@ -897,7 +903,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
-    Widget kartsArea = *this->getWidget("playerskarts"); // copy
+    Widget kartsArea = *getWidget("playerskarts"); // copy
     kartsArea.m_x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
     // ---- Create new active player
@@ -922,14 +928,14 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
 
-    this->manualAddWidget(newPlayerWidget);
+    manualAddWidget(newPlayerWidget);
     newPlayerWidget->add();
     
     m_kart_widgets.push_back(newPlayerWidget);
     
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
-    Widget* fullarea = this->getWidget("playerskarts");
+    Widget* fullarea = getWidget("playerskarts");
     const int splitWidth = fullarea->m_w / amount;
     
     for (int n=0; n<amount; n++)
@@ -956,7 +962,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 {    
     int playerID = -1;
     
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
         std::cerr << "ERROR: playerQuit() called outside of kart selection screen, "
@@ -1014,7 +1020,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     
     // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
     // and will stop when the widget has disappeared)
-    Widget* fullarea = this->getWidget("playerskarts");
+    Widget* fullarea = getWidget("playerskarts");
     m_removed_widget->move(m_removed_widget->m_x + m_removed_widget->m_w/2, 
                            fullarea->m_y + fullarea->m_h, 0, 0);
     
@@ -1072,7 +1078,7 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
         if (m_removed_widget->m_w == 0 || m_removed_widget->m_h == 0)
         {
             // destruct when too small (for "disappear" effects)
-            this->manualRemoveWidget(m_removed_widget);
+            manualRemoveWidget(m_removed_widget);
             delete m_removed_widget;
             m_removed_widget = NULL;
         }
@@ -1087,9 +1093,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "kartgroups" && !m_player_confirmed) // don't allow changing group after someone confirmed
     {
-        RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+        RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
         assert(tabs != NULL);
-        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
         assert(w != NULL);
         
         setKartsFromCurrentGroup();
@@ -1132,7 +1138,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "karts")
     {
-        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
         assert(w != NULL);
         const std::string selection = w->getSelectionIDString(playerID);
         if (selection == "locked")
@@ -1169,7 +1175,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         m_kart_widgets[playerID].markAsReady();
         m_player_confirmed = true;
         
-        RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+        RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
         assert( tabs != NULL );
         tabs->setDeactivated();
         
@@ -1220,7 +1226,7 @@ void KartSelectionScreen::allPlayersDone()
 {        
     input_manager->setMasterPlayerOnly(true);
     
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     
     const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
@@ -1434,9 +1440,9 @@ bool KartSelectionScreen::validateKartChoices()
     
 void KartSelectionScreen::renumberKarts()
 {
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    Widget* fullarea = this->getWidget("playerskarts");
+    Widget* fullarea = getWidget("playerskarts");
     const int splitWidth = fullarea->m_w / m_kart_widgets.size();
 
     //printf("Renumbering karts...");
@@ -1455,12 +1461,12 @@ void KartSelectionScreen::renumberKarts()
 
 void KartSelectionScreen::setKartsFromCurrentGroup()
 {
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert(tabs != NULL);
     
     const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
     
     // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
