@@ -430,7 +430,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     
     int x;
     int y;
-    float previous_distance=10000.0;//far ahead
+    float previous_distance=0.0;//no need to be far ahead, first kart won't try to overlap
     
     
     
@@ -459,7 +459,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         {
             float distance = world->getDistanceDownTrackForKart(kart_id)
                            + world->getTrack()->getTrackLength()*lap;
-            if ((previous_distance-distance<m_dist_show_overlap) && (!kart->hasFinishedRace()))
+            if ((position>1) && (previous_distance-distance<m_dist_show_overlap) && (!kart->hasFinishedRace()))
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
                 // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
