@@ -390,12 +390,8 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "delete")
     {
-        // TODO: ask for confirmation before deleting
-        const bool success = input_manager->getDeviceList()->deleteConfig(m_config);
-        assert(success);
-        m_config = NULL;
-        input_manager->getDeviceList()->serialize();
-        StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        //I18N: shown before deleting an input configuration
+        new ConfirmDialog( _("Are you sure you want to permanently delete this configuration?"), this );
     }
     
 }   // eventCallback
@@ -413,5 +409,16 @@ bool OptionsScreenInput2::onEscapePressed()
     StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     return false; // don't use standard escape key handler, we handled it differently
 }   // onEscapePressed
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput2::onConfirm()
+{
+    const bool success = input_manager->getDeviceList()->deleteConfig(m_config);
+    assert(success);
+    m_config = NULL;
+    input_manager->getDeviceList()->serialize();
+    StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+}
 
 // -----------------------------------------------------------------------------

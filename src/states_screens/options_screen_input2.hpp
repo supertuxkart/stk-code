@@ -23,6 +23,7 @@
 #include "irrlicht.h"
 
 #include "guiengine/screen.hpp"
+#include "states_screens/dialogs/confirm_dialog.hpp"
 
 namespace GUIEngine { class Widget; }
 class DeviceConfig;
@@ -31,11 +32,14 @@ namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
 struct Input;
 
+
 /**
   * \brief Input options screen
   * \ingroup states_screens
   */
-class OptionsScreenInput2 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput2>
+class OptionsScreenInput2 : public GUIEngine::Screen,
+                            public GUIEngine::ScreenSingleton<OptionsScreenInput2>,
+                            public ConfirmDialog::IConfirmDialogListener
 {
     OptionsScreenInput2();
     
@@ -70,6 +74,9 @@ public:
       * Updates the input bindings accordingly with the sensed input.
       */
     void gotSensedInput(Input* sensedInput);
+    
+    /** \brief Implement IConfirmDialogListener callback */
+    virtual void onConfirm();
 };
 
 #endif

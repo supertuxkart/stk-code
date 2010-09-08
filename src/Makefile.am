@@ -272,6 +272,8 @@ supertuxkart_SOURCES = \
  states_screens/credits.hpp \
  states_screens/dialogs/add_device_dialog.cpp \
  states_screens/dialogs/add_device_dialog.hpp \
+ states_screens/dialogs/confirm_dialog.cpp \
+ states_screens/dialogs/confirm_dialog.hpp \
  states_screens/dialogs/confirm_resolution_dialog.cpp \
  states_screens/dialogs/confirm_resolution_dialog.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
