@@ -22,6 +22,7 @@
 
 #include <string>
 #include "config/user_config.hpp"
+#include "utils/no_copy.hpp"
 
 /**
   * \brief Class for managing player profiles (name, control configuration, etc.)
@@ -29,7 +30,7 @@
   * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
   * \ingroup config
   */
-class PlayerProfile
+class PlayerProfile : public NoCopy
 {
 protected:
     

@@ -29,6 +29,7 @@
 #  include <AL/al.h>
 #endif
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class SFXBase;
@@ -41,7 +42,7 @@ class XMLNode;
  *  on of the (shared) buffers from the sound manager.
  * \ingroup audio
  */
-class SFXManager
+class SFXManager : public NoCopy
 {
 public:
 

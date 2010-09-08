@@ -22,11 +22,12 @@
 
 #include <string>
 
+#include "utils/no_copy.hpp"
 /**
   * \brief Abstract interface for classes that can handle music playback
   * \ingroup audio
   */
-class Music
+class Music : public NoCopy
 {
 public:
     virtual bool load        (const std::string& filename) = 0;

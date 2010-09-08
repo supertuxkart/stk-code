@@ -22,6 +22,7 @@
 #define HEADER_SFX_HPP
 
 #include "audio/sfx_manager.hpp"
+#include "utils/no_copy.hpp"
 
 /**
  * \defgroup audio
@@ -38,7 +39,7 @@ class Vec3;
  *  looping sfx like engine sounds) when necessary.
  * \ingroup audio
  */
-class SFXBase
+class SFXBase : public NoCopy
 {
 public:
     virtual           ~SFXBase()                       {}

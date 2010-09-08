@@ -47,6 +47,7 @@ const int CURRENT_CONFIG_VERSION = 8;
 
 #include "input/input.hpp"
 #include "utils/constants.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;
@@ -55,7 +56,7 @@ class PlayerProfile;
 /**
   * The base of a set of small utilities to enable quickly adding/removing stuff to/from config painlessly.
   */
-class UserConfigParam
+class UserConfigParam : public NoCopy
 {
     friend class GroupUserConfigParam;
 protected:
@@ -335,7 +336,7 @@ namespace UserConfigParams
   * \brief Class for managing general STK user configuration data.
   * \ingroup config
   */
-class UserConfig
+class UserConfig : public NoCopy
 {
 private:
    

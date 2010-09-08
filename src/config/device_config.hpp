@@ -1,12 +1,14 @@
 #ifndef DEVICE_CONFIG_HPP
 #define DEVICE_CONFIG_HPP
 
-#include <string>
 #include "input/input.hpp"
-#include <iostream>
-#include <fstream>
 #include "io/xml_node.hpp"
+#include "utils/no_copy.hpp"
+
+#include <fstream>
+#include <iostream>
 #include <irrString.h>
+#include <string>
 
 /**
   * \ingroup config
@@ -33,7 +35,7 @@ enum DeviceConfigType
   * \brief contains the key bindings information related to one input device
   * \ingroup config
   */
-class DeviceConfig
+class DeviceConfig : public NoCopy
 {
 private:
     

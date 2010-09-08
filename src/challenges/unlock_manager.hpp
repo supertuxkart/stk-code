@@ -23,6 +23,8 @@
 #include <map>
 
 #include "challenges/challenge.hpp"
+#include "utils/no_copy.hpp"
+
 #include <fstream>
 
 class XMLNode;
@@ -32,7 +34,7 @@ class SFXBase;
   * \brief main class to handle locking/challenges
   * \ingroup challenges
   */
-class UnlockManager
+class UnlockManager : public NoCopy
 {
 private:
     SFXBase    *m_locked_sound;

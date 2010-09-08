@@ -27,6 +27,7 @@
 
 #include "audio/music.hpp"
 #include "audio/music_information.hpp"
+#include "utils/no_copy.hpp"
 
 class Vec3;
 
@@ -34,7 +35,7 @@ class Vec3;
   * \brief Central place to request for musics to be loaded, played, stopped, etc...
   * \ingroup audio
   */
-class MusicManager
+class MusicManager : public NoCopy
 {
 private:        
     MusicInformation        *m_current_music;

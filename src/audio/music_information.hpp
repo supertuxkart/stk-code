@@ -24,6 +24,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "utils/no_copy.hpp"
+
 class Music;
 
 /**
@@ -32,7 +34,7 @@ class Music;
   * Delegates many calls to the underlying Music instance.
   * \ingroup audio
   */
-class MusicInformation
+class MusicInformation : public NoCopy
 {
 private:
     std::string              m_composer;

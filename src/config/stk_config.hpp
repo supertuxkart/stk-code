@@ -25,8 +25,8 @@
  */
 
 #include "karts/kart_properties.hpp"
+#include "utils/no_copy.hpp"
 
-//class Lisp;
 class XMLNode;
 class MusicInformation;
 
@@ -37,7 +37,7 @@ class MusicInformation;
  * each kart (but which can be overwritten for each kart, too).
  * \ingroup config
  */
-class STKConfig
+class STKConfig : public NoCopy
 {
 protected:
     KartProperties  m_kart_properties; /**< Default kart properties. */

@@ -24,11 +24,12 @@
   * \defgroup challenges
   */
 
-
 #include <string>
 #include <vector>
 #include <fstream>
 #include <irrlicht.h>
+
+#include "utils/no_copy.hpp"
 
 class XMLNode;
 
@@ -52,7 +53,7 @@ struct UnlockableFeature
   * \brief A class for all challenges
   * \ingroup challenges
   */
-class Challenge
+class Challenge : public NoCopy
 {
 private:
     enum {CH_INACTIVE,                 // challenge not yet possible
