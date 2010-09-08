@@ -26,6 +26,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class XMLNode;
@@ -33,7 +34,7 @@ class XMLNode;
 /** \brief A class to manage a single blender IPO curve.
   * \ingroup animations
   */
-class Ipo
+class Ipo : public NoCopy
 {
 public:
     /** All supported ipo types. */

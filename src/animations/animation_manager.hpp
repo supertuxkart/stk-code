@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include "utils/no_copy.hpp"
+
 class AnimationBase;
 class Track;
 class XMLNode;
@@ -31,7 +33,7 @@ class XMLNode;
   * \brief Controls all animations of a track.
   * \ingroup animations
   */
-class AnimationManager
+class AnimationManager : public NoCopy
 {
 private:
     std::vector<AnimationBase*> m_all_animations;

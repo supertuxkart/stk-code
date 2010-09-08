@@ -30,6 +30,7 @@
 using namespace irr;
 
 #include "tracks/track_object.hpp"
+#include "utils/no_copy.hpp"
 
 class XMLNode;
 class Ipo;
@@ -38,7 +39,7 @@ class Ipo;
   * \brief A base class for all animations.
   * \ingroup animations
   */
-class AnimationBase : public TrackObject
+class AnimationBase : public TrackObject, public NoCopy
 {
 private:
     /** Two types of animations: cyclic ones that play all the time, and
