@@ -56,7 +56,12 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     version = this->getWidget<LabelWidget>("version");
     
     if(this->addons->IsInstalledAsBool())
-        this->getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
+    {
+        if(addons_manager->GetInstalledVersion() < addons_manager->GetVersion())
+            this->getWidget<ButtonWidget>("install")->setLabel(_("Update"));
+        else
+            this->getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
+    }
     
     this->loadInfo();
 }

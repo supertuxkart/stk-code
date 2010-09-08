@@ -56,6 +56,14 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
     {
         StateManager::get()->escapePressed();
     }
+    else if (name == "list_addons")
+    {
+        GUIEngine::ListWidget* list = this->getWidget<GUIEngine::ListWidget>("list_addons");
+        std::string addons = list->getSelectionInternalName();
+
+        addons_manager->SelectId(addons);
+        this->load = new AddonsLoading(addons_manager, 0.8f, 0.8f);
+    }
     else if (name == "category")
     {
         std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
@@ -88,7 +96,7 @@ void AddonsUpdateScreen::init()
 	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
     while(addons_manager->Next())
     {
-		if(addons_manager->IsInstalledAsBool() && addons_manager->GetInstalledVersion() < addons_manager->GetVersion() )
+		if(addons_manager->IsInstalledAsBool() && addons_manager->GetInstalledVersion() < addons_manager->GetVersion())
 		{
 			std::cout << addons_manager->GetName() << std::endl;
 			w_list->addItem(addons_manager->GetIdAsStr().c_str(),

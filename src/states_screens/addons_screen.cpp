@@ -52,10 +52,13 @@ void AddonsScreen::loadedFromFile()
             + "/package.png" );
     video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir()
             + "/no-package.png" );
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir()
+            + "/package-update.png" );
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
     m_icon_bank->addTextureAsSprite(icon1);
     m_icon_bank->addTextureAsSprite(icon2);
+    m_icon_bank->addTextureAsSprite(icon3);
 }
 // ------------------------------------------------------------------------------------------------------
 void AddonsScreen::loadList()
@@ -68,7 +71,10 @@ void AddonsScreen::loadList()
     while(addons_manager->NextType(this->type))
     {
         std::cout << addons_manager->GetName() << std::endl;
-	    if(addons_manager->IsInstalledAsBool())
+        if(addons_manager->IsInstalledAsBool() && addons_manager->GetInstalledVersion() < addons_manager->GetVersion())
+        	w_list->addItem(addons_manager->GetIdAsStr().c_str(),
+        	        addons_manager->GetName().c_str(), 2 /* icon installed */);
+	    else if(addons_manager->IsInstalledAsBool())
         	w_list->addItem(addons_manager->GetIdAsStr().c_str(),
         	        addons_manager->GetName().c_str(), 0 /* icon installed */);
 
