@@ -66,6 +66,7 @@ public:
     
     void                     loadAllKarts           ();
     void                     unloadAllKarts         ();
+	void					 reLoadAllKarts			();
 
     const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
     const std::vector<std::string>& 

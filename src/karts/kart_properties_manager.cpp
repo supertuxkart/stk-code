@@ -84,6 +84,22 @@ void KartPropertiesManager::unloadAllKarts()
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
+void KartPropertiesManager::reLoadAllKarts()
+{
+    for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
+        i != m_karts_properties.end(); ++i)
+    {
+        delete *i;
+    }
+    m_karts_properties.clear();
+    m_selected_karts.clear();
+    m_kart_available.clear();
+    m_groups.clear();
+    m_all_groups.clear();
+    //m_kart_search_path.clear();
+	loadAllKarts();
+}  
+//-----------------------------------------------------------------------------
 /** Loads all kart properties and models.
  */
 void KartPropertiesManager::loadAllKarts()

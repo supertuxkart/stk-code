@@ -33,6 +33,7 @@
 #include "io/file_manager.hpp"
 
 #include "karts/kart_properties_manager.hpp"
+#include "states_screens/kart_selection.hpp"
 
 using namespace irr; /* irrXML which is used to read (not write) xml file,
 is located in the namespace irr::io.*/
@@ -378,8 +379,7 @@ void Addons::SaveInstalled()
     }
     xml_installed << "</addons>" << std::endl;
     xml_installed.close();
-    kart_properties_manager->unloadAllKarts();
-    kart_properties_manager->loadAllKarts();
+    kart_properties_manager->reLoadAllKarts();
 }
 // ----------------------------------------------------------------------------
 void Addons::UnInstall()
