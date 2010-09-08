@@ -110,5 +110,6 @@ class Addons
         std::string getDownloadStateAsStr();
 
 };
+extern Addons * addons_manager;
 #endif
 #endif

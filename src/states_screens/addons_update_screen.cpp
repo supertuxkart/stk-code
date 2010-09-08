@@ -81,6 +81,20 @@ void AddonsUpdateScreen::init()
 {
     Screen::init();
     getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update", PLAYER_ID_GAME_MASTER);
+
+    GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
+    w_list->clear();
+    addons_manager->resetIndex();
+	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
+    while(addons_manager->Next())
+    {
+		if(addons_manager->IsInstalledAsBool() && addons_manager->GetInstalledVersion() < addons_manager->GetVersion() )
+		{
+			std::cout << addons_manager->GetName() << std::endl;
+			w_list->addItem(addons_manager->GetIdAsStr().c_str(),
+					addons_manager->GetName().c_str(), 0);
+		}
+    }
 }
 
 #endif

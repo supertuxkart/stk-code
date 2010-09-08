@@ -38,7 +38,7 @@
 using namespace irr; /* irrXML which is used to read (not write) xml file,
 is located in the namespace irr::io.*/
 using namespace io;
-
+Addons* addons_manager = 0;
 // ----------------------------------------------------------------------------
 
 Addons::Addons()

@@ -63,18 +63,18 @@ void AddonsScreen::loadList()
 	std::cout << "load list" << std::endl;
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
-    this->addons->resetIndex();
+    addons_manager->resetIndex();
 	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
-    while(this->addons->NextType(this->type))
+    while(addons_manager->NextType(this->type))
     {
-        std::cout << this->addons->GetName() << std::endl;
-	    if(this->addons->IsInstalledAsBool())
-        	w_list->addItem(this->addons->GetIdAsStr().c_str(),
-        	        this->addons->GetName().c_str(), 0 /* icon installed */);
+        std::cout << addons_manager->GetName() << std::endl;
+	    if(addons_manager->IsInstalledAsBool())
+        	w_list->addItem(addons_manager->GetIdAsStr().c_str(),
+        	        addons_manager->GetName().c_str(), 0 /* icon installed */);
 
 	    else
-        	w_list->addItem(this->addons->GetIdAsStr().c_str(),
-        	        this->addons->GetName().c_str(), 1 /* icon unsinstalled*/);
+        	w_list->addItem(addons_manager->GetIdAsStr().c_str(),
+        	        addons_manager->GetName().c_str(), 1 /* icon unsinstalled*/);
     }
 
 	this->can_load_list = false;
@@ -101,8 +101,8 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
 
         if(addons != "track" && addons != "kart")
         {
-            this->addons->SelectId(addons);
-            this->load = new AddonsLoading(this->addons, 0.8f, 0.8f);
+            addons_manager->SelectId(addons);
+            this->load = new AddonsLoading(addons_manager, 0.8f, 0.8f);
         }
     }
     if (name == "category")
@@ -155,10 +155,7 @@ void AddonsScreen::init()
 // ------------------------------------------------------------------------------------------------------
 void * AddonsScreen::downloadList( void * pthis)
 {
-    AddonsScreen * pt = (AddonsScreen*)pthis;
-    //load all karts...
-	pt->addons = new Addons();
-	
+    AddonsScreen * pt = (AddonsScreen*)pthis;	
 	pthread_mutex_lock(&(pt->mutex));
 	pt->can_load_list = true;
 	pthread_mutex_unlock(&(pt->mutex));

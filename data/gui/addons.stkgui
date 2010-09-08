@@ -2,7 +2,7 @@
 
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-    <header text_align="center" width="100%" text="SuperTuxKart Options"/>
+    <header text_align="center" width="100%" text="SuperTuxKart Addons"/>
     <spacer height="15" width="10"/>
 
     <tabs id="category" height="10%" max_height="110" width="100%" align="center">

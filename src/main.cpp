@@ -71,6 +71,7 @@
 
 #ifdef ADDONS_MANAGER
 #include "addons/network.hpp"
+#include "addons/addons.hpp"
 #endif
 
 void cmdLineHelp (char* invocation)
@@ -543,6 +544,7 @@ void initRest()
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
     network_http            = new NetworkHttp          ();
+    addons_manager 			= new Addons			   ();
 #endif
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
