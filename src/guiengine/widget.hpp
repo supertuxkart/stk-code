@@ -227,6 +227,9 @@ namespace GUIEngine
         /** A simple flag that can be raised to hide this widget */
         bool m_deactivated;
         
+        /** Set to false if widget is something that should not receive focus */
+        bool m_focusable;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -259,46 +262,6 @@ namespace GUIEngine
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
         
-        
-        /** \brief adds a particular badge to this widget
-         * The STK widget toolkit has support for "badges". Badges are icon overlays displayed
-         * on the corner of a widget; they are useful to convey information visually.
-         */
-        void setBadge(BadgeType badge_bit)
-        {
-            m_badges |= int(badge_bit);
-        }
-        
-        /** \brief removes a particular bade from this widget, if it had it
-         * \see GUIEngine::Widget::setBadge for more info on badge support
-         */
-        void unsetBadge(BadgeType badge_bit)
-        {
-            m_badges &= (~int(badge_bit));
-        }
-        
-        /** \brief sets this widget to have no badge
-          * \see GUIEngine::Widget::setBadge for more info on badge support
-          */
-        void resetAllBadges()
-        {
-            m_badges = 0;
-        }
-        
-        int getBadges() const
-        {
-            return m_badges;
-        }
-        
-        /** Set to false if widget is something that should not receive focus */
-        bool m_focusable;
-        
-        /** \brief undos setDeactivated() */
-        void setActivated();
-        
-        /** \brief greys out the widget, making it not clickable for the user */
-        void setDeactivated();
-        
         /** Used in two cases :
             1) For 'placeholder' divisions; at the time the layout is created, there is nothing to
                place there yet, but we know there eventually will. So in this case pass 'true' to the
@@ -309,6 +272,53 @@ namespace GUIEngine
         
         Widget(WidgetType type, bool reserve_id = false);
         virtual ~Widget();
+        
+        /**
+          * Set the irrlicht widget to be used as parent of this widget next time Widget::add()
+          * is invoked on this widget.
+          */
+        void setParent(irr::gui::IGUIElement* parent);
+        
+        /**
+         * \brief Sets the widget (and its children, if any) visible or not.
+         * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+         * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
+         * undefined behavior may ensue (like invisible but clickable buttons).
+         */
+        void setVisible(bool visible);
+        
+        /**
+         * Call to resize/move the widget. Not all widgets can resize gracefully.
+         */
+        virtual void move(const int x, const int y, const int w, const int h);
+        
+        /**
+          * Get whether this widget is selected (only makes sense in some cases where
+          * a widget is part of a bigger widget, e.g. in ribbons, and a selected item
+          * is kept)
+          */
+        bool isSelected(const int playerID) const { return m_selected[playerID]; }
+        
+        /**
+         * \{
+         * \name Enabling or disabling widgets
+         */
+        
+        /** \brief undos setDeactivated() */
+        void setActivated();
+        
+        /** \brief greys out the widget, making it not clickable for the user */
+        void setDeactivated();
+        
+        
+        /**
+          * \}
+          */
+        
+        /**
+         * \{
+         * \name Accessing the underlying irrlicht element
+         */
         
         /**
           * Get the underlying irrLicht GUI element, casted to the right type.
@@ -323,6 +333,9 @@ namespace GUIEngine
         #endif
         }
 
+        /**
+         * Get the underlying irrLicht GUI element, casted to the right type; const version.
+         */
         template<typename T> const T* getIrrlichtElement() const
         {
             #if HAVE_RTT
@@ -333,35 +346,73 @@ namespace GUIEngine
             #endif
         }
 
+        /**
+         * Get the underlying irrLicht GUI element
+         */
         irr::gui::IGUIElement* getIrrlichtElement() { return m_element; }
-
-        void setParent(irr::gui::IGUIElement* parent);
         
+        bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
 
+        /**
+          * \}
+          */
+
+        /**
+         * \{
+         * \name Get and set properties
+         *
+         * Note that many properties are read only by the Widget::add method; so, while
+         * it will generally work to set the properties before add() is called, modifying
+         * the widget after it was added will require other widget-specific calls.
+         */
+        
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
         
-        /** Sets the text of a widget from a wchar_t. Handy for many constant
-         *  strings used in stk. */
+        /** 
+          * Sets the text of a widget from a wchar_t.
+          * Handy for many constant strings used in stk.
+          */
         virtual void setText(const wchar_t *s);
   
-        /** Sets the text of a widget from a stringw. This uses the virtual 
-         * setText(wchar_t*) function, so only that function needs to be 
-         *  overwritten by other classes. */
+        /** 
+          * Sets the text of a widget from a stringw.
+          *  \note This mehtod uses the virtual setText(wchar_t*) function, so only the latter
+          *  needs to be overwritten by other classes.
+          */
         void setText(const irr::core::stringw &s) { setText(s.c_str()); }
 
         /** Returns the text of a widget. */
         const irr::core::stringw &getText() const {return m_text; }
         
-        static void resetIDCounters();
+        /** \return Type of this widget */
+        WidgetType getType() const { return m_type; }
+        
+        /** Get the irrlicht widget ID attributed to this widget */
+        int getID() const { return m_id; }
+
+        /** Get whether this object is allowed to receive focus */
+        bool isFocusable() const { return m_focusable; }
         
         /**
+          * \}
+          */
+        
+        /**
+         * \{
+         * \name Focus management
+         */
+        
+        /**
+         * Focus the widget for the given player.
          * \param playerID ID of the player you want to set/unset focus for, starting from 0
          */
         void setFocusForPlayer(const int playerID);
         
         /**
+         * Find whether this widget is focused by a given player.
          * \param playerID ID of the player you want to set/unset focus for, starting from 0
+         * \return whether this widget is focused by a given player.
          */
         bool isFocusedForPlayer(const int playerID);
         
@@ -369,27 +420,54 @@ namespace GUIEngine
         void unsetFocusForPlayer(const int playerID);
         
         /**
-          * Call to resize/move the widget. Not all widgets can resize gracefully.
+          * \}
           */
-        virtual void move(const int x, const int y, const int w, const int h);
-        
-        /** \return Type of this widget */
-        WidgetType getType() const { return m_type; }
-        
-        bool isSelected(const int playerID) const { return m_selected[playerID]; }
-        
-        bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
         
         /**
-         * These methods provide new unique IDs each time you call them.
-         * Since IDs are used to determine tabbing order, "non-tabbable"
-         * objects are being given very different IDs so that they don't interfere.
+         * \{
+         * \name ID Counter Functions
+         *
+         * Functions used to generate IDs for new widgets. The domain of each ID
+         * encodes whether the widget can receive focus or not (this was implemented
+         * this way because navigation in irrlicht happens between sequential IDs; so
+         * to prevent navigation to a widget, one needs to give an ID that is not
+         * sequential with focusable widgets in order not to break keyboard navigation).
          */
+        
+        static void resetIDCounters();
+
+        /**
+          * \brief Provides a new unique ID on each call, for widgets that can be focused.
+          */
         static int getNewID();
+        
+        /**
+          * \brief Provides a new unique ID on each call, for widgets that can not be focused.
+          */
         static int getNewNoFocusID();
         
+        /**
+          * \brief get whether the given ID represents an ID of a widget that can be focused
+          * \return whether the given ID represents an ID of a widget that can be focused
+          *         (i.e. whether it was generated by Widget::getNewID() or
+          *          Widget::getNewNoFocusID())
+          */
         static bool isFocusableId(const int id);
         
+        /**
+          * \}
+          */
+        
+        /**
+         * \{
+         * \name Handling children
+         *
+         * If this widget is a container and has children.
+         */
+        
+        /**
+          * \return a read-only view of the childrens of this widget, if any
+          */
         const ptr_vector<Widget>& getChildren() const { return m_children; }
         
         /**
@@ -398,6 +476,18 @@ namespace GUIEngine
           * \return whether deletion was successful
           */
         bool deleteChild(const char* id);
+        
+        /**
+          * \}
+          */
+        
+        /**
+         * \{
+         * \name Callbacks for implementating classes
+         *
+         * Classes that subclass Widget to provide actual implementations may override/implement these
+         * methods to change behaviour or be notified of some events.
+         */
         
         /**
          * \brief Override in children to possibly receive updates (you may need to register to
@@ -422,17 +512,59 @@ namespace GUIEngine
           */
         virtual void elementRemoved();
         
-        int getID() const { return m_id; }
+        bool searchInsideMe() const { return m_check_inside_me; }
+
+        /**
+          * \}
+          */
         
         /**
-          * \brief Sets the widget (and its children, if any) visible or not.
-          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
-          * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
-          * undefined behavior may ensue (like invisible but clickable buttons).
-          */
-        void setVisible(bool visible);
+         * \{
+         * \name Badge support
+         *
+         * "Badges" are icons that can appear on top of some widgets.
+         */
         
-        bool searchInsideMe() const { return m_check_inside_me; }
+        /** 
+         * \brief adds a particular badge to this widget.
+         * The STK widget toolkit has support for "badges". Badges are icon overlays displayed
+         * on the corner of a widget; they are useful to convey information visually.
+         */
+        void setBadge(BadgeType badge_bit)
+        {
+            m_badges |= int(badge_bit);
+        }
+        
+        /** 
+         * \brief removes a particular bade from this widget, if it had it.
+         * \see GUIEngine::Widget::setBadge for more info on badge support
+         */
+        void unsetBadge(BadgeType badge_bit)
+        {
+            m_badges &= (~int(badge_bit));
+        }
+        
+        /** \brief sets this widget to have no badge
+         * \see GUIEngine::Widget::setBadge for more info on badge support
+         */
+        void resetAllBadges()
+        {
+            m_badges = 0;
+        }
+        
+        /**
+         * \brief Get which badges are currently on this widget
+         * \return a bitmask of BadgeType values
+         */
+        int getBadges() const
+        {
+            return m_badges;
+        }
+        
+        /**
+         * \}
+         */
+        
     };
 
     
