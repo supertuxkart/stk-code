@@ -301,8 +301,18 @@ public:
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
         if(!props)
         {
-            fprintf(stderr, "Can't find default kart '%s' - aborting.\n", 
-                    default_kart.c_str());
+            // If the default kart can't be found (e.g. previously a addon 
+            // kart was used, but the addon package was removed, use the
+            // first kart as a default. This way we don't have to hardcode
+            // any kart names.
+            props = kart_properties_manager->getKartById(0);
+            if(!props)
+            {
+                fprintf(stderr, 
+                        "Can't find default kart '%s' nor any other kart.\n",
+                        default_kart.c_str());
+                exit(-1);
+            }
         }
 
         KartModel* kartModel = props->getKartModel();
