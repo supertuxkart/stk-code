@@ -39,6 +39,9 @@ const float KART_END_X = -5.0f;
 const float KART_Y = -3.0f;
 const float KART_Z = 0.0f;
 
+
+const float GARAGE_DOOR_OPEN_TIME = 6.0f;
+
 DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 // -------------------------------------------------------------------------------------
@@ -151,13 +154,15 @@ void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
     const int lastFrame = m_garage_door->getEndFrame();
-    if (m_global_time < 6.0f)
+    if (m_global_time < GARAGE_DOOR_OPEN_TIME)
     {
-        m_garage_door->setCurrentFrame( (m_global_time/6.0f)*lastFrame );
+        m_garage_door->setCurrentFrame( (m_global_time/GARAGE_DOOR_OPEN_TIME)*lastFrame );
     }
-    else if (m_global_time > DURATION - 6.0f )
+    else if (m_global_time > DURATION - GARAGE_DOOR_OPEN_TIME)
     {
-        m_garage_door->setCurrentFrame( (1.0f - ((m_global_time - (DURATION - 6.0f))/6.0f))*lastFrame );
+        m_garage_door->setCurrentFrame( (1.0f - ((m_global_time -
+                                                  (DURATION - GARAGE_DOOR_OPEN_TIME))/GARAGE_DOOR_OPEN_TIME))
+                                       *lastFrame );
     }
     //else if (m_global_time < DURATION)
     //{
