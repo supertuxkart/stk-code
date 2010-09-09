@@ -380,7 +380,6 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         {
             for(unsigned int i=0; i<getNumberOfKarts(); i++)
             {
-                std::cout << "Refill : i=" << i << ", used[i]=" << used[i] << ", m_kart_available[i]=" << m_kart_available[i] << std::endl;
                 if(!used[i] && m_kart_available[i] &&
                    !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
                     karts.push_back(i);
@@ -393,7 +392,6 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
             {
                 for(unsigned int i=0; i<getNumberOfKarts(); i++)
                 {
-                    std::cout << "Refill : i=" << i << ", used[i]=" << used[i] << ", m_kart_available[i]=" << m_kart_available[i] << std::endl;
                     if(m_kart_available[i] &&
                         !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
                         karts.push_back(i);
