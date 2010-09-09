@@ -20,6 +20,8 @@
 #ifndef HEADER_SMOKE_HPP
 #define HEADER_SMOKE_HPP
 
+#include "utils/no_copy.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -29,7 +31,7 @@ class Kart;
   * \brief manages smoke particle effects
   * \ingroup graphics
   */
-class Smoke
+class Smoke : public NoCopy
 {
 private:
     /** The kart to which this smoke belongs. */
