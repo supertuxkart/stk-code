@@ -27,6 +27,7 @@ using namespace irr;
 
 #include "physics/kart_motion_state.hpp"
 #include "physics/user_pointer.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Material;
@@ -39,7 +40,7 @@ class Material;
 /**
   * \ingroup karts
   */
-class Moveable
+class Moveable: public NoCopy
 {
 private:
     btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */

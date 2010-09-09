@@ -25,7 +25,6 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class KartProperties;
@@ -37,9 +36,11 @@ class XMLNode;
  *  the wheels, which are loaded as separate objects. The wheels can turn
  *  and (for the front wheels) rotate. The implementation is dependent on the
  *  OpenGL library used. 
+ *  Note that this object is copied using the default copy function. See
+ *  kart.cpp.
  * \ingroup karts
  */
-class KartModel : public scene::IAnimationEndCallBack            
+class KartModel : public scene::IAnimationEndCallBack
 {
 public:
     enum   AnimationFrameType

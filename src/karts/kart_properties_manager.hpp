@@ -22,14 +22,16 @@
 
 #include <vector>
 #include <map>
+
 #include "network/remote_kart_info.hpp"
+#include "utils/no_copy.hpp"
 
 class KartProperties;
 
 /**
   * \ingroup karts
   */
-class KartPropertiesManager
+class KartPropertiesManager: public NoCopy
 {
 private:
     /** The list of all directories in which to search for karts. */

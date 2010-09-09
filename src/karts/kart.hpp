@@ -60,8 +60,7 @@ class WaterSplash;
  *  and TerrainInfo, which manages the terrain the kart is on.
  * \ingroup karts
  */
-class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
-             public NoCopy
+class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation
 {
 private:
     /** Reset position. */

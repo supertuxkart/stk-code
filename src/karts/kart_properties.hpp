@@ -30,16 +30,19 @@ using namespace irr;
 #include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Material;
 class XMLNode;
 
 /** 
- * \brief This class stores the properties of a kart.
- * This includes size, name, identifier, physical properties etc.
- * It is atm also the base class for STKConfig, which stores the default values
- * for all physics constants.
+ *  \brief This class stores the properties of a kart.
+ *  This includes size, name, identifier, physical properties etc.
+ *  It is atm also the base class for STKConfig, which stores the default values
+ *  for all physics constants.
+ *  Note that KartProperies is copied (when setting the default values from 
+ *  stk_config.
  *
  * \ingroup karts
  */

@@ -20,6 +20,7 @@
 #ifndef HEADER_EMERGENCY_ANIMATION_HPP
 #define HEADER_EMERGENCY_ANIMATION_HPP
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;
@@ -37,7 +38,7 @@ class Stars;
  *  explosion happens.
  * \ingroup karts
  */
-class EmergencyAnimation
+class EmergencyAnimation: public NoCopy
 {
 private:
     /** The coordinates where the kart was hit originally. */

@@ -30,7 +30,6 @@ using namespace irr;
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "tracks/terrain_info.hpp"
-#include "utils/no_copy.hpp"
 
 class FlyableInfo;
 class Kart;
@@ -40,7 +39,7 @@ class XMLNode;
 /**
   * \ingroup items
   */
-class Flyable : public Moveable, public TerrainInfo, public NoCopy
+class Flyable : public Moveable, public TerrainInfo
 {
 public:
 private:
