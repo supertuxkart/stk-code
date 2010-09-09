@@ -1042,6 +1042,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\confirm_dialog.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp"
 						>
 					</File>
@@ -1909,6 +1913,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\addons_loading.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\confirm_dialog.hpp"
 						>
 					</File>
 					<File
