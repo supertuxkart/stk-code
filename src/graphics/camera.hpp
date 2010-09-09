@@ -35,7 +35,7 @@ class Kart;
 
 /**
   * \brief Handles the game camera
-  * \ingroup graphicsp"
+  * \ingroup graphics
   */
 class Camera : public NoCopy
 {
