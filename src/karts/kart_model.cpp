@@ -49,6 +49,7 @@ KartModel::KartModel()
         m_wheel_physics_position[i]  = Vec3(UNDEFINED);
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
+        m_wheel_node[i]              = NULL;
         // default value for kart suspensions. move to config file later if we find each kart needs custom values
         m_min_suspension[i] = -1.3f;
         m_max_suspension[i] = 1.3f;
@@ -106,8 +107,8 @@ KartModel::~KartModel()
 {
     for(unsigned int i=0; i<4; i++)
     {
-        m_wheel_node[i]->remove();
-        //m_wheel_node[i]->drop();
+        if(m_wheel_node[i])
+            m_wheel_node[i]->drop();
     }
 
 }  // ~KartModel
@@ -143,6 +144,7 @@ void KartModel::attachModel(scene::ISceneNode **node)
     {
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i],
                                               *node);
+        m_wheel_node[i]->grab();
 #ifdef DEBUG
         std::string debug_name = m_wheel_filename[i]+" (wheel)";
         m_wheel_node[i]->setName(debug_name.c_str());
