@@ -27,6 +27,7 @@
 
 #include "guiengine/event_handler.hpp"
 #include "input/input.hpp"
+#include "utils/no_copy.hpp"
 
 class DeviceManager;
 
@@ -34,7 +35,7 @@ class DeviceManager;
   * \brief Class to handle input. 
   * \ingroup input
   */
-class InputManager
+class InputManager: public NoCopy
 {
 public:
     enum InputDriverMode

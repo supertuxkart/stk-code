@@ -3,6 +3,7 @@
 
 #include "input/input_device.hpp"
 #include "config/device_config.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 enum PlayerAssignMode
@@ -27,7 +28,7 @@ enum PlayerAssignMode
  *
  * \ingroup input
  */
-class DeviceManager
+class DeviceManager: public NoCopy
 {
 private:
 

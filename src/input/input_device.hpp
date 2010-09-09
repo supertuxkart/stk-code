@@ -10,7 +10,7 @@
 #include "input/input_manager.hpp"
 #include "io/xml_node.hpp"
 #include "states_screens/state_manager.hpp"
-
+#include "utils/no_copy.hpp"
 /**
   * \brief Input device type
   * \ingroup input
@@ -25,7 +25,7 @@ enum DeviceType
   * \brief base class for input devices
   * \ingroup input
   */
-class InputDevice
+class InputDevice: public NoCopy
 {
     friend class DeviceManager;
 protected:
