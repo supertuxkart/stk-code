@@ -189,12 +189,15 @@ void FeatureUnlockedCutScene::init()
     
     if (unlockedStuffCount == 0)  std::cerr << "There is nothing in the unlock chest!!!\n";
     
+    m_all_kart_models.clear();
     for (int n=0; n<unlockedStuffCount; n++)
     {
         if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
-            KartModel* kart_model = 
-                m_unlocked_stuff[n].m_unlocked_kart->getKartModel();
+            m_all_kart_models.push_back(
+                (*m_unlocked_stuff[n].m_unlocked_kart->getKartModel())
+                                        );
+            KartModel *kart_model = &(m_all_kart_models.back());
             kart_model->attachModel(&(m_unlocked_stuff[n].m_root_gift_node));
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
@@ -202,7 +205,7 @@ void FeatureUnlockedCutScene::init()
 #ifdef USE_IRRLICHT_BUG_WORKAROUND
             // If a mesh with this material is added, irrlicht will
             // display the 'continue' text (otherwise the text is
-            // not visible). This is a terrible work around, but
+            // not visible). This is a terrible work around, but allows
             // stk to be released without waiting for the next
             // irrlicht version.
             video::SMaterial m;
@@ -268,6 +271,7 @@ void FeatureUnlockedCutScene::tearDown()
 #endif
 
     m_unlocked_stuff.clearAndDeleteAll();
+    m_all_kart_models.clear();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
