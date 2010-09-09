@@ -213,7 +213,7 @@ public:
     std::string m_kartInternalName;
     
     PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
-                     Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
+                     core::recti area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;
@@ -227,7 +227,7 @@ public:
         m_playerID = playerID;
         m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
         
-        setSize(area->m_x, area->m_y, area->m_w, area->m_h);
+        setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y, area.getWidth(), area.getHeight());
         target_x = m_x;
         target_y = m_y;
         target_w = m_w;
@@ -928,8 +928,12 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
-    Widget kartsArea = *getWidget("playerskarts"); // copy
-    kartsArea.m_x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
+    Widget* kartsAreaWidget = getWidget("playerskarts");
+    const int shift = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
+    core::recti kartsArea(kartsAreaWidget->m_x + shift,
+                          kartsAreaWidget->m_y,
+                          kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
+                          kartsAreaWidget->m_y + kartsAreaWidget->m_h);
     
     // ---- Create new active player
     PlayerProfile* profileToUse = UserConfigParams::m_all_players.get(0);
@@ -951,7 +955,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     StateManager::ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
     
     // ---- Create player/kart widget
-    PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
+    PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size());
 
     manualAddWidget(newPlayerWidget);
     newPlayerWidget->add();
