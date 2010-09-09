@@ -23,6 +23,7 @@
 #define MAX_POWERUPS 5
 
 #include "items/powerup_manager.hpp"  // needed for powerup_type
+#include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
@@ -32,7 +33,7 @@ class SFXBase;
 /**
   * \ingroup items
   */
-class Powerup
+class Powerup : public NoCopy
 {
 private:
     /** A synchronised random number generator for network games. */

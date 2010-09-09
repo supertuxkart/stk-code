@@ -23,14 +23,16 @@
 
 #include <vector>
 #include <map>
+
 #include "items/item.hpp"
+#include "utils/no_copy.hpp"
 
 class Kart;
 
 /**
   * \ingroup items
   */
-class ItemManager
+class ItemManager : public NoCopy
 {
 
 private:

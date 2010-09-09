@@ -25,6 +25,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "utils/no_copy.hpp"
 
 class Vec3;
 class Kart;
@@ -34,7 +35,7 @@ class Flyable;
 /**
   * \ingroup items
   */
-class ProjectileManager
+class ProjectileManager : public NoCopy
 {
 private:
     typedef std::vector<Flyable*>   Projectiles;

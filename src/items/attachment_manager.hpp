@@ -21,11 +21,12 @@
 
 #include "irrlicht.h"
 #include "items/attachment.hpp"
+#include "utils/no_copy.hpp"
 
 /**
   * \ingroup items
   */
-class AttachmentManager
+class AttachmentManager: public NoCopy
 {
 private:
     scene::IAnimatedMesh *m_attachments[ATTACH_MAX];

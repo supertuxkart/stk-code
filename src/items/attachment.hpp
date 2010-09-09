@@ -21,6 +21,7 @@
 #define HEADER_ATTACHMENT_HPP
 
 #include "config/stk_config.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
@@ -43,7 +44,7 @@ enum attachmentType
 /**
   * \ingroup items
   */
-class Attachment
+class Attachment: public NoCopy
 {
 private:
     attachmentType  m_type;            //!< attachment type

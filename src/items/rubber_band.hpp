@@ -20,9 +20,9 @@
 #ifndef HEADER_RUBBER_BAND_HPP
 #define HEADER_RUBBER_BAND_HPP
 
-
-
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+
 class Kart;
 class Plunger;
 
@@ -30,7 +30,7 @@ class Plunger;
  *  the shooting kart to the plunger.
  * \ingroup items
  */
-class RubberBand
+class RubberBand : public NoCopy
 {
 private:
     enum {RB_TO_PLUNGER,         /**< Rubber band is attached to plunger.    */

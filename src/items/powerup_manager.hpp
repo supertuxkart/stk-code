@@ -27,6 +27,8 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include "utils/no_copy.hpp"
+
 class Material;
 class XMLNode;
 
@@ -64,7 +66,7 @@ class XMLNode;
  *   anvil,anvil.
  */
 
-class PowerupManager
+class PowerupManager : public NoCopy
 {
 public:
     // The anvil and parachute must be at the end of the enum, and the

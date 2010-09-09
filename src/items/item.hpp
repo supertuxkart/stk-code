@@ -28,13 +28,14 @@
 using namespace irr;
 
 #include "karts/kart.hpp"
+#include "utils/no_copy.hpp"
 
 // -----------------------------------------------------------------------------
 
 /**
   * \ingroup items
   */
-class Item
+class Item : public NoCopy
 {
 public:
     /**
