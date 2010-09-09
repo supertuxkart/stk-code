@@ -260,6 +260,12 @@ void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
     Kart    *kart       = m_karts[kart_index];
+
+    // Don't do anything if a kart that has already finished the race
+    // crosses the start line again. This avoids 'fastest lap' messages
+    // if the end controller does a fastest lap.
+    if(kart->hasFinishedRace()) return;
+
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
