@@ -21,6 +21,10 @@
 
 #include "guiengine/modaldialog.hpp"
 
+/**
+ * \brief Dialog shown when editing input bindings and it's time to press a key
+ * \ingroup states_screens
+ */
 class PressAKeyDialog : public GUIEngine::ModalDialog
 {
 public:

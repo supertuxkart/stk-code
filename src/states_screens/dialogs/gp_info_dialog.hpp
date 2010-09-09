@@ -26,6 +26,10 @@ namespace GUIEngine
     class IconButtonWidget;
 }
 
+/**
+ * \brief Dialog that shows information about a specific grand prix
+ * \ingroup states_screens
+ */
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_gp_ident;

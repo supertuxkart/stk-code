@@ -22,7 +22,11 @@
 #include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
 
-
+/**
+ * \brief Dialog shown after a resolution switch sot he user may confirm if
+ *        the resolution works.
+ * \ingroup states_screens
+ */
 class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 {
     /** number of seconds left before resolution is considered unplayable */

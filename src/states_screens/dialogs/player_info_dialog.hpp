@@ -27,6 +27,10 @@ namespace GUIEngine
     class TextBoxWidget;
 }
 
+/**
+ * \brief Dialog that allows renaming and deleting players
+ * \ingroup states_screens
+ */
 class PlayerInfoDialog : public GUIEngine::ModalDialog
 {
     GUIEngine::TextBoxWidget* textCtrl;

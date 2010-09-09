@@ -28,11 +28,12 @@ namespace GUIEngine
     class LabelWidget;
 }
 
+/**
+ * \brief Dialog that allows the player to enter the name for a new player
+ * \ingroup states_screens
+ */
 class EnterPlayerNameDialog : public GUIEngine::ModalDialog
 {
-    //GUIEngine::LabelWidget*   m_label_ctrl;
-    //GUIEngine::TextBoxWidget* textCtrl;
-    //GUIEngine::ButtonWidget*  cancelButton;
     
 public:
     /**

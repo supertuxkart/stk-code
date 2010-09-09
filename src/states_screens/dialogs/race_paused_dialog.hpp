@@ -25,9 +25,12 @@ namespace GUIEngine
     class RibbonWidget;
 }
 
+/**
+ * \brief Dialog shown when the race is paused
+ * \ingroup states_screens
+ */
 class RacePausedDialog : public GUIEngine::ModalDialog
 {
-    //GUIEngine::RibbonWidget* m_choice_ribbon;
     
 protected:
     virtual void loadedFromFile();

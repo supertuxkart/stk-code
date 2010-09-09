@@ -22,10 +22,18 @@
 #include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
 
-
+/**
+ * \brief Generic dialog to ask the user to confirm something.
+ * \ingroup states_screens
+ */
 class ConfirmDialog : public GUIEngine::ModalDialog
 {
 public:
+    
+    /**
+     * \brief Listener interface to get notified of whether the user chose to confirm or cancel
+     * \ingroup states_screens
+     */
     class IConfirmDialogListener
     {
     public:
@@ -45,8 +53,14 @@ private:
     
 public:
 
+    /**
+      * \param msg Message to display in the dialog
+      * \param listener A listener object to notify when the user made a choice
+      */
     ConfirmDialog(irr::core::stringw msg, IConfirmDialogListener* listener);
-    void onEnterPressedInternal();
+    
+    virtual void onEnterPressedInternal();
+    
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 

@@ -26,6 +26,10 @@ static const int HIGHSCORE_COUNT = 3;
 
 namespace irr { namespace gui { class IGUIImage; class IGUIStaticText; } }
 
+/**
+ * \brief Dialog that shows the information about a given track
+ * \ingroup states_screens
+ */
 class TrackInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_track_ident;
