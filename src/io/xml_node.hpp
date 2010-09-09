@@ -20,6 +20,8 @@
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
+#include "utils/no_copy.hpp"
+
 #include <string>
 #include <map>
 #include <vector>
@@ -32,7 +34,7 @@ class Vec3;
   * \brief utility class used to parse XML files
   * \ingroup io
   */
-class XMLNode
+class XMLNode : public NoCopy
 {
 private:
     /** Name of this element. */

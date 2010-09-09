@@ -32,12 +32,13 @@
 using namespace irr;
 
 #include "io/xml_node.hpp"
+#include "utils/no_copy.hpp"
 
 /**
   * \brief class handling files and paths
   * \ingroup io
   */
-class FileManager
+class FileManager : public NoCopy
 {
 private:
     /** Handle to irrlicht's file systems. */
