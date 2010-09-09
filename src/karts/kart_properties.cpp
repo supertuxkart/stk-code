@@ -213,8 +213,6 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("groups",            &m_groups           );
 
-    //m_kart_model.loadInfo(lisp);
-
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
 

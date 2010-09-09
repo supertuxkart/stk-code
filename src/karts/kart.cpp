@@ -72,6 +72,14 @@ Kart::Kart (const std::string& ident, int position,
 {
     m_kart_properties      = kart_properties_manager->getKart(ident);
     assert(m_kart_properties != NULL);
+    // We have to take a copy of the kart model, since otherwise
+    // the animations will be mixed up (i.e. different instances of
+    // the same model will set different animation frames).
+    // Technically the mesh in m_kart_model needs to be grab'ed and
+    // released when the kart is deleted, but since the original 
+    // kart_model is stored in the kart_properties all the time,
+    // there is no risk of a mesh being deleted to early.
+    m_kart_model           = *(m_kart_properties->getKartModel());
     m_initial_position     = position;
     m_race_position        = position;
     m_collected_energy     = 0;
@@ -183,10 +191,9 @@ void Kart::createPhysics()
 {
     // First: Create the chassis of the kart
     // -------------------------------------
-    const KartModel *km = m_kart_properties->getKartModel();
-    float kart_width  = km->getWidth();
-    float kart_length = km->getLength();
-    float kart_height = km->getHeight();
+    float kart_width  = getKartWidth();
+    float kart_length = getKartLength();
+    float kart_height = getKartHeight();
 
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
                                                  0.5f*kart_height,
@@ -241,7 +248,7 @@ void Kart::createPhysics()
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            m_kart_properties->getKartModel()->getWheelPhysicsPosition(i),
+                            m_kart_model.getWheelPhysicsPosition(i),
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, *m_tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
@@ -367,7 +374,7 @@ void Kart::reset()
     }
     
     // Stop any animations currently being played.
-    m_kart_properties->getKartModel()->setAnimation(KartModel::AF_DEFAULT);
+    m_kart_model.setAnimation(KartModel::AF_DEFAULT);
     // If the controller was replaced (e.g. replaced by end controller), 
     //  restore the original controller. 
     if(m_saved_controller)
@@ -375,7 +382,7 @@ void Kart::reset()
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
-    m_kart_properties->getKartModel()->setAnimation(KartModel::AF_DEFAULT);
+    m_kart_model.setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
     m_powerup.reset();
@@ -466,9 +473,9 @@ void Kart::finishedRace(float time)
         setController(new EndController(this, m_controller->getPlayer()));
         if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
             m_race_position==1)
-            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_WIN_START);
+            m_kart_model.setAnimation(KartModel::AF_WIN_START);
         else 
-            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
+            m_kart_model.setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_FINAL);
@@ -485,9 +492,9 @@ void Kart::finishedRace(float time)
         // start end animation
         setController(new EndController(this, m_controller->getPlayer()));
         if(m_race_position<=2)
-            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_WIN_START);
+            m_kart_model.setAnimation(KartModel::AF_WIN_START);
         else if(m_race_position>=0.7f*race_manager->getNumberOfKarts())
-            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
+            m_kart_model.setAnimation(KartModel::AF_LOSE_START);
             
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
@@ -1327,7 +1334,7 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::loadData()
 {
-    m_kart_properties->getKartModel()->attachModel(&m_node);
+    m_kart_model.attachModel(&m_node);
     // Attachment must be created after attachModel, since only then the
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which
@@ -1403,7 +1410,6 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                           const btQuaternion& rotation)
 {
     float wheel_up_axis[4];
-    KartModel *kart_model = m_kart_properties->getKartModel();
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
@@ -1417,15 +1423,15 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
 //        auto_skid = m_controls.m_steer*30.0f*((auto_skid_visual - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
 //    else
         auto_skid = m_controls.m_steer*30.0f;
-    kart_model->update(m_wheel_rotation, auto_skid,
-                       getSteerPercent(), wheel_up_axis);
+    m_kart_model.update(m_wheel_rotation, auto_skid,
+                        getSteerPercent(), wheel_up_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
             - m_default_suspension_length[0]
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
-            - (kart_model->getWheelGraphicsRadius(0)
-               -kart_model->getWheelGraphicsPosition(0).getY() );
+            - (m_kart_model.getWheelGraphicsRadius(0)
+               -m_kart_model.getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
 
     if(m_smoke_system)

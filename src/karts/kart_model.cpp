@@ -28,8 +28,18 @@
 
 float KartModel::UNDEFINED = -99.9f;
 
-/** The constructor reads the model file name and wheel specification from the
- *  kart config file.
+/** Default constructor which initialises all variables with defaults.
+ *  Note that the KartModel is copied, so make sure that all variables
+ *  are safe to be copied, or write a custom copy function.
+ *  ATM there are two pointers:
+ *  - to the scene node (which is otherwise handled by kart and set 
+ *    later anyway)
+ *  - to the mesh. Sharing mesh is supported in irrlicht, so that's
+ *    no problem.
+ *  Technically the scene node and mesh should be grab'ed on copy, 
+ *  and dropped when the copy is deleted. But since the master copy
+ *  in the kart_properties_manager is always kept, there is no risk of
+ *  a mesh being deleted to early.
  */
 KartModel::KartModel()
 {
@@ -94,6 +104,12 @@ void KartModel::loadInfo(const XMLNode &node)
  */
 KartModel::~KartModel()
 {
+    for(unsigned int i=0; i<4; i++)
+    {
+        m_wheel_node[i]->remove();
+        //m_wheel_node[i]->drop();
+    }
+
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
@@ -125,13 +141,13 @@ void KartModel::attachModel(scene::ISceneNode **node)
 
     for(unsigned int i=0; i<4; i++)
     {
-        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
-        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i],
+                                              *node);
 #ifdef DEBUG
         std::string debug_name = m_wheel_filename[i]+" (wheel)";
         m_wheel_node[i]->setName(debug_name.c_str());
 #endif
-        (*node)->addChild(m_wheel_node[i]);
+        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
     }
 }   // attachModel
 

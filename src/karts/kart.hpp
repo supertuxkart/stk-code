@@ -29,11 +29,13 @@
 #include "items/powerup.hpp"
 #include "karts/emergency_animation.hpp"
 #include "karts/moveable.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_model.hpp"
 #include "tracks/terrain_info.hpp"
+#include "utils/no_copy.hpp"
 
 class btKart;
 class btUprightConstraint;
@@ -58,7 +60,8 @@ class WaterSplash;
  *  and TerrainInfo, which manages the terrain the kart is on.
  * \ingroup karts
  */
-class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation
+class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
+             public NoCopy
 {
 private:
     /** Reset position. */
@@ -201,7 +204,10 @@ private:
 
 protected:
     const KartProperties *m_kart_properties;
-
+    /** This stores a copy of the kart model. It has to be a copy
+     *  since otherwise incosistencies can happen if the same kart
+     *  is used more than once. */
+    KartModel             m_kart_model;
     
 public:
                    Kart(const std::string& ident, int position, 
@@ -334,14 +340,12 @@ public:
     float          getMaxSpeedOnTerrain() const {return m_max_speed-
                                                      m_max_speed_reduction;    }
     /** Returns the length of the kart. */
-    float          getKartLength    () const
-                   {return m_kart_properties->getKartModel()->getLength();     }
+    float          getKartLength    () const {return m_kart_model.getLength(); }
     /** Returns the height of the kart. */
-    float          getKartHeight    () const 
-                   {return m_kart_properties->getKartModel()->getHeight();     }
+    float          getKartHeight    () const {return m_kart_model.getHeight(); }
     /** Returns the width of the kart. */
-    float          getKartWidth    () const 
-                   {return m_kart_properties->getKartModel()->getWidth();      }
+    float          getKartWidth     () const {return m_kart_model.getWidth();  }
+    /** Returns the bullet vehicle which represents this kart. */
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           createPhysics    ();
