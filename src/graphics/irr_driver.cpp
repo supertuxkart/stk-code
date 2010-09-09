@@ -178,6 +178,7 @@ void IrrDriver::initDevice()
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
     m_scene_manager = m_device->getSceneManager();
+    
     // Force creation of mipmaps even if the mipmaps flag in a b3d file
     // does not set the 'enable mipmap' flag.
     m_scene_manager->getParameters()->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
@@ -480,9 +481,10 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  *  since the node is not optimised.
  *  \param mesh The mesh to add.
  */
-scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
+scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
+                                          scene::ISceneNode *parent)
 {
-    return m_scene_manager->addMeshSceneNode(mesh);
+    return m_scene_manager->addMeshSceneNode(mesh, parent);
 }   // addMesh
 
 // ----------------------------------------------------------------------------

@@ -20,6 +20,8 @@
 #ifndef MOVING_TEXTURE_HPP
 #define MOVING_TEXTURE_HPP
 
+#include "utils/no_copy.hpp"
+
 #include <string>
 #include "irrlicht.h"
 using namespace irr;
@@ -30,7 +32,7 @@ class XMLNode;
   * \brief Handles animated textures (textures that move)
   * \ingroup graphics
   */
-class MovingTexture
+class MovingTexture : public NoCopy
 {
 private:
     /** Translation increment per second. */

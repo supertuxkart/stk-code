@@ -20,6 +20,8 @@
 #ifndef HEADER_MATERIAL_MANAGER_HPP
 #define HEADER_MATERIAL_MANAGER_HPP
 
+#include "utils/no_copy.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -32,7 +34,7 @@ class XMLReader;
 /**
   * \ingroup graphics
   */
-class MaterialManager
+class MaterialManager : public NoCopy
 {
 private:
 

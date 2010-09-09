@@ -20,6 +20,8 @@
 #ifndef HEADER_MATERIAL_HPP
 #define HEADER_MATERIAL_HPP
 
+#include "utils/no_copy.hpp"
+
 #include <string>
 
 #include "irrlicht.h"
@@ -31,7 +33,7 @@ class SFXBase;
 /**
   * \ingroup graphics
   */
-class Material
+class Material : public NoCopy
 {
 public:
     enum GraphicalEffect {GE_NONE, GE_SMOKE, GE_WATER};

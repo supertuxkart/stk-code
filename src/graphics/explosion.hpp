@@ -20,6 +20,8 @@
 #ifndef HEADER_EXPLOSION_HPP
 #define HEADER_EXPLOSION_HPP
 
+#include "utils/no_copy.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -29,7 +31,7 @@ class SFXBase;
 /**
   * \ingroup graphics
   */
-class Explosion 
+class Explosion : public NoCopy
 {
 private:
     SFXBase*       m_explode_sound;

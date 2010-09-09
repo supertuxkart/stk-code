@@ -24,6 +24,8 @@
 using namespace irr;
 
 #include "graphics/moving_texture.hpp"
+#include "utils/no_copy.hpp"
+
 class Kart;
 
 /**

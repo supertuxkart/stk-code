@@ -17,6 +17,8 @@
 #ifndef HEADER_STARS_HPP
 #define HEADER_STARS_HPP
 
+#include "utils/no_copy.hpp"
+
 #include <vector>
 
 #include "irrlicht.h"
@@ -26,7 +28,7 @@ using namespace irr;
   * \brief This class is used to display rotating stars around a kart's head.
   * \ingroup graphics
   */
-class Stars
+class Stars : public NoCopy
 {
 private:
     

@@ -20,6 +20,8 @@
 #ifndef HEADER_SHADOW_HPP
 #define HEADER_SHADOW_HPP
 
+#include "utils/no_copy.hpp"
+
 #include <string>
 
 #include "irrlicht.h"
@@ -31,7 +33,7 @@ using namespace irr;
  * be added later.
  * \ingroup graphics
  */
-class Shadow
+class Shadow : public NoCopy
 {
 private:
     /** The scene node for the shadow. */

@@ -20,6 +20,8 @@
 #ifndef HEADER_NITRO_HPP
 #define HEADER_NITRO_HPP
 
+#include "utils/no_copy.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -29,7 +31,7 @@ class Kart;
   * \brief Handles nitro particle effects
   * \ingroup graphics
   */
-class Nitro
+class Nitro : public NoCopy
 {
 private:
     /** The kart to which this nitro belongs. */

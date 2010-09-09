@@ -25,6 +25,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;
@@ -32,7 +33,7 @@ class Kart;
 /** \brief This class is responsible for drawing skid marks for a kart.
   * \ingroup graphics
   */
-class SkidMarks
+class SkidMarks : public NoCopy
 {
 private:
     /** Reference to the kart to which these skidmarks belong. */
@@ -51,7 +52,7 @@ private:
     /** Material to use for the skid marks. */
     video::SMaterial  *m_material;
 
-    class SkidMarkQuads : public scene::SMeshBuffer
+    class SkidMarkQuads : public scene::SMeshBuffer, public NoCopy
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines

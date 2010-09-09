@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
@@ -45,7 +46,7 @@ struct VideoMode
   * \brief class that creates the irrLicht device and offers higher-level ways to manage the 3D scene
   * \ingroup graphics
   */
-class IrrDriver : public IEventReceiver
+class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
     /** The irrlicht device. */
@@ -111,7 +112,8 @@ public:
     scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
-    scene::IMeshSceneNode*addMesh(scene::IMesh *mesh);
+    scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
+                                  scene::ISceneNode *parent=NULL);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent=NULL);
 
     scene::IParticleSystemSceneNode

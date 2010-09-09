@@ -28,6 +28,7 @@
 using namespace irr;
 
 #include "io/xml_node.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;
@@ -36,7 +37,7 @@ class Kart;
   * \brief Handles the game camera
   * \ingroup graphicsp"
   */
-class Camera
+class Camera : public NoCopy
 {
 public:
     enum Mode {

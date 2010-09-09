@@ -20,6 +20,8 @@
 #ifndef HEADER_WATER_SPLASH_HPP
 #define HEADER_WATER_SPLASH_HPP
 
+#include "utils/no_copy.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -29,7 +31,7 @@ class Kart;
   * \brief Handles a water-splash particle effect
   * \ingroup graphics
   */
-class WaterSplash
+class WaterSplash : public NoCopy
 {
 private:
     /** The kart to which this smoke belongs. */
