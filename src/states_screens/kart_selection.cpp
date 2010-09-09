@@ -315,13 +315,13 @@ public:
             }
         }
 
-        KartModel* kartModel = props->getKartModel();
+        KartModel* kart_model = props->getKartModel();
         
-        m_model_view->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
-        m_model_view->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-        m_model_view->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-        m_model_view->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-        m_model_view->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+        m_model_view->addModel( kart_model->getModel(), Vec3(0,0,0), kart_model->getBaseFrame() );
+        m_model_view->addModel( kart_model->getWheelModel(0), kart_model->getWheelGraphicsPosition(0) );
+        m_model_view->addModel( kart_model->getWheelModel(1), kart_model->getWheelGraphicsPosition(1) );
+        m_model_view->addModel( kart_model->getWheelModel(2), kart_model->getWheelGraphicsPosition(2) );
+        m_model_view->addModel( kart_model->getWheelModel(3), kart_model->getWheelGraphicsPosition(3) );
         m_model_view->setRotateContinuously( 35.0f );
         
         // ---- Kart name label
@@ -336,6 +336,7 @@ public:
         //m_kart_name->setParent(this);
         m_children.push_back(m_kart_name);
     }
+    // -------------------------------------------------------------------------
     
     ~PlayerKartWidget()
     {
@@ -357,7 +358,8 @@ public:
             m_kart_name->getIrrlichtElement()->remove();
         
         getCurrentScreen()->manualRemoveWidget(this);
-    }
+    }   // ~PlayerKartWidget
+    // -------------------------------------------------------------------------
     
     /** Called when players are renumbered (changes the player ID) */
     void setPlayerID(const int newPlayerID)
@@ -386,14 +388,16 @@ public:
         m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
         
         if (m_player_ident_spinner != NULL) m_player_ident_spinner->setID(m_playerID);
-    }
+    }   // setPlayerID
     
+    // -------------------------------------------------------------------------
     /** Returns the ID of this player */
     int getPlayerID() const
     {
         return m_playerID;
     }
     
+    // -------------------------------------------------------------------------
     /** Add the widgets to the current screen */
     virtual void add()
     {
@@ -424,12 +428,14 @@ public:
         assert(m_player_ident_spinner->getStringValue() == m_associatedPlayer->getProfile()->getName());
     }
     
+    // -------------------------------------------------------------------------
     /** Get the associated ActivePlayer object*/
     StateManager::ActivePlayer* getAssociatedPlayer()
     {
         return m_associatedPlayer;
     }
     
+    // -------------------------------------------------------------------------
     /** Starts a 'move/resize' animation, by simply passing destination coords. The animation
         will then occur on each call to 'onUpdate'. */
     void move(const int x, const int y, const int w, const int h)
@@ -445,6 +451,7 @@ public:
         h_speed = abs( m_h - h ) / 300.0f;
     }
     
+    // -------------------------------------------------------------------------
     /** Call when player confirmed his identity and kart */
     void markAsReady()
     {
@@ -470,12 +477,14 @@ public:
         m_model_view->setBadge(OK_BADGE);
     }
     
+    // -------------------------------------------------------------------------
     /** \return Whether this player confirmed his kart and indent selection */
     bool isReady()
     {
         return m_ready;
     }
     
+    // -------------------------------------------------------------------------
     /** Updates the animation (moving/shrinking/etc.) */
     void onUpdate(float delta)
     {
@@ -555,6 +564,7 @@ public:
         
     }
 
+    // -------------------------------------------------------------------------
     /** Event callback */
     virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
     {
@@ -581,6 +591,7 @@ public:
         return EVENT_LET; // continue propagating the event
     }
 
+    // -------------------------------------------------------------------------
     /** Sets the size of the widget as a whole, and placed children widgets inside itself */
     void setSize(const int x, const int y, const int w, const int h)
     {
@@ -628,11 +639,13 @@ public:
         kart_name_y = y + h - kart_name_h;
     }
     
+    // -------------------------------------------------------------------------
     /** Sets which kart was selected for this player */
     void setKartInternalName(const std::string& whichKart)
     {
         m_kartInternalName = whichKart;
     }
+    // -------------------------------------------------------------------------
     const std::string& getKartInternalName() const
     {
         return m_kartInternalName;
@@ -666,12 +679,14 @@ public:
         m_parent = parent;
     }
     
+    // -------------------------------------------------------------------------
     virtual ~KartHoverListener()
     {
         assert(m_magic_number == 0xCAFEC001);
         m_magic_number = 0xDEADBEEF;
     }
     
+    // -------------------------------------------------------------------------
     void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
                             const irr::core::stringw& selectionText, const int playerID)
     {
@@ -708,14 +723,14 @@ public:
             //printf("%s\n", selectionID.c_str());
             const KartProperties* kart = kart_properties_manager->getKart(selectionID);
             if (kart == NULL) return;
-            KartModel* kartModel = kart->getKartModel();
+            KartModel* kart_model = kart->getKartModel();
             
             w3->clearModels();
-            w3->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
-            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+            w3->addModel( kart_model->getModel(), Vec3(0,0,0), kart_model->getBaseFrame() );
+            w3->addModel( kart_model->getWheelModel(0), kart_model->getWheelGraphicsPosition(0) );
+            w3->addModel( kart_model->getWheelModel(1), kart_model->getWheelGraphicsPosition(1) );
+            w3->addModel( kart_model->getWheelModel(2), kart_model->getWheelGraphicsPosition(2) );
+            w3->addModel( kart_model->getWheelModel(3), kart_model->getWheelGraphicsPosition(3) );
             w3->update(0);
 
             m_parent->m_kart_widgets[playerID].m_kart_name->setText( selectionText.c_str() );
