@@ -220,9 +220,11 @@ Widget* AbstractTopLevelContainer::getLastWidget(ptr_vector<Widget>* within_vect
         }
         
         Widget* item = within_vector->get(i);
-        if (item->getIrrlichtElement() == NULL ||
-            item->getIrrlichtElement()->getTabOrder() == -1 ||
-            item->getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+        IGUIElement* elem = item->getIrrlichtElement();
+        
+        if (elem == NULL ||
+            elem->getTabOrder() == -1 ||
+            !Widget::isFocusableId(elem->getTabOrder()) ||
             !item->m_focusable)
         {
             continue;

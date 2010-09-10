@@ -188,14 +188,14 @@ bool Widget::deleteChild(const char* id)
 namespace GUIEngine
 {
     // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values
-    const unsigned int focusableIdsBase = 100;
-    const unsigned int unfocusableIdsBase = 1000;
+    const unsigned int FOCUSABLE_IDS_BASE = 100;
+    const unsigned int UNFOCUSABLE_IDS_BASE = 1000;
     
     /** Used to assign irrLicht IDs to widgets dynamically */
-    static unsigned int id_counter = focusableIdsBase;
+    static unsigned int id_counter = FOCUSABLE_IDS_BASE;
     
     /** for items that can't be reached with keyboard navigation but can be clicked */
-    static unsigned int id_counter_2 = unfocusableIdsBase;
+    static unsigned int id_counter_2 = UNFOCUSABLE_IDS_BASE;
 }
 
 int Widget::getNewID()
@@ -212,7 +212,7 @@ bool Widget::isFocusableId(const int id)
 {
     if (id < 0) return false;
     
-    if ((unsigned int)id >= unfocusableIdsBase) return false;
+    if ((unsigned int)id >= UNFOCUSABLE_IDS_BASE) return false;
     else                                        return true;
 }
 

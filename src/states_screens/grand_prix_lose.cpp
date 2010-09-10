@@ -270,6 +270,3 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
 
 // -------------------------------------------------------------------------------------
 
-
-
-    
