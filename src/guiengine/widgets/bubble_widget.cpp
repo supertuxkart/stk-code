@@ -20,6 +20,7 @@
 #include <irrlicht.h>
 using namespace irr::core;
 using namespace irr::gui;
+using namespace irr;
 
 using namespace GUIEngine;
 

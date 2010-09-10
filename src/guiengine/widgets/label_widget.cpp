@@ -26,6 +26,7 @@
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
+using namespace irr;
 
 // ----------------------------------------------------------------------------
 /** Constructs the label widget. Parameter:

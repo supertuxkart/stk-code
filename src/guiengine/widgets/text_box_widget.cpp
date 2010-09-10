@@ -18,9 +18,11 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
+using namespace irr;
 
 // -----------------------------------------------------------------------------
 

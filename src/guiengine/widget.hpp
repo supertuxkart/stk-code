@@ -26,7 +26,7 @@
 #include "guiengine/skin.hpp"
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
-#include "utils/vec3.hpp"
+//#include "utils/vec3.hpp"
 
 namespace GUIEngine
 {

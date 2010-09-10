@@ -21,8 +21,6 @@
 #include <cstring> // for NULL
 #include "utils/ptr_vector.hpp"
 
-#include "guiengine/widget.hpp"
-
 namespace GUIEngine
 {
     class Widget;

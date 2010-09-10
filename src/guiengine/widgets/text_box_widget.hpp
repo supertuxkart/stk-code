@@ -53,7 +53,7 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID);
         virtual void unfocused(const int playerID);
 
-        core::stringw getText() const;
+        irr::core::stringw getText() const;
     };
 }
 

@@ -46,7 +46,6 @@ namespace irr
 namespace GUIEngine
 {    
     class Screen;
-    class CutScene;
     class Widget;
     class Skin;
     class AbstractStateManager;

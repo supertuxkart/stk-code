@@ -19,6 +19,7 @@
 #include "guiengine/widgets/button_widget.hpp"
 using namespace GUIEngine;
 using namespace irr::core;
+using namespace irr;
 
 // -----------------------------------------------------------------------------
 

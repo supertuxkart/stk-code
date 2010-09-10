@@ -21,6 +21,7 @@
 #include <string.h>
 using namespace GUIEngine;
 using namespace irr::core;
+using namespace irr;
 
 // -----------------------------------------------------------------------------
 

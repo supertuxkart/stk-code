@@ -21,12 +21,12 @@
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
-#include "guiengine/event_handler.hpp"
-#include "guiengine/layout_manager.hpp"
+//#include "guiengine/event_handler.hpp"
+//#include "guiengine/layout_manager.hpp"
 #include "guiengine/skin.hpp"
 #include "input/input_manager.hpp"
 
-class PlayerProfile;
+//class PlayerProfile;
 
 /**
  * \ingroup guiengine
