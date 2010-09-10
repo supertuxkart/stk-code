@@ -13,8 +13,14 @@
 
 </div>
 
-<div x="5%" y="80%" width="90%" height="10%" layout="horizontal-row" >
+<div x="5%" y="80%" width="40%" height="10%" layout="horizontal-row">
+<spacer proportion="1" /> 
     <button id="cancel"    I18N="Addons" text="Back" align="center"/>
+<spacer proportion="1" /> 
+</div>
+<div x="50%" y="80%" width="40%" height="10%" layout="horizontal-row" >
+<spacer proportion="1" /> 
     <button id="install"    I18N="Addons" text="Install" align="center"/>
+<spacer proportion="1" /> 
 </div>
 </stkgui>
