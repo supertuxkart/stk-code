@@ -215,6 +215,7 @@ void StateManager::onTopMostScreenChanged()
 
 void StateManager::onStackEmptied()
 {
+    GUIEngine::cleanUp();
     main_loop->abort();
 }   // onStackEmptied
 
