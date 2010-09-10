@@ -36,6 +36,7 @@ public:
     void changeNewsText(std::string action);
     pthread_mutex_t m_mutex_news_text;
     pthread_t m_thread_news_text;
+    ~MainMenuScreen();
     std::string m_news_text;
     void onUpdate(float delta,  irr::video::IVideoDriver* driver);
 #endif
@@ -48,11 +49,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
-#ifdef ADDONS_MANAGER
-     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
-#endif
-
     /** This function is used to download a text from the server to show the news. */
     static void * downloadNews(void *);
     

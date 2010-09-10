@@ -1,6 +1,6 @@
 <stkgui>
 
-<div x="0%" y="10%" width="90%" height="80%" layout="horizontal-row" >
+<div x="5%" y="0%" width="90%" height="80%" layout="horizontal-row" >
     <div width="50%" height="90%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
     </div>
@@ -13,7 +13,7 @@
 
 </div>
 
-<div x="90%" y = "10%" width="80%" height="10%" layout="horizontal-row" >
+<div x="5%" y="80%" width="90%" height="10%" layout="horizontal-row" >
     <button id="cancel"    I18N="Addons" text="Back" align="center"/>
     <button id="install"    I18N="Addons" text="Install" align="center"/>
 </div>
