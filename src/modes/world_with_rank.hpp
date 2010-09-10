@@ -25,7 +25,7 @@
 /**
  *  A WorldWithRank is a world where the karts are ranked. This is the base
  *  class for races and battle modes - all of which rank the kart.
- *  A class using this as a subclass must call setKartRank(kart id, rank)
+ *  A class using this as a subclass must call setKartPosition(kart id, position)
  *  and this class is used to access the ranks from other objects.
  * \ingroup modes
  */

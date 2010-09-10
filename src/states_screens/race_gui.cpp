@@ -415,7 +415,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         y_base = UserConfigParams::m_height/2 + 20;
     }
 
-    LinearWorld *world      = (LinearWorld*)(World::getWorld());
+    WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
@@ -442,7 +442,15 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
-        const Kart *kart = world->getKartAtPosition(position);
+        Kart *kart = world->getKartAtPosition(position);
+        
+        if (kart->getPosition() == -1)//if position is not set
+        {
+            //we use karts ordered by id only
+            //(needed for beginning of MINOR_MODE_3_STRIKES)
+            kart= world->getKart(position-1);
+        }
+        
         if(kart->isEliminated()) continue;
         unsigned int kart_id = kart->getWorldKartId();
 
@@ -457,8 +465,10 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         }
         else
         {
-            float distance = world->getDistanceDownTrackForKart(kart_id)
-                           + world->getTrack()->getTrackLength()*lap;
+            LinearWorld *linear_world      = (LinearWorld*)(World::getWorld());
+            
+            float distance = linear_world->getDistanceDownTrackForKart(kart_id)
+                           + linear_world->getTrack()->getTrackLength()*lap;
             if ((position>1) && (previous_distance-distance<m_dist_show_overlap) && (!kart->hasFinishedRace()))
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
