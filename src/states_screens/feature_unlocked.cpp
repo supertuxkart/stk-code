@@ -194,10 +194,9 @@ void FeatureUnlockedCutScene::init()
     {
         if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
-            m_all_kart_models.push_back(
-                (*m_unlocked_stuff[n].m_unlocked_kart->getKartModel())
-                                        );
-            KartModel *kart_model = &(m_all_kart_models.back());
+            KartModel *kart_model = 
+                m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
+            m_all_kart_models.push_back(kart_model);
             kart_model->attachModel(&(m_unlocked_stuff[n].m_root_gift_node));
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");

@@ -25,6 +25,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class KartProperties;
@@ -40,7 +41,7 @@ class XMLNode;
  *  kart.cpp.
  * \ingroup karts
  */
-class KartModel : public scene::IAnimationEndCallBack
+class KartModel : public scene::IAnimationEndCallBack, public NoCopy
 {
 public:
     enum   AnimationFrameType
@@ -122,22 +123,31 @@ private:
     float m_z_offset;                 /**< Models are usually not at z=0 (due
                                        *   to the wheels), so this value moves
                                        *   the karts down appropriately. */
+    /** True if this is the master copy, managed by KartProperties. This
+     *  is mainly used for debugging, e.g. the master copies might not have
+     * anything attached to it etc. */
+    bool  m_is_master;
+
     void  loadWheelInfo(const XMLNode &node, 
                         const std::string &wheel_name, int index);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
 public:
-         KartModel();
-        ~KartModel();
-    void loadInfo(const XMLNode &node);
-    void loadModels(const KartProperties &kart_properties);
-    void attachModel(scene::ISceneNode **node);
-    scene::IAnimatedMesh* getModel() const { return m_mesh; }
+                  KartModel(bool is_master);
+                 ~KartModel();
+    KartModel*    makeCopy();
+    void          loadInfo(const XMLNode &node);
+    void          loadModels(const KartProperties &kart_properties);
+    void          attachModel(scene::ISceneNode **node);
+    scene::IAnimatedMesh* 
+                  getModel() const { return m_mesh; }
 
-    scene::IMesh* getWheelModel(const int wheelID) const { return m_wheel_model[wheelID]; }
+    scene::IMesh* getWheelModel(const int wheelID) const 
+                                   { return m_wheel_model[wheelID]; }
     
-    /** Since karts might be animated, we might need to know which base frame to use */
+    /** Since karts might be animated, we might need to know which base frame 
+     *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
     
     /** Returns the position of a wheel relative to the kart. 

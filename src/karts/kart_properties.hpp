@@ -65,7 +65,7 @@ private:
     /** The kart model and wheels. It is mutable since the wheels of the
      *  KartModel can rotate and turn, and animations are played, but otherwise
      *  the kart_properties object is const. */
-    mutable KartModel        m_kart_model;
+    mutable KartModel       *m_kart_model;
 
     /** List of all groups the kart belongs to. */
     std::vector<std::string> m_groups;
@@ -228,7 +228,11 @@ public:
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;             }
 
     /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModel       () const {return &m_kart_model;              }
+    KartModel*    getKartModelCopy   () const {return m_kart_model->makeCopy();   }
+
+    /** Returns a pointer to the main KartModel object. This copy
+     *  should not be modified, not attachModel be called on it. */
+    const KartModel& getMasterKartModel() const {return *m_kart_model;  }
 
     /** Returns the name of this kart. */
     const irr::core::stringw& getName() const {return m_name;                     }

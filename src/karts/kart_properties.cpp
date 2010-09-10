@@ -40,7 +40,7 @@ float KartProperties::UNDEFINED = -99.9f;
 /** The constructor initialises all values with invalid values. It can later
  *  then be checked (for STKConfig) that all values are indeed defined.
  *  Otherwise the defaults are taken from STKConfig (and since they are all
- *  defined, it is guaranteed that each kart has well defined physics values.
+ *  defined, it is guaranteed that each kart has well defined physics values).
  */
 KartProperties::KartProperties(const std::string &filename)
 {
@@ -85,7 +85,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                  = video::SColor(255, 0, 0, 0);
     m_shape                  = 32;  // close enough to a circle.
     m_engine_sfx_type        = "engine_small";
-    
+    m_kart_model             = NULL;
     // The default constructor for stk_config uses filename=""
     if (filename != "") load(filename, "kart");
 }   // KartProperties
@@ -103,8 +103,12 @@ KartProperties::~KartProperties()
  */
 void KartProperties::load(const std::string &filename, const std::string &node)
 {
-   // Get the default values from STKConfig:
-   *this = stk_config->getDefaultKartProperties();
+    // Get the default values from STKConfig:
+    *this = stk_config->getDefaultKartProperties();
+    // m_kart_model must be initialised after assigning the default
+    // values from stk_config (otherwise all kart_properties will
+    // share the same KartModel
+    m_kart_model  = new KartModel(/*is_master*/true);
 
     const XMLNode * root = 0;
     m_root  = StringUtils::getPath(filename);
@@ -157,18 +161,18 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
     if(m_version>=1)
-        m_kart_model.loadModels(*this);
+        m_kart_model->loadModels(*this);
     if(m_gravity_center_shift.getX()==UNDEFINED)
     {
         m_gravity_center_shift.setX(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setY(m_kart_model.getHeight()*0.5f);
+        m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
         m_gravity_center_shift.setZ(0);
     }
-    m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
+    m_kart_model->setDefaultPhysicsPosition(m_gravity_center_shift,
                                            m_wheel_radius           );
-    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getZ()
-                         -m_kart_model.getWheelPhysicsPosition(2).getZ());
+    m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
+                         -m_kart_model->getWheelPhysicsPosition(2).getZ());
     m_angle_at_min = asinf(m_wheel_base/m_min_radius);
     m_angle_at_max = asinf(m_wheel_base/m_max_radius);
     if(m_max_speed_turn == m_min_speed_turn)
@@ -181,8 +185,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // Useful when tweaking kart parameters
     if(UserConfigParams::m_print_kart_sizes)
         printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(),
-        m_kart_model.getWidth(), m_kart_model.getLength(),
-        m_kart_model.getHeight());
+        m_kart_model->getWidth(), m_kart_model->getLength(),
+        m_kart_model->getHeight());
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
     file_manager->popTextureSearchPath();
@@ -416,7 +420,8 @@ void KartProperties::getAllData(const XMLNode * root)
 #endif
     }   // if sounds-node exist
 
-    m_kart_model.loadInfo(*root);
+    if(m_kart_model)
+        m_kart_model->loadInfo(*root);
 }   // getAllData
 
 // ----------------------------------------------------------------------------

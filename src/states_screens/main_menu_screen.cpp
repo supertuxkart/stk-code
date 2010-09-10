@@ -147,7 +147,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
-        static int i = 3;
+        static int i = 1;
         i++;
         
         if (i % 4 == 0)

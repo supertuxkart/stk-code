@@ -32,8 +32,8 @@ AIBaseController::AIBaseController(Kart *kart,
                 : Controller(kart, player)
 {
     m_kart        = kart;
-    m_kart_length = m_kart->getKartProperties()->getKartModel()->getLength();
-    m_kart_width  = m_kart->getKartProperties()->getKartModel()->getWidth();
+    m_kart_length = m_kart->getKartModel()->getLength();
+    m_kart_width  = m_kart->getKartModel()->getWidth();
     m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
     m_track       = m_world->getTrack();
     m_quad_graph  = &m_track->getQuadGraph();

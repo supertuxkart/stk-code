@@ -62,7 +62,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     ptr_vector<UnlockedThing, HOLD> m_unlocked_stuff;
     
     /** To store the copy of the KartModel for each unlocked kart. */
-    std::vector<KartModel> m_all_kart_models;
+    std::vector<KartModel*> m_all_kart_models;
     /** sky angle, 0-360 */
     float m_sky_angle;
     

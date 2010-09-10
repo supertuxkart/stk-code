@@ -32,7 +32,8 @@ private:
     NoCopy(const NoCopy& )
     { }
     void operator=(const NoCopy& )
-{ }}
+    { }
+}   // NoCopy
 ;
 
 #endif

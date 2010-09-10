@@ -223,6 +223,9 @@ void GrandPrixWin::tearDown()
         if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
         m_kart_node[n] = NULL;
     }
+    for(unsigned int i=0; i<m_all_kart_models.size(); i++)
+        delete m_all_kart_models[i];
+    m_all_kart_models.clear();
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -399,10 +402,12 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         
         scene::ISceneNode* kart_main_node = NULL;
         
-        const KartProperties* kart = kart_properties_manager->getKart(idents[n]);
-        if (kart != NULL)
+        const KartProperties* kp = kart_properties_manager->getKart(idents[n]);
+        if (kp != NULL)
         {
-            KartModel* kart_model = kart->getKartModel();
+            KartModel *kart_model = kp->getKartModelCopy();
+            m_all_kart_models.push_back(kart_model);
+            kart_model->attachModel(&kart_main_node);
             assert(kart_model != NULL);
             
             m_kart_x[n] = m_podium_x[n];
@@ -410,9 +415,10 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
             m_kart_z[n] = -4;
             m_kart_rotation[n] = 0.0f;
             
-            kart_model->attachModel(&kart_main_node);
             assert(kart_main_node != NULL);
-            kart_main_node->setPosition( core::vector3df(m_kart_x[n], m_kart_y[n], m_kart_z[n]) );
+            kart_main_node->setPosition( core::vector3df(m_kart_x[n], 
+                                                         m_kart_y[n],
+                                                         m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             kart_model->setAnimation(KartModel::AF_DEFAULT);
         }

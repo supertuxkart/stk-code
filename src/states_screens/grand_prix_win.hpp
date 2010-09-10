@@ -2,6 +2,7 @@
 #define HEADER_GRAND_PRIX_WIN_HPP
 
 #include "guiengine/screen.hpp"
+#include "karts/kart_model.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
@@ -26,6 +27,9 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 
     irr::scene::IMeshSceneNode* m_podium_step[3];
     irr::scene::ISceneNode* m_kart_node[3];
+
+    /** A copy of the kart model for each kart used. */
+    std::vector<KartModel*> m_all_kart_models;
     
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;

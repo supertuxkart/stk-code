@@ -136,11 +136,15 @@ void GrandPrixLose::tearDown()
     m_light = NULL;
     
     irr_driver->removeNode(m_garage);
+    irr_driver->removeNode(m_garage_door);
     m_garage = NULL;
     
+    for(unsigned int i=0; i<m_all_kart_models.size(); i++)
+        delete m_all_kart_models[i];
+
+    m_all_kart_models.clear();
     irr_driver->removeNode(m_kart_node);
     
-    irr_driver->removeNode(m_garage_door);
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -245,7 +249,10 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
     const KartProperties* kart = kart_properties_manager->getKart(ident_arg[0]);
     if (kart != NULL)
     {
-        KartModel* kart_model = kart->getKartModel();
+
+        KartModel *kart_model = kart->getKartModelCopy();
+        m_all_kart_models.push_back(kart_model);
+
         m_kart_x = KART_START_X;
         m_kart_y = KART_Y;
         m_kart_z = KART_Z;
@@ -262,3 +269,7 @@ void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
 }   // setKarts
 
 // -------------------------------------------------------------------------------------
+
+
+
+    

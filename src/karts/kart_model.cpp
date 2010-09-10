@@ -29,20 +29,33 @@
 float KartModel::UNDEFINED = -99.9f;
 
 /** Default constructor which initialises all variables with defaults.
- *  Note that the KartModel is copied, so make sure that all variables
- *  are safe to be copied, or write a custom copy function.
+ *  Note that the KartModel is copied, so make sure to update makeCopy
+ *  if any more variables are added to this object.
  *  ATM there are two pointers:
- *  - to the scene node (which is otherwise handled by kart and set 
+ *  - to the scene node (which is otherwise handled by kart/movable and set
  *    later anyway)
  *  - to the mesh. Sharing mesh is supported in irrlicht, so that's
  *    no problem.
+ *  There are two different type of instances of this class:
+ *  One is the 'master instances' which is part of the kart_properties.
+ *  These instances have m_is_master = true, will cause an assertion
+ *  crash if attachModel is called or the destructor notices any
+ *  wheels being defined.
+ *  The other types are copies of one of the master objects: these are
+ *  used when actually displaying the karts (e.g. in race). They must 
+ *  be copied since otherwise (if the same kart is used more than once)
+ *  shared variables in KartModel (esp. animation status) will cause
+ *  incorrect animations. The mesh is shared (between the master instance
+ *  and all of its copies).
  *  Technically the scene node and mesh should be grab'ed on copy, 
  *  and dropped when the copy is deleted. But since the master copy
  *  in the kart_properties_manager is always kept, there is no risk of
  *  a mesh being deleted to early.
  */
-KartModel::KartModel()
+KartModel::KartModel(bool is_master)
 {
+    m_is_master = is_master;
+
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
@@ -99,7 +112,7 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
-}   // init
+}   // loadInfo
 // ----------------------------------------------------------------------------
 /** Destructor.
  */
@@ -108,10 +121,42 @@ KartModel::~KartModel()
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_node[i])
+        {
+            // Master KartModels should never have a wheel attached.
+            assert(!m_is_master);
             m_wheel_node[i]->drop();
+        }
     }
 
 }  // ~KartModel
+
+// ----------------------------------------------------------------------------
+/** This function returns a copy of this object. The memory is allocated
+ *  here, but needs to be managed (esp. freed) by the calling function.
+ *  It is also marked not to be a master copy, so attachModel can be called
+ *  for this instance.
+ */
+KartModel* KartModel::makeCopy()
+{
+    KartModel *km        = new KartModel(/*is master*/ false);
+    km->m_kart_height    = m_kart_height;
+    km->m_kart_length    = m_kart_length;
+    km->m_kart_width     = m_kart_width;
+    km->m_mesh           = m_mesh;
+    km->m_model_filename = m_model_filename;
+    for(unsigned int i=0; i<4; i++)
+    {
+        km->m_max_suspension[i]          = m_max_suspension[i];
+        km->m_min_suspension[i]          = m_min_suspension[i];
+        km->m_wheel_filename[i]          = m_wheel_filename[i];
+        km->m_wheel_model[i]             = m_wheel_model[i];
+        km->m_wheel_graphics_position[i] = m_wheel_graphics_position[i];
+        km->m_wheel_graphics_radius[i]   = m_wheel_graphics_radius[i];
+        km->m_wheel_physics_position[i]  = m_wheel_physics_position[i];
+        km->m_z_offset                   = m_z_offset;
+    }
+    return km;
+}   // makeCopy
 
 // ----------------------------------------------------------------------------
 /** Attach the kart model and wheels to the scene node.
@@ -119,6 +164,7 @@ KartModel::~KartModel()
  */
 void KartModel::attachModel(scene::ISceneNode **node)
 {
+    assert(!m_is_master);
     if(UserConfigParams::m_show_steering_animations)
     {
         *node = irr_driver->addAnimatedMesh(m_mesh);

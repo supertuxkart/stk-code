@@ -206,7 +206,7 @@ protected:
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
      *  is used more than once. */
-    KartModel             m_kart_model;
+    KartModel*            m_kart_model;
     
 public:
                    Kart(const std::string& ident, int position, 
@@ -217,6 +217,10 @@ public:
     void           loadData();
     virtual void   updateGraphics(const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
+    // ------------------------------------------------------------------------
+    /** Returns this kart's kart model. */
+    KartModel*     getKartModel()                 { return m_kart_model;      }
+    // ------------------------------------------------------------------------
     const KartProperties* 
                    getKartProperties() const      { return m_kart_properties; }
     // ------------------------------------------------------------------------
@@ -339,11 +343,11 @@ public:
     float          getMaxSpeedOnTerrain() const {return m_max_speed-
                                                      m_max_speed_reduction;    }
     /** Returns the length of the kart. */
-    float          getKartLength    () const {return m_kart_model.getLength(); }
+    float          getKartLength    () const {return m_kart_model->getLength(); }
     /** Returns the height of the kart. */
-    float          getKartHeight    () const {return m_kart_model.getHeight(); }
+    float          getKartHeight    () const {return m_kart_model->getHeight(); }
     /** Returns the width of the kart. */
-    float          getKartWidth     () const {return m_kart_model.getWidth();  }
+    float          getKartWidth     () const {return m_kart_model->getWidth();  }
     /** Returns the bullet vehicle which represents this kart. */
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}

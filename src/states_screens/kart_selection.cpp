@@ -315,13 +315,18 @@ public:
             }
         }
 
-        KartModel* kart_model = props->getKartModel();
+        const KartModel &kart_model = props->getMasterKartModel();
         
-        m_model_view->addModel( kart_model->getModel(), Vec3(0,0,0), kart_model->getBaseFrame() );
-        m_model_view->addModel( kart_model->getWheelModel(0), kart_model->getWheelGraphicsPosition(0) );
-        m_model_view->addModel( kart_model->getWheelModel(1), kart_model->getWheelGraphicsPosition(1) );
-        m_model_view->addModel( kart_model->getWheelModel(2), kart_model->getWheelGraphicsPosition(2) );
-        m_model_view->addModel( kart_model->getWheelModel(3), kart_model->getWheelGraphicsPosition(3) );
+        m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0), 
+                                kart_model.getBaseFrame() );
+        m_model_view->addModel( kart_model.getWheelModel(0), 
+                                kart_model.getWheelGraphicsPosition(0) );
+        m_model_view->addModel( kart_model.getWheelModel(1), 
+                                kart_model.getWheelGraphicsPosition(1) );
+        m_model_view->addModel( kart_model.getWheelModel(2),
+                                kart_model.getWheelGraphicsPosition(2) );
+        m_model_view->addModel( kart_model.getWheelModel(3),
+                                kart_model.getWheelGraphicsPosition(3) );
         m_model_view->setRotateContinuously( 35.0f );
         
         // ---- Kart name label
@@ -721,16 +726,20 @@ public:
         else
         {
             //printf("%s\n", selectionID.c_str());
-            const KartProperties* kart = kart_properties_manager->getKart(selectionID);
-            if (kart == NULL) return;
-            KartModel* kart_model = kart->getKartModel();
+            const KartProperties *kp = kart_properties_manager->getKart(selectionID);
+            const KartModel &kart_model = kp->getMasterKartModel();
             
             w3->clearModels();
-            w3->addModel( kart_model->getModel(), Vec3(0,0,0), kart_model->getBaseFrame() );
-            w3->addModel( kart_model->getWheelModel(0), kart_model->getWheelGraphicsPosition(0) );
-            w3->addModel( kart_model->getWheelModel(1), kart_model->getWheelGraphicsPosition(1) );
-            w3->addModel( kart_model->getWheelModel(2), kart_model->getWheelGraphicsPosition(2) );
-            w3->addModel( kart_model->getWheelModel(3), kart_model->getWheelGraphicsPosition(3) );
+            w3->addModel( kart_model.getModel(), Vec3(0,0,0), 
+                          kart_model.getBaseFrame() );
+            w3->addModel( kart_model.getWheelModel(0), 
+                          kart_model.getWheelGraphicsPosition(0) );
+            w3->addModel( kart_model.getWheelModel(1), 
+                          kart_model.getWheelGraphicsPosition(1) );
+            w3->addModel( kart_model.getWheelModel(2), 
+                          kart_model.getWheelGraphicsPosition(2) );
+            w3->addModel( kart_model.getWheelModel(3), 
+                          kart_model.getWheelGraphicsPosition(3) );
             w3->update(0);
 
             m_parent->m_kart_widgets[playerID].m_kart_name->setText( selectionText.c_str() );

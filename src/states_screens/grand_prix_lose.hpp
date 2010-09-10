@@ -2,6 +2,7 @@
 #define HEADER_GRAND_PRIX_LOSE_HPP
 
 #include "guiengine/screen.hpp"
+#include "karts/kart_model.hpp"
 
 #include <vector>
 #include <string>
@@ -36,6 +37,9 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 
     irr::scene::ILightSceneNode* m_light;
     
+    /** A copy of the kart model for each kart used. */
+    std::vector<KartModel*> m_all_kart_models;
+
     int m_phase;
     
     float m_kart_x, m_kart_y, m_kart_z;

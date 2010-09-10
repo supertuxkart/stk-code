@@ -79,7 +79,7 @@ Kart::Kart (const std::string& ident, int position,
     // released when the kart is deleted, but since the original 
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
-    m_kart_model           = *(m_kart_properties->getKartModel());
+    m_kart_model           = m_kart_properties->getKartModelCopy();
     m_initial_position     = position;
     m_race_position        = position;
     m_collected_energy     = 0;
@@ -248,7 +248,7 @@ void Kart::createPhysics()
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            m_kart_model.getWheelPhysicsPosition(i),
+                            m_kart_model->getWheelPhysicsPosition(i),
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, *m_tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
@@ -325,6 +325,7 @@ Kart::~Kart()
     }
     delete m_slipstream_original_quad;
     delete m_slipstream_quad;
+    delete m_kart_model;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -374,7 +375,7 @@ void Kart::reset()
     }
     
     // Stop any animations currently being played.
-    m_kart_model.setAnimation(KartModel::AF_DEFAULT);
+    m_kart_model->setAnimation(KartModel::AF_DEFAULT);
     // If the controller was replaced (e.g. replaced by end controller), 
     //  restore the original controller. 
     if(m_saved_controller)
@@ -382,7 +383,7 @@ void Kart::reset()
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
-    m_kart_model.setAnimation(KartModel::AF_DEFAULT);
+    m_kart_model->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
     m_powerup.reset();
@@ -473,9 +474,9 @@ void Kart::finishedRace(float time)
         setController(new EndController(this, m_controller->getPlayer()));
         if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
             m_race_position==1)
-            m_kart_model.setAnimation(KartModel::AF_WIN_START);
+            m_kart_model->setAnimation(KartModel::AF_WIN_START);
         else 
-            m_kart_model.setAnimation(KartModel::AF_LOSE_START);
+            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_FINAL);
@@ -492,9 +493,9 @@ void Kart::finishedRace(float time)
         // start end animation
         setController(new EndController(this, m_controller->getPlayer()));
         if(m_race_position<=2)
-            m_kart_model.setAnimation(KartModel::AF_WIN_START);
+            m_kart_model->setAnimation(KartModel::AF_WIN_START);
         else if(m_race_position>=0.7f*race_manager->getNumberOfKarts())
-            m_kart_model.setAnimation(KartModel::AF_LOSE_START);
+            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
             
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
@@ -1334,7 +1335,7 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::loadData()
 {
-    m_kart_model.attachModel(&m_node);
+    m_kart_model->attachModel(&m_node);
     // Attachment must be created after attachModel, since only then the
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which
@@ -1423,15 +1424,15 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
 //        auto_skid = m_controls.m_steer*30.0f*((auto_skid_visual - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
 //    else
         auto_skid = m_controls.m_steer*30.0f;
-    m_kart_model.update(m_wheel_rotation, auto_skid,
+    m_kart_model->update(m_wheel_rotation, auto_skid,
                         getSteerPercent(), wheel_up_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
             - m_default_suspension_length[0]
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
-            - (m_kart_model.getWheelGraphicsRadius(0)
-               -m_kart_model.getWheelGraphicsPosition(0).getY() );
+            - (m_kart_model->getWheelGraphicsRadius(0)
+               -m_kart_model->getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
 
     if(m_smoke_system)
