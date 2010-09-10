@@ -374,6 +374,11 @@
  coord of the widget is determined. Value can be \c "top", \c "center" or 
  \c "bottom".
  
+ \note If you want to horizontally center widgets in a horizontal-row layout,
+       or vertically center widgets in a vertical-row layout, this property
+       is not what you're looking for; instead, add a stretching spacer before
+       and after the widget(s) you want to center.
+ 
  \n
  \subsection prop13 PROP_PROPORTION
  <em> Name in XML files: </em> \c "proportion"
