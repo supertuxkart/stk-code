@@ -1,20 +1,20 @@
 <stkgui>
 
-<div x="2%" y="10%" width="96%" height="80%" layout="horizontal-row" >
-    <div width="50%" height="100%" layout="vertical-row" >
+<div x="0%" y="10%" width="90%" height="80%" layout="horizontal-row" >
+    <div width="50%" height="90%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
-    <button id="cancel"    I18N="Addons" text="Back" align="center"/>
     </div>
-    <div width="50%" height="100%" layout="vertical-row" >
+    <div width="50%" height="90%" layout="vertical-row" >
         <label id="name" width="100%" text="Name:" proportion="1" />
         <label word_wrap="true" id="description" width="100%" text="Description:" proportion="1" />
         <label id="version" width="100%" text="Version:" proportion="1" />
 
-        <spacer height="25" width="10" />
-
-    <button id="install"    I18N="Addons" text="Install" align="center"/>
-        <spacer height="10" width="10" />
     </div>
+
 </div>
 
+<div x="90%" y = "10%" width="80%" height="10%" layout="horizontal-row" >
+    <button id="cancel"    I18N="Addons" text="Back" align="center"/>
+    <button id="install"    I18N="Addons" text="Install" align="center"/>
+</div>
 </stkgui>

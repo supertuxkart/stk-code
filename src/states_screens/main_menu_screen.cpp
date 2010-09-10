@@ -243,7 +243,7 @@ void * MainMenuScreen::downloadNews( void * pthis)
 #endif
 // ------------------------------------------------------------------------------------------------------
 #ifdef ADDONS_MANAGER
-MainMenuScreen::~MainMenuScreen()
+void MainMenuScreen::tearDown()
 {
     fprintf(stdout, "canceling the thread");
     pthread_cancel(m_thread_news_text);
