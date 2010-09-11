@@ -526,6 +526,12 @@ void initUserConfig(char *argv[])
 void initRest()
 {
     irr_driver              = new IrrDriver();
+    
+    // Init GUI
+    IrrlichtDevice* device = irr_driver->getDevice();
+    video::IVideoDriver* driver = device->getVideoDriver();
+    GUIEngine::init(device, driver, StateManager::get());
+    
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -629,7 +635,7 @@ int main(int argc, char *argv[] )
                         logerrfile.c_str());
             }
         }
-        
+
         input_manager = new InputManager ();
         
         // Get into menu mode initially.
@@ -657,11 +663,6 @@ int main(int argc, char *argv[] )
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
-
-        // Init GUI prepare main menu
-        IrrlichtDevice* device = irr_driver->getDevice();
-        video::IVideoDriver* driver = device->getVideoDriver();
-        GUIEngine::init(device, driver, StateManager::get());
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
