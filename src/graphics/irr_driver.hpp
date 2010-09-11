@@ -67,7 +67,6 @@ private:
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
-    void                  displayFPS();
     void                  setupViewports();
     video::E_DRIVER_TYPE  getEngineDriverType(int index);
     
@@ -99,6 +98,7 @@ public:
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     
+    void                  displayFPS();
     /** this is not really used to process events, it's only used to shut down irrLicht's
       * chatty logging until the event handler is ready to take the task
       */

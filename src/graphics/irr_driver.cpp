@@ -865,9 +865,6 @@ void IrrDriver::update(float dt)
         {
             // Either render the gui, or the global elements of the race gui.
             GUIEngine::render(dt);
-
-            // draw FPS if enabled
-            if ( UserConfigParams::m_display_fps ) displayFPS();
         }
 
     }   // just to mark the begin/end scene block

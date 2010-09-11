@@ -1008,6 +1008,9 @@ namespace GUIEngine
             }
         }
         
+        // draw FPS if enabled
+        if ( UserConfigParams::m_display_fps ) irr_driver->displayFPS();
+        
         g_driver->enableMaterial2D(false);
         
     }   // render
