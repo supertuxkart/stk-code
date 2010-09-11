@@ -924,6 +924,9 @@ namespace GUIEngine
     {    
         GUIEngine::dt = elapsed_time;
         
+        // Not yet initialized, or already cleaned up
+        if (g_skin == NULL) return;
+        
         // ---- menu drawing
         
         // draw background image and sections
