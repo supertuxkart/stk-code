@@ -134,9 +134,15 @@ void MainLoop::run()
             updateRace(dt);
         }   // if race is active
 
-        music_manager->update(dt);
-        input_manager->update(dt);
-        irr_driver->update(dt);
+        // We need to check again because update_race may have requested
+        // the main loop to abort; and it's not a good idea to continue
+        // since the GUI engine is no more to be called then.
+        if (!m_abort)
+        {
+            music_manager->update(dt);
+            input_manager->update(dt);
+            irr_driver->update(dt);
+        }
     }  // while !m_exit
 
 }   // run
