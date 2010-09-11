@@ -924,7 +924,9 @@ namespace GUIEngine
         
         const GameState gamestate = g_state_manager->getGameState();
         
-        if (gamestate == MENU && !GUIEngine::getCurrentScreen()->needs3D())
+        if (gamestate == MENU &&
+            GUIEngine::getCurrentScreen() != NULL &&
+            !GUIEngine::getCurrentScreen()->needs3D())
         {
             g_skin->drawBgImage();
         }
