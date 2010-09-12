@@ -1630,6 +1630,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (bubble->m_zoom > 0.0f)
             {
                 bubble->m_zoom -= GUIEngine::getLatestDt()*10.0f;
+                if (bubble->m_zoom < 0.0f) bubble->m_zoom = 0.0f;
                 
                 bubble->updateSize();
             }
