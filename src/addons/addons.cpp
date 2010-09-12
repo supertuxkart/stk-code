@@ -388,13 +388,13 @@ void Addons::UnInstall()
 
     this->m_addons_list[this->index].installed = false;
     //write the xml file with the informations about installed karts
-    this->SaveInstalled();
     std::string dest_file = file_manager->getAddonsDir() + "/" + "data" + "/" +
                 this->m_addons_list[this->index].type + "s/" +
                 this->m_addons_list[this->index].name + "/";
 
     //remove the addons directory
     file_manager->removeDirectory(dest_file.c_str());
+    this->SaveInstalled();
 
 }
 // ----------------------------------------------------------------------------
