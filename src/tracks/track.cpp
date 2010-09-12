@@ -57,8 +57,6 @@ using namespace irr;
 
 const float Track::NOHIT           = -99999.9f;
 
-btTransform global_start;
-
 // ----------------------------------------------------------------------------
 Track::Track(std::string filename)
 {
@@ -189,8 +187,8 @@ void Track::setStartCoordinates(const core::line2df& line)
                            end.X - start.X);
     core::vector2df mid   = (start+end)*0.5f;
     btQuaternion q(Vec3(0, 1, 0), m_start_angle);
-    global_start.setRotation(q);
-    global_start.setOrigin(Vec3(mid.X, 0, mid.Y));
+    m_start_transform.setRotation(q);
+    m_start_transform.setOrigin(Vec3(mid.X, 0, mid.Y));
 }   // setStartCoordinates
 
 //-----------------------------------------------------------------------------
@@ -217,7 +215,7 @@ btTransform Track::getStartTransform(unsigned int pos) const
         orig = Vec3( X_DIST * (pos%2==0) ? 1.0f : -1.0f, 
                       1.0f, 
                      -Z_DIST*pos-Z_DIST_FROM_START);
-        orig  = global_start(orig);
+        orig  = m_start_transform(orig);
         angle = m_start_angle;
     }
 
@@ -934,6 +932,13 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     if(m_use_fog)
         for(unsigned int i=0; i<m_all_nodes.size(); i++)
             m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+
+    if(!m_check_manager)
+    {
+        printf("WARNING: no check lines found in track '%s'.\n", 
+               m_ident.c_str());
+        printf("Lap counting will not work, and start positions might be incorrect.\n");
+    }
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
