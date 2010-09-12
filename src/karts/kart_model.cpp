@@ -63,6 +63,7 @@ KartModel::KartModel(bool is_master)
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
         m_wheel_node[i]              = NULL;
+
         // default value for kart suspensions. move to config file later if we find each kart needs custom values
         m_min_suspension[i] = -1.3f;
         m_max_suspension[i] = 1.3f;
@@ -72,6 +73,7 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[1] = "wheel-front-left.3ds";
     m_wheel_filename[2] = "wheel-rear-right.3ds";
     m_wheel_filename[3] = "wheel-rear-left.3ds";
+    m_animated_node     = NULL;
     m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
@@ -138,28 +140,36 @@ KartModel::~KartModel()
  */
 KartModel* KartModel::makeCopy()
 {
-    KartModel *km        = new KartModel(/*is master*/ false);
-    memcpy(km, this, sizeof(KartModel));
-    // We need to set this again, since memcpy will overwrite it.
-    km->m_is_master      = false;
-#ifdef XX
-    km->m_kart_height    = m_kart_height;
-    km->m_kart_length    = m_kart_length;
-    km->m_kart_width     = m_kart_width;
-    km->m_mesh           = m_mesh;
-    km->m_model_filename = m_model_filename;
+    // Make sure that we are copying from a master objects, and
+    // that there is indeed no animated node defined here ...
+    // just in case.
+    assert(m_is_master);
+    assert(!m_animated_node);
+    KartModel *km           = new KartModel(/*is master*/ false);
+    km->m_kart_width        = m_kart_width;
+    km->m_kart_length       = m_kart_length;
+    km->m_kart_height       = m_kart_height;
+    km->m_z_offset          = m_z_offset;
+    km->m_mesh              = m_mesh;
+    km->m_model_filename    = m_model_filename;
+    km->m_animation_speed   = m_animation_speed;
+    km->m_current_animation = AF_DEFAULT;
     for(unsigned int i=0; i<4; i++)
     {
-        km->m_max_suspension[i]          = m_max_suspension[i];
-        km->m_min_suspension[i]          = m_min_suspension[i];
-        km->m_wheel_filename[i]          = m_wheel_filename[i];
         km->m_wheel_model[i]             = m_wheel_model[i];
-        km->m_wheel_graphics_position[i] = m_wheel_graphics_position[i];
-        km->m_wheel_graphics_radius[i]   = m_wheel_graphics_radius[i];
-        km->m_wheel_physics_position[i]  = m_wheel_physics_position[i];
-        km->m_z_offset                   = m_z_offset;
+        // Master should not have any wheel nodes.
+        assert(!m_wheel_node[i]);
+        km->m_wheel_filename[i]             = m_wheel_filename[i];
+        km->m_wheel_graphics_position[i]    = m_wheel_graphics_position[i];
+        km->m_wheel_physics_position[i]     = m_wheel_physics_position[i];
+        km->m_wheel_graphics_radius[i]      = m_wheel_graphics_radius[i];
+        km->m_min_suspension[i]             = m_min_suspension[i];
+        km->m_max_suspension[i]             = m_max_suspension[i];
+        km->m_dampen_suspension_amplitude[i]= m_dampen_suspension_amplitude[i];
     }
-#endif
+    for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
+        km->m_animation_frame[i] = m_animation_frame[i];
+
     return km;
 }   // makeCopy
 
