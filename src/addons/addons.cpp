@@ -347,7 +347,7 @@ void Addons::Install()
     this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;
     
     pthread_mutex_lock(&m_str_mutex);
-    m_str_state = "Writing XML...";
+    m_str_state = "Reloaing karts list...";
     pthread_mutex_unlock(&m_str_mutex);
     this->SaveInstalled();
 }
