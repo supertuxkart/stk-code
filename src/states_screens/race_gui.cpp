@@ -92,6 +92,10 @@ RaceGUI::RaceGUI()
     //I18N: Shown at the end of a race
     m_string_finished = _("Finished");
     m_string_lap      = _("Lap");
+    m_string_rank     = _("Rank");
+    
+    //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+    m_string_top      = _("Top %i");
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_ready    = _("Ready!");
     m_string_set      = _("Set!");
@@ -322,6 +326,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     drawEnergyMeter     (kart, viewport, scaling);
     drawSpeed           (kart, viewport, scaling);
     drawLap             (info, kart, viewport);
+    drawRank            (info, kart, viewport);
 
 }   // renderPlayerView
 
@@ -398,7 +403,7 @@ void RaceGUI::drawGlobalMiniMap()
 // Draw players icons and their times (if defined in the current mode).
 void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 {
-    int x_base = 15;
+    int x_base = 10;
     int y_base = 20;
     int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
     int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
@@ -411,8 +416,8 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
     {
-        x_base = UserConfigParams::m_width/2 + 15;
-        y_base = UserConfigParams::m_height/2 + 20;
+        x_base = UserConfigParams::m_width/2 + x_base;
+        y_base = UserConfigParams::m_height/2 + y_base;
     }
 
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
@@ -439,6 +444,12 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     
     gui::ScalableFont* font = GUIEngine::getFont();
     const unsigned int kart_amount = world->getNumKarts();
+    
+    //where is the limit to hide last icons
+    float y_icons_limit=UserConfigParams::m_height-m_map_height-ICON_PLAYER_WIDTH;
+    if (race_manager->getNumLocalPlayers() == 3)
+        y_icons_limit=UserConfigParams::m_height-ICON_WIDTH;
+    
     
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
@@ -486,6 +497,8 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             }
             previous_distance=distance;
         }   // not three-strike-battle
+        
+        
         previous_x=x;//save coord of the previous kart in list
         previous_y=y;
 
@@ -498,6 +511,22 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         //save position for next time
         m_previous_icons_position[kart_id].X=x;
         m_previous_icons_position[kart_id].Y=y;
+
+        if (y>y_icons_limit)
+        {
+            //there are too many icons, write "Top 9", to express that
+            //there is not everybody shown
+            core::recti pos_top;
+            pos_top.UpperLeftCorner.Y  = y_base-22;
+            pos_top.UpperLeftCorner.X  = x_base;
+
+            static video::SColor color = video::SColor(255, 255, 255, 255);
+            pos_top.LowerRightCorner   = pos_top.UpperLeftCorner;
+
+            font->draw(StringUtils::insertValues( m_string_top, position-1 ), pos_top, color);
+            
+            break;
+        }
 
         if (info[kart_id].m_text.size() > 0)
         {
@@ -910,6 +939,72 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
         font->draw(core::stringw(str).c_str(), pos, color);
     }
 } // drawLap
+
+//-----------------------------------------------------------------------------
+void RaceGUI::drawRank(const KartIconDisplayInfo* info, const Kart* kart, 
+                      const core::recti &viewport)
+{
+    WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+    const int rank = kart->getPosition();
+    const unsigned int kart_amount = world->getNumKarts();
+    
+    core::recti pos;
+    pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
+
+    // place rank string somewhere on the left of the screen
+    if (m_minimap_on_left)
+    {
+        // check if mini-map is within Y coords of this player.
+        // if the mini-map is not even in the viewport of this player, don't 
+        // bother placing the lap text at the right of the minimap.
+        if (UserConfigParams::m_height - m_map_bottom - m_map_height 
+            > viewport.LowerRightCorner.Y)
+        {
+            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
+                                   + (int)(0.1f*UserConfigParams::m_width);
+        }
+        else
+        {
+            // place lap text at the right of the mini-map
+            const int calculated_x = viewport.UpperLeftCorner.X 
+                                   + (int)(0.05f*UserConfigParams::m_width);
+            // don't overlap minimap
+            pos.UpperLeftCorner.X  = std::max(calculated_x, 
+                                              m_map_right_side_x + 15);
+        }
+    }
+    else
+    {
+        // mini-map is on the right, and lap text on right,
+        // so no overlap possible
+        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
+                               + (int)(0.05f*UserConfigParams::m_width);
+    }
+    
+    gui::ScalableFont* font = GUIEngine::getFont(); 
+    int font_height         = (int)(font->getDimension(L"X").Height);
+    
+    if (kart->hasFinishedRace())
+    {
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        pos.UpperLeftCorner.Y -= (2+2)*font_height;
+        pos.LowerRightCorner   = pos.UpperLeftCorner;
+        font->draw(m_string_finished.c_str(), pos, color);
+    }
+    else
+    {
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        pos.UpperLeftCorner.Y -= (3+2)*font_height;
+        pos.LowerRightCorner   = pos.UpperLeftCorner;
+        font->draw(m_string_rank.c_str(), pos, color);
+    
+        char str[256];
+        sprintf(str, "%d/%d", rank, kart_amount);
+        pos.UpperLeftCorner.Y  += font_height;
+        pos.LowerRightCorner.Y += font_height;
+        font->draw(core::stringw(str).c_str(), pos, color);
+    }
+} // drawRank
 
 //-----------------------------------------------------------------------------
 /** Removes messages which have been displayed long enough. This function

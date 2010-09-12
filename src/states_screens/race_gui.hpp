@@ -94,6 +94,12 @@ private:
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
 
+    /** Translated string 'rank' displayed every frame. */
+    core::stringw    m_string_rank;
+
+    /** Translated string 'Top %d' displayed every frame. */
+    core::stringw    m_string_top;
+
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go;
     
@@ -165,6 +171,8 @@ private:
     void drawSpeed             (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawLap               (const KartIconDisplayInfo* info, const Kart* kart,
+                                const core::recti &viewport);
+    void drawRank               (const KartIconDisplayInfo* info, const Kart* kart,
                                 const core::recti &viewport);
     void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
     /** Display items that are shown once only (for all karts). */
