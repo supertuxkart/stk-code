@@ -139,6 +139,10 @@ KartModel::~KartModel()
 KartModel* KartModel::makeCopy()
 {
     KartModel *km        = new KartModel(/*is master*/ false);
+    memcpy(km, this, sizeof(KartModel));
+    // We need to set this again, since memcpy will overwrite it.
+    km->m_is_master      = false;
+#ifdef XX
     km->m_kart_height    = m_kart_height;
     km->m_kart_length    = m_kart_length;
     km->m_kart_width     = m_kart_width;
@@ -155,6 +159,7 @@ KartModel* KartModel::makeCopy()
         km->m_wheel_physics_position[i]  = m_wheel_physics_position[i];
         km->m_z_offset                   = m_z_offset;
     }
+#endif
     return km;
 }   // makeCopy
 
