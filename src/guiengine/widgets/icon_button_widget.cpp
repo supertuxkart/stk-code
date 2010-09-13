@@ -111,14 +111,16 @@ void IconButtonWidget::add()
         const int label_extra_size = ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
                                        0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
         
-        // leave enough room for two lines of text
+        const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+        
+        // leave enough room for (at least) two lines of text
         widget_size = rect<s32>(m_x - label_extra_size/2,
                                 m_y + m_h,
                                 m_x + m_w + label_extra_size/2,
-                                m_y + m_h + GUIEngine::getFontHeight()*2);
+                                m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 : 0));
 
         m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
-                                                        false, true /* word wrap */, m_parent);
+                                                        false, word_wrap, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
         m_label->setNotClipped(true);

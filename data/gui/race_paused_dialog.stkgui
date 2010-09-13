@@ -14,19 +14,19 @@
         <buttonbar id="choiceribbon" proportion="4" width="100%" align="center">
         
             <icon-button id="newrace" width="128" height="128" icon="gui/main_race.png"
-                    I18N="Race paused button" text="Setup New Race"/>
+                    I18N="Race paused button" text="Setup New Race" word_wrap="true"/>
             
             <icon-button id="restart" width="128" height="128" icon="gui/restart.png"
-                    I18N="Race paused button" text="Restart Race"/>
+                    I18N="Race paused button" text="Restart Race" word_wrap="true"/>
             
             <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
-                         I18N="Race paused button" text="Options"/>
+                         I18N="Race paused button" text="Options" word_wrap="true"/>
             
             <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
-                    I18N="Race paused button" text="Help"/>
+                    I18N="Race paused button" text="Help" word_wrap="true"/>
             
             <icon-button id="exit" width="128" height="128" icon="gui/main_quit.png"
-                         I18N="Race paused button" text="Exit Race"/>
+                         I18N="Race paused button" text="Exit Race" word_wrap="true"/>
         
         </buttonbar>
         

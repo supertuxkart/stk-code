@@ -116,9 +116,10 @@
        runtime, too. Just add no children to the ribbon in the XML file, and 
        add them at runtime through the method for this.
  \note The layout algorithm will reserve space for at most one line of text
-       (if needed) for ribbon elements. If you have ribbon elements will
-       long texts that spawn many lines, expect that the extra lines will
-       not be accounted for in the sizing algorithms (i.e. extra lines will
+       (if needed) for ribbon elements. If you have ribbon elements with
+       long texts that spawn many lines, 1. give the word_wrap="true" property
+       to the icon button widget in the XML file; 2. expect that the extra lines
+       will not be accounted for in the sizing algorithms (i.e. extra lines will
        just expand over whatever is located under the ribbon)
  
  \n
@@ -298,8 +299,10 @@
  \subsection prop5 PROP_WORD_WRAP
  <em> Name in XML files: </em> \c "word_wrap" 
  
- used exclusively by label components. Value can be "true" to indicate that 
- long text should spawn on multiple lines.
+ used by label components and icon buttons. Value can be "true" to indicate 
+ that long text should spawn on multiple lines. Warning, in icon buttons,
+ the space under the button's text may be rendered unclickable by the label
+ widget overlapping other widgets under.
  
  \n
  \subsection prop6 PROP_MIN_VALUE, PROP_MAX_VALUE
