@@ -99,14 +99,11 @@ void FollowTheLeaderRace::countdownReachedZero()
     
     if (isRaceOver())
     {
-        // mark leader as finished
-        m_karts[0]->finishedRace(getTime());
-        
-        // mark last human player as finished
+        // Mark all still racing karts to be finished.
         for (unsigned int n=0; n<m_karts.size(); n++)
         {
             if (!m_karts[n]->isEliminated() && 
-                 m_karts[n]->getController()->getPlayer() != NULL) // if player kart
+                !m_karts[n]->hasFinishedRace())
             {
                 m_karts[n]->finishedRace(getTime());
             }
