@@ -262,6 +262,9 @@ namespace GUIEngine
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
         
+        /** Only used if m_show_bounding_box is true */
+        bool m_is_bounding_box_round;
+
         /** Used in two cases :
             1) For 'placeholder' divisions; at the time the layout is created, there is nothing to
                place there yet, but we know there eventually will. So in this case pass 'true' to the

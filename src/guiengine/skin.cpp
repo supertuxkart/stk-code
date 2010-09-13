@@ -1238,15 +1238,28 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
     {
         Widget& widget = (*within_vector)[n];
         
-        if(widget.m_type == WTYPE_DIV)
+        if (widget.m_type == WTYPE_DIV)
         {
-            if(widget.m_show_bounding_box)
+            if (widget.m_show_bounding_box)
             {
-                core::rect< s32 > rect = core::rect<s32>(widget.m_x,
-                                                         widget.m_y,
-                                                         widget.m_x + widget.m_w,
-                                                         widget.m_y + widget.m_h );
-                drawBoxFromStretchableTexture(&widget, rect, SkinConfig::m_render_params["section::neutral"]);
+                if (widget.m_is_bounding_box_round)
+                {
+                    core::rect< s32 > rect = core::rect<s32>(widget.m_x,
+                                                             widget.m_y,
+                                                             widget.m_x + widget.m_w,
+                                                             widget.m_y + widget.m_h );
+                    drawBoxFromStretchableTexture(&widget, rect,
+                                                  SkinConfig::m_render_params["rounded_section::neutral"]);
+                }
+                else
+                {
+                    core::rect< s32 > rect = core::rect<s32>(widget.m_x,
+                                                             widget.m_y,
+                                                             widget.m_x + widget.m_w,
+                                                             widget.m_y + widget.m_h );
+                    drawBoxFromStretchableTexture(&widget, rect,
+                                                  SkinConfig::m_render_params["section::neutral"]);
+                }
             }
             else
             {

@@ -72,6 +72,13 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& 
                     w->m_show_bounding_box = true;
                     append_to.push_back(w);
                 }
+                else if (!strcmp("roundedbox", xml->getNodeName()))
+                {
+                    Widget* w = new Widget(WTYPE_DIV);
+                    w->m_show_bounding_box = true;
+                    w->m_is_bounding_box_round = true;
+                    append_to.push_back(w);
+                }
                 else if (!strcmp("ribbon", xml->getNodeName()))
                 {
                     append_to.push_back(new RibbonWidget());
@@ -226,6 +233,8 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 if (!strcmp("box", xml->getNodeName()))
                     return;
                 if (!strcmp("placeholder", xml->getNodeName()))
+                    return;
+                if (!strcmp("roundedbox", xml->getNodeName()))
                     return;
                 
                 // we're done parsing this 'ribbon', return one step back in the recursive call

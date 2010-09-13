@@ -175,7 +175,12 @@ when the border that intersect at this corner are enabled.
 <element type="section" image="ocean/glass_section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
-  
+
+<!-- Stateless -->
+<element type="rounded_section" image="glass/glass_rsection.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="1.0" vborder_out_portion="0.2" />
+
 <!-- Stateless -->
 <element type="window" image="ocean/dialog.png"
       left_border="7" right_border="7" top_border="50" bottom_border="50"

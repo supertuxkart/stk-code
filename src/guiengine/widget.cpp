@@ -74,6 +74,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     
     m_event_handler = NULL;
     m_show_bounding_box = false;
+    m_is_bounding_box_round = false;
     m_parent = NULL;
     m_reserve_id = reserve_id;
     m_supports_multiplayer = false;
