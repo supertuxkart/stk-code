@@ -53,7 +53,8 @@ bool EventHandler::OnEvent (const SEvent &event)
         return onGUIEvent(event) == EVENT_BLOCK;
     }
     else if (GUIEngine::getStateManager()->getGameState() != GUIEngine::GAME &&
-             event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT)
+             event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT &&
+             event.EventType != EET_LOG_TEXT_EVENT)
     {
         return false; // EVENT_LET
     }
