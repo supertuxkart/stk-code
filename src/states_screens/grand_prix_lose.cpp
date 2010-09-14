@@ -33,6 +33,8 @@ const float CAMERA_START_X = -17.0f;
 const float CAMERA_START_Y = 2.0f;
 const float CAMERA_START_Z = 5.5f;
 
+const float DISTANCE_BETWEEN_KARTS = 2.0f;
+
 
 const float KART_START_X = -17.0f;
 const float KART_END_X = -5.0f;
@@ -41,6 +43,8 @@ const float KART_Z = 0.0f;
 
 
 const float GARAGE_DOOR_OPEN_TIME = 6.0f;
+
+const int MAX_KART_COUNT = 4;
 
 DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
@@ -59,7 +63,10 @@ GrandPrixLose::GrandPrixLose() : Screen("grand_prix_lose.stkgui")
 
 void GrandPrixLose::loadedFromFile()
 {
-    m_kart_node = NULL;
+    m_kart_node[0] = NULL;
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+    m_kart_node[3] = NULL;
 }   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
@@ -143,7 +150,14 @@ void GrandPrixLose::tearDown()
         delete m_all_kart_models[i];
 
     m_all_kart_models.clear();
-    irr_driver->removeNode(m_kart_node);
+
+    for (int n=0; n<MAX_KART_COUNT; n++)
+    {
+        if (m_kart_node[n] != NULL)
+        {
+            irr_driver->removeNode(m_kart_node[n]);
+        }
+    }
     
 }   // tearDown
 
@@ -177,7 +191,16 @@ void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
     if (kartProgression <= 1.0f)
     {
         m_kart_x = KART_START_X + (KART_END_X - KART_START_X)*kartProgression;
-        m_kart_node->setPosition( core::vector3df(m_kart_x, m_kart_y, m_kart_z) );
+        
+        for (int n=0; n<MAX_KART_COUNT; n++)
+        {
+            if (m_kart_node[n] != NULL)
+            {
+                m_kart_node[n]->setPosition( core::vector3df(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
+                                                             m_kart_y,
+                                                             m_kart_z) );
+            }
+        }
     }
     
     const float progression = m_global_time / DURATION;
@@ -239,33 +262,74 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::setKarts(const std::vector<std::string> ident_arg)
+void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
 {    
     scene::ISceneNode* kart_main_node = NULL;
     
     assert(ident_arg.size() > 0);
-    
-    // TODO: allow displaying more than one losers
-    const KartProperties* kart = kart_properties_manager->getKart(ident_arg[0]);
-    if (kart != NULL)
+    if ((int)ident_arg.size() > MAX_KART_COUNT)
     {
-
-        KartModel *kart_model = kart->getKartModelCopy();
-        m_all_kart_models.push_back(kart_model);
-
-        m_kart_x = KART_START_X;
-        m_kart_y = KART_Y;
-        m_kart_z = KART_Z;
-        
-        kart_model->attachModel(&kart_main_node);
-        kart_main_node->setPosition( core::vector3df(m_kart_x, m_kart_y, m_kart_z) );
-        //kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
-        kart_main_node->updateAbsolutePosition();
-        kart_main_node->setRotation(vector3df(0, 90, 0));
-        kart_model->setAnimation(KartModel::AF_DEFAULT);
-    }   // if kart !=NULL
+        ident_arg.resize(MAX_KART_COUNT);
+    }
     
-    m_kart_node = kart_main_node;
+    // (there is at least one kart so kart node 0 is sure to be set)
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+    m_kart_node[3] = NULL;
+    
+    const int count = ident_arg.size();
+    for (int n=0; n<count; n++)
+    {
+        const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n]);
+        if (kart != NULL)
+        {
+            KartModel* kart_model = kart->getKartModelCopy();
+            m_kart_x = KART_START_X;
+            m_kart_y = KART_Y;
+            m_kart_z = KART_Z;
+            
+            kart_model->attachModel(&kart_main_node);
+            kart_main_node->setPosition( core::vector3df(m_kart_x, m_kart_y, m_kart_z) );
+            //kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
+            kart_main_node->updateAbsolutePosition();
+            kart_main_node->setRotation(vector3df(0, 90, 0));
+            kart_model->setAnimation(KartModel::AF_DEFAULT);
+        }   // if kart !=NULL
+        
+        m_kart_node[n] = kart_main_node;
+    }
+    
+    const int w = UserConfigParams::m_width;
+    const int h = UserConfigParams::m_height;
+    
+    switch (count)
+    {
+        case 1:
+            m_viewport[0] = core::recti(0, 0, w, h);
+            break;
+            
+        case 2:
+            m_viewport[0] = core::recti(0, 0, w, h/2);
+            m_viewport[1] = core::recti(0, h/2, w, h);
+            break;
+            
+        case 3:
+            m_viewport[0] = core::recti(0, 0, w/2, h/2);
+            m_viewport[1] = core::recti(w/2, 0, 2, h/2);
+            m_viewport[2] = core::recti(0, h/2, w, h);
+            break;
+            
+        case 4:
+            m_viewport[0] = core::recti(0, 0, w/2, h/2);
+            m_viewport[1] = core::recti(w/2, 0, 2, h/2);
+            m_viewport[2] = core::recti(0, h/2, w/2, h);
+            m_viewport[3] = core::recti(w/2, h/2, w, h);
+            break;
+            
+        default:
+            assert(false);
+    }
+    
 }   // setKarts
 
 // -------------------------------------------------------------------------------------

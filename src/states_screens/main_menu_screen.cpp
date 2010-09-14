@@ -187,6 +187,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             StateManager::get()->pushScreen(scene);
             std::vector<std::string> losers;
             losers.push_back("nolok");
+            losers.push_back("tux");
+            losers.push_back("wilber");
             scene->setKarts( losers );
         }
     }

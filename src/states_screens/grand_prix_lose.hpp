@@ -30,7 +30,7 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 
     irr::scene::IAnimatedMeshSceneNode* m_garage_door;
 
-    irr::scene::ISceneNode* m_kart_node;
+    irr::scene::ISceneNode* m_kart_node[4];
     
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
@@ -48,6 +48,8 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     float m_camera_target_x, m_camera_target_z;
 
     MusicInformation* m_music;
+    
+    irr::core::recti m_viewport[4];
     
 public:
 
@@ -67,7 +69,7 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     /** \brief set which karts lost this GP */
-    void setKarts(const std::vector<std::string> ident);
+    void setKarts(std::vector<std::string> ident);
 
     virtual MusicInformation* getMusic() const { return m_music; }
 
