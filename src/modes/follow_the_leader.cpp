@@ -28,6 +28,12 @@
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
+    // We have to make sure that no kart finished the set number of laps
+    // in a FTL race (since otherwise its distance will not be computed
+    // correctly, and as a result e.g. a leader might suddenly fall back
+    // after crossing the start line
+    race_manager->setNumLaps(99999);
+
     m_leader_intervals = stk_config->m_leader_intervals;
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
