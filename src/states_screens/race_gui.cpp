@@ -446,7 +446,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     const unsigned int kart_amount = world->getNumKarts();
     
     //where is the limit to hide last icons
-    float y_icons_limit=UserConfigParams::m_height-m_map_height-ICON_PLAYER_WIDTH;
+    int y_icons_limit=UserConfigParams::m_height-m_map_height-ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
         y_icons_limit=UserConfigParams::m_height-ICON_WIDTH;
     
