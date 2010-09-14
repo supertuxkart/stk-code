@@ -284,6 +284,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         if (kart != NULL)
         {
             KartModel* kart_model = kart->getKartModelCopy();
+            m_all_kart_models.push_back(kart_model);
             m_kart_x = KART_START_X;
             m_kart_y = KART_Y;
             m_kart_z = KART_Z;
