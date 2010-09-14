@@ -120,9 +120,6 @@ private:
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
     float m_kart_height;              /**< Height of kart. */
-    float m_z_offset;                 /**< Models are usually not at z=0 (due
-                                       *   to the wheels), so this value moves
-                                       *   the karts down appropriately. */
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
      * anything attached to it etc. */
@@ -172,9 +169,6 @@ public:
     float getLength                 () const {return m_kart_length;              }
     float getWidth                  () const {return m_kart_width;               }
     float getHeight                 () const {return m_kart_height;              }
-    /** Returns the amount a kart has to be moved down so that the bottom of
-     *  the kart is at z=0. */
-    float getZOffset                () const {return m_z_offset;                 }
     void  update(float rotation, float visual_steer,
                  float steer, const float suspension[4]);
     void  resetWheels();

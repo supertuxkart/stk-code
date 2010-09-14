@@ -64,7 +64,8 @@ KartModel::KartModel(bool is_master)
         m_wheel_model[i]             = NULL;
         m_wheel_node[i]              = NULL;
 
-        // default value for kart suspensions. move to config file later if we find each kart needs custom values
+        // default value for kart suspensions. move to config file later 
+        // if we find each kart needs custom values
         m_min_suspension[i] = -1.3f;
         m_max_suspension[i] = 1.3f;
         m_dampen_suspension_amplitude[i] = 2.5f;
@@ -149,7 +150,6 @@ KartModel* KartModel::makeCopy()
     km->m_kart_width        = m_kart_width;
     km->m_kart_length       = m_kart_length;
     km->m_kart_height       = m_kart_height;
-    km->m_z_offset          = m_z_offset;
     km->m_mesh              = m_mesh;
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
@@ -231,16 +231,10 @@ void KartModel::loadModels(const KartProperties &kart_properties)
         exit(-2);
     }
     MeshTools::minMax3D(m_mesh, &min, &max);
-    Vec3 size = max-min;
-    m_z_offset    = min.getZ();
+    Vec3 size     = max-min;
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
-    // FIXME: How do we handle this? it's a mesh only, so we can't
-    // simply move it in a transform (unless we turn it into a scene 
-    // node). m_z_offset should probably be made available to kart.
-    // Vec3 move_kart_to_0_z(0, 0, m_z_offset);
-    // m_root->setTransform(move_kart_to_0_z);
 
     // Now set default some default parameters (if not defined) that 
     // depend on the size of the kart model (wheel position, center
@@ -268,10 +262,6 @@ void KartModel::loadModels(const KartProperties &kart_properties)
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // FIXME: wheel handling still missing.
     }   // for i<4
-    if(!m_wheel_model[0])
-    {
-        m_z_offset = m_kart_height*0.5f;
-    }
 }   // loadModels
 
 // ----------------------------------------------------------------------------
