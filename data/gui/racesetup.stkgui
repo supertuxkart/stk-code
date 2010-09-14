@@ -28,7 +28,7 @@
     
     <spacer proportion="2" width="25"/>
     
-    <bright width="100%" height="25" text="Select a game mode" align="center" text_align="left" />
+    <bright width="100%" text="Select a game mode" align="center" text_align="left" />
 
     <scrollable_toolbar id="gamemode" height="135" width="85%" label_location="bottom" align="center"
                         child_width="135" child_height="135" />
