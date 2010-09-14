@@ -765,7 +765,8 @@ namespace GUIEngine
     // ------------------------------------------------------------------------
     void cleanUp()
     {
-        if (g_skin != NULL) delete g_skin;
+        // There is no need to delete the skin, the gui environment holds it
+        //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
         
         for (int i=0; i<g_loaded_screens.size(); i++)
@@ -778,11 +779,14 @@ namespace GUIEngine
         
         if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
         
-        delete g_font;
+        //delete g_font;
+        g_font->drop();
         g_font = NULL;
-        delete g_title_font;
+        //delete g_title_font;
+        g_title_font->drop();
         g_title_font = NULL;
-        delete g_small_font;
+        //delete g_small_font;
+        g_small_font->drop();
         g_small_font = NULL;
         
         // nothing else to delete for now AFAIK, irrlicht will automatically 
