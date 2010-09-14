@@ -95,6 +95,12 @@ private:
         video::ITexture *m_kart_icon;
         /** The times of all karts in the right order. */
         core::stringw    m_finish_time_string;
+#ifdef USE_PER_LINE_BACKGROUND
+        /** For the background bar behind each line. */
+        GUIEngine::SkinWidgetContainer m_widget_container;
+        /** The parameter for rendering the background box. */
+        GUIEngine::BoxRenderParams     m_box_params;
+#endif
     };   // Rowinfo
 
     std::vector<RowInfo>       m_all_row_infos;
@@ -140,6 +146,9 @@ private:
 
     /** Size of space between columns. */
     unsigned int               m_width_column_space;
+
+    /** The overall width of the table. */
+    unsigned int               m_table_width;
     
     /** The font to use. */
     gui::ScalableFont         *m_font;

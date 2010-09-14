@@ -242,11 +242,13 @@ namespace GUIEngine
 
         irr::video::ITexture* bg_image;
         
-
+#ifdef USE_PER_LINE_BACKGROUND
+    public:
+#endif
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const irr::core::rect< irr::s32 > &dest,
                                            BoxRenderParams& params, bool deactivated=false,
                                            const irr::core::rect<irr::s32>* clipRect=NULL);
-        
+    private:
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const bool pressed);
         void drawButton(Widget* w, const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool focused);

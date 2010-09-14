@@ -23,6 +23,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
+#include "io/file_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -293,8 +294,8 @@ void RaceResultGUI::determineTableLayout()
     m_time_for_points       = 1.0f;
 
     // Determine text height
-    r                            = m_font->getDimension(L"Y");
-    m_distance_between_rows      = (int)(1.5f*r.Height);
+    r                       = m_font->getDimension(L"Y");
+    m_distance_between_rows = (int)(1.5f*r.Height);
 
     // If there are too many karts, reduce size between rows
     if(m_distance_between_rows * num_karts > height)
@@ -314,18 +315,18 @@ void RaceResultGUI::determineTableLayout()
     core::dimension2du r_all_p    = m_font->getDimension(L"999");
     unsigned int width_all_points = r_all_p.Width;
 
-    unsigned int table_width = m_width_icon + m_width_column_space
-                             + m_width_kart_name;
+    m_table_width = m_width_icon + m_width_column_space
+                  + m_width_kart_name;
 
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        table_width += m_width_finish_time + m_width_column_space;
+        m_table_width += m_width_finish_time + m_width_column_space;
 
     // Only in GP mode are the points displayed.
     if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
-        table_width += m_width_new_points + width_all_points
-                     + 2 * m_width_column_space;
+        m_table_width += m_width_new_points + width_all_points
+                      + 2 * m_width_column_space;
 
-    m_leftmost_column = table_area->m_x + (table_area->m_w - table_width)/2;
+    m_leftmost_column = table_area->m_x + (table_area->m_w - m_table_width)/2;
 }   // determineTableLayout
 
 //-----------------------------------------------------------------------------
@@ -583,6 +584,16 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
                                                : video::SColor(255,255,255,255);
 
+#ifdef USE_PER_LINE_BACKGROUND
+    // Draw the background image
+    core::rect<s32> dest(x-50, y, 
+                         x+50+m_table_width, 
+                         (int)(y+m_distance_between_rows));
+    ri->m_box_params.setTexture(irr_driver->getTexture( (file_manager->getGUIDir() + "skins/glass/glassbutton_focused.png").c_str() ) );
+    GUIEngine::getSkin()->drawBoxFromStretchableTexture(&(ri->m_widget_container),
+                                                        dest, 
+                                                        ri->m_box_params);
+#endif
     unsigned int current_x = x;
 
     // First draw the icon
