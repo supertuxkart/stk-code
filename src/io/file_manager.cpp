@@ -628,11 +628,12 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 
     for(int n=0; n<(int)files->getFileCount(); n++)
     {
-        //printf("---- Entry : %s \n", (make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n)).c_str());
-        result.insert(make_full_path ? path+"/"+ files->getFileName(n).c_str() : files->getFileName(n).c_str());
+        result.insert(make_full_path ? path+"/"+ files->getFileName(n).c_str()
+                                     : files->getFileName(n).c_str()         );
     }
 
     m_file_system->changeWorkingDirectoryTo( previous_cwd.c_str() );
+    files->drop();
 }   // listFiles
 
 //-----------------------------------------------------------------------------
