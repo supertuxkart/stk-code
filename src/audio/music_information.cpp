@@ -59,8 +59,9 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     XMLNode* root = file_manager->createXMLTree(filename);
     if (!root)
     {
-        fprintf(stderr, "Could not open music XML file '%s'.\n", 
-                filename.c_str());
+        // Don't print a message here - not finding a music file
+        // is normal since the file is searched in several different
+        // directories (e.g. in data/tracks/XX and data/music).
         throw std::runtime_error("Could not open music XML file");
     }
     if(root->getName()!="music")
