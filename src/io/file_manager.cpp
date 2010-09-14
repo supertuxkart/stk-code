@@ -326,12 +326,12 @@ std::string FileManager::getDataDir() const
 //-----------------------------------------------------------------------------
 std::string FileManager::getGUIDir() const
 {
-    return m_root_dir+"/data/gui";
+    return m_root_dir+"/data/gui/";
 }
 //-----------------------------------------------------------------------------
 std::string FileManager::getKartDir() const
 {
-    return m_root_dir+"/data/karts";
+    return m_root_dir+"/data/karts/";
 }   // getKartDir
 
 //-----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ std::string FileManager::getKartFile(const std::string& fname,
     // e.g. to load a model from a kart directory
     std::string basename = (kart_name!="") ? kart_name
                            : StringUtils::removeExtension(fname);
-    return getKartDir()+"/"+basename+"/"+fname;
+    return getKartDir()+basename+"/"+fname;
 }   // getKartFile
 
 //-----------------------------------------------------------------------------
