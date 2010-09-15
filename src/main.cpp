@@ -259,15 +259,15 @@ int handleCmdLine(int argc, char **argv)
         {
             for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); 
                 i++)
-	    {
-               const KartProperties *km = kart_properties_manager->getKartById(i);
-	       printf("%s:\t%swidth: %f length: %f height: %f\n",
-		      km->getIdent().c_str(),
-		      (km->getIdent().size()<7) ? "\t" : "",
-		      km->getMasterKartModel().getWidth(), 
-		      km->getMasterKartModel().getLength(), 
-		      km->getMasterKartModel().getHeight());  
-	    }
+            {
+                const KartProperties *km = kart_properties_manager->getKartById(i);
+                 printf("%s:\t%swidth: %f length: %f height: %f\n",
+                       km->getIdent().c_str(),
+                       (km->getIdent().size()<7) ? "\t" : "",
+                       km->getMasterKartModel().getWidth(), 
+                       km->getMasterKartModel().getLength(), 
+                       km->getMasterKartModel().getHeight());  
+            }
         }
         else if(!strcmp(argv[i], "--check-debug"))
         {
@@ -560,7 +560,7 @@ void initRest()
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
     network_http            = new NetworkHttp          ();
-    addons_manager 			= new Addons			   ();
+    addons_manager          = new Addons               ();
 #endif
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
