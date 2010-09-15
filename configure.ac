@@ -294,14 +294,18 @@ echo -n "checking irrlicht version is recent enough... "
 
 irrlicht_min_version_met="false"
 
+# Note that irrlicht 1.8 potentially needs additional flags (-lXcursor, or 
+# undefine _IRR_LINUX_XCURSOR_ # in IrrCompileConfig.h). Since there might
+# be other changes, for now I remove support for irrlicht trunk/1.8
+
 AC_TRY_RUN(
     [
         #  include "irrlicht.h"
         int main() {
-        #if (IRRLICHT_VERSION_MAJOR > 1) || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 7)
+        #if (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR == 7)
             // ok
         #else
-        #error "You need irrLicht 1.7+ to build STK"
+        #error "You need irrLicht 1.7.* to build STK, irrlicht 1.8 is not supported yet"
         #endif
         return 0;
         }
