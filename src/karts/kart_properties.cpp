@@ -182,12 +182,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                / (m_max_speed_turn - m_min_speed_turn);
 
 
-    // Useful when tweaking kart parameters
-    if(UserConfigParams::m_print_kart_sizes)
-        printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(),
-        m_kart_model->getWidth(), m_kart_model->getLength(),
-        m_kart_model->getHeight());
-
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
