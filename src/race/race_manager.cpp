@@ -52,7 +52,6 @@ RaceManager::RaceManager()
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_track_number       = 0;
-    m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
     setTrack("jungle");
     setNumLocalPlayers(0);
@@ -245,6 +244,7 @@ void RaceManager::startNew()
  */
 void RaceManager::startNextRace()
 {
+    stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();
     GUIEngine::renderLoading();
     device->getVideoDriver()->endScene();

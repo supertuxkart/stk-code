@@ -506,10 +506,10 @@ void RaceResultGUI::renderGlobal(float dt)
              break;
         case RR_INCREASE_POINTS: 
             ri->m_current_displayed_points += 
-                dt*stk_config->m_scores[0]/m_time_for_points;
+                dt*race_manager->getPositionScore(1)/m_time_for_points;
             if(ri->m_current_displayed_points>ri->m_new_overall_points)
                 ri->m_current_displayed_points = (float)ri->m_new_overall_points;
-            ri->m_new_points -= dt*stk_config->m_scores[0]/m_time_for_points;
+            ri->m_new_points -= dt*race_manager->getPositionScore(1)/m_time_for_points;
             if(ri->m_new_points<0)
                 ri->m_new_points = 0;
             break;

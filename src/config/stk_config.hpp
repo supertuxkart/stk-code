@@ -95,8 +95,10 @@ public:
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
     std::vector<int> m_switch_items; /**< How to switch items.               */
-    std::vector<int>
-          m_scores;                  /**<Scores depending on position.       */
+    /** The number of points a kart on position X has more than the
+     *  next kart. From this the actual number of points for each
+     *  position is computed. */
+    std::vector<int> m_score_increase;
 
     MusicInformation
          *m_title_music;             /**<Filename of the title music to play.*/
@@ -111,6 +113,7 @@ public:
          getDefaultKartProperties() const {return m_kart_properties; }
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
+    void  getAllScores(std::vector<int> *all_scores, int num_karts);
 }
 ;   // STKConfig
 

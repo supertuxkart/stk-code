@@ -72,7 +72,7 @@ void STKConfig::load(const std::string &filename)
                 strA,filename.c_str());exit(-1);                       \
     }
 
-    if(m_scores.size()==0 || (int)m_scores.size()!=m_max_karts)
+    if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
     {
         fprintf(stderr,"Not or not enough scores defined in stk_config");
         exit(-1);
@@ -152,7 +152,7 @@ void STKConfig::init_defaults()
     m_max_track_version        = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
-    m_scores.clear();
+    m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
 }   // init_defaults
@@ -182,10 +182,30 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *gp_node = root->getNode("grand-prix"))
     {
-        gp_node->get("scores", &m_scores);
         std::string order;
         gp_node->get("order", &order);
         m_gp_order = (order=="most-points-first");
+
+        for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
+        {
+            const XMLNode *pn=gp_node->getNode(i);
+            int from=-1;
+            pn->get("from", &from);
+            int to=-1;
+            pn->get("to", &to);
+            if(to<0) to=m_max_karts;
+            int points=-1;
+            pn->get("points", &points);
+            if(points<0 || from<0 || from>to||m_score_increase.size()!=from-1)
+            {
+                fprintf(stderr, "Incorrect GP point specification:\n");
+                fprintf(stderr, "from: %d  to: %d  points: %d\n", 
+                        from, to, points);
+                exit(-1);
+            }
+            for(int j=from; j<=to; j++)
+                m_score_increase.push_back(points);
+        }
     }
 
     if(const XMLNode *leader_node= root->getNode("follow-the-leader"))
@@ -285,3 +305,23 @@ void STKConfig::getAllData(const XMLNode * root)
 
 }   // getAllData
 
+// ----------------------------------------------------------------------------
+/** Defines the points for each position for a race with a given number
+ *  of karts.
+ *  \param all_scores A vector which will be resized to take num_karts
+ *         elements and which on return contains the number of points
+ *         for each position.
+ * \param num_karts Number of karts.
+ */
+void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
+{
+    assert(num_karts <= m_max_karts);
+    all_scores->resize(num_karts);
+    (*all_scores)[num_karts-1] = 1;  // last position gets one point
+
+    // Must be signed, in case that num_karts==1
+    for(int i=num_karts-2; i>=0; i--)
+    {
+        (*all_scores)[i] = (*all_scores)[i+1] + m_score_increase[i];
+    }
+}   // getAllScores
