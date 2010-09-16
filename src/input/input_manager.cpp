@@ -152,7 +152,8 @@ void InputManager::handleStaticAction(int key, int value)
             break;
 #endif
         case KEY_F12:
-            UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
+            if(value)
+                UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
             break;
 #ifndef WIN32
             // For now disable F9 toggling fullscreen, since windows requires
