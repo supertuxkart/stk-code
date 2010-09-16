@@ -184,7 +184,6 @@ void KartModel::attachModel(scene::ISceneNode **node)
     {
         *node = irr_driver->addAnimatedMesh(m_mesh);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
-        m_animated_node->setAnimationSpeed(1500);
         m_animated_node->setLoopMode(false);
     }
     else
@@ -338,12 +337,15 @@ void KartModel::setAnimation(AnimationFrameType type)
     if(m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
-        m_animated_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
-                                      m_animation_frame[AF_STRAIGHT] );
+        if(m_animation_frame[AF_LEFT] <= m_animation_frame[AF_RIGHT])
+            m_animated_node->setFrameLoop(m_animation_frame[AF_LEFT],
+                                          m_animation_frame[AF_RIGHT] );
+        else
+            m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
+                                          m_animation_frame[AF_LEFT] );
         m_animated_node->setAnimationEndCallback(NULL);
     }
-
-    if(m_current_animation!=AF_DEFAULT &&  m_animation_frame[type]>-1)
+    else if(m_animation_frame[type]>-1)
     {
         // 'type' is the start frame of the animation, type + 1 the frame 
         // to begin the loop with, type + 2 to end the frame with
@@ -406,10 +408,8 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  */
-void KartModel::update(float rotation, float visual_steer,
-                       float steer, const float suspension[4])
+void KartModel::update(float rotation, float steer, const float suspension[4])
 {
-
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
     // the graphical wheel models don't look too wrong.
@@ -429,7 +429,7 @@ void KartModel::update(float rotation, float visual_steer,
     }   // for i<4
 
     core::vector3df wheel_rear (rotation*RAD_TO_DEGREE, 0, 0);
-    core::vector3df wheel_steer(0, visual_steer, 0);
+    core::vector3df wheel_steer(0, steer*30.0f, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
 
     for(unsigned int i=0; i<4; i++)
@@ -454,36 +454,16 @@ void KartModel::update(float rotation, float visual_steer,
 
     // Update animation if necessary
     // -----------------------------
-    // FIXME: this implementation is currently very simple, it will always
-    // animate to the very left or right, even if actual steering is only
-    // (say) 50% of left or right.
-    int end;
-    static int last_end=-1;
-    if(steer>0.0f)       end = m_animation_frame[AF_STRAIGHT]
-                             - (int)( ( m_animation_frame[AF_STRAIGHT]
-                                       -m_animation_frame[AF_RIGHT]    )*steer);
-    else if(steer<0.0f)  end = m_animation_frame[AF_STRAIGHT]
-                             + (int) ( (m_animation_frame[AF_STRAIGHT] 
-                                       -m_animation_frame[AF_LEFT]   )*steer);
-    else                 end = m_animation_frame[AF_STRAIGHT];
+    float frame;
+    if(steer>0.0f)      frame = m_animation_frame[AF_STRAIGHT]
+                              - ( ( m_animation_frame[AF_STRAIGHT]
+                                        -m_animation_frame[AF_RIGHT]  )*steer);
+    else if(steer<0.0f) frame = m_animation_frame[AF_STRAIGHT]
+                              + ( (m_animation_frame[AF_STRAIGHT] 
+                                        -m_animation_frame[AF_LEFT]   )*steer);
+    else                frame = m_animation_frame[AF_STRAIGHT];
 
-    // No changes to current frame loop
-    if(end==last_end) return;
-
-    int begin = (int)m_animated_node->getFrameNr();
-    last_end = end;
-    // Handle reverse animation, which are done by setting
-    // the animation speed to a negative number.
-    if(begin<end)
-    {
-        m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(begin, end);
-    }
-    else
-    {
-        m_animated_node->setAnimationSpeed(-m_animation_speed);
-        m_animated_node->setFrameLoop(begin, end);
-    }
+    m_animated_node->setCurrentFrame(frame);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -493,5 +473,5 @@ void KartModel::update(float rotation, float visual_steer,
 void KartModel::resetWheels()
 {
     const float suspension[4]={0,0,0,0};
-    update(0, 0, 0.0f, suspension);
+    update(0, 0.0f, suspension);
 }   // reset

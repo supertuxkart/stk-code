@@ -169,8 +169,7 @@ public:
     float getLength                 () const {return m_kart_length;              }
     float getWidth                  () const {return m_kart_width;               }
     float getHeight                 () const {return m_kart_height;              }
-    void  update(float rotation, float visual_steer,
-                 float steer, const float suspension[4]);
+    void  update(float rotation, float steer, const float suspension[4]);
     void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
 

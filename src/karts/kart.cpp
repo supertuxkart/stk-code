@@ -1417,15 +1417,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
         wheel_up_axis[i] = m_default_suspension_length[i]
                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    const float auto_skid_visual=1.7f;
-    float auto_skid;
-    // FIXME
-//    if (m_skidding>auto_skid_visual) // Above a limit, start counter rotating the wheels to get drifting look
-//        auto_skid = m_controls.m_steer*30.0f*((auto_skid_visual - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
-//    else
-        auto_skid = m_controls.m_steer*30.0f;
-    m_kart_model->update(m_wheel_rotation, auto_skid,
-                        getSteerPercent(), wheel_up_axis);
+    m_kart_model->update(m_wheel_rotation, getSteerPercent(), wheel_up_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
