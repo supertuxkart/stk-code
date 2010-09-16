@@ -171,6 +171,7 @@ void RaceSetupScreen::init()
     kartamount->setActivated();
     kartamount->setText(L""); // FIXME: dirty trick (see below)
     kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );
+    kartamount->setMax(stk_config->m_max_karts - race_manager->getNumPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );

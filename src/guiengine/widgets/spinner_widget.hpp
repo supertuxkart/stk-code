@@ -116,7 +116,10 @@ namespace GUIEngine
           * \return the maximum value the spinner can take
           */
         int  getMax()   const { return m_max;   }
-        
+        /**
+          * \brief Sets the maximum value for a spinner.
+          */
+        void setMax(int n) {m_max = n; }
         /**
           * \return the minimum value the spinner can take
           */

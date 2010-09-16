@@ -12,7 +12,8 @@
         <spacer width="50" height="25"/>
         <!--
         <spinner id="aikartamount" proportion="3" height="100%" min_value="0" max_value="8" icon="gui/karts%i.png"/> -->
-        <spinner id="aikartamount" proportion="1" height="100%" min_value="0" max_value="20"/>
+        <!-- The maximum is set by stk from data/stk_config.xml. -->
+        <spinner id="aikartamount" proportion="1" height="100%" min_value="0"/>
     </div>
     
     <spacer proportion="2" width="25"/>
