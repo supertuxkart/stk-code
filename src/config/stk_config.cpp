@@ -196,7 +196,8 @@ void STKConfig::getAllData(const XMLNode * root)
             if(to<0) to=m_max_karts;
             int points=-1;
             pn->get("points", &points);
-            if(points<0 || from<0 || from>to||m_score_increase.size()!=from-1)
+            if(points<0 || from<0 || from>to||
+               (int)m_score_increase.size()!=from-1)
             {
                 fprintf(stderr, "Incorrect GP point specification:\n");
                 fprintf(stderr, "from: %d  to: %d  points: %d\n", 
