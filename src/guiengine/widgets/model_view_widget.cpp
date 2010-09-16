@@ -74,6 +74,8 @@ void ModelViewWidget::clearModels()
 // -----------------------------------------------------------------------------
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location, const int frame)
 {
+    if(!mesh) return;
+
     m_models.push_back(mesh);
     m_model_location.push_back(location);
     m_model_frames.push_back(frame);

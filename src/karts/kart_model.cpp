@@ -203,6 +203,7 @@ void KartModel::attachModel(scene::ISceneNode **node)
 
     for(unsigned int i=0; i<4; i++)
     {
+        if(!m_wheel_model[i]) continue;
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i],
                                               *node);
         m_wheel_node[i]->grab();
@@ -433,14 +434,15 @@ void KartModel::update(float rotation, float visual_steer,
 
     for(unsigned int i=0; i<4; i++)
     {
+        if(!m_wheel_node[i]) continue;
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
         pos.Y += clamped_suspension[i];
         m_wheel_node[i]->setPosition(pos);
     }
-    m_wheel_node[0]->setRotation(wheel_front);
-    m_wheel_node[1]->setRotation(wheel_front);
-    m_wheel_node[2]->setRotation(wheel_rear );
-    m_wheel_node[3]->setRotation(wheel_rear );
+    if(m_wheel_node[0]) m_wheel_node[0]->setRotation(wheel_front);
+    if(m_wheel_node[1]) m_wheel_node[1]->setRotation(wheel_front);
+    if(m_wheel_node[2]) m_wheel_node[2]->setRotation(wheel_rear );
+    if(m_wheel_node[3]) m_wheel_node[3]->setRotation(wheel_rear );
 
     // Check if the end animation is being played, if so, don't
     // play steering animation.
