@@ -261,12 +261,13 @@ int handleCmdLine(int argc, char **argv)
                 i++)
             {
                 const KartProperties *km = kart_properties_manager->getKartById(i);
-                 printf("%s:\t%swidth: %f length: %f height: %f\n",
+                 printf("%s:\t%swidth: %f length: %f height: %f mesh-buffer count %d\n",
                        km->getIdent().c_str(),
                        (km->getIdent().size()<7) ? "\t" : "",
                        km->getMasterKartModel().getWidth(), 
                        km->getMasterKartModel().getLength(), 
-                       km->getMasterKartModel().getHeight());  
+                       km->getMasterKartModel().getHeight(),
+                       km->getMasterKartModel().getModel()->getMeshBufferCount());  
             }
         }
         else if(!strcmp(argv[i], "--check-debug"))
