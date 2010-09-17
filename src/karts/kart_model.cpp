@@ -461,7 +461,7 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
     else if(steer<0.0f) frame = m_animation_frame[AF_STRAIGHT]
                               + ( (m_animation_frame[AF_STRAIGHT] 
                                         -m_animation_frame[AF_LEFT]   )*steer);
-    else                frame = m_animation_frame[AF_STRAIGHT];
+    else                frame = (float)m_animation_frame[AF_STRAIGHT];
 
     m_animated_node->setCurrentFrame(frame);
 }   // update
