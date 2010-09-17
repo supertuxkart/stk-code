@@ -70,10 +70,10 @@ KartModel::KartModel(bool is_master)
         m_max_suspension[i] = 1.3f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
-    m_wheel_filename[0] = "wheel-front-right.3ds";
-    m_wheel_filename[1] = "wheel-front-left.3ds";
-    m_wheel_filename[2] = "wheel-rear-right.3ds";
-    m_wheel_filename[3] = "wheel-rear-left.3ds";
+    m_wheel_filename[0] = "";
+    m_wheel_filename[1] = "";
+    m_wheel_filename[2] = "";
+    m_wheel_filename[3] = "";
     m_animated_node     = NULL;
     m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
@@ -257,6 +257,8 @@ void KartModel::loadModels(const KartProperties &kart_properties)
     // depend on the size of the model.
     for(unsigned int i=0; i<4; i++)
     {
+        // For kart models without wheels.
+        if(m_wheel_filename[i]=="") continue;
         std::string full_wheel = 
             kart_properties.getKartDir()+"/"+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
