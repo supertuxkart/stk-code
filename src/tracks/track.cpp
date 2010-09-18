@@ -417,7 +417,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
  */
-void Track::convertTrackToBullet(const scene::ISceneNode *node)
+void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
     const core::vector3df &pos = node->getPosition();
     const core::vector3df &hpr = node->getRotation();
