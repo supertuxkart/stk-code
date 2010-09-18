@@ -654,10 +654,12 @@ int main(int argc, char *argv[] )
         
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png")) );
         projectile_manager      -> loadData        ();
-
+        
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the 
         // materials.xml twice, we do this here once for both:
@@ -671,9 +673,14 @@ int main(int argc, char *argv[] )
         }
         if(materials_file!="")
             material_manager->popTempMaterial();
+        
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
+
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
+
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/banana.png") );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);

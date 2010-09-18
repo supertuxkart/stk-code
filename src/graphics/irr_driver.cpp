@@ -335,28 +335,44 @@ void IrrDriver::doApplyResSettings()
     m_video_driver  = NULL;
     m_gui_env       = NULL;
     m_scene_manager = NULL;
+    
+    
+    // ---- Reinit
+    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! That's just error prone
+    // (we're sure to update main.cpp at some point and forget this one...)
+    
     initDevice();
-
+    
+    // Re-init GUI engine
+    GUIEngine::init(m_device, m_video_driver, StateManager::get());
+        
     material_manager->reInit();
-
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
+    
     file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
     const std::string materials_file = file_manager->getModelFile("materials.xml");
-    if(materials_file!="")
-        material_manager->pushTempMaterial(materials_file);
+    if (materials_file != "")
     {
-        powerup_manager         -> loadAllPowerups ();
-        item_manager            -> loadDefaultItems();
+        material_manager->pushTempMaterial(materials_file);
     }
-    if(materials_file!="")
+    
+    powerup_manager         -> loadAllPowerups ();
+    item_manager            -> loadDefaultItems();
+    projectile_manager      -> loadData();
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
+    
+    if (materials_file != "")
+    {
         material_manager->popTempMaterial();
+    }
+    
     file_manager->popTextureSearchPath();
 
     kart_properties_manager -> loadAllKarts();
-    projectile_manager      -> loadData();
+    
     attachment_manager      -> loadModels();
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/banana.png") );
 
-    // Re-init GUI engine
-    GUIEngine::init(m_device, m_video_driver, StateManager::get());
     GUIEngine::reshowCurrentScreen();
     
 }   // changeResolution

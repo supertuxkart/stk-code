@@ -27,6 +27,8 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/string_utils.hpp"
@@ -119,7 +121,16 @@ void KartPropertiesManager::loadAllKarts()
         for(std::set<std::string>::const_iterator subdir=result.begin();
             subdir!=result.end(); subdir++)
         {
-            loadKart(*dir+"/"+*subdir);
+            const bool loaded = loadKart(*dir+"/"+*subdir);
+            
+            if (loaded)
+            {
+                GUIEngine::addLoadingIcon(irr_driver->getTexture(
+                        *dir + "/"+*subdir + "/" +
+                        m_karts_properties[m_karts_properties.size()-1]->getIconFile()
+                                                                 )
+                        );
+            }
         }   // for all files in the currently handled directory
     }   // for i
 }   // loadAllKarts

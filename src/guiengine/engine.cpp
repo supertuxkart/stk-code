@@ -1021,8 +1021,13 @@ namespace GUIEngine
     }   // render
     
     // ------------------------------------------------------------------------
-    void renderLoading()
+    
+    std::vector<irr::video::ITexture*> g_loading_icons;
+    
+    void renderLoading(bool clearIcons)
     {
+        if (clearIcons) g_loading_icons.clear();
+        
         g_skin->drawBgImage();
         ITexture* loading = 
             irr_driver->getTexture(file_manager->getGUIDir()+"/loading.png");
@@ -1055,9 +1060,49 @@ namespace GUIEngine
                            SColor(255,255,255,255),
                            true/* center h */, false /* center v */ );
         
+        const int icon_count = g_loading_icons.size();
+        const int icon_size = (int)(screen_w / 16.0f);
+        const int ICON_MARGIN = 6;
+        int x = ICON_MARGIN;
+        int y = screen_h - icon_size - ICON_MARGIN;
+        for (int n=0; n<icon_count; n++)
+        {
+            g_driver->draw2DImage(g_loading_icons[n],
+                                  core::rect<s32>(x, y, x+icon_size, y+icon_size),
+                                  core::rect<s32>(core::position2d<s32>(0, 0), g_loading_icons[n]->getSize()),
+                                  NULL, NULL, true
+                                  );
+            
+            x += ICON_MARGIN + icon_size;
+            if (x + icon_size + ICON_MARGIN/2 > screen_w)
+            {
+                y = y - ICON_MARGIN - icon_size;
+                x = ICON_MARGIN;
+            }
+        }
+    
     } // renderLoading
     
     // ------------------------------------------------------------------------
+    
+    void addLoadingIcon(irr::video::ITexture* icon)
+    {
+        if (icon != NULL)
+        {
+            g_loading_icons.push_back(icon);
+            
+            g_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+            renderLoading(false);
+            g_device->getVideoDriver()->endScene();
+        }
+        else
+        {
+            std::cerr << "WARNING: GUIEngine::addLoadingIcon given NULL icon\n";
+        }
+    } // addLoadingIcon
+
+    // ------------------------------------------------------------------------
+    
     Widget* getWidget(const char* name)
     {
         // if a modal dialog is shown, search within it too

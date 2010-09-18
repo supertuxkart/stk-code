@@ -203,7 +203,10 @@ namespace GUIEngine
     void render(float dt);
     
     /** \brief renders a "loading" screen */
-    void renderLoading();
+    void renderLoading(bool clearIcons = true);
+    
+    /** \brief to spice up a bit the loading icon : add icons to the loading screen */
+    void addLoadingIcon(irr::video::ITexture* icon);
     
     //void transmitEvent(Widget* widget, std::string& name, const int playerID);
     
