@@ -36,10 +36,12 @@ public:
     void changeNewsText(std::string action);
     pthread_mutex_t m_mutex_news_text;
     pthread_t m_thread_news_text;
-    ~MainMenuScreen();
+
     std::string m_news_text;
-    void onUpdate(float delta,  irr::video::IVideoDriver* driver);
+    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver);
+    virtual void tearDown();
 #endif
+    
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
