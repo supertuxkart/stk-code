@@ -16,7 +16,7 @@
         <spinner id="aikartamount" proportion="1" height="100%" min_value="0"/>
     </div>
     
-    <spacer proportion="2" width="25"/>
+    <spacer proportion="1" width="25"/>
     
     <ribbon id="difficulty" height="135" width="65%" align="center">
         <icon-button id="novice" width="128" height="128" icon="gui/difficulty_easy.png"
@@ -27,7 +27,7 @@
                 I18N="Difficulty"  text="Expert"/>
     </ribbon>
     
-    <spacer proportion="2" width="25"/>
+    <spacer proportion="1" width="25"/>
     
     <bright width="100%" text="Select a game mode" align="center" text_align="left" />
 
