@@ -421,16 +421,26 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
     const core::vector3df &pos = node->getPosition();
     const core::vector3df &hpr = node->getRotation();
+
     scene::IMesh *mesh;
+    // In case of readonly materials we have to get the material from
+    // the mesh, otherwise from the node. This is esp. important for
+    // water nodes, which only have the material defined in the node,
+    // but not in the mesh at all!
+    bool is_readonly_material=false;
     switch(node->getType())
     {
         case scene::ESNT_MESH          :
         case scene::ESNT_WATER_SURFACE :
         case scene::ESNT_OCTREE        : 
              mesh = ((scene::IMeshSceneNode*)node)->getMesh();
+             is_readonly_material = 
+                 ((scene::IMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_ANIMATED_MESH :
              mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
+             is_readonly_material = 
+                 ((scene::IAnimatedMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_SKY_BOX :
         case scene::ESNT_SKY_DOME:
@@ -453,7 +463,15 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                 mb->getVertexType());
             continue;
         }
-        video::SMaterial &irrMaterial=mb->getMaterial();
+
+        // Handle readonly materials correctly: mb->getMaterial can return 
+        // NULL if the node is not using readonly materials. E.g. in case
+        // of a water scene node, the mesh (which is the animated copy of
+        // the original mesh) does not contain any material information,
+        // the material is only available in the node.
+        const video::SMaterial &irrMaterial = 
+            is_readonly_material ? mb->getMaterial()
+                                 : node->getMaterial(i);
         video::ITexture* t=irrMaterial.getTexture(0);
 
         const Material* material=0;
@@ -708,10 +726,11 @@ void Track::createWater(const XMLNode &node)
     }
     mesh->grab();
     m_all_meshes.push_back(mesh);
+
     core::vector3df xyz(0,0,0);
-    node.getXYZ(&xyz);
+    node.get("xyz", &xyz);
     core::vector3df hpr(0,0,0);
-    node.getHPR(&hpr);
+    node.get("hpr", &hpr);
     scene_node->setPosition(xyz);
     scene_node->setRotation(hpr);
     m_all_nodes.push_back(scene_node);
