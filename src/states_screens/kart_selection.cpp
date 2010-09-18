@@ -1142,7 +1142,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         setKartsFromCurrentGroup();
 
         const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-                       
+        
+        RandomGenerator random;
+        
         // update players selections (FIXME: don't hardcode player 0 below)
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
@@ -1153,22 +1155,24 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             
             // try to preserve the same kart for each player (except for player 0, since it's the one 
             // that can change the groups, so focus for player 0 must remain on the tabs)
-            const std::string& selected_kart_group = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selected_kart_group, n, n>0 ))
+            const std::string& selected_kart = m_kart_widgets[n].getKartInternalName();
+            if (!w->setSelection( selected_kart, n, n>0 ))
             {
                 // if we get here, it means one player "lost" his kart in the tab switch
                 std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
                 
                 // Select a random kart in this case
-                RandomGenerator random;
+
                 const int count = w->getItems().size();
                 if (count > 0)
                 {
+                    // FIXME: two players may be given the same kart by the use of random
                     const int randomID = random.get( count );
                     
                     // select kart for players > 0 (player 0 is the one that can change the groups,
                     // so focus for player 0 must remain on the tabs)
-                    w->setSelection( randomID, n, n>0 );
+                    const bool success = w->setSelection( randomID, n, n>0 );
+                    if (!success) std::cerr << "    WARNING: setting kart of player " << n << " failed :(\n";
                 }
                 else
                 {

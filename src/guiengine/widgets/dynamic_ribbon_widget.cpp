@@ -909,7 +909,23 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
     
     //std::cout << "Player " << playerID << " has item " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
     m_rows[row].setSelection(id, playerID);
-    if (focusIt) m_rows[row].setFocusForPlayer(playerID);
+    if (focusIt)
+    {
+        m_rows[row].setFocusForPlayer(playerID);
+    }
+    else
+    {
+        // focusing the item is enough to trigger the selection listeners; however if we're setting selection
+        // without focusing they won't be noticed, which is why we notice them here
+        const int listenerAmount = m_hover_listeners.size();
+        for (int n=0; n<listenerAmount; n++)
+        {
+            m_hover_listeners[n].onSelectionChanged(this,
+                                                    name,
+                                                    m_rows[row].getSelectionText(playerID),
+                                                    playerID);
+        }
+    }
     
     propagateSelection();
     return true;
