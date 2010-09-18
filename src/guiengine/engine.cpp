@@ -796,9 +796,7 @@ namespace GUIEngine
     // ------------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, 
               AbstractStateManager* state_manager )
-    {
-        printf("================ GUI ================\n");
-        
+    {       
         g_env = device_a->getGUIEnvironment();
         g_device = device_a;
         g_driver = driver_a;
