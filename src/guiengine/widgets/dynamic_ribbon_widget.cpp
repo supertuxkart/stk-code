@@ -62,6 +62,25 @@ DynamicRibbonWidget::~DynamicRibbonWidget()
 }
 
 // -----------------------------------------------------------------------------
+
+/** Function that estimates the area (in squared pixels) that ribbon icons
+  * would take given a number of rows (used to estimate the best number of
+  * rows)
+  */
+int estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
+                        const int width, const int height,
+                        const float iconAspectRatio)
+{
+    const int row_height = height / rowCount;
+
+    float icon_height = row_height;
+    float icon_width = int(row_height * iconAspectRatio);
+    
+    const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
+    
+    return int(icons_per_row * rowCount * icon_width * icon_height);
+}
+
 void DynamicRibbonWidget::add()
 {
     //printf("****DynamicRibbonWidget::add()****\n");
@@ -141,7 +160,7 @@ void DynamicRibbonWidget::add()
     m_left_widget->m_id = left_arrow->getID();
     m_children.push_back( m_left_widget );
     
-    // ---- Determine number of rows and columns
+    // ---- Determine number of rows
     
     // Find children size (and ratio)
     m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
@@ -155,7 +174,25 @@ void DynamicRibbonWidget::add()
     }
     
     // determine row amount
-    m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
+    const float aspect_ratio = (float)m_child_width / (float)m_child_height;
+    // const int count = m_items.size();
+    
+    int max_area_so_far = -1;
+    m_row_amount = -1;
+    
+    for (int row_count = 1; row_count < 10; row_count++)
+    {
+        const int area = estimateIconAreaFor(row_count, m_child_width,
+                                             m_w, m_h - m_label_height, aspect_ratio);
+        if (area > max_area_so_far)
+        {
+            m_row_amount = row_count;
+            max_area_so_far = area;
+        }
+    }
+    assert(m_row_amount != -1);
+    
+    // m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
     
     if (m_properties[PROP_MAX_ROWS].size() > 0)
     {
