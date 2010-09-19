@@ -177,7 +177,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         else if (i % 4 == 2)
         {
             GrandPrixWin* scene = GrandPrixWin::getInstance();
-            const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
+            const std::string winners[] = { "tux", "nolok", "pidgin" };
             StateManager::get()->pushScreen(scene);
             scene->setKarts( winners );
         }
