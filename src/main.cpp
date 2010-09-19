@@ -557,7 +557,13 @@ void initRest()
     item_manager            = new ItemManager          ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+    
     grand_prix_manager      = new GrandPrixManager     ();
+    // Consistency check for challenges, and enable all challenges
+    // that have all prerequisites fulfilled
+    grand_prix_manager->checkConsistency();
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("cup_gold.png")) );
+    
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
     network_http            = new NetworkHttp          ();
@@ -568,6 +574,8 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("notes.png")) );
+    
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
     race_manager->setNumPlayers(1);
@@ -579,9 +587,6 @@ void initRest()
 
     //menu_manager= new MenuManager();
 
-    // Consistency check for challenges, and enable all challenges
-    // that have all prerequisites fulfilled
-    grand_prix_manager->checkConsistency();
 #ifdef ADDONS_MANAGER
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
     std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
