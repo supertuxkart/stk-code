@@ -37,6 +37,8 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
     
+    m_min = 0;
+    m_max = 999;
 }
 
 // -----------------------------------------------------------------------------
@@ -49,6 +51,7 @@ void SpinnerWidget::add()
     
     m_warp_around = (m_properties[PROP_WARP_AROUND] == "true");
     
+    if (min_s.size() > 0)
     {
         int i;
         std::istringstream myStream(min_s);
@@ -59,10 +62,11 @@ void SpinnerWidget::add()
         }
         else
         {
-            std::cerr << "WARNING : invalid value from spinner widget minimum value '" << min_s << "'\n";
-            m_min = 0;
+            std::cerr << "WARNING : invalid value for spinner widget minimum value : '" << min_s << "'\n";
         }
     }
+    
+    if (max_s.size() > 0)
     {
         int i;
         std::istringstream myStream(max_s);
@@ -73,8 +77,7 @@ void SpinnerWidget::add()
         }
         else
         {
-            std::cerr << "WARNING : invalid value from spinner widget maximal value '" << max_s << "'\n";
-            m_max = 10;
+            std::cerr << "WARNING : invalid value for spinner widget maximal value : '" << max_s << "'\n";
         }
     }
     
