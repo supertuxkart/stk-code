@@ -121,6 +121,7 @@ void KartModel::loadInfo(const XMLNode &node)
  */
 KartModel::~KartModel()
 {
+    m_animated_node->setAnimationEndCallback(NULL);
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_node[i])
