@@ -66,7 +66,7 @@ public:
     const int                getKartId              (const std::string &ident) const;
     int                      getKartByGroup         (const std::string& group, int i) const;
     
-    void                     loadAllKarts           ();
+    void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
 	void					 reLoadAllKarts			();
 

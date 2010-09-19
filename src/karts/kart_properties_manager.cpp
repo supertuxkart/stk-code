@@ -99,12 +99,12 @@ void KartPropertiesManager::reLoadAllKarts()
     m_groups.clear();
     m_all_groups.clear();
     //m_kart_search_path.clear();
-	loadAllKarts();
+	loadAllKarts(false);
 }  
 //-----------------------------------------------------------------------------
 /** Loads all kart properties and models.
  */
-void KartPropertiesManager::loadAllKarts()
+void KartPropertiesManager::loadAllKarts(bool loading_icon)
 {
     m_all_kart_dirs.clear();
     for(std::vector<std::string>::const_iterator dir=m_kart_search_path.begin();
@@ -123,7 +123,7 @@ void KartPropertiesManager::loadAllKarts()
         {
             const bool loaded = loadKart(*dir+"/"+*subdir);
             
-            if (loaded)
+            if (loaded && loading_icon)
             {
                 GUIEngine::addLoadingIcon(irr_driver->getTexture(
                         *dir + "/"+*subdir + "/" +
