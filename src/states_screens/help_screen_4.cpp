@@ -15,35 +15,35 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_3.hpp"
+#include "states_screens/help_screen_4.hpp"
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "modes/world.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_4.hpp"
+#include "states_screens/help_screen_3.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( HelpScreen3 );
+DEFINE_SCREEN_SINGLETON( HelpScreen4 );
 
 // ------------------------------------------------------------------------------------------------------
 
-HelpScreen3::HelpScreen3() : Screen("help3.stkgui")
+HelpScreen4::HelpScreen4() : Screen("help4.stkgui")
 {
-}   // HelpSCreen3
+}   // HelpScreen4
 
 // ------------------------------------------------------------------------------------------------------
 
-void HelpScreen3::loadedFromFile()
+void HelpScreen4::loadedFromFile()
 {
 }   // loadedFromFile
 
 // ------------------------------------------------------------------------------------------------------
 
-void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")
     {
@@ -51,8 +51,7 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
         
         if (selection == "page1") StateManager::get()->replaceTopMostScreen(HelpScreen1::getInstance());
         else if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
-        //else if(selection == "page3") StateManager::get()->replaceTopMostScreen(Help3Screen::getInstance());
-        else if(selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
+        else if(selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
     }
     else if (name == "back")
     {
@@ -62,12 +61,12 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
 
 // ------------------------------------------------------------------------------------------------------
 
-void HelpScreen3::init()
+void HelpScreen4::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     
-    if (w != NULL) w->select( "page3", PLAYER_ID_GAME_MASTER );
+    if (w != NULL) w->select( "page4", PLAYER_ID_GAME_MASTER );
 }   // init
 
 // ------------------------------------------------------------------------------------------------------

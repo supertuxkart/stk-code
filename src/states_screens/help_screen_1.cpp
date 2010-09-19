@@ -21,6 +21,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_3.hpp"
+#include "states_screens/help_screen_4.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -51,6 +52,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         //else
         if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
         else if (selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
+        else if(selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
     }
     else if (name == "back")
     {

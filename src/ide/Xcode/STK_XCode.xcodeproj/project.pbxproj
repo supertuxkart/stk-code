@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95017B3F124698C400C90D56 /* help_screen_4.cpp */; };
 		9507E9B70FC1CCE900BD2B92 /* stk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9507E9B60FC1CCE900BD2B92 /* stk.icns */; };
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
@@ -318,6 +319,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		95017B3F124698C400C90D56 /* help_screen_4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = help_screen_4.cpp; path = ../../states_screens/help_screen_4.cpp; sourceTree = SOURCE_ROOT; };
+		95017B40124698C400C90D56 /* help_screen_4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = help_screen_4.hpp; path = ../../states_screens/help_screen_4.hpp; sourceTree = SOURCE_ROOT; };
 		9505570E0F6963790056E88C /* file_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_manager.cpp; path = ../../io/file_manager.cpp; sourceTree = SOURCE_ROOT; };
 		9505570F0F6963790056E88C /* file_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = file_manager.hpp; path = ../../io/file_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9505574E0F69684D0056E88C /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
@@ -1349,6 +1352,8 @@
 				9522F1E110795EFF0067ECF5 /* help_screen_2.hpp */,
 				9522F1E410795EFF0067ECF5 /* help_screen_3.cpp */,
 				9522F1E310795EFF0067ECF5 /* help_screen_3.hpp */,
+				95017B3F124698C400C90D56 /* help_screen_4.cpp */,
+				95017B40124698C400C90D56 /* help_screen_4.hpp */,
 				958330C410122B4A00C5137E /* kart_selection.cpp */,
 				958330C510122B4A00C5137E /* kart_selection.hpp */,
 				9522F124107948AD0067ECF5 /* main_menu_screen.cpp */,
@@ -2654,6 +2659,7 @@
 				9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */,
 				956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */,
 				954378D51238493C00F57707 /* confirm_dialog.cpp in Sources */,
+				95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

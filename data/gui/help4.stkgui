@@ -1,0 +1,46 @@
+<stkgui>
+
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+    <header align="center" width="100%" text="SuperTuxKart Help" text_align="center"/>
+    <spacer height="15" width="10"/>
+    
+    <tabs id="category" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="page1" width="128" height="128" icon="gui/track_random.png"
+                I18N="Tab in help menu" text="General"/>
+        <icon-button id="page2" width="128" height="128" icon="gui/weapons.png"
+                I18N="Tab in help menu" text="Weapons"/>
+        <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png"
+                I18N="Tab in help menu" text="Game Modes"/>
+        <icon-button id="page4" width="128" height="128" icon="gui/options_input.png"
+                I18N="Tab in help menu" text="Multiplayer"/>
+    </tabs>
+    
+    <box proportion="1" width="100%" layout="vertical-row">
+        <label align="center" text="SuperTuxKart can be played in multiplayer mode on the same computer"/>
+        <label align="center" text="(network play is not yet available)"/>
+        
+        <div width="100%" proportion="2" layout="horizontal-row">
+            <icon align="center" width="64" height="64" icon="gui/options_input.png"/>
+            <spacer width="25" height="25"/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu" 
+                    text="First, you will need several input devices (having multiple gamepads or joysticks is the best way to play with several people). Go in the input configuration screen and setup the gamepads. It is also possible to play on keyboard(s), however each player will need a different set of keys, and keep in mind that most keyboards are not appropriate for multiplayer gameplay because they do not support large number of keypresses."/>
+        </div>
+        
+        <div width="100%" proportion="2" layout="horizontal-row">
+            <icon align="center" width="64" height="64" icon="gui/random_kart.png"/>
+            <spacer width="25" height="25"/>
+            <bubble proportion="1" height="100%"
+                    I18N="In the help menu"
+                    text="When input devices are configured, you are ready to play. Simply start a new race by selecting the race icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
+        </div>
+        <spacer width="50" height="25" /> 
+    </box>
+    <spacer width="50" height="45" /> 
+</div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left"
+        I18N="In the help menu, to return to the previous screen" text="Back"/>
+
+</stkgui>

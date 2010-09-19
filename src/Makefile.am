@@ -306,6 +306,8 @@ supertuxkart_SOURCES = \
  states_screens/help_screen_2.hpp \
  states_screens/help_screen_3.cpp \
  states_screens/help_screen_3.hpp \
+ states_screens/help_screen_4.cpp \
+ states_screens/help_screen_4.hpp \
  states_screens/kart_selection.cpp \
  states_screens/kart_selection.hpp \
  states_screens/main_menu_screen.cpp \

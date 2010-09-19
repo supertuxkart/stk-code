@@ -12,6 +12,8 @@
                 I18N="Tab in help menu" text="Weapons"/>
         <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png"
                 I18N="Tab in help menu" text="Game Modes"/>
+        <icon-button id="page4" width="128" height="128" icon="gui/options_input.png"
+                I18N="Tab in help menu" text="Multiplayer"/>
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
