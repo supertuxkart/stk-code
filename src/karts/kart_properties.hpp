@@ -144,6 +144,8 @@ private:
     float       m_wheel_base;          /**< Wheel base of the kart.          */
     float       m_nitro_power_boost;   /**< Nitro power boost.               */
     float       m_nitro_consumption;   /**< Nitro consumption.               */
+    float       m_nitro_small_container; /**< Nitro amount for small bottle. */
+    float       m_nitro_big_container; /**< Nitro amount for big bittle.     */
     std::string m_engine_sfx_type;     /**< Engine sound effect.             */
 
     // bullet physics data
@@ -324,6 +326,12 @@ public:
 
     /** Returns the nitro consumption. */
     float getNitroConsumption       () const {return m_nitro_consumption;        }
+
+    /** Returns the amount of nitro for a small container. */
+    float getNitroSmallContainer    () const {return m_nitro_small_container;    }
+
+    /** Returns the amount of nitro for a big container. */
+    float getNitroBigContainer      () const {return m_nitro_big_container;      }
 
     /** Returns a shift of the center of mass (lowering the center of mass 
      *  makes the karts more stable. */

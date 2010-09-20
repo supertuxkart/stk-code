@@ -62,6 +62,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
         m_time_full_steer = m_time_full_steer_ai =
         m_nitro_power_boost = m_nitro_consumption =
+        m_nitro_small_container = m_nitro_big_container =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
         m_wheel_radius = m_chassis_linear_damping =
@@ -216,8 +217,10 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))
     {
-        nitro_node->get("power-boost", &m_nitro_power_boost);
-        nitro_node->get("consumption", &m_nitro_consumption);
+        nitro_node->get("power-boost",     &m_nitro_power_boost    );
+        nitro_node->get("consumption",     &m_nitro_consumption    );
+        nitro_node->get("small-container", &m_nitro_small_container);
+        nitro_node->get("big-container",   &m_nitro_big_container  );
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -500,6 +503,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_camera_distance,           "camera distance"               );
     CHECK_NEG(m_nitro_power_boost,         "nitro power-boost"             );
     CHECK_NEG(m_nitro_consumption,         "nitro consumption"             );
+    CHECK_NEG(m_nitro_big_container,       "nitro big-container"           );
+    CHECK_NEG(m_nitro_small_container,     "nitro small-container"         );
     CHECK_NEG(m_rescue_height,             "rescue height"                 );
     CHECK_NEG(m_rescue_time,               "rescue time"                   );
     CHECK_NEG(m_rescue_vert_offset,        "rescue vert-offset"            );
