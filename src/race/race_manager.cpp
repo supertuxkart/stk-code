@@ -189,6 +189,11 @@ void RaceManager::computeRandomKartList()
 /** Starts a new race or GP (or other mode). It sets up the list of player
  *  karts, AI karts, laps etc., and then uses startNextRace to actually start
  *  the race.
+ * \pre computeRandomKartList() must have been called first I think.
+ * FIXME: remove this silly precondition, the race manager should be able to
+ *        do this automatically. If one forgets to call computeRandomKartList,
+ *        like it sure happened to me, one gets weird and hard to debug crashes.
+ *        The public interface of the RaceManager should NOT allow for this.
  */
 void RaceManager::startNew()
 {
@@ -211,7 +216,8 @@ void RaceManager::startNew()
     // First add the AI karts (randomly chosen)
     // ----------------------------------------
     int init_gp_rank = 0;
-    for(unsigned int i=0; i<m_random_kart_list.size(); i++)
+    const unsigned int ai_kart_count = m_random_kart_list.size();
+    for(unsigned int i=0; i<ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_random_kart_list[i], i, -1, -1, 
                                            init_gp_rank, KT_AI));

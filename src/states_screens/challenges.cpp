@@ -153,6 +153,7 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
             
             // Launch challenge
             unlock_manager->getChallenge(selection)->setRace();
+            race_manager->computeRandomKartList();
             race_manager->startNew();
         }
     }
