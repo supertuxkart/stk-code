@@ -26,8 +26,11 @@
   </grand-prix>
 
   <!-- Time in follow-the-leader after which karts are removed.
-       The last values applies for all remaining karts. -->
-  <follow-the-leader intervals="30 20 10"/>
+       The last values applies for all remaining karts. 
+       time-per-kart Additional time added to the interval
+       for each kart in the race. -->
+  <follow-the-leader intervals="30 20 10"
+                     time-per-kart="1.5"  />
 
   <!-- Startup information. 
        Penalty: Penalty time if a kart accelerates before GO. -->
@@ -74,6 +77,13 @@
        speed on the terrain.  -->
   <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-fraction="2.0"/>
 
+  <!-- Powerup collect-mode decides what is collected if a kart has already an 
+       powerup: same: get one more item of the same type.
+                new:  always get a new item.
+                only-if-same: if the random item is the same one as the
+                      one currently owned, increase the number, otherwise
+                      no more/new item s are given to the kart. -->
+  <powerup collect-mode="new"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
              Order: item, banana, big-nitro, small-nitro, bubble-bum -->
@@ -128,8 +138,10 @@
 
     <!-- Nitro: power-boost: increase in engine power, i.e. 1=plus 100%
          consumption: nitro consumption - heavier characters can be set
-         to need more nitro than lighter character. -->
-    <nitro power-boost="3" consumption="1"/>
+         to need more nitro than lighter character.
+         small-container: how much energy a small container gives.
+         big-container: how much energy a big container gives. -->
+    <nitro power-boost="3" consumption="1" small-container="1" big-container="3"/>
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.

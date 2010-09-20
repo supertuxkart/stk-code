@@ -117,6 +117,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
+    CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
 
     m_kart_properties.checkAllSet(filename);
@@ -140,7 +141,7 @@ void STKConfig::init_defaults()
         m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_near_ground          = m_item_switch_time          = 
-      m_penalty_time                                         = UNDEFINED;
+        m_penalty_time                                       = UNDEFINED;
     m_bubble_gum_counter       = -100;
     m_max_karts                = -100;
     m_gp_order                 = -100;
@@ -152,6 +153,7 @@ void STKConfig::init_defaults()
     m_max_track_version        = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
+    m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
@@ -210,7 +212,10 @@ void STKConfig::getAllData(const XMLNode * root)
     }
 
     if(const XMLNode *leader_node= root->getNode("follow-the-leader"))
-        leader_node->get("intervals", &m_leader_intervals);
+    {
+        leader_node->get("intervals",     &m_leader_intervals    );
+        leader_node->get("time-per-kart", &m_leader_time_per_kart);
+    }
 
     if(const XMLNode *startup_node= root->getNode("startup"))
     {
@@ -271,6 +276,23 @@ void STKConfig::getAllData(const XMLNode * root)
         zipper_node->get("force",              &m_zipper_force             );
         zipper_node->get("speed-gain",         &m_zipper_speed_gain        );
         zipper_node->get("max-speed-fraction", &m_zipper_max_speed_fraction);
+    }
+
+    if(const XMLNode *powerup_node= root->getNode("powerup"))
+    {
+        std::string s;
+        powerup_node->get("collect-mode", &s);
+        if(s=="same")
+            m_same_powerup_mode = POWERUP_MODE_SAME;
+        else if(s=="new")
+            m_same_powerup_mode = POWERUP_MODE_NEW;
+        else if(s=="only-if-same")
+            m_same_powerup_mode = POWERUP_MODE_ONLY_IF_SAME;
+        else
+        {
+            printf("Invalid item mode '%s' - ignored.\n",
+                    s.c_str());
+        }
     }
 
     if(const XMLNode *switch_node= root->getNode("switch"))

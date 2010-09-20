@@ -348,15 +348,27 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     PowerupManager::PowerupType new_powerup = 
         powerup_manager->getRandomPowerup(position);
 
-    if(m_type==PowerupManager::POWERUP_NOTHING)
+
+    // Always add a new powerup in ITEM_MODE_NEW (or if the kart
+    // doesn't have a powerup atm).
+    if(m_type == PowerupManager::POWERUP_NOTHING ||
+       stk_config->m_same_powerup_mode == STKConfig::POWERUP_MODE_NEW )
     {
         set( new_powerup, n );
     }
-    else if(new_powerup==m_type)
+    else
     {
-        m_number+=n;
-        if(m_number > MAX_POWERUPS) 
-            m_number = MAX_POWERUPS;
+        // If powerup mode is 'SAME', or it's ONLY_IF_SAME and it is the
+        // same powerup, increase the number of items.
+        if(stk_config->m_same_powerup_mode == STKConfig::POWERUP_MODE_SAME ||
+            new_powerup==m_type)
+        {
+            m_number+=n;
+            if(m_number > MAX_POWERUPS) 
+                m_number = MAX_POWERUPS;
+        }
     }
-    // Ignore new powerup if it is different from the current one
+    // Ignore new powerup if it is different from the current one and not
+    // POWERUP_MODE_SAME
+
 }   // hitBonusBox

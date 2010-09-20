@@ -42,6 +42,16 @@ class STKConfig : public NoCopy
 protected:
     KartProperties  m_kart_properties; /**< Default kart properties. */
 public:
+    /** What to do if a kart already has a powerup when it hits a bonus box:
+     *  - NEW:  give it a random new bonx box.
+     *  - SAME: give it one more item of the type it currently has.
+     *  - ONLY_IF_SAME: only give it one more item if the randomly chosen item
+     *          has the same type as the currently held item. */
+    enum {POWERUP_MODE_NEW, 
+          POWERUP_MODE_SAME, 
+          POWERUP_MODE_ONLY_IF_SAME} 
+          m_same_powerup_mode;
+
     static float UNDEFINED;
     float m_anvil_weight;            /**<Additional kart weight if anvil is
                                          attached.                           */
@@ -94,6 +104,8 @@ public:
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
+    float m_leader_time_per_kart;    /**< Additional time to each leader 
+                                          interval for each additional kart. */
     std::vector<int> m_switch_items; /**< How to switch items.               */
     /** The number of points a kart on position X has more than the
      *  next kart. From this the actual number of points for each
