@@ -121,7 +121,9 @@ void KartModel::loadInfo(const XMLNode &node)
  */
 KartModel::~KartModel()
 {
-    m_animated_node->setAnimationEndCallback(NULL);
+    if(m_animated_node)
+        m_animated_node->setAnimationEndCallback(NULL);
+    m_animated_node->drop();
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_node[i])
@@ -155,6 +157,7 @@ KartModel* KartModel::makeCopy()
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
+    km->m_animated_node     = NULL;
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -186,6 +189,7 @@ void KartModel::attachModel(scene::ISceneNode **node)
         *node = irr_driver->addAnimatedMesh(m_mesh);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
         m_animated_node->setLoopMode(false);
+        m_animated_node->grab();
     }
     else
     {
