@@ -73,8 +73,8 @@ int estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
 {
     const int row_height = height / rowCount;
 
-    float icon_height = row_height;
-    float icon_width = int(row_height * iconAspectRatio);
+    float icon_height = (float)row_height;
+    float icon_width = row_height * iconAspectRatio;
     
     const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
     

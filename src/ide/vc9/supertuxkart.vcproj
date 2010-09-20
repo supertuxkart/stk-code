@@ -983,6 +983,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\help_screen_4.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\kart_selection.cpp"
 					>
 				</File>
@@ -1850,6 +1854,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\help_screen_3.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_4.hpp"
 					>
 				</File>
 				<File
