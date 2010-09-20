@@ -48,9 +48,9 @@ const wchar_t* getAnchorString()
         case 2: return _("%s is a mighty pirate!");
         default: assert(false); return L"";   // avoid compiler warning.
     }
-}
+}   // getAnchorString
 
-
+//-----------------------------------------------------------------------------
 const wchar_t* getParachuteString()
 {
     const int PARACHUTE_STRINGS_COUNT = 3;
@@ -65,9 +65,9 @@ const wchar_t* getParachuteString()
         case 2: return _("Do you want to fly kites?");
         default: assert(false); return  L"";  // avoid compiler warning
     }
-}
+}   // getParachuteString
 
-
+//-----------------------------------------------------------------------------
 const wchar_t* getSwapperString()
 {
     const int SWAPPER_STRINGS_COUNT = 3;
@@ -82,7 +82,7 @@ const wchar_t* getSwapperString()
         case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
         default: assert(false); return L"";  // avoid compiler warning
     }
-}
+}   // getSwapperString
 
 //-----------------------------------------------------------------------------
 /** Constructor, stores the kart to which this powerup belongs. 
@@ -145,30 +145,30 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
             
         case PowerupManager::POWERUP_BOWLING:
-            m_sound_use          = sfx_manager->createSoundSource("bowling_roll");
+            m_sound_use = sfx_manager->createSoundSource("bowling_roll");
             break ;
             
         case PowerupManager::POWERUP_ANVIL:
-            m_sound_use          = sfx_manager->createSoundSource("use_anvil");
+            m_sound_use = sfx_manager->createSoundSource("use_anvil");
             break;
             
         case PowerupManager::POWERUP_PARACHUTE:
-            m_sound_use          = sfx_manager->createSoundSource("use_parachute");
+            m_sound_use = sfx_manager->createSoundSource("use_parachute");
             break;
             
         case PowerupManager::POWERUP_BUBBLEGUM:
-            m_sound_use          = sfx_manager->createSoundSource("goo");
+            m_sound_use = sfx_manager->createSoundSource("goo");
             break ;
             
         case PowerupManager::POWERUP_SWITCH:
-            m_sound_use          = sfx_manager->createSoundSource("swap");
+            m_sound_use = sfx_manager->createSoundSource("swap");
             break;
             
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
         default :
-            m_sound_use          = sfx_manager->createSoundSource("shot");
+            m_sound_use = sfx_manager->createSoundSource("shot");
             break ;
     }
     
@@ -208,7 +208,8 @@ void Powerup::use()
     RaceGUIBase* gui = world->getRaceGUI();
     switch (m_type)
     {
-    case PowerupManager::POWERUP_ZIPPER:   m_owner->handleZipper();
+    case PowerupManager::POWERUP_ZIPPER:   
+        m_owner->handleZipper();
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
@@ -339,15 +340,15 @@ void Powerup::use()
  *         so that the server can overwrite which item is collectted 
  *         (otherwise a random choice is done).
  */
-void Powerup::hitBonusBox(int n, const Item &item, int add_info)
+void Powerup::hitBonusBox(const Item &item, int add_info)
 {
     // Position can be -1 in case of a battle mode (which doesn't have 
     // positions), but this case is properly handled in getRandomPowerup.
     int position = m_owner->getPosition();
     
+    unsigned int n=1;
     PowerupManager::PowerupType new_powerup = 
-        powerup_manager->getRandomPowerup(position);
-
+        powerup_manager->getRandomPowerup(position, &n);
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

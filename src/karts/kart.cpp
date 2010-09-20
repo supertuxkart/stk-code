@@ -539,10 +539,7 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
-            // In wheelie style, karts get more items depending on energy,
-            // in nitro mode it's only one item.
-            int n = 1;
-            m_powerup.hitBonusBox(n, *item, add_info);
+            m_powerup.hitBonusBox(*item, add_info);
             break;
         }
     case Item::ITEM_BUBBLEGUM:

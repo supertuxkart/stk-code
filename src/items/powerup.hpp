@@ -58,7 +58,7 @@ public:
     void            reset        ();
     Material*       getIcon      () const;
     void            use          ();
-    void            hitBonusBox  (int n, const Item &item, int newC=-1);
+    void            hitBonusBox  (const Item &item, int newC=-1);
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}

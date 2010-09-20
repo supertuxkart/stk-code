@@ -147,7 +147,7 @@ public:
     void          updateWeightsForRace(unsigned int num_karts);
     Material*     getIcon         (int type) const {return m_all_icons [type];}
     PowerupManager::PowerupType 
-                  getRandomPowerup(unsigned int pos);
+                  getRandomPowerup(unsigned int pos, unsigned int *n);
     /** Returns the mesh for a certain powerup. 
      *  \param type Mesh type for which the model is returned. */
     irr::scene::IMesh 

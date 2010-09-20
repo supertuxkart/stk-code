@@ -79,7 +79,8 @@ void PowerupManager::unloadPowerups()
  *  \param name Name of the powerup to look up.
  *  \return The type, or POWERUP_NOTHING if the name is not found
  */
-PowerupManager::PowerupType PowerupManager::getPowerupType(const std::string &name) const
+PowerupManager::PowerupType 
+    PowerupManager::getPowerupType(const std::string &name) const
 {
     // Must match the order of PowerupType in powerup_manager.hpp!!
     static std::string powerup_names[] = {
@@ -185,17 +186,18 @@ void PowerupManager::loadWeights(const XMLNode &root,
                                  PositionClass position_class)
 {
     const XMLNode *node = root.getNode(class_name);
-    std::string s("");
-    if(node) node->get("w", &s);
+    std::string s(""), s_multi("");
+    if(node) node->get("w",       &s      );
+    if(node) node->get("w-multi", &s_multi);
 
-    if(!node || s=="")
+    if(!node || s=="" || s_multi=="")
     {
         printf("No weights found for class '%s' - probabilities will be incorrect.\n",
                class_name.c_str());
         return;
     }
 
-    std::vector<std::string> weight_list = StringUtils::split(s, ' ');
+    std::vector<std::string> weight_list = StringUtils::split(s+" "+s_multi,' ');
 
     std::vector<std::string>::iterator i=weight_list.begin();
     while(i!=weight_list.end())
@@ -209,10 +211,10 @@ void PowerupManager::loadWeights(const XMLNode &root,
             i++;
     }
     // Fill missing entries with 0s
-    while(weight_list.size()<(int)POWERUP_LAST)
+    while(weight_list.size()<2*(int)POWERUP_LAST)
         weight_list.push_back(0);
 
-    if(weight_list.size()!=(int)POWERUP_LAST)
+    if(weight_list.size()!=2*(int)POWERUP_LAST)
     {
         printf("Incorrect number of weights found in class '%s':\n", 
                class_name.c_str());
@@ -251,13 +253,11 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 
         // Then determine which items are available:
         m_powerups_for_position[pos_class].clear();
-        unsigned int sum = 0;
-        for(unsigned int i= POWERUP_FIRST; i<=POWERUP_LAST; i++)
+        for(unsigned int i= POWERUP_FIRST; i<=2*POWERUP_LAST; i++)
         {
             PowerupType type=(PowerupType)i;
             unsigned int w =m_weights[pos_class][i-POWERUP_FIRST]; 
-            sum += w;
-            for(unsigned int i=0; i<w; i++)
+            for(unsigned int j=0; j<w; j++)
                 m_powerups_for_position[pos_class].push_back(type);
         }   // for type in [POWERUP_FIRST, POWERUP_LAST]
     }
@@ -300,13 +300,24 @@ PowerupManager::PositionClass
  *  items depending on the weights defined. See updateWeightsForRace()
  *  \param pos Position of the kart (1<=pos<=number of karts) - ignored in
  *         case of a battle mode.
+ *  \param n Number of times this item is given to the kart
  */
-PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos)
+PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
+                                                             unsigned int *n)
 {
     // Positions start with 1, while the index starts with 0 - so subtract 1
-    PositionClass pos_class = race_manager->isBattleMode() ? POSITION_BATTLE_MODE 
-                                                           : m_position_to_class[pos-1];
+    PositionClass pos_class = 
+        race_manager->isBattleMode() ? POSITION_BATTLE_MODE 
+                                     : m_position_to_class[pos-1];
 
     int random = rand()%m_powerups_for_position[pos_class].size();
-    return m_powerups_for_position[pos_class][random];
+    int i=m_powerups_for_position[pos_class][random];
+    if(i>=POWERUP_MAX)
+    {
+        i -= POWERUP_MAX;
+        *n = 3;
+    }
+    else
+        *n=1;
+    return (PowerupType)i;
 }   // getRandomPowerup
