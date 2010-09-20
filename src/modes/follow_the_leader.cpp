@@ -37,7 +37,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
     m_leader_intervals = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
         m_leader_intervals[i] += 
-        stk_config->m_leader_time_per_kart * race_manager->getNumberOfKarts();
+            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
 }
@@ -139,7 +139,7 @@ void FollowTheLeaderRace::restartRace()
     m_leader_intervals    = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
         m_leader_intervals[i] += 
-        stk_config->m_leader_time_per_kart * race_manager->getNumberOfKarts();
+            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, 
                               m_leader_intervals[0]);
 }   // restartRace
