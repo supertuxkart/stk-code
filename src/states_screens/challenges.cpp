@@ -149,11 +149,11 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
             
             //FIXME: why do we need to invoke the network manager for local games??
             network_manager->initCharacterDataStructures();
-            network_manager->setupPlayerKartInfo();
             
             // Launch challenge
             unlock_manager->getChallenge(selection)->setRace();
-            race_manager->computeRandomKartList();
+            network_manager->setupPlayerKartInfo();
+            //race_manager->computeRandomKartList();
             race_manager->startNew();
         }
     }
