@@ -251,11 +251,15 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
         PositionClass pos_class = convertPositionToClass(num_karts, position);
         m_position_to_class.push_back(pos_class);
 
-        // Then determine which items are available:
+        // Then determine which items are available. This loop actually goes
+        // over the powerups twice: first the single item version, then the
+        // multi-item version. The assignment to type takes care of this
         m_powerups_for_position[pos_class].clear();
         for(unsigned int i= POWERUP_FIRST; i<=2*POWERUP_LAST; i++)
         {
-            PowerupType type=(PowerupType)i;
+            PowerupType type = 
+                (PowerupType) ((i<=POWERUP_LAST) ? i 
+                                                 : i-POWERUP_MAX+POWERUP_FIRST);
             unsigned int w =m_weights[pos_class][i-POWERUP_FIRST]; 
             for(unsigned int j=0; j<w; j++)
                 m_powerups_for_position[pos_class].push_back(type);
