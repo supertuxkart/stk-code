@@ -213,6 +213,7 @@ void RaceManager::startNew()
     // ==========================================================================
     m_kart_status.clear();
 
+    assert(m_num_karts == m_random_kart_list.size()+m_player_karts.size());
     // First add the AI karts (randomly chosen)
     // ----------------------------------------
     int init_gp_rank = 0;
