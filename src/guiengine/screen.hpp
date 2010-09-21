@@ -233,11 +233,11 @@ namespace GUIEngine
         virtual bool onEscapePressed() { return true; }
         
         /**
-         * \brief will be called everytime sometimes happens.
-         * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
-         * name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
-         * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
-         * being left, allowing for setup/clean-up.
+         * \brief will be called everytime something happens.
+         * Events are generally a widget state change. In this case, a pointer to the said widget is
+         * passed along its name, so you get its new state and/or act. There are two special events, passed
+         * with a NULL widget, and which bear the anmes "init" and "tearDown", called respectively when a
+         * screen is being made visible and when it's being left, allowing for setup/clean-up.
          */
         virtual void eventCallback(Widget* widget, const std::string& name, const int playerID) = 0;
         
