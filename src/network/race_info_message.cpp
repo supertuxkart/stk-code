@@ -48,7 +48,7 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
              + getCharLength()    // kart_info[i].getLocalPlayerId())
              + getStringLength(kart_info[i].getPlayerName());
     }
-    const std::vector<std::string>& rkl=race_manager->getRandomKartList();
+    const std::vector<std::string>& rkl=race_manager->getAIKartList();
     len += getStringVectorLength(rkl);
 
     allocate(len);
@@ -113,5 +113,5 @@ RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
         race_manager->setPlayerKart(i, kart_info[i]);
     }
     std::vector<std::string> rkl=getStringVector();
-    race_manager->setRandomKartList(rkl);
+    race_manager->setAIKartList(rkl);
 }   // RaceInfoMessage

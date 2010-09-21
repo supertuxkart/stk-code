@@ -147,13 +147,16 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
             // Go straight to the race
             StateManager::get()->enterGameState();                
             
-            //FIXME: why do we need to invoke the network manager for local games??
+            // Initialise global data - necessary even in local games to avoid
+            // many if tests in other places (e.g. if network_game call 
+            // network_manager else call race_manager).
             network_manager->initCharacterDataStructures();
             
             // Launch challenge
             unlock_manager->getChallenge(selection)->setRace();
+
+            // Sets up kart info, including random list of kart for AI
             network_manager->setupPlayerKartInfo();
-            //race_manager->computeRandomKartList();
             race_manager->startNew();
         }
     }
