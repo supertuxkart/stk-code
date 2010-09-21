@@ -205,7 +205,7 @@ void DynamicRibbonWidget::add()
             // get a better score. A number of rows that allows showing very few items
             // will be penalized. A configuration that makes items much smaller than
             // requested in the XML file will also be penalized.
-            const int score = int(log(2*visible_items) *
+            const int score = int(log(2.0f*visible_items) *
                                   std::min((float)item_height / (float)m_child_height, 1.0f) *
                                   taken_area);
             
