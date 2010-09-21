@@ -181,10 +181,10 @@
           time-full-steer ="0.2" time-full-steer-ai="0.1"    />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
-         have 3 values, one for hard, medium and low difficulties.
+         have 3 values, one for low, medium, and hard.
          brake-factor: Value used when braking. max-speed-reverse-ratio is
          the percentage of max speed for reverse gear. -->
-    <engine power="400 400 300"  max-speed="32.22 28 25" brake-factor="11.0"
+    <engine power="300 400 400"  max-speed="25 28 32.22" brake-factor="11.0"
             max-speed-reverse-ratio="0.3"/>
 
     <!-- Simulated gears: switch-ratio defines at what ratio of the maximum
