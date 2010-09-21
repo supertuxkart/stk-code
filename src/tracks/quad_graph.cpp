@@ -503,9 +503,9 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     // mapPoint2MiniMap doesn't work), so adjust the camera position
     // that the track is properly aligned (view from the side):
     //          c        camera
-    //         / \
+    //         / \ 
     //        /   \     <--- camera angle
-    //       /     \
+    //       /     \ 
     //      {  [-]  }   <--- track flat (viewed from the side)
     // If [-] is the shorter side of the track, then the camera will 
     // actually render the area in { } - which is the length of the
