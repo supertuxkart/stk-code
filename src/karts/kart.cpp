@@ -919,8 +919,7 @@ float Kart::handleSlipstream(float dt)
         target_kart = world->getKart(i);
         // Don't test for slipstream with itself.
         if(target_kart==this            || 
-            target_kart->isEliminated() || 
-            target_kart->hasFinishedRace()) continue;
+            target_kart->isEliminated()    ) continue;
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
