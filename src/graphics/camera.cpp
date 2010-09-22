@@ -296,7 +296,7 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     float dampened_steer =  fabsf(steering) * steering; 
     float angle_around = m_kart->getHeading() 
                        + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
+    float angle_up     = m_kart->getPitch() + 15.0f*DEGREE_TO_RAD;
 
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY( sin(angle_up)    );
