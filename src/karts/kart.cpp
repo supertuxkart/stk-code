@@ -880,6 +880,9 @@ float Kart::handleNitro(float dt)
  */
 float Kart::handleSlipstream(float dt)
 {
+    // Low level AIs should not do any slipstreaming.
+    if(!getController()->isPlayerController() &&
+        race_manager->getDifficulty()==RaceManager::RD_EASY) return 0;
     // First see if we are currently using accumulated slipstream credits:
     // -------------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
