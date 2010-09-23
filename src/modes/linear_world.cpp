@@ -80,6 +80,7 @@ void LinearWorld::init()
         info.m_race_lap             = -1;
         info.m_lap_start_time       = 0;
         info.m_time_at_last_lap     = 99999.9f;
+        info.m_estimated_finish     = -1.0f;
 
         m_kart_info.push_back(info);
     }   // next kart
