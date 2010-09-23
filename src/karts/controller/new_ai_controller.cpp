@@ -46,8 +46,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-NewAIController::NewAIController(Kart *kart, unsigned int kart_id) 
-               : AIBaseController(kart)
+NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
 {
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());

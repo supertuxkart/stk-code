@@ -46,8 +46,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-DefaultAIController::DefaultAIController(Kart *kart, unsigned int kart_id) 
-                   : AIBaseController(kart)
+DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
 {
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
@@ -89,23 +88,6 @@ DefaultAIController::DefaultAIController(Kart *kart, unsigned int kart_id)
     // Reset must be called after m_quad_graph etc. is set up        
     reset();
 
-    float variation = m_kart->getKartProperties()->getAISteeringVariation();
-    unsigned int num_ai_karts = race_manager->getNumberOfKarts() 
-                              - race_manager->getNumPlayers();
-    if(num_ai_karts==1)
-    {
-        m_steering_variation = 0;
-    }
-    else
-    {
-        m_steering_variation = 2*kart_id /(num_ai_karts-1) - 1.0f;
-    }
-
-    // The steering varition gets further adjusted by AI level -
-    // higher level AI will have less variation --> more potential
-    // slipstreaming.
-    m_steering_variation *= m_kart->getKartProperties()->getAISteeringVariation();
-
     switch( race_manager->getDifficulty())
     {
     case RaceManager::RD_EASY:
@@ -145,7 +127,6 @@ DefaultAIController::DefaultAIController(Kart *kart, unsigned int kart_id)
         m_min_steps               = 2;
         m_nitro_level             = NITRO_ALL;
         m_handle_bomb             = true;
-        m_steering_variation     *= 0.5f;
         setSkiddingFraction(2.0f);
         break;
     }
@@ -517,9 +498,6 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
-        // Avoid dropping all bubble gums one after another
-        if( m_time_since_last_shot >3.0f) break;
-
         // Either use the bubble gum after 10 seconds, or if the next kart 
         // behind is 'close' but not too close (too close likely means that the
         // kart is not behind but more to the side of this kart and so won't 
@@ -527,17 +505,15 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         // kart as well? I.e. only drop if the kart behind is faster? Otoh 
         // this approach helps preventing an overtaken kart to overtake us 
         // again.
-        // Don't drop bubble gums too quickly, wait at least three seconds
         m_controls->m_fire = (m_distance_behind < 15.0f &&
-                              m_distance_behind > 3.0f    );
+                               m_distance_behind > 3.0f   ) || 
+                            m_time_since_last_shot>10.0f;
         break;
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead. And some of them can fire backwards, too - which
     // isn't yet supported for AI karts.
     case PowerupManager::POWERUP_CAKE:
         {
-            // Leave some time between shots
-            if(m_time_since_last_shot<3.0f) break;
             // Since cakes can be fired all around, just use a sane distance
             // with a bit of extra for backwards, as enemy will go towards cake
             bool fire_backwards = (m_kart_behind && m_kart_ahead &&
@@ -546,17 +522,14 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
             m_controls->m_fire = (fire_backwards && distance < 25.0f)  ||
-                                 (!fire_backwards && distance < 20.0f);
+                                 (!fire_backwards && distance < 20.0f) ||
+                                 m_time_since_last_shot > 10.0f;
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
         }
     case PowerupManager::POWERUP_BOWLING:
         {
-            // Leave more time between bowling balls, since they are 
-            // slower, so it should take longer to hit something which
-            // can result in changing our target.
-            if(m_time_since_last_shot < 5.0f) break;
             // Bowling balls slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
             // acts a bit like a mine (and the kart is racing towards it, too)
@@ -565,19 +538,15 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
                                   !m_kart_ahead;
             float distance = fire_backwards ? m_distance_behind 
                                             : m_distance_ahead;
-            m_controls->m_fire = ( (fire_backwards && distance < 30.0f)  ||
-                                   (!fire_backwards && distance <10.0f)    ) &&
-                                m_time_since_last_shot > 3.0f;
+            m_controls->m_fire = (fire_backwards && distance < 30.0f)  || 
+                                (!fire_backwards && distance <10.0f)  ||
+                                m_time_since_last_shot > 10.0f;
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
         }
     case PowerupManager::POWERUP_PLUNGER:
         {
-            // Leave more time after a plunger, since it will take some
-            // time before a plunger effect becomes obvious.
-            if(m_time_since_last_shot < 5.0f) break;
-
             // Plungers can be fired backwards and are faster,
             // so allow more distance for shooting.
             bool fire_backwards = (m_kart_behind && m_kart_ahead && 
@@ -592,9 +561,6 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             break;
         }
     case PowerupManager::POWERUP_ANVIL:
-        // Wait one second more than a previous anvil ... just in case
-        if(m_time_since_last_shot < stk_config->m_anvil_time+1.0f) break;
-
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             m_controls->m_fire = m_world->getTime()<1.0f && 
@@ -923,8 +889,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getSideOfCenter(target_sector, 
-                                                  m_steering_variation);
+        direction = m_quad_graph->getQuad(target_sector).getCenter() 
                   - m_kart->getXYZ();
 
         float len=direction.length_2d();
@@ -951,8 +916,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
             if ( distance + m_kart_width * 0.5f 
                  > m_quad_graph->getNode(sector).getPathWidth() )
             {
-                *result=m_quad_graph->getSideOfCenter(sector, 
-                                                      m_steering_variation);
+                *result = m_quad_graph->getQuad(sector).getCenter();
                 return;
             }
         }

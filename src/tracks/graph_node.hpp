@@ -71,10 +71,6 @@ class GraphNode
       *  saves computation, and it is only needed to determine the distance
       *  from the center of the drivelines anyway. */
      core::line2df  m_line;
-
-     /** A vector from the center of the quad to the center of the right
-      *  side. This is used in getSideOfCenter. */
-     Vec3           m_center_to_right;
 public:
     /** Keep a shared pointer so that some asserts and tests can be 
     *  done without adding additional parameters. */
@@ -87,7 +83,6 @@ public:
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
-    Vec3         getSideOfCenter(float f) const;
 
     /** Returns the i-th successor. */
     unsigned int getSuccessor(unsigned int i)  const 
@@ -116,7 +111,6 @@ public:
     // -------------------------------------------------------------------
     /** Returns the width of the part for this quad. */
     float        getPathWidth() const  { return m_width;                 }
-
     // -------------------------------------------------------------------
     /** Returns the center point of the lower edge of this graph node. */
     const core::vector2df& getLowerCenter() const {return m_lower_center;}

@@ -117,12 +117,6 @@ public:
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
     // ----------------------------------------------------------------------
-    /** Returns a point to the right (f>0) or left (f<0) of the center
-     *  of a node. |f| <=1, with f=0 returning exactly the center point,
-     *  and f=+-1 returning the point on the right/left edge of the node.
-     */
-    Vec3         getSideOfCenter(unsigned int j, float f) const
-                 { return m_all_nodes[j]->getSideOfCenter(f); }
 };   // QuadGraph
 
 #endif

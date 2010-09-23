@@ -109,10 +109,6 @@ private:
     float m_curve_target_speed;
     float m_curve_angle;
 
-    /** Indicates how much to the left/right of the center driveline point
-     *  the AI should aim at in order to avoid AIs creating trains. */
-    float m_steering_variation;
-
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
@@ -162,7 +158,7 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
 
 public:
-                 DefaultAIController(Kart *kart, unsigned kart_id);
+                 DefaultAIController(Kart *kart);
                 ~DefaultAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();

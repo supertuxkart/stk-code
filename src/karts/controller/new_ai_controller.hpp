@@ -161,7 +161,7 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
 
 public:
-                 NewAIController(Kart *kart, unsigned int kart_id);
+                 NewAIController(Kart *kart);
     virtual     ~NewAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();

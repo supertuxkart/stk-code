@@ -112,9 +112,9 @@ protected:
     void  resetAllKarts     ();
     void  removeKart        (int kart_number, bool notifyOfElimination=true);
     Controller* 
-          loadAIController  (Kart *kart, unsigned int kart_id);
+          loadAIController  (Kart *kart);
 
-    virtual Kart *createKart(const std::string &kart_ident, int kart_id, 
+    virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
                              const btTransform &init_pos);
     /** Pointer to the track. The track is managed by world. */

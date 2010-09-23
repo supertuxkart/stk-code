@@ -171,14 +171,14 @@ void World::init()
  *         this player globally (i.e. including network players).
  *  \param init_pos The start transform (xyz and hpr).
  */
-Kart *World::createKart(const std::string &kart_ident, int kart_id,
+Kart *World::createKart(const std::string &kart_ident, int index,
                         int local_player_id, int global_player_id,
                         const btTransform &init_pos)
 {
-    int position           = kart_id+1;
+    int position           = index+1;
     Kart *new_kart         = new Kart(kart_ident, position, init_pos);
     Controller *controller = NULL;
-    switch(race_manager->getKartType(kart_id))
+    switch(race_manager->getKartType(index))
     {
     case RaceManager::KT_PLAYER:
         controller = new PlayerController(new_kart, 
@@ -193,7 +193,7 @@ Kart *World::createKart(const std::string &kart_ident, int kart_id,
         //m_num_players++;
         //break;
     case RaceManager::KT_AI:
-        controller = loadAIController(new_kart, kart_id);
+        controller = loadAIController(new_kart);
         break;
     case RaceManager::KT_GHOST:
         break;
@@ -208,7 +208,7 @@ Kart *World::createKart(const std::string &kart_ident, int kart_id,
 /** Creates an AI controller for the kart.
  *  \param kart The kart to be controlled by an AI.
  */
-Controller* World::loadAIController(Kart *kart, unsigned int kart_id)
+Controller* World::loadAIController(Kart *kart)
 {
     Controller *controller;
     // const int NUM_ROBOTS = 1;
@@ -222,14 +222,14 @@ Controller* World::loadAIController(Kart *kart, unsigned int kart_id)
     switch(turn)
     {
         case 0:
-            controller = new DefaultAIController(kart, kart_id);
+            controller = new DefaultAIController(kart);
             break;
         case 1:
-            controller = new NewAIController(kart, kart_id);
+            controller = new NewAIController(kart);
             break;
         default:
             std::cerr << "Warning: Unknown robot, using default." << std::endl;
-            controller = new DefaultAIController(kart, kart_id);
+            controller = new DefaultAIController(kart);
             break;
     }
 

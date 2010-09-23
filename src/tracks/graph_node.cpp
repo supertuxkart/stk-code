@@ -56,8 +56,6 @@ GraphNode::GraphNode(unsigned int index)
                                upper.getX(), upper.getZ() );
     // Only this 2d point is needed later
     m_lower_center = core::vector2df(lower.getX(), lower.getZ());
-
-    m_center_to_right = (quad[1]+quad[2])*0.5f-quad.getCenter();
 }   // GraphNode
 
 // ----------------------------------------------------------------------------
@@ -131,13 +129,3 @@ float GraphNode::getDistance2FromPoint(const Vec3 &xyz)
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
     return (closest-xyz2d).getLengthSQ();
 }   // getDistance2FromPoint
-
-// ----------------------------------------------------------------------------
-/** Returns a point to the right (f>0) or left (f<0) of the center
- *  of a node. |f| <=1, with f=0 returning exactly the center point,
- *  and f=+-1 returning the point on the right/left edge of the node.
- */
-Vec3 GraphNode::getSideOfCenter(float f) const
-{
-    return m_all_quads->getCenterOfQuad(m_index)+f*m_center_to_right;
-}   // getSideOfCenter

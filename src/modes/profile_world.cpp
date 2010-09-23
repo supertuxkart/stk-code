@@ -92,7 +92,7 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                            race_manager->getNumberOfKarts()-1);
     Kart *new_kart         = new Kart(prof_kart_id, index+1, init_pos);
 
-    Controller *controller = loadAIController(new_kart, index);
+    Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
 
     // Create a camera for the last kart (since this way more of the
