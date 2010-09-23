@@ -41,6 +41,7 @@ public:
     // overriding World methods
     virtual void restartRace();
     virtual std::string getIdent() const;
+    float   getClockStartTime();
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
     

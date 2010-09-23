@@ -38,6 +38,7 @@ using namespace irr;
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -1107,6 +1108,11 @@ void RaceGUI::drawGlobalMusicDescription()
     gui::IGUIFont*       font = GUIEngine::getFont();
 
     float race_time = World::getWorld()->getTime();
+    // In follow the leader the clock counts backwards, so convert the
+    // countdown time to time since start:
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        race_time = ((FollowTheLeaderRace*)World::getWorld())->getClockStartTime()
+                  - race_time;
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(race_time) /
