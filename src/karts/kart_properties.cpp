@@ -77,9 +77,9 @@ KartProperties::KartProperties(const std::string &filename)
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
-        m_slipstream_min_speed = m_camera_distance = 
+        m_slipstream_min_speed = m_camera_distance = m_camera_up_angle =
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_radius = UNDEFINED;
+        m_explosion_radius = m_ai_steering_variation = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -236,6 +236,10 @@ void KartProperties::getAllData(const XMLNode * root)
         explosion_node->get("radius", &m_explosion_radius);
     }
 
+    if(const XMLNode *ai_node = root->getNode("ai"))
+    {
+        ai_node->get("steering-variation",   &m_ai_steering_variation  );
+    }
     if(const XMLNode *skid_node = root->getNode("skid"))
     {
         skid_node->get("increase",      &m_skid_increase     );
@@ -378,7 +382,11 @@ void KartProperties::getAllData(const XMLNode * root)
     }
 
     if(const XMLNode *camera_node= root->getNode("camera"))
+    {
         camera_node->get("distance", &m_camera_distance);
+        camera_node->get("up-angle", &m_camera_up_angle);
+        m_camera_up_angle *= DEGREE_TO_RAD;
+    }
 
     if(const XMLNode *startup_node= root->getNode("startup"))
     {
@@ -501,6 +509,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_slipstream_add_power,      "slipstream add-power"          );
     CHECK_NEG(m_slipstream_min_speed,      "slipstream min-speed"          );
     CHECK_NEG(m_camera_distance,           "camera distance"               );
+    CHECK_NEG(m_camera_up_angle,           "camera up-angle"               );
     CHECK_NEG(m_nitro_power_boost,         "nitro power-boost"             );
     CHECK_NEG(m_nitro_consumption,         "nitro consumption"             );
     CHECK_NEG(m_nitro_big_container,       "nitro big-container"           );
@@ -510,6 +519,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_rescue_vert_offset,        "rescue vert-offset"            );
     CHECK_NEG(m_explosion_time,            "explosion time"                );
     CHECK_NEG(m_explosion_radius,          "explosion radius"              );
+    CHECK_NEG(m_ai_steering_variation,     "ai steering-variation"         );
 
 }   // checkAllSet
 

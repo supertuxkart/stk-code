@@ -193,16 +193,25 @@ private:
     float m_time_till_max_skid;       /**< Time till maximum skidding is
                                        *   reached. */
     bool  m_has_skidmarks;            /**< Kart leaves skid marks. */
+    /** Make the AI to steer at slightly different points to make it less
+     *  likely that the AI creates 'trains' - the kart behind getting 
+     *  slipstream. The variation should be a value between 0 (no variation,
+     *  all karts steer to the same driveline points) and 1 (karts will aim
+     *  all the way to the very edge of the drivelines). */
+    float m_ai_steering_variation;
 
-    float m_camera_distance;          /**< Distance of normal camera from kart. */
+    float m_camera_distance;          /**< Distance of normal camera from kart.*/
+    float m_camera_up_angle;          /**< Up angle of the camera in relation to
+                                         the pitch of the kart.                */
 
     /** The following two vectors define at what ratio of the maximum speed what
      * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
-     *                         0.5  means: if speed <=0.5 *maxSpeed --> gear 2
-     * The next vector contains the increase in max power (to simulate different
-     * gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1 */
-    std::vector<float> m_gear_switch_ratio,
-                       m_gear_power_increase;
+     *                         0.5  means: if speed <=0.5 *maxSpeed --> gear 2 */
+    std::vector<float> m_gear_switch_ratio;
+    /** This vector contains the increase in max power (to simulate different
+     *  gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1. See
+       m_gear_switch_ratio). */
+    std::vector<float> m_gear_power_increase;
 
     /** If the kart starts within the specified time at index I after 'go', 
      *  it receives the speed boost from m_startup_boost[I]. */
@@ -432,6 +441,12 @@ public:
 
     /** Returns distance between kart and camera. */
     float getCameraDistance         () const {return m_camera_distance;          }    
+
+    /** Returns the angle the camera has relative to the pitch of the kart. */
+    float getCameraUpAngle          () const {return m_camera_up_angle;          }
+
+    /** Returns AI steering variation value. */
+    float getAISteeringVariation    () const {return m_ai_steering_variation;    }
 
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                     }

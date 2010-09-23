@@ -118,7 +118,7 @@
     <center  gravity-shift="0 0.3 0"/>
 
     <!-- Camera: Distance between kart and camera. -->
-    <camera distance="1.5"/>
+    <camera distance="1.5" up-angle="15"/>
 
     <!-- If a kart starts within the specified time after 'go',
          it receives the corresponding bonus from 'boost'. Those
@@ -261,7 +261,14 @@
     <!-- Kart-specific explosion parameters. Height: how high this
          this kart is being pushed in the sky by an explosion.
          Time: how long it takes before the kart can drive again.  -->
-  <explosion time="2" radius="5" />
+    <explosion time="2" radius="5" />
+    <!-- Kart-specific settings used by the AI.
+         steering-variation: make each kart steer towards slightly
+         different driveline points, so that AI don't create trains.
+         Maximum value should be 1 (steer towards left/right side 
+         of driveline), 0 means exactly towards quad center point.
+         Depending on kart id karts will aim at different points.-->
+    <ai steering-variation="0.5"  />
     
   </general-kart-defaults>
 </config>
