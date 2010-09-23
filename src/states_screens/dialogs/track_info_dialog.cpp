@@ -297,9 +297,7 @@ void startGame(const std::string trackIdent, const int num_laps)
     race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-    //race_manager->setNumKarts( 1 );
     network_manager->setupPlayerKartInfo();
-    //race_manager->getKartType(1) = KT_PLAYER;
     
     race_manager->startNew();
 }

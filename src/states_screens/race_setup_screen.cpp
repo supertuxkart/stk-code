@@ -107,6 +107,10 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         }
         else if (selectedMode == "ftl")
         {
+            // Make sure there are at least three karts, otherwise FTL doesn't
+            if(race_manager->getNumberOfKarts()<3)
+                race_manager->setNumKarts(3);
+
             race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
