@@ -268,7 +268,7 @@
          Maximum value should be 1 (steer towards left/right side 
          of driveline), 0 means exactly towards quad center point.
          Depending on kart id karts will aim at different points.-->
-    <ai steering-variation="0.5"  />
+    <ai steering-variation="0.0"  />
     
   </general-kart-defaults>
 </config>
