@@ -296,8 +296,8 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     float dampened_steer =  fabsf(steering) * steering; 
     float angle_around = m_kart->getHeading() 
                        + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = m_kart->getPitch() 
-                       + m_kart->getKartProperties()->getCameraUpAngle();
+    float angle_up     = m_kart->getKartProperties()->getCameraUpAngle()
+                       - m_kart->getPitch() ;
 
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY( sin(angle_up)    );
@@ -347,8 +347,8 @@ void Camera::update(float dt)
         {
             wanted_target.setY(wanted_target.getY()+ 0.75f);
             float angle_around = m_kart->getHeading();
-            float angle_up     = m_kart->getPitch() 
-                               + m_kart->getKartProperties()->getCameraUpAngle();
+            float angle_up     = m_kart->getKartProperties()->getCameraUpAngle()
+                               - m_kart->getPitch() ;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY( sin(angle_up)    );
             wanted_position.setZ( cos(angle_around));
@@ -365,7 +365,7 @@ void Camera::update(float dt)
             float angle_around = m_kart->getHeading() 
                                + m_rotation_range * m_kart->getSteerPercent() 
                                * m_kart->getSkidding();
-            float angle_up     = m_kart->getPitch() 
+            float angle_up     = -m_kart->getPitch() 
                                - 20.0f*DEGREE_TO_RAD;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY(-sin(angle_up)    );
@@ -383,7 +383,7 @@ void Camera::update(float dt)
             // Follows the leader kart, higher off of the ground, further from the kart,
             // and turns in the opposite direction from the kart for a nice effect. :)
             float angle_around = kart->getHeading();
-            float angle_up     = kart->getPitch() + 40.0f*DEGREE_TO_RAD;
+            float angle_up     = 40.0f*DEGREE_TO_RAD - kart->getPitch() ;
             wanted_position.setX(sin(angle_around));
             wanted_position.setY(sin(angle_up)    );
             wanted_position.setZ(cos(angle_around));
@@ -438,8 +438,8 @@ void Camera::handleEndCamera(float dt)
                 //+ m_rotation_range * m_kart->getSteerPercent() 
                 //* m_kart->getSkidding()
                 ;
-            float angle_up     = m_kart->getPitch() 
-                               + m_kart->getKartProperties()->getCameraUpAngle();
+            float angle_up     = m_kart->getKartProperties()->getCameraUpAngle()
+                               - m_kart->getPitch() ;
             Vec3 wanted_position;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY( sin(angle_up)    );
