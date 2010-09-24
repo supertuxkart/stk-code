@@ -498,6 +498,9 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
+        // Avoid dropping all bubble gums one after another
+        if( m_time_since_last_shot >3.0f) break;
+
         // Either use the bubble gum after 10 seconds, or if the next kart 
         // behind is 'close' but not too close (too close likely means that the
         // kart is not behind but more to the side of this kart and so won't 
@@ -505,15 +508,17 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         // kart as well? I.e. only drop if the kart behind is faster? Otoh 
         // this approach helps preventing an overtaken kart to overtake us 
         // again.
+        // Don't drop bubble gums too quickly, wait at least three seconds
         m_controls->m_fire = (m_distance_behind < 15.0f &&
-                               m_distance_behind > 3.0f   ) || 
-                            m_time_since_last_shot>10.0f;
+                              m_distance_behind > 3.0f    );
         break;
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead. And some of them can fire backwards, too - which
     // isn't yet supported for AI karts.
     case PowerupManager::POWERUP_CAKE:
         {
+            // Leave some time between shots
+            if(m_time_since_last_shot<3.0f) break;
             // Since cakes can be fired all around, just use a sane distance
             // with a bit of extra for backwards, as enemy will go towards cake
             bool fire_backwards = (m_kart_behind && m_kart_ahead &&
@@ -522,14 +527,17 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
             m_controls->m_fire = (fire_backwards && distance < 25.0f)  ||
-                                 (!fire_backwards && distance < 20.0f) ||
-                                 m_time_since_last_shot > 10.0f;
+                                 (!fire_backwards && distance < 20.0f);
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
         }
     case PowerupManager::POWERUP_BOWLING:
         {
+            // Leave more time between bowling balls, since they are 
+            // slower, so it should take longer to hit something which
+            // can result in changing our target.
+            if(m_time_since_last_shot < 5.0f) break;
             // Bowling balls slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
             // acts a bit like a mine (and the kart is racing towards it, too)
@@ -538,15 +546,19 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
                                   !m_kart_ahead;
             float distance = fire_backwards ? m_distance_behind 
                                             : m_distance_ahead;
-            m_controls->m_fire = (fire_backwards && distance < 30.0f)  || 
-                                (!fire_backwards && distance <10.0f)  ||
-                                m_time_since_last_shot > 10.0f;
+            m_controls->m_fire = ( (fire_backwards && distance < 30.0f)  ||
+                                   (!fire_backwards && distance <10.0f)    ) &&
+                                m_time_since_last_shot > 3.0f;
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
         }
     case PowerupManager::POWERUP_PLUNGER:
         {
+            // Leave more time after a plunger, since it will take some
+            // time before a plunger effect becomes obvious.
+            if(m_time_since_last_shot < 5.0f) break;
+
             // Plungers can be fired backwards and are faster,
             // so allow more distance for shooting.
             bool fire_backwards = (m_kart_behind && m_kart_ahead && 
@@ -561,6 +573,9 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             break;
         }
     case PowerupManager::POWERUP_ANVIL:
+        // Wait one second more than a previous anvil ... just in case
+        if(m_time_since_last_shot < stk_config->m_anvil_time+1.0f) break;
+
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             m_controls->m_fire = m_world->getTime()<1.0f && 
