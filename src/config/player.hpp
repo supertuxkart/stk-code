@@ -41,6 +41,10 @@ protected:
     
     BoolUserConfigParam   m_is_guest_account;
         
+#ifdef DEBUG
+    unsigned int m_magic_number;
+#endif
+    
 public:
     
     IntUserConfigParam    m_use_frequency;
@@ -53,6 +57,9 @@ public:
                                       m_is_guest_account(false, "guest", &m_player_group),
                                       m_use_frequency(0, "use_frequency", &m_player_group)
     {
+#ifdef DEBUG
+        m_magic_number = 0xABCD1234;
+#endif
     }
     
     /**
@@ -69,14 +76,25 @@ public:
         m_name.findYourDataInAnAttributeOf(node);
         m_is_guest_account.findYourDataInAnAttributeOf(node);
         m_use_frequency.findYourDataInAnAttributeOf(node);
+        
+#ifdef DEBUG
+        m_magic_number = 0xABCD1234;
+#endif
     }
     
     
-    void setName(const std::string &name_){ m_name = name_;  }
+    ~PlayerProfile()
+    {
+#ifdef DEBUG
+        m_magic_number = 0xDEADBEEF;
+#endif
+    }
+    
+    void setName(const std::string &name_){ assert(m_magic_number == 0xABCD1234); m_name = name_;  }
 
-    const char* getName() const { return m_name.c_str();     }
+    const char* getName() const { assert(m_magic_number == 0xABCD1234); return m_name.c_str();     }
 
-    bool isGuestAccount() const { return m_is_guest_account; }
+    bool isGuestAccount() const { assert(m_magic_number == 0xABCD1234); return m_is_guest_account; }
     
     //int getLastKartId(){ return m_last_kart_id; }
     //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }

@@ -350,6 +350,9 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
             return;
         }
     }
+    
+    std::cerr << "ERROR [SpinnerWidget::setValue] : cannot find element named '"
+              <<  irr::core::stringc(new_value.c_str()).c_str() << "'\n";
     assert(false);
 }
 

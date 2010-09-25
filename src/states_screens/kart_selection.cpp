@@ -199,6 +199,10 @@ class PlayerKartWidget : public Widget
     /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
     std::string spinnerID;
     
+#ifdef DEBUG
+    long m_magic_number;
+#endif
+    
 public:
     /** Sub-widgets created by this widget */
     LabelWidget* m_player_ID_label;
@@ -212,9 +216,15 @@ public:
     std::string deviceName;
     std::string m_kartInternalName;
     
-    PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
+    PlayerKartWidget(KartSelectionScreen* parent, StateManager::ActivePlayer* associatedPlayer,
                      core::recti area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
+        assert(associatedPlayer->ok());
+        
+#ifdef DEBUG
+        m_magic_number = 0x33445566;
+#endif
+        
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;
         y_speed = 1.0f;
@@ -363,12 +373,18 @@ public:
             m_kart_name->getIrrlichtElement()->remove();
         
         getCurrentScreen()->manualRemoveWidget(this);
+        
+#ifdef DEBUG
+         m_magic_number = 0xDEADBEEF;
+#endif
     }   // ~PlayerKartWidget
     // -------------------------------------------------------------------------
     
     /** Called when players are renumbered (changes the player ID) */
     void setPlayerID(const int newPlayerID)
     {
+        assert(m_magic_number == 0x33445566);
+        
         if (StateManager::get()->getActivePlayer(newPlayerID) != m_associatedPlayer)
         {
             printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n",
@@ -399,6 +415,7 @@ public:
     /** Returns the ID of this player */
     int getPlayerID() const
     {
+        assert(m_magic_number == 0x33445566);
         return m_playerID;
     }
     
@@ -406,6 +423,21 @@ public:
     /** Add the widgets to the current screen */
     virtual void add()
     {
+        assert(m_magic_number == 0x33445566);
+        
+        // FIXME: debug, remove
+        assert(KartSelectionScreen::getInstance()->m_kart_widgets.contains(this));
+        bool mineInList = false;
+        for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
+        {
+            assert(StateManager::get()->getActivePlayer(p)->ok());
+            if (StateManager::get()->getActivePlayer(p) == m_associatedPlayer)
+            {
+                mineInList = true;
+            }
+        }
+        assert(mineInList);
+        
         m_player_ID_label->add();
         
         // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
@@ -437,6 +469,7 @@ public:
     /** Get the associated ActivePlayer object*/
     StateManager::ActivePlayer* getAssociatedPlayer()
     {
+        assert(m_magic_number == 0x33445566);
         return m_associatedPlayer;
     }
     
@@ -445,6 +478,7 @@ public:
         will then occur on each call to 'onUpdate'. */
     void move(const int x, const int y, const int w, const int h)
     {
+        assert(m_magic_number == 0x33445566);
         target_x = x;
         target_y = y;
         target_w = w;
@@ -460,6 +494,7 @@ public:
     /** Call when player confirmed his identity and kart */
     void markAsReady()
     {
+        assert(m_magic_number == 0x33445566);
         if (m_ready) return; // already ready
         
         m_ready = true;
@@ -486,6 +521,7 @@ public:
     /** \return Whether this player confirmed his kart and indent selection */
     bool isReady()
     {
+        assert(m_magic_number == 0x33445566);
         return m_ready;
     }
     
@@ -493,6 +529,7 @@ public:
     /** Updates the animation (moving/shrinking/etc.) */
     void onUpdate(float delta)
     {
+        assert(m_magic_number == 0x33445566);
         if (target_x == m_x && target_y == m_y && target_w == m_w && target_h == m_h) return;
         
         int move_step = (int)(delta*1000.0f);
@@ -573,6 +610,7 @@ public:
     /** Event callback */
     virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
     {
+        assert(m_magic_number == 0x33445566);
         if (m_ready) return EVENT_LET; // if it's declared ready, there is really nothing to process
         
         //std::cout << "= kart selection :: transmitEvent " << originator << " =\n";
@@ -600,6 +638,7 @@ public:
     /** Sets the size of the widget as a whole, and placed children widgets inside itself */
     void setSize(const int x, const int y, const int w, const int h)
     {
+        assert(m_magic_number == 0x33445566);
         m_x = x;
         m_y = y;
         m_w = w;
@@ -645,14 +684,19 @@ public:
     }
     
     // -------------------------------------------------------------------------
+    
     /** Sets which kart was selected for this player */
     void setKartInternalName(const std::string& whichKart)
     {
+        assert(m_magic_number == 0x33445566);
         m_kartInternalName = whichKart;
     }
+    
     // -------------------------------------------------------------------------
+    
     const std::string& getKartInternalName() const
     {
+        assert(m_magic_number == 0x33445566);
         return m_kartInternalName;
     }
 };
@@ -970,10 +1014,10 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size());
 
     manualAddWidget(newPlayerWidget);
-    newPlayerWidget->add();
-    
     m_kart_widgets.push_back(newPlayerWidget);
-    
+
+    newPlayerWidget->add();
+        
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
     Widget* fullarea = getWidget("playerskarts");
@@ -998,7 +1042,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 }
 
 // -----------------------------------------------------------------------------
-// Returns true if event was handled succesfully
+
 bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 {    
     int playerID = -1;
@@ -1268,7 +1312,14 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
 
 void KartSelectionScreen::allPlayersDone()
-{        
+{
+    // FIXME: debug, remove
+    printf("all players done : %i players have joined the game\n", StateManager::get()->activePlayerCount());
+    for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
+    {
+        std::cout << "    " << StateManager::get()->getActivePlayer(p)->getProfile()->getName() << std::endl;
+    }
+    
     input_manager->setMasterPlayerOnly(true);
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");

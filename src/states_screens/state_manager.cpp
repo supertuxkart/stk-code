@@ -229,6 +229,10 @@ void StateManager::onStackEmptied()
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player, 
                                          InputDevice *device)
 {
+#ifdef DEBUG
+    m_magic_number = 0xAC1EF1AE;
+#endif
+    
     m_player = player;
     m_device = NULL;
     m_kart = NULL;
@@ -239,12 +243,17 @@ StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
 StateManager::ActivePlayer::~ActivePlayer()
 {
     setDevice(NULL);
+    
+#ifdef DEBUG
+    m_magic_number = 0xDEADBEEF;
+#endif
 }   // ~ActivePlayer
 
 // ----------------------------------------------------------------------------
 
 void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
 {
+    assert(m_magic_number == 0xAC1EF1AE);
     m_player = player;
 }   // setPlayerProfile
 
@@ -252,6 +261,8 @@ void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
 
 void StateManager::ActivePlayer::setDevice(InputDevice* device)
 {
+    assert(m_magic_number == 0xAC1EF1AE);
+    
     // unset player from previous device he was assigned to, if any
     if (m_device != NULL) m_device->setPlayer(NULL);
     

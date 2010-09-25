@@ -45,6 +45,8 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     ptr_vector<PlayerKartWidget, REF> m_kart_widgets;
     
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
+    friend class PlayerKartWidget;
+    
     KartSelectionScreen();
     
     /** Stores whether any player confirmed their choice; then, some things are "frozen", for instance
@@ -81,7 +83,10 @@ public:
     /** \brief Called when a player hits 'fire'/'select' on his device to join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
     
-    /** \brief Called when a player hits 'rescue'/'cancel' on his device to leave the game */
+    /**
+      * \brief Called when a player hits 'rescue'/'cancel' on his device to leave the game
+      * \return true if event was handled succesfully
+      */
     bool playerQuit(StateManager::ActivePlayer* player);
     
      /** \brief implement callback from parent class GUIEngine::Screen */
