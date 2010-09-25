@@ -298,4 +298,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     if(!m_backface_culling)
         m->setFlag(video::EMF_BACK_FACE_CULLING, false);
 
+    m->ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    
 }   // setMaterialProperties

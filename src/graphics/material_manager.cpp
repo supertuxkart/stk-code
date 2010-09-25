@@ -69,6 +69,7 @@ void MaterialManager::setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const
         material.MaterialType = video::EMT_SOLID;
         material.ZWriteEnable = false;
         material.setFlag(video::EMF_ZWRITE_ENABLE, false);
+        material.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
         //material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         //material.Wireframe=true;
     }
@@ -109,7 +110,7 @@ void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) cons
             material.EmissiveColor = video::SColor(255, 0, 0, 0);
             material.SpecularColor = video::SColor(255, 0, 0, 0);
             //material.Shininess = 0.0f;
-            material.ColorMaterial = irr::video::ECM_DIFFUSE  ;
+            material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
             material.MaterialType = irr::video::EMT_SOLID;
         }
     }   // for i
