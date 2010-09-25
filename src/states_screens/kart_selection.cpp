@@ -943,6 +943,14 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
+    // if a removed widget is currently shrinking down, remove it upon leaving the screen
+    if (m_removed_widget != NULL)
+    {
+        manualRemoveWidget(m_removed_widget);
+        delete m_removed_widget;
+        m_removed_widget = NULL;
+    }
+    
     Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
 }   // tearDown
@@ -1093,6 +1101,15 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
     // unset selection of this player
     GUIEngine::focusNothingForPlayer(playerID);
+    
+    // delete a previous removed widget that didn't have time to fully shrink yet
+    // FIXME: handle multiple shrinking widgets gracefully?
+    if (m_removed_widget != NULL)
+    {
+        manualRemoveWidget(m_removed_widget);
+        delete m_removed_widget;
+        m_removed_widget = NULL;
+    }
     
     // keep the removed kart a while, for the 'disappear' animation to take place
     m_removed_widget = m_kart_widgets.remove(playerID);
