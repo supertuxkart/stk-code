@@ -880,9 +880,15 @@ float Kart::handleNitro(float dt)
  */
 float Kart::handleSlipstream(float dt)
 {
+    // Update this karts slipstream quad (even for low level AI, since even
+    // then player karts can get slipstream, and so have to compare with
+    // the modified slipstream quad.
+    m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
+
     // Low level AIs should not do any slipstreaming.
     if(!getController()->isPlayerController() &&
         race_manager->getDifficulty()==RaceManager::RD_EASY) return 0;
+
     // First see if we are currently using accumulated slipstream credits:
     // -------------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
@@ -908,8 +914,6 @@ float Kart::handleSlipstream(float dt)
 #endif
     // Then test if this kart is in the slipstream range of another kart:
     // ------------------------------------------------------------------
-    m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
-
     World *world           = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     bool is_sstreaming     = false;

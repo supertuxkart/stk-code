@@ -49,10 +49,10 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
     std::string debug_name = m_kart->getIdent()+" (slip-stream)";
     m_node->setName(debug_name.c_str());
 #endif
-    //m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, 
                                         0*0.25f+2.5,
                                         m_kart->getKartLength()) );
+    m_node->setVisible(false);
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
 }   // SlipStream
 
@@ -173,6 +173,7 @@ void SlipStream::setIntensity(float f, const Kart *kart)
         return;
     }
 
+    m_node->setVisible(true);
     const float above_terrain = 0.2f;
     core::vector3df my_pos = m_kart->getNode()->getPosition();
     my_pos.Y = m_kart->getHoT()+above_terrain;
