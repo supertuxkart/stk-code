@@ -608,7 +608,7 @@ bool Kart::isNearGround() const
     if(getHoT()==Track::NOHIT)
         return false;
     else
-        return ((getXYZ().getZ() - getHoT()) < stk_config->m_near_ground);
+        return ((getXYZ().getY() - getHoT()) < stk_config->m_near_ground);
 }   // isNearGround
 
 //-----------------------------------------------------------------------------
