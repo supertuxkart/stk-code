@@ -108,11 +108,16 @@ void MainMenuScreen::loadedFromFile()
 void MainMenuScreen::init()
 {
     Screen::init();
+    
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
     input_manager->setMasterPlayerOnly(false);
+    
 #ifdef ADDONS_MANAGER
+    // FIXME: this is wrong, init may be called several times in the object's
+    //        lifespan, and the pthread docs state that initing several times the same
+    //        mutex can cause undefined behavior
     pthread_mutex_init(&(this->m_mutex_news_text), NULL);
     pthread_create(&m_thread_news_text, NULL, &MainMenuScreen::downloadNews, this);
 #endif
@@ -231,15 +236,25 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 // ------------------------------------------------------------------------------------------------------
 void * MainMenuScreen::downloadNews( void * pthis)
 {
+    // enable thread to be cancelled
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+
     // FIXME: this code is wrong, "pt" might have been deleted by the
     // time the download is done (by having switched to another screen,
     // or exiting the game, etc...)
     MainMenuScreen * pt = (MainMenuScreen*)pthis;
 
-    if(download("news"))
+    if (download("news"))
+    {
+        pthread_testcancel(); // check if thread was cancelled
         pt->changeNewsText("news");
+    }
     else
+    {
+        pthread_testcancel(); // check if thread was cancelled
         pt->changeNewsText("offline");
+    }
     return NULL;
 }
 #endif
@@ -247,7 +262,7 @@ void * MainMenuScreen::downloadNews( void * pthis)
 #ifdef ADDONS_MANAGER
 void MainMenuScreen::tearDown()
 {
-    fprintf(stdout, "canceling the thread");
+    fprintf(stdout, "canceling the thread\n");
     pthread_cancel(m_thread_news_text);
 }
 #endif
