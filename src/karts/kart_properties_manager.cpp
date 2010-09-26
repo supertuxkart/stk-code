@@ -146,12 +146,22 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     if(!f) return false;
     fclose(f);
 
-    KartProperties* kart_properties = new KartProperties(config_filename);
-
+    KartProperties* kart_properties;
+    try
+    {
+        kart_properties = new KartProperties(config_filename);
+    }
+    catch (std::runtime_error& err)
+    {
+        std::cerr << "Giving up loading '" << config_filename.c_str()
+                  << "' : " << err.what() << std::endl;
+        return false;
+    }
+    
     // If the version of the kart file is not supported,
     // ignore this .kart file
-    if( kart_properties->getVersion()<stk_config->m_min_kart_version ||
-        kart_properties->getVersion()>stk_config->m_max_kart_version)
+    if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
+        kart_properties->getVersion() > stk_config->m_max_kart_version)
     {
         fprintf(stderr, "Warning: kart '%s' is not supported by this binary, ignored.\n",
                 kart_properties->getIdent().c_str());

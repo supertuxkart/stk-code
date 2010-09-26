@@ -133,6 +133,15 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 {
     std::string icon_file(""); 
     node.get("icon", &icon_file);
+    
+#ifdef DEBUG
+    if (icon_file.size() == 0)
+    {
+        std::cerr << "Cannot load powerup " << type << ", no 'icon' attribute under XML node\n";
+        assert(false);
+    }
+#endif
+    
     m_all_icons[type] = material_manager->getMaterial(icon_file,
                                   /* full_path */     false,
                                   /*make_permanent */ true); 

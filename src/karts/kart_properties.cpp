@@ -123,6 +123,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             std::ostringstream msg;
             msg << "Couldn't load kart properties '" << filename <<
                 "': no kart node.";
+            
+            delete m_kart_model;
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
@@ -161,8 +163,18 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
-    if(m_version>=1)
-        m_kart_model->loadModels(*this);
+    if (m_version >= 1)
+    {
+        const bool success = m_kart_model->loadModels(*this);
+        if (!success)
+        {
+            delete m_kart_model;
+            file_manager->popTextureSearchPath();
+            file_manager->popModelSearchPath();
+            throw std::runtime_error("Cannot load kart models");
+        }
+    }
+    
     if(m_gravity_center_shift.getX()==UNDEFINED)
     {
         m_gravity_center_shift.setX(0);

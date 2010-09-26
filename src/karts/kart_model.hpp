@@ -135,7 +135,7 @@ public:
                  ~KartModel();
     KartModel*    makeCopy();
     void          loadInfo(const XMLNode &node);
-    void          loadModels(const KartProperties &kart_properties);
+    bool          loadModels(const KartProperties &kart_properties);
     void          attachModel(scene::ISceneNode **node);
     scene::IAnimatedMesh* 
                   getModel() const { return m_mesh; }

@@ -121,9 +121,12 @@ void KartModel::loadInfo(const XMLNode &node)
  */
 KartModel::~KartModel()
 {
-    if(m_animated_node)
+    if (m_animated_node)
+    {
         m_animated_node->setAnimationEndCallback(NULL);
-    m_animated_node->drop();
+        m_animated_node->drop();
+    }
+    
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_node[i])
@@ -222,7 +225,7 @@ void KartModel::attachModel(scene::ISceneNode **node)
 // ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
  */
-void KartModel::loadModels(const KartProperties &kart_properties)
+bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
@@ -231,9 +234,9 @@ void KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 min, max;
     if(!m_mesh)
     {
-        printf("Problems loading mesh '%s' - aborting.\n",
-            full_path.c_str());
-        exit(-2);
+        printf("Problems loading mesh '%s' - kart '%s' will not be available\n",
+            full_path.c_str(), kart_properties.getIdent().c_str());
+        return false;
     }
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 size     = max-min;
@@ -269,6 +272,8 @@ void KartModel::loadModels(const KartProperties &kart_properties)
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // FIXME: wheel handling still missing.
     }   // for i<4
+    
+    return true;
 }   // loadModels
 
 // ----------------------------------------------------------------------------
