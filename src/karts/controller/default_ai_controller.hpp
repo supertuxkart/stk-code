@@ -69,22 +69,28 @@ private:
     /** The actual start delay used. */
     float m_start_delay; 
   
-    int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
-                     //even has check around the kart, if 1, it checks around
-                     //the kart always, and more than that will check the
-                     //remaining number of steps in front of the kart, always
-    bool  m_wait_for_players; //If true, the acceleration is decreased when
-                              //the AI is in a better position than all the
-                              //human players.
-    float m_max_handicap_accel; //The allowed maximum speed, in percentage,
-                                //from 0.0 to 1.0. Used only when
-                                //m_wait_for_players == true.
+    /** Minimum number of steps to check. If 0, the AI doesn't even has check
+     *  around the kart, if 1, it checks around the kart always, and more 
+     *  than that will check the remaining number of steps in front of the 
+     *  kart, always. */
+    int m_min_steps; 
+     /** If true, the acceleration is decreased when the AI is in a better 
+      *  position than all the human players. */
+    bool  m_wait_for_players;
+
+    /** The allowed maximum speed, in percentage, from 0.0 to 1.0. Used only 
+     *  when m_wait_for_players == true. */
+    float m_max_handicap_accel; 
     
-    ItemTactic m_item_tactic; //How are items going to be used?
+     /** How are items going to be used? */
+    ItemTactic m_item_tactic;
 
     /** True if the kart should try to pass on a bomb to another kart. */
-
     bool m_handle_bomb;
+
+    /** True if the AI should avtively try to make use of slipstream. */
+    bool m_make_use_of_slipstream;
+
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
@@ -127,7 +133,7 @@ private:
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
 
-  float m_time_since_stuck;
+    float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 

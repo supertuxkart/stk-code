@@ -85,13 +85,13 @@ Kart::Kart (const std::string& ident, int position,
     m_collected_energy     = 0;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
-    m_slipstream_time      = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
-    m_slip_stream          = NULL;
+    m_slipstream           = NULL;
+    m_slipstream_time      = 0.0f;
     m_skidmarks            = NULL;
     m_camera               = NULL;
     m_controller           = NULL;
@@ -308,7 +308,7 @@ Kart::~Kart()
     if(m_smoke_system)        delete m_smoke_system;
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
-    if(m_slip_stream)         delete m_slip_stream;
+    if(m_slipstream)          delete m_slipstream;
 
     delete m_shadow;
 
@@ -386,6 +386,7 @@ void Kart::reset()
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
+    m_nitro->setCreationRate(0.0f);
     m_powerup.reset();
 
     m_race_position        = m_initial_position;
@@ -420,7 +421,7 @@ void Kart::reset()
     m_controls.m_drift     = false;
     m_controls.m_fire      = false;
     m_controls.m_look_back = false;
-    m_slip_stream->reset();
+    m_slipstream->reset();
     m_vehicle->deactivateZipper();
 
     // Set the brakes so that karts don't slide downhill
@@ -687,7 +688,7 @@ void Kart::update(float dt)
         m_smoke_system->update(dt);
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
-        m_slip_stream->update(dt);
+        m_slipstream->update(dt);
     }  // UserConfigParams::m_graphical_effects
 
     updatePhysics(dt);
@@ -880,9 +881,9 @@ float Kart::handleNitro(float dt)
  */
 float Kart::handleSlipstream(float dt)
 {
-    // Update this karts slipstream quad (even for low level AI, since even
-    // then player karts can get slipstream, and so have to compare with
-    // the modified slipstream quad.
+    // Update this karts slipstream quad (even for low level AI which don't
+    // use slipstream, since even then player karts can get slipstream, 
+    // and so have to compare with the modified slipstream quad.
     m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
 
     // Low level AIs should not do any slipstreaming.
@@ -895,7 +896,7 @@ float Kart::handleSlipstream(float dt)
     {
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
-        m_slip_stream->setIntensity(2.0f, NULL);
+        m_slipstream->setIntensity(2.0f, NULL);
         return m_kart_properties->getSlipstreamAddPower();
     }
 
@@ -908,7 +909,7 @@ float Kart::handleSlipstream(float dt)
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed())
     {
-        m_slip_stream->setIntensity(0, NULL);
+        m_slipstream->setIntensity(0, NULL);
         return 0;
     }
 #endif
@@ -917,16 +918,16 @@ float Kart::handleSlipstream(float dt)
     World *world           = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     bool is_sstreaming     = false;
-    Kart *target_kart;
+    m_slipstream_target    = NULL;
     // Note that this loop can not be simply replaced with a shorter loop
     // using only the karts with a better position - since a kart might
     // be a lap behind
     for(unsigned int i=0; i<num_karts; i++)
     {
-        target_kart = world->getKart(i);
+        m_slipstream_target= world->getKart(i);
         // Don't test for slipstream with itself.
-        if(target_kart==this            || 
-            target_kart->isEliminated()    ) continue;
+        if(m_slipstream_target==this            || 
+            m_slipstream_target->isEliminated()    ) continue;
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
@@ -934,16 +935,18 @@ float Kart::handleSlipstream(float dt)
         // entirely sure if this makes sense, but it makes it easier to 
         // give karts different slipstream properties.
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
-        if(target_kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
+        if(m_slipstream_target->getSpeed() <
+            m_kart_properties->getSlipstreamMinSpeed()) 
             continue;
 #endif
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
-        Vec3 delta = getXYZ() - target_kart->getXYZ();
-        float l    = target_kart->m_kart_properties->getSlipstreamLength() 
-                   + target_kart->getKartLength()*0.5f;
+        Vec3 delta = getXYZ() - m_slipstream_target->getXYZ();
+        float l    = m_slipstream_target->m_kart_properties->getSlipstreamLength() 
+                   + m_slipstream_target->getKartLength()*0.5f;
         if(delta.length2_2d() > l*l) continue;
-        if(target_kart->m_slipstream_quad->pointInQuad(getXYZ()))
+        // Real test: if in slipstream quad of other kart
+        if(m_slipstream_target->m_slipstream_quad->pointInQuad(getXYZ()))
         {
             is_sstreaming     = true;
             break;
@@ -952,9 +955,26 @@ float Kart::handleSlipstream(float dt)
 
     if(!is_sstreaming)
     {
+        if(isSlipstreamReady()) 
+        {
+            // The first time slipstream is ready after collecting
+            // and you are leaving the slipstream area, you get a
+            // zipper bonus. 
+            if(m_slipstream_mode==SS_COLLECT)
+            {
+                m_slipstream_mode = SS_USE;
+                handleZipper();
+                // And the time is set to a maximum (to avoid that e.g. AI 
+                // karts slipstream for a long time and then get a very long 
+                // bonus).
+                m_slipstream_time = 
+                    m_kart_properties->getSlipstreamCollectTime();
+                return m_kart_properties->getSlipstreamAddPower();
+            }
+        }
         m_slipstream_time -=dt;
         if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
-        m_slip_stream->setIntensity(0, NULL);
+        m_slipstream->setIntensity(0, NULL);
         return 0;
     }   // for i<number of karts
 
@@ -962,21 +982,29 @@ float Kart::handleSlipstream(float dt)
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
                                                    : m_slipstream_time+dt;
     //printf("Collecting slipstream %f\n", m_slipstream_time);
-    m_slip_stream->setIntensity(m_slipstream_time, target_kart);
+    if(isSlipstreamReady())
+        m_nitro->setCreationRate(3.0f);
+    m_slipstream->setIntensity(m_slipstream_time, m_slipstream_target);
 
     m_slipstream_mode = SS_COLLECT;
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
-        m_slipstream_mode = SS_USE;
-        handleZipper(); // FIXME(/REMOVE?) Zipper gives a sharp push, maybe too sharp
+        m_slipstream->setIntensity(1.0f, m_slipstream_target);
         return 0;       // see below about abusing m_zipper_time_left without zipper
         //return m_kart_properties->getSlipstreamAddPower();
     }
-    //m_zipper_time_left = 5.0f; // FIXME, this is a hack to test higher speed limit without zipper, better would be own counter
     return 0;
-    //return m_kart_properties->getSlipstreamAddPower();
+   
 }   // handleSlipstream
 
+// -----------------------------------------------------------------------------
+/** Returns true if enough slipstream credits have been accumulated
+ *  to get a boost when leaving the slipstream area.
+ */
+bool Kart::isSlipstreamReady() const
+{
+    return m_slipstream_time>m_kart_properties->getSlipstreamCollectTime();
+}   // isSlipstreamReady
 
 // -----------------------------------------------------------------------------
 /** This function is called when the race starts. Up to then all brakes are
@@ -1353,7 +1381,7 @@ void Kart::loadData()
     m_smoke_system        = new Smoke(this);
     m_water_splash_system = new WaterSplash(this);
     m_nitro               = new Nitro(this);
-    m_slip_stream         = new SlipStream(this);
+    m_slipstream         = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);

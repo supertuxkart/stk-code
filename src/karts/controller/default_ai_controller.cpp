@@ -37,7 +37,7 @@
 #include <iostream>
 
 #ifdef AI_DEBUG
-#include "graphics/irr_driver.hpp"
+#  include "graphics/irr_driver.hpp"
 #endif
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
@@ -92,6 +92,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
     {
     case RaceManager::RD_EASY:
         m_wait_for_players        = true;
+        m_make_use_of_slipstream  = false;
         m_max_handicap_accel      = 0.9f;
         m_item_tactic             = IT_TEN_SECONDS;
         m_false_start_probability = 0.08f;
@@ -104,6 +105,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
         break;
     case RaceManager::RD_MEDIUM:
         m_wait_for_players        = true;
+        m_make_use_of_slipstream  = false;
         m_max_handicap_accel      = 0.95f;
         m_item_tactic             = IT_CALCULATE;
         m_false_start_probability = 0.04f;
@@ -116,6 +118,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
         break;
     case RaceManager::RD_HARD:
         m_wait_for_players        = false;
+        m_make_use_of_slipstream  = true;
         m_max_handicap_accel      = 1.0f;
         m_item_tactic             = IT_CALCULATE;
         m_false_start_probability = 0.01f;
@@ -820,6 +823,19 @@ void DefaultAIController::checkCrashes(int steps, const Vec3& pos )
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
     m_crashes.clear();
+
+    // If slipstream should be handled actively, trigger overtaking the
+    // kart which gives us slipstream if slipstream is readyA
+    if(m_make_use_of_slipstream && m_kart->isSlipstreamReady() &&
+        m_kart->getSlipstreamKart())
+    {
+        //printf("%s overtaking %s\n", m_kart->getIdent().c_str(),
+        //    m_kart->getSlipstreamKart()->getIdent().c_str());
+        // FIXME: we might define a minimum distance, and if the target kart
+        // is too close break first - otherwise the AI hits the kart when
+        // trying to overtake it, actually speeding the other kart up.
+        m_crashes.m_kart = m_kart->getSlipstreamKart()->getWorldKartId();
+    }
 
     const size_t NUM_KARTS = m_world->getNumKarts();
 

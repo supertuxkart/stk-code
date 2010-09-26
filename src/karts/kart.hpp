@@ -145,7 +145,7 @@ private:
     Nitro        *m_nitro;
 
     /** Graphical effect when slipstreaming. */
-    SlipStream   *m_slip_stream;
+    SlipStream   *m_slipstream;
 
     float         m_wheel_rotation;
     /** For each wheel it stores the suspension length after the karts are at 
@@ -169,6 +169,10 @@ private:
 
     /** The time a kart was in slipstream. */
     float         m_slipstream_time;
+    
+    /** The kart from which this kart gets slipstream. Used by the AI to
+     ** overtake the right kart. */
+    Kart         *m_slipstream_target;
 
     /** Slipstream mode: either nothing happening, or the kart is collecting
      *  'slipstream credits', or the kart is using accumulated credits. */
@@ -367,6 +371,10 @@ public:
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
+    bool           isSlipstreamReady() const;
+
+    /** Returns which kart is giving slip stream to this kart. */
+    const Kart*    getSlipstreamKart() const {return m_slipstream_target;};
     void           resetBrakes      ();
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);
