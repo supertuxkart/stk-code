@@ -67,7 +67,10 @@ void MainMenuScreen::changeNewsText(std::string action)
     {
         FILE* newsFile = NULL;
         char buffer[1024] = "";
+        
+        pthread_testcancel(); // check if thread was cancelled
         newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
+        
         if (newsFile == NULL)
         {
             fprintf(stderr, "Warning: cannot open news files\n");
@@ -82,6 +85,7 @@ void MainMenuScreen::changeNewsText(std::string action)
 
         fclose(newsFile);
         
+        pthread_testcancel(); // check if thread was cancelled
         // to remove the break line.
         //info.replace(info.size()-1,1, "");
         //std::cout << info << std::endl;
