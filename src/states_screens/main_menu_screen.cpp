@@ -95,6 +95,7 @@ void MainMenuScreen::changeNewsText(std::string action)
     }
     if(action == "offline")
     {
+        pthread_testcancel(); // check if thread was cancelled
 	    pthread_mutex_lock(&(this->m_mutex_news_text));
         m_news_text = "offline";
 	    pthread_mutex_unlock(&(this->m_mutex_news_text));
@@ -267,6 +268,12 @@ void * MainMenuScreen::downloadNews( void * pthis)
 void MainMenuScreen::tearDown()
 {
     fprintf(stdout, "canceling the thread\n");
+    
+    // grab the mutex before returning to make sure the screen is not deleted while the thread is
+    // changing the text, which would result in weird results (tearDown does not automatically mean
+    // the screen is going to be destroyed but let's play on the safe side)
+    pthread_mutex_lock(&(this->m_mutex_news_text));
     pthread_cancel(m_thread_news_text);
+    pthread_mutex_unlock(&(this->m_mutex_news_text));
 }
 #endif
