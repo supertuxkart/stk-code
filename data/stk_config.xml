@@ -117,8 +117,15 @@
                       of the chassis.  -->
     <center  gravity-shift="0 0.3 0"/>
 
-    <!-- Camera: Distance between kart and camera. -->
-    <camera distance="1.5" up-angle="15"/>
+    <!-- Camera: Distance between kart and camera. 
+         forward-up-angle: Angle between camera and plane of kart (pitch) 
+                 when the camera is pointing forward
+         backward-up-angke: Angle between camera and plane of kart (pitch)
+                 when the camera is pointing backwards. This is usually 
+                 larger than the forward-up-angle, since the kart itself
+                 otherwise obstricts too much of the view.  -->
+    <camera distance="1.5" forward-up-angle="15"
+            backward-up-angle="30"/>
 
     <!-- If a kart starts within the specified time after 'go',
          it receives the corresponding bonus from 'boost'. Those

@@ -201,8 +201,12 @@ private:
     float m_ai_steering_variation;
 
     float m_camera_distance;          /**< Distance of normal camera from kart.*/
-    float m_camera_up_angle;          /**< Up angle of the camera in relation to
-                                         the pitch of the kart.                */
+    float m_camera_forward_up_angle;  /**< Up angle of the camera in relation to
+                                           the pitch of the kart when driving 
+                                           forwards.                      */
+    float m_camera_backward_up_angle; /**< Up angle of the camera in relation to
+                                           the pitch of the kart when driving 
+                                           backwards.                      */
 
     /** The following two vectors define at what ratio of the maximum speed what
      * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
@@ -443,7 +447,10 @@ public:
     float getCameraDistance         () const {return m_camera_distance;          }    
 
     /** Returns the angle the camera has relative to the pitch of the kart. */
-    float getCameraUpAngle          () const {return m_camera_up_angle;          }
+    float getCameraForwardUpAngle   () const {return m_camera_forward_up_angle;  }
+
+    /** Returns the angle the camera has relative to the pitch of the kart. */
+    float getCameraBackwardUpAngle  () const {return m_camera_backward_up_angle; }
 
     /** Returns AI steering variation value. */
     float getAISteeringVariation    () const {return m_ai_steering_variation;    }

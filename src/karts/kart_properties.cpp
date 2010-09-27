@@ -77,7 +77,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
-        m_slipstream_min_speed = m_camera_distance = m_camera_up_angle =
+        m_slipstream_min_speed = m_camera_distance = 
+        m_camera_forward_up_angle = m_camera_backward_up_angle =
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_ai_steering_variation = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -396,8 +397,10 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *camera_node= root->getNode("camera"))
     {
         camera_node->get("distance", &m_camera_distance);
-        camera_node->get("up-angle", &m_camera_up_angle);
-        m_camera_up_angle *= DEGREE_TO_RAD;
+        camera_node->get("forward-up-angle", &m_camera_forward_up_angle);
+        m_camera_forward_up_angle *= DEGREE_TO_RAD;
+        camera_node->get("backward-up-angle", &m_camera_backward_up_angle);
+        m_camera_backward_up_angle *= DEGREE_TO_RAD;
     }
 
     if(const XMLNode *startup_node= root->getNode("startup"))
@@ -521,7 +524,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_slipstream_add_power,      "slipstream add-power"          );
     CHECK_NEG(m_slipstream_min_speed,      "slipstream min-speed"          );
     CHECK_NEG(m_camera_distance,           "camera distance"               );
-    CHECK_NEG(m_camera_up_angle,           "camera up-angle"               );
+    CHECK_NEG(m_camera_forward_up_angle,   "camera forward-up-angle"       );
+    CHECK_NEG(m_camera_backward_up_angle,  "camera forward-up-angle"       );
     CHECK_NEG(m_nitro_power_boost,         "nitro power-boost"             );
     CHECK_NEG(m_nitro_consumption,         "nitro consumption"             );
     CHECK_NEG(m_nitro_big_container,       "nitro big-container"           );
