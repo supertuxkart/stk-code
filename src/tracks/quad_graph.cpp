@@ -60,27 +60,6 @@ QuadGraph::~QuadGraph()
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
-/** Sets the offset from the middle point of the lap counting line to the
- *  beginning of quad 0. All reported values for distance along track will use
- *  this offset. As a result a kart on the start line will have distance 0,
- *  and a kart just before the start line will have a getDistanceFromStart()
- *  which is the length of the track.
- */
-void QuadGraph::setStartCoordinate(const CheckLine &cl)
-{
-    Vec3 start_point=cl.getCenterPoint();
-    int sector=UNKNOWN_SECTOR;
-    findRoadSector(start_point, &sector);
-    if(sector==UNKNOWN_SECTOR)
-    {
-        fprintf(stderr, 
-                "Start line not on quads in file '%s'. Lap counting might not work.\n",
-                m_quad_filename.c_str());
-        return;
-    }
-}   // setStartCoordinate
-
-// -----------------------------------------------------------------------------
 /** Loads a quad graph from a file.
  *  \param filename Name of the file to load.
  */
