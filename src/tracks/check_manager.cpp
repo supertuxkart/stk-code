@@ -39,7 +39,6 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
             m_all_checks.push_back(cl);
             if(cl->getType()==CheckStructure::CT_NEW_LAP)
             {
-                track->getQuadGraph().setStartCoordinate(*cl);
                 track->setStartCoordinates(cl->getLine2D());
             }
         }   // checkline

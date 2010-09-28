@@ -85,7 +85,6 @@ public:
                                  const video::SColor &fill_color
                                         =video::SColor(127, 255, 255, 255) );
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
-    void         setStartCoordinate(const CheckLine &cl);
 
     /** Returns the number of nodes in the graph. */
     unsigned int getNumNodes() const { return m_all_nodes.size();         } 
