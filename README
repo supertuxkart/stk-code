@@ -1,5 +1,5 @@
 SuperTuxKart
-==============
+============
 SuperTuxKart is a free kart racing game. It is focusing on fun and
 not on realistic kart physics. Instruction can be found on the
 in-game help page.
@@ -24,6 +24,7 @@ HARDWARE REQUIREMENTS
 * You'll need at least 128Mb RAM. 
 * A sound card would be nice - but it's not essential.
 * Ideally, you want a joystick with at least 6 buttons.
+
 
 COMPILING SuperTuxkart
 ======================
@@ -57,3 +58,15 @@ This software is released under the GNU General Public License (GPL) which
 can be found in the file 'LICENSE' in the same directory as this file.
 Information about the licenses for artwork are contained in 
 data/licenses.
+
+
+3D COORDINATES
+==============
+A reminder for those looking at the code and 3d models:
+
+STK    : X right, Y up,       Z forwards
+Blender: X right, Y forwards, Z up
+
+The exporters perform the needed transform, so in Blender you just work
+with XY plane as ground, and things will appear fine in STK (using XZ
+as ground in the code, obviously).
