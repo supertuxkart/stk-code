@@ -42,13 +42,16 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
     {
         printf("Unknown check structure '%s' - ignored.\n", kind.c_str());
     }
-    m_activate_check_index = -1;
-    node.get("other-id", &m_activate_check_index);
-    if( (m_check_type==CT_TOGGLE || m_check_type==CT_ACTIVATE) &&
-        m_activate_check_index==-1)
-    {
-        printf("Unknown other-id in checkline.\n");
-    }
+    m_check_structures_to_change_state.clear();
+    node.get("other-ids", &m_check_structures_to_change_state);
+    // Backwards compatibility to tracks exported with older versions of
+    // the track exporter
+    if(m_check_structures_to_change_state.size()==0)
+        node.get("other-id", &m_check_structures_to_change_state);
+
+    m_same_group.clear();
+    node.get("same-group", &m_same_group);
+
     m_active_at_reset=true;
     node.get("active", &m_active_at_reset);
 }   // CheckStructure
@@ -103,45 +106,76 @@ void CheckStructure::trigger(unsigned int kart_index)
 {
     switch(m_check_type)
     {
-    case CT_NEW_LAP : World::getWorld()->newLap(kart_index); 
-                      m_is_active[kart_index] = false;
-                      if(UserConfigParams::m_check_debug)
-                      {
-                          printf("CHECK: %s new lap %d triggered, now deactivated.\n",
-                              World::getWorld()->getKart(kart_index)->getIdent().c_str(),
-                              m_index);
-                      }
-                      break;
-    case CT_ACTIVATE: {
-                          CheckStructure *cs=
-                            m_check_manager->getCheckStructure(m_activate_check_index);
-                          cs->m_is_active[kart_index] = true;
-                          if(UserConfigParams::m_check_debug)
-                          {
-                              printf("CHECK: %s %d triggered, activating %d.\n",
-                                     World::getWorld()->getKart(kart_index)->getIdent().c_str(),
-                                     m_index, m_activate_check_index);
-                          }
-                          break;
-                      }
-    case CT_TOGGLE:   {
-                          CheckStructure *cs=
-                            m_check_manager->getCheckStructure(m_activate_check_index);
-                          cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
-                          if(UserConfigParams::m_check_debug)
-                          {
-                              // At least on gcc 4.3.2 we can't simply print 
-                              // cs->m_is_active[kart_index] ("cannot pass objects of
-                              // non-POD type ‘struct std::_Bit_reference’ through ‘...’; 
-                              // call will abort at runtime"). So we use this somewhat
-                              // unusual but portable construct.
-                              printf("CHECK: %s %d triggered, setting %d to %d.\n",
-                                     World::getWorld()->getKart(kart_index)->getIdent().c_str(),
-                                     m_index, m_activate_check_index,
-                                     cs->m_is_active[kart_index]==true);
-                          }
-                          break;
-                      }
+    case CT_NEW_LAP : 
+        World::getWorld()->newLap(kart_index); 
+        m_is_active[kart_index] = false;
+        if(UserConfigParams::m_check_debug)
+        {
+            printf("CHECK: %s new lap %d triggered, now deactivated.\n",
+                World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                m_index);
+        }
+        // Set all checkstructures of the same group to the same state.
+        // This is to avoid e.g. only deactivating one of many new lap
+        // counters, which could enable the user to cheat by crossing 
+        // all different lap counting lines.
+        for(unsigned int i=0; i<m_same_group.size(); i++)
+        {
+            CheckStructure *cs = 
+                m_check_manager->getCheckStructure(m_same_group[i]);
+            cs->m_is_active[kart_index] = false;
+            printf("CHECK: also deactivating index %d\n", m_same_group[i]);
+        }
+        break;
+    case CT_ACTIVATE: 
+        {
+            for(unsigned int i=0; i<m_check_structures_to_change_state.size(); 
+                i++)
+            {
+                int check_index = m_check_structures_to_change_state[i];
+                CheckStructure *cs=
+                    m_check_manager->getCheckStructure(check_index);
+                // We don't have to activate all members of the group of
+                // cs, since this check line's m_check_structure_to_change
+                // will include the full groups.
+                cs->m_is_active[kart_index] = true;
+                if(UserConfigParams::m_check_debug)
+                {
+                    printf("CHECK: %s %d triggered, activating %d.\n",
+                        World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                        m_index, check_index);
+                }
+            }   // for i<m_check_structures_to_change_state.size()
+            break;
+        }
+    case CT_TOGGLE:   
+        {
+            for(unsigned int i=0; i<m_check_structures_to_change_state.size(); 
+                i++)
+            {
+                int check_index = m_check_structures_to_change_state[i];
+                CheckStructure *cs=
+                    m_check_manager->getCheckStructure(check_index);
+                // We don't have to toggle all members of the group of
+                // cs, since this check line's m_check_structure_to_change
+                // will include the full groups. This esp. avoids toggling
+                // cs more than once!
+                cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
+                if(UserConfigParams::m_check_debug)
+                {
+                    // At least on gcc 4.3.2 we can't simply print 
+                    // cs->m_is_active[kart_index] ("cannot pass objects of
+                    // non-POD type ‘struct std::_Bit_reference’ through ‘...’; 
+                    // call will abort at runtime"). So we use this somewhat
+                    // unusual but portable construct.
+                    printf("CHECK: %s %d triggered, setting %d to %d.\n",
+                        World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                        m_index, check_index,
+                        cs->m_is_active[kart_index]==true);
+                }
+            }   // for i < m_check_structures_to_change_state
+            break;
+        }
     default:          break;
     }   // switch m_check_type
 }   // trigger

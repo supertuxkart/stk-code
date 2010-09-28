@@ -1,7 +1,7 @@
 //  $Id: check_structure.hpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2010  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public:
     /** Different types of check structures: 
      *  ACTIVATE: Activates another check structure (independent of
      *            the state that check structure is in)
-     *  TOGGLE:   Switches (or inverts) the state of another check structure.
+     *  TOGGLE:   Switches (inverts) the state of another check structure.
      *  NEW_LAP:  On crossing a new lap is counted.
      *  AMBIENT_SPHERE: Modifies the ambient color.
      *  A combination of an activate and new_lap line are used to
@@ -86,8 +86,17 @@ private:
     bool              m_active_at_reset;
 
     /** If this is a CT_ACTIVATE or CT_SWITCH type, this will contain
-     *  the index of the corresponding check structure that is triggered. */
-    int               m_activate_check_index;
+     *  the indices of the corresponding check structures that get their
+     *  state changed (activated or switched). */
+    std::vector<int> m_check_structures_to_change_state;
+
+    /** A list of check lines that should be activated/switched when this
+     *  lines is activated/switched. I.e. can be used if more than one lap
+     *  counting line is used to make sure they are all in synch, otherwise
+     *  players could cross first one then the other lap counting line
+     *  as huge shortcuts. */
+    std::vector<int> m_same_group;
+
 public:
                 CheckStructure(CheckManager *check_manager, const XMLNode &node,
                                unsigned int index);
