@@ -124,7 +124,8 @@ void CheckStructure::trigger(unsigned int kart_index)
             CheckStructure *cs = 
                 m_check_manager->getCheckStructure(m_same_group[i]);
             cs->m_is_active[kart_index] = false;
-            printf("CHECK: also deactivating index %d\n", m_same_group[i]);
+            if(UserConfigParams::m_check_debug)
+                printf("CHECK: also deactivating index %d\n", m_same_group[i]);
         }
         break;
     case CT_ACTIVATE: 
