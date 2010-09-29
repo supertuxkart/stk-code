@@ -112,7 +112,6 @@ public:
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
-    virtual Vec3 getCenterPoint() const=0;
 
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }

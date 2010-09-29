@@ -22,8 +22,9 @@
 #include <string>
 
 #include "io/xml_node.hpp"
-#include "tracks/check_line.hpp"
 #include "tracks/ambient_light_sphere.hpp"
+#include "tracks/check_lap.hpp"
+#include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/track.hpp"
 
@@ -47,6 +48,10 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
                 lap_line_found = true;
             }
         }   // checkline
+        else if(type=="check-lap")
+        {
+            m_all_checks.push_back(new CheckLap(this, *check_node, i));
+        }
         else if(type=="check-sphere")
         {
             AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node,

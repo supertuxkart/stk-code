@@ -62,9 +62,6 @@ public:
      *  this sphere. */
     float getDistance2ForKart(int index) const { return m_distance2[index];}
     // -------------------------------------------------------------------------
-    /** Returns the center point of this checkline. */
-    Vec3 getCenterPoint() const               { return m_center_point;     }
-    // -------------------------------------------------------------------------
     /** Returns the square of the radius of this sphere. */
     float getRadius2() const { return m_radius2; }
 };   // CheckSphere

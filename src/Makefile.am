@@ -341,14 +341,16 @@ supertuxkart_SOURCES = \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
+ tracks/check_lap.cpp \
+ tracks/check_lap.hpp \
+ tracks/check_line.cpp \
+ tracks/check_line.hpp \
  tracks/check_manager.cpp \
  tracks/check_manager.hpp \
  tracks/check_sphere.cpp \
  tracks/check_sphere.hpp \
  tracks/check_structure.cpp \
  tracks/check_structure.hpp \
- tracks/check_line.cpp \
- tracks/check_line.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
  tracks/quad.cpp \
