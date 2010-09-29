@@ -114,9 +114,16 @@ public:
 
     MusicInformation
          *m_title_music;             /**<Filename of the title music to play.*/
+private:
+    /** True if stk_config has been loaded. This is necessary if the
+     *  --stk-config command line parameter has been specified to avoid
+     *  that stk loads the default configuration after already having
+     *  loaded a user specified config file. */
+    bool  m_has_been_loaded;
 
+public:
     /** Empty constructor. The actual work is done in load. */
-         STKConfig() {};
+         STKConfig() {m_has_been_loaded= false;};
     void init_defaults    ();
     void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);

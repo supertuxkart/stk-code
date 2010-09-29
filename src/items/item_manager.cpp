@@ -51,6 +51,7 @@ ItemManager::ItemManager()
     m_switch_to.reserve(Item::ITEM_COUNT);
     for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
         m_switch_to.push_back((Item::ItemType)i);
+    setSwitchItems(stk_config->m_switch_items);
 }   // ItemManager
 
 //-----------------------------------------------------------------------------

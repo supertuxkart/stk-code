@@ -40,7 +40,13 @@ float STKConfig::UNDEFINED = -99.9f;
  */
 void STKConfig::load(const std::string &filename)
 {
+    // Avoid loading the default config file if a user-specific
+    // config file has already been loaded.
+    if(m_has_been_loaded) return;
+    m_has_been_loaded = true;
+
     init_defaults();
+
     XMLNode *root = 0;
     try
     {
@@ -121,7 +127,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
 
     m_kart_properties.checkAllSet(filename);
-    item_manager->setSwitchItems(m_switch_items);
 }   // load
 
 // -----------------------------------------------------------------------------

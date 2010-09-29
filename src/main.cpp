@@ -136,14 +136,20 @@ int handleCmdLinePreliminary(int argc, char **argv)
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
-        if ( !strcmp(argv[i], "--help"    ) ||
-            !strcmp(argv[i], "-help"     ) ||
+        if (!strcmp(argv[i], "--help" ) ||
+            !strcmp(argv[i], "-help"  ) ||
             !strcmp(argv[i], "--help" ) ||
-            !strcmp(argv[i], "-help" ) ||
-            !strcmp(argv[i], "-h")       )
+            !strcmp(argv[i], "-help"  ) ||
+            !strcmp(argv[i], "-h"     )     )
         {
             cmdLineHelp(argv[0]);
             exit(0);
+        }
+        else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
+        {
+            stk_config->load(file_manager->getConfigFile(argv[i+1]));
+            fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
+            i++;
         }
         else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
         {
@@ -354,12 +360,6 @@ int handleCmdLine(int argc, char **argv)
             race_manager->setGrandPrix(*gp);
             i++;
         }
-        else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
-        {
-            stk_config->load(file_manager->getConfigFile(argv[i+1]));
-            fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
-            i++;
-        }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
@@ -426,7 +426,7 @@ int handleCmdLine(int argc, char **argv)
             i++;
         }
         /* FIXME:
-        else if ( !strcmp(argv[i], "--playqers") && i+1<argc ) {
+        else if ( !strcmp(argv[i], "--players") && i+1<argc ) {
           raceSetup.numPlayers = atoi(argv[i+1]);
 
           if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4) {
@@ -496,6 +496,7 @@ int handleCmdLine(int argc, char **argv)
         }
         // these commands are already processed in handleCmdLinePreliminary, but repeat this
         // just so that we don't get error messages about unknown commands
+        else if( !strcmp(argv[i], "--stk-config")&& i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
@@ -521,7 +522,7 @@ int handleCmdLine(int argc, char **argv)
     }
 
     return 1;
-}   /* handleCmdLine */
+}   // handleCmdLine
 
 //=============================================================================
 /** Initialises the minimum number of managers to get access to user_config.
@@ -531,11 +532,15 @@ void initUserConfig(char *argv[])
     file_manager            = new FileManager(argv);
     translations            = new Translations();   // needs file_manager
     user_config             = new UserConfig();     // needs file_manager
+    stk_config              = new STKConfig();      // in case of --stk-config
+                                                    // command line parameters
 }   // initUserConfig
 
 //=============================================================================
 void initRest()
 {
+    stk_config->load(file_manager->getConfigFile("stk_config.xml"));
+
     irr_driver              = new IrrDriver();
     
     // Init GUI
@@ -550,7 +555,6 @@ void initRest()
     history                 = new History              ();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
-    stk_config              = new STKConfig            ();
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     powerup_manager         = new PowerupManager       ();
@@ -563,7 +567,6 @@ void initRest()
     addons_manager          = new Addons               ();
 #endif
 
-    stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
@@ -590,7 +593,7 @@ void initRest()
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
     std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
 #endif
-}
+}   // initRest
 
 //=============================================================================
 void cleanTuxKart()
@@ -617,7 +620,7 @@ void cleanTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
-}
+}   // cleanTuxKart
 
 //=============================================================================
 
