@@ -132,7 +132,7 @@
          fields must have the same size, and must be sorted by
          increasing times. -->
     <startup time   = "0.3 0.5"
-             boost  = "10 5"  />
+             boost  = "6 3"  />
 
     <!-- Rescue: time: How long it takes the kart to be raised.
          height: how height the kart will be raised before it is
