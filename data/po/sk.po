@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-09-12 17:21+0200\n"
-"PO-Revision-Date: 2010-09-15 15:12+0000\n"
-"Last-Translator: Miroslav R. <Unknown>\n"
+"PO-Revision-Date: 2010-09-26 01:30+0000\n"
+"Last-Translator: Miroslav Remák <Unknown>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-16 05:19+0000\n"
+"X-Launchpad-Export-Date: 2010-09-27 05:34+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
@@ -490,7 +490,7 @@ msgid ""
 "bar at the right of the game screen."
 msgstr ""
 "Zber nitra vám umožnuje získať rýchlosť, kedykoľvek si budete priať "
-"stlačením vhodného klávesu. Vašu aktuálnu hladinu nitra môžete vidieť na "
+"stlačením vhodného klávesu. Svoju aktuálnu hladinu nitra môžete vidieť na "
 "lište v pravej časti hernej obrazovky."
 
 #. I18N: ./data/grandprix/alltracks.challenge
@@ -919,7 +919,7 @@ msgstr "Mágia, syn môj. Nič iné na svete takto nezapácha."
 #. I18N: In the help menu
 #: data/po/gui_strings.h:312
 msgid "Make your rivals bite dust!"
-msgstr "Usmrtite vašich súperov!"
+msgstr "Usmrtite svojich súperov!"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:107
@@ -1089,7 +1089,7 @@ msgstr "Hráči"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:387
 msgid "Please re-configure your key bindings."
-msgstr "Prosím, prekonfigurujte vaše priradenie klávesov."
+msgstr "Prosím, prekonfigurujte svoje priradenie klávesov."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:250
@@ -1650,7 +1650,7 @@ msgstr "pán Iceblock"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Miroslav R. https://launchpad.net/~miroslavr256"
+"  Miroslav Remák https://launchpad.net/~miroslavr256"
 
 #~ msgid "Grand Prix Results"
 #~ msgstr "Výsledky Grand Prixu"

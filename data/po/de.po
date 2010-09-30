@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-12 17:21+0200\n"
-"PO-Revision-Date: 2010-09-14 11:43+0000\n"
+"PO-Revision-Date: 2010-09-21 16:10+0000\n"
 "Last-Translator: Wolfs <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-15 05:20+0000\n"
+"X-Launchpad-Export-Date: 2010-09-22 05:55+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-"
 "vanilla/supertuxkart\n"
@@ -885,7 +885,7 @@ msgstr "Links"
 
 #: src/guiengine/engine.cpp:1047
 msgid "Loading"
-msgstr "Lade Rennen"
+msgstr "Lade"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: In the main screen
@@ -1244,12 +1244,12 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:85
 msgid "See unlocked feature"
-msgstr "Freigeschaltete Merkmale anschauen"
+msgstr "Freigeschaltete Funktion anschauen"
 
 #: src/states_screens/race_result_gui.cpp:86
 #: src/states_screens/dialogs/race_over_dialog.cpp:353
 msgid "See unlocked features"
-msgstr "Siehe freigeschaltete Features"
+msgstr "Freigeschaltete Funktionen anschauen"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:186
@@ -1439,7 +1439,7 @@ msgstr "Zum Mond und zurück"
 #: src/states_screens/race_gui.cpp:98
 #, c-format
 msgid "Top %i"
-msgstr ""
+msgstr "Top %i"
 
 #. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
 #: src/states_screens/dialogs/track_info_dialog.cpp:74
@@ -1655,6 +1655,7 @@ msgstr ""
 "  Evolution https://launchpad.net/~marcken-ritter\n"
 "  Hoffi https://launchpad.net/~stefhoff\n"
 "  Jens Maucher https://launchpad.net/~jensmaucher\n"
+"  STK-team https://launchpad.net/~stk\n"
 "  Wolfs https://launchpad.net/~pizzaservice"
 
 #, c-format
