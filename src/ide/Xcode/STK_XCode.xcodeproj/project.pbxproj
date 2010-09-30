@@ -25,6 +25,7 @@
 		9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F1EB107961560067ECF5 /* options_screen_input.cpp */; };
 		9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F1ED107961560067ECF5 /* options_screen_players.cpp */; };
 		9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */; };
+		95251F3D12554AB200505BA5 /* check_lap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95251F3B12554AB200505BA5 /* check_lap.cpp */; };
 		9525B71411C851D30094BD96 /* CBatchingMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9525B71211C851D30094BD96 /* CBatchingMesh.cpp */; };
 		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
 		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
@@ -358,6 +359,8 @@
 		9522F1EE107961560067ECF5 /* options_screen_input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_input.hpp; path = ../../states_screens/options_screen_input.hpp; sourceTree = SOURCE_ROOT; };
 		9524739410497C75000C197E /* dynamic_ribbon_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dynamic_ribbon_widget.hpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.hpp; sourceTree = SOURCE_ROOT; };
 		9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_ribbon_widget.cpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95251F3B12554AB200505BA5 /* check_lap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_lap.cpp; path = ../../tracks/check_lap.cpp; sourceTree = SOURCE_ROOT; };
+		95251F3C12554AB200505BA5 /* check_lap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_lap.hpp; path = ../../tracks/check_lap.hpp; sourceTree = SOURCE_ROOT; };
 		9525B71211C851D30094BD96 /* CBatchingMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBatchingMesh.cpp; path = ../../graphics/CBatchingMesh.cpp; sourceTree = SOURCE_ROOT; };
 		9525B71311C851D30094BD96 /* CBatchingMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CBatchingMesh.hpp; path = ../../graphics/CBatchingMesh.hpp; sourceTree = SOURCE_ROOT; };
 		95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = ../../race/grand_prix_data.cpp; sourceTree = SOURCE_ROOT; };
@@ -2028,6 +2031,8 @@
 				95C77D611069589B0080838E /* ambient_light_sphere.hpp */,
 				95CB476B0FF30EF400413BAE /* bezier_curve.cpp */,
 				95CB476A0FF30EF400413BAE /* bezier_curve.hpp */,
+				95251F3B12554AB200505BA5 /* check_lap.cpp */,
+				95251F3C12554AB200505BA5 /* check_lap.hpp */,
 				95C77D65106958A50080838E /* check_line.cpp */,
 				95C77D64106958A50080838E /* check_line.hpp */,
 				955DE88110042701006A4F3C /* check_manager.cpp */,
@@ -2660,6 +2665,7 @@
 				956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */,
 				954378D51238493C00F57707 /* confirm_dialog.cpp in Sources */,
 				95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */,
+				95251F3D12554AB200505BA5 /* check_lap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
