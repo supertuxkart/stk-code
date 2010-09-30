@@ -95,6 +95,18 @@ float Quad::sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const
 // ----------------------------------------------------------------------------
 bool Quad::pointInQuad(const Vec3& p) const 
 {
+    // In case that a kart can validly run too high over one driveline
+    // and it should not be considered to be on that driveline. Example:
+    // a kart is driving over a bridge, slightly off the bridge 
+    // driveline. It must be avoided that the kart is then considered
+    // to be on the driveline under the brige. So the vertical distance
+    // is taken into account, too. to simplify this test we only compare 
+    // with the minimum height of the quad (and not with the actual
+    // height of the quad at the point where the kart is).
+    if(p.getY() - m_min_height > 5.0f ||
+       p.getY() - m_min_height < -1.0f    )
+       return false;
+
     // If a point is exactly on the line of two quads (e.g. between points
     // 0,1 on one quad, and 3,2 of the previous quad), assign this point
     // to be on the 'later' quad, i.e. on the line between points 0 and 1.
