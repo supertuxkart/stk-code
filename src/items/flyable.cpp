@@ -76,6 +76,26 @@ const wchar_t* getBowlingString()
 }
 
 
+const wchar_t* getSelfBowlingString()
+{
+    const int SELFBOWLING_STRINGS_AMOUNT = 3;
+
+    RandomGenerator r;
+    const int id = r.get(SELFBOWLING_STRINGS_AMOUNT);
+
+    switch (id)
+    {
+        //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 0 : return _("%s is practicing with a blue, big, spheric yo-yo");
+        //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 1 : return _("%s is the world master of the boomerang ball");
+        //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 2 : return _("%s should play (rubber) darts instead of bowling");
+        default: assert(false); return L"";  //  avoid compiler warning
+    }
+}
+
+
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
 scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
@@ -425,10 +445,19 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             break;
             case PowerupManager::POWERUP_BOWLING:
             {
-                hit_message += StringUtils::insertValues(getBowlingString(),
-                                                         kart_hit->getName().c_str(),
-                                                         m_owner->getName().c_str()
-                                                        ).c_str();
+                if (kart_hit == m_owner)
+                {
+                    hit_message += StringUtils::insertValues(getSelfBowlingString(),
+                                                             m_owner->getName().c_str()
+                                                            ).c_str();
+                }
+                else
+                {
+                    hit_message += StringUtils::insertValues(getBowlingString(),
+                                                             kart_hit->getName().c_str(),
+                                                             m_owner->getName().c_str()
+                                                            ).c_str();
+                }
             }
             break;
             default:
