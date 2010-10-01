@@ -361,6 +361,15 @@ namespace StringUtils
     std::string timeToString(float time)
     {
         int int_time   = (int)(time*100.0f+0.5f);
+
+        // Avoid problems if time is negative or way too large (which 
+        // should only happen if something is broken in a track elsewhere, 
+        // and an incorrect finishing time is estimated.
+        if(int_time<0)
+            return std::string("00:00:00");
+        else if(int_time >= 10000*60)  // up to 9999:59.99
+            return std::string("**:**:**");
+
         int min        = int_time / 6000;
         int sec        = (int_time-min*6000)/100;
         int hundredths = (int_time - min*6000-sec*100);
