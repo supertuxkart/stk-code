@@ -349,7 +349,7 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
     
     static int test_y = 0;
     
-    GUIEngine::getTitleFont()->draw(_("You won the Grand Prix!"),
+    GUIEngine::getTitleFont()->draw(_("You completed the Grand Prix!"),
                                     core::rect< s32 >( 0, test_y, w, h/10 ),
                                     color,
                                     true/* center h */, true /* center v */ );
