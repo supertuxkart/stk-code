@@ -710,7 +710,7 @@ void RaceGUI::drawEnergyMeter (const Kart *kart,
     float state = (float)(kart->getEnergy()) / MAX_ITEMS_COLLECTED;
     //int y = (int)(250 * scaling.Y) + viewport.UpperLeftCorner.Y;
     int w = (int)(16 * scaling.X);
-    int h = (int)(UserConfigParams::m_height/4 * scaling.Y);
+    int h = (int)(viewport.getHeight()/3);
     
     int x = viewport.LowerRightCorner.X - w - 5;
     int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
