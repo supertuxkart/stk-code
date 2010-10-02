@@ -34,6 +34,8 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
 {
     m_gauge = gauge;
     
+    m_listener = NULL;
+    
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
     
@@ -135,6 +137,7 @@ void SpinnerWidget::add()
         m_children[1].m_element = subbtn;
         m_children[1].m_id = subbtn->getID();
         m_children[1].m_event_handler = this;
+        m_children[1].m_properties[PROP_ID] = "spinnerbody";
         subbtn->setUseAlphaChannel(true);
         
         subbtn->setImage(texture);
@@ -149,6 +152,7 @@ void SpinnerWidget::add()
         m_children[1].m_element = label;
         m_children[1].m_event_handler = this;
         m_children[1].m_id = label->getID();
+        m_children[1].m_properties[PROP_ID] = "spinnerbody";
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
@@ -260,9 +264,23 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator
 {
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
+        
+    if (originator == "left")
+    {
+        leftPressed(playerID);
+    }
+    else if (originator == "right")
+    {
+        rightPressed(playerID);
+    }
+    else if (originator == "spinnerbody" || originator == m_properties[PROP_ID])
+    {
+        if (m_listener != NULL)
+        {
+            m_listener->onSpinnerConfirmed();
+        }
+    }
     
-    if      (originator == "left")  leftPressed(playerID);
-    else if (originator == "right") rightPressed(playerID);
     
     this->setFocusForPlayer( playerID );
     return EVENT_LET;

@@ -192,7 +192,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;
-                
+                                
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
             }
@@ -475,7 +475,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     }
     
     //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
-        
+    
     Widget* parent = w->m_event_handler;
     if (w->m_event_handler != NULL)
     {
@@ -509,7 +509,10 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     }
     else
     {
-        sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+        if (w->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
+        {
+            sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+        }
     }
     
     return EVENT_BLOCK;

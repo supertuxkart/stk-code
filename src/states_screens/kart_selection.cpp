@@ -173,7 +173,7 @@ public:
 // -----------------------------------------------------------------------------
 
 /** A widget representing the kart selection for a player (i.e. the player's number, name, the kart view, the kart's name) */
-class PlayerKartWidget : public Widget
+class PlayerKartWidget : public Widget, public SpinnerWidget::ISpinnerConfirmListener
 {        
     /** Whether this player confirmed their selection */
     bool m_ready;
@@ -364,7 +364,10 @@ public:
             m_player_ID_label->getIrrlichtElement()->remove();
         
         if (m_player_ident_spinner != NULL && m_player_ident_spinner->getIrrlichtElement() != NULL)
+        {
+            m_player_ident_spinner->setListener(NULL);
             m_player_ident_spinner->getIrrlichtElement()->remove();
+        }
         
         if (m_model_view->getIrrlichtElement() != NULL)
             m_model_view->getIrrlichtElement()->remove();
@@ -446,6 +449,7 @@ public:
         
         m_player_ident_spinner->add();
         m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
+        m_player_ident_spinner->setListener(this);
         
         m_model_view->add();
         m_kart_name->add();
@@ -698,6 +702,15 @@ public:
     {
         assert(m_magic_number == 0x33445566);
         return m_kartInternalName;
+    }
+    
+    // -------------------------------------------------------------------------
+
+    /** \brief Event callback from ISpinnerConfirmListener */
+    virtual void onSpinnerConfirmed()
+    {
+        printf("onSpinnerConfirmed\n");
+        KartSelectionScreen::getInstance()->playerConfirm(m_playerID);
     }
 };
 
@@ -1187,6 +1200,69 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
     }
 }
 
+void KartSelectionScreen::playerConfirm(const int playerID)
+{
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+    assert(w != NULL);
+    const std::string selection = w->getSelectionIDString(playerID);
+    if (selection == "locked")
+    {
+        unlock_manager->playLockSound();
+        return;
+    }
+    
+    // make sure no other player selected the same identity or kart
+    const int amount = m_kart_widgets.size();
+    for (int n=0; n<amount; n++)
+    {
+        if (n == playerID) continue; // don't check a kart against itself
+        
+        const bool player_ready   = m_kart_widgets[n].isReady();
+        const bool ident_conflict = !m_kart_widgets[n].getAssociatedPlayer()->getProfile()->isGuestAccount() &&
+        m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+        m_kart_widgets[playerID].getAssociatedPlayer()->getProfile();
+        const bool kart_conflict  = sameKart(m_kart_widgets[n], m_kart_widgets[playerID]);
+        
+        if (player_ready && (ident_conflict || kart_conflict))
+        {
+            printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
+            
+            sfx_manager->quickSound( "use_anvil" );
+            return;
+        }
+        
+        // If two PlayerKart entries are associated to the same ActivePlayer, something went wrong
+        assert(m_kart_widgets[n].getAssociatedPlayer() != m_kart_widgets[playerID].getAssociatedPlayer());
+    }
+    
+    // Mark this player as ready to start
+    m_kart_widgets[playerID].markAsReady();
+    m_player_confirmed = true;
+    
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert( tabs != NULL );
+    tabs->setDeactivated();
+    
+    // validate choices to notify player of duplicates
+    const bool names_ok = validateIdentChoices();
+    const bool karts_ok = validateKartChoices();
+    
+    if (!names_ok || !karts_ok) return;
+    
+    // check if all players are ready
+    bool allPlayersReady = true;
+    for (int n=0; n<amount; n++)
+    {            
+        if (!m_kart_widgets[n].isReady())
+        {
+            allPlayersReady = false;
+            break;
+        }
+    }
+    
+    if (allPlayersReady) allPlayersDone();
+}
+
 // -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
@@ -1244,65 +1320,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "karts")
     {
-        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-        assert(w != NULL);
-        const std::string selection = w->getSelectionIDString(playerID);
-        if (selection == "locked")
-        {
-            unlock_manager->playLockSound();
-            return;
-        }
-        
-        // make sure no other player selected the same identity or kart
-        const int amount = m_kart_widgets.size();
-        for (int n=0; n<amount; n++)
-        {
-            if (n == playerID) continue; // don't check a kart against itself
-            
-            const bool player_ready   = m_kart_widgets[n].isReady();
-            const bool ident_conflict = !m_kart_widgets[n].getAssociatedPlayer()->getProfile()->isGuestAccount() &&
-                                        m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                                        m_kart_widgets[playerID].getAssociatedPlayer()->getProfile();
-            const bool kart_conflict  = sameKart(m_kart_widgets[n], m_kart_widgets[playerID]);
-            
-            if (player_ready && (ident_conflict || kart_conflict))
-            {
-                printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
-                
-                sfx_manager->quickSound( "use_anvil" );
-                return;
-            }
-            
-            // If two PlayerKart entries are associated to the same ActivePlayer, something went wrong
-            assert(m_kart_widgets[n].getAssociatedPlayer() != m_kart_widgets[playerID].getAssociatedPlayer());
-        }
-        
-        // Mark this player as ready to start
-        m_kart_widgets[playerID].markAsReady();
-        m_player_confirmed = true;
-        
-        RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
-        assert( tabs != NULL );
-        tabs->setDeactivated();
-        
-        // validate choices to notify player of duplicates
-        const bool names_ok = validateIdentChoices();
-        const bool karts_ok = validateKartChoices();
-        
-        if (!names_ok || !karts_ok) return;
-        
-        // check if all players are ready
-        bool allPlayersReady = true;
-        for (int n=0; n<amount; n++)
-        {            
-            if (!m_kart_widgets[n].isReady())
-            {
-                allPlayersReady = false;
-                break;
-            }
-        }
-        
-        if (allPlayersReady) allPlayersDone();
+        playerConfirm(playerID);
     }
     else
     {

@@ -75,6 +75,8 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
     
+    void playerConfirm(const int playerID);
+    
 public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */

@@ -27,11 +27,26 @@
 
 namespace GUIEngine
 {
+    
     /** \brief A spinner or gauge widget (to select numbers / percentages).
       * \ingroup widgets
       */
     class SpinnerWidget : public Widget
     {
+    public:
+        class ISpinnerConfirmListener
+        {
+        public:
+            virtual ~ISpinnerConfirmListener() {}
+            
+            /** \brief Invoked when the spinner is selected and "fire" is pressed */
+            virtual void onSpinnerConfirmed() = 0;
+        };
+        
+    protected:
+        
+        ISpinnerConfirmListener* m_listener;
+        
         int m_value, m_min, m_max;
         
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
@@ -78,6 +93,7 @@ namespace GUIEngine
         void addLabel(irr::core::stringw label);
         void clearLabels();
         
+        void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
 
         /** \brief implement method from base class Widget */
         virtual void add();
