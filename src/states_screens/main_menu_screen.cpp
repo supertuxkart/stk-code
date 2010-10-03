@@ -69,6 +69,11 @@ void MainMenuScreen::changeNewsText(std::string action)
         char buffer[1024] = "";
         
         pthread_testcancel(); // check if thread was cancelled
+        
+        // enter the mutex; this will prevent the shutdown procedure
+        // from continuing until this critical section is over
+        pthread_mutex_lock(&(this->m_mutex_news_text));
+        
         newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
         
         if (newsFile == NULL)
@@ -85,11 +90,6 @@ void MainMenuScreen::changeNewsText(std::string action)
 
         fclose(newsFile);
         
-        pthread_testcancel(); // check if thread was cancelled
-        // to remove the break line.
-        //info.replace(info.size()-1,1, "");
-        //std::cout << info << std::endl;
-        pthread_mutex_lock(&(this->m_mutex_news_text));
         m_news_text = std::string(info).c_str();
 	    pthread_mutex_unlock(&(this->m_mutex_news_text));
     }
