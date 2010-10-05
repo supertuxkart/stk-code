@@ -107,7 +107,7 @@ btUprightConstraint::btUprightConstraint(const Kart* kart,
     m_limit[0].m_accumulatedImpulse = 0.0f;
     m_limit[1].m_accumulatedImpulse = 0.0f;
     m_limit[ 0 ].m_axis             = btVector3( 1, 0, 0 );
-    m_limit[ 1 ].m_axis             = btVector3( 0, 1, 0 );
+    m_limit[ 1 ].m_axis             = btVector3( 0, 0, 1 );
     setLimit( SIMD_PI * 0.4f );
 }   // btUprightConstraint
  
