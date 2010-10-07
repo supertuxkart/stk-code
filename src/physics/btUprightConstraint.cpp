@@ -117,8 +117,8 @@ btUprightConstraint::btUprightConstraint(const Kart* kart,
 
 void btUprightConstraint::buildJacobian()
 {
-    m_limit[ 0 ].m_angle       = m_kart->getPitch();
-    m_limit[ 1 ].m_angle       = m_kart->getRoll();
+    m_limit[ 0 ].m_angle       =  m_kart->getPitch();
+    m_limit[ 1 ].m_angle       = -m_kart->getRoll();
     for ( int i = 0; i < 2; i++ )
     {
         new (&m_jacAng[ i ])      btJacobianEntry(  m_limit[ i ].m_axis,
