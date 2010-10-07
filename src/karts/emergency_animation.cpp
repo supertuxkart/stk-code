@@ -105,9 +105,6 @@ void EmergencyAnimation::forceRescue()
 
     m_kart->attach(ATTACH_TINYTUX, m_timer);
 
-    // FIXME: which version to use?
-    m_curr_rotation.setHPR(m_kart->getRotation());
-
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll()  );
     m_curr_rotation.setHeading(0);
