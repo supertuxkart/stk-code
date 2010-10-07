@@ -287,7 +287,7 @@ void DefaultAIController::update(float dt)
         /*Response handling functions*/
         handleAcceleration(dt);
         handleSteering(dt);
-        handleItems(dt, steps);
+        handleItems(dt);
         handleRescue(dt);
         handleBraking();
         // If a bomb is attached, nitro might already be set.
@@ -470,14 +470,19 @@ void DefaultAIController::handleSteering(float dt)
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
-void DefaultAIController::handleItems( const float DELTA, const int STEPS )
+/** Handle all items depending on the chosen strategy: Either (low level AI)
+ *  just use an item after 10 seconds, or do a much better job on higher level
+ *  AI - e.g. aiming at karts ahead/behind, wait an appropriate time before 
+ *  using multiple items etc.
+ */
+void DefaultAIController::handleItems(const float dt)
 {
     m_controls->m_fire = false;
     if(m_kart->playingEmergencyAnimation() || 
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING ) 
         return;
 
-    m_time_since_last_shot += DELTA;
+    m_time_since_last_shot += dt;
 
     // Tactic 1: wait ten seconds, then use item
     // -----------------------------------------
@@ -495,14 +500,9 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
     // -------------------
     switch( m_kart->getPowerup()->getType() )
     {
-    case PowerupManager::POWERUP_ZIPPER:
-        // Do nothing. Further up a zipper is used if nitro should be selected,
-        // saving the (potential more valuable nitro) for later
-        break;
-
     case PowerupManager::POWERUP_BUBBLEGUM:
         // Avoid dropping all bubble gums one after another
-        if( m_time_since_last_shot >3.0f) break;
+        if( m_time_since_last_shot <3.0f) break;
 
         // Either use the bubble gum after 10 seconds, or if the next kart 
         // behind is 'close' but not too close (too close likely means that the
@@ -511,13 +511,12 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
         // kart as well? I.e. only drop if the kart behind is faster? Otoh 
         // this approach helps preventing an overtaken kart to overtake us 
         // again.
-        // Don't drop bubble gums too quickly, wait at least three seconds
         m_controls->m_fire = (m_distance_behind < 15.0f &&
                               m_distance_behind > 3.0f    );
-        break;
+        break;   // POWERUP_BUBBLEGUM
+
     // All the thrown/fired items might be improved by considering the angle
-    // towards m_kart_ahead. And some of them can fire backwards, too - which
-    // isn't yet supported for AI karts.
+    // towards m_kart_ahead.
     case PowerupManager::POWERUP_CAKE:
         {
             // Leave some time between shots
@@ -534,14 +533,15 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
-        }
+        }   // POWERUP_CAKE
+
     case PowerupManager::POWERUP_BOWLING:
         {
             // Leave more time between bowling balls, since they are 
             // slower, so it should take longer to hit something which
             // can result in changing our target.
             if(m_time_since_last_shot < 5.0f) break;
-            // Bowling balls slower, so only fire on closer karts - but when
+            // Bowling balls are slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
             // acts a bit like a mine (and the kart is racing towards it, too)
             bool fire_backwards = (m_kart_behind && m_kart_ahead && 
@@ -555,7 +555,13 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
-        }
+        }   // POWERUP_BOWLING
+
+    case PowerupManager::POWERUP_ZIPPER:
+        // Do nothing. Further up a zipper is used if nitro should be selected,
+        // saving the (potential more valuable nitro) for later
+        break;   // POWERUP_ZIPPER
+
     case PowerupManager::POWERUP_PLUNGER:
         {
             // Leave more time after a plunger, since it will take some
@@ -567,16 +573,32 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             bool fire_backwards = (m_kart_behind && m_kart_ahead && 
                                    m_distance_behind < m_distance_ahead) ||
                                   !m_kart_ahead;
-            float distance = fire_backwards ? m_distance_behind 
-                                            : m_distance_ahead;
-            m_controls->m_fire = distance < 30.0f                 || 
-                                m_time_since_last_shot > 10.0f;
+            float distance      = fire_backwards ? m_distance_behind 
+                                                 : m_distance_ahead;
+            m_controls->m_fire  = distance < 30.0f                 || 
+                                  m_time_since_last_shot > 10.0f;
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
-        }
+        }   // POWERUP_PLUNGER
+
+    case PowerupManager::POWERUP_SWITCH:
+        // For now don't use a switch if this kart is first (since it's more 
+        // likely that this kart then gets a good iteam), otherwise use it 
+        // after a waiting an appropriate time
+        if(m_kart->getPosition()>1 && 
+            m_time_since_last_shot > stk_config->m_item_switch_time+2.0f)
+            m_controls->m_fire = true;
+        break;   // POWERUP_SWITCH
+
+    case PowerupManager::POWERUP_PARACHUTE:
+        // Wait one second more than a previous parachute
+        if(m_time_since_last_shot > stk_config->m_parachute_time_other+1.0f)
+            m_controls->m_fire = true;
+        break;   // POWERUP_PARACHUTE
+
     case PowerupManager::POWERUP_ANVIL:
-        // Wait one second more than a previous anvil ... just in case
+        // Wait one second more than a previous anvil
         if(m_time_since_last_shot < stk_config->m_anvil_time+1.0f) break;
 
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -589,11 +611,14 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
             m_controls->m_fire = m_time_since_last_shot > 3.0f && 
                                  m_kart->getPosition()>1;
         }
+        break;   // POWERUP_ANVIL
+
     default:
-        m_controls->m_fire = true;
+        printf("Invalid or unhandled powerup '%d' in default AI.\n",
+                m_kart->getPowerup()->getType());
+        assert(false);
     }
     if(m_controls->m_fire)  m_time_since_last_shot = 0.0f;
-    return;
 }   // handleItems
 
 //-----------------------------------------------------------------------------
@@ -707,13 +732,13 @@ void DefaultAIController::handleRaceStart()
 }   // handleRaceStart
 
 //-----------------------------------------------------------------------------
-void DefaultAIController::handleRescue(const float DELTA)
+void DefaultAIController::handleRescue(const float dt)
 {
     // check if kart is stuck
     if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() && 
         !m_world->isStartPhase())
     {
-        m_time_since_stuck += DELTA;
+        m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
             m_kart->forceRescue();

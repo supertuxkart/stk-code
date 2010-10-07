@@ -147,10 +147,10 @@ private:
      *specific action (more like, associated with inaction).
      */
     void  handleRaceStart();
-    void  handleAcceleration(const float DELTA);
+    void  handleAcceleration(const float dt);
     void  handleSteering(float dt);
-    void  handleItems(const float DELTA, const int STEPS);
-    void  handleRescue(const float DELTA);
+    void  handleItems(const float dt);
+    void  handleRescue(const float dt);
     void  handleBraking();
     void  handleNitroAndZipper();
     void  computeNearestKarts();
