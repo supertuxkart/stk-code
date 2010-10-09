@@ -172,13 +172,13 @@ void AddonsLoading::close()
 void * AddonsLoading::startInstall(void* pthis)
 {
     AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(obj->addons->IsInstalled() == "yes")
+    if(!obj->addons->IsInstalledAsBool() or obj->addons->NeedUpdate())
     {
-        obj->addons->UnInstall();
+        obj->addons->Install();
     }
     else
     {
-        obj->addons->Install();
+        obj->addons->UnInstall();
     }
     pthread_mutex_lock(&(obj->m_mutex_can_install));
     obj->m_can_install = true;

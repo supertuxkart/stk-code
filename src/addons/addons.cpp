@@ -412,4 +412,11 @@ std::string Addons::getDownloadStateAsStr()
     pthread_mutex_unlock(&m_str_mutex);
     return value;
 }
+
+
+// ----------------------------------------------------------------------------
+bool Addons::NeedUpdate()
+{
+    return GetInstalledVersion() < GetVersion();
+}
 #endif

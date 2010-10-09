@@ -81,6 +81,9 @@ class Addons
         int GetInstalledVersion();
         std::string GetInstalledVersionAsStr();
 
+        /** Return a simple bool to know if the addon needs to be updated */
+        bool NeedUpdate();
+
         /** Get the installed version of the selected addon. */
         std::string GetIdAsStr();
 
