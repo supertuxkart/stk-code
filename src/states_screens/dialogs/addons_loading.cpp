@@ -161,7 +161,7 @@ void AddonsLoading::onUpdate(float delta)
 void AddonsLoading::close()
 {
 
-    GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
+    AddonsScreen* curr_screen = AddonsScreen::getInstance();
 	pthread_mutex_lock(&(((AddonsScreen*)curr_screen)->mutex));
 	((AddonsScreen*)curr_screen)->can_load_list = true;
 	pthread_mutex_unlock(&(((AddonsScreen*)curr_screen)->mutex));
