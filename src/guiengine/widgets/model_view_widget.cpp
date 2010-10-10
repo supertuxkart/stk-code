@@ -32,6 +32,8 @@ ModelViewWidget::ModelViewWidget() :
     
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
+    
+    m_rtt_unsupported = false;
 }
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
@@ -96,6 +98,8 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location, co
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
+    if (m_rtt_unsupported) return;
+    
     if (m_rotation_mode == ROTATE_CONTINUOUSLY)
     {
         angle += delta*m_rotation_speed;
@@ -149,7 +153,14 @@ void ModelViewWidget::update(float delta)
     }
     
     m_texture = m_rtt_provider->renderToTexture(angle);
-    setImage(m_texture);
+    if (m_texture != NULL)
+    {
+        setImage(m_texture);
+    }
+    else
+    {
+        m_rtt_unsupported = true;
+    }
     //getIrrlichtElement<IGUIButton>()->setImage(m_texture);
     //getIrrlichtElement<IGUIButton>()->setPressedImage(m_texture);
 }

@@ -52,7 +52,11 @@ namespace GUIEngine
         IrrDriver::RTTProvider* m_rtt_provider;
         
         float angle;
+        
+        bool m_rtt_unsupported;
+        
     public:
+        
         ModelViewWidget();
         ~ModelViewWidget();
         

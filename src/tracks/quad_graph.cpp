@@ -524,6 +524,14 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
 
+    
+    if (texture == NULL)
+    {
+        fprintf(stderr, "[QuadGraph::makeMiniMap] WARNING: RTT does not appear to work,"
+                        "mini-map will not be available\n");
+        texture = irr_driver->getTexture(file_manager->getDataDir() + "/gui/main_help.png");
+    }
+    
     return texture;
 }   // makeMiniMap
 

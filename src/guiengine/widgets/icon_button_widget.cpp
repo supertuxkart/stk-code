@@ -49,7 +49,8 @@ void IconButtonWidget::add()
     }
     else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
     {
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
+                                            m_properties[PROP_ICON]).c_str());
     }
     
     if (m_texture == NULL)
@@ -69,7 +70,8 @@ void IconButtonWidget::add()
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
         useAspectRatio = (float)m_texture_w / (float)m_texture_h;
-        //std::cout << "m_texture_h=" << m_texture_h << "; m_texture_w="<< m_texture_w << "; useAspectRatio=" << useAspectRatio << std::endl;
+        //std::cout << "m_texture_h=" << m_texture_h << "; m_texture_w="<< m_texture_w
+        //          << "; useAspectRatio=" << useAspectRatio << std::endl;
     }
     else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
     {
@@ -117,7 +119,8 @@ void IconButtonWidget::add()
         widget_size = rect<s32>(m_x - label_extra_size/2,
                                 m_y + m_h,
                                 m_x + m_w + label_extra_size/2,
-                                m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 : GUIEngine::getFontHeight()));
+                                m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 :
+                                                         GUIEngine::getFontHeight()));
 
         m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                         false, word_wrap, m_parent);
@@ -132,8 +135,9 @@ void IconButtonWidget::add()
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
-/** \precondition At the moment, the new texture must have the same aspct ratio as the previous one since the object will not
-  *               be modified to fit a different aspect ratio
+/** \precondition At the moment, the new texture must have the same aspct ratio
+  *               as the previous one since the object will not be modified
+  *               modified to fit a different aspect ratio
   */
 void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathType)
 {
@@ -163,16 +167,24 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
     m_texture_h = m_texture->getSize().Height;
 }
 // -----------------------------------------------------------------------------
-/** \precondition At the moment, the new texture must have the same aspct ratio as the previous one since the object will not
+/** \precondition At the moment, the new texture must have the same aspct ratio
+ *                as the previous one since the object will not
  *                be modified to fit a different aspect ratio
  */
 void IconButtonWidget::setImage(ITexture* texture)
 {
-    m_texture = texture;
-    assert(m_texture != NULL);
-    
-    m_texture_w = m_texture->getSize().Width;
-    m_texture_h = m_texture->getSize().Height;
+    if (texture != NULL)
+    {
+        m_texture = texture;
+        
+        m_texture_w = m_texture->getSize().Width;
+        m_texture_h = m_texture->getSize().Height;
+    }
+    else
+    {
+        fprintf(stderr, "[IconButtonWidget::setImage] invoked with NULL image pointer\n");
+        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+    }
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabel(stringw new_label)

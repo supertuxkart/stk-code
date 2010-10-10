@@ -930,9 +930,6 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 /** Begins a rendering to a texture.
  *  \param dimension The size of the texture. 
  *  \param name Name of the texture.
- *  \param dont_do_set_render_target This is a fix for the problem that 2d
- *         rendering doesn't work if setRenderTarget is called here, but 3d
- *         rendering doesn't work if it's not called here :(
  */
 IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
                                     const std::string &name)
@@ -942,7 +939,10 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
     m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
                                                                      name.c_str(),
                                                                      video::ECF_A8R8G8B8);
-    m_video_driver->setRenderTarget(m_render_target_texture);
+    if (m_render_target_texture != NULL)
+    {
+        m_video_driver->setRenderTarget(m_render_target_texture);
+    }
     
     m_rtt_main_node = NULL;
     m_camera = NULL;
@@ -1064,10 +1064,15 @@ void IrrDriver::RTTProvider::tearDownRTTScene()
  * Performs the actual render-to-texture
  *  \param target The texture to render the meshes to.
  *  \param angle (Optional) heading for all meshes.
+ *  \return the texture that was rendered to, or NULL if RTT does not work on
+ *          this computer
  */
 ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
                                                   bool is_2d_render)
 {
+    // m_render_target_texture will be NULL if RTT doesn't work on this computer
+    if (m_render_target_texture == NULL) return NULL;
+    
     // Rendering a 2d only model (using direct opengl rendering)
     // does not work if setRenderTarget is called here again.
     // And rendering 3d only works if it is called here :(
