@@ -10,8 +10,8 @@
         <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
             <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
                     I18N="Main menu button" text="Race"/>
-            <icon-button id="network" width="128" height="128" icon="gui/main_network.png"
-                    I18N="Main menu button" text="Networking"/>
+            <icon-button id="network" width="128" height="128" icon="gui/main_options.png"
+                    I18N="Main menu button" text="DEBUG"/>
             <icon-button id="challenges" width="128" height="128"
                          icon="gui/challenge.png"
                          I18N="Main menu button"  text="Challenges"/>
