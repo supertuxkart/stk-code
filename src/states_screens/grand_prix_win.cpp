@@ -22,6 +22,7 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+const float KARTS_DELTA_Y = 0.03f;
 const float INITIAL_Y = -3.0f;
 const float INITIAL_PODIUM_Y = -3.6f;
 const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
@@ -306,12 +307,12 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
             if (m_kart_node[k] != NULL)
             {
                 const float y_target = INITIAL_Y + PODIUM_HEIGHT[k];
-                if (m_kart_y[k] < y_target)
+                if (m_kart_y[k] < y_target + KARTS_DELTA_Y)
                 {
                     m_kart_y[k] += dt*(PODIUM_HEIGHT[k]);
-                    m_kart_node[k]->setPosition(   core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
+                    m_kart_node[k]->setPosition( core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
                     m_podium_step[k]->setPosition( core::vector3df(m_podium_x[k],
-                                                                   INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]),
+                                                                   INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]) - KARTS_DELTA_Y,
                                                                    m_podium_z[k]) );
 
                 }
@@ -411,7 +412,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
             assert(kart_model != NULL);
             
             m_kart_x[n] = m_podium_x[n];
-            m_kart_y[n] = INITIAL_Y;
+            m_kart_y[n] = INITIAL_Y + KARTS_DELTA_Y;
             m_kart_z[n] = -4;
             m_kart_rotation[n] = 0.0f;
             
@@ -421,6 +422,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
                                                          m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             kart_model->setAnimation(KartModel::AF_DEFAULT);
+            kart_model->update(0.0f, 0.0f, (float[]){0.0f, 0.0f, 0.0f, 0.0f});
         }
         else
         {
