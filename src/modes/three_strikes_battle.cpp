@@ -276,7 +276,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
-        btTransform &s = world->getTrack()->getStartTransform(n+1);
+        const btTransform &s = world->getTrack()->getStartTransform(n+1);
         const Vec3 &v=s.getOrigin();
         const float dist_n= fabs(kart_x - v.getX()) +
                             fabs(kart_z - v.getZ());
