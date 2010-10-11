@@ -245,4 +245,19 @@ SFXManager::SFXStatus SFXOpenAL::getStatus()
     }
 }   // getStatus
 
+//-----------------------------------------------------------------------------
+
+void SFXOpenAL::onSoundEnabledBack()
+{
+    if (m_loop)
+    {
+        if (!m_ok) init();
+        if (m_ok)
+        {
+            play();
+            pause();
+        }
+    }
+}
+
 #endif //if HAVE_OGGVORBIS

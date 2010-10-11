@@ -70,7 +70,7 @@ public:
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
     virtual SFXManager::SFXStatus getStatus();
-    virtual void                  onSoundEnabledBack() { if (m_loop) resume(); }
+    virtual void                  onSoundEnabledBack();
     
 };   // SFXOpenAL
 
