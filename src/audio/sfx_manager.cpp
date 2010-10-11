@@ -111,6 +111,12 @@ void SFXManager::soundToggled(const bool on)
             SFXBuffer* buffer = (*i).second;
             buffer->load();
         }
+        
+        resumeAll();
+    }
+    else
+    {
+        pauseAll();
     }
 }
 
@@ -381,10 +387,14 @@ void SFXManager::pauseAll()
 }   // pauseAll
 
 //----------------------------------------------------------------------------
-/** Resumes all paused SFXs.
- */
+/**
+  * Resumes all paused SFXs. If sound is disabled, does nothing.
+  */
 void SFXManager::resumeAll()
 {
+    // ignore unpausing if sound is disabled
+    if (!sfxAllowed()) return;
+    
     for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
         i!=m_all_sfx.end(); i++)
     {
