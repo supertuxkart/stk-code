@@ -292,7 +292,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     }
 
     assert( alIsBuffer(buffer->getBuffer()) );
-    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getRolloff(), buffer->getGain());
+    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain());
     
     // debugging
     /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/

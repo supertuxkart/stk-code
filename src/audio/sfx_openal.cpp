@@ -34,12 +34,12 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float rolloff, float gain) : SFXBase()
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
 {
     m_soundBuffer = buffer;
     m_soundSource = 0;
     m_ok          = false;
-    m_positional  = false;
+    m_positional  = positional;
     m_defaultGain = gain;
 
     // Don't initialise anything else if the sfx manager was not correctly

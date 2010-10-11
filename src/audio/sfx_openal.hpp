@@ -42,7 +42,7 @@ private:
     bool         m_positional;
     float        m_defaultGain;
 public:
-                                  SFXOpenAL(SFXBuffer* buffer, bool positional, float rolloff, float gain);
+                                  SFXOpenAL(SFXBuffer* buffer, bool positional, float gain);
     virtual                      ~SFXOpenAL();
     
     /** Late creation, if SFX was initially disabled */
