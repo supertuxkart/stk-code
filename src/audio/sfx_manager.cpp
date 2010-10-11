@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "vorbis/codec.h"
-#include <vorbis/vorbisfile.h>
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -86,13 +84,16 @@ SFXManager::~SFXManager()
     
     // ---- clear m_all_sfx_types
     {
-        std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.begin();
+        std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.begin();
         for (; i != m_all_sfx_types.end(); i++)
         {
-            (*i).second.freeBuffer();
+            SFXBuffer* buffer = (*i).second;
+            buffer->unload();
+            delete buffer;
         }
         m_all_sfx_types.clear();
     }
+    m_all_sfx_types.clear();
     
     sfx_manager = NULL;
 }   // ~SFXManager
@@ -136,77 +137,6 @@ void SFXManager::loadSfx()
     
     delete root;
    }   // loadSfx
-
-//----------------------------------------------------------------------------
-/** Load a vorbis file into an OpenAL buffer
- *  based on a routine by Peter Mulholland, used with permission (quote : 
- *  "Feel free to use")
- */
-bool SFXManager::loadVorbisBuffer(const std::string &name, ALuint buffer)
-{
-    const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
-
-    
-    bool success = false;
-    FILE *file;
-    vorbis_info *info;
-    OggVorbis_File oggFile;
-    
-    if (alIsBuffer(buffer) == AL_FALSE)
-    {
-        printf("Error, bad OpenAL buffer");
-        return false;
-    }
-    
-    file = fopen(name.c_str(), "rb");
-    
-    if(!file)
-    {
-        printf("LoadVorbisBuffer() - couldn't open file!");
-	return false;
-    }
-
-    if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
-    {
-        fclose(file);
-        printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
-	return false;
-    }
-
-    info = ov_info(&oggFile, -1);
-    
-    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
-    
-    char *data = (char *) malloc(len);
-    if(!data)
-    {
-        ov_clear(&oggFile);
-        printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
-	return false;
-    }
-
-    int bs = -1;
-    long todo = len;
-    char *bufpt = data;
-    
-    while (todo)
-    {
-        int read = ov_read(&oggFile, bufpt, todo, ogg_endianness, 2, 1, &bs);
-        todo -= read;
-        bufpt += read;
-    }
-    
-    alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 
-                                               : AL_FORMAT_STEREO16,
-                  data, len, info->rate);
-    success = true;
-    
-    free(data);
-    
-    ov_clear(&oggFile);
-
-    return success;
-}
 
 // -----------------------------------------------------------------------------
 /*
@@ -258,41 +188,22 @@ bool SFXManager::addSingleSfx(const std::string &sfx_name,
                               float              gain)
 {
 
-    SFXBufferInfo sfx_info;
-    sfx_info.m_rolloff    = rolloff;
-    sfx_info.m_positional = positional;
-    sfx_info.m_gain       = gain;
+    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, gain);
     
-    if(!m_initialized) 
+    m_all_sfx_types[sfx_name] = buffer;
+    
+    if (!m_initialized) 
     {
-        // Even if not initialised store the (useless) data in the mapping to
-        // avoid later warnings/errors.
-        m_all_sfx_types[sfx_name] = sfx_info;
+        // Keep the buffer even if SFX is disabled, in case
+        // SFX is enabled back later
         return false;
     }
 
-    if(UserConfigParams::m_verbosity>=5) 
+    if (UserConfigParams::m_verbosity>=5) 
         printf("Loading SFX %s\n", sfx_file.c_str());
     
-    alGetError(); // clear errors from previously
+    return buffer->load();
     
-    alGenBuffers(1, &sfx_info.m_buffer);
-    if (!checkError("generating a buffer"))
-    {
-        return false;
-    }
-
-    assert( alIsBuffer(sfx_info.m_buffer) );
-
-    if (!loadVorbisBuffer(sfx_file, sfx_info.m_buffer))
-    {
-        fprintf(stderr, "Could not load sound effect %s\n", sfx_file.c_str());
-        return false;
-    }
-    
-    m_all_sfx_types[sfx_name] = sfx_info;
-    
-    return true;
 } // addSingleSFX
 
 //----------------------------------------------------------------------------
@@ -326,26 +237,17 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
         return;
     }
 
-    SFXBufferInfo sfx_info;
-    node->get("rolloff",     &sfx_info.m_rolloff     );
-    node->get("positional",  &sfx_info.m_positional  );
-    node->get("volume",      &sfx_info.m_gain        );
-
     // Only use the filename if no full path is specified. This is used
     // to load terrain specific sfx.
-    const std::string full_path = (path=="") ? file_manager->getSFXFile(filename)
-                                             : path;
-    addSingleSfx(sfx_name, full_path, sfx_info.m_positional, sfx_info.m_rolloff,
-                 sfx_info.m_gain);
-
-    /*
-    std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.begin();
-    for (; i != m_all_sfx_types.end(); i++ )
-    {
-        printf("    got '%s', buffer is %i\n", i->first.c_str(), i->second.m_sfx_buffer);
-    }
-     */
+    const std::string full_path = (path == "") ? file_manager->getSFXFile(filename)
+                                               : path;
     
+    SFXBuffer tmpbuffer(full_path, node);
+
+    addSingleSfx(sfx_name, full_path,
+                 tmpbuffer.isPositional(),
+                 tmpbuffer.getRolloff(),
+                 tmpbuffer.getGain());
     
 }   // loadSingleSfx
 
@@ -356,19 +258,18 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info, 
+SFXBase* SFXManager::createSoundSource(const SFXBuffer& info, 
                                        const bool add_to_SFX_list)
 {
     bool positional = false;
 
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        positional = info.m_positional;
+        positional = info.isPositional();
     }
 
-    assert( alIsBuffer(info.m_buffer) );
-
-    SFXBase* sfx = new SFXOpenAL(info.m_buffer, positional, info.m_rolloff, info.m_gain);
+    assert( alIsBuffer(info.getBuffer()) );
+    SFXBase* sfx = new SFXOpenAL(info.getBuffer(), positional, info.getRolloff(), info.getGain());
     
     // debugging
     /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
@@ -384,22 +285,14 @@ SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info,
 SFXBase* SFXManager::createSoundSource(const std::string &name, 
                                        const bool addToSFXList)
 {
-    std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.find(name);
+    std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
         fprintf( stderr, "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
-        
-        /*
-        std::map<std::string, SFXBufferInfo>::iterator it = m_all_sfx_types.begin();
-        for (; it != m_all_sfx_types.end(); it++ )
-        {
-            printf("    got '%s'\n", it->first.c_str());
-        }*/
-        
         return NULL;
     }
     
-    return createSoundSource( i->second, addToSFXList );
+    return createSoundSource( *(i->second), addToSFXList );
 }  // createSoundSource
 
 //----------------------------------------------------------------------------
@@ -418,15 +311,15 @@ bool SFXManager::soundExist(const std::string &name)
  */
 void SFXManager::deleteSFXMapping(const std::string &name)
 {
-    std::map<std::string, SFXBufferInfo>::iterator i;
+    std::map<std::string, SFXBuffer*>::iterator i;
     i = m_all_sfx_types.find(name);
 
-    if(i==m_all_sfx_types.end())
+    if (i == m_all_sfx_types.end())
     {
         fprintf(stderr, "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
         return;
     }
-    (*i).second.freeBuffer();
+    (*i).second->unload();
     
     m_all_sfx_types.erase(i);
 

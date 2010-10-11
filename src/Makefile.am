@@ -30,6 +30,8 @@ supertuxkart_SOURCES = \
  audio/music_ogg.cpp \
  audio/music_ogg.hpp \
  audio/sfx_base.hpp \
+ audio/sfx_buffer.cpp \
+ audio/sfx_buffer.hpp \
  audio/sfx_openal.cpp \
  audio/sfx_openal.hpp \
  audio/sfx_manager.cpp \

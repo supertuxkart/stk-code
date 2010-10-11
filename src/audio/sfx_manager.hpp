@@ -20,6 +20,8 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include "audio/sfx_buffer.hpp"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -74,39 +76,9 @@ public:
 
 private:        
     
-    class SFXBufferInfo
-    {
-    private:
-    public:
-        ALuint   m_buffer;
-        bool     m_positional;
-        float    m_rolloff;
-        float    m_gain;
-        
-        SFXBufferInfo()
-        {
-            m_buffer     = 0;
-            m_gain       = 1.0f;
-            m_rolloff    = 0.1f;
-            m_positional = false;
-        }
-
-        
-        /** Cannot appear in destructor because copy-constructors may be used,
-          * and the OpenAL source must not be deleted on a copy */
-        void freeBuffer()
-        {
-            alDeleteBuffers(1, &m_buffer);
-            m_buffer = 0;
-        }
-        ~SFXBufferInfo()
-        {
-        }
-    };
-    
     /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
-    std::map<std::string, SFXBufferInfo> m_all_sfx_types;
+    std::map<std::string, SFXBuffer*> m_all_sfx_types;
     
     /** The actual instances (sound sources) */
     std::vector<SFXBase*> m_all_sfx;
@@ -136,7 +108,7 @@ public:
                                           float              rolloff,
                                           float              gain);
 
-    SFXBase*                 createSoundSource(const SFXBufferInfo& info, 
+    SFXBase*                 createSoundSource(const SFXBuffer& info, 
                                                const bool addToSFXList=true);
     SFXBase*                 createSoundSource(const std::string &name, 
                                                const bool addToSFXList=true);

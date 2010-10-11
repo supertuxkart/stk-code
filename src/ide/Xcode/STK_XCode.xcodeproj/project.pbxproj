@@ -14,6 +14,7 @@
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
 		950D448C118DEE3C006CFC41 /* CGUISpriteBank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950D448A118DEE3C006CFC41 /* CGUISpriteBank.cpp */; };
 		950D45D1118E040E006CFC41 /* options_screen_input2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950D45CF118E040E006CFC41 /* options_screen_input2.cpp */; };
+		9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9516B07C12629C4E005F9493 /* sfx_buffer.cpp */; };
 		951B7D19108E52C900BC03AE /* challenges.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951B7D18108E52C900BC03AE /* challenges.cpp */; };
 		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
 		9522F125107948AD0067ECF5 /* main_menu_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F124107948AD0067ECF5 /* main_menu_screen.cpp */; };
@@ -333,6 +334,8 @@
 		950D448B118DEE3C006CFC41 /* CGUISpriteBank.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CGUISpriteBank.h; path = ../../guiengine/CGUISpriteBank.h; sourceTree = SOURCE_ROOT; };
 		950D45CF118E040E006CFC41 /* options_screen_input2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_input2.cpp; path = ../../states_screens/options_screen_input2.cpp; sourceTree = SOURCE_ROOT; };
 		950D45D0118E040E006CFC41 /* options_screen_input2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_input2.hpp; path = ../../states_screens/options_screen_input2.hpp; sourceTree = SOURCE_ROOT; };
+		9516B07C12629C4E005F9493 /* sfx_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sfx_buffer.cpp; path = ../../audio/sfx_buffer.cpp; sourceTree = SOURCE_ROOT; };
+		9516B07D12629C4E005F9493 /* sfx_buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sfx_buffer.hpp; path = ../../audio/sfx_buffer.hpp; sourceTree = SOURCE_ROOT; };
 		951B7D17108E52C900BC03AE /* challenges.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenges.hpp; path = ../../states_screens/challenges.hpp; sourceTree = SOURCE_ROOT; };
 		951B7D18108E52C900BC03AE /* challenges.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges.cpp; path = ../../states_screens/challenges.cpp; sourceTree = SOURCE_ROOT; };
 		951BC65C0FFAF290006B5FF1 /* ipo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipo.cpp; path = ../../animations/ipo.cpp; sourceTree = SOURCE_ROOT; };
@@ -1476,6 +1479,8 @@
 				95C2AC2A0F296540000D3E5D /* music_ogg.cpp */,
 				95C2AC2B0F296540000D3E5D /* music_ogg.hpp */,
 				95C2AC2C0F296540000D3E5D /* sfx_base.hpp */,
+				9516B07C12629C4E005F9493 /* sfx_buffer.cpp */,
+				9516B07D12629C4E005F9493 /* sfx_buffer.hpp */,
 				95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */,
 				95C2AC2E0F296540000D3E5D /* sfx_manager.hpp */,
 				95C2AC2F0F296540000D3E5D /* sfx_openal.cpp */,
@@ -2673,6 +2678,7 @@
 				954378D51238493C00F57707 /* confirm_dialog.cpp in Sources */,
 				95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */,
 				95251F3D12554AB200505BA5 /* check_lap.cpp in Sources */,
+				9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
