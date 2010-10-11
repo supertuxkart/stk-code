@@ -113,6 +113,12 @@ void SFXManager::soundToggled(const bool on)
         }
         
         resumeAll();
+        
+        const int sfx_amount = m_all_sfx.size();
+        for (int n=0; n<sfx_amount; n++)
+        {
+            m_all_sfx[n]->onSoundEnabledBack();
+        }
     }
     else
     {

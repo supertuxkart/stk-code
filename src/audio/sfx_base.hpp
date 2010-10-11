@@ -57,6 +57,7 @@ public:
     virtual void       volume(float gain)   = 0;
     virtual SFXManager::SFXStatus  
                        getStatus()          = 0;
+    virtual void       onSoundEnabledBack() = 0;
 };   // SfxBase
 
 

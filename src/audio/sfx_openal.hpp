@@ -36,11 +36,24 @@
 class SFXOpenAL : public SFXBase
 {
 private:
-    SFXBuffer*   m_soundBuffer;   // Buffers hold sound data.
-    ALuint       m_soundSource;   // Sources are points emitting sound.
+    SFXBuffer*   m_soundBuffer;   //!< Buffers hold sound data.
+    ALuint       m_soundSource;   //!< Sources are points emitting sound.
     bool         m_ok;
     bool         m_positional;
     float        m_defaultGain;
+    
+    /** The OpenAL source contains this info, but if audio is disabled initially then
+        the sound source won't be created and we'll be left with no clue when enabling
+        sounds later */
+    bool m_loop;
+    
+    /** Contains a volume if set through the "volume" method, or a negative number if
+     this method was not called.
+     The OpenAL source contains this info, but if audio is disabled initially then
+     the sound source won't be created and we'll be left with no clue when enabling
+     sounds later. */
+    float m_gain;
+    
 public:
                                   SFXOpenAL(SFXBuffer* buffer, bool positional, float gain);
     virtual                      ~SFXOpenAL();
@@ -57,6 +70,7 @@ public:
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
     virtual SFXManager::SFXStatus getStatus();
+    virtual void                  onSoundEnabledBack() { if (m_loop) resume(); }
     
 };   // SFXOpenAL
 

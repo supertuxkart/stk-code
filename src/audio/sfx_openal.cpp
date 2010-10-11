@@ -41,7 +41,9 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
     m_ok          = false;
     m_positional  = positional;
     m_defaultGain = gain;
-
+    m_loop        = false;
+    m_gain        = -1.0f;
+    
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
     // will not be used anyway.
@@ -55,7 +57,10 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
 
 SFXOpenAL::~SFXOpenAL()
 {
-    alDeleteSources(1, &m_soundSource);
+    if (m_ok)
+    {
+        alDeleteSources(1, &m_soundSource);
+    }
 }   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
@@ -79,11 +84,20 @@ bool SFXOpenAL::init()
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
-    alSourcef (m_soundSource, AL_GAIN,            m_defaultGain);
     
+    if (m_gain < 0.0f)
+    {
+        alSourcef (m_soundSource, AL_GAIN,        m_defaultGain);
+    }
+    else
+    {
+        alSourcef (m_soundSource, AL_GAIN,        m_gain);
+    }
     
     if (m_positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
     else              alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
+    
+    alSourcei(m_soundSource, AL_LOOPING, m_loop ? AL_TRUE : AL_FALSE);
     
     m_ok = SFXManager::checkError("setting up the source");
     
@@ -117,6 +131,8 @@ void SFXOpenAL::speed(float factor)
  */
 void SFXOpenAL::volume(float gain)
 {
+    m_gain = m_defaultGain * gain;
+    
     if(!m_ok) return;
 
     alSourcef(m_soundSource, AL_GAIN, m_defaultGain * gain);
@@ -128,6 +144,8 @@ void SFXOpenAL::volume(float gain)
  */
 void SFXOpenAL::setLoop(bool status)
 {
+    m_loop = status;
+    
     if(!m_ok) return;
 
     alSourcei(m_soundSource, AL_LOOPING, status ? AL_TRUE : AL_FALSE);
@@ -141,6 +159,7 @@ void SFXOpenAL::stop()
 {
     if(!m_ok) return;
 
+    m_loop = false;
     alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
     alSourceStop(m_soundSource);
     SFXManager::checkError("stoping");
@@ -162,8 +181,15 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::resume()
 {
-    if(!m_ok) return;
-
+    if (!m_ok)
+    {
+        // lazily create OpenAL source when needed
+        init();
+        
+        // creation of OpenAL source failed, giving up
+        if (!m_ok) return;
+    }
+    
     alSourcePlay(m_soundSource);
     SFXManager::checkError("resuming");
 }   // resume

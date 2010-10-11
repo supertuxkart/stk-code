@@ -93,6 +93,8 @@ public:
     bool     isPositional() const { return m_positional; }
     float    getRolloff() const { return m_rolloff; }
     float    getGain() const { return m_gain; }
+    
+    std::string getFileName() const { return m_file; }
 
 };
 
