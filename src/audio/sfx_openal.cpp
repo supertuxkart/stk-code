@@ -254,8 +254,10 @@ void SFXOpenAL::onSoundEnabledBack()
         if (!m_ok) init();
         if (m_ok)
         {
+            alSourcef(m_soundSource, AL_GAIN, 0);
             play();
             pause();
+            alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain));
         }
     }
 }

@@ -146,6 +146,25 @@ protected:
      */
     virtual float   estimateFinishTimeForKart(Kart* kart) {return getTime(); }
 
+    /** Pausing/unpausing are not done immediately, but at next udpdate. The use of
+        this is when switching between screens : if we leave a screen that paused the
+        game, only to go to another screen that pauses back the game, this mechanism
+        prevents the game from moving on between the switch
+       */
+    bool m_schedule_pause;
+    
+    /** Pausing/unpausing are not done immediately, but at next udpdate. The use of
+     this is when switching between screens : if we leave a screen that paused the
+     game, only to go to another screen that pauses back the game, this mechanism
+     prevents the game from moving on between the switch
+     */
+    bool m_schedule_unpause;
+    
+    Phase m_scheduled_pause_phase;
+    
+    void  doPause(Phase phase);
+    void  doUnpause();
+    
 public:
                     World();
     virtual        ~World();

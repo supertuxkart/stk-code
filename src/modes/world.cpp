@@ -83,6 +83,8 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_use_highscores    = true;
     m_track             = NULL;
     m_clear_back_buffer = false;
+    m_schedule_pause    = false;
+    m_schedule_unpause  = false;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
@@ -397,6 +399,32 @@ void World::resetAllKarts()
             m_karts[i]->getCamera()->setInitialTransform();
 }   // resetAllKarts
 
+
+void World::pause(Phase phase)
+{
+    if (m_schedule_unpause)
+    {
+        m_schedule_unpause = false;
+    }
+    else
+    {
+        m_schedule_pause = true;
+        m_scheduled_pause_phase = phase;
+    }
+}
+
+void World::unpause()
+{
+    if (m_schedule_pause)
+    {
+        m_schedule_pause = false;
+    }
+    else
+    {
+        m_schedule_unpause = true;
+    }
+}
+
 //-----------------------------------------------------------------------------
 /** This is the main interface to update the world. This function calls
  *  update(), and checks then for the end of the race. Note that race over 
@@ -409,6 +437,17 @@ void World::resetAllKarts()
  */
 void World::updateWorld(float dt)
 {
+    if (m_schedule_pause)
+    {
+        doPause(m_scheduled_pause_phase);
+        m_schedule_pause = false;
+    }
+    else if (m_schedule_unpause)
+    {
+        doUnpause();
+        m_schedule_unpause = false;
+    }
+    
     // Don't update world if a menu is shown or the race is over.
     if( m_phase == FINISH_PHASE         ||
         m_phase == IN_GAME_MENU_PHASE      )  
@@ -690,7 +729,7 @@ void World::restartRace()
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).
  */
-void  World::pause(Phase phase)
+void World::doPause(Phase phase)
 {
     music_manager->pauseMusic();
     sfx_manager->pauseAll();
@@ -698,7 +737,7 @@ void  World::pause(Phase phase)
 }   // pause
 
 //-----------------------------------------------------------------------------
-void World::unpause()
+void World::doUnpause()
 {
     music_manager->resumeMusic() ;
     sfx_manager->resumeAll();
