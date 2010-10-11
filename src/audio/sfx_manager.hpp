@@ -126,6 +126,9 @@ public:
     
     void                     positionListener(const Vec3 &position, const Vec3 &front);
     void                     quickSound(const std::string &soundName);
+    
+    /** Called when sound was muted/unmuted */
+    void                     soundToggled(const bool newValue);
 
 };
 

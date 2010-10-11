@@ -144,6 +144,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
         
         UserConfigParams::m_sfx = w->getState();
+        sfx_manager->soundToggled(UserConfigParams::m_sfx);
     }
 }   // eventCallback
 

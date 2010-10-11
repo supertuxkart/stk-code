@@ -73,6 +73,8 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 bool SFXBuffer::load()
 {
+    if (m_loaded) return false;
+    
     alGetError(); // clear errors from previously
     
     alGenBuffers(1, &m_buffer);

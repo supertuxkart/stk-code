@@ -71,7 +71,8 @@ public:
     }
     
     /**
-      * \brief load the buffer from file into OpenAL
+      * \brief load the buffer from file into OpenAL.
+      * \note If this buffer is already loaded, this call does nothing and returns false
       * \return whether loading was successful
       */
     bool     load();

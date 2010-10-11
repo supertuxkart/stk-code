@@ -99,6 +99,23 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
+
+void SFXManager::soundToggled(const bool on)
+{
+    // When activating SFX, load all buffers
+    if (on)
+    {
+        std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.begin();
+        for (; i != m_all_sfx_types.end(); i++)
+        {
+            SFXBuffer* buffer = (*i).second;
+            buffer->load();
+        }
+    }
+}
+
+//----------------------------------------------------------------------------
+
 bool SFXManager::sfxAllowed()
 {
     if(!UserConfigParams::m_sfx || !m_initialized) 
