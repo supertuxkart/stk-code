@@ -43,6 +43,10 @@ class SFXBase : public NoCopy
 {
 public:
     virtual           ~SFXBase()                       {}
+    
+    /** Late creation, if SFX was initially disabled */
+    virtual bool       init() = 0;
+    
     virtual void       position(const Vec3 &position) = 0;
     virtual void       setLoop(bool status) = 0;
     virtual void       play()               = 0;

@@ -258,18 +258,18 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase* SFXManager::createSoundSource(const SFXBuffer& info, 
+SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer, 
                                        const bool add_to_SFX_list)
 {
     bool positional = false;
 
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        positional = info.isPositional();
+        positional = buffer->isPositional();
     }
 
-    assert( alIsBuffer(info.getBuffer()) );
-    SFXBase* sfx = new SFXOpenAL(info.getBuffer(), positional, info.getRolloff(), info.getGain());
+    assert( alIsBuffer(buffer->getBuffer()) );
+    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getRolloff(), buffer->getGain());
     
     // debugging
     /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
@@ -292,7 +292,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
         return NULL;
     }
     
-    return createSoundSource( *(i->second), addToSFXList );
+    return createSoundSource( i->second, addToSFXList );
 }  // createSoundSource
 
 //----------------------------------------------------------------------------

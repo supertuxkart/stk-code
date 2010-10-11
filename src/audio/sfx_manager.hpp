@@ -108,7 +108,7 @@ public:
                                           float              rolloff,
                                           float              gain);
 
-    SFXBase*                 createSoundSource(const SFXBuffer& info, 
+    SFXBase*                 createSoundSource(SFXBuffer* info, 
                                                const bool addToSFXList=true);
     SFXBase*                 createSoundSource(const std::string &name, 
                                                const bool addToSFXList=true);
