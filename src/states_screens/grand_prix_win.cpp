@@ -421,7 +421,8 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
                                                          m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             kart_model->setAnimation(KartModel::AF_DEFAULT);
-            kart_model->update(0.0f, 0.0f, (float[]){0.0f, 0.0f, 0.0f, 0.0f});
+            float susp[4]={0,0,0,0};
+            kart_model->update(0.0f, 0.0f, susp);
         }
         else
         {
