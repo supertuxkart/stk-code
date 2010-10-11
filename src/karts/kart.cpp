@@ -1149,6 +1149,13 @@ void Kart::updatePhysics(float dt)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
 
+        // FIXME: horrible hack. A small acceleration value will cause the engine power to
+        // be reduced (for the end controller)
+        if (fabsf(m_controls.m_accel) < 1.0f)
+        {
+            engine_power *= fabsf(m_controls.m_accel);
+        }
+        
         // Engine slow down due to terrain (see m_power_reduction is set in
         // update() depending on terrain type. Don't apply this if kart is already
         // going slowly, this would make it hard accelerating to get out of there

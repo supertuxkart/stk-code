@@ -143,7 +143,7 @@ void EndController::update(float dt)
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
     m_controls->m_brake     = false;
-    m_controls->m_accel     = 1.0f;
+    m_controls->m_accel     = 0.3f;
 
     // Update the current node:
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
