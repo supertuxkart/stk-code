@@ -23,7 +23,19 @@
         max-distance="25"                               />
 
   <!-- Distribution of the items depending on position of the 
-       kart. The order must correspond to powerup_manager.hpp -->
+       kart (first kart, top 33%, middle 33%, bottom 33% (but
+       not last), last kart. i
+       The order of items must correspond to powerup_manager.hpp.
+       The first line (w=...) corresponds to the weights of 
+       getting a single item, the second line (w-multi) to 
+       getting three identical items instead of just a single one.
+       E.g. as the first kart, you have 3/8 of a chance to get
+       a single bubble gum, 1/8 to get a bowling ball or switch,
+       and 3/8 to get a triple bubble gum.
+       'Global' items which affect all karts (switch) should
+       be quite rare, since otherwise the item might be used
+       too often (compared with many items which will only
+       affect a karts or two).                                -->
   <!--      bubble cake bowl zipper plunger switch para anvil -->
   <first  w="3      0    1    0      0       1      0    0"
     w-multi="3      0    0    0      0       0      0    0"    />
