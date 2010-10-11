@@ -19,6 +19,8 @@
 
 #include "tracks/quad_graph.hpp"
 
+#include "LinearMath/btTransform.h"
+
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -176,6 +178,78 @@ void QuadGraph::setDefaultSuccessors()
 }   // setDefaultSuccessors
 
 // -----------------------------------------------------------------------------
+/** Sets all start positions depending on the quad graph. The number of 
+ *  entries needed is defined by the size of the start_transform (though all
+ *  entries will be overwritten).
+ *  E.g. the karts will be placed as:
+ *   1           \
+ *     2          +--  row with three karts, each kart is 'sidewards_distance'
+ *       3       /     to the right of the previous kart, and 
+ *   4                 'forwards_distance' behind the previous kart.
+ *     5               The next row starts again with the kart being
+ *       6             'forwards_distance' behind the end of the previous row.
+ *  etc.
+ *  \param start_transforms A vector sized to the needed number of start 
+ *               positions. The values will all be overwritten with the 
+ *               default start positions.
+ *  \param karts_per_row How many karts to place in each row.
+ *  \param forwards_distance Distance in forward (Z) direction between 
+ *               each kart.
+ *  \param sidewards_distance Distance in sidewards (X) direction between 
+ *               karts.
+ */
+void QuadGraph::setDefaultStartPositions(std::vector<btTransform> 
+                                                       *start_transforms,
+                                         unsigned int karts_per_row,
+                                         float forwards_distance,
+                                         float sidewards_distance,
+                                         float upwards_distance) const
+{
+    // Node 0 is always the node on which the start line is.
+    int current_node          = getPredecessor(0);
+    int placed_karts_in_row   = 0;
+    float distance_from_start = 0.0f;
+
+    // Maximum distance to left (or right) of centre line
+    const float max_x_dist    = (karts_per_row-1)*0.5f*sidewards_distance;
+    // X position relative to the centre line
+    float x_pos               = -max_x_dist;
+
+    for(unsigned int i=0; i<start_transforms->size(); i++)
+    {
+        // First find on which segment we have to start
+        while(distance_from_start > getNode(current_node).getDistanceToSuccessor(0))
+        {
+            distance_from_start -= getNode(current_node).getDistanceToSuccessor(0);
+            current_node = getPredecessor(current_node);
+        }
+        const GraphNode &gn   = getNode(current_node);
+        const Quad      &quad = m_all_quads->getQuad(gn.getIndex());
+        Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
+        center_line.normalize();
+
+        Vec3 horizontal_line = gn[3] - gn[2];
+        horizontal_line.normalize();
+       
+        Vec3 start = gn.getUpperCenter()
+                   + center_line     * distance_from_start 
+                   + horizontal_line * x_pos;
+        // Add a certain epsilon to the height in case that the
+        // drivelines are beneath the track.
+        (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
+        (*start_transforms)[i].setRotation(
+            btQuaternion(btVector3(0, 1, 0), 
+                         gn.getAngleToSuccessor(0)));
+
+        if(fabsf(x_pos - max_x_dist)<0.1f)
+            x_pos  = -max_x_dist;
+        else
+            x_pos += sidewards_distance;
+        distance_from_start += forwards_distance;
+    }   // for i<stk_config->m_max_karts
+}   // setStartPositions
+
+// -----------------------------------------------------------------------------
 /** Creates a mesh for this graph. The mesh is not added to a scene node and 
  *  is stored in m_mesh.
  */
@@ -282,12 +356,36 @@ void QuadGraph::cleanupDebugMesh()
  *  \param node_number The number of the node.
  *  \param succ A vector of ints to which the successors are added.
  */
-void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) const {
-    const GraphNode *v=m_all_nodes[node_number];
-    for(unsigned int i=0; i<v->getNumberOfSuccessors(); i++) {
-        succ.push_back(v->getSuccessor(i));
+void QuadGraph::getSuccessors(int node_number, 
+                              std::vector<unsigned int>& succ) const
+{
+    const GraphNode *gn=m_all_nodes[node_number];
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++) {
+        succ.push_back(gn->getSuccessor(i));
     }
 }   // getSuccessors
+
+//-----------------------------------------------------------------------------
+/** Returns the first predecessor or a node (i.e. the one usually on the main
+ *  driveline).
+ *  \param node_number The number of the node.
+ *  \return The node number of the first predecessor node, or -1 if no
+ *          predecessor was found (and a warning is printed in this case).
+ */
+int QuadGraph::getPredecessor(unsigned int target_node) const
+{
+    for(unsigned int node_id=0; node_id<m_all_nodes.size(); node_id++)
+    {
+        const GraphNode *gn=m_all_nodes[node_id];
+        for(unsigned int i=0; i <gn ->getNumberOfSuccessors(); i++)
+        {
+            if(gn->getSuccessor(i)==target_node)
+                return node_id;
+        }   // for i<gn->getNumberOfSuccessors()
+    }   // node_id<m_all_nodes.size()
+    printf("Warning: no predecessor for node '%d' found.\n", target_node);
+    return -1;
+}   // getPredecessor
 
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL

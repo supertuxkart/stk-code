@@ -53,22 +53,10 @@ private:
     std::string              m_ident;
     std::string              m_screenshot;
     std::vector<MusicInformation*> m_music;
-    /** Start heading of karts (if specified in the scene file). */
-    std::vector<float>       m_start_heading;
 
-    /** Start positions of karts (if specified in the scene file). */
-    std::vector<Vec3>        m_start_positions;
-
-    /** A transform which is applied to the default start coordinates
-     *  (i.e. only if no start coordinates are defined for the track).
-     *  This is used to position the karts in case that the lap counting
-     *  line is not centered around (0,0,0), or rotated. */
-    btTransform              m_start_transform;
-    /** The explicit angle of the lap counting line. This angle can
-     *  not be easily deduced from m_start_transform (problem with the
-     *  sign), so it is saved additionally so that karts can be rotated
-     *  properly if no explicit start positions are given. */
-    float                    m_start_angle;
+    /** Start transforms of karts (either the default, or the ones taken
+     *  from the scene file). */
+    std::vector<btTransform> m_start_transforms;
 
     std::string              m_item_style;
     std::string              m_description;
@@ -121,11 +109,14 @@ private:
     /** If a sky dome is used, the number of horizontal segments 
      *  the sphere should be divided in. */
     int                      m_sky_hori_segments;
+
     /** If a sky dome is used, the number of vertical segments 
      *  the sphere should be divided in. */
     int                      m_sky_vert_segments;
+
     /** If a sky dome is used, percentage of the sphere to be used. */
     float                    m_sky_sphere_percent;
+
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
@@ -213,7 +204,7 @@ public:
     const std::string& getIdent          () const {return m_ident;              }
 
     /** Returns the name of the track, which is e.g. displayed on the screen. */
-    const irr::core::stringw& getName           () const {return m_name;               }
+    const irr::core::stringw& getName           () const {return m_name;        }
 
     /** Returns all groups this track belongs to. */
     const std::vector<std::string>
@@ -225,13 +216,16 @@ public:
     /** Returns the filename of this track. */
     const std::string& getFilename       () const {return m_filename;           }
 
-    //const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     
     /** Returns an absolute path to the screenshot file of this track */
     const std::string& getScreenshotFile () const {return m_screenshot;         }
-    
-    btTransform        getStartTransform (unsigned int pos) const;
+
+    /** Returns the start coordinates for a kart with a given index.
+     *  \param index Index of kart ranging from 0 to kart_num-1. */
+    btTransform        getStartTransform (unsigned int index) const     
+                                              {return m_start_transforms[index];}
+
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
@@ -239,7 +233,6 @@ public:
     void               update(float dt);
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
-    void               setStartCoordinates(const core::line2df& line);
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const
@@ -282,11 +275,7 @@ public:
 
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
-                                           { return m_start_positions.size(); }
-    /** Returns the i-th. start position. */
-    const Vec3 &getStartPosition(unsigned int i) {return m_start_positions[i];}
-    /** Returns the heading of the i-th. start position. */
-    const float getStartHeading(unsigned int i) {return m_start_heading[i]; }
+                                           { return m_start_transforms.size(); }
     
     /** \return the maximum number of karts that this track can sustain without them starting off-track */
     int getMaxKartCount() const { return m_max_kart_count; }

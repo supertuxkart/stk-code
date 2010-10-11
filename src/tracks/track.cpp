@@ -76,11 +76,9 @@ Track::Track(std::string filename)
     m_animation_manager    = NULL;
     m_check_manager        = NULL;
     m_mini_map             = NULL;
-    m_start_angle          = 0;
     m_sky_dx               = 0.05f;
     m_sky_dy               = 0.0f;
     m_max_kart_count       = 8;
-    m_start_transform.setIdentity();
     loadTrackInfo();
 }   // Track
 
@@ -170,63 +168,6 @@ const Vec3& Track::trackToSpatial(const int sector) const
 {
     return m_quad_graph->getQuad(sector).getCenter();
 }   // trackToSpatial
-
-//-----------------------------------------------------------------------------
-/** This function determines the linear transform and rotation for the start
- *  coordinates in order to line up propery behind the specified start line.
- *  The transform and rotation is saved in a matrix and applied to all
- *  start coordinates later on, see getStartTransform().
- *  \param line The start line.
- */
-void Track::setStartCoordinates(const core::line2df& line)
-{
-    core::vector2df start = line.start;
-    core::vector2df end   = line.end;
-
-    m_start_angle = -atan2(end.Y - start.Y,
-                           end.X - start.X);
-    core::vector2df mid   = (start+end)*0.5f;
-    btQuaternion q(Vec3(0, 1, 0), m_start_angle);
-    m_start_transform.setRotation(q);
-    m_start_transform.setOrigin(Vec3(mid.X, 0, mid.Y));
-}   // setStartCoordinates
-
-//-----------------------------------------------------------------------------
-/** Returns the start coordinates for a kart on a given position pos
-    (with pos ranging from 0 to kart_num-1).
-*/
-btTransform Track::getStartTransform(unsigned int pos) const
-{
-    Vec3  orig;
-    float angle;
-    if(pos<m_start_positions.size())
-    {
-        orig  = m_start_positions[pos];
-        angle = 0;
-    }
-    else
-    {
-        // Distance from middle of start line in X direction.
-        // +-X_DIST is used to place the karts left/right
-        const float X_DIST = 1.5f;
-        // Distance from start line in Z direction. 
-        const float Z_DIST_FROM_START = 1.5f;
-        const float Z_DIST            = 1.5f;
-        orig = Vec3( X_DIST * (pos%2==0) ? 1.0f : -1.0f, 
-                      1.0f, 
-                     -Z_DIST*pos-Z_DIST_FROM_START);
-        orig  = m_start_transform(orig);
-        angle = m_start_angle;
-    }
-
-    btTransform start;
-    start.setOrigin(orig);
-    start.setRotation(btQuaternion(btVector3(0, 1, 0), 
-                                   pos<m_start_heading.size() 
-                                   ? DEGREE_TO_RAD*m_start_heading[pos]
-                                   : angle ));
-    return start;
-}   // getStartTransform
 
 //-----------------------------------------------------------------------------
 void Track::loadTrackInfo()
@@ -516,7 +457,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+"/"+model_name;
-//    scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if(!mesh)
     {
@@ -750,11 +690,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
-    // Load the graph only now: this function is called from world, after
-    // the race gui was created. The race gui is needed since it stores
-    // the information about the size of the texture to render the mini
-    // map to.
-    if (!m_is_arena) loadQuadGraph(mode_id);
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
@@ -783,6 +718,35 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+
+    // Load the graph only now: this function is called from world, after
+    // the race gui was created. The race gui is needed since it stores
+    // the information about the size of the texture to render the mini
+    // map to.
+    if (!m_is_arena) loadQuadGraph(mode_id);
+
+    // Set the default start positions. Node that later the default
+    // positions can still be overwritten.
+    float forwards_distance  = 1.5f;
+    float sidewards_distance = 3.0f;
+    float upwards_distance   = 0.1f;
+    int   karts_per_row      = 2;
+
+    const XMLNode *default_start=root->getNode("default-start");
+    if(default_start)
+    {
+        default_start->get("forwards-distance",  &forwards_distance );
+        default_start->get("sidewards-distance", &sidewards_distance);
+        default_start->get("upwards-distance",   &upwards_distance  );
+        default_start->get("karts-per-row",      &karts_per_row     );
+    }
+    m_start_transforms.resize(race_manager->getNumberOfKarts());
+    m_quad_graph->setDefaultStartPositions(&m_start_transforms,
+                                           karts_per_row,
+                                           forwards_distance,
+                                           sidewards_distance,
+                                           upwards_distance);
+
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
@@ -821,12 +785,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if (name=="start")
         {
+            unsigned int position=0;
+            node->get("position", &position);
             Vec3 xyz(0,0,0);
             node->getXYZ(&xyz);
-            m_start_positions.push_back(xyz);
             float h=0;
             node->get("h", &h);
-            m_start_heading.push_back(h);
+            m_start_transforms[position].setOrigin(xyz);
+            m_start_transforms[position].setRotation(
+                                             btQuaternion(btVector3(0,1,0),h ) );
         }
         else if(name=="camera")
         {

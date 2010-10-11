@@ -30,7 +30,6 @@
 
 CheckManager::CheckManager(const XMLNode &node, Track *track)
 {
-    bool lap_line_found = false;
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
         const XMLNode *check_node = node.getNode(i);
@@ -39,14 +38,6 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         {
             CheckLine *cl = new CheckLine(this, *check_node, i);
             m_all_checks.push_back(cl);
-            // Only record the first lap line to be used to compute
-            // start coordinates with. The track exporter always exports
-            // the one based on the quads first.
-            if(cl->getType()==CheckStructure::CT_NEW_LAP && !lap_line_found)
-            {
-                track->setStartCoordinates(cl->getLine2D());
-                lap_line_found = true;
-            }
         }   // checkline
         else if(type=="check-lap")
         {

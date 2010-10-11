@@ -25,9 +25,9 @@
 #include "irrlicht.h"
 
 #include "tracks/quad.hpp"
+#include "tracks/quad_set.hpp"
 #include "utils/vec3.hpp"
 
-class QuadSet;
 class QuadGraph;
 
 /** 
@@ -59,11 +59,14 @@ class GraphNode
 
      /** The center point of the lower two points (e.g. points 0 and 1).
       *  This saves some computations in getDistances later. Only the
-      *  start point is needed, and only in 2d.
-      *  FIXME: this should be set depending on orientation, e.g. a quad 
-      *  might be driven on from the left to the right (esp. if a quad is 
-      *  used more than once). */
-     core::vector2df m_lower_center;
+      *  start point is needed, and only in 2d. */
+     core::vector2df m_lower_center_2d;
+
+     /** Lower center point of the graph node. */
+     Vec3 m_lower_center;
+
+     /** Upper center point of the graph node. */
+     Vec3 m_upper_center;
 
      /** Line between lower and upper center, saves computation in 
       *  getDistanceFromLine() later. The line is 2d only since otherwise
@@ -87,33 +90,43 @@ public:
     /** Returns the i-th successor. */
     unsigned int getSuccessor(unsigned int i)  const 
                                { return m_vertices[i];                   }
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of successors. */
     unsigned int getNumberOfSuccessors() const 
                                { return (unsigned int)m_vertices.size(); }
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the index in the quad_set of this node. */
     int          getIndex() const { return m_index;                     }
 
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Returns the i-th. point of a quad. ATM this just returns the vertices
+     *  from the quads, but if necessary this method will also consider 
+     *  rotated quads. So index 0 will always be lower left point, then 
+     *  counterclockwise. */
+    const Vec3& operator[](int i) const 
+                                    {return m_all_quads->getQuad(m_index)[i];}
+    // ------------------------------------------------------------------------
     /** Returns the distance to the j-th. successor. */
     float        getDistanceToSuccessor(unsigned int j) const
                                { return m_distance_to_next[j];           }
 
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the angle from this node to the j-th. successor. */
     float        getAngleToSuccessor(unsigned int j) const
                                { return m_angle_to_next[j];              }
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the distance from start. */
     float        getDistanceFromStart() const  
                                { return m_distance_from_start;           }
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the width of the part for this quad. */
     float        getPathWidth() const  { return m_width;                 }
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the center point of the lower edge of this graph node. */
-    const core::vector2df& getLowerCenter() const {return m_lower_center;}
+    const Vec3& getLowerCenter() const {return m_lower_center;}
+    // ------------------------------------------------------------------------
+    /** Returns the center point of the upper edge of this graph node. */
+    const Vec3& getUpperCenter() const {return m_upper_center;}
 };   // GraphNode
 
 #endif

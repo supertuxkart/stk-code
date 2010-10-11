@@ -132,14 +132,13 @@ void World::init()
 
     for(unsigned int i=0; i<num_karts; i++)
     {
-        btTransform init_pos=m_track->getStartTransform(i);
         const std::string& kart_ident = 
              history->replayHistory() ? history->getKartIdent(i)
                                       : race_manager->getKartIdent(i);
         int local_player_id           = race_manager->getKartLocalPlayerId(i);
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
         Kart* newkart = createKart(kart_ident, i, local_player_id,  
-                                   global_player_id, init_pos);
+                                   global_player_id);
         m_karts.push_back(newkart);
         newkart->setWorldKartId(m_karts.size()-1);
         m_track->adjustForFog(newkart->getNode());
@@ -169,13 +168,12 @@ void World::init()
  *         this player on the local machine.
  *  \param global_player_id If the kart is a player kart this is the index of
  *         this player globally (i.e. including network players).
- *  \param init_pos The start transform (xyz and hpr).
  */
 Kart *World::createKart(const std::string &kart_ident, int index,
-                        int local_player_id, int global_player_id,
-                        const btTransform &init_pos)
+                        int local_player_id, int global_player_id)
 {
     int position           = index+1;
+    btTransform init_pos   = m_track->getStartTransform(index);
     Kart *new_kart         = new Kart(kart_ident, position, init_pos);
     Controller *controller = NULL;
     switch(race_manager->getKartType(index))

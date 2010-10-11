@@ -276,24 +276,22 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
-        const Vec3 &v=world->getTrack()->getStartPosition(n);
+        btTransform &s = world->getTrack()->getStartTransform(n+1);
+        const Vec3 &v=s.getOrigin();
         const float dist_n= fabs(kart_x - v.getX()) +
                             fabs(kart_z - v.getZ());
         if(dist_n < smallest_distance_found || closest_id_found == -1)
         {
-            closest_id_found = n;
+            closest_id_found        = n+1;
             smallest_distance_found = dist_n;
         }
     }
     
     assert(closest_id_found != -1);
-    const Vec3 &v=world->getTrack()->getStartPosition(closest_id_found);
-    kart->setXYZ( Vec3(v) );
-    
-    // FIXME - implement correct heading
-    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f), 
-                         world->getTrack()->getStartHeading(closest_id_found));
-    kart->setRotation(heading);
+    const btTransform &s = world->getTrack()->getStartTransform(closest_id_found);
+    const Vec3 &xyz = s.getOrigin();
+    kart->setXYZ(xyz);
+    kart->setRotation(s.getRotation());
 
     //position kart from same height as in World::resetAllKarts
     btTransform pos;

@@ -62,6 +62,7 @@ private:
     void setDefaultSuccessors();
     void load         (const std::string &filename);
     void createMesh(bool show_invisible=true);
+    int  getPredecessor(unsigned int target_node) const;
 public:
     static const int UNKNOWN_SECTOR;
 
@@ -70,7 +71,7 @@ public:
                 ~QuadGraph     ();
     void         createDebugMesh();
     void         cleanupDebugMesh();
-    void         getSuccessors(int quadNumber, 
+    void         getSuccessors(int node_number, 
                                std::vector<unsigned int>& succ) const;
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz, 
                                 const int sector)               const;
@@ -80,6 +81,12 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
+    void         setDefaultStartPositions(std::vector<btTransform> 
+                                                       *start_transforms,
+                                         unsigned int karts_per_row,
+                                         float forwards_distance=1.5f,
+                                         float sidewards_distance=1.5f,
+                                         float upwards_distance=0.0f) const;
     video::ITexture *makeMiniMap(const core::dimension2du &where,
                                  const std::string &name, 
                                  const video::SColor &fill_color
