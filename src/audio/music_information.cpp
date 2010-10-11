@@ -45,6 +45,8 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     m_gain            = 1.0f;
     m_adjusted_gain   = 1.0f;
 
+    assert(filename.size() > 0);
+    
     if (StringUtils::getExtension(filename) != "music")
     {
         // Create information just from ogg file
@@ -110,6 +112,8 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     {
         m_fast_filename = path + "/" + m_fast_filename;
     }
+    
+    assert(m_normal_filename.size() > 0);
 
 }   // MusicInformation
 

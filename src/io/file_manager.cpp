@@ -571,7 +571,11 @@ std::string FileManager::getLogFile(const std::string& fname) const
 std::string FileManager::getMusicFile(const std::string& fname) const
 {
     std::string path;
-    findFile(path, fname, m_music_search_path);
+    const bool success = findFile(path, fname, m_music_search_path);
+    if (!success)
+    {
+        throw std::runtime_error("[FileManager::getMusicFile] Cannot find music file <" + fname + ">");
+    }
     return path;
 }   // getMusicFile
 

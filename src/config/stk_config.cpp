@@ -222,17 +222,25 @@ void STKConfig::getAllData(const XMLNode * root)
         leader_node->get("time-per-kart", &m_leader_time_per_kart);
     }
 
-    if(const XMLNode *startup_node= root->getNode("startup"))
+    if (const XMLNode *startup_node= root->getNode("startup"))
     {
         startup_node->get("penalty", &m_penalty_time );
     }
 
-    if(const XMLNode *music_node = root->getNode("music"))
+    if (const XMLNode *music_node = root->getNode("music"))
     {
         std::string title_music;
         music_node->get("title", &title_music);
-        m_title_music = new MusicInformation(
-                                     file_manager->getMusicFile(title_music) );
+        assert(title_music.size() > 0);
+        
+        try
+        {
+            m_title_music = new MusicInformation(file_manager->getDataDir() + "/music/" + title_music);
+        }
+        catch (std::runtime_error& e)
+        {
+            fprintf(stderr, "Cannot load title music : %s\n", e.what());
+        }
     }
 
     if(const XMLNode *history_node = root->getNode("history"))
