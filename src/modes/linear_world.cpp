@@ -707,6 +707,7 @@ void LinearWorld::updateRacePosition()
 
     // Define this to get a detailled analyses each time a race position 
     // changes.
+#ifdef DEBUG
 #undef DEBUG_KART_RANK
 #ifdef DEBUG_KART_RANK
     if(rank_changed)
@@ -757,6 +758,7 @@ void LinearWorld::updateRacePosition()
         }   // for i<kart_amount
         std::cout << "-------------------------------------------\n";
     }   // if rank_changed
+#endif
 #endif
 
     endSetKartPositions();
