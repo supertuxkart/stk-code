@@ -665,6 +665,7 @@ void LinearWorld::updateRacePosition()
 #ifndef DEBUG
         setKartPosition(i, p);
 #else
+        rank_changed |= kart->getPosition()!=p;
         if (!setKartPosition(i,p))
         {
             std::cerr << "ERROR, same rank used twice!!\n";
@@ -687,7 +688,6 @@ void LinearWorld::updateRacePosition()
             history->Save();
             assert(false);
         }
-        rank_changed |= kart->getPosition()!=p;
 #endif
 
         // Switch on faster music if not already done so, if the
