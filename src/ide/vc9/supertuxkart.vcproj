@@ -467,6 +467,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\audio\sfx_buffer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\audio\sfx_manager.cpp"
 					>
 				</File>
@@ -1362,6 +1366,10 @@
 				</File>
 				<File
 					RelativePath="..\..\audio\sfx_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_buffer.hpp"
 					>
 				</File>
 				<File
