@@ -116,6 +116,7 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
 }   // loadInfo
+
 // ----------------------------------------------------------------------------
 /** Destructor.
  */
@@ -356,6 +357,7 @@ void KartModel::setAnimation(AnimationFrameType type)
             m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
                                           m_animation_frame[AF_LEFT] );
         m_animated_node->setAnimationEndCallback(NULL);
+        m_animated_node->setAnimationSpeed(0);
     }
     else if(m_animation_frame[type]>-1)
     {
@@ -370,7 +372,7 @@ void KartModel::setAnimation(AnimationFrameType type)
         m_animated_node->setLoopMode(false);
         m_animated_node->setAnimationEndCallback(this);
     }
-}   // setEndAnimation
+}   // setAnimation
 
 // ----------------------------------------------------------------------------
 /** Called from irrlicht when a non-looped animation ends. This is used to
