@@ -126,7 +126,6 @@ void ThreeDAnimation::update(float dt)
     core::vector3df hpr = m_animated_node->getRotation();
     core::vector3df scale = m_animated_node->getScale();
     AnimationBase::update(dt, &xyz, &hpr, &scale);     //updates all IPOs
-    printf("xyz = %f %f %f\n", xyz.X, xyz.Y, xyz.Z);
     m_animated_node->setPosition(xyz);
     m_animated_node->setRotation(hpr);
     m_animated_node->setScale(scale);
