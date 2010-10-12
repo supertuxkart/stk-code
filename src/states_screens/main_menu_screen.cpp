@@ -171,7 +171,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         {
             std::vector<video::ITexture*> textures;
             textures.push_back(irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(track_manager->getTrack("crescentcrossing")->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(track_manager->getTrack("sandtrack")->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(track_manager->getTrack("snowmountain")->getScreenshotFile().c_str()));
 
