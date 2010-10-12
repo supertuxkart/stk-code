@@ -207,7 +207,7 @@ void QuadGraph::setDefaultStartPositions(std::vector<btTransform>
 {
     // Node 0 is always the node on which the start line is.
     int current_node          = getPredecessor(0);
-    float distance_from_start = 0.0f;
+    float distance_from_start = 0.1f;
 
     // Maximum distance to left (or right) of centre line
     const float max_x_dist    = (karts_per_row-1)*0.5f*sidewards_distance;
