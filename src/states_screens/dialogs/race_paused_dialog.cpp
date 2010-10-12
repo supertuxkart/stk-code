@@ -47,7 +47,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
 {
     loadFromFile("race_paused_dialog.stkgui");
     
-    World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
+    World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
@@ -56,7 +56,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
 // ----------------------------------------------------------------------------
 RacePausedDialog::~RacePausedDialog()
 {
-    World::getWorld()->unpause();
+    World::getWorld()->scheduleUnpause();
 }   // ~RacePausedDialog
 
 // ----------------------------------------------------------------------------
@@ -133,14 +133,14 @@ GUIEngine::EventPropagation
         {
             ModalDialog::dismiss();
             network_manager->setState(NetworkManager::NS_MAIN_MENU);
-            World::getWorld()->unpause();
+            World::getWorld()->scheduleUnpause();
             race_manager->rerunRace();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "newrace")
         {
             ModalDialog::dismiss();
-            World::getWorld()->unpause();
+            World::getWorld()->scheduleUnpause();
             race_manager->exitRace();
             Screen* newStack[] = {MainMenuScreen::getInstance(), 
                                   RaceSetupScreen::getInstance(), NULL};

@@ -295,6 +295,9 @@ void World::onGo()
  */
 void World::terminateRace()
 {
+    m_schedule_pause = false;
+    m_schedule_unpause = false;
+    
     // Update the estimated finishing time for all karts that haven't
     // finished yet.
     const unsigned int kart_amount = getNumKarts();
@@ -330,6 +333,9 @@ void World::terminateRace()
  */
 void World::resetAllKarts()
 {
+    m_schedule_pause = false;
+    m_schedule_unpause = false;
+    
     //Project karts onto track from above. This will lower each kart so
     //that at least one of its wheel will be on the surface of the track
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
@@ -400,7 +406,7 @@ void World::resetAllKarts()
 }   // resetAllKarts
 
 
-void World::pause(Phase phase)
+void World::schedulePause(Phase phase)
 {
     if (m_schedule_unpause)
     {
@@ -413,7 +419,7 @@ void World::pause(Phase phase)
     }
 }
 
-void World::unpause()
+void World::scheduleUnpause()
 {
     if (m_schedule_pause)
     {
@@ -439,12 +445,12 @@ void World::updateWorld(float dt)
 {
     if (m_schedule_pause)
     {
-        doPause(m_scheduled_pause_phase);
+        pause(m_scheduled_pause_phase);
         m_schedule_pause = false;
     }
     else if (m_schedule_unpause)
     {
-        doUnpause();
+        unpause();
         m_schedule_unpause = false;
     }
     
@@ -703,6 +709,9 @@ void World::restartRace()
 
     m_race_gui->clearAllMessages();
 
+    m_schedule_pause = false;
+    m_schedule_unpause = false;
+    
     WorldStatus::reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
@@ -729,19 +738,22 @@ void World::restartRace()
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).
  */
-void World::doPause(Phase phase)
+void World::pause(Phase phase)
 {
     music_manager->pauseMusic();
     sfx_manager->pauseAll();
+    
     WorldStatus::pause(phase);
 }   // pause
 
 //-----------------------------------------------------------------------------
-void World::doUnpause()
+void World::unpause()
 {
     music_manager->resumeMusic() ;
     sfx_manager->resumeAll();
+    
     WorldStatus::unpause();
+    
     for(unsigned int i=0; i<m_karts.size(); i++)
     {
         // Note that we can not test for isPlayerController here, since

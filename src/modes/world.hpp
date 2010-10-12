@@ -162,9 +162,6 @@ protected:
     
     Phase m_scheduled_pause_phase;
     
-    void  doPause(Phase phase);
-    void  doUnpause();
-    
 public:
                     World();
     virtual        ~World();
@@ -232,6 +229,9 @@ public:
     
     virtual void  pause(Phase phase);
     virtual void  unpause();
+    
+    void  schedulePause(Phase phase);
+    void  scheduleUnpause();
     
     /**
       * The code that draws the timer should call this first to know

@@ -85,7 +85,7 @@ Screen::~Screen()
 void Screen::init()
 {
     if(m_pause_race && World::getWorld())
-        World::getWorld()->pause(World::IN_GAME_MENU_PHASE);
+        World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void Screen::init()
 void Screen::tearDown()
 {
     if(m_pause_race && World::getWorld())
-        World::getWorld()->unpause();
+        World::getWorld()->scheduleUnpause();
 }   // tearDown
 
 // -----------------------------------------------------------------------------
