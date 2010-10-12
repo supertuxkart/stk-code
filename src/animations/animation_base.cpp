@@ -83,12 +83,12 @@ void AnimationBase::reset()
  *  \param hpr Rotation to be updated.
  */
 void AnimationBase::update(float dt, core::vector3df *xyz, 
-                           core::vector3df *hpr)
+                           core::vector3df *hpr, core::vector3df *scale)
 {
     std::vector<Ipo*>::iterator i;
     for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
     {
-        (*i)->update(dt, xyz, hpr);
+        (*i)->update(dt, xyz, hpr, scale);
     }   // for i in m_all_ipos
 
 }   // float dt

@@ -36,6 +36,7 @@ void BillboardAnimation::update(float dt)
     // FIXME: not implemented yet.
     core::vector3df xyz(0, 0, 0);
     core::vector3df hpr(0, 0, 0);
-    AnimationBase::update(dt, &xyz, &hpr);
+    core::vector3df scale(1,1,1);
+    AnimationBase::update(dt, &xyz, &hpr, &scale);
 
 }   // update

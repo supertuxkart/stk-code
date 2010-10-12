@@ -38,8 +38,9 @@ class Ipo : public NoCopy
 {
 public:
     /** All supported ipo types. */
-    enum IpoChannelType {IPO_LOCX, IPO_LOCY, IPO_LOCZ, 
-                         IPO_ROTX, IPO_ROTY, IPO_ROTZ,
+    enum IpoChannelType {IPO_LOCX,   IPO_LOCY,   IPO_LOCZ, 
+                         IPO_ROTX,   IPO_ROTY,   IPO_ROTZ,
+                         IPO_SCALEX, IPO_SCALEY, IPO_SCALEZ,
                          IPO_MAX};
     static const std::string m_all_channel_names[IPO_MAX];
 private:
@@ -74,7 +75,8 @@ private:
     core::vector3df m_initial_hpr;
 public:
             Ipo(const XMLNode &curve, float fps);
-      void  update(float dt, core::vector3df *xyz, core::vector3df *hpr);
+      void  update(float dt, core::vector3df *xyz, core::vector3df *hpr,
+                   core::vector3df *scale);
       float get() const;
       void  setInitialTransform(const core::vector3df &xyz, 
                                 const core::vector3df &hpr);

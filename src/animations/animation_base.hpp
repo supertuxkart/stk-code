@@ -70,7 +70,8 @@ protected:
 public:
                  AnimationBase(const XMLNode &node);
     virtual     ~AnimationBase();
-    virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr);
+    virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr,
+                        core::vector3df *scale);
     /** This needs to be implemented by the inheriting classes. It is called
     *  once per frame from the track. */
     virtual void update(float dt) = 0;

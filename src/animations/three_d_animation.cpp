@@ -124,9 +124,12 @@ void ThreeDAnimation::update(float dt)
 {
     core::vector3df xyz = m_animated_node->getPosition();
     core::vector3df hpr = m_animated_node->getRotation();
-    AnimationBase::update(dt, &xyz, &hpr);     //updates all IPOs
+    core::vector3df scale = m_animated_node->getScale();
+    AnimationBase::update(dt, &xyz, &hpr, &scale);     //updates all IPOs
+    printf("xyz = %f %f %f\n", xyz.X, xyz.Y, xyz.Z);
     m_animated_node->setPosition(xyz);
     m_animated_node->setRotation(hpr);
+    m_animated_node->setScale(scale);
 
     // Now update the position of the bullet body if there is one:
     if(m_body)

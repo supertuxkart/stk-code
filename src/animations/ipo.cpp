@@ -22,7 +22,9 @@
 #include "io/xml_node.hpp"
 
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
-                {"LocX", "LocY", "LocZ", "RotX", "RotY", "RotZ"};
+                {"LocX", "LocY", "LocZ", 
+                 "RotX", "RotY", "RotZ",
+                 "ScaleX", "ScaleY", "ScaleZ" };
 
 Ipo::Ipo(const XMLNode &curve, float fps)
 {
@@ -110,19 +112,23 @@ void Ipo::reset()
  *  \param xyz The position that needs to be updated.
  *  \param hpr The rotation that needs to be updated.
  */
-void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr)
+void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr,
+                 core::vector3df *scale)
 {
     m_time += dt;
     if(m_extend!=ET_CONST && m_time>m_max_time) m_time = 0;
         
     switch(m_channel)
     {
-    case Ipo::IPO_LOCX : xyz->X =  get(); break;
-    case Ipo::IPO_LOCY : xyz->Y =  get(); break;
-    case Ipo::IPO_LOCZ : xyz->Z =  get(); break;
-    case Ipo::IPO_ROTX : hpr->X = -get(); break;  // the - signs are odd,
-    case Ipo::IPO_ROTY : hpr->Y = -get(); break;  // but it works
-    case Ipo::IPO_ROTZ : hpr->Z =  get(); break;  // why no - ??
+    case Ipo::IPO_LOCX   : xyz->X   =  get(); break;
+    case Ipo::IPO_LOCY   : xyz->Y   =  get(); break;
+    case Ipo::IPO_LOCZ   : xyz->Z   =  get(); break;
+    case Ipo::IPO_ROTX   : hpr->X   = -get(); break;  // the - signs are odd,
+    case Ipo::IPO_ROTY   : hpr->Y   = -get(); break;  // but it works
+    case Ipo::IPO_ROTZ   : hpr->Z   =  get(); break;  // why no - ??
+    case Ipo::IPO_SCALEX : scale->X =  get(); break;
+    case Ipo::IPO_SCALEY : scale->Y =  get(); break;
+    case Ipo::IPO_SCALEZ : scale->Z =  get(); break;
     default: assert(false); // shut up compiler warning
     }    // switch
 
