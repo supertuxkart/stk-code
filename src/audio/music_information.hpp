@@ -83,6 +83,10 @@ public:
     void               pauseMusic       ();
     void               resumeMusic      ();
     void               volumeMusic      (float gain);
+    
+    void               setTemporaryVolume(float gain);
+    void               resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
+    
     void               switchToFastMusic();
     bool               isPlaying() const;
 };   // MusicInformation

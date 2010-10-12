@@ -278,6 +278,14 @@ void MusicInformation::volumeMusic(float gain)
 } // volumeMusic
 
 //-----------------------------------------------------------------------------
+
+void MusicInformation::setTemporaryVolume(float gain)
+{
+    if (m_normal_music != NULL) m_normal_music->volumeMusic(gain);
+    if (m_fast_music   != NULL) m_fast_music->volumeMusic(gain);
+}
+
+//-----------------------------------------------------------------------------
 void MusicInformation::switchToFastMusic()
 {    
     if(!m_enable_fast) return;

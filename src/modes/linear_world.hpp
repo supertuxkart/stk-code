@@ -37,6 +37,8 @@ class LinearWorld : public WorldWithRank
 
     /** Last lap sfx should only be played once. */
     bool         m_last_lap_sfx_played;
+    
+    bool         m_last_lap_sfx_playing;
 
 private:
     /** Some additional info that needs to be kept for each kart

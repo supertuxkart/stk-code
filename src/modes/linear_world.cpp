@@ -39,6 +39,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_kart_display_info   = NULL;
     m_last_lap_sfx        = sfx_manager->createSoundSource("lastlap");
     m_last_lap_sfx_played = false;
+    m_last_lap_sfx_playing = false;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -50,6 +51,7 @@ void LinearWorld::init()
 {
     WorldWithRank::init();
     m_last_lap_sfx_played           = false;
+    m_last_lap_sfx_playing          = false;
     const unsigned int kart_amount  = m_karts.size();
     m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
@@ -105,6 +107,7 @@ void LinearWorld::restartRace()
     //if(m_last_lap_sfx->getStatus()== SFXManager::SFX_PLAYING)
     //    m_last_lap_sfx->stop();
     m_last_lap_sfx_played = false;
+    m_last_lap_sfx_playing = false;
 
     const unsigned int kart_amount = m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
@@ -169,7 +172,13 @@ void LinearWorld::update(float delta)
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
     WorldWithRank::update(delta);
-
+    
+    if (m_last_lap_sfx_playing && m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
+    {
+        music_manager->getCurrentMusic()->resetTemporaryVolume();
+        m_last_lap_sfx_playing = false;
+    }
+    
     const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
@@ -267,24 +276,29 @@ void LinearWorld::newLap(unsigned int kart_index)
     // if the end controller does a fastest lap.
     if(kart->hasFinishedRace()) return;
 
+    const int lap_count = race_manager->getNumLaps();
+    
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
-    if(kart_info.m_race_lap+1 <= race_manager->getNumLaps())
+    if(kart_info.m_race_lap+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
         setTimeAtLapForKart(getTime(), kart_index );
         kart_info.m_race_lap++ ;
     }
     // Last lap message (kart_index's assert in previous block already)
-    if(kart_info.m_race_lap+1 == race_manager->getNumLaps())
+    if(kart_info.m_race_lap+1 == lap_count)
     {
         m_race_gui->addMessage(_("Final lap!"), m_karts[kart_index],
                                3.0f, 40, video::SColor(255, 210, 100, 50), true);
-        if(!m_last_lap_sfx_played)
+        if(!m_last_lap_sfx_played && lap_count > 1)
         {
             m_last_lap_sfx->play();
             m_last_lap_sfx_played = true;
+            m_last_lap_sfx_playing = true;
+            
+            music_manager->getCurrentMusic()->setTemporaryVolume(0.2);
         }
     }
 
