@@ -298,7 +298,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             m_last_lap_sfx_played = true;
             m_last_lap_sfx_playing = true;
             
-            music_manager->getCurrentMusic()->setTemporaryVolume(0.2);
+            music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
         }
     }
 
@@ -319,8 +319,8 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Similarly the situation can happen if the distance along track should
     // go back to zero before actually crossing the finishing line. While this
     // should not happen, it could potentially be caused by floating point
-    // errors. In this case the call to updateRacePosion will avoid duplicated
-    // race positions as well.
+    // errors. In this case the call to updateRacePosition will avoid 
+    // duplicated race positions as well.
     updateRacePosition();
 
     // Race finished
