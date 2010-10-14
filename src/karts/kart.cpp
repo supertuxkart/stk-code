@@ -411,6 +411,10 @@ void Kart::reset()
     {
         sfx_manager->deleteSFX(m_previous_terrain_sound);
     }
+    
+    m_terrain_sound = NULL;
+    m_previous_terrain_sound = NULL;
+    
     if(m_engine_sound)
         m_engine_sound->stop();
 
