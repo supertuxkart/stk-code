@@ -127,6 +127,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the center point of the upper edge of this graph node. */
     const Vec3& getUpperCenter() const {return m_upper_center;}
+    // ------------------------------------------------------------------------
+    /** Returns the length of the quad of this node. */
+    float       getNodeLength() const 
+                {return (m_lower_center-m_upper_center).length();}
 };   // GraphNode
 
 #endif

@@ -207,26 +207,27 @@ void QuadGraph::setDefaultStartPositions(std::vector<btTransform>
 {
     // Node 0 is always the node on which the start line is.
     int current_node          = getPredecessor(0);
-    float distance_from_start = 0.1f;
+    float distance_from_start = 0.1f+forwards_distance;
 
     // Maximum distance to left (or right) of centre line
-    const float max_x_dist    = (karts_per_row-1)*0.5f*sidewards_distance;
+    const float max_x_dist    = 0.5f*(karts_per_row-0.5f)*sidewards_distance;
     // X position relative to the centre line
-    float x_pos               = -max_x_dist;
+    float x_pos               = -max_x_dist + sidewards_distance*0.5f;
+    unsigned int row_number   = 0;
 
     for(unsigned int i=0; i<start_transforms->size(); i++)
     {
         // First find on which segment we have to start
-        while(distance_from_start > getNode(current_node).getDistanceToSuccessor(0))
+        while(distance_from_start > getNode(current_node).getNodeLength())
         {
-            distance_from_start -= getNode(current_node).getDistanceToSuccessor(0);
+            distance_from_start -= getNode(current_node).getNodeLength();
             current_node = getPredecessor(current_node);
         }
         const GraphNode &gn   = getNode(current_node);
         Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
         center_line.normalize();
 
-        Vec3 horizontal_line = gn[3] - gn[2];
+        Vec3 horizontal_line = gn[2] - gn[3];
         horizontal_line.normalize();
        
         Vec3 start = gn.getUpperCenter()
@@ -238,9 +239,16 @@ void QuadGraph::setDefaultStartPositions(std::vector<btTransform>
         (*start_transforms)[i].setRotation(
             btQuaternion(btVector3(0, 1, 0), 
                          gn.getAngleToSuccessor(0)));
-
-        if(fabsf(x_pos - max_x_dist)<0.1f)
+        if(x_pos >= max_x_dist-sidewards_distance*0.5f)
+        {
             x_pos  = -max_x_dist;
+            // Every 2nd row will be pushed sideways by half the distance 
+            // between karts, so that a kart can drive between the karts in
+            // the row ahead of it.
+            row_number ++;
+            if(row_number % 2 == 0)
+                x_pos += sidewards_distance*0.5f;
+        }
         else
             x_pos += sidewards_distance;
         distance_from_start += forwards_distance;
