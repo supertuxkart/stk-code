@@ -183,6 +183,7 @@ void Track::loadTrackInfo()
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
     m_sun_diffuse_color     = video::SColor(255, 255, 255, 255); 
+    m_sun_position          = core::vector3df(0, 0, 0);
     XMLNode *root           = file_manager->createXMLTree(m_filename);
         
     if(!root || root->getName()!="track")
@@ -881,26 +882,21 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
     
     // ---- Create sun (non-ambient directional light)
-    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, core::vector3df(0,0,0),
-                                                               m_sun_diffuse_color);
+    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, 
+                                                             m_sun_position,
+                                                             m_sun_diffuse_color);
     m_sun->setLightType(video::ELT_DIRECTIONAL);
-    m_sun->setRotation( core::vector3df(180, 45, 45) ); // TODO: make sun orientation configurable (calculate from m_sun_position)
 
-    // We should NOT give the sun an ambient color, we already have a scene-wide ambient color.
-    // No need for two ambient colors.
-    //m_sun->getLightData().AmbientColor  = m_sun_ambient_color;
-    
-    //m_sun->getLightData().DiffuseColor  = m_sun_diffuse_color;
+    // The angle of the light is rather important - let the sun
+    // point towards (0,0,0).
+    if(m_sun_position.getLengthSQ()==0)
+        // Backward compatibility: if no sun is specified, use the 
+        // old hardcoded default angle
+        m_sun->setRotation( core::vector3df(180, 45, 45) );
+    else
+        m_sun->setRotation((-m_sun_position).getHorizontalAngle());
+
     m_sun->getLightData().SpecularColor = m_sun_specular_color;
-
-    /*
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(0, m_sun_position);
-    video::SLight light;
-    // HACK & TEST: checking how ambient looks for some things, must be properly done once we reach an agreement
-    light.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
-    light.AmbientColor = irr::video::SColorf(0.5f, 0.666666f, 0.75f, 0.0f);
-    m_light->setLightData(light);
-     */
 
     // ---- Fog
     if (m_use_fog && !UserConfigParams::m_camera_debug)
