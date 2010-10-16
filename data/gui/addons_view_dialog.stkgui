@@ -3,7 +3,7 @@
 <div x="5%" y="0%" width="90%" height="80%" layout="horizontal-row" >
     <div width="50%" height="90%" layout="vertical-row" >
     <spacer height="22%" /> 
-        <icon id="icon" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
+        <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png"/>
     </div>
     <div width="50%" height="90%" layout="vertical-row" >
         <label id="name" width="100%" text="Name:" proportion="1" />

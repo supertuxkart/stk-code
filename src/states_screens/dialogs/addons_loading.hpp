@@ -46,6 +46,7 @@ private:
     void loadInfo();
     bool m_can_install;
     bool m_percent_update;
+	bool m_can_load_icon;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

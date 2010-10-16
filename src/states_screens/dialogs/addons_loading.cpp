@@ -43,6 +43,7 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     loadFromFile("addons_view_dialog.stkgui");
     this->addons = id;
     m_can_install = false;
+	m_can_load_icon = false;
     m_percent_update = false;
     pthread_mutex_init(&m_mutex_can_install, NULL);
 
@@ -70,18 +71,31 @@ void AddonsLoading::loadInfo()
 
 
     /*I think we can wait a little to have the icon ?*/
-    download("icon/" + this->addons->GetIcon(), this->addons->GetName() + ".png");
-    icon->setImage(std::string(file_manager->getConfigDir() + "/" +  this->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
 
 
     name->setText(StringUtils::insertValues(_("Name: %i"), this->addons->GetName().c_str()));
     description->setText(StringUtils::insertValues(_("Description: %i"), this->addons->GetDescription().c_str()));
     version->setText(StringUtils::insertValues(_("Version: %i"), this->addons->GetVersionAsStr().c_str()));
+    pthread_t thread;
+    pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
 
 
 
 }
+
+// ------------------------------------------------------------------------------------------------------
+void * AddonsLoading::downloadIcon( void * pthis)
+{
+    AddonsLoading * pt = (AddonsLoading*)pthis;
+	download("icon/" + pt->addons->GetIcon(), pt->addons->GetName() + ".png");
+	pthread_mutex_lock(&(pt->m_mutex_can_install));
+	pt->m_can_load_icon = true;
+	pthread_mutex_unlock(&(pt->m_mutex_can_install));
+	
+    return NULL;
+}
+
 // ------------------------------------------------------------------------------------------------------
 
 GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& eventSource)
@@ -154,6 +168,10 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue(addons->getDownloadState());
         m_state->setText(addons->getDownloadStateAsStr().c_str());
     }
+    if(m_can_load_icon)
+    {
+		icon->setImage(std::string(file_manager->getConfigDir() + "/" +  this->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
     pthread_mutex_unlock(&(m_mutex_can_install));
 }
 
@@ -184,24 +202,6 @@ void * AddonsLoading::startInstall(void* pthis)
     obj->m_can_install = true;
     obj->m_percent_update = false;
     pthread_mutex_unlock(&(obj->m_mutex_can_install));
-    return NULL;
-}
-// ------------------------------------------------------------------------------------------------------
-
-void * AddonsLoading::downloadIcon(void* pthis)
-{
-/*
-    AddonsLoading * obj = (AddonsLoading*)pthis;
-    download("icon/" + obj->addons->GetIcon(), obj->addons->GetName() + ".png");
-    obj->icon->setImage(std::string(file_manager->getConfigDir() + "/" +  obj->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    obj->icon->setImage(std::string(file_manager->getConfigDir() + "/" +  obj->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    obj->icon->x = 0;
-    obj->icon->y = 0;
-    obj->icon->w = obj->m_area.getWidth()/2;
-    obj->icon->h = obj->m_area.getHeight();
-    obj->icon->setParent(obj->m_irrlicht_window);
-    obj->m_children.push_back(obj->icon);
-    obj->icon->add();*/
     return NULL;
 }
 #endif
