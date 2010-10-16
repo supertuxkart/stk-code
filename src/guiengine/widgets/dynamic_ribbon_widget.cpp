@@ -871,35 +871,38 @@ void DynamicRibbonWidget::updateItemDisplay()
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
-            
-            icon_id = item_placement[n][i];
-            
-            if (icon_id < item_amount && icon_id != -1)
-            {
-                std::string item_icon = (m_items[icon_id].m_animated ?
-                                         m_items[icon_id].m_all_images[0] :
-                                         m_items[icon_id].m_sshot_file);
-                icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
-                
-                icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
-                icon->setLabel(m_items[icon_id].m_user_name);
-                icon->m_text                  = m_items[icon_id].m_user_name;
-                icon->m_badges                = m_items[icon_id].m_badges;
-                
-                //std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
-                
-                //std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
-                
-                // if the ribbon has no "ribbon-wide" label, call will do nothing
-                row.setLabel(i, m_items[icon_id].m_user_name);
-            }
-            else
-            {
-                icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
-                icon->resetAllBadges();
-                icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
-                //std::cout << "    item " << i << " is a FILLER\n";
-            }
+			
+			//FIXME : it is a bit hackish
+			if(i < item_placement[n].size())
+			{
+				icon_id = item_placement[n][i];
+				if (icon_id < item_amount && icon_id != -1)
+				{
+					std::string item_icon = (m_items[icon_id].m_animated ?
+											 m_items[icon_id].m_all_images[0] :
+											 m_items[icon_id].m_sshot_file);
+					icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
+					
+					icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
+					icon->setLabel(m_items[icon_id].m_user_name);
+					icon->m_text                  = m_items[icon_id].m_user_name;
+					icon->m_badges                = m_items[icon_id].m_badges;
+					
+					//std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
+					
+					//std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
+					
+					// if the ribbon has no "ribbon-wide" label, call will do nothing
+					row.setLabel(i, m_items[icon_id].m_user_name);
+				}
+				else
+				{
+					icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
+					icon->resetAllBadges();
+					icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
+					//std::cout << "    item " << i << " is a FILLER\n";
+				}
+			}
         } // next column
     } // next row
 }
