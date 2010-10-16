@@ -66,7 +66,7 @@ private:
     bool             m_lightmap;
     float            m_friction;
     /** How much the top speed is reduced per second. */
-    float            m_slowdown;
+    float            m_slowdown_severity;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
     /** The minimum speed at which a special sfx is started to be played. */
@@ -103,15 +103,21 @@ public:
     const std::string& 
           getTexFname        () const { return m_texname;            }
     int   getIndex           () const { return m_index;              }
+    // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
-    /** Returns the slowdown that happens if a kart is
-     *  faster than the maximum speed. */
-    float getSlowDown        () const { return m_slowdown;           }
+    // ------------------------------------------------------------------------
+    /** Returns how long it will take for a slowdown to take effect.
+     *  It is the time it takes till the full slowdown applies to
+     *  karts. So a short time will slowdown a kart much faster. */
+    float getSlowDownSeverity() const { return m_slowdown_severity;         }
+    // ------------------------------------------------------------------------
     /** Returns true if this material should have smoke effect. */
     bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
+    // ------------------------------------------------------------------------
     /** Returns true if this material should have water splashes. */
     bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}
+    // ------------------------------------------------------------------------
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &

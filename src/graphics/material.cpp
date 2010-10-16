@@ -62,7 +62,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("zipper",           &m_zipper            );
     node->get("reset",            &m_resetter          );
     node->get("max-speed",        &m_max_speed_fraction);
-    node->get("slowdown",         &m_slowdown          );
+    node->get("slowdown",         &m_slowdown_severity );
     node->get("anisotropic",      &m_anisotropic       );
     node->get("backface-culling", &m_backface_culling  );
     std::string s("");
@@ -132,7 +132,7 @@ void Material::init(unsigned int index)
     m_zipper             = false;
     m_resetter           = false;
     m_max_speed_fraction = 1.0f;
-    m_slowdown           = 1.0f;
+    m_slowdown_severity  = 1.0f;
     m_sfx_name           = "";
     m_sfx_min_speed      = 0.0f;
     m_sfx_max_speed      = 30;

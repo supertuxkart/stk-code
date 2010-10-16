@@ -103,12 +103,8 @@ Kart::Kart (const std::string& ident, int position,
     // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
 
     // Set position and heading:
-    m_reset_transform      = init_transform;
-
-    m_max_speed               = m_kart_properties->getMaxSpeed();
-    m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
+    m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
-
     m_wheel_rotation          = 0;
 
     // Create SFXBase for each custom sound (TODO: add back when properly done)
@@ -202,7 +198,7 @@ void Kart::createPhysics()
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart
     // won't topple over too easy.
-    shiftCenterOfGravity.setOrigin(getGravityCenterShift());
+    shiftCenterOfGravity.setOrigin(m_kart_properties->getGravityCenterShift());
     m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
 
     // Set mass and inertia
@@ -399,8 +395,7 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
-    m_max_speed_reduction  = 0.0f;
-    m_power_reduction      = 1.0f;
+    m_current_speed_fraction = 1.0f;
     m_slipstream_mode      = SS_NONE;
     m_last_material        = NULL;
     if(m_terrain_sound)
@@ -583,7 +578,7 @@ float Kart::getActualWheelForce()
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
-        if(m_speed <= getMaxSpeed()*gear_ratio[i])
+        if(m_speed <= m_kart_properties->getMaxSpeed()*gear_ratio[i])
         {
             return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]
                   +zipperF;
@@ -739,7 +734,6 @@ void Kart::update(float dt)
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
     const Material* material=TerrainInfo::getMaterial();
-    m_power_reduction = 1.0f;
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
@@ -748,6 +742,14 @@ void Kart::update(float dt)
         if(min->getY() - getXYZ().getY() > 17)
             forceRescue();
     }
+
+    // Sometimes the material can be 0. This can happen if a kart is above
+    // another kart (e.g. mass collision, or one kart falling on another
+    // kart). Bullet does not have any triangle information in this case,
+    // and so material can not be set. In this case it is simply ignored
+    // since it can't hurt (material is only used for friction, zipper and
+    // rescue, so those things are not triggered till the kart is on the
+    // track again)
     else if(material)
     {
         // If a terrain specific sfx is already being played, when a new
@@ -796,26 +798,19 @@ void Kart::update(float dt)
         }
         m_last_material = material;
 
-        // Sometimes the material can be 0. This can happen if a kart is above
-        // another kart (e.g. mass collision, or one kart falling on another
-        // kart). Bullet does not have any triangle information in this case,
-        // and so material can not be set. In this case it is simply ignored
-        // since it can't hurt (material is only used for friction, zipper and
-        // rescue, so those things are not triggered till the kart is on the
-        // track again)
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper();
         else
         {
-            m_power_reduction = material->getSlowDown();
             // Normal driving on terrain. Adjust for maximum terrain speed
-            float max_speed_here = material->getMaxSpeedFraction()*getMaxSpeed();
-            // If the speed is too fast, reduce the maximum speed gradually.
+            // Gradually adjust the fraction of the maximum kart speed to
+            // the amount specified for the terrain.
             // The actual capping happens in updatePhysics
-            if(max_speed_here<m_speed)
-                m_max_speed_reduction += dt*material->getSlowDown();
+            if(m_current_speed_fraction<=material->getMaxSpeedFraction())
+                m_current_speed_fraction = material->getMaxSpeedFraction();
             else
-                m_max_speed_reduction = 0.0f;
+                m_current_speed_fraction -= 
+                                dt/material->getSlowDownSeverity();
         }
     }   // if there is material
 
@@ -1128,7 +1123,9 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(float dt)
 {
-    // Check if accel is pressed for the first time.
+    // Check if accel is pressed for the first time. The actual timing
+    // is done in getStartupBoost - it returns 0 if the start was actually
+    // too slow to qualify for a boost.
     if(!m_has_started && m_controls.m_accel)
     {
         m_has_started = true;
@@ -1153,24 +1150,12 @@ void Kart::updatePhysics(float dt)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
 
-        // FIXME: horrible hack. A small acceleration value will cause the engine power to
-        // be reduced (for the end controller)
-        if (fabsf(m_controls.m_accel) < 1.0f)
-        {
-            engine_power *= fabsf(m_controls.m_accel);
-        }
-        
-        // Engine slow down due to terrain (see m_power_reduction is set in
-        // update() depending on terrain type. Don't apply this if kart is already
-        // going slowly, this would make it hard accelerating to get out of there
-        if(m_speed > 4.0)
-            engine_power *= m_power_reduction;
-
         // Lose some traction when skidding, to balance the adventage
         // Up to r5483 AIs were allowed to cheat in medium and high diff levels
         if(m_controls.m_drift)
             engine_power *= 0.5f;
-        applyEngineForce(engine_power);
+
+        applyEngineForce(engine_power*m_controls.m_accel);
 
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
@@ -1196,21 +1181,13 @@ void Kart::updatePhysics(float dt)
             {
                 resetBrakes();
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
-                if ( -m_speed <  getMaxSpeedOnTerrain()*m_max_speed_reverse_ratio )
+                if ( -m_speed <  getMaxSpeedOnTerrain()
+                                 *m_kart_properties->getMaxSpeedReverseRatio() )
                 {
                     // The backwards acceleration is artificially increased to
                     // allow players to get "unstuck" quicker if they hit e.g.
-                    // a wall. At the same time we have to prevent that driving
-                    // backards gives an advantage (see m_max_speed_reverse_ratio),
-                    // and that a potential slowdown due to the terrain the
-                    // kart is driving on feels right. The speedup factor on
-                    // normal terrain (power_reduction/slowdown_factor should
-                    // be 2.5 (which was experimentally determined to feel
-                    // right).
-                    float f = 2.5f - 3.8f*(1-m_power_reduction);
-                    // Avoid that a kart gets really stuck:
-                    if(f<0.1f) f=0.1f;
-                    applyEngineForce(-engine_power*f);
+                    // a wall. 
+                    applyEngineForce(-engine_power*2.5f);
                 }
                 else  // -m_speed >= max speed on this terrain
                 {
@@ -1464,7 +1441,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     }
     m_kart_model->update(m_wheel_rotation, getSteerPercent(), wheel_up_axis);
 
-    Vec3        center_shift  = getGravityCenterShift();
+    Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
             - m_default_suspension_length[0]
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
@@ -1499,7 +1476,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     if(m_slipstream_mode == SS_USE)
         m_nitro->setCreationRate(20.0f);
 
-    float speed_ratio    = getSpeed()/getMaxSpeed();
+    float speed_ratio    = getSpeed()/getMaxSpeedOnTerrain();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(center_shift, 
