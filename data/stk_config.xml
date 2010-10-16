@@ -191,7 +191,7 @@
          have 3 values, one for low, medium, and hard.
          brake-factor: Value used when braking. max-speed-reverse-ratio is
          the percentage of max speed for reverse gear. -->
-    <engine power="300 400 400"  max-speed="25 28 32.22" brake-factor="11.0"
+    <engine power="300 400 400"  max-speed="15 20 23" brake-factor="11.0"
             max-speed-reverse-ratio="0.3"/>
 
     <!-- Simulated gears: switch-ratio defines at what ratio of the maximum
