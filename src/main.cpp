@@ -565,8 +565,11 @@ void initRest()
 #ifdef ADDONS_MANAGER
     network_http            = new NetworkHttp          ();
     addons_manager          = new Addons               ();
-#endif
 
+    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
+	track_manager->addTrackSearchDir(file_manager->getAddonsDir() + "/data/tracks/");
+    std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
+#endif
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
@@ -589,10 +592,6 @@ void initRest()
 
     //menu_manager= new MenuManager();
 
-#ifdef ADDONS_MANAGER
-    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
-    std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
-#endif
 }   // initRest
 
 //=============================================================================
