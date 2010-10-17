@@ -1,7 +1,7 @@
 
 <supertuxkart_grand_prix name="All tracks">
 
-    <track id="beach"            laps="2" />
+    <track id="hacienda"         laps="2" />
     <track id="startrack"        laps="3" />
     <track id="lighthouse"       laps="4" />
     <track id="jungle"           laps="3" />
@@ -12,8 +12,8 @@
     <track id="snowtuxpeak"      laps="3" />
     <track id="crescentcrossing" laps="2" />
     <track id="olivermath"       laps="4" />
-    <track id="racetrack"        laps="3" />
-    <track id="city"             laps="2" />
+    <track id="farm"             laps="3" />
+    <track id="secretgarden"     laps="3" />
     <track id="xr591"            laps="3" />
     <track id="canyon"           laps="2" />
     <track id="snowmountain"     laps="3" />
