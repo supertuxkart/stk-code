@@ -866,8 +866,8 @@ void DynamicRibbonWidget::updateItemDisplay()
         
         //std::cout << "Row " << n << "\n{\n";
         
-        const int items_in_row = row.m_children.size();
-        for (int i=0; i<items_in_row; i++)
+        const unsigned int items_in_row = row.m_children.size();
+        for (unsigned int i=0; i<items_in_row; i++)
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
