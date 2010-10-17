@@ -809,8 +809,7 @@ void Kart::update(float dt)
             if(m_current_speed_fraction<=material->getMaxSpeedFraction())
                 m_current_speed_fraction = material->getMaxSpeedFraction();
             else
-                m_current_speed_fraction -= 
-                                dt/material->getSlowDownSeverity();
+                m_current_speed_fraction -= dt/material->getSlowDownTime();
         }
     }   // if there is material
 

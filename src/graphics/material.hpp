@@ -66,7 +66,7 @@ private:
     bool             m_lightmap;
     float            m_friction;
     /** How much the top speed is reduced per second. */
-    float            m_slowdown_severity;
+    float            m_slowdown_time;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
     /** The minimum speed at which a special sfx is started to be played. */
@@ -110,7 +110,7 @@ public:
     /** Returns how long it will take for a slowdown to take effect.
      *  It is the time it takes till the full slowdown applies to
      *  karts. So a short time will slowdown a kart much faster. */
-    float getSlowDownSeverity() const { return m_slowdown_severity;         }
+    float getSlowDownTime() const { return m_slowdown_time;          }
     // ------------------------------------------------------------------------
     /** Returns true if this material should have smoke effect. */
     bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
