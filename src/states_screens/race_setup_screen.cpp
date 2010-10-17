@@ -174,7 +174,11 @@ void RaceSetupScreen::init()
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
     kartamount->setText(L""); // FIXME: dirty trick (see below)
-    kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );
+    // Avoid negative numbers (which can happen if e.g. the number of karts
+    // in a previous race was lower than the number of players now.
+    int num_ai = race_manager->getNumberOfKarts()-race_manager->getNumPlayers();
+    if(num_ai<0) num_ai = 0;
+    kartamount->setValue(num_ai);
     kartamount->setMax(stk_config->m_max_karts - race_manager->getNumPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
