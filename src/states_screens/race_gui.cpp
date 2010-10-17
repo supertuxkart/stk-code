@@ -919,14 +919,7 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
     gui::ScalableFont* font = GUIEngine::getFont(); 
     int font_height         = (int)(font->getDimension(L"X").Height);
     
-    if (kart->hasFinishedRace())
-    {
-        static video::SColor color = video::SColor(255, 255, 255, 255);
-        pos.UpperLeftCorner.Y -= 2*font_height;
-        pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(m_string_finished.c_str(), pos, color);
-    }
-    else
+    if (!kart->hasFinishedRace())
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         pos.UpperLeftCorner.Y -= 3*font_height;
