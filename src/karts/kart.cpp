@@ -1281,7 +1281,7 @@ void Kart::updatePhysics(float dt)
             max_speed *= (1.0f + (stk_config->m_zipper_max_speed_fraction * m_zipper_time_left * 1.0f/zipper_fade_time));
         }
     }
-    if ( m_speed >  max_speed )
+    if ( m_speed >  max_speed && isOnGround())
     {
         const float velocity_ratio = max_speed/m_speed;
         m_speed                    = max_speed;
