@@ -314,8 +314,11 @@ public:
     bool           hasViewBlockedByPlunger() const
                                      { return m_view_blocked_by_plunger > 0; }
     // ------------------------------------------------------------------------
-    /** Sets that the view is blocked by a plunger. */
-    void           blockViewWithPlunger()   { m_view_blocked_by_plunger = 10;}
+    /** Sets that the view is blocked by a plunger. The duration depends on
+     *  the difficulty, see KartPorperties getPlungerInFaceTime. */
+    void           blockViewWithPlunger()   
+                             { m_view_blocked_by_plunger = 
+                                   m_kart_properties->getPlungerInFaceTime();}
     // -------------------------------------------------------------------------
     /** Returns a bullet transform object located at the kart's position
         and oriented in the direction the kart is going. Can be useful

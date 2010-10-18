@@ -259,11 +259,12 @@
          pushed to the side, hardly anything happens.  -->
     <collision side-impulse="0"/>
 
-    <!-- Kart-specific rubber band handling: max-length is the
-         maximum length of rubber band before it snaps. force is
+    <!-- Kart-specific plunger and rubber band handling: max-length is
+         the maximum length of rubber band before it snaps. force is
          the force a plunger/rubber band applies to the kart(s).
          duration is the duration a rubber band acts. -->
-    <rubber-band max-length="50" force="1500" duration="1"/>
+    <plunger band-max-length="50" band-force="1500" band-duration="1"
+          in-face-time="5 7 10"/>
 
     <!-- Kart-specific explosion parameters. Height: how high this
          this kart is being pushed in the sky by an explosion.

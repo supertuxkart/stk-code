@@ -141,6 +141,8 @@ private:
     float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
+    float       m_plunger_in_face_duration[3]; /**< Duration of plunger in face
+                                                     depending on difficulty.*/
     float       m_wheel_base;          /**< Wheel base of the kart.          */
     float       m_nitro_power_boost;   /**< Nitro power boost.               */
     float       m_nitro_consumption;   /**< Nitro consumption.               */
@@ -280,7 +282,7 @@ public:
                   getGroups         () const {return m_groups;                   }
     /** Returns the mass of this kart. */
     float getMass                   () const {return m_mass;                     }
-    /** Returns the maximum engine power. */
+    /** Returns the maximum engine power depending on difficulty. */
     float getMaxPower               () const {return m_engine_power[race_manager->getDifficulty()];}
 
     /** Returns the time the kart needs to fully steer in one direction from 
@@ -397,6 +399,10 @@ public:
 
     /** Returns the duration a rubber band is active for. */
     float getRubberBandDuration     () const {return m_rubber_band_duration;     }
+
+    /** Returns duration of a plunger in your face. */
+    float getPlungerInFaceTime      () const 
+               {return m_plunger_in_face_duration[race_manager->getDifficulty()];}
 
     /** Returns additional rotation of 3d model when skidding. */
     float getSkidVisual             () const {return m_skid_visual;              }
