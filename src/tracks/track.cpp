@@ -755,8 +755,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     {
         const XMLNode *node = root->getNode(i);
         const std::string name = node->getName();
-        // The track object was already converted before the loop
-        if(name=="track") continue;
+        // The track object was already converted before the loop, and the
+        // default start was already used, too - so ignore those.
+        if(name=="track" || name=="default-start") continue;
         if(name=="object")
         {
             m_track_object_manager->add(*node, *this);
