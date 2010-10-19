@@ -742,11 +742,12 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         default_start->get("karts-per-row",      &karts_per_row     );
     }
     m_start_transforms.resize(race_manager->getNumberOfKarts());
-    m_quad_graph->setDefaultStartPositions(&m_start_transforms,
-                                           karts_per_row,
-                                           forwards_distance,
-                                           sidewards_distance,
-                                           upwards_distance);
+    if(!m_is_arena)
+        m_quad_graph->setDefaultStartPositions(&m_start_transforms,
+                                               karts_per_row,
+                                               forwards_distance,
+                                               sidewards_distance,
+                                               upwards_distance);
 
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
