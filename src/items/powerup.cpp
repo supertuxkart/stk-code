@@ -232,15 +232,18 @@ void Powerup::use()
         
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
-        m_sound_use->position(m_owner->getXYZ());
-        m_sound_use->play();
-        btVector3 pos = m_owner->getXYZ();
         float up_coord = Track::NOHIT;
         Vec3 normal;
         const Material* unused2;        
+        btVector3 pos = m_owner->getXYZ();
         world->getTrack()->getTerrainInfo(pos, &up_coord, &normal, &unused2);
+        // This can happen if the kart is 'over nothing' when dropping
+        // the bubble gum
+        if(up_coord==Track::NOHIT)
+            return;
         normal.normalize();
-        assert(up_coord != Track::NOHIT);
+        m_sound_use->position(m_owner->getXYZ());
+        m_sound_use->play();
         
         pos.setY(up_coord-0.05f);
         
