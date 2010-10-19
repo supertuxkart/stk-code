@@ -88,9 +88,6 @@ private:
     /** Musical notes icon (for music description and credits) */
     Material        *m_music_icon;
 
-    /** Translated string of 'finished' message. */
-    core::stringw    m_string_finished;
-
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
 
@@ -107,10 +104,6 @@ private:
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-    
-    /** used to render lap count next to the map without overlap */
-    int              m_map_right_side_x;
-    bool             m_minimap_on_left;
     
     /** The size of a single marker in pixels, must be a power of 2. */
     int              m_marker_rendered_size;
@@ -144,7 +137,10 @@ private:
     /** Used to display messages without overlapping */
     int              m_max_font_height;
     int              m_small_font_max_height;
-    
+    /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
+     *  the rank/lap text correctly close to the right border. */
+    int              m_rank_lap_width;
+
     /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
     float            m_dist_show_overlap;///can be zero
     float            m_icons_inertia;///can be zero
@@ -159,7 +155,7 @@ private:
                               video::S3DVertex *v, unsigned short int *index);
 
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (const Kart *kart,
+    void drawEnergyMeter       (int x, int y, const Kart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawPowerupIcons      (const Kart* kart,
@@ -168,11 +164,9 @@ private:
     void drawAllMessages       (const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawSpeed             (const Kart* kart, const core::recti &viewport, 
+    void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawLap               (const KartIconDisplayInfo* info, const Kart* kart,
-                                const core::recti &viewport);
-    void drawRank               (const KartIconDisplayInfo* info, const Kart* kart,
+    void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
                                 const core::recti &viewport);
     void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
     /** Display items that are shown once only (for all karts). */

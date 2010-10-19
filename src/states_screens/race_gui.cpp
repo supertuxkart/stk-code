@@ -52,9 +52,7 @@ using namespace irr;
  *  created, so only the race manager can be accessed safely.
  */
 RaceGUI::RaceGUI()
-{
-    m_map_right_side_x = 0;
-    
+{    
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -65,7 +63,6 @@ RaceGUI::RaceGUI()
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
     m_map_bottom            = (int)( 10.0f * scaling);
-    m_minimap_on_left       = true;
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -79,7 +76,6 @@ RaceGUI::RaceGUI()
     if (race_manager->getNumLocalPlayers() == 3)
     {
         m_map_left = UserConfigParams::m_width - m_map_width;
-        m_minimap_on_left = false;
     }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
@@ -91,7 +87,6 @@ RaceGUI::RaceGUI()
     // Translate strings only one in constructor to avoid calling
     // gettext in each frame.
     //I18N: Shown at the end of a race
-    m_string_finished = _("Finished");
     m_string_lap      = _("Lap");
     m_string_rank     = _("Rank");
     
@@ -107,7 +102,26 @@ RaceGUI::RaceGUI()
     
     //read icon frame picture
     m_icons_frame=material_manager->getMaterial("icons-frame.png");
-     
+
+    // Determine maximum length of the rank/lap text, in order to
+    // align those texts properly on the right side of the viewport.
+    gui::ScalableFont* font = GUIEngine::getFont(); 
+    m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
+    int w;font->getDimension(L"99/99").Width;
+    if(race_manager->getNumLaps()>9)
+        w = font->getDimension(L"99/99").Width;
+    else
+        w = font->getDimension(L"9/9").Width;
+    // In some split screen configuration the energy bar might be next 
+    // to the lap display - so make the lap X/Y display large enough to
+    // leave space for the energy bar (16 pixels) and 10 pixels of space
+    // to the right (see drawEnergyMeter for details).
+    w += 16 + 10;
+    if(m_rank_lap_width < w) m_rank_lap_width = w;
+    w = font->getDimension(m_string_rank.c_str()).Width;
+    if(m_rank_lap_width < w) m_rank_lap_width = w;
+
+
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -324,10 +338,8 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     RaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
 
     drawPowerupIcons    (kart, viewport, scaling);
-    drawEnergyMeter     (kart, viewport, scaling);
-    drawSpeed           (kart, viewport, scaling);
-    drawLap             (info, kart, viewport);
-    drawRank            (info, kart, viewport);
+    drawSpeedAndEnergy  (kart, viewport, scaling);
+    drawRankLap         (info, kart, viewport);
 
 }   // renderPlayerView
 
@@ -354,7 +366,7 @@ void RaceGUI::drawGlobalTimer()
     
     gui::ScalableFont* font = GUIEngine::getFont();
     font->draw(sw.c_str(), pos, time_color);
-}   // DRAWGLOBALTimer
+}   // drawGlobalTimer
 
 //-----------------------------------------------------------------------------
 /** Draws the mini map and the position of all karts on it.
@@ -374,7 +386,6 @@ void RaceGUI::drawGlobalMiniMap()
                          m_map_left + m_map_width, lower_y);
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
     irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
-    m_map_right_side_x = dest.LowerRightCorner.X;
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
@@ -702,19 +713,28 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
 }   // drawPowerupIcons
 
 //-----------------------------------------------------------------------------
-/* Energy meter that gets filled with coins */
-void RaceGUI::drawEnergyMeter (const Kart *kart,              
-                               const core::recti &viewport, 
-                               const core::vector2df &scaling)
+/** Energy meter that gets filled with nitro. This function is called from
+ *  drawSpeedAndEnergy, which defines the correct position of the energy
+ *  meter.
+ *  \param x X position of the meter.
+ *  \param y Y position of the meter.
+ *  \param kart Kart to display the data for.
+ *  \param scaling Scaling applied (in case of split screen)
+ */
+void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,              
+                              const core::recti &viewport, 
+                              const core::vector2df &scaling)
 {
     float state = (float)(kart->getEnergy()) / MAX_ITEMS_COLLECTED;
-    //int y = (int)(250 * scaling.Y) + viewport.UpperLeftCorner.Y;
-    int w = (int)(16 * scaling.X);
+    // Don't scale width, it looks too small otherwise
+    int w = 16;
     int h = (int)(viewport.getHeight()/3);
-    
-    int x = viewport.LowerRightCorner.X - w - 5;
-    int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
 
+    // Move energy bar slighty 'into' the speedometer. Leave 10 points
+    // between right edge of viewport and energy meter, and don't scale.
+    x    -= w+10;
+    y    -= (int)(30*scaling.Y);
+    
     float coin_target = (float)race_manager->getCoinTarget();
     int th = (int)(h*(coin_target/MAX_ITEMS_COLLECTED));
     
@@ -766,8 +786,8 @@ void RaceGUI::drawEnergyMeter (const Kart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport, 
-                        const core::vector2df &scaling)
+void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
+                                 const core::vector2df &scaling)
 {
 
     float minRatio         = std::min(scaling.X, scaling.Y);
@@ -775,8 +795,13 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
     core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 10.0f*scaling.X;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 15.0f*scaling.X;
     offset.Y = viewport.LowerRightCorner.Y-10*scaling.Y;
+
+    
+    drawEnergyMeter(viewport.LowerRightCorner.X, 
+                    viewport.LowerRightCorner.Y - meter_height, kart,
+                    viewport, scaling);
     
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
@@ -873,132 +898,66 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart, 
-                      const core::recti &viewport)
+/** Displays the rank and the lap of the kart.
+ *  \param info Info object c
+*/
+void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart, 
+                          const core::recti &viewport)
 {
-    // Don't display laps in follow the leader mode
-    if(!World::getWorld()->raceHasLaps()) return;
-    
-    const int lap = info[kart->getWorldKartId()].lap;
-    
-    if(lap<0) return;  // don't display 'lap 0/...'
+    // Don't display laps or ranks if the kart has already finished the race.
+    if (kart->hasFinishedRace()) return;
 
     core::recti pos;
-    pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
-
-    // place lap count somewhere on the left of the screen
-    if (m_minimap_on_left)
-    {
-        // check if mini-map is within Y coords of this player.
-        // if the mini-map is not even in the viewport of this player, don't 
-        // bother placing the lap text at the right of the minimap.
-        if (UserConfigParams::m_height - m_map_bottom - m_map_height 
-            > viewport.LowerRightCorner.Y)
-        {
-            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
-                                   + (int)(0.1f*UserConfigParams::m_width);
-        }
-        else
-        {
-            // place lap text at the right of the mini-map
-            const int calculated_x = viewport.UpperLeftCorner.X 
-                                   + (int)(0.05f*UserConfigParams::m_width);
-            // don't overlap minimap
-            pos.UpperLeftCorner.X  = std::max(calculated_x, 
-                                              m_map_right_side_x + 15);
-        }
-    }
-    else
-    {
-        // mini-map is on the right, and lap text on right,
-        // so no overlap possible
-        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
-                               + (int)(0.05f*UserConfigParams::m_width);
-    }
-    
+    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
+    // If the time display in the top right is in this viewport,
+    // move the lap/rank display down a little bit so that it is
+    // displayed under the time.
+    if(viewport.UpperLeftCorner.Y==0 && 
+        viewport.LowerRightCorner.X==UserConfigParams::m_width &&
+        race_manager->getNumPlayers()!=3)
+        pos.UpperLeftCorner.Y   += 40;
+    pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
+    pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X 
+                            - m_rank_lap_width-10;
+    pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
     gui::ScalableFont* font = GUIEngine::getFont(); 
     int font_height         = (int)(font->getDimension(L"X").Height);
-    
-    if (!kart->hasFinishedRace())
-    {
-        static video::SColor color = video::SColor(255, 255, 255, 255);
-        pos.UpperLeftCorner.Y -= 3*font_height;
-        pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(m_string_lap.c_str(), pos, color);
-    
-        char str[256];
-        sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
-        font->draw(core::stringw(str).c_str(), pos, color);
-    }
-} // drawLap
-
-//-----------------------------------------------------------------------------
-void RaceGUI::drawRank(const KartIconDisplayInfo* info, const Kart* kart, 
-                      const core::recti &viewport)
-{
+    static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
-    const int rank = kart->getPosition();
-    const unsigned int kart_amount = world->getNumKarts();
-    
-    core::recti pos;
-    pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
 
-    // place rank string somewhere on the left of the screen
-    if (m_minimap_on_left)
+    const int rank = kart->getPosition();
+        
+    font->draw(m_string_rank.c_str(), pos, color);
+    pos.UpperLeftCorner.Y  += font_height;
+    pos.LowerRightCorner.Y += font_height;
+
+    char str[256];
+    const unsigned int kart_amount = world->getNumKarts();
+    sprintf(str, "%d/%d", rank, kart_amount);
+    font->draw(core::stringw(str).c_str(), pos, color);
+    pos.UpperLeftCorner.Y  += font_height;
+    pos.LowerRightCorner.Y += font_height;
+
+    // Don't display laps in follow the leader mode
+    if(world->raceHasLaps())
     {
-        // check if mini-map is within Y coords of this player.
-        // if the mini-map is not even in the viewport of this player, don't 
-        // bother placing the lap text at the right of the minimap.
-        if (UserConfigParams::m_height - m_map_bottom - m_map_height 
-            > viewport.LowerRightCorner.Y)
+        const int lap = info[kart->getWorldKartId()].lap;
+    
+        // don't display 'lap 0/...'
+        if(lap>=0)
         {
-            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
-                                   + (int)(0.1f*UserConfigParams::m_width);
-        }
-        else
-        {
-            // place lap text at the right of the mini-map
-            const int calculated_x = viewport.UpperLeftCorner.X 
-                                   + (int)(0.05f*UserConfigParams::m_width);
-            // don't overlap minimap
-            pos.UpperLeftCorner.X  = std::max(calculated_x, 
-                                              m_map_right_side_x + 15);
+            font->draw(m_string_lap.c_str(), pos, color);
+            char str[256];
+            sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
+            pos.UpperLeftCorner.Y  += font_height;
+            pos.LowerRightCorner.Y += font_height;
+            font->draw(core::stringw(str).c_str(), pos, color);
+            pos.UpperLeftCorner.Y  += font_height;
+            pos.LowerRightCorner.Y += font_height;
         }
     }
-    else
-    {
-        // mini-map is on the right, and lap text on right,
-        // so no overlap possible
-        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
-                               + (int)(0.05f*UserConfigParams::m_width);
-    }
-    
-    gui::ScalableFont* font = GUIEngine::getFont(); 
-    int font_height         = (int)(font->getDimension(L"X").Height);
-    
-    if (kart->hasFinishedRace())
-    {
-        static video::SColor color = video::SColor(255, 255, 255, 255);
-        pos.UpperLeftCorner.Y -= (2+2)*font_height;
-        pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(m_string_finished.c_str(), pos, color);
-    }
-    else
-    {
-        static video::SColor color = video::SColor(255, 255, 255, 255);
-        pos.UpperLeftCorner.Y -= (3+2)*font_height;
-        pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(m_string_rank.c_str(), pos, color);
-    
-        char str[256];
-        sprintf(str, "%d/%d", rank, kart_amount);
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
-        font->draw(core::stringw(str).c_str(), pos, color);
-    }
-} // drawRank
+
+} // drawRankLap
 
 //-----------------------------------------------------------------------------
 /** Removes messages which have been displayed long enough. This function
