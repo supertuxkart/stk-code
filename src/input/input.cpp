@@ -28,7 +28,8 @@ using namespace irr;
 
 // -----------------------------------------------------------------------------
 
-irr::core::stringw Input::getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir)
+irr::core::stringw Input::getInputAsString(const Input::InputType type, const int id,
+                                           const Input::AxisDirection dir)
 {
     irr::core::stringw s;
     

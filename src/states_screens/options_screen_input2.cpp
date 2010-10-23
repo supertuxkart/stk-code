@@ -195,7 +195,7 @@ void OptionsScreenInput2::updateInputButtons()
          action <= PA_LAST_GAME_ACTION;
          action=PlayerAction(action+1))
     {
-        const irr::core::stringw item = m_config->getBindingAsString(action);
+        const irr::core::stringw item = m_config->getMappingIdString(action);
         if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
         {
             currentlyUsedKeys.insert( item );
@@ -209,7 +209,7 @@ void OptionsScreenInput2::updateInputButtons()
             for (PlayerAction others = PA_FIRST_GAME_ACTION;
                  others < action; others=PlayerAction(others+1))
             {
-                const irr::core::stringw others_item = m_config->getBindingAsString(others);
+                const irr::core::stringw others_item = m_config->getMappingIdString(others);
                 if (others_item == item)
                 {
                     actions->markItemRed( KartActionStrings[others] );

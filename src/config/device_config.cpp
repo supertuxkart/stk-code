@@ -18,6 +18,68 @@ irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) 
 
 //------------------------------------------------------------------------------
 
+irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) const
+{
+    irr::core::stringw returnString = "";
+    
+    if ((action < PA_COUNT) && (action >= 0))
+    {
+        const Input::InputType type = m_bindings[action].type;
+        const int id = m_bindings[action].id;
+        const Input::AxisDirection dir = m_bindings[action].dir;
+        
+        switch (type)
+        {
+            case Input::IT_KEYBOARD:
+                returnString += "keyb_";
+                returnString += id;
+                break;
+                
+            case Input::IT_STICKMOTION:
+                returnString += "stkmo_";
+                returnString += id;
+                returnString += "$";
+                returnString += dir;
+                break;
+                
+            case Input::IT_STICKBUTTON:
+                returnString += "stkbt_";
+                returnString += id;
+                break;
+                
+            case Input::IT_STICKHAT:
+                returnString += "stkht_";
+                returnString += id;
+                break;
+                
+            case Input::IT_MOUSEMOTION:
+                returnString += "mousemo_";
+                returnString += id;
+                returnString += "$";
+                returnString += dir;
+                break;
+                
+            case Input::IT_MOUSEBUTTON:
+                returnString += "mousebtn_";
+                returnString += id;
+                break;
+                
+            default:
+                assert(false);
+                returnString += type;
+                returnString += "_";
+                returnString += id;
+                returnString += "$";
+                returnString += dir;
+        }
+    }
+    
+    return returnString;
+}
+
+
+//------------------------------------------------------------------------------
+
 irr::core::stringw DeviceConfig::toString ()
 {
     irr::core::stringw returnString = "";

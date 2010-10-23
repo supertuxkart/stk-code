@@ -68,8 +68,13 @@ public:
     std::string        getName           () const { return m_name; };
     irr::core::stringw toString          ();
     DeviceConfigType   getType           () const { return m_type; }
+    
+    /** Get a user-readable string describing the bound action */
     irr::core::stringw getBindingAsString(const PlayerAction action) const;
-
+    
+    /** Get an internal unique string describing the bound action */
+    irr::core::stringw getMappingIdString (const PlayerAction action) const;
+    
     void        serialize           (std::ofstream& stream);
     bool        deserializeAction   (irr::io::IrrXMLReader* xml);
     
