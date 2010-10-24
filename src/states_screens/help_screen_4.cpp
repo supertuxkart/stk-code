@@ -51,7 +51,7 @@ void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const i
         
         if (selection == "page1") StateManager::get()->replaceTopMostScreen(HelpScreen1::getInstance());
         else if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
-        else if(selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
+        else if(selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
     }
     else if (name == "back")
     {
