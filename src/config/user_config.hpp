@@ -219,7 +219,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps", &m_race_setup_group, "Default number of laps.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty", &m_race_setup_group, "Default race difficulty. 0=easy, 1=medium, 2=hard") );
-    
+    PARAM_PREFIX IntUserConfigParam          m_game_mode
+            PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode", &m_race_setup_group, "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes") );
+
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );

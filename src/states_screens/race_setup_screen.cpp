@@ -30,6 +30,10 @@
 
 #include "states_screens/race_setup_screen.hpp"
 
+const int CONFIG_CODE_NORMAL = 0;
+const int CONFIG_CODE_TIMETRIAL = 1;
+const int CONFIG_CODE_FTL = 2;
+const int CONFIG_CODE_3STRIKES = 3;
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
@@ -98,11 +102,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         if (selectedMode == "normal")
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_NORMAL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
         else if (selectedMode == "timetrial")
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
         else if (selectedMode == "ftl")
@@ -112,11 +118,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
                 race_manager->setNumKarts(3);
 
             race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
         else if (selectedMode == "3strikes")
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
             race_manager->setNumKarts( race_manager->getNumPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
@@ -223,7 +231,24 @@ void RaceSetupScreen::init()
     }
     
 
-    w2->updateItemDisplay();    
+    w2->updateItemDisplay();
+    
+    // restore saved game mode
+    switch (UserConfigParams::m_game_mode)
+    {
+        case CONFIG_CODE_NORMAL :
+            w2->setSelection("normal", PLAYER_ID_GAME_MASTER, true);
+            break;
+        case CONFIG_CODE_TIMETRIAL :
+            w2->setSelection("timetrial", PLAYER_ID_GAME_MASTER, true);
+            break;
+        case CONFIG_CODE_FTL :
+            w2->setSelection("ftl", PLAYER_ID_GAME_MASTER, true);
+            break;
+        case CONFIG_CODE_3STRIKES :
+            w2->setSelection("3strikes", PLAYER_ID_GAME_MASTER, true);
+            break;
+    }
     
     //FIXME: it's unclear to me whether I must add a listener everytime init is called or not
     m_mode_listener = new GameModeRibbonListener(this);
