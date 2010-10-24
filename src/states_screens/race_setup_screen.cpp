@@ -169,7 +169,7 @@ void RaceSetupScreen::init()
     Screen::init();
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
-    w->setSelection( race_manager->getDifficulty(), PLAYER_ID_GAME_MASTER );
+    w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
