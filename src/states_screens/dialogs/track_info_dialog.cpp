@@ -125,7 +125,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
         
         m_widgets.push_back(m_spinner);
         m_spinner->add();
-        m_spinner->setValue(3);
+        m_spinner->setValue( UserConfigParams::m_num_laps );
         m_spinner->getIrrlichtElement()->setTabStop(true);
         m_spinner->getIrrlichtElement()->setTabGroup(false);
     }
@@ -325,6 +325,7 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         assert(m_spinner != NULL);
         const int num_laps = m_spinner->getValue();
         race_manager->setNumLaps(num_laps);
+        UserConfigParams::m_num_laps = num_laps;
         updateHighScores();
     }
     
