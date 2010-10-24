@@ -23,44 +23,34 @@
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/gift.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="6" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Collect blue boxes : they will give you weapons or other powerups"/>
+            <bubble proportion="6" height="100%" word_wrap="true"
+                    I18N="In the help menu"
+                    text="Collect blue boxes : they will give you weapons or other powerups"/>
             <spacer width="25" height="25"/>
             <icon align="center" width="64" height="64" icon="gui/banana.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="4" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Avoid bananas!"/>
+            <bubble proportion="4" height="100%" word_wrap="true"
+                    I18N="In the help menu"
+                    text="Avoid bananas!"/>
         </div>
-
-<!--
-        <div width="100%" proportion="2" layout="horizontal-row">
-            <icon align="center" width="64" height="64" icon="gui/banana.png"/>
-            <spacer width="25" height="25"/>
-            <label proportion="2" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Avoid bananas!"/>
-        </div>
-        -->
         
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/nitro.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="3" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."/>
+            <bubble proportion="3" height="100%" word_wrap="true"
+                    I18N="In the help menu"
+                    text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."/>
             </div>
 
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="textures/gui_lock.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="2" height="100%" word_wrap="true"
-                   I18N="In the help menu"
-                   text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
+            <bubble proportion="2" height="100%" word_wrap="true"
+                    I18N="In the help menu"
+                    text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
         </div>
 
-        <label align="left" word_wrap="true" width="100%" proportion="1"
+        <bubble align="left" word_wrap="true" width="100%" proportion="1"
                 I18N="in the help menu"
                 text="The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"/>
 
