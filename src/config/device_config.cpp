@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "config/device_config.hpp"
 
 //==== D E V I C E C O N F I G =================================================
