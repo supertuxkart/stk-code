@@ -281,6 +281,7 @@
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
+		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
 		95C77D66106958A50080838E /* check_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D65106958A50080838E /* check_line.cpp */; };
 		95C77D6F106958E10080838E /* check_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D6D106958E10080838E /* check_sphere.cpp */; };
@@ -547,6 +548,8 @@
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD12102DE08F00EF2001 /* device_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_config.hpp; path = ../../config/device_config.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD13102DE08F00EF2001 /* device_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_config.cpp; path = ../../config/device_config.cpp; sourceTree = SOURCE_ROOT; };
+		95BF1E66127513A100F78AE7 /* max_speed.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = max_speed.cpp; path = ../../karts/max_speed.cpp; sourceTree = SOURCE_ROOT; };
+		95BF1E67127513A100F78AE7 /* max_speed.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = max_speed.hpp; path = ../../karts/max_speed.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC280F296540000D3E5D /* music_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_information.cpp; path = ../../audio/music_information.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC290F296540000D3E5D /* music_information.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_information.hpp; path = ../../audio/music_information.hpp; sourceTree = SOURCE_ROOT; };
@@ -1924,6 +1927,8 @@
 				95C2B11E0F296545000D3E5D /* kart_properties.hpp */,
 				95C2B11F0F296545000D3E5D /* kart_properties_manager.cpp */,
 				95C2B1200F296545000D3E5D /* kart_properties_manager.hpp */,
+				95BF1E66127513A100F78AE7 /* max_speed.cpp */,
+				95BF1E67127513A100F78AE7 /* max_speed.hpp */,
 				95C2B1210F296545000D3E5D /* moveable.cpp */,
 				95C2B1220F296545000D3E5D /* moveable.hpp */,
 			);
@@ -2679,6 +2684,7 @@
 				95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */,
 				95251F3D12554AB200505BA5 /* check_lap.cpp in Sources */,
 				9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */,
+				95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
