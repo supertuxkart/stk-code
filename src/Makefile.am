@@ -171,13 +171,13 @@ supertuxkart_SOURCES = \
  karts/controller/default_ai_controller.hpp \
  karts/controller/end_controller.cpp \
  karts/controller/end_controller.hpp \
- karts/emergency_animation.cpp \
- karts/emergency_animation.hpp \
  karts/controller/kart_control.hpp \
  karts/controller/new_ai_controller.cpp \
  karts/controller/new_ai_controller.hpp \
  karts/controller/player_controller.cpp \
  karts/controller/player_controller.hpp \
+ karts/emergency_animation.cpp \
+ karts/emergency_animation.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
  karts/kart_model.cpp \
@@ -186,6 +186,8 @@ supertuxkart_SOURCES = \
  karts/kart_properties.hpp \
  karts/kart_properties_manager.cpp \
  karts/kart_properties_manager.hpp    \
+ karts/max_speed.cpp \
+ karts/max_speed.hpp \
  karts/moveable.cpp \
  karts/moveable.hpp \
  modes/follow_the_leader.cpp \
