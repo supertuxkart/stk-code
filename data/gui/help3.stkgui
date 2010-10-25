@@ -24,7 +24,7 @@
             <spacer width="25" height="25"/>
             <bubble proportion="1" height="100%"
                     I18N="In the help menu" 
-                    text="Regular Race - all blows allowed, so catch weapons and make clever use of them!"/>
+                    text="Regular Race: all blows allowed, so catch weapons and make clever use of them!"/>
         </div>
         
         <div width="100%" proportion="2" layout="horizontal-row">
@@ -48,11 +48,11 @@
             <spacer width="25" height="25"/>
             <bubble proportion="1" height="100%"
                     I18N="In the help menu"
-                    text="3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."/>
+                    text="3 Strikes Battle: only in multiplayer games. Hit others with weapons until they lose all their lives."/>
         </div>
     
        <bubble proportion="3" width="100%" I18N="In the help menu"
-            text="* Most of these game modes can also be played in a Grand Prix fashion : instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
+            text="* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
 
     </box>
     <spacer width="50" height="45" /> 
