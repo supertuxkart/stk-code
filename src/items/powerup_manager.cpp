@@ -268,7 +268,7 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
         {
             PowerupType type = 
                 (PowerupType) ((i<=POWERUP_LAST) ? i 
-                                                 : i-POWERUP_MAX+POWERUP_FIRST);
+                                                 : i+POWERUP_FIRST);
             unsigned int w =m_weights[pos_class][i-POWERUP_FIRST]; 
             for(unsigned int j=0; j<w; j++)
                 m_powerups_for_position[pos_class].push_back(type);
