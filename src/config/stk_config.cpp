@@ -105,10 +105,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
     CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
-    CHECK_NEG(m_zipper_time,               "zipper-time"                );
-    CHECK_NEG(m_zipper_force,              "zipper-force"               );
-    CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
-    CHECK_NEG(m_zipper_max_speed_fraction, "zipper-max-speed-fraction"  );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubble_gum_counter,        "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
@@ -140,9 +136,7 @@ void STKConfig::init_defaults()
         m_parachute_time       = m_parachute_done_fraction   =
         m_parachute_time_other = m_anvil_speed_factor        =
         m_bomb_time            = m_bomb_time_increase        =
-        m_anvil_time           = m_zipper_time               =
-        m_zipper_force         = m_zipper_speed_gain         =
-        m_zipper_max_speed_fraction = m_music_credit_time    =
+        m_anvil_time           = m_music_credit_time         =
         m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_near_ground          = m_item_switch_time          = 
@@ -281,14 +275,6 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         bomb_node->get("time", &m_bomb_time);
         bomb_node->get("time-increase", &m_bomb_time_increase);
-    }
-
-    if(const XMLNode *zipper_node= root->getNode("zipper"))
-    {
-        zipper_node->get("time",               &m_zipper_time              );
-        zipper_node->get("force",              &m_zipper_force             );
-        zipper_node->get("speed-gain",         &m_zipper_speed_gain        );
-        zipper_node->get("max-speed-fraction", &m_zipper_max_speed_fraction);
     }
 
     if(const XMLNode *powerup_node= root->getNode("powerup"))

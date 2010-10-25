@@ -66,12 +66,6 @@ public:
     float m_bomb_time_increase;      /**<Time added to bomb timer when it's
                                          passed on.                          */
     float m_anvil_time;              /**<Time an anvil is active.            */
-    float m_zipper_time;             /**<Duration a zipper is active.        */
-    float m_zipper_force;            /**<Additional force added to the
-                                         acceleration.                       */
-    float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
-    float m_zipper_max_speed_fraction;/**<Fraction of max speed allowed past
-                                          regular max speed                  */
     float m_item_switch_time;        /**< Time items will be switched.       */
     int   m_bubble_gum_counter;      /**< How many times bananas must be eaten
                                           before they disappear.             */

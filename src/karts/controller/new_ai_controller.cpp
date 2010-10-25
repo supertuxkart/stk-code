@@ -245,7 +245,8 @@ void NewAIController::update(float dt)
     // use the zipper instead
     if(m_controls->m_nitro && 
         m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER && 
-        m_kart->getSpeed()>1.0f && m_kart->getZipperTimeLeft()<=0)
+        m_kart->getSpeed()>1.0f && 
+        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
         // Make sure that not all AI karts use the zipper at the same
         // time in time trial at start up, so during the first 5 seconds

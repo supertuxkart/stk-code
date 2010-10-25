@@ -71,12 +71,6 @@
        to timer when bomb is passed on. -->
   <bomb time="30.0" time-increase="-5.0"/>
 
-  <!-- time is the time a zipper is active. force is the additional 
-       zipper force. speed-gain is the one time additional speed.
-       max-speed-fraction is a factor multiplied to the maximum 
-       speed on the terrain.  -->
-  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-fraction="2.0"/>
-
   <!-- Powerup collect-mode decides what is collected if a kart has already an 
        powerup: same: get one more item of the same type.
                 new:  always get a new item.
@@ -149,6 +143,14 @@
          small-container: how much energy a small container gives.
          big-container: how much energy a big container gives. -->
     <nitro power-boost="3" consumption="1" small-container="1" big-container="3"/>
+
+  <!-- time is the time a zipper is active. force is the additional 
+       zipper force. speed-gain is the one time additional speed.
+       max-speed-increase is the additional speed allowed on top
+       of the kart-specific maximum kart speed. Fade-out time determines
+       how long it takes for a zipper to fade out (after 'time').  -->
+  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+          fade-out-time="1.0"  />
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.

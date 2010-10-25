@@ -93,7 +93,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_EASY:
         m_wait_for_players        = true;
         m_make_use_of_slipstream  = false;
-        m_max_handicap_accel      = 0.9f;
+        m_max_handicap_speed      = 0.9f;
         m_item_tactic             = IT_TEN_SECONDS;
         m_false_start_probability = 0.08f;
         m_min_start_delay         = 0.3f;
@@ -106,7 +106,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_MEDIUM:
         m_wait_for_players        = true;
         m_make_use_of_slipstream  = false;
-        m_max_handicap_accel      = 0.95f;
+        m_max_handicap_speed      = 0.95f;
         m_item_tactic             = IT_CALCULATE;
         m_false_start_probability = 0.04f;
         m_min_start_delay         = 0.25f;
@@ -119,7 +119,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_HARD:
         m_wait_for_players        = false;
         m_make_use_of_slipstream  = true;
-        m_max_handicap_accel      = 1.0f;
+        m_max_handicap_speed      = 1.0f;
         m_item_tactic             = IT_CALCULATE;
         m_false_start_probability = 0.01f;
         // See http://www.humanbenchmark.com/tests/reactiontime/stats.php
@@ -298,7 +298,8 @@ void DefaultAIController::update(float dt)
     // use the zipper instead
     if(m_controls->m_nitro && 
         m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER && 
-        m_kart->getSpeed()>1.0f && m_kart->getZipperTimeLeft()<=0)
+        m_kart->getSpeed()>1.0f && 
+        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
         // Make sure that not all AI karts use the zipper at the same
         // time in time trial at start up, so during the first 5 seconds
@@ -691,6 +692,11 @@ void DefaultAIController::handleAcceleration( const float dt)
         return;
     }
     
+
+    // FIXME: this needs to be rewritten, it doesn't make any sense:
+    // wait for players triggers the opposite (if a player is ahead
+    // of this AI, go full speed). Besides, it's going to use full
+    // speed anyway.
     if( m_wait_for_players )
     {
         //Find if any player is ahead of this kart
@@ -704,7 +710,7 @@ void DefaultAIController::handleAcceleration( const float dt)
 
         if( player_winning )
         {
-            m_controls->m_accel = m_max_handicap_accel;
+            m_controls->m_accel = m_max_handicap_speed;
             return;
         }
     }

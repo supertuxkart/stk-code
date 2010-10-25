@@ -78,9 +78,8 @@ private:
       *  position than all the human players. */
     bool  m_wait_for_players;
 
-    /** The allowed maximum speed, in percentage, from 0.0 to 1.0. Used only 
-     *  when m_wait_for_players == true. */
-    float m_max_handicap_accel; 
+    /** The allowed maximum speed in percent of the kart's maximum speed. */
+    float m_max_handicap_speed; 
     
      /** How are items going to be used? */
     ItemTactic m_item_tactic;

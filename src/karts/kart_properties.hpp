@@ -132,6 +132,21 @@ private:
     /** How far away from an explosion karts will still be affected. */
     float m_explosion_radius;
 
+    /** Duration a zipper is active. */
+    float m_zipper_time;
+    
+    /** Fade out time for a zipper. */
+    float m_zipper_fade_out_time;
+
+    /** Additional force added to the acceleration. */
+    float m_zipper_force;
+    
+    /** Initial one time speed gain. */
+    float m_zipper_speed_gain;
+    
+    /** Absolute increase of the kart's maximum speed (in m/s). */
+    float m_zipper_max_speed_increase;
+
     /** Vertical offset after rescue. */
     float m_rescue_vert_offset;
 
@@ -403,6 +418,18 @@ public:
     /** Returns duration of a plunger in your face. */
     float getPlungerInFaceTime      () const 
                {return m_plunger_in_face_duration[race_manager->getDifficulty()];}
+    /** Returns the time a zipper is active. */
+    float getZipperTime             () const {return m_zipper_time;              }
+    /** Returns the time a zipper is active. */
+    float getZipperFadeOutTime     () const {return m_zipper_fade_out_time;      }
+    /** Returns the additional force added applied to the kart. */
+    float getZipperForce            () const { return m_zipper_force;            }
+    /** Returns the initial zipper speed gain. */
+    float getZipperSpeedGain        () const { return m_zipper_speed_gain;       }
+    /** Returns the increase of the maximum speed of the kart 
+     *  if a zipper is active. */
+    float getZipperMaxSpeedIncrease () const { return m_zipper_max_speed_increase;}
+
 
     /** Returns additional rotation of 3d model when skidding. */
     float getSkidVisual             () const {return m_skid_visual;              }

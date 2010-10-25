@@ -64,7 +64,7 @@
 Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
-       Moveable(), EmergencyAnimation(this), m_powerup(this)
+       Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
@@ -344,6 +344,23 @@ void Kart::adjustSpeed(float f)
 }   // adjustSpeed
 
 //-----------------------------------------------------------------------------
+/** Caps the speed at a given value. If necessary the kart will 
+ *  instantaneously change its speed.
+ *  \param max_speed Maximum speed of the kart.
+ */
+void Kart::capSpeed(float max_speed)
+{
+    if ( m_speed >  max_speed && isOnGround() )
+    {
+        const float velocity_ratio = max_speed/m_speed;
+        btVector3 velocity         = getBody()->getLinearVelocity();
+        velocity *= velocity_ratio;
+        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+    }
+
+}   // capSpeed
+
+//-----------------------------------------------------------------------------
 /** This method is to be called every time the mass of the kart is updated,
  *  which includes attaching an anvil to the kart (and detaching).
  */
@@ -363,7 +380,7 @@ void Kart::updatedWeight()
 void Kart::reset()
 {
     EmergencyAnimation::reset();
-
+    MaxSpeed::reset();
     if (m_camera)
     {
         m_camera->reset();
@@ -388,7 +405,6 @@ void Kart::reset()
     m_race_position        = m_initial_position;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
-    m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
     m_has_started          = false;
     m_wheel_rotation       = 0;
@@ -574,17 +590,18 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getActualWheelForce()
 {
-    float zipperF=(m_zipper_time_left>0.0f) ? stk_config->m_zipper_force : 0.0f;
+    float time_left = MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER);
+    float zipper_force = time_left>0.0f ? m_kart_properties->getZipperForce(): 0.0f;
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getMaxSpeed()*gear_ratio[i])
         {
             return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]
-                  +zipperF;
+                  +zipper_force;
         }
     }
-    return getMaxPower()+zipperF;
+    return getMaxPower()+zipper_force;
 
 }   // getActualWheelForce
 
@@ -648,7 +665,8 @@ void Kart::update(float dt)
 
     // When really on air, free fly, when near ground, try to glide / adjust for landing
     // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
-    if(!isNearGround() && !(m_zipper_time_left > 0.0f))
+    if(!isNearGround() && 
+        MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER)<=0.0f )
         m_uprightConstraint->setLimit(M_PI);
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
@@ -669,8 +687,6 @@ void Kart::update(float dt)
         // like in ski jump sports, too boring but also works.
         //m_body->setAngularVelocity(btVector3(0,0,0));
     }
-
-    m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
     //timeframe is the delta time, we don't have to multiply it with dt.
@@ -802,6 +818,9 @@ void Kart::update(float dt)
         else if(material->isZipper() && isOnGround()) handleZipper();
         else
         {
+            MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
+                                  material->getMaxSpeedFraction(), 
+                                  material->getSlowDownTime()     );
             // Normal driving on terrain. Adjust for maximum terrain speed
             // Gradually adjust the fraction of the maximum kart speed to
             // the amount specified for the terrain.
@@ -841,13 +860,16 @@ void Kart::handleZipper()
 {
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake) return;
-    m_zipper_time_left  = stk_config->m_zipper_time;
 
-    btVector3 v         = m_body->getLinearVelocity();
-    float current_speed = v.length();
-    float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain,
-                                   getMaxSpeedOnTerrain() *
-                                   (1 + stk_config->m_zipper_max_speed_fraction));
+    MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_ZIPPER, 
+                               m_kart_properties->getZipperMaxSpeedIncrease(),
+                               m_kart_properties->getZipperTime(),
+                               /*fade_out_time*/ 3.0f);
+    // This will result in all max speed settings updated, but no 
+    // changes to any slow downs since dt=0
+    MaxSpeed::update(0);
+    float speed = std::min(m_speed+m_kart_properties->getZipperSpeedGain(),
+                           MaxSpeed::getCurrentMaxSpeed()                   );
 
     m_vehicle->activateZipper(speed);
     // Play custom character sound (weee!)
@@ -988,7 +1010,7 @@ float Kart::handleSlipstream(float dt)
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
         m_slipstream->setIntensity(1.0f, m_slipstream_target);
-        return 0;       // see below about abusing m_zipper_time_left without zipper
+        return 0;       // see below about abusing zipper without zipper
         //return m_kart_properties->getSlipstreamAddPower();
     }
     return 0;
@@ -1128,9 +1150,10 @@ void Kart::updatePhysics(float dt)
     if(!m_has_started && m_controls.m_accel)
     {
         m_has_started = true;
-        m_zipper_time_left = 5.0f;
         float f       = m_kart_properties->getStartupBoost();
         m_vehicle->activateZipper(f);
+        MaxSpeed::increaseMaxSpeed(MS_INCREASE_ZIPPER, +10,
+                                   5.0f, 5.0f);
 
     }
 
@@ -1267,33 +1290,8 @@ void Kart::updatePhysics(float dt)
     if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
         m_speed *= -1.f;
 
-    //cap at maximum velocity
-    float max_speed = getMaxSpeedOnTerrain();
-    if (m_zipper_time_left > 0.0f)
-    {
-        const float zipper_fade_time = 3.0f;
-        if (m_zipper_time_left > zipper_fade_time)
-        {
-            max_speed *= (1.0f + stk_config->m_zipper_max_speed_fraction);
-        }
-        else
-        {
-            max_speed *= (1.0f + (stk_config->m_zipper_max_speed_fraction * m_zipper_time_left * 1.0f/zipper_fade_time));
-        }
-    }
-    if ( m_speed >  max_speed && isOnGround())
-    {
-        const float velocity_ratio = max_speed/m_speed;
-        m_speed                    = max_speed;
-        btVector3 velocity         = m_body->getLinearVelocity();
-
-        velocity.setZ( velocity.getZ() * velocity_ratio );
-        velocity.setX( velocity.getX() * velocity_ratio );
-        velocity.setY( velocity.getY() * velocity_ratio ); // Up-down too
-
-        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
-
-    }
+    // Cap speed if necessary
+    MaxSpeed::update(dt);
 
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
@@ -1322,6 +1320,7 @@ void Kart::updatePhysics(float dt)
     {
         if(isOnGround())
         {
+            float max_speed = MaxSpeed::getCurrentMaxSpeed();
             // Engine noise is based half in total speed, half in fake gears:
             // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
             // ignoring the gear settings from stk_config, but providing a
@@ -1378,7 +1377,7 @@ void Kart::loadData()
     m_smoke_system        = new Smoke(this);
     m_water_splash_system = new WaterSplash(this);
     m_nitro               = new Nitro(this);
-    m_slipstream         = new SlipStream(this);
+    m_slipstream          = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);

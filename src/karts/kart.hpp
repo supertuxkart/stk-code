@@ -27,13 +27,13 @@
 
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "karts/emergency_animation.hpp"
+#include "karts/max_speed.hpp"
 #include "karts/moveable.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/controller/controller.hpp"
-#include "karts/controller/kart_control.hpp"
-#include "karts/kart_model.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
@@ -60,7 +60,8 @@ class WaterSplash;
  *  and TerrainInfo, which manages the terrain the kart is on.
  * \ingroup karts
  */
-class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation
+class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
+             public MaxSpeed
 {
 private:
     /** Reset position. */
@@ -93,7 +94,6 @@ private:
 protected:       // Used by the AI atm
     KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
     Powerup      m_powerup;
-    float        m_zipper_time_left;   /**<Zipper time left. */
     Attachment  *m_attachment;
     /** Easier access for player_kart. */
     Camera      *m_camera;
@@ -229,6 +229,7 @@ public:
     void           resetBrakes      ();
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);
+    void           capSpeed         (float max_speed);
     void           updatedWeight    ();
     virtual void   collectedItem    (Item *item, int random_attachment);
     virtual void   reset            ();
@@ -291,9 +292,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     int            getNumPowerup       () const { return m_powerup.getNum(); }
-    // ------------------------------------------------------------------------
-    /** Returns the time left for a zipper. */
-    float          getZipperTimeLeft   () const { return m_zipper_time_left; }
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     float          getEnergy           () const { return m_collected_energy; }
