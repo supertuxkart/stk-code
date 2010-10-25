@@ -216,8 +216,8 @@ void RaceSetupScreen::init()
     {
         irr::core::stringw name3 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
-        //FIXME: avoid duplicating descriptions from the help menu!
-        name3 += _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
+        //I18N: short definition for follow-the-leader game mode
+        name3 += _("Keep up with the leader kart but don't overtake it!");
         w2->addItem(name3, "ftl", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
     
