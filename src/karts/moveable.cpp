@@ -91,6 +91,26 @@ void Moveable::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+
+void Moveable::fly()
+{
+    m_body->setGravity(btVector3(0.0, 8.0, 0.0));
+    //m_body->setMassProps( 0.0, btVector3(0.0, 0.0, 0.0) );
+    flyUp();
+    //m_body->applyCentralForce( btVector3(0.0, 9000.0, 0.0) );
+}
+
+void Moveable::flyUp()
+{
+    m_body->applyCentralImpulse(btVector3(0.0, 100.0, 0.0));
+}
+
+void Moveable::flyDown()
+{
+    m_body->applyCentralImpulse(btVector3(0.0, -100.0, 0.0));
+}
+
+//-----------------------------------------------------------------------------
 /** Updates the current position and rotation from the corresponding physics
  *  body, and then calls updateGraphics to position the model correctly.
  *  \param float dt Time step size.

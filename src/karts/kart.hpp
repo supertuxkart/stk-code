@@ -64,6 +64,9 @@ class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
              public MaxSpeed
 {
 private:
+    
+    bool m_flying;
+    
     /** Reset position. */
     btTransform  m_reset_transform;
     /** Index of kart in world. */
@@ -226,6 +229,8 @@ public:
     float          getActualWheelForce();
     bool           isSlipstreamReady() const;
 
+    virtual void fly();
+    
     void           resetBrakes      ();
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);

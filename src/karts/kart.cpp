@@ -96,7 +96,8 @@ Kart::Kart (const std::string& ident, int position,
     m_camera               = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
-
+    m_flying               = false;
+    
     m_view_blocked_by_plunger = 0;
 
     // Initialize custom sound vector (TODO: add back when properly done)
@@ -266,6 +267,13 @@ void Kart::createPhysics()
     World::getWorld()->getPhysics()->addKart(this);
 
 }   // createPhysics
+
+void Kart::fly()
+{
+    m_flying = true;
+    Moveable::fly();
+    //m_vehicle->m_flying = true;
+}
 
 // ----------------------------------------------------------------------------
 /** Starts the engine sound effect. Called once the track intro phase is over.
@@ -663,14 +671,17 @@ void Kart::update(float dt)
         m_controls.m_fire = false;
     }
 
-    // When really on air, free fly, when near ground, try to glide / adjust for landing
-    // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
-    if(!isNearGround() && 
-        MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER)<=0.0f )
-        m_uprightConstraint->setLimit(M_PI);
-    else
-        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-
+    if (!m_flying)
+    {
+        // When really on air, free fly, when near ground, try to glide / adjust for landing
+        // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
+        if(!isNearGround() && 
+            MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER)<=0.0f )
+            m_uprightConstraint->setLimit(M_PI);
+        else
+            m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
+    }
+    
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
     // straight after jumping, but still allowing some "boat shake" (roll and pitch).
@@ -1162,8 +1173,28 @@ void Kart::updatePhysics(float dt)
                                                + handleSlipstream(dt);
     if(m_attachment->getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
+    if (m_flying)
+    {
+        if (m_controls.m_accel)
+        {
+            float orientation = getHeading();
+            m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0, 60.0f*cos(orientation)));
+        }
+        if (m_controls.m_steer != 0.0f)
+        {
+            m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 2000.0f, 0.0));
+        }
+        if (m_controls.m_brake)
+        {
+            float orientation = getHeading();
+            m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0, -60.0f*cos(orientation)));
+        }
+    }
+    
+    
     if(m_controls.m_accel)   // accelerating
-    {   // For a short time after a collision disable the engine,
+    {
+        // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
         if(m_bounce_back_time>0.0f)
             engine_power = 0.0f;
