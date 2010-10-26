@@ -94,6 +94,7 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
 }   // EndController
 
 //-----------------------------------------------------------------------------
@@ -143,7 +144,7 @@ void EndController::update(float dt)
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
     m_controls->m_brake     = false;
-    m_controls->m_accel     = 0.3f;
+    m_controls->m_accel     = 1.0f;
 
     // Update the current node:
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)

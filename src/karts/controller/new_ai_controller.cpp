@@ -571,7 +571,7 @@ void NewAIController::handleAcceleration( const float DELTA )
 
     if(m_kart->hasViewBlockedByPlunger())
     {
-        if(!(m_kart->getSpeed() > m_kart->getMaxSpeedOnTerrain() / 2))
+        if(!(m_kart->getSpeed() > m_kart->getCurrentMaxSpeed() / 2))
             m_controls->m_accel = 0.05f;
         else 
             m_controls->m_accel = 0.0f;
@@ -642,7 +642,7 @@ void NewAIController::handleNitroAndZipper()
 {
     m_controls->m_nitro = false;
     // If we are already very fast, save nitro.
-    if(m_kart->getSpeed() > 0.95f*m_kart->getMaxSpeedOnTerrain())
+    if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
         return;
     // Don't use nitro when the AI has a plunger in the face!
     if(m_kart->hasViewBlockedByPlunger()) return;
@@ -865,7 +865,7 @@ void NewAIController::reset()
 {
     m_time_since_last_shot       = 0.0f;
     m_start_kart_crash_direction = 0;
-    m_curve_target_speed         = m_kart->getMaxSpeedOnTerrain();
+    m_curve_target_speed         = m_kart->getCurrentMaxSpeed();
     m_curve_angle                = 0.0;
     m_time_till_start            = -1.0f;
     m_crash_time                 = 0.0f;
@@ -939,5 +939,5 @@ void NewAIController::findCurve()
                       -m_quad_graph->getAngleToNext(m_track_node, 
                                                     m_successor_index[m_track_node]) );
     
-    m_curve_target_speed = m_kart->getMaxSpeedOnTerrain();
+    m_curve_target_speed = m_kart->getCurrentMaxSpeed();
 }   // findCurve
