@@ -259,6 +259,8 @@ namespace UserConfigParams
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool                       m_gamepad_debug     PARAM_DEFAULT( false );
+    /** If material debugging (printing terrain specific slowdown) is enabled. */
+    PARAM_PREFIX bool                       m_material_debug    PARAM_DEFAULT( false );
 
     /** If track debugging is enabled. */
     PARAM_PREFIX int                        m_track_debug       PARAM_DEFAULT( false );
