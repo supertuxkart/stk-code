@@ -831,6 +831,15 @@ void Kart::update(float dt)
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
                                   material->getMaxSpeedFraction(), 
                                   material->getSlowDownTime()     );
+#ifdef DEBUG
+            if(UserConfigParams::m_material_debug)
+            {
+                printf("%s\tfraction %f\ttime %f.\n",
+                       material->getTexFname().c_str(),
+                       material->getMaxSpeedFraction(),
+                       material->getSlowDownTime()       );
+            }
+#endif
         }
     }   // if there is material
 

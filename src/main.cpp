@@ -257,6 +257,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_track_debug=1;
         }
+        else if(!strcmp(argv[i], "--material-debug"))
+        {
+            UserConfigParams::m_material_debug = true;
+        }
         else if(!strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
