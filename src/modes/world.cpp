@@ -110,14 +110,12 @@ void World::init()
     m_race_gui = new RaceGUI();
 
     // Grab the track file
-    try
-    {
-        m_track = track_manager->getTrack(race_manager->getTrackName());
-    }
-    catch(std::runtime_error)
+    m_track = track_manager->getTrack(race_manager->getTrackName());
+    if(!m_track)
     {
         std::ostringstream msg;
-        msg << "Track '" << race_manager->getTrackName() << "' not found.\n";
+        msg << "Track '" << race_manager->getTrackName() 
+            << "' not found.\n";
         throw std::runtime_error(msg.str());
     }
 
