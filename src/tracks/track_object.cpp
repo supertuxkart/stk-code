@@ -84,7 +84,9 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     {
     }
     m_animated_node->setPosition(m_init_xyz.toIrrVector());
-    m_animated_node->setRotation(m_init_hpr.toIrrHPR()   );
+    // Note that toIrrHPR converts radians to degrees. Since the value
+    // from the xml file is already in degrees, there is no need for that.
+    m_animated_node->setRotation(m_init_hpr.toIrrVector()   );
     m_animated_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // TrackObject
 
