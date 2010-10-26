@@ -101,10 +101,6 @@ protected:       // Used by the AI atm
     /** Easier access for player_kart. */
     Camera      *m_camera;
 private:
-    /** Depending on terrain a certain reduction to the maximum speed applies.
-     *  This reduction is accumulated in m_current_speed_fraction, which will
-     *  always be between the fraction for the terrain and 1.0. */
-    float        m_current_speed_fraction;
     /** True if the kart hasn't moved since 'ready-set-go' - used to 
      *  determine startup boost. */
     bool         m_has_started;
@@ -366,12 +362,6 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the kart controls. Used e.g. by replaying history. */
     void           setControls(const KartControl &c) { m_controls = c;        }
-    // ------------------------------------------------------------------------
-    /** Returns the maximum speed of the kart including the effect of 
-     *  the terrain it is on. */    
-    float          getMaxSpeedOnTerrain() const 
-                                {return m_kart_properties->getMaxSpeed()
-                                       *m_current_speed_fraction;             }
     // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float          getKartLength   () const {return m_kart_model->getLength();}

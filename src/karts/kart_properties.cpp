@@ -63,6 +63,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_time_full_steer = m_time_full_steer_ai =
         m_nitro_power_boost = m_nitro_consumption =
         m_nitro_small_container = m_nitro_big_container =
+        m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
         m_wheel_radius = m_chassis_linear_damping =
@@ -81,8 +82,10 @@ KartProperties::KartProperties(const std::string &filename)
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
-        m_slipstream_min_speed = m_camera_distance = 
-        m_camera_forward_up_angle = m_camera_backward_up_angle =
+        m_slipstream_min_speed = m_slipstream_max_speed_increase =
+        m_slipstream_duration = m_slipstream_fade_out_time =
+        m_camera_distance = m_camera_forward_up_angle = 
+        m_camera_backward_up_angle =
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_ai_steering_variation = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -234,10 +237,14 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))
     {
-        nitro_node->get("power-boost",     &m_nitro_power_boost    );
-        nitro_node->get("consumption",     &m_nitro_consumption    );
-        nitro_node->get("small-container", &m_nitro_small_container);
-        nitro_node->get("big-container",   &m_nitro_big_container  );
+        nitro_node->get("power-boost",        &m_nitro_power_boost       );
+        nitro_node->get("consumption",        &m_nitro_consumption       );
+        nitro_node->get("small-container",    &m_nitro_small_container   );
+        nitro_node->get("big-container",      &m_nitro_big_container     );
+        nitro_node->get("max-speed-increase", &m_nitro_max_speed_increase);
+        nitro_node->get("duration",           &m_nitro_duration          );
+        nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
+
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -269,11 +276,15 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
     {
-        slipstream_node->get("length",       &m_slipstream_length      );
-        slipstream_node->get("collect-time", &m_slipstream_collect_time);
-        slipstream_node->get("use-time",     &m_slipstream_use_time    );
-        slipstream_node->get("add-power",    &m_slipstream_add_power   );
-        slipstream_node->get("min-speed",    &m_slipstream_min_speed   );
+        slipstream_node->get("length",       &m_slipstream_length            );
+        slipstream_node->get("collect-time", &m_slipstream_collect_time      );
+        slipstream_node->get("use-time",     &m_slipstream_use_time          );
+        slipstream_node->get("add-power",    &m_slipstream_add_power         );
+        slipstream_node->get("min-speed",    &m_slipstream_min_speed         );
+        slipstream_node->get("max-speed-increase", 
+                                             &m_slipstream_max_speed_increase);
+        slipstream_node->get("duration",     &m_slipstream_duration          );
+        slipstream_node->get("fade-out-time",&m_slipstream_fade_out_time     );
     }
 
     if(const XMLNode *turn_node = root->getNode("turn"))
@@ -553,6 +564,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
     CHECK_NEG(m_slipstream_add_power,       "slipstream add-power"          );
     CHECK_NEG(m_slipstream_min_speed,       "slipstream min-speed"          );
+    CHECK_NEG(m_slipstream_max_speed_increase, 
+                                            "slipstream max-speed-increase" );
+    CHECK_NEG(m_slipstream_duration,        "slipstream duration"           );
+    CHECK_NEG(m_slipstream_fade_out_time,   "slipstream fade-out-time"      );
     CHECK_NEG(m_camera_distance,            "camera distance"               );
     CHECK_NEG(m_camera_forward_up_angle,    "camera forward-up-angle"       );
     CHECK_NEG(m_camera_backward_up_angle,   "camera forward-up-angle"       );
@@ -560,6 +575,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_consumption,          "nitro consumption"             );
     CHECK_NEG(m_nitro_big_container,        "nitro big-container"           );
     CHECK_NEG(m_nitro_small_container,      "nitro small-container"         );
+    CHECK_NEG(m_nitro_max_speed_increase,   "nitro max-speed-increase"      );
+    CHECK_NEG(m_nitro_duration,             "nitro duration"                );
+    CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
     CHECK_NEG(m_rescue_height,              "rescue height"                 );
     CHECK_NEG(m_rescue_time,                "rescue time"                   );
     CHECK_NEG(m_rescue_vert_offset,         "rescue vert-offset"            );

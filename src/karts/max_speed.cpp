@@ -122,6 +122,9 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
+/** Handles the speed increase for a certain category. 
+ *  \param dt Time step size.
+ */
 void MaxSpeed::SpeedDecrease::update(float dt)
 {
     float diff = m_current_fraction - m_max_speed_fraction;
@@ -137,12 +140,21 @@ void MaxSpeed::SpeedDecrease::update(float dt)
 }   // SpeedDecrease::update
 
 // ----------------------------------------------------------------------------
+/** Returns how much increased speed time is left over in the given category.
+ *  \param category Which category to report on.
+ */
 float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
 {
     return m_speed_increase[category].getTimeLeft();
 }   // getSpeedIncreaseTimeLeft
 
 // ----------------------------------------------------------------------------
+/** Updates all speed increase and decrease objects, and determines the
+ *  current maximum speed. Note that the function can be called with
+ *  dt=0, in which case the maxium speed will be updated, but no
+ *  change to any of the speed increase/decrease objects will be done.
+ *  \param dt Time step size (dt=0 only updates the current maximum speed).
+ */
 void MaxSpeed::update(float dt)
 {
 

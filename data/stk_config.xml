@@ -141,8 +141,15 @@
          consumption: nitro consumption - heavier characters can be set
          to need more nitro than lighter character.
          small-container: how much energy a small container gives.
-         big-container: how much energy a big container gives. -->
-    <nitro power-boost="3" consumption="1" small-container="1" big-container="3"/>
+         big-container: how much energy a big container gives. 
+         max-speed-increase: How much the speed of a kart might exceed
+         its maximum speed (in m/s). 
+         duration: How long the increased speed will be valid after
+         the kart stops using nitro (and the fade-out-time starts).
+         fade-out-time: Duration during which the increased maximum
+         speed due to nitro fades out.  -->
+    <nitro power-boost="3" consumption="1" small-container="1" big-container="3"
+           max-speed-increase="5" duration="1" fade-out-time="2"/>
 
   <!-- time is the time a zipper is active. force is the additional 
        zipper force. speed-gain is the one time additional speed.
@@ -164,9 +171,16 @@
          collect-time: How many seconds of sstream give  maximum benefit
          use-time: How long the benefit will last.
          add-power: Additional power due to sstreaming. 1 = +100%
-         min-speed: Minimum speed necessary for slipstream to take effect. -->
+         min-speed: Minimum speed necessary for slipstream to take effect. 
+         max-speed-increase: How much the speed of the kart might exceed
+         its normal maximum speed.
+         duration: How long the higher speed lasts after slipstream stopped
+         working.
+         fade-out-time: How long the slip stream speed increase will 
+         gradually be reduced.  -->
     <slipstream length="10" collect-time="2" use-time="5"
-                add-power="3" min-speed="10" />
+                add-power="3" min-speed="10"
+                max-speed-increase="5" duration="1" fade-out-time="2"/>
 
     <!-- min-speed-radius and max-speed-radius define the smallest turn 
          radius at lowest speed (4.64 m at speed 0) and at high speed

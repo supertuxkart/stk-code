@@ -419,7 +419,6 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
-    m_current_speed_fraction = 1.0f;
     m_slipstream_mode      = SS_NONE;
     m_last_material        = NULL;
     if(m_terrain_sound)
@@ -832,14 +831,6 @@ void Kart::update(float dt)
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
                                   material->getMaxSpeedFraction(), 
                                   material->getSlowDownTime()     );
-            // Normal driving on terrain. Adjust for maximum terrain speed
-            // Gradually adjust the fraction of the maximum kart speed to
-            // the amount specified for the terrain.
-            // The actual capping happens in updatePhysics
-            if(m_current_speed_fraction<=material->getMaxSpeedFraction())
-                m_current_speed_fraction = material->getMaxSpeedFraction();
-            else
-                m_current_speed_fraction -= dt/material->getSlowDownTime();
         }
     }   // if there is material
 
@@ -901,6 +892,10 @@ float Kart::handleNitro(float dt)
         m_collected_energy = 0;
         return 0.0;
     }
+    MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
+                               m_kart_properties->getNitroMaxSpeedIncrease(),
+                               m_kart_properties->getNitroDuration(), 
+                               m_kart_properties->getNitroFadeOutTime()      );
     return m_kart_properties->getNitroPowerBoost() * getMaxPower();
 
 }   // handleNitro
@@ -928,6 +923,10 @@ float Kart::handleSlipstream(float dt)
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
         m_slipstream->setIntensity(2.0f, NULL);
+        MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
+                    m_kart_properties->getSlipstreamMaxSpeedIncrease(),
+                    m_kart_properties->getSlipstreamDuration(),
+                    m_kart_properties->getSlipstreamFadeOutTime()       );
         return m_kart_properties->getSlipstreamAddPower();
     }
 
@@ -1234,7 +1233,7 @@ void Kart::updatePhysics(float dt)
             {
                 resetBrakes();
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
-                if ( -m_speed <  getMaxSpeedOnTerrain()
+                if ( -m_speed <  MaxSpeed::getCurrentMaxSpeed()
                                  *m_kart_properties->getMaxSpeedReverseRatio() )
                 {
                     // The backwards acceleration is artificially increased to
@@ -1515,7 +1514,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     if(m_slipstream_mode == SS_USE)
         m_nitro->setCreationRate(20.0f);
 
-    float speed_ratio    = getSpeed()/getMaxSpeedOnTerrain();
+    float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(center_shift, 
