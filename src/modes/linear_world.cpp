@@ -298,7 +298,9 @@ void LinearWorld::newLap(unsigned int kart_index)
             m_last_lap_sfx_played = true;
             m_last_lap_sfx_playing = true;
             
-            music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
+            // In case that no music is defined
+            if(music_manager->getCurrentMusic())
+                music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
         }
     }
 
