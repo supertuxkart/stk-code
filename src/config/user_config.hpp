@@ -221,7 +221,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty", &m_race_setup_group, "Default race difficulty. 0=easy, 1=medium, 2=hard") );
     PARAM_PREFIX IntUserConfigParam          m_game_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode", &m_race_setup_group, "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes") );
-
+    PARAM_PREFIX StringUserConfigParam m_default_kart
+            PARAM_DEFAULT( StringUserConfigParam("tux", "kart", "Kart to select by default (the last used kart)") );
+    
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );
@@ -321,8 +323,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
 
     PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
-
-    PARAM_PREFIX std::string m_default_kart  PARAM_DEFAULT( "tux" ); // not saved to file
     
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

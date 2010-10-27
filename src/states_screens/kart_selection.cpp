@@ -307,7 +307,7 @@ public:
         m_children.push_back(m_model_view);
         
         // Init kart model
-        std::string& default_kart = UserConfigParams::m_default_kart;
+        const std::string default_kart = UserConfigParams::m_default_kart.toString();
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
         if(!props)
         {
@@ -938,7 +938,11 @@ void KartSelectionScreen::init()
     }
     
     // Player 0 select default kart
-    w->setSelection(UserConfigParams::m_default_kart, 0, true);
+    if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
+    {
+        // if kart from config not found, select the first instead
+        w->setSelection(0, 0, true);
+    }
     
     /*
     std::cout << "===== screen contents =====\n";
@@ -1209,6 +1213,11 @@ void KartSelectionScreen::playerConfirm(const int playerID)
     {
         unlock_manager->playLockSound();
         return;
+    }
+    
+    if (playerID == PLAYER_ID_GAME_MASTER)
+    {
+        UserConfigParams::m_default_kart = selection;
     }
     
     // make sure no other player selected the same identity or kart
