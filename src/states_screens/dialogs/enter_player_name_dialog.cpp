@@ -91,14 +91,20 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
             sfx_manager->quickSound( "use_anvil" );
             return;
         }
+        
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+        
+        ModalDialog::dismiss();
     }
-    
-    // irrLicht is too stupid to remove focus from deleted widgets
-    // so do it by hand
-    GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
-    GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-
-    ModalDialog::dismiss();
+    else
+    {
+        LabelWidget* label = getWidget<LabelWidget>("title");
+        label->setText(_("Cannot add a player with this name."));
+        sfx_manager->quickSound( "use_anvil" );
+    }
 }
 
 // -----------------------------------------------------------------------------
