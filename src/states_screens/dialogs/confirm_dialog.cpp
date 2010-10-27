@@ -50,7 +50,7 @@ GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& event
     
     if (eventSource == "cancel")
     {   
-        ModalDialog::dismiss();
+        //ModalDialog::dismiss();
         
         m_listener->onCancel();
         
@@ -58,7 +58,7 @@ GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& event
     }
     else if (eventSource == "confirm")
     {
-        ModalDialog::dismiss();
+        //ModalDialog::dismiss();
         
         m_listener->onConfirm();
         
@@ -66,4 +66,11 @@ GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& event
     }
     
     return GUIEngine::EVENT_LET;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ConfirmDialog::IConfirmDialogListener::onCancel()
+{
+    ModalDialog::dismiss();
 }

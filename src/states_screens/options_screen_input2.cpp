@@ -418,6 +418,7 @@ void OptionsScreenInput2::onConfirm()
     assert(success);
     m_config = NULL;
     input_manager->getDeviceList()->serialize();
+    ModalDialog::dismiss();
     StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
 }
 

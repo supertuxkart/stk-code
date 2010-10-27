@@ -40,11 +40,17 @@ public:
         IConfirmDialogListener() {}
         virtual ~IConfirmDialogListener() {}
         
-        /** \brief Implement to be notified of dialog confirmed */
+        /** \brief Implement to be notified of dialog confirmed.
+          * \note  The dialog is not closed automatically, close it in the callback if this
+          *        behavior is desired.
+          */
         virtual void onConfirm() = 0;
         
-        /** \brief Implement to be notified of dialog cancelled */
-        virtual void onCancel() {}
+        /** \brief Implement to be notified of dialog cancelled.
+          * \note  The default implementation is to close the modal dialog, but you may override
+          *        this method to change the behavior.
+          */
+        virtual void onCancel();
     };
     
 private:
