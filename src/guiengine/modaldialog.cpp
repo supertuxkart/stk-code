@@ -122,6 +122,7 @@ ModalDialog::~ModalDialog()
     GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
     
     m_irrlicht_window->remove();
+    m_irrlicht_window = NULL;
     
     if (modalWindow == this) modalWindow = NULL;
     

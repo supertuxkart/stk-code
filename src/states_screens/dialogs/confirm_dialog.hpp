@@ -59,6 +59,8 @@ public:
       */
     ConfirmDialog(irr::core::stringw msg, IConfirmDialogListener* listener);
     
+    ~ConfirmDialog() { m_listener = NULL; }
+    
     virtual void onEnterPressedInternal();
     
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
