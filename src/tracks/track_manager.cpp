@@ -76,7 +76,6 @@ Track* TrackManager::getTrack(const std::string& ident) const
     std::cerr << msg.str() << std::endl;
     return NULL;
     
-    //throw std::runtime_error(msg.str());
 }   // getTrack
 
 //-----------------------------------------------------------------------------

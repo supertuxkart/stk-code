@@ -49,17 +49,13 @@ GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& event
 {
     
     if (eventSource == "cancel")
-    {   
-        //ModalDialog::dismiss();
-        
+    {           
         m_listener->onCancel();
         
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "confirm")
-    {
-        //ModalDialog::dismiss();
-        
+    {        
         m_listener->onConfirm();
         
         return GUIEngine::EVENT_BLOCK;
