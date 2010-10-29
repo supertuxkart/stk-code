@@ -425,10 +425,7 @@ void RaceManager::exitRace()
         bool someHumanPlayerWon = false;
         const unsigned int kartStatusCount = m_kart_status.size();
         
-        /** The rank from which players are considered losers - you are behind half the players OR
-            behind the first 3 (the first condition handles cases where there are 3 karts or less).
-            However this rank may not be 0, since at least one player must win, hence the std::max call. */
-        const int loserThreshold = std::max(1, std::min(3, int(kartStatusCount)/2));
+        const int loserThreshold = 3;
         
         std::string winners[3];
         std::vector<std::string> humanLosers; // because we don't care about AIs that lost
