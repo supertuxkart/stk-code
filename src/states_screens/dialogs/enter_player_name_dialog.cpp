@@ -81,7 +81,20 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     // ---- Otherwise, accept entered name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     stringw playerName = textCtrl->getText();
-    if (playerName.size() > 0)
+    const int size = playerName.size();
+    
+    // sanity check
+    int nonEmptyChars = 0;
+    for (int n=0; n<size; n++)
+    {
+        if (playerName[n] != L' ')
+        {
+            nonEmptyChars++;
+        }
+    }
+    
+    
+    if (size > 0 && nonEmptyChars > 0)
     {
         const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
         if (!success)
