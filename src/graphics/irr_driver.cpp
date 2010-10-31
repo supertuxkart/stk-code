@@ -166,6 +166,29 @@ void IrrDriver::initDevice()
         }   // for bits=24, 16
         if(m_device) break;
     }   // for edt_types
+    
+    // if still no device, try with a standard 800x600 window size, maybe
+    // size is the problem
+    if(!m_device)
+    {
+        UserConfigParams::m_width = 800;
+        UserConfigParams::m_height = 600;
+        
+        m_device = createDevice(video::EDT_OPENGL,
+                                core::dimension2d<u32>(UserConfigParams::m_width,
+                                                       UserConfigParams::m_height ),
+                                32, //bits per pixel
+                                UserConfigParams::m_fullscreen,
+                                false,  // stencil buffers
+                                false,  // vsync
+                                this    // event receiver
+                                );
+        if (m_device)
+        {
+            fprintf(stderr, "An invalid resolution was set in the config file, reverting to saner values\n");
+        }
+    }
+    
     if(!m_device)
     {
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
