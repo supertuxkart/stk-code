@@ -788,7 +788,8 @@ void LinearWorld::updateRacePosition()
 void LinearWorld::checkForWrongDirection(unsigned int i)
 {
     if(!m_karts[i]->getController()->isPlayerController()) return;
-    if(!m_kart_info[i].m_on_road) return;
+    if(!m_kart_info[i].m_on_road ||
+        m_karts[i]->playingEmergencyAnimation()) return;
 
     const Kart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
