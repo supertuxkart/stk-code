@@ -59,7 +59,8 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
     
     m_init_pos.setIdentity();
-    m_init_pos.setOrigin(m_init_xyz);
+    Vec3 init_xyz(m_init_xyz);
+    m_init_pos.setOrigin(init_xyz);
 
 }   // PhysicalObject
 

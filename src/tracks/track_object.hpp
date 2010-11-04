@@ -65,10 +65,13 @@ protected:
     scene::IAnimatedMeshSceneNode *m_animated_node;
 
     /** The initial XYZ position of the object. */
-    Vec3                    m_init_xyz;
+    core::vector3df                m_init_xyz;
 
     /** The initial hpr of the object. */
-    Vec3                    m_init_hpr;
+    core::vector3df                m_init_hpr;
+
+    /** The initial scale of the object. */
+    core::vector3df                m_init_scale;
 
 public:
                  TrackObject(const XMLNode &xml_node);

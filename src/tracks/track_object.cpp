@@ -75,18 +75,19 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     if(!m_enabled)
         m_animated_node->setVisible(false);
 
-    m_init_xyz = Vec3(0,0,0);
-    int result = xml_node.get("xyz", &m_init_xyz);
-    m_init_hpr = Vec3(0,0,0);
-    result     = xml_node.get("hpr", &m_init_hpr);
+    m_init_xyz   = core::vector3df(0,0,0);
+    int result   = xml_node.get("xyz", &m_init_xyz);
+    m_init_hpr   = core::vector3df(0,0,0);
+    result       = xml_node.get("hpr", &m_init_hpr);
+    m_init_scale = core::vector3df(1,1,1);
+    result       = xml_node.get("scale", &m_init_scale);
     if(!XMLNode::hasP(result) ||
        !XMLNode::hasR(result))   // Needs perhaps pitch and roll
     {
     }
-    m_animated_node->setPosition(m_init_xyz.toIrrVector());
-    // Note that toIrrHPR converts radians to degrees. Since the value
-    // from the xml file is already in degrees, there is no need for that.
-    m_animated_node->setRotation(m_init_hpr.toIrrVector()   );
+    m_animated_node->setPosition(m_init_xyz);
+    m_animated_node->setRotation(m_init_hpr);
+    m_animated_node->setScale(m_init_scale);
     m_animated_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // TrackObject
 
@@ -102,8 +103,9 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    m_animated_node->setPosition(m_init_xyz.toIrrVector());
-    m_animated_node->setRotation(m_init_hpr.toIrrHPR());
+    m_animated_node->setPosition(m_init_xyz);
+    m_animated_node->setRotation(m_init_hpr);
+    m_animated_node->setScale(m_init_scale);
     m_animated_node->setLoopMode(false);
 
     if(m_is_looped)
