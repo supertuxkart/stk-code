@@ -123,9 +123,9 @@ void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr,
     case Ipo::IPO_LOCX   : xyz->X   =  get(); break;
     case Ipo::IPO_LOCY   : xyz->Y   =  get(); break;
     case Ipo::IPO_LOCZ   : xyz->Z   =  get(); break;
-    case Ipo::IPO_ROTX   : hpr->X   = -get(); break;  // the - signs are odd,
-    case Ipo::IPO_ROTY   : hpr->Y   = -get(); break;  // but it works
-    case Ipo::IPO_ROTZ   : hpr->Z   =  get(); break;  // why no - ??
+    case Ipo::IPO_ROTX   : hpr->X   =  get(); break;
+    case Ipo::IPO_ROTY   : hpr->Y   =  get(); break;
+    case Ipo::IPO_ROTZ   : hpr->Z   =  get(); break;
     case Ipo::IPO_SCALEX : scale->X =  get(); break;
     case Ipo::IPO_SCALEY : scale->Y =  get(); break;
     case Ipo::IPO_SCALEZ : scale->Z =  get(); break;
