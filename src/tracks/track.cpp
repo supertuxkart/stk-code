@@ -361,8 +361,9 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
-    const core::vector3df &pos = node->getPosition();
-    const core::vector3df &hpr = node->getRotation();
+    const core::vector3df &pos   = node->getPosition();
+    const core::vector3df &hpr   = node->getRotation();
+    const core::vector3df &scale = node->getScale();
 
     scene::IMesh *mesh;
     // In case of readonly materials we have to get the material from
@@ -397,6 +398,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     core::matrix4 mat;
     mat.setRotationDegrees(hpr);
     mat.setTranslation(pos);
+    mat.setScale(scale);
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
@@ -532,13 +534,16 @@ bool Track::loadMainTrack(const XMLNode &root)
         scene_node->setName(debug_name.c_str());
 #endif
 
-        //core::vector3df xyz(0,0,0);
-        Vec3 xyz(0,0,0);
+        core::vector3df xyz(0,0,0);
         n->get("xyz", &xyz);
+        scene_node->setPosition(xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
-        scene_node->setPosition(xyz.toIrrVector());
         scene_node->setRotation(hpr);
+        core::vector3df scale(1.0f, 1.0f, 1.0f);
+        n->get("scale", &scale);
+        scene_node->setScale(scale);
+
         handleAnimatedTextures(scene_node, *n);
         m_all_nodes.push_back(scene_node);
     }   // for i
