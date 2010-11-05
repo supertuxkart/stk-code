@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/sh
 
 echo "Generating ./configure script"
 ./autogen.sh
