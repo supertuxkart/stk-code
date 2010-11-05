@@ -270,7 +270,7 @@ void PlayerController::update(float dt)
     if(World::getWorld()->isStartPhase())
     {
         if(m_controls->m_accel || m_controls->m_brake ||
-           m_controls->m_fire  || m_controls->m_nitro || m_controls->m_drift)
+           m_controls->m_fire  || m_controls->m_nitro)
         {
             if (m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
