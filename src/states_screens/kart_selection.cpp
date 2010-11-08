@@ -1204,6 +1204,8 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
     }
 }
 
+// -----------------------------------------------------------------------------
+
 void KartSelectionScreen::playerConfirm(const int playerID)
 {
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
@@ -1220,19 +1222,25 @@ void KartSelectionScreen::playerConfirm(const int playerID)
         UserConfigParams::m_default_kart = selection;
     }
     
-    // make sure no other player selected the same identity or kart
     const int amount = m_kart_widgets.size();
+
+    // Check if we have enough karts for everybody. If there are more players than
+    // karts then just allow duplicates
+    const int availableKartCount = w->getItems().size();
+    const bool willNeedDuplicates = (amount > availableKartCount);
+    
+    // make sure no other player selected the same identity or kart
     for (int n=0; n<amount; n++)
     {
         if (n == playerID) continue; // don't check a kart against itself
         
         const bool player_ready   = m_kart_widgets[n].isReady();
         const bool ident_conflict = !m_kart_widgets[n].getAssociatedPlayer()->getProfile()->isGuestAccount() &&
-        m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-        m_kart_widgets[playerID].getAssociatedPlayer()->getProfile();
+                                    m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                                    m_kart_widgets[playerID].getAssociatedPlayer()->getProfile();
         const bool kart_conflict  = sameKart(m_kart_widgets[n], m_kart_widgets[playerID]);
         
-        if (player_ready && (ident_conflict || kart_conflict))
+        if (player_ready && (ident_conflict || kart_conflict) && !willNeedDuplicates)
         {
             printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
             
@@ -1437,7 +1445,7 @@ void KartSelectionScreen::allPlayersDone()
             // mark the item as taken
             for (int i=0; i<item_count; i++)
             {
-                if (items[i].m_code_name == items[n].m_code_name)
+                if (items[i].m_code_name == m_kart_widgets[n].m_kartInternalName)
                 {
                     items[i].m_code_name = ID_DONT_USE;
                     break;
@@ -1456,6 +1464,7 @@ void KartSelectionScreen::allPlayersDone()
 }
 
 // -----------------------------------------------------------------------------
+
 bool KartSelectionScreen::validateIdentChoices()
 {
     bool ok = true;
@@ -1536,6 +1545,14 @@ bool KartSelectionScreen::validateKartChoices()
         m_kart_widgets[n].m_model_view->unsetBadge(BAD_BADGE);
     }
     
+    // Check if we have enough karts for everybody. If there are more players than
+    // karts then just allow duplicates
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    const int availableKartCount = w->getItems().size();
+    if (amount > availableKartCount) return true;
+    
+    // Check everyone for duplicates
     for (int n=0; n<amount; n++)
     {        
         for (int m=n+1; m<amount; m++)
