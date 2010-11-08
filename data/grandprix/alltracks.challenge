@@ -3,7 +3,7 @@
 <challenge
     id="worldsend"
     name="Win the At World's End Grand Prix"
-    description="Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
+    description="Come first in the At World's End Grand Prix with 3 Expert AI karts."
     unlock-gp="alltracks"
     depend-on="islandfollow"
     major="grandprix"
