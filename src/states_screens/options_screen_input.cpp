@@ -56,10 +56,12 @@ void OptionsScreenInput::loadedFromFile()
 {    
     video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir() + "/keyboard.png" );
     video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad.png" );
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad_off.png" );
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
     m_icon_bank->addTextureAsSprite(icon1);    
     m_icon_bank->addTextureAsSprite(icon2);
+    m_icon_bank->addTextureAsSprite(icon3);
     
     // scale icons depending on screen resolution. the numbers below are a bit arbitrary
     const int screen_width = irr_driver->getFrameSize().Width;
@@ -109,7 +111,9 @@ void OptionsScreenInput::buildDeviceList()
             gpname << "gamepad" << i;
             const std::string internal_name = gpname.str();
             
-            devices->addItem(internal_name, name, 1 /* icon */);
+            const int icon = (config->isEnabled() ? 1 : 2);
+            
+            devices->addItem(internal_name, name, icon);
         }   // if config->isPlugged
     }   // for i<gpad_config_count
 }   // buildDeviceList

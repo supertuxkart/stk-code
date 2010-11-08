@@ -140,6 +140,8 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
                                const PlayerAction  lastActionToCheck,
                                PlayerAction*       action /* out */ )
 {
+    if (!m_enabled) return false;
+    
     bool success = false;
     int  n;
 
@@ -310,7 +312,8 @@ KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
 
 void GamepadConfig::serialize (std::ofstream& stream)
 {
-    stream << "<gamepad name =\"" << m_name.c_str() << "\">\n\n";
+    stream << "<gamepad name =\"" << m_name.c_str() << "\" enabled=\""
+           << (m_enabled ? "true" : "false") << "\">\n\n";
     DeviceConfig::serialize(stream);
     stream << "</gamepad>\n\n\n";
 }
@@ -363,6 +366,17 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_
     {
         m_name = name_string;
     }
+    
+    const char* enabled_string = xml->getAttributeValue("enabled");
+    if (enabled_string != NULL)
+    {
+        m_enabled = (strcmp(enabled_string, "true") == 0);
+    }
+    else
+    {
+        m_enabled = true;
+    }
+    
     setPlugged(false);
     setDefaultBinds();
 }

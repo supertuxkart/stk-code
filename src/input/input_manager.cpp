@@ -446,8 +446,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
             // reset timer when released
             if (abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON))
             {
-                if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
-                else std::cout << "resetting for another reason\n";
+                //if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
+                //else std::cout << "resetting for another reason\n";
 
                 m_timer_in_use = false;
                 m_timer = 0;

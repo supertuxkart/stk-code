@@ -44,6 +44,8 @@ private:
     
 protected:
     
+    bool        m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
+
     std::string m_name;
     
     DeviceConfigType m_type;
@@ -51,6 +53,7 @@ protected:
     DeviceConfig(DeviceConfigType type)
     {
         m_type = type;
+        m_enabled = true;
     }
     
     /**
@@ -112,6 +115,8 @@ public:
     
     bool hasBindingFor(const int buttonID) const;
     
+    /** At this time only relevant for gamepads, keyboards are always enabled */
+    bool isEnabled() const { return m_enabled; }
 };
 
 //==== K E Y B O A R D C O N F I G =============================================
@@ -157,8 +162,7 @@ public:
     GamepadConfig           (const std::string      name,
                              const int              axis_count,
                              const int              btnCount);
-    //        ~GamepadConfig();
-    
+    //        ~GamepadConfig();  
 };
 
 #endif
