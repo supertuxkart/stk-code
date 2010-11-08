@@ -78,7 +78,6 @@ Track::Track(std::string filename)
     m_mini_map             = NULL;
     m_sky_dx               = 0.05f;
     m_sky_dy               = 0.0f;
-    m_max_kart_count       = 8;
     loadTrackInfo();
 }   // Track
 
@@ -206,10 +205,6 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
-    root->get("ambient",               &m_sun_diffuse_color);
-    root->get("ambient",               &m_sun_specular_color);
-    root->get("ambient",               &m_default_ambient_color);
-    root->get("maxKartCount",          &m_max_kart_count);
         
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
