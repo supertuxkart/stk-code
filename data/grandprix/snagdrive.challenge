@@ -5,7 +5,7 @@
     name="Win To the Moon and Back Grand Prix"
     description="Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
     unlock-gp="snagdrive"
-    depend-on="energyshiftingsands junglefollow"
+    depend-on="energyshiftingsands junglefollow gardenhead"
     major="grandprix"
     minor="quickrace"
     gp="tothemoonandback"
