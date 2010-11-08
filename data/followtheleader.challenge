@@ -3,7 +3,7 @@
 <challenge
     id="penguinplaygroundgp"
     name="Win Penguin Playground Grand Prix"
-    description="Win Penguin Playground Grand Prix with 3 &apos;Racer&apos; Level AI karts."
+    description="Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
     unlock-mode="FOLLOW_LEADER"
     major="grandprix"
     minor="quickrace"

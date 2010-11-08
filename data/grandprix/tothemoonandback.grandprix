@@ -2,9 +2,9 @@
 <supertuxkart_grand_prix name="To the Moon and Back">
 
     <track id="lighthouse" laps="4" />
-    <track id="skyline"    laps="3" />
     <track id="startrack"  laps="3" />
-    <track id="xr591"      laps="3" />
     <track id="hacienda"   laps="3" />
- 
+    <track id="secretgarden" laps="2" />
+    <track id="farm"         laps="3" />
+     
 </supertuxkart_grand_prix>

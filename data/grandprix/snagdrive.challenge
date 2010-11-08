@@ -3,7 +3,7 @@
 <challenge
     id="tothemoonandbackgp"
     name="Win To the Moon and Back Grand Prix"
-    description="Win the To the Moon and Back Grand Prix with 3 'Racer' Level AI karts."
+    description="Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
     unlock-gp="snagdrive"
     depend-on="energyshiftingsands junglefollow"
     major="grandprix"

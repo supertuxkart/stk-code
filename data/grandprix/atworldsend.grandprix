@@ -3,9 +3,8 @@
 
     <track id="fortmagma"    laps="3" />
     <track id="canyon"       laps="2" />
-    <track id="secretgarden" laps="2" />
-    <track id="snowtuxpeak"  laps="3" />
-    <track id="farm"         laps="3" />
- 
+    <track id="xr591"        laps="3" />
+    <track id="mines"            laps="3" />
+    
 </supertuxkart_grand_prix>
 
