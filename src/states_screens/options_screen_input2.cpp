@@ -68,7 +68,13 @@ void OptionsScreenInput2::init()
     ButtonWidget* deleteBtn = this->getWidget<ButtonWidget>("delete");
     if (m_config->getType() != DEVICE_CONFIG_TYPE_KEYBOARD)
     {
-        deleteBtn->setDeactivated();
+        //I18N: button to disable a gamepad configuration
+        if (m_config->isEnabled())  deleteBtn->setLabel(_("Disable Device"));
+        //I18N: button to enable a gamepad configuration
+        else                        deleteBtn->setLabel(_("Enable Device"));
+            
+            
+        //deleteBtn->setDeactivated();
     }
     else if (input_manager->getDeviceList()->getKeyboardAmount() < 2)
     {
@@ -390,8 +396,25 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "delete")
     {
-        //I18N: shown before deleting an input configuration
-        new ConfirmDialog( _("Are you sure you want to permanently delete this configuration?"), this );
+        if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD)
+        {
+           // keyboard configs may be deleted 
+           //I18N: shown before deleting an input configuration
+            new ConfirmDialog( _("Are you sure you want to permanently delete this configuration?"), this );
+        }
+        else
+        {
+            // gamepad configs may be disabled
+            if (m_config->isEnabled())  m_config->setEnabled(false);
+            else                        m_config->setEnabled(true);
+            
+            // update widget label
+            ButtonWidget* deleteBtn = this->getWidget<ButtonWidget>("delete");
+            if (m_config->isEnabled())  deleteBtn->setLabel(_("Disable Device"));
+            else                        deleteBtn->setLabel(_("Enable Device"));
+            
+            input_manager->getDeviceList()->serialize();
+        }
     }
     
 }   // eventCallback

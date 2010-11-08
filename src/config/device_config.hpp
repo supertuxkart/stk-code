@@ -117,6 +117,8 @@ public:
     
     /** At this time only relevant for gamepads, keyboards are always enabled */
     bool isEnabled() const { return m_enabled; }
+    
+    void setEnabled(bool newValue) { m_enabled = newValue; }
 };
 
 //==== K E Y B O A R D C O N F I G =============================================
