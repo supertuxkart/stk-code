@@ -1,4 +1,5 @@
 All icons come from Open Game Art (art by onyum.com, comissionned by Bart Kelsey)
+released under CC-BY-SA 3+
 * options_players & random_kart were tweaked by Marianne Gagnon
 
 
