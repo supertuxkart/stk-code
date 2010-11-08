@@ -89,6 +89,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_animated_node->setRotation(m_init_hpr);
     m_animated_node->setScale(m_init_scale);
     m_animated_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    reset();
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -106,12 +107,11 @@ void TrackObject::reset()
     m_animated_node->setPosition(m_init_xyz);
     m_animated_node->setRotation(m_init_hpr);
     m_animated_node->setScale(m_init_scale);
-    m_animated_node->setLoopMode(false);
+    m_animated_node->setLoopMode(m_is_looped);
 
     if(m_is_looped)
     {
         m_animated_node->setFrameLoop(m_frame_start, m_frame_end);
-        m_animated_node->setLoopMode(true);
     }
 }   // reset
 // ----------------------------------------------------------------------------
