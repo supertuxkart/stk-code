@@ -1217,17 +1217,17 @@ void Kart::updatePhysics(float dt)
         {
             btVector3 velocity = m_body->getLinearVelocity(); 
             
-            const int x = (int)velocity.x();
+            const float x = velocity.x();
             if (x > 0.2f)        velocity.setX(x - 0.2f);
             else if (x < -0.2f)  velocity.setX(x + 0.2f);
             else                 velocity.setX(0);
             
-            const int y = (int)velocity.y();
+            const float y = velocity.y();
             if (y > 0.2f)        velocity.setY(y - 0.2f);
             else if (y < -0.2f)  velocity.setY(y + 0.2f);
             else                 velocity.setY(0);
             
-            const int z = (int)velocity.z();
+            const float z = velocity.z();
             if (z > 0.2f)        velocity.setZ(z - 0.2f);
             else if (z < -0.2f)  velocity.setZ(z + 0.2f);
             else                 velocity.setZ(0);
