@@ -88,11 +88,12 @@ void AddonsLoading::loadInfo()
 void * AddonsLoading::downloadIcon( void * pthis)
 {
     AddonsLoading * pt = (AddonsLoading*)pthis;
-	download("icon/" + pt->addons->GetIcon(), pt->addons->GetName() + ".png");
-	pthread_mutex_lock(&(pt->m_mutex_can_install));
-	pt->m_can_load_icon = true;
-	pthread_mutex_unlock(&(pt->m_mutex_can_install));
-	
+	if(download("icon/" + pt->addons->GetIcon(), pt->addons->GetName() + ".png"))
+    {
+        pthread_mutex_lock(&(pt->m_mutex_can_install));
+        pt->m_can_load_icon = true;
+        pthread_mutex_unlock(&(pt->m_mutex_can_install));
+	}
     return NULL;
 }
 

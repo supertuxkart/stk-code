@@ -50,6 +50,8 @@ Addons::Addons()
     m_download_state = download_state;
     pthread_mutex_init(&m_str_mutex, NULL);
 
+    /*It is _very_ dirty to save the list as a locale file since we have a
+    function to load it directly in a string.*/
     download("list");
     std::string xml_file = file_manager->getConfigDir() + "/" + "list";
     std::cout << xml_file << std::endl;
@@ -167,6 +169,7 @@ void Addons::GetInstalledAddons()
                         addons.type = xml->getNodeName();
                         addons.name = name;
                         addons.installed_version = version;
+                        addons.version = version;
                         addons.installed = true;
                         this->m_addons_list.push_back(addons);
                     }
