@@ -836,7 +836,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                     m_ident.c_str(), node->getName().c_str());
         }
 
-    }
+    }   // for i<root->getNumNodes()
     delete root;
 
     // Init all track objects
