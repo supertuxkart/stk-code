@@ -41,21 +41,44 @@ private:
     GUIEngine::IconButtonWidget *       icon;
     GUIEngine::IconButtonWidget *       m_next;
     GUIEngine::IconButtonWidget *       m_previous;
+    
+    /**
+     * This function is called when the user click on 'Install', 'Uninstall', or
+     * 'Update'. It is started using a thread.
+     * */
     static void * startInstall(void*);
+    /**
+     * This function handle the downllading of the addons icon.
+     * It is started using a thread. When it is ended, it change the flag
+     * 'm_can_load_icon' and the onUpdate function reload the icon
+     * */
     static void * downloadIcon(void*);
     void loadInfo();
+    
+    /* These three bool are some flags.
+     * m_can_install : when the installation is finidhed, onUpdate close the
+     * dialog.
+     * m_percent_update : to reload the download percent
+     * m_can_load_icon see above (function downloadIcon)*/
     bool m_can_install;
     bool m_percent_update;
 	bool m_can_load_icon;
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
     pthread_mutex_t m_mutex_can_install;
-    Addons * addons;
-    AddonsLoading(Addons * id, const float percentWidth, const float percentHeight);
+    AddonsLoading(const float percentWidth, const float percentHeight);
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    
+    /** This function is called by the GUI, all the frame (or somthing like
+     * that). It checks the flags (m_can_install, m_can_load_icon and
+     * m_percent_update) and do the necessary.
+     * */
     void onUpdate(float delta);
+    
+    /** To close the dialog when the (un)installation is finished.*/
     void close();
 };
 

@@ -37,11 +37,10 @@ using namespace irr::gui;
 
 // ------------------------------------------------------------------------------------------------------
 
-AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
+AddonsLoading::AddonsLoading(const float w, const float h) :
         ModalDialog(w, h)
 {
     loadFromFile("addons_view_dialog.stkgui");
-    this->addons = id;
     m_can_install = false;
 	m_can_load_icon = false;
     m_percent_update = false;
@@ -56,7 +55,7 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
     
     version = this->getWidget<LabelWidget>("version");
     
-    if(this->addons->IsInstalledAsBool())
+    if(addons_manager->IsInstalledAsBool())
     {
         if(addons_manager->GetInstalledVersion() < addons_manager->GetVersion())
             this->getWidget<ButtonWidget>("install")->setLabel(_("Update"));
@@ -68,27 +67,18 @@ AddonsLoading::AddonsLoading(Addons * id, const float w, const float h) :
 }
 void AddonsLoading::loadInfo()
 {
-
-
-    /*I think we can wait a little to have the icon ?*/
-
-
-
-    name->setText(StringUtils::insertValues(_("Name: %i"), this->addons->GetName().c_str()));
-    description->setText(StringUtils::insertValues(_("Description: %i"), this->addons->GetDescription().c_str()));
-    version->setText(StringUtils::insertValues(_("Version: %i"), this->addons->GetVersionAsStr().c_str()));
+    name->setText(StringUtils::insertValues(_("Name: %i"), addons_manager->GetName().c_str()));
+    description->setText(StringUtils::insertValues(_("Description: %i"), addons_manager->GetDescription().c_str()));
+    version->setText(StringUtils::insertValues(_("Version: %i"), addons_manager->GetVersionAsStr().c_str()));
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
-
-
-
 }
 
 // ------------------------------------------------------------------------------------------------------
 void * AddonsLoading::downloadIcon( void * pthis)
 {
     AddonsLoading * pt = (AddonsLoading*)pthis;
-	if(download("icon/" + pt->addons->GetIcon(), pt->addons->GetName() + ".png"))
+	if(download("icon/" + addons_manager->GetIcon(), addons_manager->GetName() + ".png"))
     {
         pthread_mutex_lock(&(pt->m_mutex_can_install));
         pt->m_can_load_icon = true;
@@ -109,12 +99,12 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     }
     else if(eventSource == "next")
     {
-        this->addons->NextType(this->addons->GetType());
+        addons_manager->NextType(addons_manager->GetType());
         this->loadInfo();
     }
     else if(eventSource == "previous")
     {
-        this->addons->PreviousType(this->addons->GetType());
+        addons_manager->PreviousType(addons_manager->GetType());
         this->loadInfo();
     }
     if(eventSource == "install")
@@ -166,12 +156,12 @@ void AddonsLoading::onUpdate(float delta)
     }
     if(m_percent_update)
     {
-        m_progress->setValue(addons->getDownloadState());
-        m_state->setText(addons->getDownloadStateAsStr().c_str());
+        m_progress->setValue(addons_manager->getDownloadState());
+        m_state->setText(addons_manager->getDownloadStateAsStr().c_str());
     }
     if(m_can_load_icon)
     {
-		icon->setImage(std::string(file_manager->getConfigDir() + "/" +  this->addons->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+		icon->setImage(std::string(file_manager->getConfigDir() + "/" +  addons_manager->GetName() + ".png").c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
     pthread_mutex_unlock(&(m_mutex_can_install));
 }
@@ -191,13 +181,13 @@ void AddonsLoading::close()
 void * AddonsLoading::startInstall(void* pthis)
 {
     AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(!obj->addons->IsInstalledAsBool() or obj->addons->NeedUpdate())
+    if(!addons_manager->IsInstalledAsBool() or addons_manager->NeedUpdate())
     {
-        obj->addons->Install();
+        addons_manager->Install();
     }
     else
     {
-        obj->addons->UnInstall();
+        addons_manager->UnInstall();
     }
     pthread_mutex_lock(&(obj->m_mutex_can_install));
     obj->m_can_install = true;

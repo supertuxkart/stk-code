@@ -106,7 +106,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
         std::string addons = list->getSelectionInternalName();
 
         addons_manager->SelectId(addons);
-        this->load = new AddonsLoading(addons_manager, 0.8f, 0.8f);
+        this->load = new AddonsLoading(0.8f, 0.8f);
     }
     if (name == "category")
     {
