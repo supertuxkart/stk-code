@@ -295,11 +295,14 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             kart_main_node->updateAbsolutePosition();
             kart_main_node->setRotation(vector3df(0, 90, 0));
             kart_model->setAnimation(KartModel::AF_DEFAULT);
+            float susp[4]={0,0,0,0};
+            kart_model->update(0.0f, 0.0f, susp);
         }   // if kart !=NULL
         
         m_kart_node[n] = kart_main_node;
     }
     
+    /*
     const int w = UserConfigParams::m_width;
     const int h = UserConfigParams::m_height;
     
@@ -330,6 +333,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         default:
             assert(false);
     }
+     */
     
 }   // setKarts
 

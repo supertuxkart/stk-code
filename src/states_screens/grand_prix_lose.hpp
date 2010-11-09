@@ -49,7 +49,7 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 
     MusicInformation* m_music;
     
-    irr::core::recti m_viewport[4];
+    //irr::core::recti m_viewport[4];
     
 public:
 

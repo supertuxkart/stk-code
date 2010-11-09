@@ -198,6 +198,10 @@ void FeatureUnlockedCutScene::init()
                 m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             kart_model->attachModel(&(m_unlocked_stuff[n].m_root_gift_node));
+            kart_model->setAnimation(KartModel::AF_DEFAULT);
+            float susp[4]={0,0,0,0};
+            kart_model->update(0.0f, 0.0f, susp);
+            
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
 #endif
