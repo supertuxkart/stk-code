@@ -61,36 +61,18 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 }
 #endif
 #ifdef ADDONS_MANAGER
-void MainMenuScreen::changeNewsText(std::string action)
+void MainMenuScreen::changeNewsText(std::string action, std::string content)
 {
     if(action == "news")
-    {
-        FILE* newsFile = NULL;
-        char buffer[1024] = "";
-        
+    {        
         pthread_testcancel(); // check if thread was cancelled
         
         // enter the mutex; this will prevent the shutdown procedure
         // from continuing until this critical section is over
         pthread_mutex_lock(&(this->m_mutex_news_text));
-        
-        newsFile = fopen(std::string(file_manager->getConfigDir() + "/news").c_str(), "r+");
-        
-        if (newsFile == NULL)
-        {
-            fprintf(stderr, "Warning: cannot open news files\n");
-            return;
-        }
-        
-        std::string info = std::string("");
-        while (fgets(buffer, 1024, newsFile) != NULL)
-        {
-            info += std::string(buffer);
-        }
 
-        fclose(newsFile);
-        
-        m_news_text = std::string(info).c_str();
+        m_news_text = content;
+
 	    pthread_mutex_unlock(&(this->m_mutex_news_text));
     }
     if(action == "offline")
@@ -248,16 +230,19 @@ void * MainMenuScreen::downloadNews( void * pthis)
     // FIXME: this code is wrong, "pt" might have been deleted by the
     // time the download is done (by having switched to another screen,
     // or exiting the game, etc...)
-    MainMenuScreen * pt = (MainMenuScreen*)pthis;
-
-    if (download("news"))
+    //MainMenuScreen * pt = (MainMenuScreen*)pthis;
+    
+    std::string news = network_http->downloadToStr("news");
+    if (news != "")
     {
         pthread_testcancel(); // check if thread was cancelled
-        pt->changeNewsText("news");
+        MainMenuScreen * pt = (MainMenuScreen*)pthis;
+        pt->changeNewsText("news", news);
     }
     else
     {
         pthread_testcancel(); // check if thread was cancelled
+        MainMenuScreen * pt = (MainMenuScreen*)pthis;
         pt->changeNewsText("offline");
     }
     return NULL;

@@ -33,7 +33,7 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 public:
     
 #ifdef ADDONS_MANAGER
-    void changeNewsText(std::string action);
+    void changeNewsText(std::string action, std::string content="");
     pthread_mutex_t m_mutex_news_text;
     pthread_t m_thread_news_text;
 
