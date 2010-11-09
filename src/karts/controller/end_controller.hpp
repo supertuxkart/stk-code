@@ -58,24 +58,6 @@ private:
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
 
-    /** The current node the kart is on. This can be different from the value
-     *  in LinearWorld, since it takes the chosen path of the AI into account
-     *  (e.g. the closest point in LinearWorld might be on a branch not
-     *  chosen by the AI). */
-    int   m_track_node;
-    
-    /** Which of the successors of a node was selected by the AI. */
-    std::vector<int> m_successor_index;
-    /** For each node in the graph this list contains the chosen next node.
-     *  For normal lap track without branches we always have 
-     *  m_next_node_index[i] = (i+1) % size;
-     *  but if a branch is possible, the AI will select one option here. 
-     *  If the node is not used, m_next_node_index will be -1. */
-    std::vector<int> m_next_node_index;
-    /** For each graph node this list contains a list of the next X
-     *  graph nodes. */
-    std::vector<std::vector<int> > m_all_look_aheads;
-
     float m_time_since_stuck;
 
     /** For debugging purpose: a sphere indicating where the AI 

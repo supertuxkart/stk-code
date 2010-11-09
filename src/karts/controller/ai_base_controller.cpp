@@ -34,10 +34,92 @@ AIBaseController::AIBaseController(Kart *kart,
     m_kart        = kart;
     m_kart_length = m_kart->getKartModel()->getLength();
     m_kart_width  = m_kart->getKartModel()->getWidth();
-    m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
-    m_track       = m_world->getTrack();
-    m_quad_graph  = &m_track->getQuadGraph();
+
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    {
+        m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
+        m_track       = m_world->getTrack();
+        m_quad_graph  = &m_track->getQuadGraph();
+
+        m_next_node_index.reserve(m_quad_graph->getNumNodes());
+        m_successor_index.reserve(m_quad_graph->getNumNodes());
+        std::vector<unsigned int> next;
+
+        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        {
+            next.clear();
+            m_quad_graph->getSuccessors(i, next);
+            // For now pick one part on random, which is not adjusted during the 
+            // race. Long term statistics might be gathered to determine the
+            // best way, potentially depending on race position etc.
+            int indx = rand() % next.size();
+            m_successor_index.push_back(indx);
+            m_next_node_index.push_back(next[indx]);
+
+        }
+
+        const unsigned int look_ahead=10;
+        // Now compute for each node in the graph the list of the next 'look_ahead'
+        // graph nodes. This is the list of node that is tested in checkCrashes.
+        // If the look_ahead is too big, the AI can skip loops (see 
+        // QuadGraph::findRoadSector for details), if it's too short the AI won't
+        // find too good a driveline. Note that in general this list should
+        // be computed recursively, but since the AI for now is using only 
+        // (randomly picked) path this is fine
+        m_all_look_aheads.reserve(m_quad_graph->getNumNodes());
+        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        {
+            std::vector<int> l;
+            int current = i;
+            for(unsigned int j=0; j<look_ahead; j++)
+            {
+                l.push_back(m_next_node_index[current]);
+                current = m_next_node_index[current];
+            }   // for j<look_ahead
+            m_all_look_aheads.push_back(l);
+        }
+    }
+    else
+    {
+        // Those variables are not defined in a battle mode (m_world is
+        // a linear world, since it assumes the existance of drivelines)
+        m_world           = NULL;
+        m_track           = NULL;
+        m_quad_graph      = NULL;
+        m_next_node_index.clear();
+        m_all_look_aheads.clear();
+        m_successor_index.clear();
+    }   // if battle mode
+
 }   // AIBaseController
+
+//-----------------------------------------------------------------------------
+void AIBaseController::update(float dt)
+{
+    Controller::update(dt);
+
+    if(m_quad_graph)
+    {
+        // Update the current node:
+        int old_node = m_track_node;
+        if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
+        {
+            m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node, 
+                &m_all_look_aheads[m_track_node]);
+        }
+        // If we can't find a proper place on the track, to a broader search
+        // on off-track locations.
+        if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+        {
+            m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+        }
+        // IF the AI is off track (or on a branch of the track it did not
+        // select to be on), keep the old position.
+        if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
+            m_next_node_index[m_track_node]==-1)
+            m_track_node = old_node;
+    }
+}   // update
 
 //-----------------------------------------------------------------------------
 /** Returns the next sector of the given sector index. This is used

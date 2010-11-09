@@ -50,40 +50,44 @@
 EndController::EndController(Kart *kart, StateManager::ActivePlayer *player) 
              : AIBaseController(kart, player)
 {
-    m_next_node_index.reserve(m_quad_graph->getNumNodes());
-    m_successor_index.reserve(m_quad_graph->getNumNodes());
-    std::vector<unsigned int> next;
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
-        // 0 is always a valid successor - so even if the kart should end
-        // up by accident on a non-selected path, it will keep on working.
-        m_successor_index.push_back(0);
-
-        next.clear();
-        m_quad_graph->getSuccessors(i, next);
-        m_next_node_index.push_back(next[0]);
-    }
-
-    const unsigned int look_ahead=10;
-    // Now compute for each node in the graph the list of the next 'look_ahead'
-    // graph nodes. This is the list of node that is tested in checkCrashes.
-    // If the look_ahead is too big, the AI can skip loops (see 
-    // QuadGraph::findRoadSector for details), if it's too short the AI won't
-    // find too good a driveline. Note that in general this list should
-    // be computed recursively, but since the AI for now is using only 
-    // (randomly picked) path this is fine
-    m_all_look_aheads.reserve(m_quad_graph->getNumNodes());
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
-    {
-        std::vector<int> l;
-        int current = i;
-        for(unsigned int j=0; j<look_ahead; j++)
+        // Overwrite the random selected default path from AIBaseController
+        // with a path that always picks the first branch (i.e. it follows
+        // the main driveline).
+        std::vector<unsigned int> next;
+        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
         {
-            l.push_back(m_next_node_index[current]);
-            current = m_next_node_index[current];
-        }   // for j<look_ahead
-        m_all_look_aheads.push_back(l);
-    }
+            // 0 is always a valid successor - so even if the kart should end
+            // up by accident on a non-selected path, it will keep on working.
+            m_successor_index[i] = 0;
+
+            next.clear();
+            m_quad_graph->getSuccessors(i, next);
+            m_next_node_index[i] = next[0];
+        }
+
+        const unsigned int look_ahead=10;
+        // Now compute for each node in the graph the list of the next 'look_ahead'
+        // graph nodes. This is the list of node that is tested in checkCrashes.
+        // If the look_ahead is too big, the AI can skip loops (see 
+        // QuadGraph::findRoadSector for details), if it's too short the AI won't
+        // find too good a driveline. Note that in general this list should
+        // be computed recursively, but since the AI for now is using only 
+        // (randomly picked) path this is fine
+        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        {
+            std::vector<int> l;
+            int current = i;
+            for(unsigned int j=0; j<look_ahead; j++)
+            {
+                l.push_back(m_next_node_index[current]);
+                current = m_next_node_index[current];
+            }   // for j<look_ahead
+            m_all_look_aheads[i] = l;
+        }
+    }   // if not battle mode
+
     // Reset must be called after m_quad_graph etc. is set up        
     reset();
 
@@ -111,18 +115,23 @@ EndController::~EndController()
 //-----------------------------------------------------------------------------
 void EndController::reset()
 {
-    m_crash_time                 = 0.0f;
-    m_time_since_stuck           = 0.0f;
+    AIBaseController::reset();
 
-    Controller::reset();
-    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
-    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+    m_crash_time       = 0.0f;
+    m_time_since_stuck = 0.0f;
 
-    // Node that this can happen quite easily, e.g. an AI kart is
-    // taken over by the end controller while it is off track.
-    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+    m_track_node       = QuadGraph::UNKNOWN_SECTOR;
+    // In battle mode there is no quad graph, so nothing to do in this case
+    if(m_quad_graph)
     {
-        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+        m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+
+        // Node that this can happen quite easily, e.g. an AI kart is
+        // taken over by the end controller while it is off track.
+        if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+        {
+            m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+        }
     }
 }   // reset
 
@@ -146,23 +155,17 @@ void EndController::update(float dt)
     m_controls->m_brake     = false;
     m_controls->m_accel     = 1.0f;
 
-    // Update the current node:
-    if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
-    {
-        int old_node = m_track_node;
-        m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node, 
-                                     &m_all_look_aheads[m_track_node]);
-        // IF the AI is off track (or on a branch of the track it did not
-        // select to be on), keep the old position.
-        if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
-            m_next_node_index[m_track_node]==-1)
-            m_track_node = old_node;
-    }
-    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
-    {
-        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
-    }
+    AIBaseController::update(dt);
 
+    // In case of battle mode: don't do anything
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    {
+        m_controls->m_accel = 0.0f;
+        // Brake while we are still driving forwards (if we keep
+        // on braking, the kart will reverse otherwise)
+        m_controls->m_brake = m_kart->getSpeed()>0;
+        return;
+    }
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
     int steps = 0;
@@ -172,9 +175,6 @@ void EndController::update(float dt)
     /*Response handling functions*/
     handleSteering(dt);
     handleRescue(dt);
-
-    /*And obviously general kart stuff*/
-    Controller::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
