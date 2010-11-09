@@ -3,7 +3,7 @@
 <challenge
     id="energyshiftingsands"
     name="Collect the Pharaohs Treasure"
-    description="Finish with at least 9 nitro points on 3 laps of Shifting Sands in under 2:20 minutes."
+    description="Finish with at least 12 nitro points on 3 laps of Shifting Sands in under 2:20 minutes."
     unlock-gp="tothemoonandback"
     depend-on="energymathclass farmtracktime"
     major="single"
@@ -12,7 +12,7 @@
     difficulty="medium"
     karts="1"
     laps="3"
-    energy="9"
+    energy="12"
     time="140"
 />
 
