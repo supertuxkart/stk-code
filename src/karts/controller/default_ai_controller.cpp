@@ -215,21 +215,24 @@ void DefaultAIController::update(float dt)
 #endif
 
     // Update the current node:
+    int old_node = m_track_node;
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
     {
-        int old_node = m_track_node;
         m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node, 
                                      &m_all_look_aheads[m_track_node]);
-        // IF the AI is off track (or on a branch of the track it did not
-        // select to be on), keep the old position.
-        if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
-            m_next_node_index[m_track_node]==-1)
-            m_track_node = old_node;
     }
+    // If we can't find a proper place on the track, to a broader search
+    // on off-track locations.
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
         m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
     }
+    // IF the AI is off track (or on a branch of the track it did not
+    // select to be on), keep the old position.
+    if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
+        m_next_node_index[m_track_node]==-1)
+        m_track_node = old_node;
+
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
     {
