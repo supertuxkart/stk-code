@@ -95,12 +95,6 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_LCONTROL:
             control_is_pressed = value!=0;
             break;
-        case KEY_KEY_J:
-        {
-            Kart* kart = world->getLocalPlayerKart(0);
-            kart->fly();
-            break;
-        }
         case KEY_KEY_I:
         {
             Kart* kart = world->getLocalPlayerKart(0);

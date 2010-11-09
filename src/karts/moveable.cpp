@@ -24,6 +24,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 Moveable::Moveable()
 {
@@ -92,22 +94,20 @@ void Moveable::reset()
 
 //-----------------------------------------------------------------------------
 
-void Moveable::fly()
-{
-    m_body->setGravity(btVector3(0.0, 8.0, 0.0));
-    //m_body->setMassProps( 0.0, btVector3(0.0, 0.0, 0.0) );
-    flyUp();
-    //m_body->applyCentralForce( btVector3(0.0, 9000.0, 0.0) );
-}
-
 void Moveable::flyUp()
 {
+    m_body->setGravity(btVector3(0.0, 8.0, 0.0));
     m_body->applyCentralImpulse(btVector3(0.0, 100.0, 0.0));
 }
 
 void Moveable::flyDown()
 {
     m_body->applyCentralImpulse(btVector3(0.0, -100.0, 0.0));
+}
+
+void Moveable::stopFlying()
+{
+    m_body->setGravity(btVector3(0.0, -World::getWorld()->getTrack()->getGravity(), 0.0));
 }
 
 //-----------------------------------------------------------------------------

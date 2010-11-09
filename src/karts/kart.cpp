@@ -268,11 +268,25 @@ void Kart::createPhysics()
 
 }   // createPhysics
 
-void Kart::fly()
+// ----------------------------------------------------------------------------
+
+void Kart::flyUp()
 {
     m_flying = true;
-    Moveable::fly();
-    //m_vehicle->m_flying = true;
+    Moveable::flyUp();
+}
+
+void Kart::flyDown()
+{
+    if (isNearGround())
+    {
+        stopFlying();
+        m_flying = false;
+    }
+    else
+    {
+        Moveable::flyDown();
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -387,6 +401,12 @@ void Kart::updatedWeight()
  */
 void Kart::reset()
 {
+    if (m_flying)
+    {
+        m_flying = false;
+        stopFlying();
+    }
+    
     EmergencyAnimation::reset();
     MaxSpeed::reset();
     if (m_camera)
@@ -680,6 +700,7 @@ void Kart::update(float dt)
         else
             m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     }
+
     
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
@@ -1190,12 +1211,31 @@ void Kart::updatePhysics(float dt)
         }
         if (m_controls.m_steer != 0.0f)
         {
-            m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 2000.0f, 0.0));
+            m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
         }
         if (m_controls.m_brake)
         {
-            float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0, -60.0f*cos(orientation)));
+            btVector3 velocity = m_body->getLinearVelocity(); 
+            
+            const int x = velocity.x();
+            if (x > 0.2)        velocity.setX(x - 0.2);
+            else if (x < -0.2)  velocity.setX(x + 0.2);
+            else                velocity.setX(0);
+            
+            const int y = velocity.y();
+            if (y > 0.2)        velocity.setY(y - 0.2);
+            else if (y < -0.2)  velocity.setY(y + 0.2);
+            else                velocity.setY(0);
+            
+            const int z = velocity.z();
+            if (z > 0.2)        velocity.setZ(z - 0.2);
+            else if (z < -0.2)  velocity.setZ(z + 0.2);
+            else                velocity.setZ(0);
+            
+            m_body->setLinearVelocity(velocity);
+            
+            //float orientation = getHeading();
+            //m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0, -60.0f*cos(orientation)));
         }
     }
     

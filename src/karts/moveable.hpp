@@ -86,9 +86,9 @@ public:
                   getRotation()   const        {return m_transform.getRotation();  }
 
     /** Enter flying mode */
-    virtual void fly();
     virtual void flyUp();
     virtual void flyDown();
+    virtual void stopFlying();
     
     /** Sets the XYZ coordinates of the moveable. */
     void setXYZ(const Vec3& a) 

@@ -225,7 +225,8 @@ public:
     float          getActualWheelForce();
     bool           isSlipstreamReady() const;
 
-    virtual void fly();
+    virtual void flyUp();
+    virtual void flyDown();
     
     void           resetBrakes      ();
     void           startEngineSFX   ();
