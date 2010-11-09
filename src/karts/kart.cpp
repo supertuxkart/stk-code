@@ -552,6 +552,7 @@ void Kart::finishedRace(float time)
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
+        setController(new EndController(this, m_controller->getPlayer()));
     }             
         
 }   // finishedRace
