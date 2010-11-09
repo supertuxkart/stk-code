@@ -751,6 +751,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
+    unsigned int start_position_counter = 0;
 
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -788,15 +789,22 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if (name=="start")
         {
-            unsigned int position=0;
+            unsigned int position = start_position_counter;
+            start_position_counter++;
             node->get("position", &position);
             Vec3 xyz(0,0,0);
             node->getXYZ(&xyz);
             float h=0;
             node->get("h", &h);
-            m_start_transforms[position].setOrigin(xyz);
-            m_start_transforms[position].setRotation(
-                                             btQuaternion(btVector3(0,1,0),h ) );
+            // It is possible that there are more start positions defined
+            // than there are karts (and therefore that there are values
+            // allocated in m_start_transforms. Ignore those:
+            if(position <m_start_transforms.size())
+            {
+                m_start_transforms[position].setOrigin(xyz);
+                m_start_transforms[position].setRotation(
+                                           btQuaternion(btVector3(0,1,0),h ) );
+            }
         }
         else if(name=="camera")
         {
