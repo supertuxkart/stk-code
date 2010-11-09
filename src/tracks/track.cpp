@@ -813,8 +813,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="sun")
         {
             node->get("xyz",           &m_sun_position );
-            node->get("ambient-color", &m_default_ambient_color);
-            //node->get("sun-color",     &m_sun_ambient_color);
+            node->get("ambient",       &m_default_ambient_color);
             node->get("sun-specular",  &m_sun_specular_color);
             node->get("sun-diffuse",   &m_sun_diffuse_color);
             node->get("fog",           &m_use_fog);
