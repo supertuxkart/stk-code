@@ -188,14 +188,15 @@ void GrandPrixWin::init()
     m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
     
     scene::ISceneManager* sceneManager = irr_driver->getSceneManager();
-    sceneManager->setAmbientLight(video::SColor(255, 120, 120, 120));
+    sceneManager->setAmbientLight(video::SColor(255, 95, 95, 95));
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
-                                                               video::SColorf(1.0f,1.0f,1.0f),
+                                                               video::SColorf(0.25f,0.25f,0.25f),
                                                                300.0f /* radius */);
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
+    m_light->getLightData().DiffuseColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
+    m_light->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
+    m_light->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
     
     sfx_manager->quickSound("winner");
 }   // init

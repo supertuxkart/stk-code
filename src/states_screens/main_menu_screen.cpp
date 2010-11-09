@@ -169,7 +169,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         else if (i % 4 == 2)
         {
             GrandPrixWin* scene = GrandPrixWin::getInstance();
-            const std::string winners[] = { "tux", "nolok", "pidgin" };
+            const std::string winners[] = { "elephpant", "nolok", "pidgin" };
             StateManager::get()->pushScreen(scene);
             scene->setKarts( winners );
         }
@@ -179,7 +179,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             StateManager::get()->pushScreen(scene);
             std::vector<std::string> losers;
             losers.push_back("nolok");
-            losers.push_back("tux");
+            losers.push_back("elephpant");
             losers.push_back("wilber");
             scene->setKarts( losers );
         }
