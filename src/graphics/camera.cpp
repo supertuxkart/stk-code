@@ -150,8 +150,6 @@ void Camera::setupCamera()
             const int x2 = (m_index%2==0 ? UserConfigParams::m_width>>1  : UserConfigParams::m_width);
             const int y2 = (m_index<2    ? UserConfigParams::m_height>>1 : UserConfigParams::m_height);
             m_viewport = core::recti(x1, y1, x2, y2);
-            std::cout << "Viewport : " << m_viewport.UpperLeftCorner.X << ", " << m_viewport.UpperLeftCorner.Y << "; size : "
-                      << m_viewport.getWidth() << "x" << m_viewport.getHeight() << "\n";
             m_scaling  = core::vector2df(0.5f, 0.5f);
             m_fov      = DEGREE_TO_RAD*50.0f;
             }
