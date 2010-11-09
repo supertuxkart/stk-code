@@ -112,6 +112,11 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
+#ifdef FORCE_RESCUE_ON_FIRST_KART
+                // Can be useful for debugging places where the AI gets into
+                // a rescue loop: rescue, drive, crash, rescue to same place
+                world->getKart(0)->forceRescue();
+#endif
             }
             break;
         case KEY_F2:
