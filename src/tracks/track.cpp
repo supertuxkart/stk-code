@@ -924,7 +924,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         for(unsigned int i=0; i<m_all_nodes.size(); i++)
             m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
 
-    if(!m_check_manager)
+    // Only print warning if not in battle mode, since battle tracks don't have
+    // any quads or check lines.
+    if(!m_check_manager && race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
         printf("WARNING: no check lines found in track '%s'.\n", 
                m_ident.c_str());
