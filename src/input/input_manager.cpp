@@ -97,13 +97,21 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         case KEY_KEY_I:
         {
+            if (world == NULL) break;
+            
             Kart* kart = world->getLocalPlayerKart(0);
+            if (kart == NULL) break;
+            
             kart->flyUp();
             break;
         }
         case KEY_KEY_K:
         {
+            if (world == NULL) break;
+            
             Kart* kart = world->getLocalPlayerKart(0);
+            if (kart == NULL) break;
+            
             kart->flyDown();
             break;
         }
