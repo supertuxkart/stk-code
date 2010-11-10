@@ -657,8 +657,6 @@ void    btKart::updateFriction(btScalar timeStep)
                     *groundObject, wheelInfo.m_raycastInfo.m_contactPointWS,
                     btScalar(0.), m_axle[i],m_sideImpulse[i],timeStep);
 
-                //m_sideImpulse[i] *= sideFrictionStiffness2; // hiker: sideFrictionStiffness2 is a global(!) variable = 1.0
-
             }
 
 
@@ -668,6 +666,7 @@ void    btKart::updateFriction(btScalar timeStep)
     btScalar sideFactor = btScalar(1.);
     btScalar fwdFactor = 0.5;
 
+    bool sliding = false;
     {
         for (int wheel =0;wheel <getNumWheels();wheel++)
         {
@@ -713,13 +712,46 @@ void    btKart::updateFriction(btScalar timeStep)
 
                     m_forwardImpulse[wheel] = rollingFriction;//wheelInfo.m_engineForce* timeStep;
                 }
-            }
-        }
+                btScalar maximp = wheelInfo.m_wheelsSuspensionForce * timeStep * wheelInfo.m_frictionSlip;
+                btScalar maximpSide = maximp;
+
+                btScalar maximpSquared = maximp * maximpSide;
+
+                btScalar x = (m_forwardImpulse[wheel] ) * fwdFactor;
+                btScalar y = (m_sideImpulse[wheel] ) * sideFactor;
+
+                btScalar impulseSquared = (x*x + y*y);
+
+                if (impulseSquared > maximpSquared)
+                {
+                    sliding = true;
+
+                    btScalar factor = maximp / btSqrt(impulseSquared);
+
+                    m_wheelInfo[wheel].m_skidInfo *= factor;
+                }
+            }    // if groundObject
+
+        }   // for wheel<getNumWheels()
 
         m_zipper_active = false;
+    }   // close block
+
+
+    if (sliding)
+    {
+        for (int wheel = 0;wheel < getNumWheels(); wheel++)
+        {
+            if (m_sideImpulse[wheel] != btScalar(0.))
+            {
+                if (m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
+                {
+                    m_forwardImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
+                    m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
+                }
+            }
+        }
     }
-
-
 
 
 
@@ -735,7 +767,7 @@ void    btKart::updateFriction(btScalar timeStep)
             if (m_forwardImpulse[wheel] != btScalar(0.))
             {
                 m_chassisBody->applyImpulse(m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
-                                            btVector3(0,0,0));
+                    btVector3(0,0,0));
             }
             if (m_sideImpulse[wheel] != btScalar(0.))
             {
