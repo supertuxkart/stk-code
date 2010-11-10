@@ -54,30 +54,6 @@ MaterialManager::~MaterialManager()
 }   // ~MaterialManager
 
 //-----------------------------------------------------------------------------
-
-void MaterialManager::setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const
-{
-    video::SMaterial& material = mb->getMaterial();
-
-    //printf("=== I've got a flat material here! (%i, %i, %i) ==\n",
-    //       material.AmbientColor.getRed(), material.AmbientColor.getGreen(), material.AmbientColor.getBlue());
-    if (material.AmbientColor.getAlpha() < 255)
-    {
-        //printf("---> AND IT's TRANSLUSCENT!!\n");
-
-        //m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-        material.MaterialType = video::EMT_SOLID;
-        material.ZWriteEnable = false;
-        material.setFlag(video::EMF_ZWRITE_ENABLE, false);
-        material.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-        //material.setFlag(video::EMF_BACK_FACE_CULLING, false);
-        //material.Wireframe=true;
-    }
-    
-//    material.Shininess = 0.6f;
-}
-
-//-----------------------------------------------------------------------------
 /** Searches for the material in the given texture, and calls a function
  *  in the material to set the irrlicht material flags.
  *  \param t Pointer to the texture.

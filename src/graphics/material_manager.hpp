@@ -51,7 +51,6 @@ public:
                                   scene::IMeshBuffer *mb) const;
     
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
-    void      setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const;
 
     int       addEntity        (Material *m);
     Material *getMaterial      (const std::string& t, bool is_full_path=false,
