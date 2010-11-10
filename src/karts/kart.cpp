@@ -22,6 +22,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <algorithm> // for min and max
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -1350,6 +1351,42 @@ void Kart::updatePhysics(float dt)
     {
         m_skid_sound->stop();
     }
+    
+    // dynamically determine friction so that the kart looses its traction when trying to drive on too steep surfaces
+    // Below angles of 0.25 rad, you have full traction; above 0.5 rad angles you have absolutely none; inbetween
+    // there is a linear change in friction
+    float friction = 1.0f;
+    if (isOnGround())
+    {
+        float pitch = fabs(getPitch());
+        float roll = fabsf(getRoll());
+        if (pitch > 0.25f)
+        {
+            friction = std::min( friction, std::max(1.0f - (pitch - 0.25f) / 0.25f, 0.0f) );
+        }
+        if (roll > 0.25f)
+        {
+            friction = std::min( friction, std::max(1.0f - (roll - 0.25f) / 0.25f, 0.0f) );
+        }
+    }
+    
+    for (unsigned int i=0; i<4; i++)
+    {
+        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+        wheel.m_frictionSlip = friction*m_kart_properties->getFrictionSlip();
+    }
+    
+    /*
+    // debug prints
+    static float f = 0.0f;
+    f += dt;
+    if (f > 0.5f)
+    {
+        f -= 0.5f;
+        printf("[%s] %f %f --> friction = %f\n", m_kart_properties->getIdent().c_str(), getPitch(), getRoll(), friction);
+    }
+     */
+
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
     m_vehicle->setSteeringValue(steering, 0);

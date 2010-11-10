@@ -242,7 +242,7 @@
 
     <!-- friction: slip used for bullet skidding. A high value 
          (like 10000000) disables bullet skidding. -->
-    <friction slip="10"/>
+    <friction slip="1000"/>
 
     <!-- Values related to stability of the chassis: damping, and reduced
          impact of roll. -->
