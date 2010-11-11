@@ -1362,11 +1362,13 @@ void Kart::updatePhysics(float dt)
         float roll = fabsf(getRoll());
         if (pitch > 0.25f)
         {
-            friction = std::min( friction, std::max(1.0f - (pitch - 0.25f) / 0.25f, 0.0f) );
+            float x = std::min((pitch - 0.25f) / 0.25f, 1.0f);
+            friction = std::min( friction, 1.0f - x*x );
         }
         if (roll > 0.25f)
         {
-            friction = std::min( friction, std::max(1.0f - (roll - 0.25f) / 0.25f, 0.0f) );
+            float x = std::min((roll - 0.25f) / 0.25f, 1.0f);
+            friction = std::min( friction, 1.0f - x*x );
         }
     }
     
@@ -1385,7 +1387,7 @@ void Kart::updatePhysics(float dt)
         f -= 0.5f;
         printf("[%s] %f %f --> friction = %f\n", m_kart_properties->getIdent().c_str(), getPitch(), getRoll(), friction);
     }
-     */
+    */
 
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
