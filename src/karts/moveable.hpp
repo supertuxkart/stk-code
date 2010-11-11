@@ -72,15 +72,11 @@ public:
                  &getVelocityLC() const        {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
-    /** Returns the heading between -180 and 180 degrees. Note that using 
-     *  getHPR().getHeading() can result a different heading  (e.g. a heading
-     *  of 180 degrees is the same as a roll and pitch around 180).*/
+    /** Returns the heading between -pi and pi. */
     float         getHeading()    const        {return m_heading;                  }
-    /** Returns the pitch of the kart, restricted to between -90 and 90 degrees.
-     *  Note that using getHPR().getPitch can result in a different value! */
+   /** Returns the pitch of the kart, restricted to between -pi/2 and pi/2. */
     float         getPitch()      const        {return m_pitch;                    }
-    /** Returns the roll of the kart between -180 and 180 degrees. Note that
-     *  using getHPR.getRoll can result in a different value!  */
+    /** Returns the roll of the kart between -pi and pi.  */
     float         getRoll()       const        {return m_roll;                     }
     const btQuaternion 
                   getRotation()   const        {return m_transform.getRotation();  }
