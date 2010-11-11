@@ -81,6 +81,20 @@ private:
      *  the pitch of a sfx depending on speed of the kart.
      */
     float            m_sfx_pitch_per_speed;
+    /** Additional speed allowed on top of the kart-specific maximum kart speed
+     *  if a zipper is used. If this value is <0 the kart specific value will
+     *  be used. */
+    float            m_zipper_max_speed_increase;
+    /** Time a zipper stays activated. If this value is <0 the kart specific 
+     *  value will be used. */
+    float            m_zipper_duration;
+    /** A one time additional speed gain - the kart will instantly add this 
+     *  amount of speed to its current speed. If this value is <0 the kart
+     *  specific value will be used. */
+    float            m_zipper_speed_gain;
+    /**  Time it takes for the zipper advantage to fade out. If this value 
+     *  is <0 the kart specific value will be used. */
+    float            m_zipper_fade_out_time;
 
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
@@ -96,6 +110,7 @@ public:
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const   { return m_texture;        }
     bool  isIgnore           () const { return m_ignore;             }
+    /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
     bool  isSphereMap        () const { return m_sphere_map;         }
     bool  isReset            () const { return m_resetter;           }
@@ -122,6 +137,18 @@ public:
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &
          getSFXName          () const { return m_sfx_name; }
+    // ------------------------------------------------------------------------
+    /** Returns the zipper parametersfor the current material. */
+    void getZipperParameter(float *zipper_max_speed_increase,
+                             float *zipper_duration,
+                             float *zipper_speed_gain,
+                             float *zipper_fade_out_time) const
+    {
+        *zipper_max_speed_increase = m_zipper_max_speed_increase;
+        *zipper_duration           = m_zipper_duration;
+        *zipper_speed_gain         = m_zipper_speed_gain;
+    }   // getZipperParameter
+
 } ;
 
 

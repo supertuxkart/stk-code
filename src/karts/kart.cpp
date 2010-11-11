@@ -848,7 +848,7 @@ void Kart::update(float dt)
         m_last_material = material;
 
         if     (material->isReset()  && isOnGround()) forceRescue();
-        else if(material->isZipper() && isOnGround()) handleZipper();
+        else if(material->isZipper() && isOnGround()) handleZipper(material);
         else
         {
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
@@ -888,22 +888,58 @@ void Kart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Sets zipper time, and apply one time additional speed boost.
+/** Sets zipper time, and apply one time additional speed boost. It can be 
+ *  used with a specific material, in which case the zipper parmaters are
+ *  taken from this material (parameters that are <0 will be using the
+ *  kart-specific values from kart-properties.
+ *  \param material If not NULL, will be used to determine the zipper
+ *                  parameters, otherwise the defaults from kart properties
+ *                  will be used.
  */
-void Kart::handleZipper()
+void Kart::handleZipper(const Material *material)
 {
+    /** The additional speed allowed on top of the kart-specific maximum kart 
+     *  speed. */
+    float max_speed_increase;
+
+    /**Time the zipper stays activated. */
+    float duration;
+    /** A one time additional speed gain - the kart will instantly add this 
+     *  amount of speed to its current speed. */
+    float speed_gain;
+    /** Time it takes for the zipper advantage to fade out. */
+    float fade_out_time;
+
+    if(material)
+    {
+        material->getZipperParameter(&max_speed_increase, &duration, 
+                                     &speed_gain, &fade_out_time);
+        if(max_speed_increase<0) 
+            max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
+        if(duration<0)
+            duration           = m_kart_properties->getZipperTime();
+        if(speed_gain<0)
+            speed_gain         = m_kart_properties->getZipperSpeedGain();
+        if(fade_out_time<0)
+            fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+    }
+    else
+    {
+        max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
+        duration           = m_kart_properties->getZipperTime();
+        speed_gain         = m_kart_properties->getZipperSpeedGain();
+        fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+    }
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake) return;
 
     MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_ZIPPER, 
-                               m_kart_properties->getZipperMaxSpeedIncrease(),
-                               m_kart_properties->getZipperTime(),
-                               /*fade_out_time*/ 3.0f);
+                               max_speed_increase, duration, fade_out_time);
     // This will result in all max speed settings updated, but no 
     // changes to any slow downs since dt=0
     MaxSpeed::update(0);
-    float speed = std::min(m_speed+m_kart_properties->getZipperSpeedGain(),
-                           MaxSpeed::getCurrentMaxSpeed()                   );
+    float speed = std::min(m_speed + speed_gain, 
+                           MaxSpeed::getCurrentMaxSpeed() );
 
     m_vehicle->activateZipper(speed);
     // Play custom character sound (weee!)

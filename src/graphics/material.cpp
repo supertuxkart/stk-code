@@ -59,7 +59,6 @@ Material::Material(const XMLNode *node, int index)
     node->get("sphere",           &m_sphere_map        );
     node->get("friction",         &m_friction          );
     node->get("ignore",           &m_ignore            );
-    node->get("zipper",           &m_zipper            );
     node->get("reset",            &m_resetter          );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
@@ -77,6 +76,12 @@ Material::Material(const XMLNode *node, int index)
             s.c_str());
     else
         m_graphical_effect = GE_NONE;
+
+    node->get("zipper",                    &m_zipper                   );
+    node->get("zipper-duration",           &m_zipper_duration          );
+    node->get("zipper-fade-out-time",      &m_zipper_fade_out_time     );
+    node->get("zipper-max-speed-increase", &m_zipper_max_speed_increase);
+    node->get("zipper-speed-gain",         &m_zipper_speed_gain        );
 
     // Terrain-specifc sound effect
     for(unsigned int i=0; i<node->getNumNodes(); i++)
@@ -118,27 +123,31 @@ Material::Material(const std::string& fname, int index, bool is_full_path)
  */
 void Material::init(unsigned int index)
 {
-    m_index              = index;
-    m_clamp_tex          = 0;
-    m_alpha_testing      = false;
-    m_lightmap           = false;
-    m_alpha_blending     = false;
-    m_lighting           = true;
-    m_anisotropic        = false;
-    m_backface_culling   = true;
-    m_sphere_map         = false;
-    m_friction           = 1.0f;
-    m_ignore             = false;
-    m_zipper             = false;
-    m_resetter           = false;
-    m_max_speed_fraction = 1.0f;
-    m_slowdown_time      = 1.0f;
-    m_sfx_name           = "";
-    m_sfx_min_speed      = 0.0f;
-    m_sfx_max_speed      = 30;
-    m_sfx_min_pitch      = 1.0f;
-    m_sfx_max_pitch      = 1.0f;
-    m_graphical_effect   = GE_NONE;
+    m_index                     = index;
+    m_clamp_tex                 = 0;
+    m_alpha_testing             = false;
+    m_lightmap                  = false;
+    m_alpha_blending            = false;
+    m_lighting                  = true;
+    m_anisotropic               = false;
+    m_backface_culling          = true;
+    m_sphere_map                = false;
+    m_friction                  = 1.0f;
+    m_ignore                    = false;
+    m_resetter                  = false;
+    m_max_speed_fraction        = 1.0f;
+    m_slowdown_time             = 1.0f;
+    m_sfx_name                  = "";
+    m_sfx_min_speed             = 0.0f;
+    m_sfx_max_speed             = 30;
+    m_sfx_min_pitch             = 1.0f;
+    m_sfx_max_pitch             = 1.0f;
+    m_graphical_effect          = GE_NONE;
+    m_zipper                    = false;
+    m_zipper_duration           = -1.0f;
+    m_zipper_fade_out_time      = -1.0f;
+    m_zipper_max_speed_increase = -1.0f;
+    m_zipper_speed_gain         = -1.0f;
 }   // init
 
 //-----------------------------------------------------------------------------

@@ -235,7 +235,7 @@ public:
     void           updatedWeight    ();
     virtual void   collectedItem    (Item *item, int random_attachment);
     virtual void   reset            ();
-    virtual void   handleZipper     ();
+    virtual void   handleZipper     (const Material *m=NULL);
     virtual void   crashed          (Kart *k);
     
     virtual void   update           (float dt);
