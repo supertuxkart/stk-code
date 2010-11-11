@@ -43,12 +43,9 @@
 #  define M_PI 3.14159265358979323846f  /* As in Linux's math.h */
 #endif
 
-/* And we want float for everyone, not double */
-const float M_PIf = 4.0f*atanf(1.0f);
-
-#define NINETY_DEGREE_RAD  (M_PIf/2.0f)
-#define DEGREE_TO_RAD      (M_PIf/180.0f)
-#define RAD_TO_DEGREE      (180.0f/M_PIf)
+#define NINETY_DEGREE_RAD  (M_PI/2.0f)
+#define DEGREE_TO_RAD      (M_PI/180.0f)
+#define RAD_TO_DEGREE      (180.0f/M_PI)
 
 const int MAX_PLAYER_COUNT = 4;
 

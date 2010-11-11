@@ -266,9 +266,9 @@ static std::string binding_to_set_button;
 void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
 {
     const bool keyboard = (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD &&
-                           sensedInput->type == Input::IT_KEYBOARD);
-    const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
-                           sensedInput->type == Input::IT_STICKBUTTON) &&
+                           sensedInput->m_type == Input::IT_KEYBOARD);
+    const bool gamepad =  (sensedInput->m_type == Input::IT_STICKMOTION ||
+                           sensedInput->m_type == Input::IT_STICKBUTTON) &&
                            m_config->getType() == DEVICE_CONFIG_TYPE_GAMEPAD;
         
     if (keyboard)
@@ -276,11 +276,13 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
 		if (UserConfigParams::m_verbosity>=5)
         {
 			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
-				      << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
+                << " : setting to keyboard key " << sensedInput->m_button_id
+                << " \n\n";
         }
         
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
-        keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
+        keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD, 
+                             sensedInput->m_button_id, Input::AD_NEUTRAL);
         
         // refresh display
         updateInputButtons();
@@ -290,16 +292,19 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
 		if (UserConfigParams::m_verbosity>=5)
         {
 			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
-		              << " : setting to gamepad #" << sensedInput->deviceID << " : ";
+                      << " : setting to gamepad #" 
+                      << sensedInput->m_device_id<< " : ";
         
-            if (sensedInput->type == Input::IT_STICKMOTION)
+            if (sensedInput->m_type == Input::IT_STICKMOTION)
             {
-                std::cout << "axis " << sensedInput->btnID << " direction "
-                          << (sensedInput->axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n\n";
+                std::cout << "axis " << sensedInput->m_button_id<< " direction "
+                          << (sensedInput->m_axis_direction== Input::AD_NEGATIVE
+                              ? "-" : "+") 
+                          << "\n\n";
             }
-            else if (sensedInput->type == Input::IT_STICKBUTTON)
+            else if (sensedInput->m_type == Input::IT_STICKBUTTON)
             {
-                std::cout << "button " << sensedInput->btnID << "\n\n";
+                std::cout << "button " << sensedInput->m_button_id<< "\n\n";
             }
             else
             {
@@ -308,8 +313,9 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
         }
         
         GamepadConfig* config =  (GamepadConfig*)m_config;
-        config->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
-                           (Input::AxisDirection)sensedInput->axisDirection);
+        config->setBinding(binding_to_set, sensedInput->m_type, 
+                           sensedInput->m_button_id,
+                           (Input::AxisDirection)sensedInput->m_axis_direction);
         
         // refresh display
         updateInputButtons();

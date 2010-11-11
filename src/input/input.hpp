@@ -56,13 +56,15 @@ struct Input
     };
     static const int IT_LAST = IT_MOUSEBUTTON;
 
-    InputType type;
-    int deviceID;
-    int btnID; // or axis ID for gamepads axes
-    int axisDirection;
+    InputType m_type;
+    int       m_device_id;
+    int       m_button_id; // or axis ID for gamepads axes
+    int       m_axis_direction;
+    wchar_t   m_character;
 
     Input()
-        : type(IT_NONE), deviceID(0), btnID(0), axisDirection(0)
+        : m_type(IT_NONE), m_device_id(0), m_button_id(0), 
+          m_axis_direction(0), m_character(0)
     {
         // Nothing to do.
     }
@@ -91,7 +93,8 @@ struct Input
      * to the system.
      */
     Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0) 
-        : type(ntype), deviceID(deviceID), btnID(btnID), axisDirection(axisDirection)
+        : m_type(ntype), m_device_id(deviceID), m_button_id(btnID), 
+          m_axis_direction(axisDirection)
     {
         // Nothing to do.
     }

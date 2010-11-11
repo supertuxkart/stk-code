@@ -43,7 +43,16 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             s = "?";
             
             switch(id)
-        {
+            {
+#ifdef WIN32
+            case 186: s=";";  break;
+            case 191: s="/";  break;
+            case 192: s="`";  break;
+            case 219: s="[";  break;
+            case 220: s="\\"; break;
+            case 221: s="]";  break;
+            case 222: s="'";  break;
+#endif
             case KEY_LBUTTON : 
                 s = "left mouse button";
                 break;

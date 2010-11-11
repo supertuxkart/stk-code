@@ -28,6 +28,7 @@ using namespace irr;
 
 class Kart;
 class Item;
+enum PlayerAction;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
@@ -63,7 +64,7 @@ public:
     virtual bool  isPlayerController () const {return false;}
     virtual bool  isNetworkController() const {return false;}
     /** Default: ignore actions. Only PlayerController get them. */
-    virtual void  action             (PlayerAction action, int value) {}
+    virtual void  action             (const PlayerAction &action, int value) {}
     virtual const irr::core::stringw& getNamePostfix() const;
 
 };   // Controller

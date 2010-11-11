@@ -228,10 +228,10 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
     if (store_new)
     {
         
-        m_sensed_input->type = type;
-        m_sensed_input->deviceID = deviceID;
-        m_sensed_input->btnID = btnID;
-        m_sensed_input->axisDirection = axisDirection;
+        m_sensed_input->m_type = type;
+        m_sensed_input->m_device_id = deviceID;
+        m_sensed_input->m_button_id= btnID;
+        m_sensed_input->m_axis_direction = axisDirection;
 
         if (type == Input::IT_KEYBOARD && value > Input::MAX_VALUE/2)
         {
@@ -240,7 +240,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
         else if (type == Input::IT_KEYBOARD && value == 0)
         {
             // only notify on key release
-            if (m_sensed_input_high_kbd.find(m_sensed_input->btnID) != m_sensed_input_high_kbd.end())
+            if (m_sensed_input_high_kbd.find(m_sensed_input->m_button_id) 
+                != m_sensed_input_high_kbd.end())
             {
                 OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
                 return;
@@ -282,7 +283,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_has_high_value )
             {
-                m_sensed_input->axisDirection = (axisDirection?0:-1);
+                m_sensed_input->m_axis_direction= (axisDirection?0:-1);
                 OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
             }
         }

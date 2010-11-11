@@ -45,7 +45,8 @@ const int CURRENT_CONFIG_VERSION = 8;
 #include <vector>
 #include <fstream>
 
-#include "input/input.hpp"
+#include "irrlicht.h"
+
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
