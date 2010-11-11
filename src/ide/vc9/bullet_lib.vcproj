@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(STK_INCLUDE)&quot;"
+				AdditionalIncludeDirectories="..\..\bullet\src"
 				PreprocessorDefinitions="WIN32;BT_NO_PROFILE;HAVE_GLUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -108,7 +108,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(STK_INCLUDE)&quot;"
+				AdditionalIncludeDirectories="..\..\bullet\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;BT_NO_PROFILE;HAVE_GLUT"
 				MinimalRebuild="true"
 				RuntimeLibrary="0"
@@ -171,7 +171,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(STK_INCLUDE)&quot;"
+				AdditionalIncludeDirectories="..\..\bullet\src"
 				PreprocessorDefinitions="WIN32;BT_NO_PROFILE;HAVE_GLUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
