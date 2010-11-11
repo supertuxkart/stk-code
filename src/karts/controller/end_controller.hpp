@@ -83,7 +83,7 @@ public:
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
     virtual bool isPlayerController () const {return m_player!=NULL;}
-    virtual void  action             (const PlayerAction &action, int value);
+    virtual void  action             (PlayerAction action, int value);
 
 };   // EndKart
 

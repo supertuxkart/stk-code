@@ -113,7 +113,7 @@ void PlayerController::resetInputState()
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
  */
-void PlayerController::action(const PlayerAction &action, int value)
+void PlayerController::action(PlayerAction action, int value)
 {
     switch (action)
     {

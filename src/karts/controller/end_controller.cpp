@@ -138,7 +138,7 @@ void EndController::reset()
 //-----------------------------------------------------------------------------
 /** The end controller must forward 'fire' presses to the race gui.
  */
-void EndController::action(const PlayerAction &action, int value)
+void EndController::action(PlayerAction action, int value)
 {
     if(action!=PA_FIRE) return;
     RaceResultGUI *race_result_gui = dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());

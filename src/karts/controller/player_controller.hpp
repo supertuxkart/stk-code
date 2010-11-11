@@ -51,7 +51,7 @@ public:
                                       unsigned int player_index);
                   ~PlayerController  ();
     void           update            (float);
-    void           action            (const PlayerAction &action, int value);
+    void           action            (PlayerAction action, int value);
     void           handleZipper      ();
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
