@@ -1358,17 +1358,23 @@ void Kart::updatePhysics(float dt)
     float friction = 1.0f;
     if (isOnGround())
     {
-        float pitch = fabs(getPitch());
-        float roll = fabsf(getRoll());
-        if (pitch > 0.25f)
+        const btMatrix3x3 &m = m_vehicle->getChassisWorldTransform().getBasis();
+        // To get the angle between up=(0,1,0), we have to do:
+        // m*(0,1,0) to get the up vector of the kart, then the 
+        // scalar product between this and (0,1,0) - which is m[1][1]:
+        float distanceFromUp = m[1][1];
+        
+        if (distanceFromUp < 0.85f)
         {
-            float x = std::min((pitch - 0.25f) / 0.25f, 1.0f);
-            friction = std::min( friction, 1.0f - x*x );
+            friction = 0.0f;
         }
-        if (roll > 0.25f)
+        else if (distanceFromUp > 0.9f)
         {
-            float x = std::min((roll - 0.25f) / 0.25f, 1.0f);
-            friction = std::min( friction, 1.0f - x*x );
+            friction = 1.0f;
+        }
+        else
+        {
+            friction = (distanceFromUp - 0.85f) / 0.5f;
         }
     }
     
