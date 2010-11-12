@@ -742,7 +742,7 @@ void    btKart::updateFriction(btScalar timeStep)
     {
         for (int wheel = 0;wheel < getNumWheels(); wheel++)
         {
-            if (m_sideImpulse[wheel] != btScalar(0.))
+            if (m_sideImpulse[wheel] != btScalar(0.) && m_allow_sliding)
             {
                 if (m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
                 {

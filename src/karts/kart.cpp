@@ -1392,6 +1392,8 @@ void Kart::updatePhysics(float dt)
     // Below angles of 0.25 rad, you have full traction; above 0.5 rad angles you have absolutely none; inbetween
     // there is a linear change in friction
     float friction = 1.0f;
+    bool enableSkidding = false;
+    
     if (isOnGround())
     {
         const btMatrix3x3 &m = m_vehicle->getChassisWorldTransform().getBasis();
@@ -1403,6 +1405,7 @@ void Kart::updatePhysics(float dt)
         if (distanceFromUp < 0.85f)
         {
             friction = 0.0f;
+            enableSkidding = true;
         }
         else if (distanceFromUp > 0.9f)
         {
@@ -1411,6 +1414,7 @@ void Kart::updatePhysics(float dt)
         else
         {
             friction = (distanceFromUp - 0.85f) / 0.5f;
+            enableSkidding = true;
         }
     }
     
@@ -1419,6 +1423,9 @@ void Kart::updatePhysics(float dt)
         btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
         wheel.m_frictionSlip = friction*m_kart_properties->getFrictionSlip();
     }
+    
+    m_vehicle->enableSliding(enableSkidding);
+
     
     /*
     // debug prints

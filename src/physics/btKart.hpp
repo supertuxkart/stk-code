@@ -28,7 +28,14 @@ class btKart : public btRaycastVehicle
     int          m_num_wheels_on_ground;
     bool         m_zipper_active;
     btScalar     m_zipper_velocity;
+    
+    /** Sliding (skidding) will only be permited when this is true. Also check
+      * the friction parameter in the wheels since friction directly affects skidding
+      */
+    bool         m_allow_sliding;
+    
 public:
+    
     btKart(const btVehicleTuning& tuning,btRigidBody* chassis,
            btVehicleRaycaster* raycaster, float track_connect_accel );
     virtual     ~btKart() ;
@@ -46,6 +53,11 @@ public:
     void         deactivateZipper() { m_zipper_active = false; }
     void         updateSuspension(btScalar deltaTime);
     virtual void updateFriction(btScalar timeStep);
+    
+    /** Sliding (skidding) will only be permited when this is set to true. Also check
+      * the friction parameter in the wheels since friction directly affects skidding
+      */
+    void         enableSliding(bool enabled) { m_allow_sliding = enabled; }
 };
 
 #endif //BT_KART_H
