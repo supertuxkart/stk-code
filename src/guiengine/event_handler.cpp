@@ -456,7 +456,14 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
 
 void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name, const int playerID)
 {
-    getCurrentScreen()->eventCallback(widget, name, playerID);
+    if (ModalDialog::isADialogActive())
+    {
+        ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]);
+    }
+    else
+    {
+        getCurrentScreen()->eventCallback(widget, name, playerID);
+    }
 }
 
 // -----------------------------------------------------------------------------
