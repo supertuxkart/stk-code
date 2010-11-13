@@ -458,12 +458,13 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 {
     if (ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]);
+        if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) == EVENT_BLOCK)
+        {
+            return;
+        }
     }
-    else
-    {
-        getCurrentScreen()->eventCallback(widget, name, playerID);
-    }
+
+    getCurrentScreen()->eventCallback(widget, name, playerID);
 }
 
 // -----------------------------------------------------------------------------
@@ -502,15 +503,6 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
          parent event handler says so */
         if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
         {
-            // notify modal dialog too
-            if (ModalDialog::isADialogActive())
-            {
-                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK)
-                {
-                    return EVENT_BLOCK;
-                }
-            }
-            
             sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
         }
     }
