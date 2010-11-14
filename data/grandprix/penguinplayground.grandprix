@@ -4,6 +4,7 @@
     <track id="sandtrack"    laps="3" />
     <track id="snowmountain" laps="3" />
     <track id="olivermath"   laps="4" />
+    <track id="scotland"     laps="3" />
     <track id="jungle"       laps="2" /> 
  
 </supertuxkart_grand_prix>

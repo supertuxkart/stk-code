@@ -1,7 +1,8 @@
 
 <supertuxkart_grand_prix name="All tracks">
 
-    <track id="hacienda"         laps="2" />
+    <track id="hacienda"         laps="3" />
+    <track id="scotland"         laps="3" />
     <track id="startrack"        laps="3" />
     <track id="lighthouse"       laps="4" />
     <track id="jungle"           laps="3" />
