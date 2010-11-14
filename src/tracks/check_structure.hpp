@@ -31,19 +31,17 @@ class CheckManager;
 /** 
  * \brief Virtual base class for a check structure.
  *
- * A check structure has a certain ype:
+ *  A check structure has a certain ype:
  *  CT_NEW_LAP  : triggering this check structure will cause a new lap to be
  *                counted. If this type is triggered, it will set itselt to
  *                inactive (which means it is not possible to count several
  *                laps by driving over the starting line forwardws and 
  *                backwards)
- *  CT_RESET_NEW_LAP: Activates all lap checks. Each track must have at least
- *                one reset checks somewhere on the track. This is used to 
- *                avoid shortcuts, since karts are forced to cross this reset
- *                check first before a new lap can be counted.
- * Each check structure can be active or inactive. A new_la counter is 
- * initialised as non-active, so that karts have to trigger a reset check
- * before a lap can be counted.
+ *  CT_ACTIVATE:  Activates the specified other check structures.
+ *  CT_TOGGLE:    Toggles the specified other check structures (active to 
+ *                inactive and vice versa.
+ *  Each check structure can be active or inactive. Only lap counters are
+ *  initialised to be active, all other check structures are inactive.
  *
  * \ingroup tracks
  */
@@ -68,8 +66,7 @@ protected:
      *  when e.g. a check point is reached the first time, or a checkline is
      *  crossed. */
     std::vector<Vec3> m_previous_position;
-    /** Stores if this check structure is active (for a given kart). Used e.g.
-     *  in lap counting. */
+    /** Stores if this check structure is active (for a given kart). */
     std::vector<bool> m_is_active;
 private:
     /** Stores a pointer to the check manager. */
@@ -85,9 +82,8 @@ private:
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
 
-    /** If this is a CT_ACTIVATE or CT_SWITCH type, this will contain
-     *  the indices of the corresponding check structures that get their
-     *  state changed (activated or switched). */
+    /** Contains the indices of the corresponding check structures that 
+     *  get their state changed (activated or switched). */
     std::vector<int> m_check_structures_to_change_state;
 
     /** A list of check lines that should be activated/switched when this
@@ -96,6 +92,11 @@ private:
      *  players could cross first one then the other lap counting line
      *  as huge shortcuts. */
     std::vector<int> m_same_group;
+
+    enum ChangeState {CS_DEACTIVATE, CS_ACTIVATE, CS_TOGGLE};
+
+    void changeStatus(const std::vector<int> indices, int kart_index,
+                      ChangeState change_state);
 
 public:
                 CheckStructure(CheckManager *check_manager, const XMLNode &node,
