@@ -126,7 +126,7 @@ namespace StringUtils
         try
         {
             std::string::size_type start=0;
-            while(start!=std::string::npos)
+            while(start!=std::string::npos && start<s.size())
             {
                 std::string::size_type i=s.find(c, start);
                 if (i!=std::string::npos)
