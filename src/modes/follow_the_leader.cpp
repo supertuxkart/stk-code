@@ -117,6 +117,25 @@ void FollowTheLeaderRace::countdownReachedZero()
     
     if (isRaceOver())
     {
+        // Handle special FTL situation: the leader is kart number 3 when
+        // the last kart gets eliminated. In this case kart on position 1
+        // is eliminated, and the kart formerly on position 2 is on 
+        // position 1, the leader now position 2. In this case the kart 
+        // on position 1 would get more points for this victory. So if
+        // this is the case, change the position 
+        if(m_karts[0]->getPosition()!=1)
+        {
+            // Adjust the position of all still driving karts except
+            // the leader by -1, and move the leader to position 1.
+            for (unsigned int i=1; i<m_karts.size(); i++)
+            {
+                if(!m_karts[i]->hasFinishedRace() &&
+                    !m_karts[i]->isEliminated() )
+                    m_karts[i]->setPosition(m_karts[i]->getPosition()-1);
+            }
+            m_karts[0]->setPosition(1);
+        }
+
         // Mark all still racing karts to be finished.
         for (unsigned int n=0; n<m_karts.size(); n++)
         {
