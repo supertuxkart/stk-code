@@ -37,7 +37,15 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
     
     m_throttle_FPS = false;
     
-    m_music = music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music"));
+    try
+    {
+        m_music = music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music"));
+    }
+    catch (std::exception& e)
+    {
+        fprintf(stderr, "%s", e.what());
+        m_music = NULL;
+    }
 }   // GrandPrixWin
 
 // -------------------------------------------------------------------------------------
@@ -130,8 +138,6 @@ void GrandPrixWin::init()
         
         unlocked_label->add();
     }
-    
-    //music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
 
     m_phase = 1;
     m_sky_angle = 0.0f;

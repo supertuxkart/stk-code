@@ -56,7 +56,15 @@ GrandPrixLose::GrandPrixLose() : Screen("grand_prix_lose.stkgui")
     
     m_throttle_FPS = false;
     
-    m_music = music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music"));
+    try
+    {
+        m_music = music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music"));
+    }
+    catch (std::exception& e)
+    {
+        fprintf(stderr, "%s", e.what());
+        m_music = NULL;
+    }
 }   // GrandPrixLose
 
 // -------------------------------------------------------------------------------------
@@ -74,7 +82,6 @@ void GrandPrixLose::loadedFromFile()
 void GrandPrixLose::init()
 {
     Screen::init();
-    //music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("lose_theme.music")));
 
     m_phase = 1;
     m_sky_angle = 0.0f;
