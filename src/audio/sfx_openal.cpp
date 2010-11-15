@@ -237,7 +237,7 @@ SFXManager::SFXStatus SFXOpenAL::getStatus()
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
     switch(state)
     {
-    case AL_STOPPED: return SFXManager::SFX_STOPED;
+    case AL_STOPPED: return SFXManager::SFX_STOPPED;
     case AL_PLAYING: return SFXManager::SFX_PLAYING;
     case AL_PAUSED:  return SFXManager::SFX_PAUSED;
     case AL_INITIAL: return SFXManager::SFX_INITIAL;

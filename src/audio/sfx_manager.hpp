@@ -54,23 +54,23 @@ public:
       */
     enum CustomSFX
     {
-        CUSTOM_HORN,    // Replaces default horn
-        CUSTOM_CRASH,   // Played when colliding with another kart
-        CUSTOM_WIN,     // Played when racer wins
-        CUSTOM_EXPLODE, // Played when struck by bowling ball or dynamite
-        CUSTOM_GOO,     // Played when driving through goo
-        CUSTOM_PASS,    // Played when passing another kart
-        CUSTOM_ZIPPER,  // Played when kart hits zipper
-        CUSTOM_NAME,    // Introduction "I'm Tux!"
-        CUSTOM_ATTACH,  // Played when something is attached to kart (Uh-Oh)
-        CUSTOM_SHOOT,   // Played when weapon is used
+        CUSTOM_HORN,    //!< Replaces default horn
+        CUSTOM_CRASH,   //!< Played when colliding with another kart
+        CUSTOM_WIN,     //!< Played when racer wins
+        CUSTOM_EXPLODE, //!< Played when struck by bowling ball or dynamite
+        CUSTOM_GOO,     //!< Played when driving through goo
+        CUSTOM_PASS,    //!< Played when passing another kart
+        CUSTOM_ZIPPER,  //!< Played when kart hits zipper
+        CUSTOM_NAME,    //!< Introduction (e.g. "I'm Tux!")
+        CUSTOM_ATTACH,  //!< Played when something is attached to kart (Uh-Oh)
+        CUSTOM_SHOOT,   //!< Played when weapon is used
         NUM_CUSTOMS
     };
 
     /** Status of a sound effect. */
     enum SFXStatus
     {
-        SFX_UNKNOWN = -1, SFX_STOPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
         SFX_INITIAL = 3
     };
 

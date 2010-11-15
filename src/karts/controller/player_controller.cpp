@@ -369,7 +369,10 @@ void PlayerController::finishedRace(float time)
  */
 void PlayerController::handleZipper()
 {
-    m_wee_sound->play();
+    if (m_wee_sound->getStatus() != SFXManager::SFX_PLAYING)
+    {
+        m_wee_sound->play();
+    }
 }   // handleZipper
 
 //-----------------------------------------------------------------------------

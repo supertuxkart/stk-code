@@ -209,7 +209,7 @@ void Material::initCustomSFX(const XMLNode *sfx)
  */
 void Material::setSFXSpeed(SFXBase *sfx, float speed) const
 {
-    if(sfx->getStatus()==SFXManager::SFX_STOPED)
+    if(sfx->getStatus()==SFXManager::SFX_STOPPED)
     {
         if(speed<m_sfx_min_speed) return;
         sfx->play();

@@ -832,7 +832,7 @@ void Kart::update(float dt)
                 m_terrain_sound = NULL;
         }
         if(m_previous_terrain_sound && 
-            m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPED)
+            m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
         {
             // We don't modify the position of m_previous_terrain_sound 
             // anymore, so that it keeps on playing at the place where the 
