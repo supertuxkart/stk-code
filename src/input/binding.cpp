@@ -55,7 +55,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
     // Convert strings to string tags to integer types
     m_type = (Input::InputType)atoi(event_string);
     m_id   = atoi(id_string);
-    m_character = atoi(character);
+    m_character = character ? atoi(character) : 0;
 
     // If the action is not a stick motion (button or key)
     if (m_type == Input::IT_STICKMOTION)
