@@ -348,7 +348,13 @@ void World::resetAllKarts()
         {
             fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
                     (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+#ifdef DEBUG
+            fprintf(stderr, "Activating fly mode.\n");
+            (*i)->flyUp();
+            continue;
+#else
             exit(-1);
+#endif
         }
     }
 
@@ -385,8 +391,14 @@ void World::resetAllKarts()
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-                (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+                            (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+#ifdef DEBUG
+                    fprintf(stderr, "Activating fly mode.\n");
+                    (*i)->flyUp();
+                    continue;
+#else
                     exit(-1);
+#endif
                 }
                 all_finished=false;
                 break;
