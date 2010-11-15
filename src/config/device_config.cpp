@@ -10,9 +10,7 @@ irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) 
 
     if ((action < PA_COUNT) && (action >= 0))
     {
-        returnString += Input::getInputAsString(m_bindings[action].type, 
-                                                m_bindings[action].id,
-                                                m_bindings[action].dir);
+        returnString = m_bindings[action].getAsString();
     }
 
     return returnString;
@@ -26,9 +24,9 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
     
     if ((action < PA_COUNT) && (action >= 0))
     {
-        const Input::InputType type = m_bindings[action].type;
-        const int id = m_bindings[action].id;
-        const Input::AxisDirection dir = m_bindings[action].dir;
+        const Input::InputType type = m_bindings[action].getType();
+        const int id = m_bindings[action].getId();
+        const Input::AxisDirection dir = m_bindings[action].getDirection();
         
         switch (type)
         {
@@ -89,9 +87,7 @@ irr::core::stringw DeviceConfig::toString ()
     {
         returnString += KartActionStrings[n].c_str();
         returnString += ": ";
-        returnString += Input::getInputAsString(m_bindings[n].type, 
-                                                m_bindings[n].id,
-                                                m_bindings[n].dir);
+        returnString += m_bindings[n].getAsString();
         returnString += "\n";
     }
     return returnString;
@@ -102,11 +98,10 @@ irr::core::stringw DeviceConfig::toString ()
 void DeviceConfig::setBinding ( const PlayerAction      action, 
                                 const Input::InputType  type,
                                 const int               id,
-                                Input::AxisDirection    direction )
+                                Input::AxisDirection    direction,
+                                wchar_t                 character)
 {
-    m_bindings[action].type = type;
-    m_bindings[action].id = id;
-    m_bindings[action].dir = direction;
+    m_bindings[action].set(type, id, direction, character);
 }
 
 //------------------------------------------------------------------------------
@@ -147,13 +142,15 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 
     for (n = firstActionToCheck; ((n <= lastActionToCheck) && (!success)); n++)
     {
-        if ((m_bindings[n].type == type) && (m_bindings[n].id == id))
+        if ((m_bindings[n].getType() == type) && (m_bindings[n].getId() == id))
         {
 
             if (type == Input::IT_STICKMOTION)
             {
-                if ( ((m_bindings[n].dir == Input::AD_POSITIVE) && (value > 0)) ||
-                     ((m_bindings[n].dir == Input::AD_NEGATIVE) && (value < 0)) )
+                if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE) 
+                       && (value > 0))                                      ||
+                     ((m_bindings[n].getDirection() == Input::AD_NEGATIVE) 
+                       && (value < 0))                                        )
                 {
                     success = true;
                    *action = (PlayerAction)n;
@@ -178,19 +175,11 @@ void DeviceConfig::serialize (std::ofstream& stream)
     {
         stream << "    "
                << "<action "
-                   << "name=\""      << KartActionStrings[n] << "\" "
-                   << "id=\""        << m_bindings[n].id     << "\" "
-                   << "event=\""     << m_bindings[n].type   << "\" ";
-        
-        // Only serialize the direction for stick motions
-        if (m_bindings[n].type == Input::IT_STICKMOTION)
-        {
-            stream << "direction=\"" << m_bindings[n].dir    << "\" ";
-        }
-
+               << "name=\""      << KartActionStrings[n] << "\" ";
+        m_bindings[n].serialize(stream);
         stream   << "/>\n";
     }
-}
+}   // serialize
 
 //------------------------------------------------------------------------------
 
@@ -198,70 +187,34 @@ bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
 {
     bool                 success = false;
     int                  binding_id = -1;
-    int                  id;
-    Input::InputType     type;
-    Input::AxisDirection dir;
 
     // Never hurts to check ;)
     if (xml == NULL)
     {
         fprintf(stderr, "Error: null pointer (DeviceConfig::deserializeAction)\n");
+        return false;
     }
-    else
-    {
+
     // Read tags from XML
-        const char *name_string     = xml->getAttributeValue("name");
-        const char *id_string       = xml->getAttributeValue("id");
-        const char *event_string    = xml->getAttributeValue("event");
-        const char *dir_string      = xml->getAttributeValue("direction");
-    
-        // Proceed only if neccesary tags were found
-        if ((name_string != NULL) && (id_string != NULL) && 
-            (event_string != NULL))
+    const char *name_string     = xml->getAttributeValue("name");
+    // Try to determine action # for verbose action name
+    for (int i = 0; i < PA_COUNT; i++)
+    {
+        if (strcmp(name_string, KartActionStrings[i].c_str()) == 0)
         {
-            // Convert strings to string tags to integer types
-            type = (Input::InputType)atoi(event_string);
-            id = atoi(id_string);
+            binding_id = i;
+            break;
+        }
+    }
+    if(binding_id==-1)
+    {
+        printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n", 
+               name_string);
+        return false;
+    }
 
-            // Try to determine action # for verbose action name
-            for (int n = 0; ((n < PA_COUNT) && (binding_id == -1)); n++)
-            {
-                if (strcmp(name_string, KartActionStrings[n].c_str()) == 0)
-                    binding_id = n;
-            }
-
-            // If action # was found then store the bind
-            if (binding_id != -1)
-            {
-                // If the action is not a stick motion (button or key)
-                if (type != Input::IT_STICKMOTION)
-                {
-                    setBinding((PlayerAction)binding_id, type, id);
-                    success = true;
-                }
-
-                // If the action is a stick motion & a direction is defined
-                else if (dir_string != NULL)
-                {
-                    dir = (Input::AxisDirection)atoi(dir_string);
-                    setBinding((PlayerAction)binding_id, type, id, dir);
-                    success = true;
-                }
-                else
-                {
-                    printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
-                }
-            } // end if binding_id != -1
-            else
-            {
-                printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n", name_string);
-            }
-            
-        } // end if name_string != NULL ...
-    } // end if xml == NULL ... else
-
-    return success;
-}
+    return m_bindings[binding_id].deserialize(xml);
+}   // deserializeAction
 
 
 //  KeyboardConfig & GamepadConfig classes really should be in a separate cpp
@@ -394,11 +347,11 @@ irr::core::stringw GamepadConfig::toString ()
 
 //------------------------------------------------------------------------------
 
-bool DeviceConfig::hasBindingFor(const int buttonID) const
+bool DeviceConfig::hasBindingFor(const int button_id) const
 {
     for (int n=0; n<PA_COUNT; n++)
     {
-        if (m_bindings[n].id == buttonID) return true;
+        if (m_bindings[n].getId() == button_id) return true;
     }
     return false;
 }

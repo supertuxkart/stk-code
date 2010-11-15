@@ -1,6 +1,7 @@
 #ifndef DEVICE_CONFIG_HPP
 #define DEVICE_CONFIG_HPP
 
+#include "input/binding.hpp"
 #include "input/input.hpp"
 #include "io/xml_node.hpp"
 #include "utils/no_copy.hpp"
@@ -13,14 +14,6 @@
 /**
   * \ingroup config
   */
-struct KeyBinding
-{
-    
-    Input::InputType        type;
-    int                     id;
-    Input::AxisDirection    dir;
-    
-};
 
 enum DeviceConfigType
 {
@@ -39,12 +32,12 @@ class DeviceConfig : public NoCopy
 {
 private:
     
-    KeyBinding  m_bindings[PA_COUNT];
-    bool        m_plugged;  //!< Is there a device connected to the system which uses this config?
+    Binding  m_bindings[PA_COUNT];
+    bool     m_plugged;  //!< Is there a device connected to the system which uses this config?
     
 protected:
     
-    bool        m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
+    bool     m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
 
     std::string m_name;
     
@@ -84,7 +77,8 @@ public:
     void        setBinding          (const PlayerAction     action,
                                      const Input::InputType type,
                                      const int              id,
-                                     Input::AxisDirection   direction = Input::AD_NEUTRAL);
+                                     Input::AxisDirection   direction = Input::AD_NEUTRAL,
+                                     wchar_t                character=0);
     
     void        setPlugged            (bool plugged) {m_plugged = plugged;}
     bool        isPlugged           () {return m_plugged;}
@@ -111,7 +105,7 @@ public:
                                      const int              value,
                                      PlayerAction*          action /* out */);
     
-    KeyBinding  getBinding          (int i) {return m_bindings[i];}
+    Binding     getBinding          (int i) {return m_bindings[i];}
     
     bool hasBindingFor(const int buttonID) const;
     

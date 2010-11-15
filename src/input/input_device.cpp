@@ -89,18 +89,28 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
 }   // GamePadDevice
 
 // -----------------------------------------------------------------------------
+/** Destructor for GamePadDevice.
+ */
+GamePadDevice::~GamePadDevice()
+{
+    delete[] m_prevAxisDirections;
+
+    // FIXME - any need to close devices?
+}   // ~GamePadDevice
+
+// -----------------------------------------------------------------------------
 
 bool GamePadDevice::isButtonPressed(const int i)
 {
     return m_buttonPressed[i];
-}
+}   // isButtonPressed
 
 // -----------------------------------------------------------------------------
 
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
     m_buttonPressed[i] = isButtonPressed;
-}
+}   // setButtonPressed
 
 // -----------------------------------------------------------------------------
 
@@ -108,7 +118,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
                                        Input::AxisDirection direction, 
                                        StateManager::ActivePlayer* player)
 {
-    KeyBinding bind;
+    Binding bind;
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
 
     Kart* pk = player->getKart();
@@ -121,14 +131,14 @@ void GamePadDevice::resetAxisDirection(const int axis,
     for(int n=0; n<PA_COUNT; n++)
     {
         bind = m_configuration->getBinding(n);
-        if(bind.id == axis && bind.dir == direction)
+        if(bind.getId() == axis && bind.getDirection()== direction)
         {
             ((PlayerController*)(pk->getController()))->action((PlayerAction)n, 0);
             return;
         }
     }
 
-}
+}   // resetAxisDirection
 
 // -----------------------------------------------------------------------------
 
@@ -208,17 +218,6 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     }
 
     return success;
-}
-
-// -----------------------------------------------------------------------------
-
-/** Destructor for GamePadDevice.
- */
-GamePadDevice::~GamePadDevice()
-{
-    delete[] m_prevAxisDirections;
-
-    // FIXME - any need to close devices?
-}   // ~GamePadDevice
+}   // hasBinding
 
 // -----------------------------------------------------------------------------

@@ -25,6 +25,8 @@
 #include <string>
 #include <irrString.h>
 
+class Binding;
+
 const int DEADZONE_MOUSE       =  150;
 const int DEADZONE_MOUSE_SENSE =  200;
 const int DEADZONE_JOYSTICK    = 2000;
@@ -99,9 +101,7 @@ struct Input
         // Nothing to do.
     }
     
-    static irr::core::stringw getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir=AD_NEUTRAL);
-
-};
+};   // struct Input
 
 /**
   * \brief types of input events / what actions the players can do

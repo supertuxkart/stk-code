@@ -232,6 +232,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
         m_sensed_input->m_device_id = deviceID;
         m_sensed_input->m_button_id= btnID;
         m_sensed_input->m_axis_direction = axisDirection;
+        m_sensed_input->m_character      = deviceID;
 
         if (type == Input::IT_KEYBOARD && value > Input::MAX_VALUE/2)
         {
@@ -591,7 +592,15 @@ EventPropagation InputManager::input(const SEvent& event)
     }
     else if (event.EventType == EET_KEY_INPUT_EVENT)
     {
-        const int key = event.KeyInput.Key;
+        // On some systems (linux esp.) certain keys (e.g. [] ) have a 0 
+        // Key value, but do have a value defined in the Char field.
+        // So to distinguish them (otherwise [] would both be mapped to
+        // the same value 0, which means we can't distinguish which key
+        // was actually pressed anymore). We set bit 10 which should
+        // allow us to distinguish those artifical keys from the
+        // 'real' keys.
+        const int key = event.KeyInput.Key ? event.KeyInput.Key
+                                           : event.KeyInput.Char+1024;
 
         if (event.KeyInput.PressedDown)
         {
@@ -618,17 +627,8 @@ EventPropagation InputManager::input(const SEvent& event)
             
             const bool wasInTextBox = GUIEngine::isWithinATextBox();
             
-            dispatchInput(Input::IT_KEYBOARD, 0, key,
-                  // FIXME: not sure why this happens: with plib the unicode
-                  // value is 0. Since all values defined in user_config
-                  // assume that the unicode value is 0, it does not work
-                  // with irrlicht, which has proper unicode values defined
-                  // (keydown is not recognised, but keyup is). So for now
-                  // (till user_config is migrated to full irrlicht support)
-                  // we pass the 0 here artifically so that keyboard handling
-                  // works.
-                  Input::AD_POSITIVE,  // FIXME: was ev.key.keysym.unicode,
-                  Input::MAX_VALUE);
+            dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
+                          Input::AD_POSITIVE, Input::MAX_VALUE);
             
             // if this action took us into a text box, don't let event continue (FIXME not the cleanest solution)
             if (!wasInTextBox && GUIEngine::isWithinATextBox())
@@ -654,7 +654,8 @@ EventPropagation InputManager::input(const SEvent& event)
                 }
             }
             
-            dispatchInput(Input::IT_KEYBOARD, 0, key, Input::AD_POSITIVE, 0);
+            dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key, 
+                          Input::AD_POSITIVE, 0);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }

@@ -863,11 +863,11 @@
 				Name="input"
 				>
 				<File
-					RelativePath="..\..\input\device_manager.cpp"
+					RelativePath="..\..\input\binding.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\input\input.cpp"
+					RelativePath="..\..\input\device_manager.cpp"
 					>
 				</File>
 				<File
@@ -1744,6 +1744,10 @@
 			<Filter
 				Name="input"
 				>
+				<File
+					RelativePath="..\..\input\binding.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\input\device_manager.hpp"
 					>
