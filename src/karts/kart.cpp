@@ -1394,7 +1394,11 @@ void Kart::updatePhysics(float dt)
     float friction = 1.0f;
     bool enableSkidding = false;
     
-    if (isOnGround())
+    // If a material has friction of more than 10000 treat this
+    // as no-skidding possible. This way the current skidding
+    // handling can be disabled for certain material (e.g. the
+    // curve in skyline on which otherwise karts could not drive).
+    if (isOnGround() && getMaterial()->getFriction()<10000.0f)
     {
         const btMatrix3x3 &m = m_vehicle->getChassisWorldTransform().getBasis();
         // To get the angle between up=(0,1,0), we have to do:
