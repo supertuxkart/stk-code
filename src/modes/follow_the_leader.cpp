@@ -126,12 +126,12 @@ void FollowTheLeaderRace::countdownReachedZero()
         if(m_karts[0]->getPosition()!=1)
         {
             // Adjust the position of all still driving karts except
-            // the leader by -1, and move the leader to position 1.
+            // the leader by +1, and move the leader to position 1.
             for (unsigned int i=1; i<m_karts.size(); i++)
             {
                 if(!m_karts[i]->hasFinishedRace() &&
                     !m_karts[i]->isEliminated() )
-                    m_karts[i]->setPosition(m_karts[i]->getPosition()-1);
+                    m_karts[i]->setPosition(m_karts[i]->getPosition()+1);
             }
             m_karts[0]->setPosition(1);
         }
