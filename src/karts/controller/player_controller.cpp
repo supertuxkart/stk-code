@@ -369,7 +369,11 @@ void PlayerController::finishedRace(float time)
  */
 void PlayerController::handleZipper()
 {
-    if (m_wee_sound->getStatus() != SFXManager::SFX_PLAYING)
+    // Only play a zipper sound if it's not already playing, and
+    // if the material has changed (to avoid machine gun effect
+    // on conveyor belt zippers).
+    if (m_wee_sound->getStatus() != SFXManager::SFX_PLAYING &&
+        m_kart->getMaterial()!=m_kart->getLastMaterial())
     {
         m_wee_sound->play();
     }
