@@ -280,6 +280,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
             }
             catch (std::exception& e)
             {
+                (void)e;
                 mi = NULL;
             }
             
