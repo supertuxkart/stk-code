@@ -28,8 +28,9 @@
 
 TerrainInfo::TerrainInfo(int frequency)
 {
-    m_HoT_frequency=frequency;
-    m_HoT_counter=frequency;
+    m_HoT_frequency = frequency;
+    m_HoT_counter   = frequency;
+    m_last_material = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,6 +47,7 @@ void TerrainInfo::update(const Vec3& pos)
     m_HoT_counter++;
     if(m_HoT_counter>=m_HoT_frequency)
     {
+        m_last_material = m_material;
         World::getWorld()->getTrack()->getTerrainInfo(pos, &m_HoT,
                                                       &m_normal, &m_material);
         m_normal.normalize();

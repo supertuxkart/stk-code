@@ -194,10 +194,6 @@ private:
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;
 
-    /** Stores the last material, used to detect if a kart enteres a new
-     *  terrain and might stop/start terrain specific sfx. */
-    const Material *m_last_material;
-
     float         handleSlipstream(float dt);
     void          updatePhysics(float dt);
 

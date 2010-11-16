@@ -441,7 +441,7 @@ void Kart::reset()
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
     m_slipstream_mode      = SS_NONE;
-    m_last_material        = NULL;
+    
     if(m_terrain_sound)
     {
         sfx_manager->deleteSFX(m_terrain_sound);
@@ -808,7 +808,7 @@ void Kart::update(float dt)
         // In case that three sfx needed to be played (i.e. a previous is
         // playing, a current is playing, and a new terrain with sfx is
         // entered), the oldest (previous) sfx is stopped and deleted.
-        if(m_last_material!=material)
+        if(getLastMaterial()!=material)
         {
             // First stop any previously playing terrain sound
             // and remove it, sp that m_previous_terrain_sound
@@ -845,7 +845,6 @@ void Kart::update(float dt)
             m_terrain_sound->position(getXYZ());
             material->setSFXSpeed(m_terrain_sound, m_speed);
         }
-        m_last_material = material;
 
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper(material);
