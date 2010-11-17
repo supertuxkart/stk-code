@@ -271,9 +271,9 @@ void QuadGraph::createMesh(bool show_invisible)
 
     // Count the number of quads to display (some quads might be invisible
     unsigned int  n = 0;
-    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        if(show_invisible || !m_all_quads->getQuad(i).isInvisible())
+        if(show_invisible || !m_all_nodes[i]->getQuad().isInvisible())
             n++;
     }
 
@@ -286,16 +286,16 @@ void QuadGraph::createMesh(bool show_invisible)
 
     // Now add all quads
     int i=0;
-    for(unsigned int count=0; count<m_all_quads->getNumberOfQuads(); count++)
+    for(unsigned int count=0; count<m_all_nodes.size(); count++)
     {
         // Ignore invisible quads
-        if(!show_invisible && m_all_quads->getQuad(count).isInvisible())
+        if(!show_invisible && m_all_nodes[count]->getQuad().isInvisible())
             continue;
         // Swap the colours from red to blue and back
         c.setRed (i%2 ? 255 : 0); 
         c.setBlue(i%2 ? 0 : 255);
         // Transfer the 4 points of the current quad to the list of vertices
-        m_all_quads->getQuad(i).getVertices(new_v+4*i, c);
+        m_all_nodes[count]->getQuad().getVertices(new_v+4*i, c);
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code 

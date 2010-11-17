@@ -99,6 +99,9 @@ public:
     int          getIndex() const { return m_index;                     }
 
     // ------------------------------------------------------------------------
+    /** Returns the quad of this graph node. */
+    const Quad& getQuad() const {return m_all_quads->getQuad(m_index);}
+    // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. ATM this just returns the vertices
      *  from the quads, but if necessary this method will also consider 
      *  rotated quads. So index 0 will always be lower left point, then 
