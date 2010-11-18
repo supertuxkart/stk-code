@@ -149,6 +149,7 @@ void Challenge::addUnlockKartReward(const std::string &internal_name,
     }
     catch (std::exception& e)
     {
+        (void)e;   // avoid compiler warning
         throw std::runtime_error(StringUtils::insertValues("Challenge refers to unknown kart <%s>", internal_name.c_str()));
     }
     
