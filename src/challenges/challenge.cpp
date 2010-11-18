@@ -37,7 +37,11 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
     {
         case UNLOCK_TRACK:
         {    // {} avoids compiler warning
-            Track* track = track_manager->getTrack( name );
+            const Track* track = track_manager->getTrack( name );
+            
+            // shouldn't happen but let's avoid crashes as much as possible...
+            if (track == NULL) return irr::core::stringw( L"????" );
+            
             return StringUtils::insertValues(_("New track '%s' now available"), 
                                              track->getName().c_str() );
             break;
@@ -49,7 +53,12 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
         }
         case UNLOCK_GP:
         {
-            const irr::core::stringw& gp_user_name = grand_prix_manager->getGrandPrix(name)->getName();
+            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(name);
+            
+            // shouldn't happen but let's avoid crashes as much as possible...
+            if (gp == NULL) return irr::core::stringw( L"????" );
+            
+            const irr::core::stringw& gp_user_name = gp->getName();
             return StringUtils::insertValues(_("New Grand Prix '%s' now available"),
                                                 gp_user_name.c_str());
         }
@@ -60,7 +69,11 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
         }
         case UNLOCK_KART:
         {
-            const KartProperties *kp=kart_properties_manager->getKart( name );
+            const KartProperties* kp = kart_properties_manager->getKart( name );
+            
+            // shouldn't happen but let's avoid crashes as much as possible...
+            if (kp == NULL) return irr::core::stringw( L"????" );
+            
             return StringUtils::insertValues( _("New kart '%s' now available"),
                                               kp->getName().c_str());
         }
@@ -71,8 +84,15 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
 }
 
 //-----------------------------------------------------------------------------
+
 void Challenge::addUnlockTrackReward(const std::string &track_name)
 {
+    
+    if (track_manager->getTrack(track_name) == NULL)
+    {
+        throw std::runtime_error(StringUtils::insertValues("Challenge refers to unknown track <%s>", track_name.c_str()));
+    }
+    
     UnlockableFeature feature;
     feature.name = track_name;
     feature.type = UNLOCK_TRACK;
@@ -80,6 +100,7 @@ void Challenge::addUnlockTrackReward(const std::string &track_name)
 }
 
 //-----------------------------------------------------------------------------
+
 void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
                                     const irr::core::stringw &user_mode_name)
 {    
@@ -93,6 +114,11 @@ void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockGPReward(const std::string &gp_name)
 {
+    if (grand_prix_manager->getGrandPrix(gp_name) == NULL)
+    {
+        throw std::runtime_error(StringUtils::insertValues("Challenge refers to unknown Grand Prix <%s>", gp_name.c_str()));
+    }
+    
     UnlockableFeature feature;
     
     feature.name = gp_name.c_str();
@@ -102,6 +128,7 @@ void Challenge::addUnlockGPReward(const std::string &gp_name)
 }
 
 //-----------------------------------------------------------------------------
+
 void Challenge::addUnlockDifficultyReward(const std::string &internal_name, 
                                           const irr::core::stringw &user_name)
 {
@@ -116,6 +143,15 @@ void Challenge::addUnlockDifficultyReward(const std::string &internal_name,
 void Challenge::addUnlockKartReward(const std::string &internal_name, 
                                     const irr::core::stringw &user_name)
 {
+    try
+    {
+        kart_properties_manager->getKartId(internal_name);
+    }
+    catch (std::exception& e)
+    {
+        throw std::runtime_error(StringUtils::insertValues("Challenge refers to unknown kart <%s>", internal_name.c_str()));
+    }
+    
     UnlockableFeature feature;
     feature.name = internal_name;
     feature.type = UNLOCK_KART;
