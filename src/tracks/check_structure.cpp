@@ -58,7 +58,7 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
     // the same_group list. While this should be guaranteed by the
     // current track exporter, tracks exported with the old track
     // exporter will not have this.
-    if(std::find(m_same_group.begin(), m_same_group.end(), m_index)
+    if(std::find(m_same_group.begin(), m_same_group.end(), (int)m_index)
             == m_same_group.end())
         m_same_group.push_back(m_index);
 
