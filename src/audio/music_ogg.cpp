@@ -278,7 +278,7 @@ void MusicOggStream::updateFaster(float percent, float max_pitch)
 void MusicOggStream::update()
 {
 
-    if (m_pausedMusic || m_soundSource == -1)
+    if (m_pausedMusic || m_soundSource == ALuint(-1))
     {
         // nothing todo
         return;

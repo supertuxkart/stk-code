@@ -185,7 +185,6 @@ void DeviceConfig::serialize (std::ofstream& stream)
 
 bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
 {
-    bool                 success = false;
     int                  binding_id = -1;
 
     // Never hurts to check ;)
