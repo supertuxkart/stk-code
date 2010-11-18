@@ -52,7 +52,7 @@ public:
                   ~PlayerController  ();
     void           update            (float);
     void           action            (PlayerAction action, int value);
-    void           handleZipper      ();
+    void           handleZipper      (bool play_sound);
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
     virtual void   setPosition       (int p);

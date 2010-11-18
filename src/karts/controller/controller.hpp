@@ -54,7 +54,7 @@ public:
     StateManager::ActivePlayer *getPlayer () {return m_player;}
     virtual void  reset              () {};
     virtual void  update             (float dt) {};
-    virtual void  handleZipper       () {};
+    virtual void  handleZipper       (bool play_sound) {};
     virtual void  collectedItem      (const Item &item, int add_info=-1,
                                      float previous_energy=0) {};
 

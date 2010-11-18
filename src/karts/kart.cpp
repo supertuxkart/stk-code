@@ -894,8 +894,10 @@ void Kart::update(float dt)
  *  \param material If not NULL, will be used to determine the zipper
  *                  parameters, otherwise the defaults from kart properties
  *                  will be used.
+ * \param play_sound If true this will cause a sfx to be played even if the
+ *                  terrain hasn't changed. It is used by the zipper powerup.
  */
-void Kart::handleZipper(const Material *material)
+void Kart::handleZipper(const Material *material, bool play_sound)
 {
     /** The additional speed allowed on top of the kart-specific maximum kart 
      *  speed. */
@@ -943,7 +945,7 @@ void Kart::handleZipper(const Material *material)
     m_vehicle->activateZipper(speed);
     // Play custom character sound (weee!)
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
-    m_controller->handleZipper();
+    m_controller->handleZipper(play_sound);
 }   // handleZipper
 
 // -----------------------------------------------------------------------------
