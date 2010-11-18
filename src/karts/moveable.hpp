@@ -100,7 +100,6 @@ public:
         m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
-    virtual void  handleZipper ()  {};
     virtual void  updateGraphics(const Vec3& off_xyz,  
                                  const btQuaternion& off_rotation);
     virtual void  reset();
