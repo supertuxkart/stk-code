@@ -21,8 +21,19 @@
         <spacer height="20" width="10"/>
 
         <label width="100%" I18N="In the graphics settings" text="Skin"/>
-        <!-- FIXME: don't hardcode size -->
-        <spinner id="skinchoice" width="300" height="50" />
+
+        <!-- FIXME don't hardcode height, should depend on text height -->
+        <div width="75%" height="40" layout="horizontal-row" >
+            
+            <!-- FIXME: don't hardcode size -->
+            <spinner id="skinchoice" width="300" height="50" />
+            
+            <spacer width="100" height="100%" />
+            <checkbox id="anim" width="40" height="40" />
+            <spacer width="20" height="100%" />
+            <label proportion="1" height="100%" I18N="In the video settings" text="Animated Karts"/>
+        </div>
+        
 
         <spacer height="40" width="10"/>
         <label width="100%" I18N="In the graphics settings" text="Resolution"/>
@@ -33,6 +44,7 @@
         
         <spacer height="10" width="10"/>
         
+        <!-- FIXME don't hardcode height, should depend on text height -->
         <div width="75%" height="40" layout="horizontal-row" >
             <spacer width="40" height="100%" />
             <checkbox id="fullscreen" width="40" height="40"/>
@@ -43,7 +55,9 @@
         <spacer height="10" width="10"/>
 
         <button id="apply_resolution"
-                I18N="In the video settings menu" text="Apply video changes" />
+                I18N="In the video settings menu" text="Apply new resolution" />
+        
+        <spacer height="4" width="4"/>
         
     </box>
     

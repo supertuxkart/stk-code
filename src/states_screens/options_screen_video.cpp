@@ -108,6 +108,9 @@ void OptionsScreenVideo::init()
     GUIEngine::ButtonWidget* applyBtn = this->getWidget<GUIEngine::ButtonWidget>("apply_resolution");
     assert( applyBtn != NULL );
     
+    GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
+    assert( animatedKarts != NULL );
+    
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
     assert( res != NULL );
@@ -154,18 +157,20 @@ void OptionsScreenVideo::init()
     
     res->updateItemDisplay();
         
-    // forbid changing resolution from in-game
+    // forbid changing resolution or animation settings from in-game
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
     {
         res->setDeactivated();
         full->setDeactivated();
         applyBtn->setDeactivated();
+        animatedKarts->setDeactivated();
     }
     else
     {
         res->setActivated();
         full->setActivated();
         applyBtn->setActivated();
+        animatedKarts->setActivated();
     }
     
     // ---- select current resolution every time
@@ -189,7 +194,6 @@ void OptionsScreenVideo::init()
     }  // end for
     
     // --- select the right skin in the spinner
-    
     bool currSkinFound = false;
     const int skinCount = m_skins.size();
     for (int n=0; n<skinCount; n++)
@@ -209,6 +213,9 @@ void OptionsScreenVideo::init()
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }
+    
+    // --- set animations checkbox value
+    animatedKarts->setState( UserConfigParams::m_show_steering_animations );
     
 }   // init
 
@@ -259,6 +266,12 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         const core::stringw selectedSkin = skinSelector->getStringValue();
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
+    }
+    else if (name == "anim")
+    {
+        GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
+        assert( animatedKarts != NULL );
+        UserConfigParams::m_show_steering_animations = animatedKarts->getState();
     }
     
 }   // eventCallback
