@@ -73,7 +73,7 @@
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
-    printf("checking whether we are using an app bundle... ");
+    printf("[FileManager] checking whether we are using an app bundle... ");
     // the following code will enable STK to find its data when placed in an app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
     char path[1024];
@@ -161,7 +161,7 @@ FileManager::FileManager(char *argv[])
 #endif
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
-    fprintf(stderr, "Data files will be fetched from: '%s'\n",
+    fprintf(stderr, "[FileManager] Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
     checkAndCreateConfigDir();
 #ifdef ADDONS_MANAGER
@@ -366,17 +366,18 @@ std::string FileManager::getConfigFile(const std::string& fname) const
 
 //-----------------------------------------------------------------------------
 /** If the directory specified in path does not exist, it is created.
- * /params path Directory to test.
- * /return True if the directory exists or could be created, false otherwise.
+ * \params path Directory to test.
+ * \return      True if the directory exists or could be created, false otherwise.
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
-    std::cout << "creating...:" << path << std::endl;
     // irrlicht apparently returns true for files and directory
     // (using access/_access internally):
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
+    std::cout << "creating directory <" << path << ">" << std::endl;
+    
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
     bool error = _mkdir(path.c_str()) != 0;
@@ -386,25 +387,29 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     return !error;
 }   // checkAndCreateDirectory
 
+//-----------------------------------------------------------------------------
 bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 {
-    std::cout << "creating...:" << path << std::endl;
     // irrlicht apparently returns true for files and directory
     // (using access/_access internally):
-
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
+    
+    std::cout << "creating directory(ies) <" << path << "> ..." << std::endl;
+    
     std::vector<std::string> split = StringUtils::split(path,'/');
-    std::string current_path ="";
-    for(unsigned int i=0; i<split.size(); i++)
+    std::string current_path = "";
+    for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        std::cout << "Checking for: " << current_path << std::endl;
-        if(m_file_system->existFile(io::path(current_path.c_str())))
-            std::cout << "The directory exist." << std::endl;
+        std::cout << "   Checking for: " << current_path << std::endl;
+        if (m_file_system->existFile(io::path(current_path.c_str())))
+        {
+            //std::cout << "The directory exist." << std::endl;
+        }
         else
         {
-            if(!checkAndCreateDirectory(current_path))
+            if (!checkAndCreateDirectory(current_path))
             {
                 fprintf(stderr, "Can't create dir '%s'",
                         current_path.c_str());

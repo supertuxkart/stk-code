@@ -572,7 +572,6 @@ void initRest()
 
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
 	track_manager->addTrackSearchDir(file_manager->getAddonsDir() + "/data/tracks/");
-    std::cout << "addons dir:" << file_manager->getAddonsDir() + "/data/karts/" << std::endl;
 #endif
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();

@@ -45,16 +45,20 @@ Addons* addons_manager = 0;
 Addons::Addons()
 {
     this->index = -1;
-    std::cout << "Loading an xml file for addons: ";
     int download_state = 0;
     m_download_state = download_state;
     pthread_mutex_init(&m_str_mutex, NULL);
 
-    /*It is _very_ dirty to save the list as a locale file since we have a
-    function to load it directly in a string.*/
-    download("list");
+    // FIXME: It is _very_ dirty to save the list as a locale file since we have a
+    //        function to load it directly in a string.
+    const bool success = download("list");
+    if (!success)
+    {
+        fprintf(stderr, "Downloading 'list' failed\n");
+    }
+    
     std::string xml_file = file_manager->getConfigDir() + "/" + "list";
-    std::cout << xml_file << std::endl;
+    std::cout << "[Addons] Using file '" << xml_file << "'\n";
     IrrXMLReader* xml = createIrrXMLReader(xml_file.c_str());
 
     // strings for storing the data we want to get out of the file
@@ -122,7 +126,7 @@ void Addons::GetInstalledAddons()
 
     /* checking for installed addons */
 
-    std::cout << "Loading an xml file for installed addons: ";
+    std::cout << "[Addons] Loading an xml file for installed addons: ";
     std::cout << this->file_installed << std::endl;
     IrrXMLReader* xml = createIrrXMLReader(this->file_installed.c_str());
 
@@ -161,7 +165,7 @@ void Addons::GetInstalledAddons()
                     {
                         this->m_addons_list[this->index].installed = true;
                         this->m_addons_list[this->index].installed_version = version;
-                        std::cout << "An addons is already installed: " + id << std::endl;
+                        std::cout << "[Addons] An addon is already installed: " << id << std::endl;
                     }
                     else
                     {
@@ -323,10 +327,19 @@ void Addons::Install()
     m_str_state = "Downloading...";
     pthread_mutex_unlock(&m_str_mutex);
 
-    download(std::string("file/" + this->m_addons_list[this->index].file),
-            this->m_addons_list[this->index].name, &m_download_state);
+    std::string file = "file/" + this->m_addons_list[this->index].file;
+    bool success = download(file,
+                            this->m_addons_list[this->index].name, &m_download_state);
+    
+    if (!success)
+    {
+        // TODO: show a message in the interface
+        fprintf(stderr, "[Addons] Failed to download '%s'\n", file.c_str());
+        return;
+    }
+    
     file_manager->checkAndCreateDirForAddons(this->m_addons_list[this->index].name,
-        this->m_addons_list[this->index].type + "s/");
+                                             this->m_addons_list[this->index].type + "s/");
 
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
@@ -339,11 +352,11 @@ void Addons::Install()
     m_str_state = "Unzip the addons...";
     pthread_mutex_unlock(&m_str_mutex);
 
-    const bool success = extract_zip(from, to);
+    success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface
-        std::cerr << "Failed to unzip " << from << " to " << to << std::endl;
+        std::cerr << "[Addons] Failed to unzip '" << from << "' to '" << to << "'\n";
         return;
     }
 
@@ -351,7 +364,7 @@ void Addons::Install()
     this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;
     
     pthread_mutex_lock(&m_str_mutex);
-    m_str_state = "Reloaing karts list...";
+    m_str_state = "Reloading kart list...";
     pthread_mutex_unlock(&m_str_mutex);
     this->SaveInstalled();
 }
@@ -389,7 +402,7 @@ void Addons::SaveInstalled()
 // ----------------------------------------------------------------------------
 void Addons::UnInstall()
 {
-    std::cout << "Uninstall: " << this->m_addons_list[this->index].name << std::endl;
+    std::cout << "[Addons] Uninstalling <" << this->m_addons_list[this->index].name << ">\n";
 
     this->m_addons_list[this->index].installed = false;
     //write the xml file with the informations about installed karts
@@ -402,7 +415,9 @@ void Addons::UnInstall()
     this->SaveInstalled();
 
 }
+
 // ----------------------------------------------------------------------------
+
 int Addons::getDownloadState()
 {
     pthread_mutex_lock(&download_mutex);
@@ -410,6 +425,9 @@ int Addons::getDownloadState()
     pthread_mutex_unlock(&download_mutex);
     return value;
 }
+
+// ----------------------------------------------------------------------------
+
 std::string Addons::getDownloadStateAsStr()
 {
     pthread_mutex_lock(&m_str_mutex);
@@ -418,8 +436,8 @@ std::string Addons::getDownloadStateAsStr()
     return value;
 }
 
-
 // ----------------------------------------------------------------------------
+
 bool Addons::NeedUpdate()
 {
     return GetInstalledVersion() < GetVersion();

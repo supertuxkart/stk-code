@@ -27,34 +27,40 @@
 #include "io/file_manager.hpp"
 
 pthread_mutex_t download_mutex;
-
 NetworkHttp * network_http = 0;
+
+// ------------------------------------------------------------------------------------------------------
+
 NetworkHttp::NetworkHttp()
 {
     pthread_t thread;
     pthread_create(&thread, NULL, &NetworkHttp::checkNewServer, this);
 }
+
 // ---------------------------------------------------------------------------
 
 void * NetworkHttp::checkNewServer(void * obj)
 {
     NetworkHttp * pthis = (NetworkHttp *)obj;
     std::string newserver = pthis->downloadToStr("redirect");
-    if(newserver != "")
+    if (newserver != "")
     {
         newserver.replace(newserver.find("\n"), 1, "");
 
-        std::cout << "Current server: " << UserConfigParams::m_server_addons.toString() << std::endl;
+        std::cout << "[Addons] Current server: " << UserConfigParams::m_server_addons.toString() << std::endl;
         UserConfigParams::m_server_addons = newserver;
-        std::cout << "New server: " << newserver << std::endl;
+        std::cout << "[Addons] New server: " << newserver << std::endl;
         user_config->saveConfig();
     }
     else
     {
-        std::cout << "No new server." << std::endl;
+        std::cout << "[Addons] No new server." << std::endl;
     }
     return NULL;
 }
+
+// ------------------------------------------------------------------------------------------------------
+
 size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::string * stream)
 {
     static std::string str = std::string(ptr);
@@ -64,17 +70,18 @@ size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::stri
     return nb_char;
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 std::string NetworkHttp::downloadToStr(std::string url)
 {
 	CURL *session = curl_easy_init();
 
 	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + url).c_str());
 	
-	std::string * fout = new std::string("");
-	
+	std::string fout;
 	
 	//from and out
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fout);
+	curl_easy_setopt(session,  CURLOPT_WRITEDATA, &fout);
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
 	
 	int succes = curl_easy_perform(session);
@@ -82,22 +89,15 @@ std::string NetworkHttp::downloadToStr(std::string url)
 	//stop curl
 	curl_easy_cleanup(session);
 	
-	if(succes == 0)
-	{
-    	std::cout << "Download successfull" << std::endl;
-    	return *fout;
-	}
-	else
-	{
-	    std::cout << "Download failed... check your network connexion" << std::endl;
-	    return "";
-    }
+	if (succes == 0) return fout;
+	else             return "";
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 bool download(std::string file, std::string save, int * progress_data)
 {
 	CURL *session = curl_easy_init();
-	std::cout << "Downloading: " << std::string(UserConfigParams::m_server_addons.toString() + "/" + file) << std::endl;
 	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + file).c_str());
 	FILE * fout;
 	if(save != "")
@@ -120,7 +120,7 @@ bool download(std::string file, std::string save, int * progress_data)
 	//to update the progress bar
 	curl_easy_setopt(session,  CURLOPT_PROGRESSDATA, progress_data);
 	
-	int succes = curl_easy_perform(session);
+	int success = curl_easy_perform(session);
 	
 	//close the file where we downloaded the content
 	fclose(fout);
@@ -128,18 +128,12 @@ bool download(std::string file, std::string save, int * progress_data)
 	//stop curl
 	curl_easy_cleanup(session);
 	
-	if(succes == 0)
-	{
-    	std::cout << "Download successfull" << std::endl;
-    	return true;
-	}
-	else
-	{
-	    std::cout << "Download failed... check your network connexion" << std::endl;
-	    return false;
-    }
+    return (success == 0);
 }
-//FIXME : this way is a bit ugly but the simpliesst at the moment
+
+// ------------------------------------------------------------------------------------------------------
+
+//FIXME : this way is a bit ugly but the simplest at the moment
 int time_last_print = 0;
 int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {

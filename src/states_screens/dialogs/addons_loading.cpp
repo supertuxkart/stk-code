@@ -78,12 +78,18 @@ void AddonsLoading::loadInfo()
 void * AddonsLoading::downloadIcon( void * pthis)
 {
     AddonsLoading * pt = (AddonsLoading*)pthis;
-	if(download("icon/" + addons_manager->GetIcon(), addons_manager->GetName() + ".png"))
+    
+    std::string iconPath = "icon/" + addons_manager->GetIcon();
+	if (download(iconPath, addons_manager->GetName() + ".png"))
     {
         pthread_mutex_lock(&(pt->m_mutex_can_install));
         pt->m_can_load_icon = true;
         pthread_mutex_unlock(&(pt->m_mutex_can_install));
 	}
+    else
+    {
+        fprintf(stderr, "[Addons] Download icon '%s' failed\n", iconPath.c_str());
+    }
     return NULL;
 }
 

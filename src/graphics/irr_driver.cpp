@@ -45,10 +45,11 @@ using namespace irr::video;
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
-const int MIN_SUPPORTED_HEIGHT = 480; //TODO: do some tests, 480 might be too small without a special menu
+const int MIN_SUPPORTED_HEIGHT = 600; //TODO: do some tests, 600 might be too small without a special menu
 const int MIN_SUPPORTED_WIDTH  = 800;
 
 // ----------------------------------------------------------------------------
+
 IrrDriver::IrrDriver()
 {
     m_res_switching = false;
@@ -58,13 +59,14 @@ IrrDriver::IrrDriver()
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
+
 IrrDriver::~IrrDriver()
 {
-    //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
 }   // ~IrrDriver
+
 // ----------------------------------------------------------------------------
 
 void IrrDriver::initDevice()
@@ -73,8 +75,8 @@ void IrrDriver::initDevice()
 
     // ---- the first time, get a list of available video modes
     if (firstTime)
-    {
-        //std::cout << "^^^^^^^^ Creating m_device (as NULL) ^^^^^^^^\n";
+    {        
+        std::cout << "[IrrDriver] Creating NULL device\n";
         m_device = createDevice(video::EDT_NULL);
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
@@ -98,13 +100,7 @@ void IrrDriver::initDevice()
                 mode.height = h;
                 m_modes.push_back( mode );
             }
-            
-            //std::cout <<
-            //"bits : " << modes->getVideoModeDepth(i) <<
-            //" resolution=" << modes->getVideoModeResolution(i).Width <<
-            //"x" << modes->getVideoModeResolution(i).Height << std::endl;
         }
-        //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
         m_device->closeDevice();
         // In some circumstances it would happen that a WM_QUIT message
         // (apparently sent for this NULL device) is later received by
@@ -119,8 +115,6 @@ void IrrDriver::initDevice()
         firstTime = false;
     } // end if firstTime
     
-
-
 
     int numDrivers = 5;
 
@@ -144,15 +138,16 @@ void IrrDriver::initDevice()
         {
             // Get the correct type.
             type = getEngineDriverType( UserConfigParams::m_renderer );
-        } else {
+        } else
+        {
             // Get the correct type.
             type = getEngineDriverType( driver_type );
         }
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
-        for(int bits=32; bits>15; bits -=8)
+        for (int bits=32; bits>15; bits -=8)
         {
-            //std::cout << "^^^^^^^^ CREATING m_device ^^^^^^^^\n";
+            std::cout << "[IrrDriver] Tring to create device with " << bits << " bits\n";
             m_device = createDevice(type,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
@@ -163,7 +158,7 @@ void IrrDriver::initDevice()
                                     this    // event receiver
                                     );
             if(m_device) break;
-        }   // for bits=24, 16
+        }   // for bits=32, 24, 16
         if(m_device) break;
     }   // for edt_types
     
@@ -283,7 +278,7 @@ video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
     }
 
     // Ouput which render will be tried.
-    std::cout << "Trying " << rendererName << " rendering." << std::endl;
+    std::cout << "[IrrDriver] Trying " << rendererName << " rendering." << std::endl;
 
     return type;
 }
@@ -746,8 +741,8 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename)
 #ifndef NDEBUG
     if (out == NULL)
     {
-        printf("Texture '%s' not found.\n", filename.c_str());
-        printf("Put a breakpoint at line %s:%i to debug!\n", __FILE__, __LINE__ );
+        printf("[IrrDriver] Texture '%s' not found; Put a breakpoint at line %s:%i to debug!\n",
+               filename.c_str(), __FILE__, __LINE__);
     }
 #endif
     
@@ -930,7 +925,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
             // Ignore 'normal' messages
             if (event.LogEvent.Level>0)
             {
-                printf("Level %d: %s\n",
+                printf("[IrrDriver Temp Logger] Level %d: %s\n",
                        event.LogEvent.Level,event.LogEvent.Text);
             }
             return true;

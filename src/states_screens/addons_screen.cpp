@@ -127,6 +127,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
 }
 
 // ------------------------------------------------------------------------------------------------------
+
 void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
 	pthread_mutex_lock(&(this->mutex));
@@ -136,6 +137,9 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     }
 	pthread_mutex_unlock(&(this->mutex));
 }
+
+// ------------------------------------------------------------------------------------------------------
+
 void AddonsScreen::init()
 {
     Screen::init();
@@ -143,7 +147,7 @@ void AddonsScreen::init()
     this->type = "kart";
 
     pthread_mutex_init(&(this->mutex), NULL);
-    std::cout << "Addons dir:" + file_manager->getAddonsDir() << std::endl;
+    std::cout << "[Addons] Using directory <" + file_manager->getAddonsDir() << ">\n";
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setIcons(m_icon_bank);
     //w_list->clear();
@@ -156,6 +160,7 @@ void AddonsScreen::init()
 }
 
 // ------------------------------------------------------------------------------------------------------
+
 void * AddonsScreen::downloadList( void * pthis)
 {
     AddonsScreen * pt = (AddonsScreen*)pthis;	

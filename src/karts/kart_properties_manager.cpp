@@ -163,7 +163,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
         kart_properties->getVersion() > stk_config->m_max_kart_version)
     {
-        fprintf(stderr, "Warning: kart '%s' is not supported by this binary, ignored.\n",
+        fprintf(stderr, "[KartPropertiesManager] Warning: kart '%s' is not supported by this binary, ignored.\n",
                 kart_properties->getIdent().c_str());
         delete kart_properties;
         return false;

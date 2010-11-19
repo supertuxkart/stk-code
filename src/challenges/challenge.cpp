@@ -175,10 +175,6 @@ void Challenge::load(const XMLNode* challengesNode)
     node->get("solved", &finished);
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
     
-    if(m_state == CH_SOLVED)
-    {
-        std::cout << "Solved challenge!! " << getId().c_str() << std::endl;
-    }
     
     if(!finished) loadAdditionalInfo(node);
 }   // load

@@ -69,7 +69,7 @@ bool EventHandler::OnEvent (const SEvent &event)
     else if (event.EventType == EET_LOG_TEXT_EVENT)
     {
         // Ignore 'normal' messages
-        if (event.LogEvent.Level>0)
+        if (event.LogEvent.Level > irr:: ELL_INFORMATION)
         {
             // Unfortunatly irrlicht produces some internal error/warnings
             // messages that can't be avoided (see COpenGLTexture where
@@ -83,8 +83,15 @@ bool EventHandler::OnEvent (const SEvent &event)
 #else
             return true; // EVENT_BLOCK
 #endif
-            printf("Level %d: %s\n",
-                   event.LogEvent.Level,event.LogEvent.Text);
+            
+            if (event.LogEvent.Level == irr::ELL_WARNING)
+            {
+                printf("[Irrlicht Warning] %s\n", event.LogEvent.Text);
+            }
+            else if (event.LogEvent.Level == irr::ELL_ERROR)
+            {
+                printf("[Irrlicht Error] %s\n", event.LogEvent.Text);
+            }
         }
         return true;
     }
