@@ -111,6 +111,9 @@ void OptionsScreenVideo::init()
     GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
     assert( animatedKarts != NULL );
     
+    GUIEngine::CheckBoxWidget* gfx = this->getWidget<GUIEngine::CheckBoxWidget>("gfx");
+    assert( gfx != NULL );
+    
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
     assert( res != NULL );
@@ -164,6 +167,7 @@ void OptionsScreenVideo::init()
         full->setDeactivated();
         applyBtn->setDeactivated();
         animatedKarts->setDeactivated();
+        gfx->setDeactivated();
     }
     else
     {
@@ -171,6 +175,7 @@ void OptionsScreenVideo::init()
         full->setActivated();
         applyBtn->setActivated();
         animatedKarts->setActivated();
+        gfx->setActivated();
     }
     
     // ---- select current resolution every time
@@ -214,9 +219,9 @@ void OptionsScreenVideo::init()
         GUIEngine::reloadSkin();
     }
     
-    // --- set animations checkbox value
+    // --- set gfx settings values
     animatedKarts->setState( UserConfigParams::m_show_steering_animations );
-    
+    gfx->setState( UserConfigParams::m_graphical_effects );
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -272,6 +277,12 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
         assert( animatedKarts != NULL );
         UserConfigParams::m_show_steering_animations = animatedKarts->getState();
+    }
+    else if (name == "gfx")
+    {
+        GUIEngine::CheckBoxWidget* gfx = this->getWidget<GUIEngine::CheckBoxWidget>("gfx");
+        assert( gfx != NULL );
+        UserConfigParams::m_graphical_effects = gfx->getState();
     }
     
 }   // eventCallback

@@ -20,22 +20,38 @@
         
         <spacer height="20" width="10"/>
 
-        <label width="100%" I18N="In the graphics settings" text="Skin"/>
-
         <!-- FIXME don't hardcode height, should depend on text height -->
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="100%" proportion="2" layout="horizontal-row" >
             
-            <!-- FIXME: don't hardcode size -->
-            <spinner id="skinchoice" width="300" height="50" />
+            <!-- ************ SKIN CHOICE ************ -->
+            <div layout="vertical-row" proportion="2" height="100%">
+                <label width="100%" I18N="In the graphics settings" text="Skin"/>
             
-            <spacer width="100" height="100%" />
-            <checkbox id="anim" width="40" height="40" />
-            <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" I18N="In the video settings" text="Animated Karts"/>
+                <!-- FIXME: don't hardcode size -->
+                <spinner id="skinchoice" width="300" height="50" />
+            </div>
+            
+            <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
+            <div layout="vertical-row" proportion="3" height="100%">
+                
+                <label width="100%" I18N="In the graphics settings" text="Graphical Effects Settings"/>
+                
+                <div width="100%" proportion="1" layout="horizontal-row" >
+                    <checkbox id="anim" width="40" height="40" />
+                    <spacer width="20" height="100%" />
+                    <label proportion="1" height="100%" I18N="In the video settings" text="Animated Karts"/>
+                </div>
+                
+                <div width="100%" proportion="1" layout="horizontal-row" >
+                    <checkbox id="gfx" width="40" height="40" />
+                    <spacer width="20" height="100%" />
+                    <label proportion="1" height="100%" I18N="In the video settings" text="Animated Effects and Scenery"/>
+                </div>
+            </div>
         </div>
         
-
-        <spacer height="40" width="10"/>
+        <!-- ************ RESOLUTION CHOICE ************ -->
+        <spacer height="10" width="10"/>
         <label width="100%" I18N="In the graphics settings" text="Resolution"/>
         
         <scrollable_ribbon id="resolutions" proportion="2" label_location="each"

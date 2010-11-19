@@ -154,8 +154,11 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     m_add_rotation.setHeading( (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setPitch(   (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
-    m_stars_effect->showFor(6.0f);
-
+    
+    if ( UserConfigParams::m_graphical_effects )
+    {
+        m_stars_effect->showFor(6.0f);
+    }
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
