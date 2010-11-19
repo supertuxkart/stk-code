@@ -19,6 +19,7 @@
 
 #include "tracks/track_object_manager.hpp"
 
+#include "config/user_config.hpp"
 #include "animations/three_d_animation.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
@@ -102,10 +103,13 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
 // ----------------------------------------------------------------------------
 void TrackObjectManager::update(float dt)
 {
-    for(std::vector<TrackObject*>::const_iterator i=m_all_objects.begin();
-        i!=m_all_objects.end(); i++)
+    if ( UserConfigParams::m_graphical_effects )
     {
-        (*i)->update(dt);
+        for(std::vector<TrackObject*>::const_iterator i=m_all_objects.begin();
+            i!=m_all_objects.end(); i++)
+        {
+            (*i)->update(dt);
+        }
     }
 }   // update
 

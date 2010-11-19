@@ -735,10 +735,11 @@ void Kart::update(float dt)
     {
         m_smoke_system->update(dt);
         m_water_splash_system->update(dt);
-        m_nitro->update(dt);
-        m_slipstream->update(dt);
     }  // UserConfigParams::m_graphical_effects
 
+    m_nitro->update(dt);
+    m_slipstream->update(dt);
+    
     updatePhysics(dt);
 
     /* (TODO: add back when properly done)
