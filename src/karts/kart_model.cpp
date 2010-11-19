@@ -230,15 +230,22 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
-    if(!UserConfigParams::m_show_steering_animations)
-        m_mesh->setHardwareMappingHint(scene::EHM_STATIC);
-    Vec3 min, max;
+    
     if(!m_mesh)
     {
         printf("Problems loading mesh '%s' - kart '%s' will not be available\n",
             full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+    else
+    {
+        if (!UserConfigParams::m_show_steering_animations)
+        {
+            m_mesh->setHardwareMappingHint(scene::EHM_STATIC);
+        }
+    }
+    
+    Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 size     = max-min;
     m_kart_width  = size.getX();
