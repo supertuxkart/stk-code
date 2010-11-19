@@ -660,10 +660,21 @@ void Track::createWater(const XMLNode &node)
     node.get("height", &wave_height);
     node.get("speed",  &wave_speed);
     node.get("length", &wave_length);
-    scene::ISceneNode* scene_node = irr_driver->addWaterNode(mesh,
-                                                             wave_height, 
-                                                             wave_speed,
-                                                             wave_length);
+    scene::ISceneNode* scene_node;
+    
+    
+    if (UserConfigParams::m_graphical_effects)
+    {
+        scene_node = irr_driver->addWaterNode(mesh,
+                                              wave_height, 
+                                              wave_speed,
+                                              wave_length);
+    }
+    else
+    {
+        scene_node = irr_driver->addMesh(mesh);
+    }
+    
 #ifdef DEBUG
     std::string debug_name = model_name+"(water node)";
     scene_node->setName(debug_name.c_str());
