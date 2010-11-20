@@ -391,8 +391,7 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
 void RaceResultGUI::renderGlobal(float dt)
 {
     m_timer               += dt;
-    World *world           = World::getWorld();
-    assert(world->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
+    assert(World::getWorld()->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = m_all_row_infos.size();
     
     // First: Update the finite state machine
