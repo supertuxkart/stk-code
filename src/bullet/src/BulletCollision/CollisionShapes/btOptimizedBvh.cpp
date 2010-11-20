@@ -24,6 +24,7 @@ btOptimizedBvh::btOptimizedBvh() : m_useQuantization(false),
 					m_traversalMode(TRAVERSAL_STACKLESS)
 					//m_traversalMode(TRAVERSAL_RECURSIVE)
 					,m_subtreeHeaderCount(0) //PCK: add this line
+                    ,debug_abort(false)
 { 
 
 }
@@ -1355,7 +1356,8 @@ btOptimizedBvh *btOptimizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
 btOptimizedBvh::btOptimizedBvh(btOptimizedBvh &self, bool ownsMemory) :
 m_bvhAabbMin(self.m_bvhAabbMin),
 m_bvhAabbMax(self.m_bvhAabbMax),
-m_bvhQuantization(self.m_bvhQuantization)
+m_bvhQuantization(self.m_bvhQuantization),
+debug_abort(false)
 {
 
 
