@@ -174,7 +174,8 @@ void PlayerController::action(PlayerAction action, int value)
     case PA_DRIFT:
         m_controls->m_drift = (value!=0);
         break;
-    default: assert(false);
+    default: 
+        printf("Unknown action for player controller\n");
     }
 
 }   // action
