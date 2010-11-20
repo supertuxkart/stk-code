@@ -46,8 +46,8 @@ KeyboardDevice::KeyboardDevice()
 
 // -----------------------------------------------------------------------------
 
-bool KeyboardDevice::hasBinding(const int id, InputManager::InputDriverMode mode,
-                                PlayerAction* action /* out */)
+bool KeyboardDevice::processAndMapInput(const int id, InputManager::InputDriverMode mode,
+                                        PlayerAction* action /* out */)
 {
     if (mode == InputManager::INGAME)
     {
@@ -142,16 +142,17 @@ void GamePadDevice::resetAxisDirection(const int axis,
 
 // -----------------------------------------------------------------------------
 
-bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value,
-                               InputManager::InputDriverMode mode,
-                               StateManager::ActivePlayer* player, PlayerAction* action /* out */)
+bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, const int value,
+                                       InputManager::InputDriverMode mode,
+                                       StateManager::ActivePlayer* player,
+                                       PlayerAction* action /* out */)
 {
     bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open
     
-    if(type == Input::IT_STICKMOTION)
+    if (type == Input::IT_STICKMOTION)
     {
-        if(id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
+        if (id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
 
         if (player != NULL)
         {
@@ -213,11 +214,11 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     }
     else
     {
-        fprintf(stderr, "hasBinding() called on improperly initialized GamePadDevice\n");
+        fprintf(stderr, "processAndMapInput() called on improperly initialized GamePadDevice\n");
         abort();
     }
 
     return success;
-}   // hasBinding
+}   // processAndMapInput
 
 // -----------------------------------------------------------------------------

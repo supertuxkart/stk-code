@@ -65,7 +65,7 @@ public:
      * \param      mode    Used to determine whether to bind menu actions or game actions
      * \param[out] action  The action associated to this input (only check this value if method returned true)
      */
-    bool hasBinding(const int id, InputManager::InputDriverMode mode, PlayerAction* action);
+    bool processAndMapInput(const int id, InputManager::InputDriverMode mode, PlayerAction* action);
     
 };
 
@@ -97,17 +97,21 @@ public:
     void setButtonPressed(const int i, bool isButtonPressed);
     
     /**
-     * \return Checks if this key belongs to this device.
-     * If yes, sets action and returns true; otherwise returns false.
+     * Invoked when this device it used. Verifies if the key/button that was pressed
+     * is associated with a binding. If yes, sets action and returns true; otherwise returns false.
      *
      * \param      player  Only passed to know where to send 'axis reset's when necessary
      * \param      id      ID of the key that was pressed or of the axis that was triggered (depending on
      *                     the value of the 'type' parameter)
      * \param      mode    Used to determine whether to map menu actions or game actions
      * \param[out] action  The action associated to this input (only check this value if method returned true)
+     *
+     * \return Whether the pressed key/button is bound with an action
      */
-    bool hasBinding(Input::InputType type, const int id, const int value, InputManager::InputDriverMode mode,
-                    StateManager::ActivePlayer* player, PlayerAction* action);
+    bool processAndMapInput(Input::InputType type, const int id, const int value,
+                            InputManager::InputDriverMode mode,
+                            StateManager::ActivePlayer* player,
+                            PlayerAction* action);
 
 };
 

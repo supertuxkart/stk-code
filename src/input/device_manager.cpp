@@ -245,7 +245,7 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
-        if (keyboard->hasBinding(btnID, mode, action))
+        if (keyboard->processAndMapInput(btnID, mode, action))
         {
             //std::cout << "   binding found in keyboard #"  << (n+1) << "; action is " << KartActionStrings[*action] << "\n";
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
@@ -277,7 +277,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 
     if (gPad != NULL) 
     {
-        if (gPad->hasBinding(type, btnID, value, mode, gPad->getPlayer(), action))
+        if (gPad->processAndMapInput(type, btnID, value, mode, gPad->getPlayer(), action))
         {
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
