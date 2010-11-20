@@ -32,6 +32,7 @@ subject to the following restrictions:
 #ifdef BT_DEBUG
 #  include <iostream>
 #endif
+#include <cstdio>
 //http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclang/html/vclrf__m128.asp
 
 
