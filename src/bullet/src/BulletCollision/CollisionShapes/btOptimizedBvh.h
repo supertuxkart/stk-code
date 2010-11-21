@@ -359,6 +359,26 @@ public:
 
 		btAssert(m_useQuantization);
 #ifdef BT_DEBUG
+	if( (point.getX() > m_bvhAabbMax.getX() ))
+        {
+            std::cout << "Bullet Assertion error " 
+                << point.getX() << " "<<point.getY()<<" "<<point.getZ()
+                << "  "<<m_bvhAabbMax.getX()<<" "<< m_bvhAabbMax.getY()
+                << " " <<m_bvhAabbMax.getZ()<<"  "
+                << m_bvhAabbMin.getX()<<" "<< m_bvhAabbMin.getX()
+                << " "<< m_bvhAabbMin.getX()<<" "
+                << isMax;
+            printf("in hex: %x %x %x\n",
+                ((int*)&point)[0],((int*)&point)[1],((int*)&point)[2]);
+            printf("in hex: %x %x %x\n",
+                ((int*)&m_bvhAabbMax)[0],((int*)&m_bvhAabbMax)[1],((int*)&m_bvhAabbMax)[2]);
+            printf("in hex: %x %x %x\n",
+                ((int*)&m_bvhAabbMin)[0],((int*)&m_bvhAabbMin)[1],((int*)&m_bvhAabbMin)[2]);
+#ifdef KA_DEBUG
+            debug_abort=1;
+            return;
+#endif
+        }
 		if( (point.getX() > m_bvhAabbMax.getX() ) ||
 		    (point.getY() > m_bvhAabbMax.getY() ) ||
             (point.getZ() > m_bvhAabbMax.getZ() ) ||
