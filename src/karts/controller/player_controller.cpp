@@ -175,7 +175,7 @@ void PlayerController::action(PlayerAction action, int value)
         m_controls->m_drift = (value!=0);
         break;
     default: 
-        printf("Unknown action for player controller\n");
+       break;
     }
 
 }   // action
