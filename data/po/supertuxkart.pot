@@ -575,14 +575,6 @@ msgstr ""
 msgid "Credits"
 msgstr ""
 
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#. I18N: ./data/gui/mainaddons.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:315 data/po/gui_strings.h:347
-msgid "DEBUG"
-msgstr ""
-
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: To delete a keyboard configuration
 #: data/po/gui_strings.h:441
@@ -758,11 +750,6 @@ msgid ""
 "Follow the leader: run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
-msgstr ""
-
-#. I18N: ./data/dummy.challenge
-#: data/po/gui_strings.h:639
-msgid "For testing purposes"
 msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
