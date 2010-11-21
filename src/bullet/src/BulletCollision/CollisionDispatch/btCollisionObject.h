@@ -213,6 +213,12 @@ public:
 
 	void	setWorldTransform(const btTransform& worldTrans)
 	{
+	  btAssert(!isnan(worldTrans.getOrigin().getX()));
+	  btAssert(!isnan(worldTrans.getOrigin().getY()));
+	  btAssert(!isnan(worldTrans.getOrigin().getZ()));
+	  btAssert(!isinf(worldTrans.getOrigin().getX()));
+	  btAssert(!isinf(worldTrans.getOrigin().getY()));
+	  btAssert(!isinf(worldTrans.getOrigin().getZ()));
 		m_worldTransform = worldTrans;
 	}
 
