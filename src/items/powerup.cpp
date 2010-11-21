@@ -209,7 +209,7 @@ void Powerup::use()
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:   
-        m_owner->handleZipper();
+        m_owner->handleZipper(NULL, true);
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
