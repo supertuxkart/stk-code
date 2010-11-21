@@ -214,6 +214,7 @@ void UnlockManager::load()
     {
         std::cerr << "Challenge file '" << filename << "' will be created." 
                   << std::endl;
+        save();
         return;
     }
     
