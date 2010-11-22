@@ -147,6 +147,7 @@ public:
         *zipper_max_speed_increase = m_zipper_max_speed_increase;
         *zipper_duration           = m_zipper_duration;
         *zipper_speed_gain         = m_zipper_speed_gain;
+        *zipper_fade_out_time      = m_zipper_fade_out_time;
     }   // getZipperParameter
 
 } ;
