@@ -70,7 +70,6 @@ private:
     std::vector<scene::IMesh*>      m_all_meshes;
     scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
-    TriangleMesh*            m_non_collision_mesh;
     /** Minimum coordinates of this track. */
     Vec3                     m_aabb_min;
     /** Maximum coordinates of this track. */

@@ -67,7 +67,6 @@ Track::Track(std::string filename)
     m_screenshot           = "";
     m_version              = 0;
     m_track_mesh           = new TriangleMesh();
-    m_non_collision_mesh   = new TriangleMesh();
     m_all_nodes.clear();
     m_all_meshes.clear();
     m_is_arena             = false;
@@ -89,7 +88,6 @@ Track::~Track()
     if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
     delete m_track_mesh;
-    delete m_non_collision_mesh;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -153,8 +151,6 @@ void Track::cleanup()
 
     irr_driver->removeNode(m_sun);
 
-    delete m_non_collision_mesh;
-    m_non_collision_mesh = new TriangleMesh();
     delete m_track_mesh;
     m_track_mesh = new TriangleMesh();
 
@@ -342,11 +338,6 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
         return;
     }
-    if (m_non_collision_mesh == NULL)
-    {
-        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
-        return;
-    }
 
     m_track_mesh->removeBody();
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
@@ -354,7 +345,6 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         convertTrackToBullet(m_all_nodes[i]);
     }
     m_track_mesh->createBody();
-    m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
 }   // createPhysicsModel
 
@@ -428,10 +418,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         {
             std::string image = std::string(core::stringc(t->getName()).c_str());
             material=material_manager->getMaterial(StringUtils::getBasename(image));
-            // Zipper are converted to non-collision mesh, since otherwise
-            // the road becomes 'bumpy' if the meshes are not 100% correctly
-            // aligned.
-            if(material->isZipper()) tmesh = m_non_collision_mesh;
             // Materials to be ignored are not converted into bullet meshes.
             if(material->isIgnore()) continue;
         } 
