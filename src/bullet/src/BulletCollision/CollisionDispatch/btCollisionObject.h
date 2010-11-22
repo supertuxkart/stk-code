@@ -16,6 +16,13 @@ subject to the following restrictions:
 #ifndef COLLISION_OBJECT_H
 #define COLLISION_OBJECT_H
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#  define isinf(x) (!_finite(x))
+#else
+#  include <math.h>
+#endif
+
 #include "LinearMath/btTransform.h"
 
 //island management, m_activationState1
