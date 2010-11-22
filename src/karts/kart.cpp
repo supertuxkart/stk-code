@@ -933,7 +933,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
         fade_out_time      = m_kart_properties->getZipperFadeOutTime();
     }
     // Ignore a zipper that's activated while braking
-    if(m_controls.m_brake) return;
+    if(m_controls.m_brake || m_speed<0) return;
 
     MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_ZIPPER, 
                                max_speed_increase, duration, fade_out_time);
