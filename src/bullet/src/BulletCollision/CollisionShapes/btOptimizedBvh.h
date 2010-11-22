@@ -177,10 +177,6 @@ ATTRIBUTE_ALIGNED16(class) btOptimizedBvh
 	btVector3			m_bvhAabbMin;
 	btVector3			m_bvhAabbMax;
 	btVector3			m_bvhQuantization;
-#define KA_DEBUG
-#ifdef KA_DEBUG
-    mutable bool debug_abort;
-#endif
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
@@ -359,29 +355,9 @@ public:
 
 		btAssert(m_useQuantization);
 #ifdef BT_DEBUG
-	if( (point.getX() > m_bvhAabbMax.getX() ))
-        {
-            std::cout << "Bullet Assertion error " 
-                << point.getX() << " "<<point.getY()<<" "<<point.getZ()
-                << "  "<<m_bvhAabbMax.getX()<<" "<< m_bvhAabbMax.getY()
-                << " " <<m_bvhAabbMax.getZ()<<"  "
-                << m_bvhAabbMin.getX()<<" "<< m_bvhAabbMin.getX()
-                << " "<< m_bvhAabbMin.getX()<<" "
-                << isMax;
-            printf("in hex: %x %x %x\n",
-                ((int*)&point)[0],((int*)&point)[1],((int*)&point)[2]);
-            printf("in hex: %x %x %x\n",
-                ((int*)&m_bvhAabbMax)[0],((int*)&m_bvhAabbMax)[1],((int*)&m_bvhAabbMax)[2]);
-            printf("in hex: %x %x %x\n",
-                ((int*)&m_bvhAabbMin)[0],((int*)&m_bvhAabbMin)[1],((int*)&m_bvhAabbMin)[2]);
-#ifdef KA_DEBUG
-            debug_abort=1;
-            return;
-#endif
-        }
 		if( (point.getX() > m_bvhAabbMax.getX() ) ||
 		    (point.getY() > m_bvhAabbMax.getY() ) ||
-            (point.getZ() > m_bvhAabbMax.getZ() ) ||
+		    (point.getZ() > m_bvhAabbMax.getZ() ) ||
 		    (point.getX() < m_bvhAabbMin.getX() ) ||
 		    (point.getY() < m_bvhAabbMin.getY() ) ||
 		    (point.getZ() < m_bvhAabbMin.getZ() )    )
@@ -393,16 +369,6 @@ public:
                 << m_bvhAabbMin.getX()<<" "<< m_bvhAabbMin.getX()
                 << " "<< m_bvhAabbMin.getX()<<" "
                 << isMax;
-            printf("in hex: %x %x %x\n",
-                ((int*)&point)[0],((int*)&point)[1],((int*)&point)[2]);
-            printf("in hex: %x %x %x\n",
-                ((int*)&m_bvhAabbMax)[0],((int*)&m_bvhAabbMax)[1],((int*)&m_bvhAabbMax)[2]);
-            printf("in hex: %x %x %x\n",
-                ((int*)&m_bvhAabbMin)[0],((int*)&m_bvhAabbMin)[1],((int*)&m_bvhAabbMin)[2]);
-#ifdef KA_DEBUG
-            debug_abort=1;
-            return;
-#endif
         }
 #endif
 		btAssert(point.getX() <= m_bvhAabbMax.getX());
@@ -477,14 +443,6 @@ public:
 		clampedPoint.setMin(m_bvhAabbMax);
 
 		quantize(out,clampedPoint,isMax);
-#ifdef KA_DEBUG
-        if(debug_abort)
-        {
-            printf("Aborting, original values: %x %x %x\n",
-                ((int*)&point2)[0],((int*)&point2)[1],((int*)&point2)[2]);
-            btAssert(false);
-        }
-#endif
 	}
 	
 	SIMD_FORCE_INLINE btVector3	unQuantize(const unsigned short* vecIn) const
