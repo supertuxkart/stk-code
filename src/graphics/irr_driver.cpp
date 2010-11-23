@@ -350,6 +350,9 @@ void IrrDriver::doApplyResSettings()
     m_device->clearSystemMessages();
     m_device->run(); 
     //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
+
+    // Clear the pointer stored in the file manager
+    file_manager->dropFileSystem();
     m_device->drop();
     m_device        = NULL;
     m_video_driver  = NULL;

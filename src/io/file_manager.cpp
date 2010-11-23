@@ -175,9 +175,8 @@ FileManager::FileManager(char *argv[])
  */
 void FileManager::dropFileSystem()
 {
-    //std::cout << "^^^^^^^^ Dropping m_device (in FileManager) ^^^^^^^^\n";
-
     m_device->drop();
+    m_device = NULL;
 }   // dropFileSystem
 
 //-----------------------------------------------------------------------------
