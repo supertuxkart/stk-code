@@ -52,8 +52,8 @@ const int MIN_SUPPORTED_WIDTH  = 800;
 
 IrrDriver::IrrDriver()
 {
-    m_res_switching = false;
-    m_device = NULL;
+    m_resolution_changing = RES_CHANGE_NONE;
+    m_device              = NULL;
     file_manager->dropFileSystem();
     initDevice();
 }   // IrrDriver
@@ -317,19 +317,22 @@ void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen
     UserConfigParams::m_height = h;
     UserConfigParams::m_fullscreen = fullscreen;
 
-    doApplyResSettings();
-    
-    new ConfirmResolutionDialog();
-}
+    // Setting this flag will trigger a call to applyResolutionSetting()
+    // in the next update call. This avoids the problem that changeResolution
+    // is actually called from the gui, i.e. the event loop, i.e. while the
+    // old device is active - so we can't delete this device (which we must
+    // do in applyResolutionSettings
+    m_resolution_changing = RES_CHANGE_YES;
+}   // changeResolution
 
 //-----------------------------------------------------------------------------
 
-void IrrDriver::doApplyResSettings()
+void IrrDriver::applyResolutionSettings()
 {
-    m_res_switching = true;
-    
-    // show black before resolution switch so we don't see OpenGL's buffer garbage during switch
-    m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+    // show black before resolution switch so we don't see OpenGL's buffer 
+    // garbage during switch
+    m_device->getVideoDriver()->beginScene(true, true, 
+                                           video::SColor(255,100,101,140));
     m_device->getVideoDriver()->draw2DRectangle( SColor(255, 0, 0, 0),
                                                 core::rect<s32>(0, 0,
                                                                 UserConfigParams::m_prev_width,
@@ -407,8 +410,17 @@ void IrrDriver::cancelResChange()
     UserConfigParams::m_width = UserConfigParams::m_prev_width;
     UserConfigParams::m_height = UserConfigParams::m_prev_height;
     UserConfigParams::m_fullscreen = UserConfigParams::m_prev_fullscreen;
-    
-    doApplyResSettings();
+
+    // This will trigger calling applyResolutionSettings in update(). This is 
+    // necessary to avoid that the old screen is deleted, while it is
+    // still active (i.e. sending out events which triggered the change
+    // of resolution    // Setting this flag will trigger a call to applyResolutionSetting()
+    // in the next update call. This avoids the problem that changeResolution
+    // is actually called from the gui, i.e. the event loop, i.e. while the
+    // old device is active - so we can't delete this device (which we must
+    // do in applyResolutionSettings)
+    m_resolution_changing=RES_CHANGE_CANCEL;
+
 }   // cancelResChange
 
 // ----------------------------------------------------------------------------
@@ -420,15 +432,15 @@ void IrrDriver::printRenderStats()
 {
     io::IAttributes * attr = m_scene_manager->getParameters();
     printf("[%ls], FPS:%3d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
-	   m_video_driver->getName(),
-	   m_video_driver->getFPS (),
-	   (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
-	   attr->getAttributeAsInt ( "culled" ),
-	   attr->getAttributeAsInt ( "calls" ),
-	   attr->getAttributeAsInt ( "drawn_solid" ),
-	   attr->getAttributeAsInt ( "drawn_transparent" ),
-	   attr->getAttributeAsInt ( "drawn_transparent_effect" )
-	   );
+           m_video_driver->getName(),
+           m_video_driver->getFPS (),
+           (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
+           attr->getAttributeAsInt ( "culled" ),
+           attr->getAttributeAsInt ( "calls" ),
+           attr->getAttributeAsInt ( "drawn_solid" ),
+           attr->getAttributeAsInt ( "drawn_transparent" ),
+           attr->getAttributeAsInt ( "drawn_transparent_effect" )
+           );
 
 }   // printRenderStats
 
@@ -818,16 +830,22 @@ void IrrDriver::displayFPS()
  */
 void IrrDriver::update(float dt)
 {
+    // If the resolution should be switched, do it now. This will delete the 
+    // old device and create a new one. 
+    if (m_resolution_changing!=RES_CHANGE_NONE)
+    {
+        applyResolutionSettings();
+        if(m_resolution_changing==RES_CHANGE_YES)
+	    new ConfirmResolutionDialog();
+        m_resolution_changing = RES_CHANGE_NONE;
+    }
+
+
     if (!m_device->run())
     {
-        // FIXME: I have NO idea why, after performing resolution switch, the irrlicht device asks once to be deleted
-        if (m_res_switching)    m_res_switching = false;
-        else                    main_loop->abort();
+        main_loop->abort();
     }
-    else if (m_res_switching)
-    {
-        m_res_switching = false;
-    }
+
     
     World *world = World::getWorld();
     

@@ -60,9 +60,13 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
     
-    /** Flag set during resolution switching, so that the game doesn't think it needs
-      * to exit because no frame is open */
-    bool m_res_switching;
+    /** Flag to indicate if a resolution change is pending (which will be
+     *  acted upon in the next update). None means no change, yes means
+     *  change to new resolution and trigger confirmation dialog. 
+     *  Cancel indicates a change of the resolution (back to the original
+     *  one), but no confirmation dialog. */
+    enum {RES_CHANGE_NONE, RES_CHANGE_YES, 
+          RES_CHANGE_CANCEL}                m_resolution_changing;
     
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
@@ -74,7 +78,7 @@ private:
     bool m_pointer_shown;
     
     /** Internal method that applies the resolution in user settings. */
-    void                 doApplyResSettings();
+    void                 applyResolutionSettings();
     
 public:
                           IrrDriver();
@@ -136,7 +140,7 @@ public:
     
     /** Call to change resolution */
     void                  changeResolution(const int w, const int h, const bool fullscreen);
-    /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
+  /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
     void                  cancelResChange();
     
     void                  showPointer();
