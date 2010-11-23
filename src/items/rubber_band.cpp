@@ -82,14 +82,17 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
 }   // RubberBand
 
 // ----------------------------------------------------------------------------
-/** Removes the rubber band from the scene. Is called when the plunger 
- *  explodes.
- */
-void RubberBand::removeFromScene()
+RubberBand::~RubberBand()
 {
     irr_driver->removeNode(m_node);
-    irr_driver->removeMesh(m_mesh);
-}   // removeFromScene
+
+    // This mesh is self made and so not stored in the
+    // mesh cache. So no reason to call
+    // irr_driver->removeMesh(m_mesh);
+    // But it was implicitly 'grabbed' during creation, so we have
+    // to drop it here.
+    m_mesh->drop();
+}   // RubberBand
 
 // ----------------------------------------------------------------------------
 /** Updates the position of the rubber band. It especially sets the

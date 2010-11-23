@@ -64,8 +64,8 @@ private:
 
 public:
          RubberBand(Plunger *plunger, const Kart &kart);
+        ~RubberBand();
     void update(float dt);
-    void removeFromScene();
     void hit(Kart *kart_hit, const Vec3 *track_xyz=NULL);
 };   // RubberBand
 #endif
