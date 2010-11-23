@@ -159,7 +159,12 @@ private:
     /** Force of an attached rubber band. */
     /** Duration a rubber band works. */
     float       m_rubber_band_force;
+    /** How long the rubber band will fly. */
     float       m_rubber_band_duration;
+    /** Increase of maximum speed of the kart when the rubber band pulls. */
+    float       m_rubber_band_speed_increase;
+    /** Fade out time when the rubber band is removed. */
+    float       m_rubber_band_fade_out_time;
      /**Duration of plunger in face depending on difficulty. */
     float       m_plunger_in_face_duration[3];
     /** Wheel base of the kart. */
@@ -464,6 +469,14 @@ public:
 
     /** Returns the duration a rubber band is active for. */
     float getRubberBandDuration     () const {return m_rubber_band_duration;  }
+
+    /** Returns the increase of maximum speed while a rubber band is 
+     *  pulling. */
+    float getRubberBandSpeedIncrease() const {return m_rubber_band_speed_increase;}
+
+    /** Return the fade out time once a rubber band is removed. */
+    float getRubberBandFadeOutTime  () const {return m_rubber_band_fade_out_time;}
+
 
     /** Returns duration of a plunger in your face. */
     float getPlungerInFaceTime      () const 

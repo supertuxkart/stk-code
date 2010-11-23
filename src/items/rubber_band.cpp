@@ -58,7 +58,7 @@ const wchar_t* getPlungerString()
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
-RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
+RubberBand::RubberBand(Plunger *plunger, Kart *kart) :
             m_plunger(plunger), m_owner(kart)
 {
     video::SColor color(77, 179, 0, 0);
@@ -75,7 +75,7 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
 #ifdef DEBUG
-    std::string debug_name = m_owner.getIdent()+" (rubber-band)";
+    std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());
 #endif
 
@@ -101,7 +101,7 @@ RubberBand::~RubberBand()
  */
 void RubberBand::updatePosition()
 {
-    const Vec3 &k = m_owner.getXYZ();
+    const Vec3 &k = m_owner->getXYZ();
 
     // Get the position to which the band is attached
     // ----------------------------------------------
@@ -137,7 +137,7 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
-    if(m_owner.isEliminated())
+    if(m_owner->isEliminated())
     {
         // Rubber band snaps
         m_plunger->hit(NULL);
@@ -147,12 +147,12 @@ void RubberBand::update(float dt)
     }
 
     updatePosition();
-    const Vec3 &k = m_owner.getXYZ();
+    const Vec3 &k = m_owner->getXYZ();
 
     // Check for rubber band snapping
     // ------------------------------
     float l = (m_end_position-k).length2();
-    float max_len = m_owner.getKartProperties()->getRubberBandMaxLength();
+    float max_len = m_owner->getKartProperties()->getRubberBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -165,7 +165,7 @@ void RubberBand::update(float dt)
     // ----------------------------
     if(m_attached_state!=RB_TO_PLUNGER)
     {
-        float force = m_owner.getKartProperties()->getRubberBandForce();
+        float force = m_owner->getKartProperties()->getRubberBandForce();
         Vec3 diff   = m_end_position-k;
         
         // detach rubber band if kart gets very close to hit point
@@ -179,7 +179,11 @@ void RubberBand::update(float dt)
         }
         
         diff.normalize();   // diff can't be zero here
-        m_owner.getBody()->applyCentralForce(diff*force);
+        m_owner->getBody()->applyCentralForce(diff*force);
+        m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
+            m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
+            /*duration*/0.1f, 
+            m_owner->getKartProperties()->getRubberBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }
@@ -198,19 +202,19 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
     short int old_kart_group=0;
 
     // If the owner is being rescued, the broadphase handle does not exist!
-    if(m_owner.getBody()->getBroadphaseHandle())
-        old_kart_group = m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
+    if(m_owner->getBody()->getBroadphaseHandle())
+        old_kart_group = m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
-    if(m_owner.getBody()->getBroadphaseHandle())
-        m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    if(m_owner->getBody()->getBroadphaseHandle())
+        m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
     World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
                                                                 ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
-    if(m_owner.getBody()->getBroadphaseHandle())
-        m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
+    if(m_owner->getBody()->getBroadphaseHandle())
+        m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
     if(ray_callback.HasHit())
     {
         Vec3 pos(ray_callback.m_hitPointWorld);
@@ -246,7 +250,7 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
         irr::core::stringw hit_message;
         hit_message += StringUtils::insertValues(getPlungerString(),
                                                  kart_hit->getName().c_str(),
-                                                 m_owner.getName().c_str()
+                                                 m_owner->getName().c_str()
                                                 ).c_str();
         gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         return;

@@ -44,7 +44,7 @@ private:
     /** The plunger the rubber band is attached to. */
     Plunger            *m_plunger;
     /** The kart who shot this plunger. */
-    const Kart         &m_owner;
+    Kart               *m_owner;
 
     /** The scene node for the rubber band. */
     scene::ISceneNode  *m_node;
@@ -63,7 +63,7 @@ private:
     void updatePosition();
 
 public:
-         RubberBand(Plunger *plunger, const Kart &kart);
+         RubberBand(Plunger *plunger, Kart *kart);
         ~RubberBand();
     void update(float dt);
     void hit(Kart *kart_hit, const Vec3 *track_xyz=NULL);

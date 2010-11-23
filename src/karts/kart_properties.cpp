@@ -74,7 +74,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max =
         m_rubber_band_max_length = m_rubber_band_force =
-        m_rubber_band_duration = m_plunger_in_face_duration[0] =
+        m_rubber_band_duration = m_rubber_band_speed_increase = 
+        m_rubber_band_fade_out_time = m_plunger_in_face_duration[0] =
         m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
@@ -404,9 +405,11 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *plunger_node= root->getNode("plunger"))
     {
-        plunger_node->get("band-max-length", &m_rubber_band_max_length  );
-        plunger_node->get("band-force",      &m_rubber_band_force       );
-        plunger_node->get("band-duration",   &m_rubber_band_duration    );
+        plunger_node->get("band-max-length",    &m_rubber_band_max_length    );
+        plunger_node->get("band-force",         &m_rubber_band_force         );
+        plunger_node->get("band-duration",      &m_rubber_band_duration      );
+        plunger_node->get("band-speed-increase",&m_rubber_band_speed_increase);
+        plunger_node->get("band-fade-out-time", &m_rubber_band_fade_out_time );
         std::vector<float> v;
         plunger_node->get("in-face-time",    &v);
         if(v.size()!=3)
@@ -543,12 +546,14 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
     CHECK_NEG(m_track_connection_accel,     "track-connection-accel"        );
-    CHECK_NEG(m_rubber_band_max_length,     "rubber-band max-length"        );
-    CHECK_NEG(m_plunger_in_face_duration[0],"plunger: in-face-time[0]"      );
-    CHECK_NEG(m_plunger_in_face_duration[1],"plunger: in-face-time[1]"      );
-    CHECK_NEG(m_plunger_in_face_duration[2],"plunger: in-face-time[2]"      );
-    CHECK_NEG(m_rubber_band_force,          "rubber-band force"             );
-    CHECK_NEG(m_rubber_band_duration,       "rubber-band duration"          );
+    CHECK_NEG(m_plunger_in_face_duration[0],"plunger in-face-time[0]"       );
+    CHECK_NEG(m_plunger_in_face_duration[1],"plunger in-face-time[1]"       );
+    CHECK_NEG(m_plunger_in_face_duration[2],"plunger in-face-time[2]"       );
+    CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
+    CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
+    CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );
+    CHECK_NEG(m_rubber_band_speed_increase, "plunger band-speed-increase"   );
+    CHECK_NEG(m_rubber_band_fade_out_time,  "plunger band-fade-out-time"    );
     CHECK_NEG(m_zipper_time,                "zipper-time"                   );
     CHECK_NEG(m_zipper_fade_out_time,       "zipper-fade-out-time"          );
     CHECK_NEG(m_zipper_force,               "zipper-force"                  );

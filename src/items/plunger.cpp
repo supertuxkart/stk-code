@@ -112,7 +112,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
         m_rubber_band = NULL;
     else
     {
-        m_rubber_band = new RubberBand(this, *kart);
+        m_rubber_band = new RubberBand(this, kart);
     }
     m_keep_alive = -1;
 }   // Plunger
