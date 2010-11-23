@@ -347,6 +347,8 @@ void IrrDriver::doApplyResSettings()
     
     //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
     m_device->closeDevice();
+    m_device->clearSystemMessages();
+    m_device->run(); 
     //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
     m_device->drop();
     m_device        = NULL;
