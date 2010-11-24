@@ -929,7 +929,6 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
             if ( distance + m_kart_width * 0.5f 
                  > m_quad_graph->getNode(sector).getPathWidth() )
             {
-                printf("Steps %d\n", count);
                 *result = m_quad_graph->getQuad(sector).getCenter();
                 return;
             }
