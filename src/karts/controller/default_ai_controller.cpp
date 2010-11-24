@@ -889,14 +889,12 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
 
     Vec3 direction;
     Vec3 step_track_coord;
-    float distance;
-    int steps;
 
-    int count=0;
-    //We exit from the function when we have found a solution
-    while( 1 )
+    // The original while(1) loop is replaced with a for loop to avoid
+    // infinite loops (which we had once or twice). Usually the number
+    // of iterations in the while loop is less than 7.
+    for(unsigned int i=0; i<100; i++)
     {
-        count ++;
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
         target_sector = m_next_node_index[sector];
@@ -906,8 +904,13 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
                   - m_kart->getXYZ();
 
         float len=direction.length_2d();
-        steps = int( len / m_kart_length );
+        unsigned int steps = unsigned int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
+
+        // That shouldn't happen, but since we had one instance of
+        // STK hanging, add an upper limit here (usually it's at most
+        // 20 steps)
+        if( steps>1000) steps = 1000;
 
         //Protection against having vel_normal with nan values
         if(len>0.0f) {
@@ -923,7 +926,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
             m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
  
-            distance = fabsf(step_track_coord[0]);
+            float distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f 
@@ -934,7 +937,8 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
             }
         }
         sector = target_sector;
-    }
+    }   // for i<100
+    *result = m_quad_graph->getQuad(sector).getCenter();
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
