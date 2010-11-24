@@ -31,7 +31,6 @@
 #include "utils/translation.hpp"
 
 class Kart;
-class Kart;
 class Track;
 
 
