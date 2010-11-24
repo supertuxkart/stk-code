@@ -904,7 +904,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
                   - m_kart->getXYZ();
 
         float len=direction.length_2d();
-        unsigned int steps = unsigned int( len / m_kart_length );
+        unsigned int steps = (unsigned int)( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
         // That shouldn't happen, but since we had one instance of
