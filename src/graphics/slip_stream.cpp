@@ -385,10 +385,12 @@ void SlipStream::update(float dt)
         }
 #endif
         // Quick test: the kart must be not more than
-        // slipstream length+kart_length() away from the other kart
+        // slipstream length+0.5*kart_length()+0.5*target_kart_length
+        // away from the other kart
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
         float l    = m_target_kart->getKartProperties()->getSlipstreamLength() 
-                   + m_target_kart->getKartLength()*0.5f;
+                   + 0.5f*( m_target_kart->getKartLength()
+                           +m_kart->getKartLength()        );
         if(delta.length2_2d() > l*l) 
         {
             if(UserConfigParams::m_slipstream_debug &&
