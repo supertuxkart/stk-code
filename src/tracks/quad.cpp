@@ -42,7 +42,7 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      }
      m_center = 0.25f*(p0+p1+p2+p3);
      m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
-                               std::min(p0.getY(), p1.getY())  );
+                               std::min(p2.getY(), p3.getY())  );
      m_invisible = invisible;
 
 }   // Quad
@@ -134,4 +134,8 @@ void Quad::transform(const btTransform &t, Quad *result) const
     result->m_p[1] = t(m_p[1]);
     result->m_p[2] = t(m_p[2]);
     result->m_p[3] = t(m_p[3]);
+    result->m_min_height = std::min ( std::min(result->m_p[0].getY(), 
+                                               result->m_p[1].getY()),
+                                      std::min(result->m_p[2].getY(), 
+                                               result->m_p[3].getY())  );
 }   // transform
