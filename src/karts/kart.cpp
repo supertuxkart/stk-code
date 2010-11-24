@@ -728,7 +728,6 @@ void Kart::update(float dt)
     }  // UserConfigParams::m_graphical_effects
 
     m_nitro->update(dt);
-    m_slipstream->update(dt);
     
     updatePhysics(dt);
 
