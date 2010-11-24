@@ -354,9 +354,6 @@ void SlipStream::update(float dt)
     bool is_sstreaming     = false;
     m_target_kart          = NULL;
 
-
-    irr::video::S3DVertex* vertices = NULL;
-    video::SColor          color(255, 0, 0, 0);
     // Note that this loop can not be simply replaced with a shorter loop
     // using only the karts with a better position - since a kart might
     // be a lap behind
