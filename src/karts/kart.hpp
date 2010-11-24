@@ -140,7 +140,7 @@ private:
     /** Graphical effect when using a nitro. */
     Nitro        *m_nitro;
 
-    /** Graphical effect when slipstreaming. */
+    /** Handles all slipstreaming. */
     SlipStream   *m_slipstream;
 
     float         m_wheel_rotation;
@@ -152,27 +152,6 @@ private:
 
     /** The skidmarks object for this kart. */
     SkidMarks    *m_skidmarks;
-
-    // Variables for slipstreaming
-    // ---------------------------
-    /** The quad inside which another kart is considered to be slipstreaming.
-     *  This value is current area, i.e. takes the kart position into account. */
-    Quad         *m_slipstream_quad;
-
-    /** This is slipstream area if the kart is at 0,0,0 without rotation. From 
-     *  this value m_slipstream_area is computed by applying the kart transform. */
-    Quad         *m_slipstream_original_quad;
-
-    /** The time a kart was in slipstream. */
-    float         m_slipstream_time;
-    
-    /** The kart from which this kart gets slipstream. Used by the AI to
-     ** overtake the right kart. */
-    Kart         *m_slipstream_target;
-
-    /** Slipstream mode: either nothing happening, or the kart is collecting
-     *  'slipstream credits', or the kart is using accumulated credits. */
-    enum         {SS_NONE, SS_COLLECT, SS_USE} m_slipstream_mode;
 
     float         m_finish_time;
     bool          m_finished_race;
@@ -194,7 +173,6 @@ private:
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;
 
-    float         handleSlipstream(float dt);
     void          updatePhysics(float dt);
 
 protected:
@@ -219,7 +197,6 @@ public:
     void           applyEngineForce (float force);
     float          handleNitro      (float dt);
     float          getActualWheelForce();
-    bool           isSlipstreamReady() const;
 
     virtual void flyUp();
     virtual void flyDown();
@@ -383,8 +360,11 @@ public:
      *  from the server information.                                       */
     void           setSpeed         (float s) {m_speed = s;                   }
     // ------------------------------------------------------------------------
-    /** Returns which kart is giving slip stream to this kart. */
-    const Kart*    getSlipstreamKart() const {return m_slipstream_target;};
+    /** Returns the slipstream object of this kart. */
+    const SlipStream* getSlipstream() const {return m_slipstream; }
+    // ------------------------------------------------------------------------
+    /** Activates a slipstream effect, atm that is display some nitro. */
+    void           setSlipstreamEffect(float f);
     // ------------------------------------------------------------------------
     /** Returns a name to be displayed for this kart. */
     virtual const irr::core::stringw& getName() const 

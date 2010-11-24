@@ -23,6 +23,8 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
+#include "tracks/quad.hpp"
 #include "utils/constants.hpp"
 
 /** Creates the slip stream object using a moving texture.
@@ -39,8 +41,6 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
 
     m.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
     
-    //m.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
-    //m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
 
     createMesh(m);
@@ -54,6 +54,29 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
                                         m_kart->getKartLength()) );
     m_node->setVisible(false);
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
+    if(UserConfigParams::m_slipstream_debug)
+    {
+        video::SMaterial material;
+        m_debug_mesh = irr_driver->createQuadMesh(&material, true);
+        m_debug_node = irr_driver->addMesh(m_debug_mesh);
+    }
+    else
+    {
+        m_debug_mesh = NULL;
+        m_debug_node = NULL;
+    }
+    m_slipstream_time      = 0.0f;
+
+    float length = m_kart->getKartProperties()->getSlipstreamLength();
+    float kw     = m_kart->getKartWidth();
+    float kl     = m_kart->getKartLength();
+    Vec3 p0(-kw*0.5f, 0, -kl*0.5f       );
+    Vec3 p1(-kw*0.5f, 0, -kl*0.5f-length);
+    Vec3 p2( kw*0.5f, 0, -kl*0.5f-length);
+    Vec3 p3( kw*0.5f, 0, -kl*0.5f       );
+    m_slipstream_original_quad = new Quad(p0, p1, p2, p3);
+    m_slipstream_quad          = new Quad(p0, p1, p2, p3);
+
 }   // SlipStream
 
 //-----------------------------------------------------------------------------
@@ -62,7 +85,22 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
 SlipStream::~SlipStream()
 {
     irr_driver->removeNode(m_node);
+    if(m_debug_node)
+    {
+        irr_driver->removeNode(m_debug_node);
+        m_debug_mesh->drop();
+    }
+    delete m_slipstream_original_quad;
+    delete m_slipstream_quad;
+
 }   // ~SlipStream
+
+//-----------------------------------------------------------------------------
+/** Called at re-start of a race. */
+void SlipStream::reset()
+{
+    m_slipstream_mode = SS_NONE;
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Creates the mesh for the slipstream effect. This function creates a
@@ -197,12 +235,153 @@ void SlipStream::setIntensity(float f, const Kart *kart)
 }   // setIntensity
 
 //-----------------------------------------------------------------------------
+/** Returns true if enough slipstream credits have been accumulated
+*  to get a boost when leaving the slipstream area.
+*/
+bool SlipStream::isSlipstreamReady() const
+{
+    return m_slipstream_time>
+        m_kart->getKartProperties()->getSlipstreamCollectTime();
+}   // isSlipstreamReady
+
+//-----------------------------------------------------------------------------
+/** Returns the additional force being applied to the kart because of 
+ *  slipstreaming.
+ */
+float SlipStream::getSlipstreamPower()
+{
+    // Low level AIs should not do any slipstreaming.
+    if(!m_kart->getController()->isPlayerController() &&
+        race_manager->getDifficulty()==RaceManager::RD_EASY) return 0;
+
+    // First see if we are currently using accumulated slipstream credits:
+    // -------------------------------------------------------------------
+    if(m_slipstream_mode==SS_USE)
+    {
+        setIntensity(2.0f, NULL);
+        const KartProperties *kp=m_kart->getKartProperties();
+        m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
+                                kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamDuration(),
+                                kp->getSlipstreamFadeOutTime()       );
+        return kp->getSlipstreamAddPower();
+    }
+    return 0;
+}   // getSlipstreamPower
+
+//-----------------------------------------------------------------------------
 /** Update, called once per timestep.
  *  \param dt Time step size.
  */
 void SlipStream::update(float dt)
 {
     MovingTexture::update(dt);
+
+    // Update this karts slipstream quad (even for low level AI which don't
+    // use slipstream, since even then player karts can get slipstream, 
+    // and so have to compare with the modified slipstream quad.
+    m_slipstream_original_quad->transform(m_kart->getTrans(), 
+                                          m_slipstream_quad);
+
+    if(m_slipstream_mode==SS_USE)
+    {
+        m_slipstream_time -= dt;
+        if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
+    }
+
+
+    // If this kart is too slow for slipstreaming taking effect, do nothing
+    // --------------------------------------------------------------------
+    // Define this to get slipstream effect shown even when the karts are
+    // not moving. This is useful for debugging the graphics of SS-ing.
+#undef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+#ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+    if(m_kart->getSpeed()<m_kart->getKartProperties()->getSlipstreamMinSpeed())
+    {
+        setIntensity(0, NULL);
+        m_slipstream_mode = SS_NONE;
+        return;
+    }
+#endif
+
+
+    // Then test if this kart is in the slipstream range of another kart:
+    // ------------------------------------------------------------------
+    World *world           = World::getWorld();
+    unsigned int num_karts = world->getNumKarts();
+    bool is_sstreaming     = false;
+    m_target_kart          = NULL;
+    // Note that this loop can not be simply replaced with a shorter loop
+    // using only the karts with a better position - since a kart might
+    // be a lap behind
+    for(unsigned int i=0; i<num_karts; i++)
+    {
+        m_target_kart= world->getKart(i);
+        // Don't test for slipstream with itself.
+        if(m_target_kart==m_kart         || 
+            m_target_kart->isEliminated()    ) continue;
+
+        // If the kart we are testing against is too slow, no need to test
+        // slipstreaming. Note: We compare the speed of the other kart 
+        // against the minimum slipstream speed kart of this kart - not 
+        // entirely sure if this makes sense, but it makes it easier to 
+        // give karts different slipstream properties.
+#ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+        if(m_target_kart->getSpeed() <
+            m_kart->getKartProperties()->getSlipstreamMinSpeed()) 
+            continue;
+#endif
+        // Quick test: the kart must be not more than
+        // slipstream length+kart_length() away from the other kart
+        Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
+        float l    = m_target_kart->getKartProperties()->getSlipstreamLength() 
+                   + m_target_kart->getKartLength()*0.5f;
+        if(delta.length2_2d() > l*l) continue;
+        // Real test: if in slipstream quad of other kart
+        if(m_target_kart->getSlipstream()->m_slipstream_quad
+                                         ->pointInQuad(m_kart->getXYZ()))
+        {
+            is_sstreaming     = true;
+            break;
+        }
+    }   // for i < num_karts
+
+    if(!is_sstreaming)
+    {
+        if(isSlipstreamReady()) 
+        {
+            // The first time slipstream is ready after collecting
+            // and you are leaving the slipstream area, you get a
+            // zipper bonus. 
+            if(m_slipstream_mode==SS_COLLECT)
+            {
+                m_slipstream_mode = SS_USE;
+                m_kart->handleZipper();
+                m_slipstream_time = 
+                    m_kart->getKartProperties()->getSlipstreamCollectTime();
+                return;
+            }
+        }
+        m_slipstream_time -=dt;
+        if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
+        setIntensity(0, NULL);
+        return;
+    }   // if !is_sstreaming
+
+    // Accumulate slipstream credits now
+    m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
+                                                   : m_slipstream_time+dt;
+    if(isSlipstreamReady())
+        m_kart->setSlipstreamEffect(3.0f);
+    setIntensity(m_slipstream_time, m_target_kart);
+
+    m_slipstream_mode = SS_COLLECT;
+    if(m_slipstream_time>m_kart->getKartProperties()->getSlipstreamCollectTime())
+    {
+        setIntensity(1.0f, m_target_kart);
+    }
+    
+
 return;
     core::vector3df pos = m_kart->getNode()->getPosition();
     pos.Y = m_kart->getHoT()+0.2f;

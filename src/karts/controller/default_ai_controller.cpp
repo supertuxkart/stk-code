@@ -39,6 +39,7 @@
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
 #endif
+#include "graphics/slip_stream.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -803,16 +804,17 @@ void DefaultAIController::checkCrashes(int steps, const Vec3& pos )
     m_crashes.clear();
 
     // If slipstream should be handled actively, trigger overtaking the
-    // kart which gives us slipstream if slipstream is readyA
-    if(m_make_use_of_slipstream && m_kart->isSlipstreamReady() &&
-        m_kart->getSlipstreamKart())
+    // kart which gives us slipstream if slipstream is ready
+    const SlipStream *slip=m_kart->getSlipstream();
+    if(m_make_use_of_slipstream && slip->isSlipstreamReady() &&
+        slip->getSlipstreamTarget())
     {
         //printf("%s overtaking %s\n", m_kart->getIdent().c_str(),
         //    m_kart->getSlipstreamKart()->getIdent().c_str());
         // FIXME: we might define a minimum distance, and if the target kart
         // is too close break first - otherwise the AI hits the kart when
         // trying to overtake it, actually speeding the other kart up.
-        m_crashes.m_kart = m_kart->getSlipstreamKart()->getWorldKartId();
+        m_crashes.m_kart = slip->getSlipstreamTarget()->getWorldKartId();
     }
 
     const size_t NUM_KARTS = m_world->getNumKarts();
@@ -890,9 +892,11 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
     float distance;
     int steps;
 
+    int count=0;
     //We exit from the function when we have found a solution
     while( 1 )
     {
+        count ++;
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
         target_sector = m_next_node_index[sector];
@@ -925,6 +929,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
             if ( distance + m_kart_width * 0.5f 
                  > m_quad_graph->getNode(sector).getPathWidth() )
             {
+                printf("Steps %d\n", count);
                 *result = m_quad_graph->getQuad(sector).getCenter();
                 return;
             }
