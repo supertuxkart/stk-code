@@ -64,8 +64,6 @@ private:
      *  'slipstream credits', or the kart is using accumulated credits. */
     enum         {SS_NONE, SS_COLLECT, SS_USE} m_slipstream_mode;
 
-    void         createMesh(const video::SMaterial &m);
-
     /** The quad inside which another kart is considered to be slipstreaming.
      *  This value is current area, i.e. takes the kart position into account. */
     Quad         *m_slipstream_quad;
@@ -78,6 +76,8 @@ private:
      ** overtake the right kart. */
     Kart         *m_target_kart;
 
+    void         createMesh(const video::SMaterial &m);
+    void         setDebugColor(const video::SColor &color);
 public:
                  SlipStream  (Kart* kart);
     virtual     ~SlipStream  ();

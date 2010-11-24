@@ -363,6 +363,9 @@ public:
     /** Returns the slipstream object of this kart. */
     const SlipStream* getSlipstream() const {return m_slipstream; }
     // ------------------------------------------------------------------------
+    /** Returns the slipstream object of this kart. */
+    SlipStream* getSlipstream() {return m_slipstream; }
+    // ------------------------------------------------------------------------
     /** Activates a slipstream effect, atm that is display some nitro. */
     void           setSlipstreamEffect(float f);
     // ------------------------------------------------------------------------

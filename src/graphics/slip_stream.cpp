@@ -34,6 +34,9 @@
 SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
     video::SMaterial m;
+    m.BackfaceCulling = false;
+    m.MaterialType    = video::EMT_SOLID;
+
     Material *material = material_manager->getMaterial("slipstream.png");
     m.setTexture(0, material->getTexture());
     m.setFlag(video::EMF_BACK_FACE_CULLING, false);
@@ -54,28 +57,49 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
                                         m_kart->getKartLength()) );
     m_node->setVisible(false);
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
+    m_slipstream_time      = 0.0f;
+
+    float length = m_kart->getKartProperties()->getSlipstreamLength();
+    float kw     = m_kart->getKartWidth();
+    float kl     = m_kart->getKartLength();
+
+    Vec3 p[4];
+    p[0]=Vec3(-kw*0.5f, 0, -kl*0.5f       );
+    p[1]=Vec3(-kw*0.5f, 0, -kl*0.5f-length);
+    p[2]=Vec3( kw*0.5f, 0, -kl*0.5f-length);
+    p[3]=Vec3( kw*0.5f, 0, -kl*0.5f       );
+    m_slipstream_original_quad = new Quad(p[0], p[1], p[2], p[3]);
+    m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
     if(UserConfigParams::m_slipstream_debug)
     {
         video::SMaterial material;
+        material.MaterialType    = video::EMT_SOLID;
+        material.BackfaceCulling = false;
+        material.Lighting        = false;
+        material.ColorMaterial   = video::ECM_DIFFUSE_AND_AMBIENT;
+
         m_debug_mesh = irr_driver->createQuadMesh(&material, true);
-        m_debug_node = irr_driver->addMesh(m_debug_mesh);
+        scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
+        assert(buffer->getVertexType()==video::EVT_STANDARD);
+        irr::video::S3DVertex* vertices 
+            = (video::S3DVertex*)buffer->getVertices();
+        video::SColor red(128, 255, 0, 0);
+        for(unsigned int i=0; i<4; i++)
+        {
+            vertices[i].Pos   = p[i].toIrrVector();
+            vertices[i].Color = red;
+        }
+        buffer->recalculateBoundingBox();
+        m_mesh->setBoundingBox(buffer->getBoundingBox());
+        m_debug_node = irr_driver->addMesh(m_debug_mesh, m_kart->getNode());
+        m_debug_node->grab();
+        m_debug_node->setAutomaticCulling(scene::EAC_OFF);
     }
     else
     {
         m_debug_mesh = NULL;
         m_debug_node = NULL;
     }
-    m_slipstream_time      = 0.0f;
-
-    float length = m_kart->getKartProperties()->getSlipstreamLength();
-    float kw     = m_kart->getKartWidth();
-    float kl     = m_kart->getKartLength();
-    Vec3 p0(-kw*0.5f, 0, -kl*0.5f       );
-    Vec3 p1(-kw*0.5f, 0, -kl*0.5f-length);
-    Vec3 p2( kw*0.5f, 0, -kl*0.5f-length);
-    Vec3 p3( kw*0.5f, 0, -kl*0.5f       );
-    m_slipstream_original_quad = new Quad(p0, p1, p2, p3);
-    m_slipstream_quad          = new Quad(p0, p1, p2, p3);
 
 }   // SlipStream
 
@@ -87,7 +111,7 @@ SlipStream::~SlipStream()
     irr_driver->removeNode(m_node);
     if(m_debug_node)
     {
-        irr_driver->removeNode(m_debug_node);
+        m_debug_node->drop();
         m_debug_mesh->drop();
     }
     delete m_slipstream_original_quad;
@@ -270,6 +294,24 @@ float SlipStream::getSlipstreamPower()
 }   // getSlipstreamPower
 
 //-----------------------------------------------------------------------------
+/** Sets the color of the debug mesh (which shows the area in which slipstream
+ *  can be accumulated).
+ *  Color codes:
+ *  black:  kart too slow
+ *  red:    not inside of slipstream area
+ *  green:  slipstream is being accumulated.
+ */
+void SlipStream::setDebugColor(const video::SColor &color)
+{
+    if(!UserConfigParams::m_slipstream_debug) return;
+    scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
+    irr::video::S3DVertex* vertices = 
+        (video::S3DVertex*)buffer->getVertices();
+    for(unsigned int i=0; i<4; i++)
+        vertices[i].Color=color;
+}   // setDebugColor
+
+//-----------------------------------------------------------------------------
 /** Update, called once per timestep.
  *  \param dt Time step size.
  */
@@ -289,7 +331,6 @@ void SlipStream::update(float dt)
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
     }
 
-
     // If this kart is too slow for slipstreaming taking effect, do nothing
     // --------------------------------------------------------------------
     // Define this to get slipstream effect shown even when the karts are
@@ -300,10 +341,11 @@ void SlipStream::update(float dt)
     {
         setIntensity(0, NULL);
         m_slipstream_mode = SS_NONE;
+        if(UserConfigParams::m_slipstream_debug)
+            setDebugColor(video::SColor(255, 0, 0, 0));
         return;
     }
 #endif
-
 
     // Then test if this kart is in the slipstream range of another kart:
     // ------------------------------------------------------------------
@@ -311,6 +353,10 @@ void SlipStream::update(float dt)
     unsigned int num_karts = world->getNumKarts();
     bool is_sstreaming     = false;
     m_target_kart          = NULL;
+
+
+    irr::video::S3DVertex* vertices = NULL;
+    video::SColor          color(255, 0, 0, 0);
     // Note that this loop can not be simply replaced with a shorter loop
     // using only the karts with a better position - since a kart might
     // be a lap behind
@@ -329,14 +375,28 @@ void SlipStream::update(float dt)
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
         if(m_target_kart->getSpeed() <
             m_kart->getKartProperties()->getSlipstreamMinSpeed()) 
+        {
+            if(UserConfigParams::m_slipstream_debug &&
+                m_kart->getController()->isPlayerController())
+                m_target_kart->getSlipstream()
+                              ->setDebugColor(video::SColor(255, 0, 0, 0));
+
             continue;
+        }
 #endif
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
         float l    = m_target_kart->getKartProperties()->getSlipstreamLength() 
                    + m_target_kart->getKartLength()*0.5f;
-        if(delta.length2_2d() > l*l) continue;
+        if(delta.length2_2d() > l*l) 
+        {
+            if(UserConfigParams::m_slipstream_debug &&
+                m_kart->getController()->isPlayerController())
+                m_target_kart->getSlipstream()
+                             ->setDebugColor(video::SColor(255, 0, 0, 128));
+            continue;
+        }
         // Real test: if in slipstream quad of other kart
         if(m_target_kart->getSlipstream()->m_slipstream_quad
                                          ->pointInQuad(m_kart->getXYZ()))
@@ -344,10 +404,19 @@ void SlipStream::update(float dt)
             is_sstreaming     = true;
             break;
         }
+        if(UserConfigParams::m_slipstream_debug &&
+            m_kart->getController()->isPlayerController())
+            m_target_kart->getSlipstream()
+                         ->setDebugColor(video::SColor(255, 0, 0, 255));
     }   // for i < num_karts
 
     if(!is_sstreaming)
     {
+        if(UserConfigParams::m_slipstream_debug &&
+            m_kart->getController()->isPlayerController())
+            m_target_kart->getSlipstream()
+                         ->setDebugColor(video::SColor(255, 255, 0, 0));
+
         if(isSlipstreamReady()) 
         {
             // The first time slipstream is ready after collecting
@@ -368,6 +437,9 @@ void SlipStream::update(float dt)
         return;
     }   // if !is_sstreaming
 
+    if(UserConfigParams::m_slipstream_debug &&
+        m_kart->getController()->isPlayerController())
+        m_target_kart->getSlipstream()->setDebugColor(video::SColor(255, 0, 255, 0));
     // Accumulate slipstream credits now
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
                                                    : m_slipstream_time+dt;
