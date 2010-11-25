@@ -57,7 +57,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     const float gravity = 0.0f;
 
-    float y_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getY();
+    float forward_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getZ();
     float up_velocity = 0.0f;
     float plunger_speed = 2 * m_speed;
 
@@ -67,40 +67,41 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   
     Vec3        direction;
-    float       kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction,
+    float       kart_dist_2;
+    getClosestKart(&closest_kart, &kart_dist_2, &direction,
                    kart /* search in front of this kart */, m_reverse_mode);
 
-    btTransform trans = kart->getTrans();
+    btTransform kart_transform = kart->getKartTransform();
+    btMatrix3x3 kart_rotation = kart_transform.getBasis();
+    // The current forward vector is rotation*(0,0,1), or:
+    btVector3 forward(kart_rotation.getColumn(2));
 
-    btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
-    btVector3 thisKartDirVector(thisKartDirMatrix.getColumn(2));
-
-    float heading=kart->getHeading();
-    float pitch = kart->getTerrainPitch(heading);
+    float heading =kart->getHeading();
+    float pitch  = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
-    if(closest_kart != NULL && kartDistSquared < 30*30)
+    if(closest_kart != NULL && kart_dist_2 < 30*30)
     {
         float fire_angle     = 0.0f;
         getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
-                                       plunger_speed, gravity, y_offset,
+                                       plunger_speed, gravity, forward_offset,
                                        &fire_angle, &up_velocity);
 
+        btTransform trans = kart->getTrans();
+    
         trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
-        createPhysics(y_offset, m_initial_velocity,
+        createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend), gravity, 
                       /* rotates */false , /*turn around*/false, &trans );
     }
     else
     {
-        trans = kart->getKartHeading();
-
-        createPhysics(y_offset, btVector3(pitch, 0.0f, plunger_speed),
-                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
+        createPhysics(forward_offset, btVector3(pitch, 0.0f, plunger_speed),
+                      new btCylinderShape(0.5f*m_extend), gravity, 
+                      false /* rotates */, m_reverse_mode, &kart_transform );
     }
 
     //adjust height according to terrain

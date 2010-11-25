@@ -159,7 +159,7 @@ void Kart::setController(Controller *controller)
  *  otherwise).
  *  \param customPitch Pitch value to overwrite the terrain pitch.
  */
-btTransform Kart::getKartHeading(const float customPitch)
+btTransform Kart::getKartTransform(const float customPitch)
 {
     btTransform trans = getTrans();
 
@@ -170,7 +170,7 @@ btTransform Kart::getKartHeading(const float customPitch)
     trans.setBasis(m);
 
     return trans;
-}   // getKartHeading
+}   // getKartTransform
 
 // ----------------------------------------------------------------------------
 /** Creates the physical representation of this kart. Atm it uses the actual

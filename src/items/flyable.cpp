@@ -156,8 +156,8 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             const btTransform* custom_direction)
 {
     // Get Kart heading direction
-    btTransform trans = ( custom_direction == NULL ? m_owner->getKartHeading()
-                                                   : *custom_direction );
+    btTransform trans = ( !custom_direction ? m_owner->getKartTransform()
+                                            : *custom_direction          );
 
     // Apply offset
     btTransform offset_transform;
