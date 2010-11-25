@@ -30,7 +30,7 @@ float Bowling::m_st_force_to_target;
 Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING, 
                                        50.0f /* mass */)
 {
-    float y_offset = 0.5f*kart->getKartLength() + m_extend.getY()/2.0f;
+    float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
     
     // if the kart is looking backwards, release from the back
     if( kart->getControls().m_look_back ) 
