@@ -329,7 +329,8 @@ void OptionsScreenInput2::gotSensedInput(Input sensed_input)
     ModalDialog::dismiss();
     input_manager->setMode(InputManager::MENU);
         
-    if (keyboard && sensed_input.m_button_id == irr::KEY_SHIFT)
+    if (keyboard && (sensed_input.m_button_id == irr::KEY_SHIFT || sensed_input.m_button_id == irr::KEY_LSHIFT || 
+                     sensed_input.m_button_id == irr::KEY_RSHIFT))
     {
         new MessageDialog(_("Warning, 'Shift' is not a recommended key : when shift is pressed down, all keys that contain a character that is different in upper-case will stop working."));
     }
