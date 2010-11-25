@@ -41,6 +41,7 @@ btKart::btKart(const btVehicleTuning& tuning,btRigidBody* chassis,
     
     m_zipper_active = false;
     m_zipper_velocity = btScalar(0);
+    m_allow_sliding = false;
 }
 
 // ----------------------------------------------------------------------------

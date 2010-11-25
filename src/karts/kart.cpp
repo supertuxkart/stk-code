@@ -1251,11 +1251,12 @@ void Kart::updatePhysics(float dt)
         m_skid_sound->stop();
     }
     
-    // dynamically determine friction so that the kart looses its traction when trying to drive on too steep surfaces
-    // Below angles of 0.25 rad, you have full traction; above 0.5 rad angles you have absolutely none; inbetween
-    // there is a linear change in friction
+    // dynamically determine friction so that the kart looses its traction 
+    // when trying to drive on too steep surfaces. Below angles of 0.25 rad, 
+    // you have full traction; above 0.5 rad angles you have absolutely none; 
+    // inbetween  there is a linear change in friction
     float friction = 1.0f;
-    bool enableSkidding = false;
+    bool enable_skidding = false;
     
     // If a material has friction of more than 10000 treat this
     // as no-skidding possible. This way the current skidding
@@ -1276,7 +1277,7 @@ void Kart::updatePhysics(float dt)
         if (distanceFromUp < 0.85f)
         {
             friction = 0.0f;
-            enableSkidding = true;
+            enable_skidding = true;
         }
         else if (distanceFromUp > 0.9f)
         {
@@ -1285,7 +1286,7 @@ void Kart::updatePhysics(float dt)
         else
         {
             friction = (distanceFromUp - 0.85f) / 0.5f;
-            enableSkidding = true;
+            enable_skidding = true;
         }
     }
     
@@ -1295,7 +1296,7 @@ void Kart::updatePhysics(float dt)
         wheel.m_frictionSlip = friction*m_kart_properties->getFrictionSlip();
     }
     
-    m_vehicle->enableSliding(enableSkidding);
+    m_vehicle->enableSliding(enable_skidding);
 
     
     /*
