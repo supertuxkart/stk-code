@@ -724,8 +724,9 @@ void DynamicRibbonWidget::propagateSelection()
         {
             where = 0.0f;
         }
-        assert(where >= 0.0f);
-        assert(where <= 1.0f);
+        
+        if (where < 0.0f)      where = 0.0f;
+        else if (where > 1.0f) where = 1.0f;
 
         if (m_combo)
         {
