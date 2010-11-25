@@ -15,10 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/confirm_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -26,7 +27,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-ConfirmDialog::ConfirmDialog(irr::core::stringw msg, IConfirmDialogListener* listener) :
+MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener) :
     ModalDialog(0.6f, 0.6f)
 {    
     loadFromFile("confirm_dialog.stkgui");
@@ -39,24 +40,58 @@ ConfirmDialog::ConfirmDialog(irr::core::stringw msg, IConfirmDialogListener* lis
 
 // ------------------------------------------------------------------------------------------------------
 
-void ConfirmDialog::onEnterPressedInternal()
+MessageDialog::MessageDialog(irr::core::stringw msg) :
+    ModalDialog(0.6f, 0.6f)
+{    
+    loadFromFile("confirm_dialog.stkgui");
+    
+    m_listener = NULL;
+    
+    LabelWidget* message = getWidget<LabelWidget>("title");
+    message->setText( msg.c_str() );
+    
+    ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+    yesbtn->setVisible(false);
+    
+    ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
+    cancelbtn->setText(_("OK"));
+    cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void MessageDialog::onEnterPressedInternal()
 {
 }
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& eventSource)
 {
     
     if (eventSource == "cancel")
-    {           
-        m_listener->onCancel();
+    {
+        if (m_listener == NULL)
+        {
+            ModalDialog::dismiss();
+        }
+        else
+        {
+            m_listener->onCancel();
+        }
         
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "confirm")
-    {        
-        m_listener->onConfirm();
+    {
+        if (m_listener == NULL)
+        {
+            ModalDialog::dismiss();
+        }
+        else
+        {
+            m_listener->onConfirm();
+        }
         
         return GUIEngine::EVENT_BLOCK;
     }
@@ -66,7 +101,7 @@ GUIEngine::EventPropagation ConfirmDialog::processEvent(const std::string& event
 
 // ------------------------------------------------------------------------------------------------------
 
-void ConfirmDialog::IConfirmDialogListener::onCancel()
+void MessageDialog::IConfirmDialogListener::onCancel()
 {
     ModalDialog::dismiss();
 }

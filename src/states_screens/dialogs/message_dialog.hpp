@@ -23,10 +23,10 @@
 #include "guiengine/modaldialog.hpp"
 
 /**
- * \brief Generic dialog to ask the user to confirm something.
+ * \brief Generic dialog to ask the user to confirm something, or to show a simple message box
  * \ingroup states_screens
  */
-class ConfirmDialog : public GUIEngine::ModalDialog
+class MessageDialog : public GUIEngine::ModalDialog
 {
 public:
     
@@ -61,11 +61,20 @@ public:
 
     /**
       * \param msg Message to display in the dialog
-      * \param listener A listener object to notify when the user made a choice
+      * \param listener A listener object to notify when the user made a choice. Note that
+      *                 MessageDialog does not take ownership of the listener and will not
+      *                 delete it.
       */
-    ConfirmDialog(irr::core::stringw msg, IConfirmDialogListener* listener);
+    MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener);
     
-    ~ConfirmDialog() { m_listener = NULL; }
+    /**
+      * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
+      * \param msg Message to display in the dialog
+      */
+    MessageDialog(irr::core::stringw msg);
+
+    
+    ~MessageDialog() { m_listener = NULL; }
     
     virtual void onEnterPressedInternal();
     

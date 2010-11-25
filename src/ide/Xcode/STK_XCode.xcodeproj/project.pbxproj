@@ -50,8 +50,8 @@
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
+		95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95395A75129DFE130079BCE7 /* message_dialog.cpp */; };
 		953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F8B1F11F7C13C00205E66 /* scalable_font.cpp */; };
-		954378D51238493C00F57707 /* confirm_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954378D41238493C00F57707 /* confirm_dialog.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
@@ -411,6 +411,8 @@
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
 		953789810FC7831400DD1F8E /* quad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad.cpp; path = ../../tracks/quad.cpp; sourceTree = SOURCE_ROOT; };
+		95395A75129DFE130079BCE7 /* message_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message_dialog.cpp; path = ../../states_screens/dialogs/message_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		95395A76129DFE130079BCE7 /* message_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = message_dialog.hpp; path = ../../states_screens/dialogs/message_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = ../../physics/triangle_mesh.hpp; sourceTree = SOURCE_ROOT; };
@@ -421,8 +423,6 @@
 		953F8B2011F7C13C00205E66 /* scalable_font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scalable_font.hpp; path = ../../guiengine/scalable_font.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../utils/ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
-		954378D41238493C00F57707 /* confirm_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = confirm_dialog.cpp; path = ../../states_screens/dialogs/confirm_dialog.cpp; sourceTree = SOURCE_ROOT; };
-		954378E712384BEB00F57707 /* confirm_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = confirm_dialog.hpp; path = ../../states_screens/dialogs/confirm_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
 		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -1401,14 +1401,14 @@
 				956541E010DD628C00C83E99 /* add_device_dialog.hpp */,
 				95E6A0BE11DCF37800AE088A /* addons_loading.cpp */,
 				95E6A0BF11DCF37800AE088A /* addons_loading.hpp */,
-				954378D41238493C00F57707 /* confirm_dialog.cpp */,
-				954378E712384BEB00F57707 /* confirm_dialog.hpp */,
 				95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */,
 				95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */,
 				95833237101243ED00C5137E /* enter_player_name_dialog.cpp */,
 				95833238101243ED00C5137E /* enter_player_name_dialog.hpp */,
 				95634EF01126272C009C145D /* gp_info_dialog.cpp */,
 				95634EF11126272C009C145D /* gp_info_dialog.hpp */,
+				95395A75129DFE130079BCE7 /* message_dialog.cpp */,
+				95395A76129DFE130079BCE7 /* message_dialog.hpp */,
 				95833239101243ED00C5137E /* player_info_dialog.cpp */,
 				9583323A101243ED00C5137E /* player_info_dialog.hpp */,
 				9583323B101243ED00C5137E /* press_a_key_dialog.cpp */,
@@ -2681,12 +2681,12 @@
 				956039BA1218C09E00EB96C4 /* abstract_top_level_container.cpp in Sources */,
 				9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */,
 				956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */,
-				954378D51238493C00F57707 /* confirm_dialog.cpp in Sources */,
 				95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */,
 				95251F3D12554AB200505BA5 /* check_lap.cpp in Sources */,
 				9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */,
 				95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */,
 				9528CC241291E7A10078A5EF /* binding.cpp in Sources */,
+				95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

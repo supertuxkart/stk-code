@@ -244,7 +244,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
             if (m_sensed_input_high_kbd.find(m_sensed_input->m_button_id) 
                 != m_sensed_input_high_kbd.end())
             {
-                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
                 return;
             }
         }
@@ -261,7 +261,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
 
             if (abs(value) > Input::MAX_VALUE/2.0f)
             {
-                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
                 return;
             }
         }
@@ -280,12 +280,12 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && id_has_high_value )
             {
-                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_has_high_value )
             {
                 m_sensed_input->m_axis_direction= (axisDirection?0:-1);
-                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
             }
         }
     }

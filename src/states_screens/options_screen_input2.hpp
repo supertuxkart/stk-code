@@ -23,7 +23,7 @@
 #include "irrlicht.h"
 
 #include "guiengine/screen.hpp"
-#include "states_screens/dialogs/confirm_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 
 namespace GUIEngine { class Widget; }
 class DeviceConfig;
@@ -39,7 +39,7 @@ struct Input;
   */
 class OptionsScreenInput2 : public GUIEngine::Screen,
                             public GUIEngine::ScreenSingleton<OptionsScreenInput2>,
-                            public ConfirmDialog::IConfirmDialogListener
+                            public MessageDialog::IConfirmDialogListener
 {
     OptionsScreenInput2();
     
@@ -73,7 +73,7 @@ public:
       * \brief invoke in "input sensing" mode, when input was sensed.
       * Updates the input bindings accordingly with the sensed input.
       */
-    void gotSensedInput(Input* sensedInput);
+    void gotSensedInput(Input sensedInput);
     
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm();
