@@ -1074,6 +1074,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\message_dialog.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\player_info_dialog.cpp"
 						>
 					</File>
@@ -1965,6 +1969,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\gp_info_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\message_dialog.hpp"
 						>
 					</File>
 					<File
