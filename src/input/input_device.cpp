@@ -118,7 +118,6 @@ void GamePadDevice::resetAxisDirection(const int axis,
                                        Input::AxisDirection direction, 
                                        StateManager::ActivePlayer* player)
 {
-    Binding bind;
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
 
     Kart* pk = player->getKart();
@@ -130,7 +129,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
     
     for(int n=0; n<PA_COUNT; n++)
     {
-        bind = m_configuration->getBinding(n);
+        Binding& bind = m_configuration->getBinding(n);
         if(bind.getId() == axis && bind.getDirection()== direction)
         {
             ((PlayerController*)(pk->getController()))->action((PlayerAction)n, 0);

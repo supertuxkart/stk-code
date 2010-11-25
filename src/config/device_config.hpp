@@ -105,7 +105,7 @@ public:
                                      const int              value,
                                      PlayerAction*          action /* out */);
     
-    Binding     getBinding          (int i) {return m_bindings[i];}
+    Binding&    getBinding          (int i) {return m_bindings[i];}
     
     bool hasBindingFor(const int buttonID) const;
     

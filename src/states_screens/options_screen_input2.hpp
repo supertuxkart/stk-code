@@ -73,7 +73,7 @@ public:
       * \brief invoke in "input sensing" mode, when input was sensed.
       * Updates the input bindings accordingly with the sensed input.
       */
-    void gotSensedInput(Input sensedInput);
+    void gotSensedInput(const Input& sensedInput);
     
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm();

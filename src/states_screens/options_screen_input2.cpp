@@ -263,7 +263,7 @@ void OptionsScreenInput2::updateInputButtons()
 static PlayerAction binding_to_set;
 static std::string binding_to_set_button;
 
-void OptionsScreenInput2::gotSensedInput(Input sensed_input)
+void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
 {
     const bool keyboard = (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD &&
                            sensed_input.m_type == Input::IT_KEYBOARD);

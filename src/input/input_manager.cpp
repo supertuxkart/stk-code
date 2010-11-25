@@ -51,7 +51,7 @@ using GUIEngine::EVENT_BLOCK;
 //-----------------------------------------------------------------------------
 /** Initialise input
  */
-InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
+InputManager::InputManager() : m_mode(BOOTSTRAP),
                                m_mouse_val_x(0), m_mouse_val_y(0)
 {
     m_device_manager = new DeviceManager();
@@ -202,96 +202,110 @@ void InputManager::handleStaticAction(int key, int value)
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */
-void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
+void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
                                 Input::AxisDirection axisDirection, int value)
 {
 #if INPUT_MODE_DEBUG
     std::cout << "INPUT SENSING... ";
 #endif
-    
-    bool store_new = true;
         
     // don't store if we're trying to do something like bindings keyboard keys on a gamepad
     if (m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD)
-    {
-        store_new = false;
-    }
+        return;
     if (m_mode == INPUT_SENSE_GAMEPAD  && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON)
-    {
-        store_new = false;
-    }
+        return;
 
 #if INPUT_MODE_DEBUG
     std::cout << (store_new ? "storing it" : "ignoring it") << "\n";
-#endif
-    
-    if (store_new)
+#endif    
+        
+
+    switch(type)
     {
-        
-        m_sensed_input->m_type = type;
-        m_sensed_input->m_device_id = deviceID;
-        m_sensed_input->m_button_id= btnID;
-        m_sensed_input->m_axis_direction = axisDirection;
-        m_sensed_input->m_character      = deviceID;
+    case Input::IT_KEYBOARD: 
+        if (value > Input::MAX_VALUE/2)
+        {
+            m_sensed_input_high_kbd.insert(button);
+            break;
+        }
+        if (value != 0) break;   // That shouldn't happen
+        // only notify on key release
+        if (m_sensed_input_high_kbd.find(button)
+            != m_sensed_input_high_kbd.end())
+        {
+            Input sensed_input;
+            sensed_input.m_type           = Input::IT_KEYBOARD;
+            sensed_input.m_device_id      = deviceID;
+            sensed_input.m_button_id      = button;
+            sensed_input.m_character      = deviceID;
+            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            return;
+        }
+        break;
+    case Input::IT_STICKBUTTON:
+        if (abs(value) > Input::MAX_VALUE/2.0f)
+        {
+            Input sensed_input;
+            sensed_input.m_type           = Input::IT_STICKBUTTON;
+            sensed_input.m_device_id      = deviceID;
+            sensed_input.m_button_id      = button;
+            sensed_input.m_character      = deviceID;
+            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            return;
+        }
+        break;
+    case Input::IT_STICKMOTION:
+        std::cout << "%% storing new axis binding, value=" << value <<
+            " deviceID=" << deviceID << " button=" << button << " axisDirection=" <<
+            (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
+        // We have to save the direction in which the axis was moved.
+        // This is done by storing it as a sign (and since button can
+        // be zero, we add one before changing the sign).
+        int input_id = value>=0 ? 1+button : -(1+button);
 
-        if (type == Input::IT_KEYBOARD && value > Input::MAX_VALUE/2)
-        {
-            m_sensed_input_high_kbd.insert(btnID);
-        }
-        else if (type == Input::IT_KEYBOARD && value == 0)
-        {
-            // only notify on key release
-            if (m_sensed_input_high_kbd.find(m_sensed_input->m_button_id) 
-                != m_sensed_input_high_kbd.end())
-            {
-                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
-                return;
-            }
-        }
-        else if (type == Input::IT_STICKMOTION)
-        {
-            std::cout << "%% storing new axis binding, value=" << value <<
-                    " deviceID=" << deviceID << " btnID=" << btnID << " axisDirection=" <<
-                    (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
-        }
-        else if (type == Input::IT_STICKBUTTON)
-        {
-            std::cout << "%% storing new gamepad button binding value=" << value <<
-            " deviceID=" << deviceID << " btnID=" << btnID << "\n";
+        bool id_was_high         = m_sensed_input_high_gamepad.find(input_id) 
+                                   != m_sensed_input_high_gamepad.end();
+        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(-input_id)
+                                   != m_sensed_input_high_gamepad.end();
 
-            if (abs(value) > Input::MAX_VALUE/2.0f)
-            {
-                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
-                return;
-            }
-        }
-        
-        if (type == Input::IT_STICKMOTION)
+        // A stick was pushed far enough (for the first time) to count as
+        // 'triggered' - save the axis (coded with direction in the button
+        // value) for later, so that it can be registered when the stick is 
+        // released again.
+        // This is mostly legacy behaviour, it is probably good enough
+        // to register this as soon as the value is high enough.
+        if (!id_was_high && abs(value) > Input::MAX_VALUE*6.0f/7.0f) 
         {
-            // It is necessary to test both ids because the center position is always positive (0)
-            const int input_id = axisDirection*50 + btnID;
-            const int input_id_inverse = (axisDirection?0:-1) *50 + btnID;
-            bool id_has_high_value = m_sensed_input_high_gamepad.find(input_id) != m_sensed_input_high_gamepad.end();
-            bool inverse_id_has_high_value = m_sensed_input_high_gamepad.find(input_id_inverse) != m_sensed_input_high_gamepad.end();
-
-            if (!id_has_high_value && abs(value) > Input::MAX_VALUE*6.0f/7.0f) 
-            {
-                m_sensed_input_high_gamepad.insert(input_id);
-            }
-            else if ( abs(value) < Input::MAX_VALUE/8.0f && id_has_high_value )
-            {
-                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
-            }
-            else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_has_high_value )
-            {
-                m_sensed_input->m_axis_direction= (axisDirection?0:-1);
-                OptionsScreenInput2::getInstance()->gotSensedInput(*m_sensed_input);
-            }
+            m_sensed_input_high_gamepad.insert(input_id);
         }
-    }
+        else if ( abs(value) < Input::MAX_VALUE/8.0f && id_was_high )
+        {
+            Input sensed_input;
+            sensed_input.m_type           = type;
+            sensed_input.m_device_id      = deviceID;
+            sensed_input.m_button_id      = button;
+            sensed_input.m_axis_direction = value>=0 ? Input::AD_POSITIVE  
+                                                     : Input::AD_NEGATIVE;
+            sensed_input.m_character      = deviceID;
+            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+        }
+        else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_was_high )
+        {
+            Input sensed_input;
+            sensed_input.m_type           = type;
+            sensed_input.m_device_id      = deviceID;
+            sensed_input.m_button_id      = button;
+            // Since the inverse direction was high (i.e. stick went from
+            // +30000 to -100), we have to inverse the sign
+            sensed_input.m_axis_direction = value>=0 ? Input::AD_NEGATIVE
+                                                     : Input::AD_POSITIVE;
+            sensed_input.m_character      = deviceID;
+            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+        }
+        break;
+    }   // switch
+}   // inputSensing
 
-    return;
-}
 //-----------------------------------------------------------------------------
 int InputManager::getPlayerKeyboardID() const
 {
@@ -325,27 +339,27 @@ int InputManager::getPlayerKeyboardID() const
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
+void InputManager::dispatchInput(Input::InputType type, int deviceID, int button,
                                  Input::AxisDirection axisDirection, int value)
 {
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
     {
-        inputSensing(type, deviceID, btnID, axisDirection,  value);
+        inputSensing(type, deviceID, button, axisDirection,  value);
         return;
     }
     
     StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
-    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value,
+    bool action_found = m_device_manager->translateInput( type, deviceID, button, axisDirection, value,
                                                           m_mode, &player, &action);
 
     // if didn't find a _menu_ action, try finding a corresponding game action as fallback
     // (the GUI can handle them too)
     if (!action_found && m_mode == MENU)
     {
-        action_found = m_device_manager->translateInput(type, deviceID, btnID, axisDirection, value,
+        action_found = m_device_manager->translateInput(type, deviceID, button, axisDirection, value,
                                                         INGAME, &player, &action);
     }
     
@@ -356,14 +370,14 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
     {
         action = PA_BEFORE_FIRST;
 
-        if      (btnID == KEY_UP)     action = PA_MENU_UP;
-        else if (btnID == KEY_DOWN)   action = PA_MENU_DOWN;
-        else if (btnID == KEY_LEFT)   action = PA_MENU_LEFT;
-        else if (btnID == KEY_RIGHT)  action = PA_MENU_RIGHT;
-        else if (btnID == KEY_SPACE)  action = PA_MENU_SELECT;
-        else if (btnID == KEY_RETURN) action = PA_MENU_SELECT;
+        if      (button == KEY_UP)     action = PA_MENU_UP;
+        else if (button == KEY_DOWN)   action = PA_MENU_DOWN;
+        else if (button == KEY_LEFT)   action = PA_MENU_LEFT;
+        else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
+        else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
+        else if (button == KEY_RETURN) action = PA_MENU_SELECT;
 
-        if (btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
+        if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
             GUIEngine::ModalDialog::onEnterPressed();
         }
@@ -409,8 +423,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
-                        //std::cout << "==== New Player Joining with Key " << btnID << " ====" << std::endl;
-                        device = m_device_manager->getKeyboardFromBtnID(btnID);
+                        //std::cout << "==== New Player Joining with Key " << button << " ====" << std::endl;
+                        device = m_device_manager->getKeyboardFromBtnID(button);
                     }
                     else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
                     {
@@ -511,7 +525,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
     else if (type == Input::IT_KEYBOARD)
     {
         // keyboard press not handled by device manager / bindings. Check static bindings...
-        handleStaticAction( btnID, value );
+        handleStaticAction( button, value );
     }
 }   // input
 
@@ -562,10 +576,10 @@ EventPropagation InputManager::input(const SEvent& event)
             }
 
             // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
-            if (value < 0)
-                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_NEGATIVE, value);
-            else
-                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
+//            if (value < 0)
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_NEUTRAL, value);
+//            else
+//                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
 
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
@@ -699,25 +713,6 @@ EventPropagation InputManager::input(const SEvent& event)
 }
 
 //-----------------------------------------------------------------------------
-/** Retrieves the Input instance that has been prepared in the input sense
- * mode.
- *
- *
- * It is wrong to call it when not in input sensing mode anymore.
- */
-/*
-Input &InputManager::getSensedInput()
-{
-    assert (m_mode == INPUT_SENSE_KEYBOARD ||
-            m_mode == INPUT_SENSE_GAMEPAD   );
-
-    // m_sensed_input should be available in input sense mode.
-    assert (m_sensed_input);
-
-    return *m_sensed_input;
-}   // getSensedInput
-*/
-//-----------------------------------------------------------------------------
 /** Queries the input driver whether it is in the given expected mode.
  */
 bool InputManager::isInMode(InputDriverMode expMode)
@@ -795,9 +790,6 @@ void InputManager::setMode(InputDriverMode new_mode)
                     // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
                     m_mode = MENU;
 
-                    delete m_sensed_input;
-                    m_sensed_input = 0;
-
                     break;
                     
                     /*
@@ -844,12 +836,8 @@ void InputManager::setMode(InputDriverMode new_mode)
 
             // Reset the helper values for the relative mouse movement supresses to
             // the notification of them as an input.
-            m_mouse_val_x      = m_mouse_val_y = 0;
-            m_sensed_input     = new Input();
-
-            //irr_driver->hidePointer();
-
-            m_mode = new_mode;
+            m_mouse_val_x = m_mouse_val_y = 0;
+            m_mode        = new_mode;
 
             break;
             /*
