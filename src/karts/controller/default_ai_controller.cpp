@@ -919,7 +919,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
 
         Vec3 step_coord;
         //Test if we crash if we drive towards the target sector
-        for( int i = 2; i < steps; ++i )
+        for(unsigned int i = 2; i < steps; ++i )
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
