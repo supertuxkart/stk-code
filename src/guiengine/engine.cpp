@@ -700,6 +700,8 @@ namespace GUIEngine
         g_env->clear();
         if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
         g_current_screen = NULL;
+        
+        gui_messages.clear();
     }   // clear
 
     // ------------------------------------------------------------------------
@@ -711,6 +713,8 @@ namespace GUIEngine
         //FIXME: I'm not very sure why this isn't called in the regular 
         // clear() method??
         needsUpdate.clearWithoutDeleting();
+        
+        gui_messages.clear();
     }   // cleanForGame
     
     // ------------------------------------------------------------------------
