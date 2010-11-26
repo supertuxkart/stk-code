@@ -362,6 +362,7 @@ UserConfig::UserConfig()
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
 {
+    UserConfigParams::m_all_players.clearAndDeleteAll();
 }   // ~UserConfig
 
 // -----------------------------------------------------------------------------
