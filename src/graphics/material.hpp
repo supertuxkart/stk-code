@@ -62,6 +62,9 @@ private:
     /** Whether to use anisotropic filtering for this texture */
     bool             m_anisotropic;
     
+    /** Disable the culling **/
+    bool             m_disable_cull;
+    
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
     float            m_friction;
