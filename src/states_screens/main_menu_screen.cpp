@@ -100,6 +100,19 @@ void MainMenuScreen::init()
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
     input_manager->setMasterPlayerOnly(false);
+	
+	// Avoid incorrect behaviour in certain race circumstances:
+	// If a multi-player game is played with two keyboards, the 2nd
+	// player selects his kart last, and only the keyboard is used
+	// to select all other settings - then if the next time the kart
+	// selection screen comes up, the default device will still be
+	// the 2nd player. So if the first player presses 'select', it
+	// will instead add a second player (so basically the key 
+	// binding for the second player become the default, so pressing
+	// select will add a new player). See bug 3090931
+	// To avoid this, we will clean the last used device, making
+	// the key bindings for the first player the default again.
+	input_manager->getDeviceList()->clearLatestUsedDevice();
     
 #ifdef ADDONS_MANAGER
     // FIXME: this is wrong, init may be called several times in the object's

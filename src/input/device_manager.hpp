@@ -126,6 +126,7 @@ public:
                          StateManager::ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );
 
+	void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
     bool initialize();
     void serialize();

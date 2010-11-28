@@ -342,6 +342,12 @@ InputDevice* DeviceManager::getLatestUsedDevice()
     return m_latest_used_device;
 }
 // -----------------------------------------------------------------------------
+void DeviceManager::clearLatestUsedDevice()
+{
+	m_latest_used_device = NULL;
+}   // clearLatestUsedDevice
+
+// -----------------------------------------------------------------------------
 bool DeviceManager::deserialize()
 {
     static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
