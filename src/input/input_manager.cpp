@@ -485,7 +485,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
                 {
                     GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(deviceID);
 
-                    if (gp != NULL)
+                    if (gp != NULL &&
+                        abs(value)>gp->m_deadzone)
                     {
                         //I18N: message shown when an input device is used but is not associated to any player
                         GUIEngine::showMessage(StringUtils::insertValues(_("Ignoring '%s', you needed to join earlier to play!"),
@@ -575,11 +576,7 @@ EventPropagation InputManager::input(const SEvent& event)
                        event.JoystickEvent.Joystick, axis_id, value);
             }
 
-            // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
-//            if (value < 0)
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_NEUTRAL, value);
-//            else
-//                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
 
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
