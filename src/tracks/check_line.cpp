@@ -42,8 +42,54 @@ CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node,
     node.get("p2", &p2);
     node.get("min-height", &m_min_height);
     m_line.setLine(p1, p2);
+    if(UserConfigParams::m_check_debug)
+    {
+        video::SMaterial material;
+        material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+        scene::IMesh *mesh = irr_driver->createQuadMesh(&material, 
+                                                        /*create mesh*/true);
+        scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+        assert(buffer->getVertexType()==video::EVT_STANDARD);
+        irr::video::S3DVertex* vertices 
+            = (video::S3DVertex*)buffer->getVertices();
+        vertices[0].Pos = core::vector3df(p1.X, 
+                                          m_min_height-m_under_min_height, 
+                                          p1.Y);
+        vertices[1].Pos = core::vector3df(p2.X, 
+                                          m_min_height-m_under_min_height, 
+                                          p2.Y);
+        vertices[2].Pos = core::vector3df(p2.X, 
+                                          m_min_height+m_over_min_height, 
+                                          p2.Y);
+        vertices[3].Pos = core::vector3df(p1.X, 
+                                          m_min_height+m_over_min_height, 
+                                          p1.Y);
+        for(unsigned int i=0; i<4; i++)
+        {
+            vertices[i].Color = m_active_at_reset 
+                              ? video::SColor(0, 255, 0, 0)
+                              : video::SColor(0, 128, 128, 128);
+        }
+        buffer->recalculateBoundingBox();
+        mesh->setBoundingBox(buffer->getBoundingBox());
+        m_debug_node = irr_driver->addMesh(mesh);
+        mesh->drop();
+        m_debug_node->grab();
+    }
+    else
+    {
+        m_debug_node = NULL;
+    }
 }   // CheckLine
 
+// ----------------------------------------------------------------------------
+CheckLine::~CheckLine()
+{
+    if(m_debug_node)
+        m_debug_node->drop();
+        
+}   // CheckLine
 // ----------------------------------------------------------------------------
 void CheckLine::reset(const Track &track)
 {
@@ -80,8 +126,8 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
         // between -1 and 4 units (negative numbers are unlikely, but help
         // in case that there is 'somewhat' inside of the track, or the
         // checklines are a bit off in Z direction.
-        result = new_pos.getY()-m_min_height<4.0f   && 
-                 new_pos.getY()-m_min_height>-1.0f;
+        result = new_pos.getY()-m_min_height<m_over_min_height   && 
+                 new_pos.getY()-m_min_height>-m_under_min_height;
         if(UserConfigParams::m_check_debug && !result)
         {
             printf("CHECK: Kart %s crosses line, but wrong height (%f vs %f).\n",

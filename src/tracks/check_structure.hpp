@@ -68,6 +68,10 @@ protected:
     std::vector<Vec3> m_previous_position;
     /** Stores if this check structure is active (for a given kart). */
     std::vector<bool> m_is_active;
+
+    /** True if this check structure should be activated at a reset. */
+    bool              m_active_at_reset;
+
 private:
     /** Stores a pointer to the check manager. */
     CheckManager      *m_check_manager;
@@ -78,9 +82,6 @@ private:
     /** Stores the index of this check structure. This is only used for
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
-
-    /** True if this check structure should be activated at a reset. */
-    bool              m_active_at_reset;
 
     /** Contains the indices of the corresponding check structures that 
      *  get their state changed (activated or switched). */

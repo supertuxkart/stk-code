@@ -52,10 +52,21 @@ private:
      *  computations. True if the value is >=0, i.e. the point is on
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
+
+    /** Used to display debug information about checklines. */
+    scene::IMeshSceneNode *m_debug_node;
+
+    /** How much a kart is allowed to be under the minimum height of a
+     *  quad and still considered to be able to cross it. */
+    static const int m_under_min_height = 1;
+
+    /** How much a kart is allowed to be over the minimum height of a
+     *  quad and still considered to be able to cross it. */
+    static const int m_over_min_height  = 4;
 public:
                  CheckLine(CheckManager *check_manager, const XMLNode &node,
                            unsigned int index);
-    virtual     ~CheckLine() {};
+    virtual     ~CheckLine();
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);
     /** Returns the actual line data for this checkpoint. */
