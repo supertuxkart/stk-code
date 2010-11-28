@@ -233,6 +233,7 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     io::IXMLReader *xml_reader = createXMLReader(filename);
     if(!xml_reader) return NULL;
     return new XMLNode(xml_reader);
+    xml_reader->drop();
 }   // getXMLTree
 
 //-----------------------------------------------------------------------------
