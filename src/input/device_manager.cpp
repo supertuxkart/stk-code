@@ -20,7 +20,7 @@ DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
-}
+}   // DeviceManager
 
 // -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
@@ -101,9 +101,9 @@ bool DeviceManager::initialize()
 
     if (created) serialize();
     return created;
-}
-// -----------------------------------------------------------------------------
+}   // initialize
 
+// -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
 {
     m_assign_mode = assignMode;
@@ -126,7 +126,8 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
             m_keyboards[i].setPlayer(NULL);
         }
     }
-}
+}   // setAssignMode
+
 // -----------------------------------------------------------------------------
 GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
 {
@@ -137,11 +138,12 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
         if(m_gamepads[i].m_index == id)
         {
 
-            gamepad = m_gamepads.get(i);
+            return m_gamepads.get(i);
         }
     }
-    return gamepad;
-}
+    return NULL;
+}   // getGamePadFromIrrID
+
 // -----------------------------------------------------------------------------
 /**
  * Check if we already have a config object for gamepad 'irr_id' as reported by irrLicht
@@ -181,21 +183,22 @@ bool DeviceManager::getConfigForGamepad(const int irr_id, GamepadConfig **config
 void DeviceManager::addKeyboard(KeyboardDevice* d)
 {
     m_keyboards.push_back(d);
-}
+}   // addKeyboard
+
 // -----------------------------------------------------------------------------
 void DeviceManager::addEmptyKeyboard()
 {
     KeyboardConfig* newConf = new KeyboardConfig();
     m_keyboard_configs.push_back(newConf);
     m_keyboards.push_back( new KeyboardDevice(newConf) );
-}
+}   // addEmptyKeyboard
 
 // -----------------------------------------------------------------------------
 
 void DeviceManager::addGamepad(GamePadDevice* d)
 {
     m_gamepads.push_back(d);
-}
+}   // addGamepad
 
 // -----------------------------------------------------------------------------
 
@@ -229,7 +232,7 @@ bool DeviceManager::deleteConfig(DeviceConfig* config)
     }
     
     return false;
-}
+}   // deleteConfig
 
 // -----------------------------------------------------------------------------
 
@@ -261,7 +264,8 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
     }
     
     return NULL; // no appropriate binding found
-}
+}   // mapKeyboardInput
+
 //-----------------------------------------------------------------------------
 
 InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
@@ -292,7 +296,8 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
     }
 
     return gPad;
-}
+}   // mapGamepadInput
+
 //-----------------------------------------------------------------------------
 
 bool DeviceManager::translateInput( Input::InputType type,
@@ -327,7 +332,8 @@ bool DeviceManager::translateInput( Input::InputType type,
         m_latest_used_device = device;
     }
     return (device != NULL);
-}
+}   // translateInput
+
 //-----------------------------------------------------------------------------
 InputDevice* DeviceManager::getLatestUsedDevice()
 {
@@ -340,7 +346,8 @@ InputDevice* DeviceManager::getLatestUsedDevice()
     }
     
     return m_latest_used_device;
-}
+}   // getLatestUsedDevice
+
 // -----------------------------------------------------------------------------
 void DeviceManager::clearLatestUsedDevice()
 {
@@ -460,11 +467,13 @@ bool DeviceManager::deserialize()
     }
 
     return true;
-}
+}   // deserialize
+
 // -----------------------------------------------------------------------------
 void DeviceManager::serialize()
 {
-    static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
+    static std::string filepath = file_manager->getConfigDir() + "/" 
+                                + INPUT_FILE_NAME;
     if(UserConfigParams::m_verbosity>=5) printf("Serializing input.xml...\n");
 
     
@@ -473,7 +482,8 @@ void DeviceManager::serialize()
     
     if(!configfile.is_open())
     {
-        std::cerr << "Failed to open " << filepath.c_str() << " for writing, controls won't be saved\n";
+        std::cerr << "Failed to open " << filepath.c_str() 
+                 << " for writing, controls won't be saved\n";
         return;
     }
     
@@ -492,7 +502,7 @@ void DeviceManager::serialize()
     configfile << "</input>\n";
     configfile.close(); 
     if(UserConfigParams::m_verbosity>=5) printf("Serialization complete.\n\n");
-}
+}   // serialize
                     
 // -----------------------------------------------------------------------------
 
@@ -501,11 +511,12 @@ KeyboardDevice* DeviceManager::getKeyboardFromBtnID(const int btnID)
     const int keyboard_amount = m_keyboards.size();
     for (int n=0; n<keyboard_amount; n++)
     {
-        if (m_keyboards[n].getConfiguration()->hasBindingFor(btnID)) return m_keyboards.get(n);
+        if (m_keyboards[n].getConfiguration()->hasBindingFor(btnID)) 
+            return m_keyboards.get(n);
     }
     
     return NULL;
-}
+}   // getKeyboardFromBtnID
 
 // -----------------------------------------------------------------------------
 
@@ -516,4 +527,4 @@ void DeviceManager::shutdown()
     m_gamepad_configs.clearAndDeleteAll();
     m_keyboard_configs.clearAndDeleteAll();
     m_latest_used_device = NULL;
-}
+}   // shutdown
