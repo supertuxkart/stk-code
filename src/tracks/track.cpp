@@ -824,6 +824,61 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         {
             m_check_manager = new CheckManager(*node, this);
         }
+        else if (name=="billboard")
+        {
+            std::vector<float> billboard_size;
+            std::vector<float> billboard_origin;
+            std::string path;
+            node->get("texture", &path);
+            node->get("size", &billboard_size);
+            node->get("origin", &billboard_origin);
+            
+            video::ITexture* billboard_texture_load;
+            
+            billboard_texture_load = irr_driver->getTexture(path);
+            scene::ISceneNode* node3d;
+            node3d = irr_driver->addBillboard(core::dimension2d< f32 >( billboard_size[0], billboard_size[1] ), billboard_texture_load);
+            node3d -> setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
+            node3d -> setPosition(core::vector3df( billboard_origin[0],  billboard_origin[2], billboard_origin[1] ));
+        }
+        else if (name=="particle-emitter")
+        {
+            // based on http://irrlicht.sourceforge.net/tut008.html
+            std::string path;
+            std::vector<float> emitter_origin;
+            scene::ISceneManager* smgr = irr_driver->getSceneManager();
+            node->get("texture", &path);
+            node->get("origin", &emitter_origin);
+            video::ITexture* particle_texture_load;
+            particle_texture_load = irr_driver->getTexture(path);
+
+            scene::IParticleSystemSceneNode* ps = smgr->addParticleSystemSceneNode(false);
+
+            scene::IParticleEmitter* em = ps->createBoxEmitter(
+                    core::aabbox3d<f32>(-2,0,-2,2,1,2),    // emitter size
+                    core::vector3df(0.0f,0.06f,0.0f),      // initial direction
+                    2,3,                                   // emit rate
+                    video::SColor(0,255,255,255),          // darkest color
+                    video::SColor(0,255,255,255),          // brightest color
+                    800,2000,0,                            // min and max age, angle
+                    core::dimension2df(1.f,1.f),           // min size
+                    core::dimension2df(2.f,2.f));          // max size
+
+            ps->setEmitter(em);
+            em->drop();
+
+            scene::IParticleAffector* paf = ps->createFadeOutParticleAffector();
+
+            ps->addAffector(paf);
+            paf->drop();
+
+            ps->setPosition(core::vector3df(emitter_origin[0],  emitter_origin[2], emitter_origin[1] ));
+            ps->setScale(core::vector3df(1,1,1));
+            ps->setMaterialFlag(video::EMF_LIGHTING, false);
+            ps->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
+            ps->setMaterialTexture(0, particle_texture_load);
+            ps->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+        }
         else if(name=="sun")
         {
             node->get("xyz",           &m_sun_position );
