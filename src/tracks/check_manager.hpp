@@ -36,6 +36,7 @@ private:
     std::vector<CheckStructure*> m_all_checks;
 public:
          CheckManager(const XMLNode &node, Track *track);
+        ~CheckManager();
     void update(float dt);
     void reset(const Track &track);
     /** Returns the nth. check structure. */

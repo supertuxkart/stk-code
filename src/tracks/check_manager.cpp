@@ -55,6 +55,16 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
 }   // CheckManager
 
 // ----------------------------------------------------------------------------
+CheckManager::~CheckManager()
+{
+    for(unsigned int i=0; i<m_all_checks.size(); i++)
+    {
+        delete m_all_checks[i];
+    }
+}   // ~CheckManager
+
+// ----------------------------------------------------------------------------
+
 /** Resets all checks. */
 void CheckManager::reset(const Track &track)
 {

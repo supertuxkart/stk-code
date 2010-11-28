@@ -146,6 +146,12 @@ void Track::cleanup()
         m_animation_manager = NULL;
     }
 
+    if(m_check_manager)
+    {
+        delete m_check_manager;
+        m_check_manager=NULL;
+    }
+
     delete m_track_object_manager;
     m_track_object_manager = NULL;
 
