@@ -321,7 +321,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("jungle", "last_track", "Name of the last track used.") ); 
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("Glass.stkskin", "skin_file", "Name of the skin to use") );
+            PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );
             
     PARAM_PREFIX StringUserConfigParam      m_server_addons
             PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
