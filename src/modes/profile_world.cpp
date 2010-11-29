@@ -21,6 +21,7 @@
 
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "tracks/track.hpp"
 
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps = 0;
@@ -82,14 +83,15 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *  \param init_pos The start XYZ coordinates.
  */
 Kart *ProfileWorld::createKart(const std::string &kart_ident, int index, 
-                               int local_player_id, int global_player_id,
-                               const btTransform &init_pos)
+                               int local_player_id, int global_player_id)
 {
     // Ignore the kart identifier specified for this kart, instead load
     // _only_ the kart specified for the player. This allows to measure
     // the impact different karts have on performance.
     const std::string prof_kart_id = race_manager->getKartIdent(
                                            race_manager->getNumberOfKarts()-1);
+    btTransform init_pos   = m_track->getStartTransform(index);
+
     Kart *new_kart         = new Kart(prof_kart_id, index+1, init_pos);
 
     Controller *controller = loadAIController(new_kart);
