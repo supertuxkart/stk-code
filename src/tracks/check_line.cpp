@@ -78,7 +78,6 @@ CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node,
         mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh);
         mesh->drop();
-        m_debug_node->grab();
     }
     else
     {
@@ -90,7 +89,7 @@ CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node,
 CheckLine::~CheckLine()
 {
     if(m_debug_node)
-        m_debug_node->drop();
+        irr_driver->removeNode(m_debug_node);
         
 }   // CheckLine
 // ----------------------------------------------------------------------------
