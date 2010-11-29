@@ -126,6 +126,7 @@ void ItemManager::loadDefaultItems()
         m_item_mesh[i]          = mesh;
         mesh->grab();
     }   // for i
+    delete root;
 }   // loadDefaultItems
 
 //-----------------------------------------------------------------------------
