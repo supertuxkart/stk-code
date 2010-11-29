@@ -615,12 +615,12 @@ void cleanTuxKart()
     if(powerup_manager)         delete powerup_manager;   
     if(projectile_manager)      delete projectile_manager;
     if(kart_properties_manager) delete kart_properties_manager;
-    if(stk_config)              delete stk_config;
     if(track_manager)           delete track_manager;
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
+    if(stk_config)              delete stk_config;
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;

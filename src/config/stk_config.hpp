@@ -118,6 +118,7 @@ private:
 public:
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {m_has_been_loaded= false;};
+        ~STKConfig();
     void init_defaults    ();
     void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);
