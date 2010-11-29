@@ -121,6 +121,10 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
                                   int kart_index,
                                   ChangeState change_state)
 {
+    bool update_debug_colors = 
+        UserConfigParams::m_check_debug &&
+        kart_index==World::getWorld()->getPlayerKart(0)->getWorldKartId();
+
     for(unsigned int i=0; i<indices.size(); i++)
     {
         CheckStructure *cs = 
@@ -160,7 +164,10 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
             }
             cs->m_is_active[kart_index] = !cs->m_is_active[kart_index]; 
         }   // switch
-
+        if(update_debug_colors)
+        {
+            cs->changeDebugColor(cs->m_is_active[kart_index]);
+        }
     }   // for i<indices.size()
 }   //changeStatus
 

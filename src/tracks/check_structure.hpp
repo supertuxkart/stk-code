@@ -104,6 +104,7 @@ public:
                                unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
+    virtual void changeDebugColor(bool is_active) {}
     /** True if going from old_pos to new_pos crosses this checkline. This function
      *  is called from update (of the checkline structure).
      *  \param old_pos  Position in previous frame.
@@ -117,6 +118,7 @@ public:
 
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }
+
 };   // CheckStructure
 
 #endif

@@ -21,6 +21,8 @@
 
 #include <string>
 
+#include "irrlicht.h"
+
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -46,6 +48,7 @@ CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node,
     {
         video::SMaterial material;
         material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        material.setFlag(video::EMF_LIGHTING, false);
         material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
         scene::IMesh *mesh = irr_driver->createQuadMesh(&material, 
                                                         /*create mesh*/true);
@@ -100,6 +103,22 @@ void CheckLine::reset(const Track &track)
         m_previous_sign[i] = m_line.getPointOrientation(p)>=0;
     }
 }   // reset
+
+// ----------------------------------------------------------------------------
+void CheckLine::changeDebugColor(bool is_active)
+{
+    assert(m_debug_node);
+
+    scene::IMesh *mesh         = m_debug_node->getMesh();
+    scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+    irr::video::S3DVertex* vertices 
+                               = (video::S3DVertex*)buffer->getVertices();
+    for(unsigned int i=0; i<4; i++)
+    {
+        vertices[i].Color = is_active ? video::SColor(0, 255, 0, 0)
+                                      : video::SColor(0, 128, 128, 128);
+    }
+}   // changeDebugColor
 
 // ----------------------------------------------------------------------------
 /** True if going from old_pos to new_pos crosses this checkline. This function
