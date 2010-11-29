@@ -334,6 +334,10 @@ Kart::~Kart()
         delete m_kart_chassis.getChildShape(i);
     }
     delete m_kart_model;
+    if(m_controller)
+        delete m_controller;
+    if(m_saved_controller)
+        delete m_saved_controller;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
