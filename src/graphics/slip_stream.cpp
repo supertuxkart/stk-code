@@ -73,10 +73,9 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
     if(UserConfigParams::m_slipstream_debug)
     {
         video::SMaterial material;
-        material.MaterialType    = video::EMT_SOLID;
-        material.BackfaceCulling = false;
-        material.Lighting        = false;
-        material.ColorMaterial   = video::ECM_DIFFUSE_AND_AMBIENT;
+        material.MaterialType    = video::EMT_TRANSPARENT_ADD_COLOR;
+        material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        material.setFlag(video::EMF_LIGHTING, false);
 
         m_debug_mesh = irr_driver->createQuadMesh(&material, true);
         scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
@@ -93,7 +92,6 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
         m_mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(m_debug_mesh, m_kart->getNode());
         m_debug_node->grab();
-        m_debug_node->setAutomaticCulling(scene::EAC_OFF);
     }
     else
     {
