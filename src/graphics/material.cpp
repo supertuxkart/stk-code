@@ -63,7 +63,6 @@ Material::Material(const XMLNode *node, int index)
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("anisotropic",      &m_anisotropic       );
-    node->get("noculling",        &m_disable_cull      );
     node->get("backface-culling", &m_backface_culling  );
     std::string s("");
     node->get("graphical-effect", &s                   );
@@ -278,15 +277,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     else if (UserConfigParams::m_trilinear)
     {
         m->setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }
-    
-    // noculling
-    if (m_disable_cull)
-    {
-        m->setFlag( irr::video::EMF_BACK_FACE_CULLING , false );
-    }
-
-    
+    }    
     
     if ( (m_clamp_tex & UCLAMP) != 0)
     {
