@@ -167,11 +167,11 @@ void LinearWorld::restartRace()
  *  sectors, which are then used to determine the kart positions.
  *  \param dt Time step size.
  */
-void LinearWorld::update(float delta)
+void LinearWorld::update(float dt)
 {
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
-    WorldWithRank::update(delta);
+    WorldWithRank::update(dt);
     
     if (m_last_lap_sfx_playing && m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
     {
@@ -223,6 +223,7 @@ void LinearWorld::update(float delta)
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
     
+    WorldWithRank::updateTrack(dt);
     updateRacePosition();
     
     for (unsigned int i=0; i<kart_amount; i++)

@@ -121,6 +121,16 @@ std::string ThreeStrikesBattle::getIdent() const
 }   // getIdent
 
 //-----------------------------------------------------------------------------
+/** Update the world and the track.
+ *  \param dt Time step size. 
+ */
+void ThreeStrikesBattle::update(float dt)
+{
+    WorldWithRank::update(dt);
+    WorldWithRank::updateTrack(dt);
+}   // update
+
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::updateKartRanks()
 {
     beginSetKartPositions();

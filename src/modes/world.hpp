@@ -137,6 +137,7 @@ protected:
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool    isRaceOver() = 0;
     virtual void    update(float dt);
+            void    updateTrack(float dt);
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
      *  a default (useful for battle mode and ftl races) we just use the 

@@ -74,7 +74,7 @@ public:
     virtual std::string getIdent() const;
     
     virtual void kartHit(const int kart_id);
-        
+    virtual void update(float dt);            
     void updateKartRanks();
 };   // ThreeStrikesBattles
 

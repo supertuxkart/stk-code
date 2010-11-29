@@ -513,24 +513,31 @@ void World::update(float dt)
         // Update all karts that are not eliminated
         if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
     }
-    // The order of updates is rather important: if track update would
-    // be called before kart update, then the check manager (called from
-    // track update) will be using the old kart position to determine
-    // e.g. if a kart has crossed a new line. But linear world (from
-    // which this is called in case of a race) will be using the new
-    // position of the karts to determine the driveline quad a kart
-    // is on. So if a kart just arrived at quad 0 (meaning the distance
-    // along the track goes from close-to-lap-length to close-to-zero),
-    // the order of karts will be incorrect, since this kart will not
-    // have started the next lap. While this will only last for one
-    // frame (since in the next frame the check manager will detect
-    // the new lap), it causes an incorrect display of icons in the
-    // icon display for this one frame.
-    m_track->update(dt);
 
     projectile_manager->update(dt);
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Only updates the track. The order in which the various parts of STK are 
+ *  updated is quite important (i.e. the track can't be updated as part of
+ *  the standard update call):
+ *  the track must be updated after updating the karts (otherwise the
+ *  checklines would be using the previous kart positions to determine
+ *  new laps, but linear world which determines distance along track would
+ *  be using the new kart positions --> the lap counting line will be 
+ *  triggered one frame too late, potentially causing strange behaviour of
+ *  the icons.
+ *  Similarly linear world must update the position of all karts after all
+ *  karts have been updated (i.e. World::update() must be called before
+ *  updating the position of the karts). The check manager (which is called
+ *  from Track::update()) needs the updated distance along track, so track
+ *  update has to be called after updating the race position in linear world.
+ *  That's why there is a separate call for trackUpdate here.
+ */
+void World::updateTrack(float dt)
+{
+    m_track->update(dt);
+}   // update Track
 // ----------------------------------------------------------------------------
 
 Highscores* World::getHighscores() const
