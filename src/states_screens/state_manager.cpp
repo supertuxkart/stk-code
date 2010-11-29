@@ -253,7 +253,9 @@ StateManager::ActivePlayer::~ActivePlayer()
 
 void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
 {
+#ifdef DEBUG
     assert(m_magic_number == 0xAC1EF1AE);
+#endif
     m_player = player;
 }   // setPlayerProfile
 
@@ -261,7 +263,9 @@ void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
 
 void StateManager::ActivePlayer::setDevice(InputDevice* device)
 {
+#ifdef DEBUG
     assert(m_magic_number == 0xAC1EF1AE);
+#endif
     
     // unset player from previous device he was assigned to, if any
     if (m_device != NULL) m_device->setPlayer(NULL);

@@ -94,29 +94,53 @@ public:
 #endif
         
         /** \return the identity of this active player */
-        PlayerProfile* getProfile() { assert(m_magic_number == 0xAC1EF1AE); return m_player; }
+        PlayerProfile* getProfile() { 
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE); 
+#endif
+			return m_player; }
         
         /** \return the identity of this active player */
-        const PlayerProfile* getConstProfile() const { assert(m_magic_number == 0xAC1EF1AE); return m_player; }
+        const PlayerProfile* getConstProfile() const { 
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE); 
+#endif
+			return m_player; }
 
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
         
         /** ID of this player within the list of active players */
-        int getID() const { assert(m_magic_number == 0xAC1EF1AE); return m_id; }
+        int getID() const {
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE); 
+#endif
+			return m_id; }
         
         /** \return Which input device this player is using, or NULL if none 
          *  is set yet */
-        InputDevice* getDevice() const { assert(m_magic_number == 0xAC1EF1AE); return m_device; }
+        InputDevice* getDevice() const { 
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE);
+#endif
+			return m_device; }
          
         void setDevice(InputDevice* device);
         
         /** Sets the kart for this player. */
-        void setKart(Kart *kart) { assert(m_magic_number == 0xAC1EF1AE); m_kart = kart; }
+        void setKart(Kart *kart) { 
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE);
+#endif
+			m_kart = kart; }
         
         /** \return the kart of this player. Only valid while world exists. */
-        Kart* getKart()          { assert(m_magic_number == 0xAC1EF1AE); assert(m_kart != NULL); return m_kart; }
+        Kart* getKart()          { 
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE); 
+#endif
+			assert(m_kart != NULL); return m_kart; }
     };
 
 

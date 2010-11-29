@@ -219,9 +219,8 @@ public:
     PlayerKartWidget(KartSelectionScreen* parent, StateManager::ActivePlayer* associatedPlayer,
                      core::recti area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
-        assert(associatedPlayer->ok());
-        
 #ifdef DEBUG
+        assert(associatedPlayer->ok());
         m_magic_number = 0x33445566;
 #endif
         
@@ -433,7 +432,9 @@ public:
         bool mineInList = false;
         for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
+#ifdef DEBUG
             assert(StateManager::get()->getActivePlayer(p)->ok());
+#endif
             if (StateManager::get()->getActivePlayer(p) == m_associatedPlayer)
             {
                 mineInList = true;

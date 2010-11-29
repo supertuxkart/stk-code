@@ -90,11 +90,23 @@ public:
 #endif
     }
     
-    void setName(const std::string &name_){ assert(m_magic_number == 0xABCD1234); m_name = name_;  }
+    void setName(const std::string &name_) { 
+#ifdef DEBUG
+		assert(m_magic_number == 0xABCD1234);
+#endif
+		m_name = name_;  }
 
-    const char* getName() const { assert(m_magic_number == 0xABCD1234); return m_name.c_str();     }
+    const char* getName() const { 
+#ifdef DEBUG
+		assert(m_magic_number == 0xABCD1234);
+#endif
+		return m_name.c_str();     }
 
-    bool isGuestAccount() const { assert(m_magic_number == 0xABCD1234); return m_is_guest_account; }
+    bool isGuestAccount() const { 
+#ifdef DEBUG
+		assert(m_magic_number == 0xABCD1234); 
+#endif
+		return m_is_guest_account; }
     
     //int getLastKartId(){ return m_last_kart_id; }
     //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
