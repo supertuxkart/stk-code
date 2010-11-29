@@ -318,7 +318,7 @@ public:
             if(!props)
             {
                 fprintf(stderr, 
-                        "Can't find default kart '%s' nor any other kart.\n",
+                        "[KartSelectionScreen] WARNING: Can't find default kart '%s' nor any other kart.\n",
                         default_kart.c_str());
                 exit(-1);
             }
@@ -389,9 +389,9 @@ public:
         
         if (StateManager::get()->getActivePlayer(newPlayerID) != m_associatedPlayer)
         {
-            printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n",
-                   StateManager::get()->getActivePlayer(newPlayerID), newPlayerID, m_associatedPlayer);
-            std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
+            std::cerr << "[KartSelectionScreen]  WARNING: Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
+            fprintf(stderr, "    Player: %p  -  Index: %d  -  m_associatedPlayer: %p\n",
+                    StateManager::get()->getActivePlayer(newPlayerID), newPlayerID, m_associatedPlayer);
             assert(false);
         }
         
@@ -629,7 +629,7 @@ public:
         {
             if(UserConfigParams::m_verbosity>=5)
             {
-                std::cout << "Identity changed for player " << m_playerID
+                std::cout << "[KartSelectionScreen] Identity changed for player " << m_playerID
                           << " : " << irr::core::stringc(m_player_ident_spinner->getStringValue().c_str()).c_str() 
                           << std::endl;
             }
@@ -710,7 +710,6 @@ public:
     /** \brief Event callback from ISpinnerConfirmListener */
     virtual void onSpinnerConfirmed()
     {
-        printf("onSpinnerConfirmed\n");
         KartSelectionScreen::getInstance()->playerConfirm(m_playerID);
     }
 };
@@ -945,16 +944,6 @@ void KartSelectionScreen::init()
         w->setSelection(0, 0, true);
     }
     
-    /*
-    std::cout << "===== screen contents =====\n";
-    gui::IGUIElement* root = GUIEngine::getGUIEnv()->getRootGUIElement();
-    const core::list< gui::IGUIElement * > children = root->getChildren();
-    for (core::list< gui::IGUIElement * >::ConstIterator it = children.begin(); it != children.end(); it++)
-    {
-        std::cout << (*it)->getID() << " : " << (*it)->getTypeName() << " " << core::stringc((*it)->getText()).c_str() << "\n";
-    }
-    std::cout << "==========================\n";
-     */
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -985,25 +974,25 @@ void KartSelectionScreen::unloaded()
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
-    if (UserConfigParams::m_verbosity>=5) std::cout << "playerJoin() ==========\n";
+    if (UserConfigParams::m_verbosity>=5) std::cout << "[KartSelectionScreen]  playerJoin() invoked\n";
 
     assert (g_dispatcher != NULL);
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
+        std::cerr << "[KartSelectionScreen] playerJoin(): Called outside of kart selection screen.\n";
         return false;
     }
     else if (device == NULL)
     {
-        std::cerr << "playerJoin(): Received null device pointer\n";
+        std::cerr << "[KartSelectionScreen] playerJoin(): Received null device pointer\n";
         return false;
     }
 
     if (StateManager::get()->activePlayerCount() >= MAX_PLAYER_COUNT)
     {
-        std::cerr << "Maximum number of players reached\n";
+        std::cerr << "[KartSelectionScreen] Maximum number of players reached\n";
         sfx_manager->quickSound( "use_anvil" );
         return false;
     }
@@ -1076,7 +1065,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        std::cerr << "ERROR: playerQuit() called outside of kart selection screen, "
+        std::cerr << "[KartSelectionScreen] ERROR: playerQuit() called outside of kart selection screen, "
                   << "or the XML file for this screen was changed without adapting the code accordingly\n";
         return false;
     }
@@ -1107,7 +1096,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     }
     if (playerID == -1)
     {
-        std::cout << "void playerQuit(ActivePlayer* player) : cannot find passed player\n";
+        std::cerr << "[KartSelectionScreen] WARNING: playerQuit cannot find passed player\n";
         return false;
     }
     if(UserConfigParams::m_verbosity>=5)
@@ -1157,7 +1146,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             const bool success = w->setSelection(selectedKart.c_str(), n, true);
             if (!success)
             {
-                std::cerr << "Failed to select kart " << selectedKart.c_str() << " for player " << n
+                std::cerr << "[KartSelectionScreen] Failed to select kart " << selectedKart.c_str() << " for player " << n
                           << ", what's going on??\n";
             }
         }
@@ -1243,7 +1232,8 @@ void KartSelectionScreen::playerConfirm(const int playerID)
         
         if (player_ready && (ident_conflict || kart_conflict) && !willNeedDuplicates)
         {
-            printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
+            if (UserConfigParams::m_verbosity>=5)
+                printf("[KartSelectionScreen] You can't select this identity or kart, someone already took it!!\n");
             
             sfx_manager->quickSound( "use_anvil" );
             return;
@@ -1314,10 +1304,10 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             if (!w->setSelection( selected_kart, n, n>0 ))
             {
                 // if we get here, it means one player "lost" his kart in the tab switch
-                std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
+                if (UserConfigParams::m_verbosity>=5)
+                    std::cout << "[KartSelectionScreen] Player " << n << " lost their selection when switching tabs!!!\n";
                 
                 // Select a random kart in this case
-
                 const int count = w->getItems().size();
                 if (count > 0)
                 {
@@ -1327,11 +1317,11 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                     // select kart for players > 0 (player 0 is the one that can change the groups,
                     // so focus for player 0 must remain on the tabs)
                     const bool success = w->setSelection( randomID, n, n>0 );
-                    if (!success) std::cerr << "    WARNING: setting kart of player " << n << " failed :(\n";
+                    if (!success) std::cerr << "[KartSelectionScreen] WARNING: setting kart of player " << n << " failed :(\n";
                 }
                 else
                 {
-                    std::cerr << "WARNING : kart selection screen has 0 items in the ribbon\n";
+                    std::cerr << "[KartSelectionScreen] WARNING : 0 items in the ribbon\n";
                 }
             }
         } // end for
@@ -1366,13 +1356,6 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
 
 void KartSelectionScreen::allPlayersDone()
 {
-    // FIXME: debug, remove
-    printf("all players done : %i players have joined the game\n", StateManager::get()->activePlayerCount());
-    for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
-    {
-        std::cout << "    " << StateManager::get()->getActivePlayer(p)->getProfile()->getName() << std::endl;
-    }
-    
     input_manager->setMasterPlayerOnly(true);
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
@@ -1383,13 +1366,12 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Print selection (for debugging purposes)
     if(UserConfigParams::m_verbosity>=4)
     {
-        std::cout << "==========\n" << players.size() << " players :\n";
+        std::cout << "[KartSelectionScreen] " << players.size() << " players :\n";
         for (int n=0; n<players.size(); n++)
         {
             std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
                 << " on " << players[n].getDevice()->m_name << std::endl;
         }
-        std::cout << "==========\n";
     }
     
     for (int n=0; n<players.size(); n++)
@@ -1503,9 +1485,14 @@ bool KartSelectionScreen::validateIdentChoices()
             if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                 m_kart_widgets[m].getAssociatedPlayer()->getProfile())
             {
-                printf("\n***\n*** Identity conflict!! ***\n***\n\n");
-                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
-                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                if (UserConfigParams::m_verbosity >= 5)
+                {
+                    printf("[KartSelectionScreen]  Identity conflict!!\n");
+                    std::cout << "    Player " << n << " chose "
+                              << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                    std::cout << "    Player " << m << " chose "
+                              << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                }
                 
                 // two players took the same name. check if one is ready
                 if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
@@ -1561,20 +1548,27 @@ bool KartSelectionScreen::validateKartChoices()
             // check if 2 players took the same name
             if (sameKart(m_kart_widgets[n], m_kart_widgets[m]))
             {
-                printf("\n***\n*** Kart conflict!! ***\n***\n\n");
-                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
-                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getKartInternalName() << std::endl;
+                if (UserConfigParams::m_verbosity >= 5)
+                {
+                    printf("[KartSelectionScreen] Kart conflict!!\n");
+                    std::cout << "    Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
+                    std::cout << "    Player " << m << " chose " << m_kart_widgets[m].getKartInternalName() << std::endl;
+                }
                 
                 // two players took the same kart. check if one is ready
                 if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
                 {
-                    std::cout << "--> Setting red badge on player " << n << std::endl;
+                    if (UserConfigParams::m_verbosity >= 5)
+                        std::cout << "    --> Setting red badge on player " << n << std::endl;
+                    
                     // player m is ready, so player n should not choose this name
                     m_kart_widgets[n].m_model_view->setBadge(BAD_BADGE);
                 }
                 else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
                 {
-                    std::cout << "--> Setting red badge on player " << m << std::endl;
+                    if (UserConfigParams::m_verbosity >= 5)
+                        std::cout << "    --> Setting red badge on player " << m << std::endl;
+                    
                     // player n is ready, so player m should not choose this name
                     m_kart_widgets[m].m_model_view->setBadge(BAD_BADGE);
                 }
@@ -1718,7 +1712,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 EventPropagation FocusDispatcher::focused(const int playerID)
 { 
     if(UserConfigParams::m_verbosity>=5)
-        std::cout << "FocusDispatcher focused by player " << playerID << std::endl;
+        std::cout << "[KartSelectionScreen] FocusDispatcher focused by player " << playerID << std::endl;
 
     // since this screen is multiplayer, redirect focus to the right widget
     const int amount = m_parent->m_kart_widgets.size();
@@ -1742,7 +1736,7 @@ EventPropagation FocusDispatcher::focused(const int playerID)
         }
     }
     
-    std::cerr << "WARNING: the focus dispatcher in kart selection screen can't find the widget for player " << playerID << "!\n";
+    std::cerr << "[KartSelectionScreen] WARNING: the focus dispatcher can't find the widget for player " << playerID << "!\n";
     //assert(false);
     return GUIEngine::EVENT_LET;        
 }
