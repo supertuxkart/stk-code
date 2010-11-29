@@ -450,8 +450,12 @@ bool OptionsScreenInput2::onEscapePressed()
 
 void OptionsScreenInput2::onConfirm()
 {
+#ifdef DEBUG
     const bool success = input_manager->getDeviceList()->deleteConfig(m_config);
     assert(success);
+#else
+    input_manager->getDeviceList()->deleteConfig(m_config);
+#endif
     m_config = NULL;
     input_manager->getDeviceList()->serialize();
     ModalDialog::dismiss();
