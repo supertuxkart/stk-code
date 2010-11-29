@@ -123,7 +123,7 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
 {
     bool update_debug_colors = 
         UserConfigParams::m_check_debug &&
-        kart_index==World::getWorld()->getPlayerKart(0)->getWorldKartId();
+        kart_index == (int)World::getWorld()->getPlayerKart(0)->getWorldKartId();
 
     for(unsigned int i=0; i<indices.size(); i++)
     {
