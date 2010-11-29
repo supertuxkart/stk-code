@@ -131,11 +131,10 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
 // -----------------------------------------------------------------------------
 GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
 {
-    GamePadDevice *gamepad = NULL;
-
-    for(int i = 0; i < m_gamepads.size(); i++)
+    const int count = m_gamepads.size();
+    for (int i = 0; i < count; i++)
     {
-        if(m_gamepads[i].m_index == id)
+        if (m_gamepads[i].m_index == id)
         {
 
             return m_gamepads.get(i);
