@@ -306,6 +306,11 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
+    else
+    {
+        m_race_gui->addMessage(StringUtils::insertValues(_("Lap %i"), kart_info.m_race_lap+1),
+                               m_karts[kart_index], 3.0f, 40, video::SColor(255, 210, 100, 50), true);
+    }
 
     // The race positions must be updated here: consider the situation where 
     // the first kart does not cross the finish line in its last lap, instead 
