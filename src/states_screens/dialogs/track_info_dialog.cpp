@@ -119,6 +119,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
         m_spinner->m_properties[PROP_ID] = "lapcountspinner";
         m_spinner->m_properties[PROP_MIN_VALUE] = "1";
         m_spinner->m_properties[PROP_MAX_VALUE] = "99";
+        m_spinner->m_properties[PROP_WARP_AROUND] = "true";
         
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
         m_spinner->setText( _("%i laps") );
