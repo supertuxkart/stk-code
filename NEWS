@@ -1,3 +1,23 @@
+SuperTuxkart 0.6.2a (October 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: STK would crash while trying to save the config file
+          on Windows Vista.
+
+SuperTuxkart 0.6.2 (July 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: battle mode would not display track groups.
+
+SuperTuxkart 0.6.1 (Feburary 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added new kart ("Puffy"), new battle map ("Cave"), and new music
+  for Snow Mountain.
+* Added slow-down for karts driving backwards.
+* Somewhat reduced 'shaking' of AI driven karts.
+* Fixed several bugs, including incorrect rescues, and track
+  and kart selection issues.
+
+
+
 SuperTuxKart 0.5 (May 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, 
