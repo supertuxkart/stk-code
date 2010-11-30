@@ -64,7 +64,7 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
     float current_distance = 
         ((LinearWorld*)World::getWorld())->getDistanceDownTrackForKart(indx);
     bool result =(m_previous_distance[indx]>0.95f*track_length &&
-                  current_distance<2.0f);
+                  current_distance<7.0f);
     if(UserConfigParams::m_check_debug && result)
     {
         printf("CHECK: Kart %s crossed start line from %f to %f.\n",
