@@ -398,7 +398,11 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     core::matrix4 mat;
     mat.setRotationDegrees(hpr);
     mat.setTranslation(pos);
-    mat.setScale(scale);
+    core::matrix4 mat_scale;
+    // Note that we can't simply call mat.setScale, since this would
+    // overwrite the elements on the diagonal, making any rotation incorrect.
+    mat_scale.setScale(scale);
+    mat *= mat_scale;
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
