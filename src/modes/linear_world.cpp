@@ -306,7 +306,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else
+    else if (kart_info.m_race_lap > 0)
     {
         m_race_gui->addMessage(StringUtils::insertValues(_("Lap %i"), kart_info.m_race_lap+1),
                                m_karts[kart_index], 3.0f, 40, video::SColor(255, 210, 100, 50), true);
