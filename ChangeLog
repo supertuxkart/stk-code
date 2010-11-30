@@ -4,16 +4,38 @@ Too many to list them all. Main points:
 * Irrlicht:
   - Ported from plib to irrlicht
   - Added animations to karts and some tracks
-
 * GUI
   - Completely new designed GUI
-
 * Other improvements
   - Allowed alternative ways/shortcuts in tracks
   - New item 'switch'
-
 * New art:
   - New tracks farm, hacienda, scotland, secret garden
+
+SuperTuxKart 0.6.2a (October 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: STK would crash while trying to save the config file
+          on Windows Vista.
+
+SuperTuxKart 0.6.2 (July 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: Game could crash in rare circumstances.
+* Bugfix: Restarting a GP (with the in-race menu ESC) would
+          not subtract already allocated points.
+* Bugfix: A race could be finished with an invalid shortcut.
+* Bugfix: Playing a challenge after a splitscreen game would
+          play the challenge in split screen.
+* Bugfix: Items explode over void.
+* Bugfix: Grass in castle arena slowed down the kart.
+* Bugfix: GP result showed kart identifier instead of name.
+* Improvement: there is now 1 1 sec. wait period for the race
+          result screen, avoiding the problem that someone
+          presses space/enter at the end of a race, immediately
+          quitting the menu before it can be read.
+
+SuperTuxKart 0.6.1a (February 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: battle mode would not display track groups.
 
 SuperTuxKart 0.6.1 (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
