@@ -1,12 +1,19 @@
-SuperTuxKart SVN
-~~~~~~~~~~~~~~~~
+SuperTuxKart 0.7rc1 (November 2010)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Too many to list them all. Main points:
 * Irrlicht:
-  - Renamed global scene object to stk_scene (to avoid a name clash with
-    irrlicht's namespace 'scene').
+  - Ported from plib to irrlicht
+  - Added animations to karts and some tracks
+
+* GUI
+  - Completely new designed GUI
+
+* Other improvements
+  - Allowed alternative ways/shortcuts in tracks
+  - New item 'switch'
+
 * New art:
-* Bugfixes:
-* Code cleanup:
-  - Removed all snprintfs and constants defining a maximum message size.
+  - New tracks farm, hacienda, scotland, secret garden
 
 SuperTuxKart 0.6.1 (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
