@@ -2,7 +2,6 @@
 <materials>
   <material name="banana.png" alpha="0.5"/>
   <material name="gift-box.png"/>
-  <material name="reset-button.png"/>
   <material name="gift-loop.png"  sphere="Y"/>
   <material name="gold.png"  light="Y" sphere="Y"/>
   <material name="nitro-tank.png" clampV="Y" transparency="Y" alpha="0.5"/>
