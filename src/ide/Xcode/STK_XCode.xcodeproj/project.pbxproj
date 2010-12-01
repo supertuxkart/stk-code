@@ -243,6 +243,7 @@
 		9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9554C4A411F1188000906416 /* race_result_gui.cpp */; };
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
+		95591C4412A5E91E00FB1E95 /* fribidi.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9560368A12187EFB00EB96C4 /* layout_manager.cpp */; };
@@ -312,6 +313,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				95591C4412A5E91E00FB1E95 /* fribidi.framework in Copy frameworks */,
 				9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */,
 				9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */,
 				9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */,
@@ -2398,7 +2400,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\ncp -rf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n${PROJECT_DIR}/cleanupRelease.sh\n\nelse\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\nln -sFhf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n\nfi";
+			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\"\ncp -rf \"${PROJECT_DIR}/../../../data\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\"\n\"${PROJECT_DIR}/cleanupRelease.sh\"\n\nelse\n\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\"\nln -sFhf \"${PROJECT_DIR}/../../../data\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\"\n\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2857,7 +2859,10 @@
 				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-DNDEBUG=1",
+					"$(inherited)",
+				);
 				OTHER_LDFLAGS = "$(inherited)";
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
