@@ -49,7 +49,7 @@ initAttachmentType iat[]=
     {ATTACH_PARACHUTE,   "parachute.b3d",   "parachute-attach-icon.png"},
     {ATTACH_BOMB,        "bomb.b3d",        "bomb-attach-icon.png"},
     {ATTACH_ANVIL,       "anchor.b3d",      "anchor-attach-icon.png"},
-    {ATTACH_TINYTUX,     "reset-button.b3d",""},
+    {ATTACH_TINYTUX,     "reset-button.b3d",NULL},
     {ATTACH_MAX,         "",                ""},
 };
 
@@ -71,11 +71,13 @@ void AttachmentManager::loadModels()
         // have to be in memory till the end of the game.
         std::string full_path = file_manager->getModelFile(iat[i].file);
         m_attachments[iat[i].attachment]=irr_driver->getAnimatedMesh(full_path);
-
-        std::string full_icon_path = file_manager->getModelFile(iat[i].icon_file);
-        m_all_icons[iat[i].attachment]=material_manager->getMaterial(full_icon_path,
-                                  /* full_path */     false,
-                                  /*make_permanent */ true); 
+        if(iat[i].icon_file)
+        {
+            std::string full_icon_path = file_manager->getModelFile(iat[i].icon_file);
+            m_all_icons[iat[i].attachment]=material_manager->getMaterial(full_icon_path,
+                                       /* full_path */     false,
+                                      /*make_permanent */ true); 
+        }
 
     }   // for
 }   // reInit
