@@ -153,8 +153,10 @@ void Material::init(unsigned int index)
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {
-    // Avoid irrlicht warning about not being able to load texture.
-    m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
+    const std::string &full_path = is_full_path 
+                                 ? m_texname
+                                 : file_manager->getTextureFile(m_texname);
+    m_texture = irr_driver->getTexture(full_path);
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
