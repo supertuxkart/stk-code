@@ -52,7 +52,7 @@ SFXManager::SFXManager()
 {
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
-    m_master_gain = 1.0f;
+    m_master_gain = UserConfigParams::m_sfx_volume;
     
     loadSfx();
     if (!sfxAllowed()) return;
