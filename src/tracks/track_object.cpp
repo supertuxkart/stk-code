@@ -35,68 +35,71 @@
  */
 TrackObject::TrackObject(const XMLNode &xml_node)
 {
-
-    std::string model_name;
-    xml_node.get("model", &model_name);
-    std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
-    m_animated_mesh = irr_driver->getAnimatedMesh(full_path);
-    if(!m_animated_mesh)
-    {
-        // If the model isn't found in the track directory, look 
-        // in STK's model directory.
-        full_path = file_manager->getModelFile(model_name);
-        m_animated_mesh = irr_driver->getAnimatedMesh(full_path);
-        if(!m_animated_mesh)
-        {
-            fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
-                    xml_node.getName().c_str(), model_name.c_str());
-            return;
-        }   // if(!m_animated_mesh)
-    }
-    m_animated_node = irr_driver->addAnimatedMesh(m_animated_mesh);
-#ifdef DEBUG
-    std::string debug_name = model_name+" (track-object)";
-    m_animated_node->setName(debug_name.c_str());
-#endif
-
-    // Get the information from the xml node.
-    m_enabled = true;
-    xml_node.get("enabled", &m_enabled);
-
-    m_is_looped = false;
-    xml_node.get("looped", &m_is_looped);
-
-    m_frame_start = m_animated_node->getStartFrame();
-    xml_node.get("frame-start", &m_frame_start);
-
-    m_frame_end = m_animated_node->getEndFrame();
-    xml_node.get("frame-end", &m_frame_end);
-
-    if(!m_enabled)
-        m_animated_node->setVisible(false);
-
     m_init_xyz   = core::vector3df(0,0,0);
-    int result   = xml_node.get("xyz", &m_init_xyz);
     m_init_hpr   = core::vector3df(0,0,0);
-    result       = xml_node.get("hpr", &m_init_hpr);
     m_init_scale = core::vector3df(1,1,1);
-    result       = xml_node.get("scale", &m_init_scale);
-    if(!XMLNode::hasP(result) ||
-       !XMLNode::hasR(result))   // Needs perhaps pitch and roll
+    m_enabled    = true;
+    m_is_looped  = false;
+
+    xml_node.get("xyz",     &m_init_xyz  );
+    xml_node.get("hpr",     &m_init_hpr  );
+    xml_node.get("scale",   &m_init_scale);
+    xml_node.get("enabled", &m_enabled   );
+    xml_node.get("looped",  &m_is_looped );
+    std::string model_name;
+    xml_node.get("model",   &model_name  );
+
+    // Some animated objects (billboards) don't use this scene node
+    if(model_name=="")
     {
+        m_node = NULL;
     }
-    m_animated_node->setPosition(m_init_xyz);
-    m_animated_node->setRotation(m_init_hpr);
-    m_animated_node->setScale(m_init_scale);
-    m_animated_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    else
+    {
+        std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
+        scene::IAnimatedMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+        if(!mesh)
+        {
+            // If the model isn't found in the track directory, look 
+            // in STK's model directory.
+            full_path = file_manager->getModelFile(model_name);
+            mesh      = irr_driver->getAnimatedMesh(full_path);
+            if(!mesh)
+            {
+                fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
+                       xml_node.getName().c_str(), model_name.c_str());
+                return;
+            }   // if(!mesh)
+        }
+
+        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(mesh);
+        m_node = node;
+#ifdef DEBUG
+        std::string debug_name = model_name+" (track-object)";
+        m_node->setName(debug_name.c_str());
+#endif
+        m_frame_start = node->getStartFrame();
+        xml_node.get("frame-start", &m_frame_start);
+
+        m_frame_end = node->getEndFrame();
+        xml_node.get("frame-end", &m_frame_end);
+
+        if(!m_enabled)
+            m_node->setVisible(false);
+
+        m_node->setPosition(m_init_xyz);
+        m_node->setRotation(m_init_hpr);
+        m_node->setScale(m_init_scale);
+        m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    }
     reset();
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
 TrackObject::~TrackObject()
 {
-    irr_driver->removeNode(m_animated_node);
-    irr_driver->removeMesh(m_animated_mesh);
+    if(m_node)
+        irr_driver->removeNode(m_node);
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------
@@ -104,14 +107,21 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    m_animated_node->setPosition(m_init_xyz);
-    m_animated_node->setRotation(m_init_hpr);
-    m_animated_node->setScale(m_init_scale);
-    m_animated_node->setLoopMode(m_is_looped);
-
-    if(m_is_looped)
+    if(!m_node) return;
+    if(m_node->getType()==scene::ESNT_ANIMATED_MESH)
     {
-        m_animated_node->setFrameLoop(m_frame_start, m_frame_end);
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
+
+        a_node->setPosition(m_init_xyz);
+        a_node->setRotation(m_init_hpr);
+        a_node->setScale(m_init_scale);
+        a_node->setLoopMode(m_is_looped);
+
+        if(m_is_looped)
+        {
+            a_node->setFrameLoop(m_frame_start, m_frame_end);
+        }
     }
 }   // reset
 // ----------------------------------------------------------------------------
@@ -122,7 +132,8 @@ void TrackObject::reset()
 void TrackObject::setEnable(bool mode)
 {
     m_enabled = mode;
-    m_animated_node->setVisible(m_enabled);
+    if(m_node)
+        m_node->setVisible(m_enabled);
 }   // setEnable
 // ----------------------------------------------------------------------------
 /** This function is called from irrlicht when a (non-looped) animation ends.

@@ -403,6 +403,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     // overwrite the elements on the diagonal, making any rotation incorrect.
     mat_scale.setScale(scale);
     mat *= mat_scale;
+    printf("track mbc for %s %d\n", node->getName(), mesh->getMeshBufferCount());
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
@@ -778,7 +779,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         if(name=="track" || name=="default-start") continue;
         if(name=="object")
         {
-            m_track_object_manager->add(*node, *this);
+            m_track_object_manager->add(*node);
         }
         else if(name=="water")
         {
@@ -833,23 +834,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="checks")
         {
             m_check_manager = new CheckManager(*node, this);
-        }
-        else if (name=="billboard")
-        {
-            std::vector<float> billboard_size;
-            std::vector<float> billboard_origin;
-            std::string path;
-            node->get("texture", &path);
-            node->get("size", &billboard_size);
-            node->get("origin", &billboard_origin);
-            
-            video::ITexture* billboard_texture_load;
-            
-            billboard_texture_load = irr_driver->getTexture(path);
-            scene::ISceneNode* node3d;
-            node3d = irr_driver->addBillboard(core::dimension2d< f32 >( billboard_size[0], billboard_size[1] ), billboard_texture_load);
-            node3d -> setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
-            node3d -> setPosition(core::vector3df( billboard_origin[0],  billboard_origin[2], billboard_origin[1] ));
         }
         else if (name=="particle-emitter")
         {

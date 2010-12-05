@@ -29,20 +29,19 @@
 #include "physics/physics.hpp"
 #include "physics/kart_motion_state.hpp"
 #include "tracks/bezier_curve.hpp"
-#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-ThreeDAnimation::ThreeDAnimation(const Track &track,
-                                 const XMLNode &node)
+ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
                : AnimationBase(node)
 {
     /** Save the initial position and rotation in the base animation object. */
-    setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
+    setInitialTransform(AnimationBase::m_node->getPosition(),
+                        AnimationBase::m_node->getRotation() );
 
     m_body            = NULL;
     m_motion_state    = NULL;
     m_collision_shape = NULL;
-    m_hpr = AnimationBase::m_animated_node->getRotation();
+    m_hpr = AnimationBase::m_node->getRotation();
     std::string shape;
     node.get("shape", &shape);
     if(shape!="")
@@ -58,7 +57,9 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    MeshTools::minMax3D(m_animated_mesh, &min, &max);
+    scene::IAnimatedMesh *mesh =
+        ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+    MeshTools::minMax3D(mesh, &min, &max);
     Vec3 extend = max-min;
     if(shape=="box")
     {
@@ -87,9 +88,9 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
         fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
         return;
     }
-    const core::vector3df &hpr=m_animated_node->getRotation()*DEGREE_TO_RAD;
+    const core::vector3df &hpr=m_node->getRotation()*DEGREE_TO_RAD;
     btQuaternion q(hpr.X, hpr.Y, hpr.Z);
-    const core::vector3df &xyz=m_animated_node->getPosition();
+    const core::vector3df &xyz=m_node->getPosition();
     Vec3 p(xyz);
     btTransform trans(q,p);
     m_motion_state = new KartMotionState(trans);
@@ -123,11 +124,11 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    core::vector3df xyz = m_animated_node->getPosition();
-    core::vector3df scale = m_animated_node->getScale();
+    core::vector3df xyz   = m_node->getPosition();
+    core::vector3df scale = m_node->getScale();
     AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
-    m_animated_node->setPosition(xyz);
-    m_animated_node->setScale(scale);
+    m_node->setPosition(xyz);
+    m_node->setScale(scale);
     // Note that the rotation order of irrlicht is different from the one
     // in blender. So in order to reproduce the blender IPO rotations 
     // correctly, we have to get the rotations around each axis and combine
@@ -142,7 +143,7 @@ void ThreeDAnimation::update(float dt)
     mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.Z));
     m = my*mz*mx;
     core::vector3df hpr = m.getRotationDegrees();
-    m_animated_node->setRotation(hpr);
+    m_node->setRotation(hpr);
 
     // Now update the position of the bullet body if there is one:
     if(m_body)

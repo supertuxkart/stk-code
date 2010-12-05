@@ -78,12 +78,12 @@ PhysicalObject::~PhysicalObject()
  */
 void PhysicalObject::init()
 {
-    assert(m_animated_mesh);
-
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    MeshTools::minMax3D(m_animated_mesh, &min, &max);
+    scene::IAnimatedMesh *mesh 
+        = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+    MeshTools::minMax3D(mesh, &min, &max);
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -133,7 +133,7 @@ void PhysicalObject::init()
         irr_driver->getSceneManager()->getMeshManipulator();
     core::matrix4 transform(core::matrix4::EM4CONST_IDENTITY);  // 
     transform.setTranslation(offset_from_center.toIrrVector());
-    mesh_manipulator->transformMesh(m_animated_mesh, transform);
+    mesh_manipulator->transformMesh(mesh, transform);
 
     // 2. Create the rigid object
     // --------------------------
@@ -167,10 +167,10 @@ void PhysicalObject::update(float dt)
         m_body->setAngularVelocity(btVector3(0,0,0));
         xyz = Vec3(m_init_pos.getOrigin());
     }
-    m_animated_node->setPosition(xyz.toIrrVector());
+    m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
     hpr.setHPR(t.getRotation());
-    m_animated_node->setRotation(hpr.toIrrHPR());
+    m_node->setRotation(hpr.toIrrHPR());
     return;
 }   // update
 

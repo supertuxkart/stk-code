@@ -18,14 +18,30 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "animations/billboard_animation.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 
 class XMLNode;
 
 /** A 2d billboard animation. */
-BillboardAnimation::BillboardAnimation(const Track &track_name, 
-                                       const XMLNode &node)
-                  : AnimationBase(node)
+BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
+                  : AnimationBase(xml_node)
 {
+    std::string texture_name;
+    float       width, height;
+
+    xml_node.get("texture", &texture_name);
+    xml_node.get("width",   &width       );
+    xml_node.get("height",  &height      );
+    core::vector3df xyz;
+    xml_node.getXYZ(&xyz);
+    video::ITexture *texture = 
+        irr_driver->getTexture(file_manager->getTextureFile(texture_name));
+    m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
+                                                       texture);
+    m_node-> setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
+
+    m_node->setPosition(xyz);
 }   // BillboardAnimation
 
 // ----------------------------------------------------------------------------
@@ -33,10 +49,11 @@ BillboardAnimation::BillboardAnimation(const Track &track_name,
  *  \param dt Time since last call. */
 void BillboardAnimation::update(float dt)
 {
-    // FIXME: not implemented yet.
     core::vector3df xyz(0, 0, 0);
     core::vector3df hpr(0, 0, 0);
     core::vector3df scale(1,1,1);
     AnimationBase::update(dt, &xyz, &hpr, &scale);
-
+    m_node->setPosition(xyz);
+    m_node->setScale(xyz);
+    // Setting rotation doesn't make sense
 }   // update

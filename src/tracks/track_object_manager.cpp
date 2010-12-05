@@ -20,6 +20,7 @@
 #include "tracks/track_object_manager.hpp"
 
 #include "config/user_config.hpp"
+#include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
@@ -42,7 +43,7 @@ TrackObjectManager::~TrackObjectManager()
 /** Adds an object to the track object manager. The type to add is specified
  *  in the xml_node.
  */
-void TrackObjectManager::add(const XMLNode &xml_node, const Track &track)
+void TrackObjectManager::add(const XMLNode &xml_node)
 {
     std::string type;
     xml_node.get("type", &type);
@@ -52,11 +53,16 @@ void TrackObjectManager::add(const XMLNode &xml_node, const Track &track)
     }
     else if(type=="animation")
     {
-        m_all_objects.push_back(new ThreeDAnimation(track, xml_node));
+        m_all_objects.push_back(new ThreeDAnimation(xml_node));
+    }
+    else if(type=="billboard")
+    {
+        m_all_objects.push_back(new BillboardAnimation(xml_node));
     }
     else
     {
-        fprintf(stderr, "Unknown track object: '%s' - ignored.\n", type.c_str());
+        fprintf(stderr, "Unknown track object: '%s' - ignored.\n", 
+                type.c_str());
     }
 }   // add
 

@@ -67,7 +67,11 @@ float MainLoop::getLimitedDt()
         // don't allow the game to run slower than a certain amount.
         // when the computer can't keep it up, slow down the shown time instead
         static const float max_elapsed_time = 3.0f*1.0f/60.0f*1000.0f; /* time 3 internal substeps take */
-        if(dt > max_elapsed_time) dt=max_elapsed_time;
+        if(dt > max_elapsed_time) 
+        {
+            printf("slowdown: max elapsed %f dt %f\n", max_elapsed_time, dt);
+            dt=max_elapsed_time;
+        }
 
         // Throttle fps if more than maximum, which can reduce 
         // the noise the fan on a graphics card makes.

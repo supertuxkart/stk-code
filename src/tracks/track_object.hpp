@@ -58,11 +58,8 @@ private:
     virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
 
 protected:
-    /** The irrlicht mesh for this object. */
-    scene::IAnimatedMesh   *m_animated_mesh;
-
     /** The irrlicht scene node this object is attached to. */
-    scene::IAnimatedMeshSceneNode *m_animated_node;
+    scene::ISceneNode *m_node;
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;

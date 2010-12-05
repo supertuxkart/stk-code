@@ -22,6 +22,9 @@
 
 #include <string>
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "animations/animation_base.hpp"
 
 class Track;
@@ -33,11 +36,9 @@ class XMLNode;
   */
 class BillboardAnimation : public AnimationBase
 {
-private:
-
 public:
-             BillboardAnimation(const Track &track, const XMLNode &node);
-    virtual ~BillboardAnimation(){}
+             BillboardAnimation(const XMLNode &node);
+    virtual ~BillboardAnimation() {};
     virtual void update(float dt);
 
 };   // BillboardAnimation
