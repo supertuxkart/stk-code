@@ -521,11 +521,23 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                 case UNLOCK_KART:
                 {
                     const KartProperties* kart = kart_properties_manager->getKart(unlockedFeatures[i].name);
-                    assert(kart != NULL);
                     
-                    // the passed kart will not be modified, that's why I allow myself to use const_cast
-                    addUnlockedKart( const_cast<KartProperties*>(kart),
-                                     unlockedFeatures[i].getUnlockedMessage() );
+                    if (kart == NULL)
+                    {
+                        fprintf(stderr, "[KartSelectionScreen] WANRING: could not find a kart named '%s'\n",
+                                unlockedFeatures[i].name.c_str());
+                        
+                        video::ITexture* tex = irr_driver->getTexture(file_manager->getGUIDir() + "/main_help.png");
+                        addUnlockedPicture(tex, 1.0f, 0.75f,
+                                           L"???" );
+                    }
+                    else
+                    {
+                        // the passed kart will not be modified, that's why I allow myself to use const_cast
+                        addUnlockedKart(const_cast<KartProperties*>(kart),
+                                        unlockedFeatures[i].getUnlockedMessage() );
+                    }
+                    
                     break;
                 }
                 case UNLOCK_DIFFICULTY:

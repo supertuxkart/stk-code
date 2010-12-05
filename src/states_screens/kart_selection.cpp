@@ -310,6 +310,8 @@ public:
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
         if(!props)
         {
+            fprintf(stderr, "[KartSelectionScreen] WARNING: could not find a kart named '%s'\n", default_kart.c_str());
+            
             // If the default kart can't be found (e.g. previously a addon 
             // kart was used, but the addon package was removed, use the
             // first kart as a default. This way we don't have to hardcode
@@ -802,6 +804,10 @@ public:
                 w3->update(0);
 
                 m_parent->m_kart_widgets[playerID].m_kart_name->setText( selectionText.c_str() );
+            }
+            else
+            {
+                fprintf(stderr, "[KartSelectionScreen] WARNING: could not find a kart named '%s'\n", selectionID.c_str());
             }
         }
 
