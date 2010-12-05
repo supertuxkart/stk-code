@@ -92,6 +92,7 @@ void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki
 void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& kart)
 {
     assert(0<=player_id && player_id <m_local_player_karts.size());
+    assert(kart_properties_manager->getKart(kart) != NULL);
 
     m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
                                                   StateManager::get()->getActivePlayerProfile(player_id)->getName(),

@@ -304,7 +304,11 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
             kart_model->update(0.0f, 0.0f, susp);
-        }   // if kart !=NULL
+        }
+        else
+        {
+            fprintf(stderr, "[GrandPrixLose] WARNING: could not find a kart named '%s'\n", ident_arg[n].c_str());
+        }// if kart !=NULL
         
         m_kart_node[n] = kart_main_node;
     }

@@ -26,6 +26,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -131,6 +132,12 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
         {
             //FIXME: simplify and centralize race start sequence!!
 
+            // Verify the kart in the config exists
+            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+            {
+                UserConfigParams::m_default_kart.revertToDefaults();
+            }
+            
             // Use latest used device
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             

@@ -191,7 +191,7 @@ const int KartPropertiesManager::getKartId(const std::string &ident) const
         i != m_karts_properties.end(); ++i)
     {
         if(UserConfigParams::m_verbosity>=5)
-            std::cout << " -- " << (*i)->getIdent().c_str() << std::endl;
+            std::cout << "[KartPropertiesManager] getKartId : " << (*i)->getIdent().c_str() << std::endl;
         if ((*i)->getIdent() == ident)
             return i-m_karts_properties.begin();
     }
@@ -211,7 +211,6 @@ const KartProperties* KartPropertiesManager::getKart(const std::string &ident) c
             return *i;
     }
 
-    printf("Could not find a kart named %s\n", ident.c_str());
     return NULL;
 }   // getKart
 
@@ -341,8 +340,15 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     std::vector<std::string> all_karts;
     for(unsigned int i=0; i<existing_karts.size(); i++)
     {
-        int id=getKartId(existing_karts[i].getKartName());
-        used[id] = true;
+        try
+        {
+            int id=getKartId(existing_karts[i].getKartName());
+            used[id] = true;
+        }
+        catch (std::runtime_error& ex)
+        {
+            std::cerr << "[KartPropertiesManager] getRandomKartList : WARNING, can't find kart '" << existing_karts[i].getKartName() << "'\n";
+        }
     }
 
     // Add karts from the current group

@@ -433,7 +433,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         }
         else
         {
-            std::cerr << "GrandPrixWin : warning : kart '" << idents[n] << "' not found!\n";
+            std::cerr << "[GrandPrixWin] WARNING : kart '" << idents[n] << "' not found!\n";
         }
         
         m_kart_node[n] = kart_main_node;
