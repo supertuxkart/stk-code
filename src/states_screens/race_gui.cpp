@@ -107,11 +107,13 @@ RaceGUI::RaceGUI()
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 
     m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
-    int w;font->getDimension(L"99/99").Width;
-    if(race_manager->getNumLaps()>9)
+    
+    int w;
+    if (race_manager->getNumLaps() > 9)
         w = font->getDimension(L"99/99").Width;
     else
         w = font->getDimension(L"9/9").Width;
+    
     // In some split screen configuration the energy bar might be next 
     // to the lap display - so make the lap X/Y display large enough to
     // leave space for the energy bar (16 pixels) and 10 pixels of space
@@ -122,6 +124,8 @@ RaceGUI::RaceGUI()
     if(m_rank_lap_width < w) m_rank_lap_width = w;
 
 
+    m_timer_width = font->getDimension(L"99:99:99").Width;
+    
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -355,8 +359,8 @@ void RaceGUI::drawGlobalTimer()
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(UserConfigParams::m_width-120, 10, 
-                        UserConfigParams::m_width,     50);
+    core::rect<s32> pos(UserConfigParams::m_width - m_timer_width - 10, 10, 
+                        UserConfigParams::m_width,                      50);
     
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)

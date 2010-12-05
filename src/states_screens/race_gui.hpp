@@ -137,13 +137,18 @@ private:
     /** Used to display messages without overlapping */
     int              m_max_font_height;
     int              m_small_font_max_height;
+    
     /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
      *  the rank/lap text correctly close to the right border. */
     int              m_rank_lap_width;
 
+    /** Maximum string length for the timer */
+    int              m_timer_width;
+    
     /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
     float            m_dist_show_overlap;///can be zero
     float            m_icons_inertia;///can be zero
+    
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
     Material         *m_icons_frame;
