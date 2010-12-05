@@ -403,7 +403,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     // overwrite the elements on the diagonal, making any rotation incorrect.
     mat_scale.setScale(scale);
     mat *= mat_scale;
-    printf("track mbc for %s %d\n", node->getName(), mesh->getMeshBufferCount());
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
