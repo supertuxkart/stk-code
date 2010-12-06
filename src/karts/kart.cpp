@@ -1378,10 +1378,13 @@ void Kart::updatePhysics(float dt)
             // ignoring the gear settings from stk_config, but providing a
             // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
             // it a "staired sawtooth", so more acoustically rich.
-            float gears = 3.0f * fmod((float)(m_speed / max_speed), 0.333334f);
-            m_engine_sound->speed(0.6f +
-                                  (float)(m_speed / max_speed) * 0.35f +
-                                  gears * 0.35f);
+            float f = m_speed/max_speed;
+            // Speed at this stage is not yet capped, so it can be > 1, which 
+            // results in odd engine sfx.
+            if (f>1.0f) f=1.0f;
+
+            float gears = 3.0f * fmod(f, 0.333334f);
+            m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
         }
         else
         {
