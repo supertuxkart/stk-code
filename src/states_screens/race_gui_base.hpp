@@ -53,6 +53,8 @@ public:
     };   // KartIconDisplayInfo
 
 public:
+    
+    bool m_enabled;
 
                   RaceGUIBase() {};
     virtual      ~RaceGUIBase() {};

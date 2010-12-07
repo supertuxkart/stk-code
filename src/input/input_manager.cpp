@@ -169,6 +169,15 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
+            
+        case KEY_F8:
+            if(value && control_is_pressed)
+            {
+                RaceGUIBase* gui = World::getWorld()->getRaceGUI();
+                if (gui != NULL) gui->m_enabled = !gui->m_enabled;
+            }
+            break;
+            
         case KEY_F11:
             if(value && control_is_pressed)
             {
