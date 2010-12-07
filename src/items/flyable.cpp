@@ -66,7 +66,7 @@ const wchar_t* getBowlingString()
     switch (id)
     {
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 0 : return _("%0 will not play bowling with %1 again");
+        case 0 : return _("%0 will not go bowling with %1 again");
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
         case 1 : return _("%1 strikes %0");
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
