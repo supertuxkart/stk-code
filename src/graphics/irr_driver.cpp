@@ -345,6 +345,7 @@ void IrrDriver::applyResolutionSettings()
     item_manager            -> removeTextures();
     kart_properties_manager -> unloadAllKarts();
     powerup_manager         -> unloadPowerups();
+    delete input_manager;
     GUIEngine::clear();
     GUIEngine::cleanUp();
     
@@ -371,8 +372,11 @@ void IrrDriver::applyResolutionSettings()
     
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
-        
+    
     material_manager->reInit();
+    input_manager = new InputManager ();
+    input_manager->setMode(InputManager::MENU);
+    
     GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
     
     file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
@@ -398,7 +402,7 @@ void IrrDriver::applyResolutionSettings()
     
     attachment_manager      -> loadModels();
     GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/banana.png") );
-
+    
     GUIEngine::reshowCurrentScreen();
     
 }   // changeResolution
