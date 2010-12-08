@@ -147,12 +147,8 @@ void OptionsScreenVideo::init()
             else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(name, name, "/gui/screen1610.png");
             else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(name, name, "/gui/screen53.png");
             else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(name, name, "/gui/screen32.png");
-            else
-            {
-                std::cout << "Unknown screen size ratio : " << ratio << std::endl;
-                // FIXME - do something better than showing a random icon
-                res->addItem(name,name, file_manager->getDataDir() + "/gui/screen1610.png");
-            }
+            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(name, name, "/gui/screen169.png");
+            else                                          res->addItem(name, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
         } // next resolution
         
