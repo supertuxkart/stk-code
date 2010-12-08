@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="supertuxkart workspace">
+		<Project filename="supertuxkart.cbp" active="1">
+			<Depends filename="bullet_lib.cbp" />
+			<Depends filename="enet.cbp" />
+		</Project>
+		<Project filename="bullet_lib.cbp" />
+		<Project filename="enet.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

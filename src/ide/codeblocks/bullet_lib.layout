@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionObject.h" open="0" top="0" tabpos="0">
+		<Cursor position="7062" topLine="254" />
+	</File>
+	<File name="../../bullet/src/LinearMath/btConvexHull.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="25706" topLine="1091" />
+	</File>
+	<File name="../../bullet/src/LinearMath/btScalar.h" open="0" top="0" tabpos="0">
+		<Cursor position="5133" topLine="148" />
+	</File>
+</CodeBlocks_layout_file>

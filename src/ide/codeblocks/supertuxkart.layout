@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../../animations/animation_base.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="1029" topLine="8" />
+	</File>
+	<File name="../../animations/three_d_animation.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2859" topLine="50" />
+	</File>
+	<File name="../../audio/music_ogg.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="1227" topLine="9" />
+	</File>
+	<File name="../../audio/sfx_buffer.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="1093" topLine="6" />
+	</File>
+	<File name="../../io/file_manager.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="4834" topLine="123" />
+	</File>
+	<File name="../../items/bowling.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2000" topLine="33" />
+	</File>
+	<File name="../../../src/main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="6812" topLine="177" />
+	</File>
+	<File name="../../main_loop.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="0" topLine="117" />
+	</File>
+	<File name="../../network/message.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2505" topLine="68" />
+	</File>
+	<File name="../../utils/translation.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="1698" topLine="22" />
+	</File>
+	<File name="../../utils/vec3.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="2591" topLine="37" />
+	</File>
+</CodeBlocks_layout_file>

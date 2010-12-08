@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="bullet_lib" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="Debug/libbullet" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-Wno-ignored-qualifiers" />
+					<Add option="-DBT_NO_PROFILE" />
+					<Add option="-DHAVE_GLUT" />
+					<Add directory="../../bullet/src" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../bullet/src" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="Release/libbullet" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wno-ignored-qualifiers" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DBT_NO_PROFILE" />
+					<Add option="-DHAVE_GLUT" />
+					<Add directory="../../bullet/src" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../bullet/src" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="curl-debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="curl-debug Win32" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DBT_NO_PROFILE" />
+					<Add option="-DHAVE_GLUT" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add directory="../../bullet/src" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../bullet/src" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btAxisSweep3.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btDispatcher.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btDispatcher.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/SphereTriangleDetector.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/SphereTriangleDetector.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btBoxBoxDetector.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionConfiguration.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionDispatcher.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionObject.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionObject.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionWorld.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCollisionWorld.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btManifoldResult.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btManifoldResult.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSimulationIslandManager.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSimulationIslandManager.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btUnionFind.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionDispatch/btUnionFind.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btBoxShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btBoxShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCapsuleShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCapsuleShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCollisionMargin.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCollisionShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCollisionShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCompoundShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCompoundShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConcaveShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConcaveShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConeShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConeShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexHull.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexHullShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexHullShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexInternalShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexInternalShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCylinderShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btCylinderShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btEmptyShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btEmptyShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btMinkowskiSumShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btMultiSphereShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btMultiSphereShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btOptimizedBvh.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btOptimizedBvh.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btShapeHull.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btShapeHull.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btSphereShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btSphereShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btStaticPlaneShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btStaticPlaneShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btStridingMeshInterface.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btStridingMeshInterface.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTetrahedronShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTetrahedronShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleBuffer.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleBuffer.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleCallback.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleCallback.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleMesh.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleMesh.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleMeshShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleMeshShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btTriangleShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btUniformScalingShape.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/CollisionShapes/btUniformScalingShape.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btConvexCast.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btConvexCast.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btConvexPenetrationDepthSolver.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkEpa.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkEpa.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btPointCollector.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.cpp" />
+		<Unit filename="../../bullet/src/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btConstraintSolver.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btContactConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btContactConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btContactSolverInfo.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btHingeConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btHingeConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btJacobianEntry.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSolverBody.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btSolverConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btTypedConstraint.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/ConstraintSolver/btTypedConstraint.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/Bullet-C-API.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btContinuousDynamicsWorld.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btDynamicsWorld.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btRigidBody.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btRigidBody.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Vehicle/btRaycastVehicle.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Vehicle/btRaycastVehicle.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Vehicle/btVehicleRaycaster.h" />
+		<Unit filename="../../bullet/src/BulletDynamics/Vehicle/btWheelInfo.cpp" />
+		<Unit filename="../../bullet/src/BulletDynamics/Vehicle/btWheelInfo.h" />
+		<Unit filename="../../bullet/src/LinearMath/btAabbUtil2.h" />
+		<Unit filename="../../bullet/src/LinearMath/btAlignedAllocator.cpp" />
+		<Unit filename="../../bullet/src/LinearMath/btAlignedAllocator.h" />
+		<Unit filename="../../bullet/src/LinearMath/btAlignedObjectArray.h" />
+		<Unit filename="../../bullet/src/LinearMath/btConvexHull.cpp" />
+		<Unit filename="../../bullet/src/LinearMath/btDefaultMotionState.h" />
+		<Unit filename="../../bullet/src/LinearMath/btGeometryUtil.cpp" />
+		<Unit filename="../../bullet/src/LinearMath/btGeometryUtil.h" />
+		<Unit filename="../../bullet/src/LinearMath/btIDebugDraw.h" />
+		<Unit filename="../../bullet/src/LinearMath/btList.h" />
+		<Unit filename="../../bullet/src/LinearMath/btMatrix3x3.h" />
+		<Unit filename="../../bullet/src/LinearMath/btMinMax.h" />
+		<Unit filename="../../bullet/src/LinearMath/btMotionState.h" />
+		<Unit filename="../../bullet/src/LinearMath/btPoint3.h" />
+		<Unit filename="../../bullet/src/LinearMath/btPoolAllocator.h" />
+		<Unit filename="../../bullet/src/LinearMath/btQuadWord.h" />
+		<Unit filename="../../bullet/src/LinearMath/btQuaternion.h" />
+		<Unit filename="../../bullet/src/LinearMath/btQuickprof.cpp" />
+		<Unit filename="../../bullet/src/LinearMath/btQuickprof.h" />
+		<Unit filename="../../bullet/src/LinearMath/btRandom.h" />
+		<Unit filename="../../bullet/src/LinearMath/btScalar.h" />
+		<Unit filename="../../bullet/src/LinearMath/btStackAlloc.h" />
+		<Unit filename="../../bullet/src/LinearMath/btTransform.h" />
+		<Unit filename="../../bullet/src/LinearMath/btTransformUtil.h" />
+		<Unit filename="../../bullet/src/LinearMath/btTypedUserInfo.h" />
+		<Unit filename="../../bullet/src/LinearMath/btVector3.h" />
+		<Unit filename="../../bullet/src/btBulletCollisionCommon.h" />
+		<Unit filename="../../bullet/src/btBulletDynamicsCommon.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
