@@ -313,6 +313,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
+    sfx_manager->deleteSFX(m_beep_sound   );
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_smoke_system)        delete m_smoke_system;

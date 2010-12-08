@@ -72,6 +72,8 @@ public:
     virtual SFXManager::SFXStatus getStatus();
     virtual void                  onSoundEnabledBack();
     
+    const SFXBuffer* getBuffer() const { return m_soundBuffer; }
+    
 };   // SFXOpenAL
 
 #endif // HEADER_SFX_OPENAL_HPP

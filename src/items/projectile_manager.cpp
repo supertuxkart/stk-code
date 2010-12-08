@@ -54,11 +54,12 @@ void ProjectileManager::cleanup()
     {
         delete *i;
     }
+    
     m_active_projectiles.clear();
     for(Explosions::iterator i  = m_active_explosions.begin();
         i != m_active_explosions.end(); ++i)
     {
-    // FIXME: still to do
+        delete *i;
     }
 
     m_active_explosions.clear();
@@ -108,10 +109,11 @@ void ProjectileManager::update(float dt)
         while(e!=m_active_explosions.end())
         {
             if(!(*e)->hasEnded()) { e++; continue;}
-            //Explosion *exp=*e;
-            Explosions::iterator eNext=m_active_explosions.erase(e);
-            //ssgDeRefDelete(exp);  // reduce refcount and free object
-            e=eNext;
+
+            delete *e;
+            
+            Explosions::iterator eNext = m_active_explosions.erase(e);
+            e = eNext;
         }   // while e!=m_active_explosions.end()
     }   // if m_explosion_ended
     m_something_was_hit=false;

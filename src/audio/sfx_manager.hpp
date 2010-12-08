@@ -129,6 +129,9 @@ public:
     
     /** Called when sound was muted/unmuted */
     void                     soundToggled(const bool newValue);
+    
+    /** Prints the list of currently loaded sounds to stdout. Useful to debug audio leaks */
+    void dump();
 
 };
 
