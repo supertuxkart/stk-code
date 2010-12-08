@@ -433,6 +433,7 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
+    m_view_blocked_by_plunger = 0.0f;
     
     if(m_terrain_sound)
     {
@@ -864,16 +865,23 @@ void Kart::update(float dt)
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks->update(dt);
 
+    const bool emergency = playingEmergencyAnimation();
+    
+    if (emergency)
+    {
+        m_view_blocked_by_plunger = 0.0f;
+    }
+    
     // Remove the shadow if the kart is not on the ground (if a kart
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
-    if( (!isOnGround() || playingEmergencyAnimation()) && m_shadow_enabled)
+    if( (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !playingEmergencyAnimation())
+    if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;
