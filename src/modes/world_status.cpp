@@ -65,6 +65,7 @@ WorldStatus::~WorldStatus()
 {
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
+    sfx_manager->deleteSFX(m_track_intro_sound);
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
