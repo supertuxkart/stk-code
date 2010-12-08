@@ -29,6 +29,7 @@
 #endif
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "utils/constants.hpp"
 
@@ -366,37 +367,7 @@ bool MusicOggStream::check(const char* what)
 
     if (error != AL_NO_ERROR)
     {
-        const char* errMessage;
-        switch (error)
-        {
-            case AL_INVALID_NAME:
-                errMessage = "AL_INVALID_NAME";
-                break;
-
-            case AL_ILLEGAL_ENUM:
-                //case AL_INVALID_ENUM:
-                errMessage = "AL_ILLEGAL_ENUM";
-                break;
-            
-            case AL_INVALID_VALUE:
-                errMessage = "AL_INVALID_VALUE";
-                break;
-
-            case AL_ILLEGAL_COMMAND:
-                //case AL_INVALID_OPERATION:
-                errMessage = "AL_ILLEGAL_COMMAND";
-                break;
-                
-            case AL_OUT_OF_MEMORY:
-                errMessage = "AL_OUT_OF_MEMORY";
-                break;
-                
-            default:
-                errMessage = "other error";
-                break;
-            
-        }
-        fprintf(stderr, "OpenAL error %d at %s : %s\n", error, what, errMessage);
+        fprintf(stderr, "[MusicOggStream] OpenAL error at %s : %s (%i)\n", what, SFXManager::getErrorString(error).c_str(), error);
         return false;
     }
 
