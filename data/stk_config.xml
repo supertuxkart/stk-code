@@ -281,7 +281,7 @@
          duration is the duration a rubber band acts. -->
     <plunger band-max-length="50" band-force="1500" band-duration="1"
           band-speed-increase="7" band-fade-out-time="3"
-          in-face-time="5 7 10"/>
+          in-face-time="4 6 7"/>
 
     <!-- Kart-specific explosion parameters. Height: how high this
          this kart is being pushed in the sky by an explosion.
