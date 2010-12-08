@@ -28,6 +28,8 @@ using namespace irr;
 class Vec3;
 class SFXBase;
 
+const float explosion_time = 1.5f;
+
 /**
   * \ingroup graphics
   */
@@ -44,7 +46,7 @@ public:
     void init     (const Vec3& coord);
     void update   (float delta_t);
     int  inUse    ();
-    bool hasEnded () { return  m_remaining_time<0.0f;  }
+    bool hasEnded () { return  m_remaining_time < -explosion_time;  }
 
 } ;
 

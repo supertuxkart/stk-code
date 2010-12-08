@@ -27,7 +27,6 @@
 #include "items/projectile_manager.hpp"
 #include "utils/vec3.hpp"
 
-const float explosion_time = 1.5f;
 const float burst_time = 0.1f;
 
 Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
