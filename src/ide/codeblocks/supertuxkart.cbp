@@ -501,6 +501,14 @@
 		<Unit filename="../../states_screens/state_manager.hpp" />
 		<Unit filename="../../states_screens/tracks_screen.cpp" />
 		<Unit filename="../../states_screens/tracks_screen.hpp" />
+		<Unit filename="../../states_screens/tutorial_screen.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../states_screens/tutorial_screen.hpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="../../tracks/ambient_light_sphere.cpp" />
 		<Unit filename="../../tracks/ambient_light_sphere.hpp" />
 		<Unit filename="../../tracks/bezier_curve.cpp" />
