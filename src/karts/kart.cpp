@@ -1437,7 +1437,10 @@ void Kart::loadData()
     createPhysics();
 
     // Attach Particle System
-    m_smoke_system        = new Smoke(this);
+    if ( UserConfigParams::m_graphical_effects )
+    {
+        m_smoke_system        = new Smoke(this);
+    }
     m_water_splash_system = new WaterSplash(this);
     m_nitro               = new Nitro(this);
     m_slipstream          = new SlipStream(this);
