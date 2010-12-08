@@ -18,8 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-// Note: the irrlicht include is only here (and esp. before including 
-//       translation.hpp, which contradicts our style rule) to avoid the 
+// Note: the irrlicht include is only here (and esp. before including
+//       translation.hpp, which contradicts our style rule) to avoid the
 //        warning message  "  'swprintf' : macro redefinition"
 //       This happens if libintl.h is included before irrlicht.h (since
 //       both files redefine swprintf).
@@ -49,11 +49,15 @@
 Translations* translations=NULL;
 bool remove_bom = false;
 
+#ifdef LINUX // m_debug
+#define PACKAGE "supertuxkart"
+#endif
+
 // ----------------------------------------------------------------------------
 Translations::Translations()
-{ 
+{
 #ifdef ENABLE_NLS
-    
+
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
@@ -63,10 +67,10 @@ Translations::Translations()
 #else
     setlocale(LC_MESSAGES, "");
 #endif
-    
-    
+
+
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
-    
+
     if (sizeof(wchar_t) == 4)
     {
         // FIXME: will probably not work on PPC maccs
@@ -82,29 +86,29 @@ Translations::Translations()
         fprintf(stderr, "Your wchar_t is neither 2 byte-long nor 4. What now??\n");
         exit(1);
     }
-    
+
     textdomain (PACKAGE);
-    
+
     // This is a silly but working hack I added to determine whether the current language is RTL or
     // not, since gettext doesn't seem to provide this information
-    
+
     // This one is just for the xgettext parser to pick up
 #define ignore(X)
-    
+
     ignore(_("   Is this a RTL language?"));
-    
+
     //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
     const char* isRtl = gettext("   Is this a RTL language?");
     m_rtl = (isRtl[0] == 'Y');
-    
+
 #endif
-        
+
 }   // Translations
 // ----------------------------------------------------------------------------
 const wchar_t* Translations::w_gettext(const char* original)
 {
     if (original[0] == '\0') return L"";
-    
+
 #if TRANSLATE_VERBOSE
     #if ENABLE_NLS
     std::cout << "Translating " << original << "\n";
@@ -112,7 +116,7 @@ const wchar_t* Translations::w_gettext(const char* original)
     std::cout << "NOT Translating " << original << "\n";
     #endif
 #endif
-    
+
 #if ENABLE_NLS
     const char* original_t = gettext(original);
 #else
@@ -136,43 +140,43 @@ const wchar_t* Translations::w_gettext(const char* original)
             zeros = 0;
         }
     }*/
-    
+
     if(original_t==original)
     {
         m_converted_string = core::stringw(original);
-        
+
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << m_converted_string.c_str() << std::endl;
 #endif
         return m_converted_string.c_str();
     }
-    
+
     // print
     //for (int n=0;; n+=4)
-    
+
     wchar_t* out_ptr = (wchar_t*)original_t;
     if (remove_bom) out_ptr++;
-    
+
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
-    
-    
+
+
 #if ENABLE_BIDI
     if(this->isRTLLanguage())
     {
         const int FRIBIDI_BUFFER_SIZE = 512;
         FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-        
+
         int len = 0;
         int n = 0;
         //std::cout << "fribidi input : ";
-        for (n = 0; ; n++) 
+        for (n = 0; ; n++)
         {
             fribidiInput[n] = out_ptr[n];
             //std::cout << (int)fribidiInput[n] << " ";
             len++;
-            
+
             if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
             {
                 std::cerr << "WARNING : translated string too long, truncating!\n";
@@ -184,7 +188,7 @@ const wchar_t* Translations::w_gettext(const char* original)
         //std::cout << " (len=" << len << ")\n";
 
         FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
-        
+
         static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
         for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
         fribidi_boolean result = fribidi_log2vis(fribidiInput,
@@ -195,14 +199,14 @@ const wchar_t* Translations::w_gettext(const char* original)
                                                  /* gint        *position_V_to_L_list */ NULL,
                                                  /* gint8       *embedding_level_list */ NULL
                                                  );
-        
+
         if (!result)
         {
             std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
             m_converted_string = core::stringw(original);
             return m_converted_string.c_str();
         }
-        
+
         //std::cout << "fribidi output : ";
         //for (FriBidiChar* c=fribidiOutput; *c != 0; c++)
         //{
@@ -210,13 +214,13 @@ const wchar_t* Translations::w_gettext(const char* original)
         //}
         //std::cout << "\n";
 
-        
+
         return (const wchar_t*)fribidiOutput;
     }
-    
+
 #endif
     return out_ptr;
-    
+
 }
 
 bool Translations::isRTLLanguage() const
