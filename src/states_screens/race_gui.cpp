@@ -53,6 +53,8 @@ using namespace irr;
  */
 RaceGUI::RaceGUI()
 {    
+    m_enabled = true;
+    
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -257,7 +259,7 @@ void RaceGUI::createRegularPolygon(unsigned int n, float radius,
 void RaceGUI::renderGlobal(float dt)
 {
     cleanupMessages(dt);
-
+    
     // Special case : when 3 players play, use 4th window to display such 
     // stuff (but we must clear it)
     if (race_manager->getNumLocalPlayers() == 3 && 
@@ -282,6 +284,7 @@ void RaceGUI::renderGlobal(float dt)
 
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
+    if (!m_enabled) return;
 
     drawGlobalTimer();
     if(world->getPhase() == WorldStatus::GO_PHASE ||
@@ -302,6 +305,8 @@ void RaceGUI::renderGlobal(float dt)
  */
 void RaceGUI::renderPlayerView(const Kart *kart)
 {
+    if (!m_enabled) return;
+    
     const core::recti &viewport    = kart->getCamera()->getViewport();
     core::vector2df scaling = kart->getCamera()->getScaling();
     //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
@@ -936,7 +941,7 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart,
     pos.LowerRightCorner.Y += font_height;
 
     char str[256];
-    const unsigned int kart_amount = world->getNumKarts();
+    const unsigned int kart_amount = world->getCurrentNumKarts();
     sprintf(str, "%d/%d", rank, kart_amount);
     font->draw(core::stringw(str).c_str(), pos, color);
     pos.UpperLeftCorner.Y  += font_height;
