@@ -30,7 +30,7 @@
 const float burst_time = 0.1f;
 
 Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
-{
+{    
     m_remaining_time = burst_time; // short emision time, explosion, not constant flame
     m_node = irr_driver->addParticleNode();
 #ifdef DEBUG
@@ -137,6 +137,7 @@ void Explosion::update(float dt)
     {
         // Sound and animation finished --> remove node
         irr_driver->removeNode(m_node);
+        m_node = NULL;
         projectile_manager->FinishedExplosion();
         return;
     }
