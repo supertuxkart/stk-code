@@ -941,7 +941,7 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart,
     pos.LowerRightCorner.Y += font_height;
 
     char str[256];
-    const unsigned int kart_amount = world->getNumKarts();
+    const unsigned int kart_amount = world->getCurrentNumKarts();
     sprintf(str, "%d/%d", rank, kart_amount);
     font->draw(core::stringw(str).c_str(), pos, color);
     pos.UpperLeftCorner.Y  += font_height;
