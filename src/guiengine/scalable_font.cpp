@@ -121,6 +121,15 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 info.m_file_name   = fn;
                 info.m_has_alpha   = (alpha == core::stringw("true"));
                 info.m_scale       = scale;
+                
+                
+#ifdef DEBUG
+                if (m_texture_files.find(i) != m_texture_files.end())
+                {
+                    fprintf(stderr, "[ScalableFont] WARNING: Font conflict, two images have texture %i\n", i);
+                }
+#endif
+                
                 m_texture_files[i] = info;                
             }
             else if (core::stringw(L"c") == xml->getNodeName())
@@ -182,6 +191,12 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 rectangle.LowerRightCorner.Y = val;
                 
                 CharacterMap[ch] = Areas.size();
+#ifdef DEBUG
+                if (CharacterMap.find(ch) != CharacterMap.end())
+                {
+                    fprintf(stderr, "[ScalableFont] WARNING: Font conflict, two images have character %i\n", (int)ch);
+                }
+#endif
                 
                 //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
                 
