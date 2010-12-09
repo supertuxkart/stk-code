@@ -11,6 +11,10 @@
 	so fonts that are rendered will be aliased or anti-aliased depending
 	on the system that they are created on.
 
+        acme_pjz modified the original irrlicht font tool to only write the
+        characters needed in a list of .po files - which saves huge amount
+        of space for Asian fonts.
+
 */
 
 
