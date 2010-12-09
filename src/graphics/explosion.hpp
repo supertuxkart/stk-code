@@ -39,14 +39,14 @@ private:
     SFXBase*       m_explode_sound;
     float          m_remaining_time;
     scene::IParticleSystemSceneNode   *m_node;
-    
+        
 public:
          Explosion(const Vec3& coord, const char* explosion_sound);
         ~Explosion();
     void init     (const Vec3& coord);
     void update   (float delta_t);
     int  inUse    ();
-    bool hasEnded () { return  m_remaining_time < -explosion_time;  }
+    bool hasEnded () { return  m_remaining_time <= -explosion_time;  }
 
 } ;
 
