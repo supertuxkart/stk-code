@@ -17,6 +17,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 
@@ -127,6 +128,13 @@ void IconButtonWidget::add()
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
         m_label->setNotClipped(true);
+        
+        const int max_w = m_label->getAbsolutePosition().getWidth();
+        if (!word_wrap &&
+            (int)GUIEngine::getFont()->getDimension(message.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
+        {
+            m_label->setOverrideFont( GUIEngine::getSmallFont() );
+        }
     }
     
     // ---- IDs
@@ -193,4 +201,17 @@ void IconButtonWidget::setLabel(stringw new_label)
     if (m_label == NULL) return;
     
     m_label->setText( new_label.c_str() );
+    
+    const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+    const int max_w = m_label->getAbsolutePosition().getWidth();
+    
+    if (!word_wrap &&
+        (int)GUIEngine::getFont()->getDimension(new_label.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
+    {
+        m_label->setOverrideFont( GUIEngine::getSmallFont() );
+    }
+    else
+    {
+        m_label->setOverrideFont( NULL );
+    }
 }
