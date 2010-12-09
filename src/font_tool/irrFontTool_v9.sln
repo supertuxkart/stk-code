@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Font Tool", "irrFontTool_v9.vcproj", "{4D53E40F-37E3-42B1-8848-F4C6F8313A17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4D53E40F-37E3-42B1-8848-F4C6F8313A17}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4D53E40F-37E3-42B1-8848-F4C6F8313A17}.Debug|Win32.Build.0 = Debug|Win32
+		{4D53E40F-37E3-42B1-8848-F4C6F8313A17}.Release|Win32.ActiveCfg = Release|Win32
+		{4D53E40F-37E3-42B1-8848-F4C6F8313A17}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
