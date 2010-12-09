@@ -91,6 +91,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 if (included != NULL)
                 {
                     doReadXmlFile(included);
+                    included->drop();
                 }
             }
             else if (core::stringw(L"Texture") == xml->getNodeName())
