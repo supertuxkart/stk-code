@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
 #include "race/race_manager.hpp"
@@ -150,6 +151,24 @@ void History::updateReplay(float dt)
 void History::Save()
 {
     FILE *fd       = fopen("history.dat","w");
+    if(fd)
+        printf("History saved in ./history.dat.\n");
+    else
+    {
+        std::string fn = file_manager->getConfigDir()+"/history.dat";
+        fd = fopen(fn.c_str(), "w");
+        if(fd)
+            printf("History saved in '%s'.\n",fn.c_str());
+
+    }
+    if(!fd)
+    {
+        printf("Can't open history.dat file for writing - can't save history.\n");
+        printf("Make sure history.dat in the current directory or the config\n");
+        printf("directory is writable.\n");
+        return;
+    }
+
     World *world   = World::getWorld();
     int  num_karts = world->getNumKarts();
 #ifdef VERSION
@@ -207,8 +226,18 @@ void History::Load()
 {
     char s[1024], s1[1024];
     int  n;
+
     FILE *fd = fopen("history.dat","r");
-    if (fd == NULL)
+    if(fd)
+        printf("Reading ./history.dat\n");
+    else
+    {
+        std::string fn = file_manager->getConfigDir()+"/history.dat";
+        fd = fopen(fn.c_str(), "r");
+        if(fd)
+            printf("Reading '%s'.\n", fn.c_str());
+    }
+    if(!fd)
     {
         fprintf(stderr, "ERROR: could not open history.dat\n");
         exit(-2);
