@@ -85,7 +85,6 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
             if (core::stringw(L"include") == xml->getNodeName())
             {
                 core::stringc filename = xml->getAttributeValue(L"file");
-                // FIXME: need to delete the created XML reader?
                 io::IXMLReader* included = file_manager->createXMLReader(
                     file_manager->getFontFile(filename.c_str()));
                 if (included != NULL)
@@ -190,13 +189,13 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 }
                 rectangle.LowerRightCorner.Y = val;
                 
-                CharacterMap[ch] = Areas.size();
 #ifdef DEBUG
                 if (CharacterMap.find(ch) != CharacterMap.end())
                 {
                     fprintf(stderr, "[ScalableFont] WARNING: Font conflict, two images have character %i\n", (int)ch);
                 }
 #endif
+                CharacterMap[ch] = Areas.size();
                 
                 //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
                 
