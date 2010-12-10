@@ -1,0 +1,22 @@
+<stkgui>
+
+    <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+            
+        <header I18N="Title for challenges screen" text="Tutorial : Selection Room" text_align="center" width="100%" />
+        
+        <box id="animated_area" width="100%" proportion="1" layout="vertical-row">
+        
+        <ribbon_grid id="tutorial" proportion="3" width="100%"
+            label_location="bottom" align="center" child_width="128" child_height="128" />
+        
+        <spacer proportion="1" width="100%"/>
+                
+        </box>
+
+        <spacer width="100%" height="45"/>
+
+    </div>
+        
+    <button id="back" x="20" y="-40" height="35" align="left" text="Back to main menu"/>
+
+</stkgui>
