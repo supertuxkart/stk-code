@@ -277,6 +277,9 @@ namespace UserConfigParams
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool                       m_slipstream_debug  PARAM_DEFAULT( false );
 
+    /** True if currently developed tutorial debugging is enabled. */
+    PARAM_PREFIX bool                       m_tutorial_debug    PARAM_DEFAULT( false );
+
     /** Verbosity level for debug messages. Note that error and important warnings
      *  must always be printed. */
     PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
