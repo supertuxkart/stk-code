@@ -342,6 +342,8 @@ supertuxkart_SOURCES = \
  states_screens/state_manager.hpp \
  states_screens/tracks_screen.cpp \
  states_screens/tracks_screen.hpp \
+ states_screens/tutorial_screen.cpp \
+ states_screens/tutorial_screen.hpp \
  tracks/ambient_light_sphere.cpp \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
