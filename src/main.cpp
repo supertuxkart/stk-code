@@ -249,6 +249,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_gamepad_debug=true;
         }
+		else if (sscanf(argv[i], "--tutorial-debug=%d",&n)==1) // ASV TBC
+		{
+			UserConfigParams::m_tutorial_debug=n;
+		}
         else if(sscanf(argv[i], "--track-debug=%d",&n)==1)
         {
             UserConfigParams::m_track_debug=n;

@@ -31,13 +31,13 @@
 	<File name="../../network/message.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2505" topLine="68" />
 	</File>
-	<File name="../../states_screens/challenges.cpp" open="1" top="1" tabpos="3">
+	<File name="../../states_screens/challenges.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="2262" topLine="33" />
 	</File>
 	<File name="../../states_screens/challenges.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="10" />
 	</File>
-	<File name="../../states_screens/tutorial_screen.cpp" open="1" top="0" tabpos="2">
+	<File name="../../states_screens/tutorial_screen.cpp" open="1" top="1" tabpos="2">
 		<Cursor position="2440" topLine="48" />
 	</File>
 	<File name="../../states_screens/tutorial_screen.hpp" open="1" top="0" tabpos="1">

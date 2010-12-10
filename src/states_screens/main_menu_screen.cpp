@@ -37,6 +37,9 @@
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 
+//FIXME : remove, temporary tutorial test
+#include "states_screens/tutorial_screen.hpp"
+
 // FIXME : remove, temporary test
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
@@ -223,6 +226,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
     }
+	else if (selection == "tutorial")
+	{
+		  StateManager::get()->pushScreen(TutorialScreen::getInstance());
+	}
 #ifdef ADDONS_MANAGER
     else if (selection == "addons")
     {

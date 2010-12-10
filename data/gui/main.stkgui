@@ -12,6 +12,9 @@
             <icon-button id="challenges" width="128" height="128"
                          icon="gui/challenge.png"
                          I18N="Main menu button"  text="Challenges"/>
+			<icon-button id="tutorial" width="128" height="128"
+                         icon="gui/tutorial.png"
+                         I18N="Main menu button"  text="Tutorial"/>
         </buttonbar>
         
         <spacer width="10" proportion="1"/>

@@ -260,6 +260,8 @@ namespace UserConfigParams
                                                "Type of the renderer.") );
 
     // ---- Debug - not saved to config file
+	/** If tutorial game mode debugging is enabled. */
+	PARAM_PREFIX bool                       m_tutorial_debug     PARAM_DEFAULT( false );
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool                       m_gamepad_debug     PARAM_DEFAULT( false );
     /** If material debugging (printing terrain specific slowdown) is enabled. */
