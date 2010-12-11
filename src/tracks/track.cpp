@@ -921,6 +921,27 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // Init all track objects
     m_track_object_manager->init();
 
+    
+    // ---- Fog
+    // It's important to execute this BEFORE the code that creates the skycube, otherwise the skycube node
+    // could be modified to have fog enabled, which we don't want
+    if (m_use_fog && !UserConfigParams::m_camera_debug)
+    {
+        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start 
+         and end do not matter */
+        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, 
+                                             m_fog_start, m_fog_end, m_fog_density);
+    }
+    
+    // Enable for for all track nodes if fog is used
+    if(m_use_fog)
+    {
+        const unsigned int count = m_all_nodes.size();
+        for(unsigned int i=0; i<count; i++)
+            m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+    }
+    
+    
     // Sky dome and boxes support
     // --------------------------
     if(m_sky_type==SKY_DOME)
@@ -978,22 +999,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
     m_sun->getLightData().SpecularColor = m_sun_specular_color;
 
-    // ---- Fog
-    if (m_use_fog && !UserConfigParams::m_camera_debug)
-    {
-        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start 
-           and end do not matter */
-        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, 
-                                             m_fog_start, m_fog_end, m_fog_density);
-    }
 
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
-
-    // Enable for for all track nodes if fog is used
-    if(m_use_fog)
-        for(unsigned int i=0; i<m_all_nodes.size(); i++)
-            m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
