@@ -215,6 +215,8 @@ void UnlockManager::load()
         std::cerr << "Challenge file '" << filename << "' will be created." 
                   << std::endl;
         save();
+        
+        if (root) delete root;
         return;
     }
     
@@ -224,6 +226,8 @@ void UnlockManager::load()
         i->second->load(root);
     }
     computeActive();
+    
+    delete root;
 }   // load
 
 //-----------------------------------------------------------------------------

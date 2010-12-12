@@ -118,6 +118,15 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
 }   // MusicInformation
 
 //-----------------------------------------------------------------------------
+
+MusicInformation::~MusicInformation()
+{
+    delete m_normal_music;
+    delete m_fast_music;
+}
+
+//-----------------------------------------------------------------------------
+
 void MusicInformation::addMusicToTracks()
 {
     for(int i=0; i<(int)m_all_tracks.size(); i++)
@@ -146,6 +155,8 @@ void MusicInformation::startMusic()
                 m_normal_filename.c_str());
         return;
     }
+    
+    if (m_normal_music != NULL) delete m_normal_music;
     m_normal_music = new MusicOggStream();
 
     if((m_normal_music->load(m_normal_filename)) == false)
@@ -161,7 +172,8 @@ void MusicInformation::startMusic()
 
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
-    if(m_fast_filename=="") 
+    if (m_fast_music != NULL) delete m_fast_music;
+    if (m_fast_filename == "") 
     {
         m_fast_music = NULL;
         return;   // no fast music

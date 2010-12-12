@@ -69,6 +69,7 @@ public:
 #pragma warning(disable:4290)
 #endif
                        MusicInformation (const std::string& filename) throw (std::runtime_error);
+                      ~MusicInformation ();
     const std::string& getComposer      () const {return m_composer;        }
     const std::string& getTitle         () const {return m_title;           }
     const std::string& getNormalFilename() const {return m_normal_filename; }
