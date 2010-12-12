@@ -347,6 +347,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         }
         catch (std::runtime_error& ex)
         {
+            (void)ex;
             std::cerr << "[KartPropertiesManager] getRandomKartList : WARNING, can't find kart '" << existing_karts[i].getKartName() << "'\n";
         }
     }
