@@ -315,6 +315,9 @@ void QuadGraph::createMesh(bool show_invisible)
     //m_node->setAutomaticCulling(scene::EAC_OFF);
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
+    
+    delete[] ind;
+    delete[] new_v;
 }   // createMesh
 
 // -----------------------------------------------------------------------------
