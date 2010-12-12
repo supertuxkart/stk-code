@@ -958,7 +958,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 float Kart::handleNitro(float dt)
 {
-    if(!m_controls.m_nitro) return 0.0;
+    if(!m_controls.m_nitro || !isOnGround()) return 0.0;
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
     if(m_collected_energy<0)
     {
@@ -1544,7 +1544,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     if(m_nitro)
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
+        m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && m_collected_energy>0
                                  ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
 
     // For testing purposes mis-use the nitro graphical effects to show
