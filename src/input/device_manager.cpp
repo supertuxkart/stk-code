@@ -450,11 +450,13 @@ bool DeviceManager::deserialize()
                 
             } // end switch
         } // end while
+        
         if(UserConfigParams::m_verbosity>=4)
         {
             printf("Found %d keyboard and %d gamepad configurations.\n", 
                    m_keyboard_configs.size(), m_gamepad_configs.size());
         }
+        
         // For Debugging....
         /*
         for (int n = 0; n < m_keyboard_configs.size(); n++)
@@ -463,6 +465,8 @@ bool DeviceManager::deserialize()
         for (int n = 0; n < m_gamepad_configs.size(); n++)
             printf("%s", m_gamepad_configs[n].toString().c_str());
         */
+        
+        delete xml;
     }
 
     return true;
