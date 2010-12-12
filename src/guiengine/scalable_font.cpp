@@ -54,8 +54,10 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 
     setInvisibleCharacters ( L" " );
     
-    // FIXME: need to delete the created XML reader?
-    load( file_manager->createXMLReader(filename.c_str()) );
+    io::IXMLReader* reader = file_manager->createXMLReader(filename.c_str());
+    load( reader );
+    reader->drop();
+    
     assert(Areas.size() > 0);
 }
 
