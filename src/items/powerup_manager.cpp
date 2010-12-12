@@ -120,6 +120,8 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
     
+    delete root;
+    
 }  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
