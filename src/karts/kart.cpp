@@ -339,6 +339,7 @@ Kart::~Kart()
         delete m_controller;
     if(m_saved_controller)
         delete m_saved_controller;
+    if (m_camera) delete m_camera;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
