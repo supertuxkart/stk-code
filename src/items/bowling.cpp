@@ -91,7 +91,7 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
 // -----------------------------------------------------------------------------
 void Bowling::update(float dt)
 {
-    Flyable::update(dt);    
+    Flyable::update(dt);
     const Kart *kart=0;
     Vec3        direction;
     float       minDistance;
@@ -113,7 +113,16 @@ void Bowling::update(float dt)
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
     btTransform trans = getTrans();
-    float hat         = trans.getOrigin().getY();
+    float hat         = getXYZ().getY()-getHoT();
+    if(hat-0.5f*m_extend.getY()<0.01f)
+    {
+        const Material *material = getMaterial();
+        if(!material || material->isReset())
+        {
+            hit(NULL);
+            return;
+        }
+    }
     btVector3 v       = m_body->getLinearVelocity();
     float vlen        = v.length2();
     if (hat<= m_max_height)
