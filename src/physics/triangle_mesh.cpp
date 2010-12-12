@@ -98,7 +98,11 @@ void TriangleMesh::removeBody()
 {
     World::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
-    m_body = 0;
+    delete m_motion_state;
+    delete m_collision_shape;
+    m_body            = NULL;
+    m_motion_state    = NULL;
+    m_collision_shape = NULL;
 }   // removeBody
 
 // -----------------------------------------------------------------------------
