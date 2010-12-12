@@ -95,11 +95,13 @@ private:
      */
 
 protected:       // Used by the AI atm
+    
     KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
     Powerup      m_powerup;
     Attachment  *m_attachment;
-    /** Easier access for player_kart. */
+    
     Camera      *m_camera;
+    
 private:
     /** True if the kart hasn't moved since 'ready-set-go' - used to 
      *  determine startup boost. */
@@ -256,7 +258,7 @@ public:
      *  to this kart) - const version. */
     const Camera*  getCamera         () const {return m_camera;}
     // ------------------------------------------------------------------------
-    /** Sets the camera for this kart. */
+    /** Sets the camera for this kart. Takes ownership of the camera and will delete it. */
     void           setCamera(Camera *camera) {m_camera=camera; }
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
