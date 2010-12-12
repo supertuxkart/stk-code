@@ -189,7 +189,7 @@ void FeatureUnlockedCutScene::init()
     
     if (unlockedStuffCount == 0)  std::cerr << "There is nothing in the unlock chest!!!\n";
     
-    m_all_kart_models.clear();
+    m_all_kart_models.clearAndDeleteAll();
     for (int n=0; n<unlockedStuffCount; n++)
     {
         if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
@@ -239,6 +239,7 @@ void FeatureUnlockedCutScene::init()
                                                    m_unlocked_stuff[n].m_w,
                                                    m_unlocked_stuff[n].m_h);
             m_unlocked_stuff[n].m_root_gift_node   = irr_driver->addMesh(mesh);
+            mesh->drop();
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
 #endif
@@ -274,7 +275,7 @@ void FeatureUnlockedCutScene::tearDown()
 #endif
 
     m_unlocked_stuff.clearAndDeleteAll();
-    m_all_kart_models.clear();
+    m_all_kart_models.clearAndDeleteAll();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
