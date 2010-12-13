@@ -191,12 +191,6 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 }
                 rectangle.LowerRightCorner.Y = val;
                 
-#ifdef DEBUG
-                if (CharacterMap.find(ch) != CharacterMap.end())
-                {
-                    fprintf(stderr, "[ScalableFont] WARNING: Font conflict, two images have character %i\n", (int)ch);
-                }
-#endif
                 CharacterMap[ch] = Areas.size();
                 
                 //std::cout << "Inserting character '" << (int)ch << "' with area " << Areas.size() << std::endl;
