@@ -826,7 +826,7 @@ void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
     float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
-    if(speed_ratio>1 || !kart->isOnGround()) speed_ratio = 1;
+    if(speed_ratio>1) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
     core::dimension2du bar_size    = bar_texture->getOriginalSize();
