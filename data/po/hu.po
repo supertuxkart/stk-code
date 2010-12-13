@@ -1,0 +1,1761 @@
+# Hungarian translation for stk
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the stk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: stk\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-11-30 18:42-0500\n"
+"PO-Revision-Date: 2010-11-21 16:33+0000\n"
+"Last-Translator: Balint <Unknown>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-12-12 21:44+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:94 src/utils/translation.cpp:97
+msgid "   Is this a RTL language?"
+msgstr "   N"
+
+#: src/states_screens/options_screen_input.cpp:94
+#, c-format
+msgid "   Keyboard %i"
+msgstr "   Billentyűzet %i"
+
+#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
+#: src/items/rubber_band.cpp:43
+msgid "%0 bites %1's bait"
+msgstr "%0 bekapja %2 csaliját"
+
+#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:49
+msgid "%0 eats too much of %1's cake"
+msgstr "%0 túl sokat eszik %1 sütijéből"
+
+#. I18N: shown when a player receives a plunger in his face
+#: src/items/plunger.cpp:47
+msgid "%0 gets a fancy mask from %1"
+msgstr "%0 egy szép maszkot kap %1-tól"
+
+#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:73
+msgid "%0 is bowled over by %1"
+msgstr "%0 sztrájkol %1 miatt"
+
+#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:51
+msgid "%0 is dubious of %1's cooking skills"
+msgstr "%0 kételkedik %1 főzési képességeiben"
+
+#. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:53
+msgid "%0 should not play with %1's lunch"
+msgstr "%0-nak nem kéne %1 ebédjével játszania"
+
+#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:69
+msgid "%0 will not play bowling with %1 again"
+msgstr "%0 nem fog többé bowlingozni %1-val"
+
+#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
+#: src/items/rubber_band.cpp:45
+msgid "%1 latches onto %0 for a free ride"
+msgstr "%1 becsatlakozik %0-ba egy ingyenfuvarért"
+
+#. I18N: shown when a player receives a plunger in his face
+#: src/items/plunger.cpp:49
+msgid "%1 merges %0's face with a plunger"
+msgstr "%1 egyesíti %0 arcát egy vécépumpával"
+
+#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+#: src/items/flyable.cpp:71
+msgid "%1 strikes %0"
+msgstr "%1 strike-ot gurít %0-ra"
+
+#. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
+#: src/items/rubber_band.cpp:47
+msgid "%1 tests a tractor beam on %0"
+msgstr "%1 kipróbál egy vonósugarat %0-n"
+
+#. I18N: In the track setup screen (number of laps choice, where %i is the number)
+#: src/states_screens/dialogs/track_info_dialog.cpp:125
+#, c-format
+msgid "%i laps"
+msgstr "%i kör"
+
+#. I18N: In results of battle mode; %i is where the rank is inserted;
+#. I18N: the first %s is where the kart name is inserted;
+#. I18N: the second %s is where the time is inserted
+#: src/states_screens/dialogs/race_over_dialog.cpp:169
+#, c-format
+msgid "%i. %s : survived for %s"
+msgstr "%i. %s: %s ideig élt túl"
+
+#. I18N: as in "fastest lap: 60 seconds by Wilber"
+#: src/modes/linear_world.cpp:369
+#, c-format
+msgid "%s by %s"
+msgstr "%s: %s"
+
+#: src/items/powerup.cpp:48
+#, c-format
+msgid "%s is a mighty pirate!"
+msgstr "%s egy hatalmas kalóz!"
+
+#. I18N: shown when hit by own bowling ball. %s is the kart.
+#: src/items/flyable.cpp:89
+#, c-format
+msgid "%s is practicing with a blue, big, spheric yo-yo"
+msgstr "%s egy nagy, kék, gömb alakú yo-yo-val gyakorol."
+
+#: src/states_screens/kart_selection.cpp:508
+#, c-format
+msgid "%s is ready"
+msgstr "%s kész"
+
+#. I18N: shown when hit by own bowling ball. %s is the kart.
+#: src/items/flyable.cpp:91
+#, c-format
+msgid "%s is the world master of the boomerang ball"
+msgstr "%s a bumeránglabda nemzetközi mestere"
+
+#: src/items/powerup.cpp:47
+#, c-format
+msgid "%s pays the next round of grog!"
+msgstr "%s fizeti a következő kör grogot!"
+
+#. I18N: shown when hit by own bowling ball. %s is the kart.
+#: src/items/flyable.cpp:93
+#, c-format
+msgid "%s should play (rubber) darts instead of bowling"
+msgstr "%s-nak (gumi) dartokkal kéne játszania bowling helyett"
+
+#: src/modes/world.cpp:682
+#, c-format
+msgid "'%s' has been eliminated."
+msgstr "\"%s\" el lett távolítva."
+
+#. I18N: for empty highscores entries
+#: src/states_screens/dialogs/track_info_dialog.cpp:262
+msgid "(Empty)"
+msgstr "(Üres)"
+
+#. I18N: ./data/gui/karts.stkgui
+#. I18N: In the kart selection (player setup) screen
+#: data/po/gui_strings.h:307
+msgid "(more players can join by pressing 'fire' now)"
+msgstr "(több játékos tud csatlakozni most a \"tüzelés\" lenyomásával)"
+
+#. I18N: ./data/gui/help4.stkgui
+#: data/po/gui_strings.h:287
+msgid "(network play is not yet available)"
+msgstr "(a hálózati játék még nem elérhető)"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help screen
+#: data/po/gui_strings.h:164
+msgid "* Current key bindings can be seen/changed in menu Options"
+msgstr ""
+"* A jelenlegi billentyűparancsokat meg lehet nézni/változtatni a Beállítások "
+"menüpontban"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:258
+msgid ""
+"* Most of these game modes can also be played in a Grand Prix fashion: "
+"instead of playing a single race, you play many in a row. The better you "
+"rank, the more points you get. In the end, the player with the most points "
+"wins the cup."
+msgstr ""
+"* Ezek közül a játékmódok közül a legtöbbet lehet Nagydíj stílusban is "
+"játszani: ahelyett, hogy egy futamot játszol le, többször versenyzel, "
+"sorban. Minél jobb helyezést érsz el, annál több pontot kapsz. A végén a "
+"legtöbb pontot elérő játékos nyeri a kupát."
+
+#. I18N: ./data/gui/options_input.stkgui
+#: data/po/gui_strings.h:479
+msgid ""
+"* Which config to use will be inferred from which 'fire' key is pressed to "
+"join the game."
+msgstr ""
+"* A megfelelő beállítások kiválasztása a játékba való csatlakozáskor "
+"megnyomott \"tüzelés\" gombból következik."
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:149
+msgid "3 Strikes Battle"
+msgstr "3 Csapásos Csata"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:254
+msgid ""
+"3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
+"they lose all their lives."
+msgstr ""
+"3 Csapásos Csata: csak több játékosos játékokban. Találd el a többieket a "
+"fegyverekkel amíg elveszítik minden életüket."
+
+#: src/states_screens/dialogs/track_info_dialog.cpp:187
+msgid "= Highscores ="
+msgstr "= Toplista ="
+
+#: src/items/powerup.cpp:81
+msgid "A wizard did it!"
+msgstr "Egy varázsló tette!"
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:424
+#: src/states_screens/race_result_gui.cpp:100
+msgid "Abort Grand Prix"
+msgstr "Nagydíj megszakítása"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:331 data/po/gui_strings.h:367
+msgid "About"
+msgstr "Névjegy"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:156
+msgid "Accelerate"
+msgstr "Gyorsítás"
+
+#. I18N: In the 'add new input device' dialog
+#: src/states_screens/dialogs/add_device_dialog.cpp:60
+msgid "Add Keyboard Configuration"
+msgstr "Új billentyűzetbeállítás hozzáadása"
+
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:510
+msgid "Add Player"
+msgstr "Játékos hozzáadása"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the input configuration screen
+#: data/po/gui_strings.h:476
+msgid "Add a device"
+msgstr "Eszköz hozzáadása"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: data/po/gui_strings.h:66
+msgid "Add-Ons"
+msgstr "Bővítmények"
+
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:355
+msgid "Addons"
+msgstr "Bővítmények"
+
+#. I18N: ./data/karts/adiumy/kart.xml
+#: data/po/gui_strings.h:750
+msgid "Adiumy"
+msgstr "Adiumy"
+
+#. I18N: name of the tab that will show arenas from all groups
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/kart_selection.cpp:867
+#: src/states_screens/tracks_screen.cpp:85 data/po/gui_strings.h:70
+msgid "All"
+msgstr "Összes"
+
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:633
+msgid "All Tracks"
+msgstr "Összes pálya"
+
+#: src/states_screens/race_setup_screen.cpp:200
+msgid "All blows allowed, so catch weapons and make clever use of them!"
+msgstr ""
+"Minden ütés engedélyezett, úgyhogy vedd fel a fegyvereket és használd fel "
+"őket okosan!"
+
+#. I18N: ./data/grandprix/alltracks.grandprix
+#: data/po/gui_strings.h:732
+msgid "All tracks"
+msgstr "Összes pálya"
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:209
+msgid "Anchor - slows down greatly the kart in the first position"
+msgstr "Horgony - jelentősen lelassítja az első helyen álló kartot"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+#: data/po/gui_strings.h:549
+msgid "Animated Effects and Scenery"
+msgstr "Animált effektek és látvány"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+#: data/po/gui_strings.h:545
+msgid "Animated Karts"
+msgstr "Animált kartok"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings menu
+#: data/po/gui_strings.h:561
+msgid "Apply new resolution"
+msgstr "Új felbontás alkalmazása"
+
+#. I18N: shown before deleting an input configuration
+#: src/states_screens/options_screen_input2.cpp:416
+msgid "Are you sure you want to permanently delete this configuration?"
+msgstr "Biztos, hogy véglegesen törölni akarod ezeket a beállításokat?"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: Section in arena tracks selection screen
+#: data/po/gui_strings.h:58
+msgid "Arenas"
+msgstr "Arénák"
+
+#. I18N: shown when anchor applied. %s is the victim.
+#: src/items/powerup.cpp:46
+#, c-format
+msgid "Arrr, the %s dropped anchor, Captain!"
+msgstr "Errr, a %s lehorgonyzott, Kapitány!"
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+#: data/po/gui_strings.h:572
+msgid "Assign to ESC key"
+msgstr "Hoozárendelés az ESC billentyűhöz"
+
+#. I18N: ./data/grandprix/atworldsend.grandprix
+#: data/po/gui_strings.h:735
+msgid "At World's End"
+msgstr "A Világ Végén"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:382 data/po/gui_strings.h:429
+#: data/po/gui_strings.h:460 data/po/gui_strings.h:494
+#: data/po/gui_strings.h:525
+msgid "Audio"
+msgstr "Hang"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:148
+msgid "Avoid bananas!"
+msgstr "Kerüld a banánokat!"
+
+#. I18N: to appear in input configuration screen, for gamepad axes
+#: src/input/binding.cpp:252
+#, c-format
+msgid "Axis %d %s"
+msgstr "%d %s tengely"
+
+#. I18N: ./data/gui/addons.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/addons_update.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/addons_view_dialog.stkgui
+#. I18N: Addons
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#: data/po/gui_strings.h:18 data/po/gui_strings.h:37 data/po/gui_strings.h:50
+#: data/po/gui_strings.h:168 data/po/gui_strings.h:216
+#: data/po/gui_strings.h:262 data/po/gui_strings.h:299
+#: data/po/gui_strings.h:418 data/po/gui_strings.h:449
+#: data/po/gui_strings.h:483 data/po/gui_strings.h:514
+#: data/po/gui_strings.h:565
+msgid "Back"
+msgstr "Vissza"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: data/po/gui_strings.h:583
+msgid "Back to Race"
+msgstr "Vissza a versenyhez"
+
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: In the input configuration screen
+#: data/po/gui_strings.h:445
+msgid "Back to device list"
+msgstr "Vissza az eszközlistához"
+
+#. I18N: ./data/gui/challenges.stkgui
+#. I18N: ./data/gui/credits.stkgui
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:100
+msgid "Back to main menu"
+msgstr "Vissza a főmenühöz"
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:392
+msgid "Back to the main menu"
+msgstr "Vissza a főmenühöz"
+
+#: src/states_screens/race_result_gui.cpp:113
+msgid "Back to the menu"
+msgstr "Vissza a menühöz"
+
+#: src/items/powerup.cpp:82
+msgid "Banana? Box? Banana? Box? Banana? Box?"
+msgstr "Banán? Láda? Banán? Láda? Banán? Láda?"
+
+#. I18N: when failing a GP
+#: src/states_screens/grand_prix_lose.cpp:233
+msgid "Better luck next time!"
+msgstr "Több szerencsét legközelebbre!"
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:203
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
+"backwards."
+msgstr ""
+"Bowlinglabda - lepattan a falakról. Ha hátrafele nézel, hátrafelé fog "
+"elgurulni."
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:159
+msgid "Brake"
+msgstr "Fék"
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:194
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr "RágóGumi - egy ragadós rózsaszín tócsát hagy mögötted"
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:197
+msgid ""
+"Cake - thrown at the closest rival, best on short ranges and long straights"
+msgstr ""
+"Süti - a legközelebbi ellenségre dobódik, rövid távokon és hosszú "
+"egyenesekben a legjobb"
+
+#. I18N: ./data/gui/confirm_dialog.stkgui
+#. I18N: In a 'are you sure?' dialog
+#. I18N: ./data/gui/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#: src/states_screens/dialogs/add_device_dialog.cpp:76
+#: src/states_screens/dialogs/player_info_dialog.cpp:89
+#: data/po/gui_strings.h:85 data/po/gui_strings.h:93
+msgid "Cancel"
+msgstr "Mégse"
+
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:174
+msgid "Cancel Remove"
+msgstr "Mégse törölje"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:195
+msgid "Cancel/Back"
+msgstr "Mégse/Vissza"
+
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:103
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:118
+msgid "Cannot add a player with this name."
+msgstr "Ilyen névvel nem adható hozzá játékos."
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:319 data/po/gui_strings.h:351
+msgid "Challenges"
+msgstr "Feladatok"
+
+#. I18N: ./data/gui/challenges.stkgui
+#. I18N: Title for challenges screen
+#: data/po/gui_strings.h:74
+msgid "Challenges : Trophy Room"
+msgstr "Feladatok: Trófea terem"
+
+#. I18N: ./data/gui/karts.stkgui
+#. I18N: In the kart selection (player setup) screen
+#: data/po/gui_strings.h:303
+msgid "Choose a Kart"
+msgstr "Válassz kartot"
+
+#. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
+#: data/po/gui_strings.h:678
+msgid "Collect Nitro in Math Class"
+msgstr "Gyűjts nitrót a Matekórában"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:144
+msgid "Collect blue boxes : they will give you weapons or other powerups"
+msgstr ""
+
+#. I18N: ./data/tracks/mines/mines.challenge
+#: data/po/gui_strings.h:708
+msgid "Collect fuel for your rocket"
+msgstr "Gyűjts üzemanyagot a rakétádhoz"
+
+#. I18N: ./data/grandprix/tothemoonandback.challenge
+#: data/po/gui_strings.h:660
+msgid "Collect the Pharaohs Treasure"
+msgstr "Gyűjtsd össze a Fáraók Kincsét"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:152
+msgid ""
+"Collecting nitro allows you to get speed boosts whenever you wish by "
+"pressing the appropriate key. You can see your current level of nitro in the "
+"bar at the right of the game screen."
+msgstr ""
+"A nitrók összegyűjtése lehetővé teszi számodra a sebességfokozást, amikor "
+"csak akarod, a megfelelő billentyű lenyomásával. A jelenlegi nitrószintedet "
+"láthatod a játék képernyőjének jobb szélén lévő sávon."
+
+#. I18N: ./data/grandprix/alltracks.challenge
+#: data/po/gui_strings.h:645
+msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
+msgstr ""
+"Légy első A Világ Végén Nagydíjon 3 profi számítógép-vezérelt kart ellen."
+
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:155
+msgid "Confirm Remove"
+msgstr "Igen, törölje"
+
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
+#, c-format
+msgid "Confirm resolution within %i seconds"
+msgstr ""
+
+#: src/states_screens/race_setup_screen.cpp:207
+msgid "Contains no powerups, so only your driving skills matter!"
+msgstr ""
+
+#. I18N: ./data/gui/feature_unlocked.stkgui
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
+#: src/states_screens/race_result_gui.cpp:94 data/po/gui_strings.h:111
+#: data/po/gui_strings.h:114 data/po/gui_strings.h:117
+msgid "Continue"
+msgstr "Folytatás"
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:409
+msgid "Continue Grand Prix"
+msgstr "Nagydíj folytatása"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:390 data/po/gui_strings.h:437
+#: data/po/gui_strings.h:468 data/po/gui_strings.h:502
+#: data/po/gui_strings.h:533
+msgid "Controls"
+msgstr "Irányítás"
+
+#. I18N: ./data/gui/credits.stkgui
+#. I18N: Title in credits screen
+#: data/po/gui_strings.h:97
+msgid "Credits"
+msgstr "Készítők"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:315 data/po/gui_strings.h:347
+msgid "DEBUG"
+msgstr ""
+
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: To delete a keyboard configuration
+#: data/po/gui_strings.h:441
+msgid "Delete Configuration"
+msgstr ""
+
+#. I18N: ./data/gui/addons_view_dialog.stkgui
+#: data/po/gui_strings.h:43
+msgid "Description:"
+msgstr ""
+
+#: src/states_screens/dialogs/addons_loading.cpp:71
+#, c-format
+msgid "Description: %i"
+msgstr ""
+
+#. I18N: button to disable a gamepad configuration
+#: src/states_screens/options_screen_input2.cpp:72
+#: src/states_screens/options_screen_input2.cpp:426
+msgid "Disable Device"
+msgstr ""
+
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:139
+#, c-format
+msgid "Do you really want to delete player '%s' ?"
+msgstr ""
+
+#: src/items/powerup.cpp:65
+msgid "Do you want to fly kites?"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:183
+msgid "Down"
+msgstr ""
+
+#. I18N: ./data/karts/elephpant/kart.xml
+#: data/po/gui_strings.h:753
+msgid "Elephpant"
+msgstr ""
+
+#. I18N: button to enable a gamepad configuration
+#: src/states_screens/options_screen_input2.cpp:74
+#: src/states_screens/options_screen_input2.cpp:427
+msgid "Enable Device"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Next to checkbox in settings menu
+#: data/po/gui_strings.h:398 data/po/gui_strings.h:410
+msgid "Enabled"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:693
+msgid "Energy"
+msgstr ""
+
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#: data/po/gui_strings.h:104
+msgid "Enter the new player's name"
+msgstr ""
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: data/po/gui_strings.h:603
+msgid "Exit Race"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:622
+msgid "Expert"
+msgstr ""
+
+#: src/states_screens/feature_unlocked.cpp:428
+msgid "Feature Unlocked"
+msgstr ""
+
+#: src/modes/linear_world.cpp:294
+msgid "Final lap!"
+msgstr ""
+
+#. I18N: ./data/tracks/hacienda/hacienda.challenge
+#: data/po/gui_strings.h:693
+msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
+msgstr ""
+
+#. I18N: ./data/tracks/tuxtollway/tollway.challenge
+#: data/po/gui_strings.h:723
+msgid ""
+"Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
+msgstr ""
+
+#. I18N: ./data/tracks/fortmagma/fortmagma.challenge
+#: data/po/gui_strings.h:687
+msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
+msgstr ""
+
+#. I18N: ./data/tracks/hacienda/hacienda.challenge
+#: data/po/gui_strings.h:690
+msgid "Finish Farm in 2:30"
+msgstr ""
+
+#. I18N: ./data/tracks/tuxtollway/tollway.challenge
+#: data/po/gui_strings.h:720
+msgid "Finish Lighthouse in 1:30"
+msgstr ""
+
+#. I18N: ./data/tracks/fortmagma/fortmagma.challenge
+#: data/po/gui_strings.h:684
+msgid "Finish Mines in 3:00"
+msgstr ""
+
+#. I18N: ./data/grandprix/tothemoonandback.challenge
+#: data/po/gui_strings.h:663
+msgid ""
+"Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
+"2:20 minutes."
+msgstr ""
+
+#. I18N: ./data/tracks/mines/mines.challenge
+#: data/po/gui_strings.h:711
+msgid ""
+"Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
+"minutes."
+msgstr ""
+
+#. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
+#: data/po/gui_strings.h:681
+msgid ""
+"Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
+"in under 52 seconds."
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:162
+msgid "Fire"
+msgstr ""
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:291
+msgid ""
+"First, you will need several input devices (having multiple gamepads or "
+"joysticks is the best way to play with several people). Go in the input "
+"configuration screen and setup the gamepads. It is also possible to play on "
+"keyboard(s), however each player will need a different set of keys, and keep "
+"in mind that most keyboards are not appropriate for multiplayer gameplay "
+"because they do not support large number of keypresses."
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:147
+msgid "Follow the Leader"
+msgstr ""
+
+#. I18N: ./data/tracks/lighthouse/lighthouse.challenge
+#: data/po/gui_strings.h:702
+msgid "Follow the Leader around the Solar System"
+msgstr ""
+
+#. I18N: ./data/grandprix/atworldsend.challenge
+#: data/po/gui_strings.h:648
+msgid "Follow the Leader on a Desert Island"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:250
+msgid ""
+"Follow the leader: run for second place, as the last kart will be "
+"disqualified every time the counter hits zero. Beware : going in front of "
+"the leader will get you eliminated too!"
+msgstr ""
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+#: data/po/gui_strings.h:557
+msgid "Fullscreen"
+msgstr ""
+
+#. I18N: warning, this string needs to be SHORT!
+#: src/states_screens/dialogs/race_over_dialog.cpp:257
+msgid "GP scores :"
+msgstr ""
+
+#. I18N: Key binding section
+#: src/states_screens/options_screen_input2.cpp:100
+msgid "Game Keys"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:132 data/po/gui_strings.h:183
+#: data/po/gui_strings.h:231 data/po/gui_strings.h:277
+msgid "Game Modes"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for gamepad buttons
+#: src/input/binding.cpp:259
+#, c-format
+msgid "Gamepad button %d"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for gamepad hats
+#: src/input/binding.cpp:264
+#, c-format
+msgid "Gamepad hat %d"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:124 data/po/gui_strings.h:175
+#: data/po/gui_strings.h:223 data/po/gui_strings.h:269
+msgid "General"
+msgstr ""
+
+#: src/items/powerup.cpp:63
+msgid "Geronimo!!!"
+msgstr ""
+
+#. I18N: ./data/karts/gnu/kart.xml
+#: data/po/gui_strings.h:756
+msgid "Gnu"
+msgstr ""
+
+#: src/states_screens/race_gui.cpp:98
+msgid "Go!"
+msgstr ""
+
+#. I18N: ./data/karts/gooey/kart.xml
+#: data/po/gui_strings.h:759
+msgid "Gooey"
+msgstr ""
+
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:629
+msgid "Grand Prix"
+msgstr ""
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the graphics settings
+#: data/po/gui_strings.h:541
+msgid "Graphical Effects Settings"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:378 data/po/gui_strings.h:425
+#: data/po/gui_strings.h:456 data/po/gui_strings.h:490
+#: data/po/gui_strings.h:521
+msgid "Graphics"
+msgstr ""
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: data/po/gui_strings.h:327 data/po/gui_strings.h:363
+#: data/po/gui_strings.h:599
+msgid "Help"
+msgstr ""
+
+#. I18N: ./data/karts/hexley/kart.xml
+#: data/po/gui_strings.h:762
+msgid "Hexley"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:217
+msgid "Highscores"
+msgstr ""
+
+#: src/states_screens/race_setup_screen.cpp:229
+msgid ""
+"Hit others with weapons until they lose all their lives. (Only in "
+"multiplayer games)"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:156
+msgid ""
+"If you see a button with a lock like this one, you need to complete a "
+"challenge to unlock it."
+msgstr ""
+
+#. I18N: message shown when an input device is used but is not associated to any player
+#: src/input/input_manager.cpp:492
+#, c-format
+msgid "Ignoring '%s', you needed to join earlier to play!"
+msgstr ""
+
+#. I18N: ./data/gui/addons_view_dialog.stkgui
+#. I18N: Addons
+#: data/po/gui_strings.h:54
+msgid "Install"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:618
+msgid "Intermediate"
+msgstr ""
+
+#. I18N: ./data/gui/addons.stkgui
+#. I18N: Section in the addons menu
+#. I18N: ./data/gui/addons_update.stkgui
+#. I18N: Section in the addons menu
+#: data/po/gui_strings.h:6 data/po/gui_strings.h:25
+msgid "Karts"
+msgstr ""
+
+#. I18N: ./data/gui/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
+#: data/po/gui_strings.h:89
+msgid "Keep this resolution"
+msgstr ""
+
+#. I18N: short definition for follow-the-leader game mode
+#: src/states_screens/race_setup_screen.cpp:220
+msgid "Keep up with the leader kart but don't overtake it!"
+msgstr ""
+
+#. I18N: ./data/karts/konqi/kart.xml
+#: data/po/gui_strings.h:765
+msgid "Konqi"
+msgstr ""
+
+#. I18N: Shown at the end of a race
+#: src/states_screens/race_gui.cpp:90
+msgid "Lap"
+msgstr ""
+
+#: src/modes/linear_world.cpp:311
+#, c-format
+msgid "Lap %i"
+msgstr ""
+
+#: src/modes/follow_the_leader.cpp:190
+msgid "Leader"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:186
+msgid "Left"
+msgstr ""
+
+#: src/guiengine/engine.cpp:1061
+msgid "Loading"
+msgstr ""
+
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: In the main screen
+#: data/po/gui_strings.h:339
+msgid "Loading news from stkaddons..."
+msgstr ""
+
+#: src/states_screens/arenas_screen.cpp:188
+#: src/states_screens/arenas_screen.cpp:211
+#: src/states_screens/challenges.cpp:95
+#: src/states_screens/kart_selection.cpp:1639
+#: src/states_screens/kart_selection.cpp:1684
+#: src/states_screens/race_setup_screen.cpp:212
+#: src/states_screens/tracks_screen.cpp:261
+#: src/states_screens/tracks_screen.cpp:285
+msgid "Locked : solve active challenges to gain access to more!"
+msgstr ""
+
+#: src/states_screens/tracks_screen.cpp:216
+msgid "Locked!"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:171
+msgid "Look Back"
+msgstr ""
+
+#: src/items/powerup.cpp:80
+msgid "Magic, son. Nothing else in the world smells like that."
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:140
+msgid "Make your rivals bite dust!"
+msgstr ""
+
+#. I18N: Key binding section
+#: src/states_screens/options_screen_input2.cpp:113
+msgid "Menu Keys"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#: src/input/binding.cpp:272
+#, c-format
+msgid "Mouse axis %d %s"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#: src/input/binding.cpp:268
+#, c-format
+msgid "Mouse button %d"
+msgstr ""
+
+#. I18N: ./data/karts/mozilla/kart.xml
+#: data/po/gui_strings.h:768
+msgid "Mozilla"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:136 data/po/gui_strings.h:187
+#: data/po/gui_strings.h:235 data/po/gui_strings.h:281
+msgid "Multiplayer"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the audio/video settings submenu
+#: data/po/gui_strings.h:394
+msgid "Music"
+msgstr ""
+
+#. I18N: ./data/gui/addons_view_dialog.stkgui
+#: data/po/gui_strings.h:40
+msgid "Name:"
+msgstr ""
+
+#: src/states_screens/dialogs/addons_loading.cpp:70
+#, c-format
+msgid "Name: %i"
+msgstr ""
+
+#: src/challenges/challenge.cpp:62
+#, c-format
+msgid "New Grand Prix '%s' now available"
+msgstr ""
+
+#: src/challenges/challenge.cpp:67
+#, c-format
+msgid "New difficulty '%s' now available"
+msgstr ""
+
+#: src/modes/linear_world.cpp:363
+msgid "New fastest lap"
+msgstr ""
+
+#: src/challenges/challenge.cpp:51
+#, c-format
+msgid "New game mode '%s' now available"
+msgstr ""
+
+#: src/challenges/challenge.cpp:77
+#, c-format
+msgid "New kart '%s' now available"
+msgstr ""
+
+#: src/challenges/challenge.cpp:45
+#, c-format
+msgid "New track '%s' now available"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:165
+msgid "Nitro"
+msgstr ""
+
+#. I18N: ./data/karts/nolok/kart.xml
+#: data/po/gui_strings.h:771
+msgid "Nolok"
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:143
+msgid "Normal Race"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:614
+msgid "Novice"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: In race setup menu
+#: data/po/gui_strings.h:610
+msgid "Number of AI karts"
+msgstr ""
+
+#: src/states_screens/dialogs/message_dialog.cpp:57
+msgid "OK"
+msgstr ""
+
+#. I18N: message shown when a player that isn't game master tries to modify options that
+#. I18N: only the game master is allowed to
+#: src/input/input_manager.cpp:517
+msgid "Only the Game Master may act at this point!"
+msgstr ""
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: data/po/gui_strings.h:323 data/po/gui_strings.h:359
+#: data/po/gui_strings.h:595
+msgid "Options"
+msgstr ""
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:206
+msgid "Parachute - slows down all karts in a better position!"
+msgstr ""
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#: data/po/gui_strings.h:579
+msgid "Paused"
+msgstr ""
+
+#: src/karts/controller/player_controller.cpp:281
+msgid "Penalty time!!"
+msgstr ""
+
+#. I18N: ./data/grandprix/penguinplayground.grandprix
+#: data/po/gui_strings.h:738
+msgid "Penguin Playground"
+msgstr ""
+
+#. I18N: ./data/karts/pidgin/kart.xml
+#: data/po/gui_strings.h:774
+msgid "Pidgin"
+msgstr ""
+
+#. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+#: src/states_screens/kart_selection.cpp:259
+#: src/states_screens/kart_selection.cpp:409
+#, c-format
+msgid "Player %i (%s)"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:386 data/po/gui_strings.h:433
+#: data/po/gui_strings.h:464 data/po/gui_strings.h:498
+#: data/po/gui_strings.h:529
+msgid "Players"
+msgstr ""
+
+#. I18N: shown when config file is too old
+#: src/input/device_manager.cpp:399
+msgid "Please re-configure your key bindings."
+msgstr ""
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:200
+msgid ""
+"Plunger - throw straight to pull an opponent back, or throw while looking "
+"back to make one lose sight!"
+msgstr ""
+
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: When configuring input
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+#: data/po/gui_strings.h:108 data/po/gui_strings.h:576
+msgid "Press ESC to cancel"
+msgstr ""
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#: data/po/gui_strings.h:568
+msgid "Press a key"
+msgstr ""
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In key bindings configuration menu
+#: data/po/gui_strings.h:472
+msgid "Press enter or double-click on a device to configure it"
+msgstr ""
+
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:506
+msgid "Press enter or double-click on a player to edit him/her"
+msgstr ""
+
+#. I18N: ./data/karts/puffy/kart.xml
+#: data/po/gui_strings.h:777
+msgid "Puffy"
+msgstr ""
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:335 data/po/gui_strings.h:371
+msgid "Quit"
+msgstr ""
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/mainaddons.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:311 data/po/gui_strings.h:343
+msgid "Race"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:104
+msgid "Race Results"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#: data/po/gui_strings.h:606
+msgid "Race Setup"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:380
+msgid "Race in this track again"
+msgstr ""
+
+#: src/states_screens/arenas_screen.cpp:221
+msgid "Random Arena"
+msgstr ""
+
+#: src/states_screens/kart_selection.cpp:781
+#: src/states_screens/kart_selection.cpp:1698
+msgid "Random Kart"
+msgstr ""
+
+#: src/states_screens/tracks_screen.cpp:297
+msgid "Random Track"
+msgstr ""
+
+#: src/states_screens/race_gui.cpp:91
+msgid "Rank"
+msgstr ""
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/states_screens/race_gui.cpp:96
+msgid "Ready!"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:242
+msgid ""
+"Regular Race: all blows allowed, so catch weapons and make clever use of "
+"them!"
+msgstr ""
+
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:108
+msgid "Remove"
+msgstr ""
+
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:74
+msgid "Rename"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:174
+msgid "Rescue"
+msgstr ""
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the graphics settings
+#: data/po/gui_strings.h:553
+msgid "Resolution"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:97
+#: src/states_screens/race_result_gui.cpp:110
+msgid "Restart"
+msgstr ""
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: data/po/gui_strings.h:591
+msgid "Restart Race"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:189
+msgid "Right"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:86
+msgid "See unlocked feature"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:353
+#: src/states_screens/race_result_gui.cpp:87
+msgid "See unlocked features"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:192
+msgid "Select"
+msgstr ""
+
+#. I18N: ./data/gui/racesetup.stkgui
+#: data/po/gui_strings.h:625
+msgid "Select a game mode"
+msgstr ""
+
+#: src/states_screens/race_gui.cpp:97
+msgid "Set!"
+msgstr ""
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: src/states_screens/dialogs/race_over_dialog.cpp:369
+#: src/states_screens/race_result_gui.cpp:107 data/po/gui_strings.h:587
+msgid "Setup New Race"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:168
+msgid "Sharp Turn"
+msgstr ""
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the graphics settings
+#: data/po/gui_strings.h:537
+msgid "Skin"
+msgstr ""
+
+#. I18N: ./data/grandprix/snagdrive.grandprix
+#: data/po/gui_strings.h:741
+msgid "Snag Drive"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in audio/video settings submenu
+#: data/po/gui_strings.h:406
+msgid "Sound Effects"
+msgstr ""
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: data/po/gui_strings.h:62
+msgid "Standard"
+msgstr ""
+
+#: src/states_screens/dialogs/gp_info_dialog.cpp:144
+msgid "Start Grand Prix"
+msgstr ""
+
+#: src/states_screens/dialogs/track_info_dialog.cpp:141
+msgid "Start Race"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:150
+msgid "Steer Left"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:153
+msgid "Steer Right"
+msgstr ""
+
+#. I18N: ./data/gui/addons.stkgui
+#. I18N: ./data/gui/addons_update.stkgui
+#: data/po/gui_strings.h:2 data/po/gui_strings.h:21
+msgid "SuperTuxKart Addons"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help4.stkgui
+#: data/po/gui_strings.h:120 data/po/gui_strings.h:171
+#: data/po/gui_strings.h:219 data/po/gui_strings.h:265
+msgid "SuperTuxKart Help"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: ./data/gui/options_video.stkgui
+#: data/po/gui_strings.h:374 data/po/gui_strings.h:421
+#: data/po/gui_strings.h:452 data/po/gui_strings.h:486
+#: data/po/gui_strings.h:517
+msgid "SuperTuxKart Options"
+msgstr ""
+
+#. I18N: ./data/gui/help4.stkgui
+#: data/po/gui_strings.h:284
+msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+#: data/po/gui_strings.h:238
+msgid "SuperTuxKart features several game modes"
+msgstr ""
+
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:212
+msgid ""
+"Swapper - gift boxes are transformed into bananas and vice versa for a short "
+"time"
+msgstr ""
+
+#. I18N: ./data/grandprix/test.grandprix
+#: data/po/gui_strings.h:744
+msgid "Test"
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help menu
+#: data/po/gui_strings.h:160
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns and have better control in "
+"tight curves"
+msgstr ""
+
+#: src/items/powerup.cpp:64
+msgid "The Space Shuttle has landed!"
+msgstr ""
+
+#: src/race/highscore_manager.cpp:96
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+
+#: src/states_screens/dialogs/gp_info_dialog.cpp:149
+msgid "This Grand Prix is broken!"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:688
+msgid "Time"
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:145
+msgid "Time Trial"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:246
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr ""
+
+#: src/states_screens/dialogs/add_device_dialog.cpp:49
+msgid ""
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it "
+"connected and it will appear in the list.\n"
+"\n"
+"To add a keyboard config, you can use the button below, HOWEVER please note "
+"that most keyboards only support a limited amount of simultaneous keypresses "
+"and are thus inappropriate for multiplayer gameplay. (You can, however, "
+"connect multiple keyboards to the computer. Remember that everyone still "
+"needs different keybindings in this case.)"
+msgstr ""
+
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:191
+msgid "To help you win, there are some powerups you can collect :"
+msgstr ""
+
+#. I18N: ./data/grandprix/tothemoonandback.grandprix
+#: data/po/gui_strings.h:747
+msgid "To the Moon and Back"
+msgstr ""
+
+#. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+#: src/states_screens/race_gui.cpp:94
+#, c-format
+msgid "Top %i"
+msgstr ""
+
+#. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
+#: src/states_screens/dialogs/track_info_dialog.cpp:74
+#, c-format
+msgid "Track by %s"
+msgstr ""
+
+#. I18N: ./data/gui/addons.stkgui
+#. I18N: Section in the addons menu
+#. I18N: ./data/gui/addons_update.stkgui
+#. I18N: Section in the addons menu
+#: data/po/gui_strings.h:10 data/po/gui_strings.h:29
+msgid "Tracks"
+msgstr ""
+
+#. I18N: ./data/karts/tux/kart.xml
+#: data/po/gui_strings.h:780
+msgid "Tux"
+msgstr ""
+
+#: src/states_screens/dialogs/addons_loading.cpp:63
+msgid "Uninstall"
+msgstr ""
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:180
+msgid "Up"
+msgstr ""
+
+#. I18N: ./data/gui/addons.stkgui
+#. I18N: Section in the addons menu
+#. I18N: ./data/gui/addons_update.stkgui
+#. I18N: Section in the addons menu
+#: src/states_screens/dialogs/addons_loading.cpp:61 data/po/gui_strings.h:14
+#: data/po/gui_strings.h:33
+msgid "Update"
+msgstr ""
+
+#: src/states_screens/addons_screen.cpp:157
+msgid "Updating the list..."
+msgstr ""
+
+#. I18N: ./data/gui/addons_view_dialog.stkgui
+#: data/po/gui_strings.h:46
+msgid "Version:"
+msgstr ""
+
+#: src/states_screens/dialogs/addons_loading.cpp:72
+#, c-format
+msgid "Version: %i"
+msgstr ""
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Music volume in options
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Sound volume in options
+#: data/po/gui_strings.h:402 data/po/gui_strings.h:414
+msgid "Volume"
+msgstr ""
+
+#: src/modes/linear_world.cpp:821
+msgid "WRONG WAY!"
+msgstr ""
+
+#: src/states_screens/options_screen_input2.cpp:335
+msgid ""
+"Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
+"keys that contain a character that is different in upper-case will stop "
+"working."
+msgstr ""
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:179
+#: data/po/gui_strings.h:227 data/po/gui_strings.h:273
+msgid "Weapons"
+msgstr ""
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:295
+msgid ""
+"When input devices are configured, you are ready to play. Simply start a new "
+"race by selecting the race icon in the main menu. When it is time to choose "
+"a kart, each player can press on the 'fire' key of their gamepad or keyboard "
+"to join the game. Each player can use their input device to select their "
+"kart. The game continues when everyone selected their kart. Note that the "
+"mouse may not be used for this operation."
+msgstr ""
+
+#. I18N: ./data/karts/wilber/kart.xml
+#: data/po/gui_strings.h:783
+msgid "Wilber"
+msgstr ""
+
+#. I18N: ./data/followtheleader.challenge
+#: data/po/gui_strings.h:636
+msgid "Win Penguin Playground Grand Prix"
+msgstr ""
+
+#. I18N: ./data/followtheleader.challenge
+#: data/po/gui_strings.h:639
+msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
+msgstr ""
+
+#. I18N: ./data/grandprix/snagdrive.challenge
+#: data/po/gui_strings.h:654
+msgid "Win To the Moon and Back Grand Prix"
+msgstr ""
+
+#. I18N: ./data/tracks/skyline/skyline.challenge
+#: data/po/gui_strings.h:717
+msgid ""
+"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+msgstr ""
+
+#. I18N: ./data/tracks/xr591/xr591.challenge
+#: data/po/gui_strings.h:729
+msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
+msgstr ""
+
+#. I18N: ./data/karts/gnu/gnu.challenge
+#: data/po/gui_strings.h:669
+msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
+msgstr ""
+
+#. I18N: ./data/tracks/islandtrack/island.challenge
+#: data/po/gui_strings.h:699
+msgid ""
+"Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
+msgstr ""
+
+#. I18N: ./data/tracks/canyon/canyon.challenge
+#: data/po/gui_strings.h:675
+msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
+msgstr ""
+
+#. I18N: ./data/grandprix/atworldsend.challenge
+#: data/po/gui_strings.h:651
+msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
+msgstr ""
+
+#. I18N: ./data/tracks/lighthouse/lighthouse.challenge
+#: data/po/gui_strings.h:705
+msgid "Win a Follow the Leader race with 5 AI karts on Star track"
+msgstr ""
+
+#. I18N: ./data/tracks/skyline/skyline.challenge
+#: data/po/gui_strings.h:714
+msgid "Win a Head to Head in the Secret Garden"
+msgstr ""
+
+#. I18N: ./data/tracks/xr591/xr591.challenge
+#: data/po/gui_strings.h:726
+msgid "Win a race on Canyon"
+msgstr ""
+
+#. I18N: ./data/karts/gnu/gnu.challenge
+#: data/po/gui_strings.h:666
+msgid "Win a race on Fort Magma"
+msgstr ""
+
+#. I18N: ./data/tracks/islandtrack/island.challenge
+#: data/po/gui_strings.h:696
+msgid "Win a race on Snow Mountain"
+msgstr ""
+
+#. I18N: ./data/tracks/canyon/canyon.challenge
+#: data/po/gui_strings.h:672
+msgid "Win a race on Tux Tollway"
+msgstr ""
+
+#. I18N: ./data/grandprix/alltracks.challenge
+#: data/po/gui_strings.h:642
+msgid "Win the At World's End Grand Prix"
+msgstr ""
+
+#. I18N: ./data/grandprix/snagdrive.challenge
+#: data/po/gui_strings.h:657
+msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
+msgstr ""
+
+#. I18N: ./data/gui/confirm_dialog.stkgui
+#. I18N: In a 'are you sure?' dialog
+#: data/po/gui_strings.h:81
+msgid "Yes"
+msgstr ""
+
+#: src/states_screens/grand_prix_win.cpp:360
+msgid "You completed the Grand Prix!"
+msgstr ""
+
+#: src/karts/kart.cpp:523 src/karts/kart.cpp:542
+msgid "You finished the race!"
+msgstr ""
+
+#: src/modes/world.cpp:678
+msgid "You have been eliminated!"
+msgstr ""
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:341
+#: src/states_screens/grand_prix_win.cpp:99
+msgid "You unlocked a new feature!"
+msgstr ""
+
+#: src/karts/kart.cpp:523 src/karts/kart.cpp:542
+msgid "You won the race!"
+msgstr ""
+
+#: src/config/user_config.cpp:424
+msgid ""
+"Your config file was malformed, so it was deleted and a new one will be "
+"created."
+msgstr ""
+
+#: src/config/user_config.cpp:434
+msgid ""
+"Your config file was too old, so it was deleted and a new one will be "
+"created."
+msgstr ""
+
+#: src/input/device_manager.cpp:401
+msgid "Your input config file is not compatible with this version of STK."
+msgstr ""
+
+#. I18N: Unbound key binding
+#: src/input/binding.cpp:86
+msgid "[none]"
+msgstr ""
+
+#: src/states_screens/credits.cpp:228
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Balint https://launchpad.net/~lbekefi"
