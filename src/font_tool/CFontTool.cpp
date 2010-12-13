@@ -765,6 +765,7 @@ bool CFontTool::saveBitmapFont(const c8 *filename, const c8* format)
 	writer->writeLineBreak();
 
 	// write images and link to them
+    u32 offset_for_asian_fonts=100;
 	for (u32 i=0; i<currentImages.size(); ++i)
 	{
 		imagename = filename;
@@ -774,7 +775,7 @@ bool CFontTool::saveBitmapFont(const c8 *filename, const c8* format)
 		Device->getVideoDriver()->writeImageToFile(currentImages[i],imagename.c_str());
 
 		writer->writeElement(L"Texture", true,
-				L"index", core::stringw(i).c_str(),
+				L"index", core::stringw(i+offset_for_asian_fonts).c_str(),
 				L"filename", core::stringw(imagename.c_str()).c_str(),
 				L"hasAlpha", UseAlphaChannel ? L"true" : L"false");
 		writer->writeLineBreak();
@@ -808,9 +809,9 @@ bool CFontTool::saveBitmapFont(const c8 *filename, const c8* format)
 		names.push_back(core::stringw(L"c"));
 		values.push_back(core::stringw(c));
 		// image number
-		if (fa.sourceimage != 0)
+		if (fa.sourceimage+offset_for_asian_fonts != 0)
 		{
-			image = core::stringw(fa.sourceimage);
+			image = core::stringw(fa.sourceimage+offset_for_asian_fonts);
 			names.push_back(core::stringw(L"i"));
 			values.push_back(image);
 		}
