@@ -1,4 +1,4 @@
-# Icelandic translation for stk
+# Serbian translation for stk
 # Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
 # This file is distributed under the same license as the stk package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-13 07:05+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: Icelandic <is@li.org>\n"
+"PO-Revision-Date: 2010-12-14 05:37+0000\n"
+"Last-Translator: dboki89 <Unknown>\n"
+"Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,68 +25,68 @@ msgstr "   N"
 #: src/states_screens/options_screen_input.cpp:94
 #, c-format
 msgid "   Keyboard %i"
-msgstr "   Lyklaborð %i"
+msgstr "   Тастер %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
 msgid "%0 bites %1's bait"
-msgstr "%0 bítur á færi %1"
+msgstr "%0 је загризао/ла %1-ов мамац"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:49
 msgid "%0 eats too much of %1's cake"
-msgstr "%0 borðar of mikið af kökum %1"
+msgstr "%0 једе превише %1-вих колача"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr "%0 fær fína grímu frá %1"
+msgstr "%0 је добио/ла лепу маску од %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:73
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 је прегажен/на куглом од %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:51
 msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0 er skeptískur á eldamennsku %1"
+msgstr "%0 сумња у %1-ве кулинарске способности"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:53
 msgid "%0 should not play with %1's lunch"
-msgstr "%0 ætti ekki að leika sér að málsverði %1"
+msgstr "%0 се не би смео/ла играти са %1-вим ручком"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:69
 msgid "%0 will not play bowling with %1 again"
-msgstr "%0 mun ekki spila keilu með %1 aftur"
+msgstr "%0 се неће више куглати са %1"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%1 latches onto %0 for a free ride"
-msgstr "%1 húkkar sér far hjá %0"
+msgstr "%1 се прикачио/ла за %0 ради бесплатне вожње"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr "%1 hendir drullusokki framan í %0"
+msgstr "%1 је спојио/ла %0-во лица са вакуум гумом"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:71
 msgid "%1 strikes %0"
-msgstr "%1 hittir %0"
+msgstr "%1 удара %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 тестира вучни сноп на %0"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:125
 #, c-format
 msgid "%i laps"
-msgstr "%i hringir"
+msgstr "%i кругова"
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -94,73 +94,73 @@ msgstr "%i hringir"
 #: src/states_screens/dialogs/race_over_dialog.cpp:169
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : је преживео %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:369
 #, c-format
 msgid "%s by %s"
-msgstr "%s sett af %s"
+msgstr "%s - %s"
 
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr "%s er mikill víkingur!"
+msgstr "%s је моћни пират!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:89
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr ""
+msgstr "%s вежба са плавим, великим, сферичним јо-јо"
 
 #: src/states_screens/kart_selection.cpp:508
 #, c-format
 msgid "%s is ready"
-msgstr "%s er tilbúin/n"
+msgstr "%s је спреман/на"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:91
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr ""
+msgstr "%s је светски мајстор бумеранг лопте"
 
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s плаћа следећу рунду грога!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:93
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
-msgstr "%s ætti frekar að spila gúmmí-pílukast frekar en keilu"
+msgstr "%s би требао/ла играти пикадо (гуменим стрелицама) уместо куглања"
 
 #: src/modes/world.cpp:682
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' је елиминисан/на."
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:262
 msgid "(Empty)"
-msgstr "(Tómt)"
+msgstr "(Празно)"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:307
 msgid "(more players can join by pressing 'fire' now)"
-msgstr ""
+msgstr "(више играча може да се придружи притиском на 'пуцај')"
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:287
 msgid "(network play is not yet available)"
-msgstr "(netspil er ekki enn mögulegt)"
+msgstr "(игра у мрежи још није доступна)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:164
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "* Тренутно подешени тастери се могу видети/променити у менију Опције"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -171,6 +171,9 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
+"* Већина ових модова се могу играти и као Гран При: уместо да возите једну "
+"трку, возите више заредом. Што се боље рангирате, више поена добијете. На "
+"крају, играч са највише поена осваја куп."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:479
@@ -178,11 +181,13 @@ msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
 msgstr ""
+"* Која конфигурација ће се користити биће закључено по томе који тастер "
+"'пуцај' буде притиснут за придруживање игри."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:149
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "Борба на 3 пораза"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -191,19 +196,21 @@ msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
+"Борба на 3 пораза: само у играма са више играча. Ударати друге док не изгубе "
+"све животе."
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:187
 msgid "= Highscores ="
-msgstr ""
+msgstr "= Најбољи резултати ="
 
 #: src/items/powerup.cpp:81
 msgid "A wizard did it!"
-msgstr ""
+msgstr "Чаробњак је то урадио!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:424
 #: src/states_screens/race_result_gui.cpp:100
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Одустани од Гран При"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -211,41 +218,41 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:331 data/po/gui_strings.h:367
 msgid "About"
-msgstr ""
+msgstr "О програму"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:156
 msgid "Accelerate"
-msgstr ""
+msgstr "Убрзај"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:60
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Додај конфигурацију тастатуре"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:510
 msgid "Add Player"
-msgstr ""
+msgstr "Додај играча"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:476
 msgid "Add a device"
-msgstr ""
+msgstr "Додај уређај"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: data/po/gui_strings.h:66
 msgid "Add-Ons"
-msgstr ""
+msgstr "Додаци"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:355
 msgid "Addons"
-msgstr ""
+msgstr "Додаци"
 
 #. I18N: ./data/karts/adiumy/kart.xml
 #: data/po/gui_strings.h:750
@@ -260,73 +267,73 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:867
 #: src/states_screens/tracks_screen.cpp:85 data/po/gui_strings.h:70
 msgid "All"
-msgstr ""
+msgstr "Све"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:633
 msgid "All Tracks"
-msgstr ""
+msgstr "Све стазе"
 
 #: src/states_screens/race_setup_screen.cpp:200
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
+msgstr "Сви ударци дозвољени, зато ухватите оружје и паметно га употребите!"
 
 #. I18N: ./data/grandprix/alltracks.grandprix
 #: data/po/gui_strings.h:732
 msgid "All tracks"
-msgstr ""
+msgstr "Све стазе"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:209
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr ""
+msgstr "Сидро - знатно успори карт на првој позицији"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:549
 msgid "Animated Effects and Scenery"
-msgstr ""
+msgstr "Анимирани ефекти и пејзаж"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:545
 msgid "Animated Karts"
-msgstr ""
+msgstr "Анимирани картеви"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:561
 msgid "Apply new resolution"
-msgstr ""
+msgstr "Примени нову резолуцију"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:416
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr ""
+msgstr "Јесте ли сигурни да желите трајно избрисати ову конфигурацију?"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
 #: data/po/gui_strings.h:58
 msgid "Arenas"
-msgstr ""
+msgstr "Арене"
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:46
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr ""
+msgstr "Аррр, %s је бацио сидро, капетане!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 #: data/po/gui_strings.h:572
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "Додели тастеру ESC"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:735
 msgid "At World's End"
-msgstr ""
+msgstr "На крају света"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -342,19 +349,19 @@ msgstr ""
 #: data/po/gui_strings.h:460 data/po/gui_strings.h:494
 #: data/po/gui_strings.h:525
 msgid "Audio"
-msgstr ""
+msgstr "Звук"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:148
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "Избегавај банане!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:252
 #, c-format
 msgid "Axis %d %s"
-msgstr ""
+msgstr "Осе %d %s"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: In the options menu, to go back to the main menu or game
@@ -387,42 +394,42 @@ msgstr ""
 #: data/po/gui_strings.h:483 data/po/gui_strings.h:514
 #: data/po/gui_strings.h:565
 msgid "Back"
-msgstr ""
+msgstr "Назад"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:583
 msgid "Back to Race"
-msgstr ""
+msgstr "Назад на трку"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:445
 msgid "Back to device list"
-msgstr ""
+msgstr "Назад на листу уређаја"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: ./data/gui/credits.stkgui
 #: data/po/gui_strings.h:77 data/po/gui_strings.h:100
 msgid "Back to main menu"
-msgstr ""
+msgstr "Назад на главни мени"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:392
 msgid "Back to the main menu"
-msgstr ""
+msgstr "Назад на главни мени"
 
 #: src/states_screens/race_result_gui.cpp:113
 msgid "Back to the menu"
-msgstr ""
+msgstr "Назад на мени"
 
 #: src/items/powerup.cpp:82
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Банана? Кутија? Банана? Кутија? Банана? Кутија?"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:233
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Више среће следећи пут!"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:203
@@ -430,22 +437,26 @@ msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
 msgstr ""
+"Кугла за куглање - одбија се од зидова. Уколико гледате назад, биће бачена "
+"уназад."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:159
 msgid "Brake"
-msgstr ""
+msgstr "Кочи"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:194
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr ""
+msgstr "Жвакаћа гума - оставите лепљиву розе локву иза себе"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:197
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
+"Колач - бачен на најближег ривала, најбоље на кратким удаљеностима и дугим "
+"правим деоницама"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -455,22 +466,22 @@ msgstr ""
 #: src/states_screens/dialogs/player_info_dialog.cpp:89
 #: data/po/gui_strings.h:85 data/po/gui_strings.h:93
 msgid "Cancel"
-msgstr ""
+msgstr "Одустани"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:174
 msgid "Cancel Remove"
-msgstr ""
+msgstr "Одустани од уклањања"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:195
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Одустани/Назад"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:103
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:118
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "Не могу додати играча са овим именом"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -478,40 +489,40 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:319 data/po/gui_strings.h:351
 msgid "Challenges"
-msgstr ""
+msgstr "Изазови"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:74
 msgid "Challenges : Trophy Room"
-msgstr ""
+msgstr "Изазови: Соба трофеја"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:303
 msgid "Choose a Kart"
-msgstr ""
+msgstr "Одаберите карт"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:678
 msgid "Collect Nitro in Math Class"
-msgstr ""
+msgstr "Скупљајте нитро на Часу математике"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:144
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr ""
+msgstr "Скупљајте плаве кутије : оне дају оружје и друга побољшања"
 
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:708
 msgid "Collect fuel for your rocket"
-msgstr ""
+msgstr "Скупљајте гориво за Вашу ракету"
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:660
 msgid "Collect the Pharaohs Treasure"
-msgstr ""
+msgstr "Скупљајте Фараоново благо"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -521,26 +532,29 @@ msgid ""
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
 msgstr ""
+"Скупљање нитра Вам омогућује да повећавате брзину кад год пожелите притиском "
+"на одговарајући тастер. Можете видети тренутни ниво Вашег нитра у резервоару "
+"на десној страни екрана."
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:645
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
-msgstr ""
+msgstr "Хајде прво у На крају света Гран При са 3 Експерт АИ карта."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
 msgid "Confirm Remove"
-msgstr ""
+msgstr "Потврди уклањање"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr ""
+msgstr "Потврди резолуцију у наредних %i секунди"
 
 #: src/states_screens/race_setup_screen.cpp:207
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "Не садржи појачања, тако да само Ваше вештине вожње важе!"
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
@@ -548,11 +562,11 @@ msgstr ""
 #: src/states_screens/race_result_gui.cpp:94 data/po/gui_strings.h:111
 #: data/po/gui_strings.h:114 data/po/gui_strings.h:117
 msgid "Continue"
-msgstr ""
+msgstr "Настави"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:409
 msgid "Continue Grand Prix"
-msgstr ""
+msgstr "Настави Гран При"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -568,13 +582,13 @@ msgstr ""
 #: data/po/gui_strings.h:468 data/po/gui_strings.h:502
 #: data/po/gui_strings.h:533
 msgid "Controls"
-msgstr ""
+msgstr "Контроле"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 #: data/po/gui_strings.h:97
 msgid "Credits"
-msgstr ""
+msgstr "Заслуге"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -588,38 +602,38 @@ msgstr ""
 #. I18N: To delete a keyboard configuration
 #: data/po/gui_strings.h:441
 msgid "Delete Configuration"
-msgstr ""
+msgstr "Избриши конфигурацију"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:43
 msgid "Description:"
-msgstr ""
+msgstr "Опис:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:71
 #, c-format
 msgid "Description: %i"
-msgstr ""
+msgstr "Опис: %i"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:72
 #: src/states_screens/options_screen_input2.cpp:426
 msgid "Disable Device"
-msgstr ""
+msgstr "Онемогући уређај"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr ""
+msgstr "Да ли стварно желите избрисати играча '%s' ?"
 
 #: src/items/powerup.cpp:65
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "Да ли желите да летите змајевима?"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:183
 msgid "Down"
-msgstr ""
+msgstr "Доле"
 
 #. I18N: ./data/karts/elephpant/kart.xml
 #: data/po/gui_strings.h:753
@@ -630,74 +644,76 @@ msgstr ""
 #: src/states_screens/options_screen_input2.cpp:74
 #: src/states_screens/options_screen_input2.cpp:427
 msgid "Enable Device"
-msgstr ""
+msgstr "Омогући уређај"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
 #: data/po/gui_strings.h:398 data/po/gui_strings.h:410
 msgid "Enabled"
-msgstr ""
+msgstr "Омогућено"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:693
 msgid "Energy"
-msgstr ""
+msgstr "Енергија"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
 #: data/po/gui_strings.h:104
 msgid "Enter the new player's name"
-msgstr ""
+msgstr "Унесите име новог играча"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:603
 msgid "Exit Race"
-msgstr ""
+msgstr "Напустите трку"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:622
 msgid "Expert"
-msgstr ""
+msgstr "Стручни / Експерт"
 
 #: src/states_screens/feature_unlocked.cpp:428
 msgid "Feature Unlocked"
-msgstr ""
+msgstr "Посебност откључана"
 
 #: src/modes/linear_world.cpp:294
 msgid "Final lap!"
-msgstr ""
+msgstr "Последњи круг!"
 
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:693
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-msgstr ""
+msgstr "Завршите 3 круга Фарме са 3 Лака АИ карта за мање од 2:30 минуте."
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
 #: data/po/gui_strings.h:723
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
+"Завршите 3 круга Светионика са 3 Експерт АИ карта за мање од 1:30 минута."
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:687
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
+"Завршите 3 круга у Рудницима са 3 Експерт АИ карта за мање од 3:00 минуте."
 
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:690
 msgid "Finish Farm in 2:30"
-msgstr ""
+msgstr "Завршите Фарму за мање од 2:30 минуте."
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
 #: data/po/gui_strings.h:720
 msgid "Finish Lighthouse in 1:30"
-msgstr ""
+msgstr "Завршите Светионик за мање од 1:30 минута."
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:684
 msgid "Finish Mines in 3:00"
-msgstr ""
+msgstr "Завршите Руднике за мање од 3:00 минуте."
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:663
@@ -705,6 +721,8 @@ msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr ""
+"Завршите са најмање 12 нитро поена на 3 круга Живог песка за мање од 2:20 "
+"минуте."
 
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:711
@@ -712,6 +730,7 @@ msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
 msgstr ""
+"Завршите са најмање 16 нитро поена на 2 круга XR591 за мање од 2:30 минуте."
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:681
@@ -719,11 +738,13 @@ msgid ""
 "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
 msgstr ""
+"Завршите са најмање 6 нитро поена на 3 круга Оливеровог Часа математике за "
+"мање од 52 секунде."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:162
 msgid "Fire"
-msgstr ""
+msgstr "Пуцај"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -736,21 +757,27 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
+"Прво, биће вам потребно неколико \"уносних\" уређаја (поседовање више "
+"гејмпеда и џојстика је најбољи начин да играте са неколико људи). Идите на "
+"екран конфигурације уноса и подесите гејмпедове. Такође је могуће играти и "
+"на тастатури/ама, међутим, сваки играч ће требати другачији сет тастера. "
+"Имајте на уму да већина тастатура није погодна за играње више играча зато "
+"што не подржавају велики број истовременог притискања тастера."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:147
 msgid "Follow the Leader"
-msgstr ""
+msgstr "Прати вођу"
 
 #. I18N: ./data/tracks/lighthouse/lighthouse.challenge
 #: data/po/gui_strings.h:702
 msgid "Follow the Leader around the Solar System"
-msgstr ""
+msgstr "Прати вођу око Сунчевог система"
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:648
 msgid "Follow the Leader on a Desert Island"
-msgstr ""
+msgstr "Прати вођу на Пустом острву"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -760,22 +787,25 @@ msgid ""
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
 msgstr ""
+"Прати вођу : возите за друго место, јер ће последњи карт бити "
+"дисквалификован сваки пут кад време буде одбројано. Пазите : одлазак испред "
+"вође ће Вас такође елиминисати!"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:557
 msgid "Fullscreen"
-msgstr ""
+msgstr "Цео екран"
 
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:257
 msgid "GP scores :"
-msgstr ""
+msgstr "ГП резултати :"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:100
 msgid "Game Keys"
-msgstr ""
+msgstr "Тастери игре"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -788,13 +818,13 @@ msgstr ""
 #: data/po/gui_strings.h:132 data/po/gui_strings.h:183
 #: data/po/gui_strings.h:231 data/po/gui_strings.h:277
 msgid "Game Modes"
-msgstr ""
+msgstr "Модови игре"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:259
 #, c-format
 msgid "Gamepad button %d"
-msgstr ""
+msgstr "Гелмпед тастер %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:264
@@ -813,11 +843,11 @@ msgstr ""
 #: data/po/gui_strings.h:124 data/po/gui_strings.h:175
 #: data/po/gui_strings.h:223 data/po/gui_strings.h:269
 msgid "General"
-msgstr ""
+msgstr "Опште"
 
 #: src/items/powerup.cpp:63
 msgid "Geronimo!!!"
-msgstr ""
+msgstr "Џеронимо!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
 #: data/po/gui_strings.h:756
@@ -826,7 +856,7 @@ msgstr ""
 
 #: src/states_screens/race_gui.cpp:98
 msgid "Go!"
-msgstr ""
+msgstr "Крени!"
 
 #. I18N: ./data/karts/gooey/kart.xml
 #: data/po/gui_strings.h:759
@@ -837,13 +867,13 @@ msgstr ""
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:629
 msgid "Grand Prix"
-msgstr ""
+msgstr "Гран При"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:541
 msgid "Graphical Effects Settings"
-msgstr ""
+msgstr "Подешавања графичких ефеката"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -859,7 +889,7 @@ msgstr ""
 #: data/po/gui_strings.h:456 data/po/gui_strings.h:490
 #: data/po/gui_strings.h:521
 msgid "Graphics"
-msgstr ""
+msgstr "Графика"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -870,7 +900,7 @@ msgstr ""
 #: data/po/gui_strings.h:327 data/po/gui_strings.h:363
 #: data/po/gui_strings.h:599
 msgid "Help"
-msgstr ""
+msgstr "Помоћ"
 
 #. I18N: ./data/karts/hexley/kart.xml
 #: data/po/gui_strings.h:762
@@ -879,13 +909,15 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:217
 msgid "Highscores"
-msgstr ""
+msgstr "Најбољи резултати"
 
 #: src/states_screens/race_setup_screen.cpp:229
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
 msgstr ""
+"Погодите друге оружјем док не изгубе све животе. (Само у играма са више "
+"играча)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -894,24 +926,26 @@ msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
 msgstr ""
+"Уколико видите дугме са катанцем попут овог, треба да завршите изазов да га "
+"откључате."
 
 #. I18N: message shown when an input device is used but is not associated to any player
 #: src/input/input_manager.cpp:492
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Игнорисан '%s'. Требао/ла си се раније прикључити да би играо/ла!"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #. I18N: Addons
 #: data/po/gui_strings.h:54
 msgid "Install"
-msgstr ""
+msgstr "Инсталирај"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:618
 msgid "Intermediate"
-msgstr ""
+msgstr "Средњи"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -919,52 +953,52 @@ msgstr ""
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:6 data/po/gui_strings.h:25
 msgid "Karts"
-msgstr ""
+msgstr "Картеви"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: data/po/gui_strings.h:89
 msgid "Keep this resolution"
-msgstr ""
+msgstr "Задржи ову резолуцију"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:220
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr ""
+msgstr "Одржавајте брзину са карт вођом, али га не претичите!"
 
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:765
 msgid "Konqi"
-msgstr ""
+msgstr "Конки"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui.cpp:90
 msgid "Lap"
-msgstr ""
+msgstr "Круг"
 
 #: src/modes/linear_world.cpp:311
 #, c-format
 msgid "Lap %i"
-msgstr ""
+msgstr "Круг %i"
 
 #: src/modes/follow_the_leader.cpp:190
 msgid "Leader"
-msgstr ""
+msgstr "Вођа"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:186
 msgid "Left"
-msgstr ""
+msgstr "Лево"
 
 #: src/guiengine/engine.cpp:1061
 msgid "Loading"
-msgstr ""
+msgstr "Учитавам"
 
 #. I18N: ./data/gui/mainaddons.stkgui
 #. I18N: In the main screen
 #: data/po/gui_strings.h:339
 msgid "Loading news from stkaddons..."
-msgstr ""
+msgstr "Учитавам новости са \"stkaddons\"..."
 
 #: src/states_screens/arenas_screen.cpp:188
 #: src/states_screens/arenas_screen.cpp:211
@@ -975,48 +1009,48 @@ msgstr ""
 #: src/states_screens/tracks_screen.cpp:261
 #: src/states_screens/tracks_screen.cpp:285
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
+msgstr "Закључано : пређите активне изазове да добијете приступ другима!"
 
 #: src/states_screens/tracks_screen.cpp:216
 msgid "Locked!"
-msgstr ""
+msgstr "Закључано!"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:171
 msgid "Look Back"
-msgstr ""
+msgstr "Поглед уназад"
 
 #: src/items/powerup.cpp:80
 msgid "Magic, son. Nothing else in the world smells like that."
-msgstr ""
+msgstr "Магија, сине. Ништа друго на свету не мирише тако."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:140
 msgid "Make your rivals bite dust!"
-msgstr ""
+msgstr "Нека Вам ривали једу прашину!"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:113
 msgid "Menu Keys"
-msgstr ""
+msgstr "Тастери Менија"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:272
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr ""
+msgstr "Оса миша %d %s"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:268
 #, c-format
 msgid "Mouse button %d"
-msgstr ""
+msgstr "Тастер миша %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
 #: data/po/gui_strings.h:768
 msgid "Mozilla"
-msgstr ""
+msgstr "Мозила"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1029,57 +1063,57 @@ msgstr ""
 #: data/po/gui_strings.h:136 data/po/gui_strings.h:187
 #: data/po/gui_strings.h:235 data/po/gui_strings.h:281
 msgid "Multiplayer"
-msgstr ""
+msgstr "Више играча"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
 #: data/po/gui_strings.h:394
 msgid "Music"
-msgstr ""
+msgstr "Музика"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:40
 msgid "Name:"
-msgstr ""
+msgstr "Назив:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:70
 #, c-format
 msgid "Name: %i"
-msgstr ""
+msgstr "Назив: %i"
 
 #: src/challenges/challenge.cpp:62
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Нови Гран При '%s' је сада доступан"
 
 #: src/challenges/challenge.cpp:67
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr ""
+msgstr "Нова тежина '%s' је сада доступна"
 
 #: src/modes/linear_world.cpp:363
 msgid "New fastest lap"
-msgstr ""
+msgstr "Нов најбржи круг"
 
 #: src/challenges/challenge.cpp:51
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Нови мод игре '%s' је сада доступан"
 
 #: src/challenges/challenge.cpp:77
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Нови карт '%s' је сада доступан"
 
 #: src/challenges/challenge.cpp:45
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Нова стаза '%s' је сада доступна"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:165
 msgid "Nitro"
-msgstr ""
+msgstr "Нитро"
 
 #. I18N: ./data/karts/nolok/kart.xml
 #: data/po/gui_strings.h:771
@@ -1089,29 +1123,29 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
 msgid "Normal Race"
-msgstr ""
+msgstr "Нормална трка"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:614
 msgid "Novice"
-msgstr ""
+msgstr "Новајлија"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: In race setup menu
 #: data/po/gui_strings.h:610
 msgid "Number of AI karts"
-msgstr ""
+msgstr "Број АИ картева"
 
 #: src/states_screens/dialogs/message_dialog.cpp:57
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. I18N: message shown when a player that isn't game master tries to modify options that
 #. I18N: only the game master is allowed to
 #: src/input/input_manager.cpp:517
 msgid "Only the Game Master may act at this point!"
-msgstr ""
+msgstr "Само Мајстор игре може да делује у овом тренутку!"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -1122,38 +1156,38 @@ msgstr ""
 #: data/po/gui_strings.h:323 data/po/gui_strings.h:359
 #: data/po/gui_strings.h:595
 msgid "Options"
-msgstr ""
+msgstr "Opcije"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:206
 msgid "Parachute - slows down all karts in a better position!"
-msgstr ""
+msgstr "Падобран - успорава све картеве на бољој позицији!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #: data/po/gui_strings.h:579
 msgid "Paused"
-msgstr ""
+msgstr "Паузирано"
 
 #: src/karts/controller/player_controller.cpp:281
 msgid "Penalty time!!"
-msgstr ""
+msgstr "Казнено време!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
 #: data/po/gui_strings.h:738
 msgid "Penguin Playground"
-msgstr ""
+msgstr "Пингвиново игралиште"
 
 #. I18N: ./data/karts/pidgin/kart.xml
 #: data/po/gui_strings.h:774
 msgid "Pidgin"
-msgstr ""
+msgstr "Писмоноша (pidgin)"
 
 #. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
 #: src/states_screens/kart_selection.cpp:259
 #: src/states_screens/kart_selection.cpp:409
 #, c-format
 msgid "Player %i (%s)"
-msgstr ""
+msgstr "Играч %i (%s)"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1169,12 +1203,12 @@ msgstr ""
 #: data/po/gui_strings.h:464 data/po/gui_strings.h:498
 #: data/po/gui_strings.h:529
 msgid "Players"
-msgstr ""
+msgstr "Играчи"
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:399
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Молимо поново конфигуришите тастере игре"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:200
@@ -1182,6 +1216,8 @@ msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight!"
 msgstr ""
+"Вакуум гума - баците право да повучете противника уназад, или баците када "
+"гледате назад да некога заслепите!"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: When configuring input
@@ -1189,24 +1225,24 @@ msgstr ""
 #. I18N: When configuring input
 #: data/po/gui_strings.h:108 data/po/gui_strings.h:576
 msgid "Press ESC to cancel"
-msgstr ""
+msgstr "Притисни ESC за прекид"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #: data/po/gui_strings.h:568
 msgid "Press a key"
-msgstr ""
+msgstr "Притисни тастер"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In key bindings configuration menu
 #: data/po/gui_strings.h:472
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
+msgstr "Притисни \"enter\" или дупло кликни на уређај да би га конфигурисао"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:506
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr ""
+msgstr "Притисни \"enter\" или дупло кликни на играча да га/је измениш"
 
 #. I18N: ./data/karts/puffy/kart.xml
 #: data/po/gui_strings.h:777
@@ -1219,7 +1255,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:335 data/po/gui_strings.h:371
 msgid "Quit"
-msgstr ""
+msgstr "Изађи"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -1227,42 +1263,42 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:311 data/po/gui_strings.h:343
 msgid "Race"
-msgstr ""
+msgstr "Трка"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:104
 msgid "Race Results"
-msgstr ""
+msgstr "Резултати трке"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:606
 msgid "Race Setup"
-msgstr ""
+msgstr "Подешавање трке"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:380
 msgid "Race in this track again"
-msgstr ""
+msgstr "Тркај се поново на овој стази"
 
 #: src/states_screens/arenas_screen.cpp:221
 msgid "Random Arena"
-msgstr ""
+msgstr "Насумична арена"
 
 #: src/states_screens/kart_selection.cpp:781
 #: src/states_screens/kart_selection.cpp:1698
 msgid "Random Kart"
-msgstr ""
+msgstr "Насумични карт"
 
 #: src/states_screens/tracks_screen.cpp:297
 msgid "Random Track"
-msgstr ""
+msgstr "Насумична стаза"
 
 #: src/states_screens/race_gui.cpp:91
 msgid "Rank"
-msgstr ""
+msgstr "Ранг"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui.cpp:96
 msgid "Ready!"
-msgstr ""
+msgstr "Спремни!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1271,125 +1307,127 @@ msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
 msgstr ""
+"Обична трка : сви ударци дозвољени, зато ухватите оружје и паметно га "
+"употребите!"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:108
 msgid "Remove"
-msgstr ""
+msgstr "Уклони"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:74
 msgid "Rename"
-msgstr ""
+msgstr "Преименуј"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:174
 msgid "Rescue"
-msgstr ""
+msgstr "Спашавање"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:553
 msgid "Resolution"
-msgstr ""
+msgstr "Резолуција"
 
 #: src/states_screens/race_result_gui.cpp:97
 #: src/states_screens/race_result_gui.cpp:110
 msgid "Restart"
-msgstr ""
+msgstr "Поново покрени"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:591
 msgid "Restart Race"
-msgstr ""
+msgstr "Понови трку"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:189
 msgid "Right"
-msgstr ""
+msgstr "Десно"
 
 #: src/states_screens/race_result_gui.cpp:86
 msgid "See unlocked feature"
-msgstr ""
+msgstr "Види откључану посебност"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:353
 #: src/states_screens/race_result_gui.cpp:87
 msgid "See unlocked features"
-msgstr ""
+msgstr "Види откључане посебности"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:192
 msgid "Select"
-msgstr ""
+msgstr "Изабери"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:625
 msgid "Select a game mode"
-msgstr ""
+msgstr "Изабери мод игре"
 
 #: src/states_screens/race_gui.cpp:97
 msgid "Set!"
-msgstr ""
+msgstr "Позор!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_over_dialog.cpp:369
 #: src/states_screens/race_result_gui.cpp:107 data/po/gui_strings.h:587
 msgid "Setup New Race"
-msgstr ""
+msgstr "Подеси нову трку"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:168
 msgid "Sharp Turn"
-msgstr ""
+msgstr "Оштро скретање"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:537
 msgid "Skin"
-msgstr ""
+msgstr "Маска"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
 #: data/po/gui_strings.h:741
 msgid "Snag Drive"
-msgstr ""
+msgstr "Чворугава вожња"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
 #: data/po/gui_strings.h:406
 msgid "Sound Effects"
-msgstr ""
+msgstr "Звучни ефекти"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: data/po/gui_strings.h:62
 msgid "Standard"
-msgstr ""
+msgstr "Стандард"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:144
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Почни Гран При"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:141
 msgid "Start Race"
-msgstr ""
+msgstr "Почни трку"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:150
 msgid "Steer Left"
-msgstr ""
+msgstr "Скрени лево"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:153
 msgid "Steer Right"
-msgstr ""
+msgstr "Скрени десно"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: ./data/gui/addons_update.stkgui
 #: data/po/gui_strings.h:2 data/po/gui_strings.h:21
 msgid "SuperTuxKart Addons"
-msgstr ""
+msgstr "SuperTuxKart Додаци"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
@@ -1398,7 +1436,7 @@ msgstr ""
 #: data/po/gui_strings.h:120 data/po/gui_strings.h:171
 #: data/po/gui_strings.h:219 data/po/gui_strings.h:265
 msgid "SuperTuxKart Help"
-msgstr ""
+msgstr "SuperTuxKart Помоћ"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
@@ -1409,17 +1447,17 @@ msgstr ""
 #: data/po/gui_strings.h:452 data/po/gui_strings.h:486
 #: data/po/gui_strings.h:517
 msgid "SuperTuxKart Options"
-msgstr ""
+msgstr "SuperTuxKart Опције"
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:284
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr ""
+msgstr "SuperTuxKart се може играти у моду са више играча на истом рачунару"
 
 #. I18N: ./data/gui/help3.stkgui
 #: data/po/gui_strings.h:238
 msgid "SuperTuxKart features several game modes"
-msgstr ""
+msgstr "SuperTuxKart има неколико модова игре"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:212
@@ -1427,11 +1465,12 @@ msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
 msgstr ""
+"Замена - поклон кутије се преобразе у банане и обратно на кратко време"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:744
 msgid "Test"
-msgstr ""
+msgstr "Тест"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
@@ -1440,35 +1479,41 @@ msgid ""
 "The 'sharp turn' key allows you to do sharp turns and have better control in "
 "tight curves"
 msgstr ""
+"Тастер 'оштро скретање' Вам омогућава да оштро скрећете и имате бољу "
+"контролу у уским кривинама"
 
 #: src/items/powerup.cpp:64
 msgid "The Space Shuttle has landed!"
-msgstr ""
+msgstr "Спејсшатл је слетео!"
 
 #: src/race/highscore_manager.cpp:96
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr ""
+"Датотека са најбољим резултатима је превише стара,\n"
+"сви најбољи резултати су избрисани."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:149
 msgid "This Grand Prix is broken!"
-msgstr ""
+msgstr "Овај Гран При је сломљен!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:688
 msgid "Time"
-msgstr ""
+msgstr "Време"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:145
 msgid "Time Trial"
-msgstr ""
+msgstr "Временом ограничена трка"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:246
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
+"Временом ограничена трка: Не садржи појачања, тако да само Ваше вештине "
+"вожње важе!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:49
 msgid ""
@@ -1481,17 +1526,26 @@ msgid ""
 "connect multiple keyboards to the computer. Remember that everyone still "
 "needs different keybindings in this case.)"
 msgstr ""
+"Да бисте додали нови гејмпед/џојстик уређај, једноставно покрените "
+"SuperTuxKart са прикљученим уређајем и он ће се појавити на листи.\n"
+"\n"
+"Да бисте додали конфигурацију тастатуре, можете користити дугме испод, "
+"МЕЂУТИМ, молимо обратите пажњу да већина тастатура подржава само ограничен "
+"број истовремено притиснутих тастера, те су стога неподесне за играње са "
+"више играча. (Можете, међутим, да прикључите више тастатура за рачунар. "
+"Запамтите да и у овом случају сваки играч треба имати друге тастере за игру.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:191
 msgid "To help you win, there are some powerups you can collect :"
 msgstr ""
+"Да Вам помогну да победите, постоје нека појачања која можете покупити :"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
 #: data/po/gui_strings.h:747
 msgid "To the Moon and Back"
-msgstr ""
+msgstr "До Месеца и назад"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui.cpp:94
@@ -1503,7 +1557,7 @@ msgstr ""
 #: src/states_screens/dialogs/track_info_dialog.cpp:74
 #, c-format
 msgid "Track by %s"
-msgstr ""
+msgstr "Стазу направио/ла - %s"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -1511,7 +1565,7 @@ msgstr ""
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:10 data/po/gui_strings.h:29
 msgid "Tracks"
-msgstr ""
+msgstr "Стазе"
 
 #. I18N: ./data/karts/tux/kart.xml
 #: data/po/gui_strings.h:780
@@ -1520,12 +1574,12 @@ msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:63
 msgid "Uninstall"
-msgstr ""
+msgstr "Деинсталирај"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:180
 msgid "Up"
-msgstr ""
+msgstr "Горе"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -1534,21 +1588,21 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:61 data/po/gui_strings.h:14
 #: data/po/gui_strings.h:33
 msgid "Update"
-msgstr ""
+msgstr "Ажурирај"
 
 #: src/states_screens/addons_screen.cpp:157
 msgid "Updating the list..."
-msgstr ""
+msgstr "Ажурирам листу..."
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:46
 msgid "Version:"
-msgstr ""
+msgstr "Издање:"
 
 #: src/states_screens/dialogs/addons_loading.cpp:72
 #, c-format
 msgid "Version: %i"
-msgstr ""
+msgstr "Издање: %i"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1556,11 +1610,11 @@ msgstr ""
 #. I18N: Sound volume in options
 #: data/po/gui_strings.h:402 data/po/gui_strings.h:414
 msgid "Volume"
-msgstr ""
+msgstr "Јачина"
 
 #: src/modes/linear_world.cpp:821
 msgid "WRONG WAY!"
-msgstr ""
+msgstr "ПОГРЕШАН ПУТ!"
 
 #: src/states_screens/options_screen_input2.cpp:335
 msgid ""
@@ -1568,6 +1622,9 @@ msgid ""
 "keys that contain a character that is different in upper-case will stop "
 "working."
 msgstr ""
+"Упозорење, 'shift' није препоручен тастер : када је 'shift' притиснут, сви "
+"тастери који садрже карактер који је другачији када се пише великим словима, "
+"престаће да функционишу."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1580,7 +1637,7 @@ msgstr ""
 #: data/po/gui_strings.h:128 data/po/gui_strings.h:179
 #: data/po/gui_strings.h:227 data/po/gui_strings.h:273
 msgid "Weapons"
-msgstr ""
+msgstr "Оружја"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1593,6 +1650,12 @@ msgid ""
 "kart. The game continues when everyone selected their kart. Note that the "
 "mouse may not be used for this operation."
 msgstr ""
+"Када су уређаји за \"унос\" конфигурисани, спремни сте за игру. Једноставно "
+"покрените нову трку одабиром иконе трке у главном менију. Када је време да "
+"одаберете карт, сваки играч може да притисне тастер 'пуцај' да се придружи "
+"игри. Сваки играч може да користи сопствени уређај за \"унос\" да изабере "
+"себи карт. Игра се наставља када свако одабере свој карт. Приметите да се "
+"миш не може користити за ову операцију."
 
 #. I18N: ./data/karts/wilber/kart.xml
 #: data/po/gui_strings.h:783
@@ -1602,141 +1665,149 @@ msgstr ""
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:636
 msgid "Win Penguin Playground Grand Prix"
-msgstr ""
+msgstr "Освоји Гран При Пингвиново игралиште"
 
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:639
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
-msgstr ""
+msgstr "Освоји Гран При Пингвиново игралиште са 3 Експерт АИ карта."
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:654
 msgid "Win To the Moon and Back Grand Prix"
-msgstr ""
+msgstr "Освоји Гран При До Месеца и назад"
 
 #. I18N: ./data/tracks/skyline/skyline.challenge
 #: data/po/gui_strings.h:717
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
 msgstr ""
+"Победи у трци од једног круга Главом уз главу у Тајним вртовима против 1 "
+"Експерт АИ карта."
 
 #. I18N: ./data/tracks/xr591/xr591.challenge
 #: data/po/gui_strings.h:729
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
-msgstr ""
+msgstr "Победи трку од 3 круга на Кањону против 4 Експерт АИ карта."
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:669
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
-msgstr ""
+msgstr "Победи трку од 3 круга на Утврди Магма против 3 Експерт АИ карта."
 
 #. I18N: ./data/tracks/islandtrack/island.challenge
 #: data/po/gui_strings.h:699
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
+"Победи трку од 3 круга на Снежној планини за мање од 3:05 против 3 АИ карта "
+"средње тежине."
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:675
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
-msgstr ""
+msgstr "Победи трку од 3 круга на Tux Tollway против 4 Експерт АИ карта."
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:651
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
-msgstr ""
+msgstr "Победи Прати вођу трку против 3 АИ карта на Напуштеном острву"
 
 #. I18N: ./data/tracks/lighthouse/lighthouse.challenge
 #: data/po/gui_strings.h:705
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
-msgstr ""
+msgstr "Победи Прати вођу трку са 5 АИ картева на Звезданим стазама."
 
 #. I18N: ./data/tracks/skyline/skyline.challenge
 #: data/po/gui_strings.h:714
 msgid "Win a Head to Head in the Secret Garden"
-msgstr ""
+msgstr "Победи Главом уз главу у Тајним вртовима."
 
 #. I18N: ./data/tracks/xr591/xr591.challenge
 #: data/po/gui_strings.h:726
 msgid "Win a race on Canyon"
-msgstr ""
+msgstr "Победи трку на Кањону"
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:666
 msgid "Win a race on Fort Magma"
-msgstr ""
+msgstr "Победи трку на Утврда Магма"
 
 #. I18N: ./data/tracks/islandtrack/island.challenge
 #: data/po/gui_strings.h:696
 msgid "Win a race on Snow Mountain"
-msgstr ""
+msgstr "Победи трку на Снежној планини"
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:672
 msgid "Win a race on Tux Tollway"
-msgstr ""
+msgstr "Победи трку на Tux Tollway"
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:642
 msgid "Win the At World's End Grand Prix"
-msgstr ""
+msgstr "Освоји Гран При На крају света"
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:657
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
-msgstr ""
+msgstr "Освоји Гран При До Месеца и назад са 3 Експерт АИ карта."
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: data/po/gui_strings.h:81
 msgid "Yes"
-msgstr ""
+msgstr "Да"
 
 #: src/states_screens/grand_prix_win.cpp:360
 msgid "You completed the Grand Prix!"
-msgstr ""
+msgstr "Завршили сте Гран При!"
 
 #: src/karts/kart.cpp:523 src/karts/kart.cpp:542
 msgid "You finished the race!"
-msgstr ""
+msgstr "Завршили сте трку!"
 
 #: src/modes/world.cpp:678
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Елиминисани сте!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:341
 #: src/states_screens/grand_prix_win.cpp:99
 msgid "You unlocked a new feature!"
-msgstr ""
+msgstr "Откључали сте нову посебност!"
 
 #: src/karts/kart.cpp:523 src/karts/kart.cpp:542
 msgid "You won the race!"
-msgstr ""
+msgstr "Победили сте у трци!"
 
 #: src/config/user_config.cpp:424
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Ваша конфигурациона датотека је била неисправна, те је обрисана и нова ће "
+"бити направљена."
 
 #: src/config/user_config.cpp:434
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Ваша конфигурациона датотека је била превише стара, те је обрисана и нова ће "
+"бити направљена."
 
 #: src/input/device_manager.cpp:401
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
+"Унешена конфигурациона датотека није компатибилна са овом верзијом STK."
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:86
 msgid "[none]"
-msgstr ""
+msgstr "[nijedan/nijedna]"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Olafur Skorrdal https://launchpad.net/~skorrdal\n"
-"  STK-team https://launchpad.net/~stk"
+"  dboki89 https://launchpad.net/~dboki89"
