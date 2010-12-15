@@ -331,6 +331,70 @@ void World::terminateRace()
  */
 void World::resetAllKarts()
 {
+    // If track checking is requested, check all rescue positions if
+    // they are heigh enough.
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+        UserConfigParams::m_track_debug)
+    {
+        const QuadGraph &qg=m_track->getQuadGraph();
+        Vec3 eps = Vec3(0,1.5f*m_karts[0]->getKartHeight(),0);
+        for(unsigned int quad=0; quad<qg.getNumNodes(); quad++)
+        {
+            const Quad &q   = qg.getQuad(quad);
+            const Vec3 center = q.getCenter();
+            // We have to test for all karts, since the karts have different
+            // heights and so things might change from kart to kart.
+            for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
+            {
+                Kart *kart = m_karts[kart_id];
+                kart->setXYZ(center);
+    
+                btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
+                                     m_track->getAngle(quad) );
+                kart->setRotation(heading);
+
+                // A certain epsilon is added here to the Z coordinate, in case
+                // that the drivelines are somewhat under the track. Otherwise,
+                // the kart might be placed a little bit under the track,
+                // triggering a rescue, ... (experimentally found value)
+                float epsilon = 0.5f * kart->getKartHeight();
+
+                btTransform pos;
+                pos.setOrigin(center+eps);
+                pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
+                                m_track->getAngle(quad))                 );
+                kart->getBody()->setCenterOfMassTransform(pos);
+                bool kart_over_ground = m_physics->projectKartDownwards(kart);
+                if(kart_over_ground)
+                {
+                    const Vec3 &xyz = kart->getTrans().getOrigin()+Vec3(0,0.3f,0);
+                    ((TerrainInfo*)kart)->update(xyz);
+                    const Material *material = kart->getMaterial();
+                    if(!material || material->isReset())
+                        kart_over_ground = false;
+                }
+                if(!kart_over_ground)
+                {
+                    printf("Kart '%s' not over quad '%d'\n",
+                        kart->getIdent().c_str(), quad);
+                    printf("Center point: %f %f %f\n",
+                        center.getX(), center.getY(), center.getZ());
+
+                }
+            }   // for kart_id<m_karts.size()
+        }   // for quad < quad_graph.getNumNodes
+
+        for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
+        {
+            // Reset the karts back to the original start position.
+            // This call is a bit of an overkill, but setting the correct
+            // transforms, positions, motion state is a bit of a hassle.
+            m_karts[kart_id]->reset();
+        }
+
+    }   // if m_track_debug
+
+
     m_schedule_pause = false;
     m_schedule_unpause = false;
     
