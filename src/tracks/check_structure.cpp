@@ -154,7 +154,7 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
             {
                 // At least on gcc 4.3.2 we can't simply print 
                 // cs->m_is_active[kart_index] ("cannot pass objects of
-                // non-POD type ‘struct std::_Bit_reference’ through ‘...’; 
+                // non-POD type 'struct std::_Bit_reference' through '...'; 
                 // call will abort at runtime"). So we use this somewhat
                 // unusual but portable construct.
                 printf("CHECK: Toggling %d for %s from %d.\n",
