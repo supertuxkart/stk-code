@@ -83,6 +83,15 @@ void OptionsScreenAudio::init()
 
 // -----------------------------------------------------------------------------
 
+void OptionsScreenAudio::tearDown()
+{
+    Screen::tearDown();
+    // save changes when leaving screen
+    user_config->saveConfig();
+}   // tearDown
+
+// -----------------------------------------------------------------------------
+
 void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "options_choice")
