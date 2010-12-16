@@ -54,7 +54,7 @@ UnlockManager::UnlockManager()
                                         i != result.end()  ; i++)
     {
         if (StringUtils::hasSuffix(*i, ".challenge")) 
-            addChallenge(file_manager->getConfigFile(*i));
+            addChallenge(file_manager->getDataFile(*i));
     }   // for i
 
     // Read challenges from .../data/tracks/*
@@ -135,7 +135,7 @@ UnlockManager::UnlockManager()
                                         i != result.end()  ; i++)
     {
         if (StringUtils::hasSuffix(*i, ".challenge")) 
-            addChallenge(file_manager->getConfigFile("grandprix/"+*i));
+            addChallenge(file_manager->getDataFile("grandprix/"+*i));
     }   // for i
 
     // Hard coded challenges can be added here.

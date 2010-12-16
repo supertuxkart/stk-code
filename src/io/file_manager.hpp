@@ -78,7 +78,7 @@ public:
     io::IXMLReader *createXMLReader(const std::string &filename);
     XMLNode        *createXMLTree(const std::string &filename);
 
-    std::string getConfigDir     () const;
+    std::string     getConfigDir () const;
     bool            checkAndCreateDirectoryP(const std::string &path);
 #ifdef ADDONS_MANAGER
     std::string getAddonsDir     () const;
@@ -94,7 +94,7 @@ public:
     std::string getTextureFile   (const std::string& fname) const;
     std::string getKartFile      (const std::string& fname,
                                   const std::string& kart="") const;
-    std::string getConfigFile    (const std::string& fname) const;
+    std::string getDataFile      (const std::string& fname) const;
     std::string getHighscoreFile (const std::string& fname) const;
     std::string getChallengeFile (const std::string& fname) const;
     std::string getLogFile       (const std::string& fname) const;

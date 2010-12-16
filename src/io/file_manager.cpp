@@ -74,12 +74,16 @@
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
     printf("[FileManager] checking whether we are using an app bundle... ");
-    // the following code will enable STK to find its data when placed in an app bundle on mac OS X.
+    // the following code will enable STK to find its data when placed in an 
+    // app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
     char path[1024];
     CFBundleRef main_bundle = CFBundleGetMainBundle(); assert(main_bundle);
-    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle); assert(main_bundle_URL);
-    CFStringRef cf_string_ref = CFURLCopyFileSystemPath( main_bundle_URL, kCFURLPOSIXPathStyle); assert(cf_string_ref);
+    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle); 
+    assert(main_bundle_URL);
+    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, 
+                                                        kCFURLPOSIXPathStyle);
+    assert(cf_string_ref);
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
@@ -114,12 +118,12 @@ FileManager::FileManager(char *argv[])
 {
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
-    // since the code above may rely on it, save it to be able to restore it after.
+    // since the code above may rely on it, save it to be able to restore 
+    // it after.
     char buffer[256];
     getcwd(buffer, 256);
 #endif
 
-    //std::cout << "^^^^^^^^ CREATING m_device (NULL) in FileManager ^^^^^^^^\n";
     m_device = createDevice(video::EDT_NULL);
 
 #ifdef __APPLE__
@@ -360,15 +364,15 @@ std::string FileManager::getKartFile(const std::string& fname,
 }   // getKartFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getConfigFile(const std::string& fname) const
+std::string FileManager::getDataFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
-}   // getConfigFile
+}   // getDataFile
 
 //-----------------------------------------------------------------------------
 /** If the directory specified in path does not exist, it is created.
  * \params path Directory to test.
- * \return      True if the directory exists or could be created, false otherwise.
+ * \return  True if the directory exists or could be created, false otherwise.
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
@@ -434,7 +438,8 @@ void FileManager::checkAndCreateConfigDir()
         m_config_dir  = getenv("APPDATA");
         if(!checkAndCreateDirectory(m_config_dir))
         {
-            fprintf(stderr, "Can't create config dir '%s', falling back to '.'.\n",
+            fprintf(stderr, 
+                    "Can't create config dir '%s', falling back to '.'.\n",
                     m_config_dir.c_str());
             m_config_dir = ".";
         }
@@ -453,7 +458,8 @@ void FileManager::checkAndCreateConfigDir()
     else
     {
         std::cerr << "No home directory, this should NOT happen!\n";
-        // Fall back to system-wide app data (rather than user-specific data), but should not happen anyway.
+        // Fall back to system-wide app data (rather than user-specific data),
+        // but should not happen anyway.
         m_config_dir = "";
 	}
     m_config_dir += "/Library/Application Support/";
@@ -467,7 +473,8 @@ void FileManager::checkAndCreateConfigDir()
 	}
     else if (!getenv("HOME"))
     {
-	    std::cerr << "No home directory, this should NOT happen - trying '.' for config files!\n";
+	    std::cerr << "No home directory, this should NOT happen "
+                  << "- trying '.' for config files!\n";
         m_config_dir = ".";
     }
     else
@@ -477,7 +484,8 @@ void FileManager::checkAndCreateConfigDir()
         if(!checkAndCreateDirectory(m_config_dir))
         {
             // If $HOME/.config can not be created:
-            fprintf(stderr, "Can't create dir '%s', falling back to use '%s'.\n",
+            fprintf(stderr, 
+                    "Can't create dir '%s', falling back to use '%s'.\n",
                     m_config_dir.c_str(), getenv("HOME"));
             m_config_dir = getenv("HOME");
             m_config_dir += ".";
@@ -491,8 +499,9 @@ void FileManager::checkAndCreateConfigDir()
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
-        fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
-            m_config_dir.c_str());
+        fprintf(stderr, 
+                "Can not  create config dir '%s', falling back to '.'.\n",
+                m_config_dir.c_str());
         m_config_dir = ".";
     }
     return;
@@ -514,7 +523,8 @@ void FileManager::checkAndCreateAddonsDir()
 	}
     else if (!getenv("HOME"))
     {
-	    std::cerr << "No home directory, this should NOT happen - trying '.addons' for addons files!\n";
+	    std::cerr << "No home directory, this should NOT happen "
+                  << "- trying '.addons' for addons files!\n";
         m_addons_dir = "stkaddons";
     }
     else
@@ -524,7 +534,8 @@ void FileManager::checkAndCreateAddonsDir()
         if(!checkAndCreateDirectory(m_config_dir))
         {
             // If $HOME/.config can not be created:
-            fprintf(stderr, "Can't create dir '%s', falling back to use '%s'.\n",
+            fprintf(stderr, 
+                    "Can't create dir '%s', falling back to use '%s'.\n",
                     m_config_dir.c_str(), getenv("HOME"));
             m_addons_dir = getenv("HOME");
             m_addons_dir += ".";
@@ -539,7 +550,9 @@ void FileManager::checkAndCreateAddonsDir()
 
     if(!checkAndCreateDirectory(m_addons_dir))
     {
-        fprintf(stderr, "Can not create add-ons dir '%s', falling back to '.'.\n", m_addons_dir.c_str());
+        fprintf(stderr, 
+                "Can not create add-ons dir '%s', falling back to '.'.\n", 
+                m_addons_dir.c_str());
         m_config_dir = ".";
     }
     else
@@ -547,7 +560,8 @@ void FileManager::checkAndCreateAddonsDir()
         //we hope that there will be no problem since we created the other dir
         if (!checkAndCreateDirectory(m_addons_dir + "/data/"))
         {
-            fprintf(stderr, "Failed to create add-ons data dir at '%s'\n", (m_addons_dir + "/data/").c_str());
+            fprintf(stderr, "Failed to create add-ons data dir at '%s'\n",
+                    (m_addons_dir + "/data/").c_str());
         }
     }
     return;
@@ -580,7 +594,8 @@ std::string FileManager::getMusicFile(const std::string& fname) const
     const bool success = findFile(path, fname, m_music_search_path);
     if (!success)
     {
-        throw std::runtime_error("[FileManager::getMusicFile] Cannot find music file <" + fname + ">");
+        throw std::runtime_error(
+            "[FileManager::getMusicFile] Cannot find music file <"+fname+">");
     }
     return path;
 }   // getMusicFile
@@ -614,7 +629,6 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 {
     result.clear();
 
-    std::string previous_cwd1 = std::string(m_file_system->getWorkingDirectory().c_str());
 #ifdef WIN32
     std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
 #else
@@ -627,7 +641,7 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
     if(stat(path.c_str(), &mystat) < 0) return;
     if(! S_ISDIR(mystat.st_mode))       return;
 
-    std::string previous_cwd = std::string(m_file_system->getWorkingDirectory().c_str());
+    io::path previous_cwd = m_file_system->getWorkingDirectory();
 
     if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
     {
@@ -642,14 +656,15 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
                                      : files->getFileName(n).c_str()         );
     }
 
-    m_file_system->changeWorkingDirectoryTo( previous_cwd.c_str() );
+    m_file_system->changeWorkingDirectoryTo( previous_cwd );
     files->drop();
 }   // listFiles
 
 //-----------------------------------------------------------------------------
 
 #ifdef ADDONS_MANAGER
-void FileManager::checkAndCreateDirForAddons(std::string addons_name, std::string addons_type)
+void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
+                                             std::string addons_type)
 {
     bool success = checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type);
     if(!success)

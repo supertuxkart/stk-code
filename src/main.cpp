@@ -147,7 +147,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
-            stk_config->load(file_manager->getConfigFile(argv[i+1]));
+            stk_config->load(file_manager->getDataFile(argv[i+1]));
             fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
             i++;
         }
@@ -551,7 +551,7 @@ void initUserConfig(char *argv[])
 //=============================================================================
 void initRest()
 {
-    stk_config->load(file_manager->getConfigFile("stk_config.xml"));
+    stk_config->load(file_manager->getDataFile("stk_config.xml"));
 
     irr_driver              = new IrrDriver();
     

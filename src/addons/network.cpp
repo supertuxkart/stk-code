@@ -113,9 +113,9 @@ bool download(std::string file, const std::string &save, int * progress_data)
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	FILE * fout;
 	if(save != "")
-	    fout = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
+	    fout = fopen(std::string(file_manager->getConfigDir() + "/" + save).c_str(), "w");
     else
-    	fout = fopen(std::string(file_manager->getConfigDir() + std::string("/") + file).c_str(), "w");
+    	fout = fopen(std::string(file_manager->getConfigDir() + "/" + file).c_str(), "w");
 	
 	
 	//from and out
