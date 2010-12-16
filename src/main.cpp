@@ -611,7 +611,9 @@ void cleanTuxKart()
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     if(race_manager)            delete race_manager;
+#ifdef ADDONS_MANAGER
     if(network_http)            delete network_http;
+#endif
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
