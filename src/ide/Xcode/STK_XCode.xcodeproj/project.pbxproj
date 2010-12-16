@@ -56,7 +56,6 @@
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
-		954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C270FF98B6E0047FE3E /* animation_manager.cpp */; };
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
 		954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */; };
 		9551B27111DC0D4D002DD140 /* addons_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B26D11DC0D4D002DD140 /* addons_screen.cpp */; };
@@ -259,6 +258,8 @@
 		956C6ED61128D3FB004336C8 /* new_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECF1128D3FB004336C8 /* new_ai_controller.cpp */; };
 		956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ED11128D3FB004336C8 /* player_controller.cpp */; };
 		9574F17C11206881008D202E /* world_status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9574F17A11206881008D202E /* world_status.cpp */; };
+		9576460712BAD1CF00DB80C7 /* tutorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460312BAD1CF00DB80C7 /* tutorial.cpp */; };
+		9576460812BAD1CF00DB80C7 /* tutorial_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */; };
 		957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957ED47E1163FF18002AB42C /* ai_base_controller.cpp */; };
 		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
 		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
@@ -282,6 +283,7 @@
 		958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D8C53104F523000A81934 /* race_paused_dialog.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
+		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
@@ -432,8 +434,6 @@
 		954E486911B19C4100B1DF63 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = fribidi.framework; path = /Library/Frameworks/fribidi.framework; sourceTree = "<absolute>"; };
 		954E4C250FF98B6E0047FE3E /* animation_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_base.cpp; path = ../../animations/animation_base.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C260FF98B6E0047FE3E /* animation_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = animation_base.hpp; path = ../../animations/animation_base.hpp; sourceTree = SOURCE_ROOT; };
-		954E4C270FF98B6E0047FE3E /* animation_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_manager.cpp; path = ../../animations/animation_manager.cpp; sourceTree = SOURCE_ROOT; };
-		954E4C280FF98B6E0047FE3E /* animation_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = animation_manager.hpp; path = ../../animations/animation_manager.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = billboard_animation.cpp; path = ../../animations/billboard_animation.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C2A0FF98B6E0047FE3E /* billboard_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = billboard_animation.hpp; path = ../../animations/billboard_animation.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = three_d_animation.cpp; path = ../../animations/three_d_animation.cpp; sourceTree = SOURCE_ROOT; };
@@ -497,6 +497,10 @@
 		956C6ED21128D3FB004336C8 /* player_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player_controller.hpp; path = ../../karts/controller/player_controller.hpp; sourceTree = SOURCE_ROOT; };
 		9574F17A11206881008D202E /* world_status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_status.cpp; path = ../../modes/world_status.cpp; sourceTree = SOURCE_ROOT; };
 		9574F17B11206881008D202E /* world_status.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_status.hpp; path = ../../modes/world_status.hpp; sourceTree = SOURCE_ROOT; };
+		9576460312BAD1CF00DB80C7 /* tutorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial.cpp; path = ../../tutorial/tutorial.cpp; sourceTree = SOURCE_ROOT; };
+		9576460412BAD1CF00DB80C7 /* tutorial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial.hpp; path = ../../tutorial/tutorial.hpp; sourceTree = SOURCE_ROOT; };
+		9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_manager.cpp; path = ../../tutorial/tutorial_manager.cpp; sourceTree = SOURCE_ROOT; };
+		9576460612BAD1CF00DB80C7 /* tutorial_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_manager.hpp; path = ../../tutorial/tutorial_manager.hpp; sourceTree = SOURCE_ROOT; };
 		957BF97811EA96720018118A /* race_gui_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui_base.hpp; path = ../../states_screens/race_gui_base.hpp; sourceTree = SOURCE_ROOT; };
 		957ED47E1163FF18002AB42C /* ai_base_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ai_base_controller.cpp; path = ../../karts/controller/ai_base_controller.cpp; sourceTree = SOURCE_ROOT; };
 		957ED47F1163FF18002AB42C /* ai_base_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ai_base_controller.hpp; path = ../../karts/controller/ai_base_controller.hpp; sourceTree = SOURCE_ROOT; };
@@ -550,6 +554,8 @@
 		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = ../../input/input_device.hpp; sourceTree = SOURCE_ROOT; };
 		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = ../../input/device_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_screen.cpp; path = ../../states_screens/tutorial_screen.cpp; sourceTree = SOURCE_ROOT; };
+		95AAD97F12BAD36300B7B8A3 /* tutorial_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_screen.hpp; path = ../../states_screens/tutorial_screen.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD12102DE08F00EF2001 /* device_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_config.hpp; path = ../../config/device_config.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD13102DE08F00EF2001 /* device_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_config.cpp; path = ../../config/device_config.cpp; sourceTree = SOURCE_ROOT; };
 		95BF1E66127513A100F78AE7 /* max_speed.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = max_speed.cpp; path = ../../karts/max_speed.cpp; sourceTree = SOURCE_ROOT; };
@@ -1257,8 +1263,6 @@
 			children = (
 				954E4C250FF98B6E0047FE3E /* animation_base.cpp */,
 				954E4C260FF98B6E0047FE3E /* animation_base.hpp */,
-				954E4C270FF98B6E0047FE3E /* animation_manager.cpp */,
-				954E4C280FF98B6E0047FE3E /* animation_manager.hpp */,
 				954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */,
 				954E4C2A0FF98B6E0047FE3E /* billboard_animation.hpp */,
 				951BC65C0FFAF290006B5FF1 /* ipo.cpp */,
@@ -1303,6 +1307,18 @@
 			);
 			name = controller;
 			path = ../../karts/controller;
+			sourceTree = SOURCE_ROOT;
+		};
+		9576460212BAD1CF00DB80C7 /* tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				9576460312BAD1CF00DB80C7 /* tutorial.cpp */,
+				9576460412BAD1CF00DB80C7 /* tutorial.hpp */,
+				9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */,
+				9576460612BAD1CF00DB80C7 /* tutorial_manager.hpp */,
+			);
+			name = tutorial;
+			path = ../../tutorial;
 			sourceTree = SOURCE_ROOT;
 		};
 		958330B110122B4A00C5137E /* guiengine */ = {
@@ -1466,6 +1482,7 @@
 				95C2B19C0F296545000D3E5D /* replay */,
 				958330C110122B4A00C5137E /* states_screens */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
+				9576460212BAD1CF00DB80C7 /* tutorial */,
 				95C2B1DF0F296546000D3E5D /* utils */,
 				95C2B1360F296545000D3E5D /* main.cpp */,
 				95C2B1380F296545000D3E5D /* main_loop.cpp */,
@@ -2073,6 +2090,8 @@
 				959482D010EBC0790031BADF /* track_object_manager.hpp */,
 				959482D110EBC0790031BADF /* track_object.cpp */,
 				959482D210EBC0790031BADF /* track_object.hpp */,
+				95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */,
+				95AAD97F12BAD36300B7B8A3 /* tutorial_screen.hpp */,
 			);
 			name = tracks;
 			path = ../../tracks;
@@ -2583,7 +2602,6 @@
 				95D950D30FE473CA002E10AD /* user_config.cpp in Sources */,
 				95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */,
 				954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */,
-				954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */,
 				954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */,
 				954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */,
 				951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */,
@@ -2689,6 +2707,9 @@
 				95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */,
 				9528CC241291E7A10078A5EF /* binding.cpp in Sources */,
 				95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */,
+				9576460712BAD1CF00DB80C7 /* tutorial.cpp in Sources */,
+				9576460812BAD1CF00DB80C7 /* tutorial_manager.cpp in Sources */,
+				95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
