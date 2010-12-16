@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="supertuxkart"
 	ProjectGUID="{B1BC2764-1A43-4800-A654-788B0D05EDA2}"
 	RootNamespace="supertuxkart"
@@ -1042,6 +1042,10 @@
 					RelativePath="..\..\states_screens\tracks_screen.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\states_screens\tutorial_screen.cpp"
+					>
+				</File>
 				<Filter
 					Name="dialogs"
 					>
@@ -1104,6 +1108,18 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tutorial"
+				>
+				<File
+					RelativePath="..\..\tutorial\tutorial.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tutorial\tutorial_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -1932,6 +1948,10 @@
 					RelativePath="..\..\states_screens\tracks_screen.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\states_screens\tutorial_screen.hpp"
+					>
+				</File>
 				<Filter
 					Name="dialogs"
 					>
@@ -1994,6 +2014,18 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tutorial"
+				>
+				<File
+					RelativePath="..\..\tutorial\tutorial.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tutorial\tutorial_manager.hpp"
 					>
 				</File>
 			</Filter>

@@ -226,10 +226,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
     }
-	else if (selection == "tutorial")
-	{
-//FIXME missing atm!		  StateManager::get()->pushScreen(TutorialScreen::getInstance());
-	}
+    else if (selection == "tutorial")
+    {
+        StateManager::get()->pushScreen(TutorialScreen::getInstance());
+    }
 #ifdef ADDONS_MANAGER
     else if (selection == "addons")
     {
