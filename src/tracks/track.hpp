@@ -155,9 +155,6 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
-    /** Animation manager. */
-    AnimationManager         *m_animation_manager;
-
     /** Checkline manager. */
     CheckManager             *m_check_manager;
 

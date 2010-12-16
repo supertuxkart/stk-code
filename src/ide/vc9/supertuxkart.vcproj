@@ -931,10 +931,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\animations\animation_manager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\animations\billboard_animation.cpp"
 					>
 				</File>
@@ -1818,10 +1814,6 @@
 				>
 				<File
 					RelativePath="..\..\animations\animation_base.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\animations\animation_manager.hpp"
 					>
 				</File>
 				<File

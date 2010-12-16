@@ -14,8 +14,6 @@ supertuxkart_SOURCES = \
  main_loop.hpp \
  animations/animation_base.hpp \
  animations/animation_base.cpp \
- animations/animation_manager.cpp \
- animations/animation_manager.hpp \
  animations/billboard_animation.cpp \
  animations/billboard_animation.hpp \
  animations/ipo.cpp \

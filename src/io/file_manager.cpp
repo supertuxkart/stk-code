@@ -557,7 +557,7 @@ void FileManager::checkAndCreateAddonsDir()
 std::string FileManager::getAddonsDir() const
 {
     return m_addons_dir;
-}   // getConfigDir
+}   // getADdonsDir
 /* see l450: to avoid the compilation of unused methods. */
 #endif
 

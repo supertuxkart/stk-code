@@ -27,7 +27,6 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "animations/animation_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -72,7 +71,6 @@ Track::Track(std::string filename)
     m_is_arena             = false;
     m_camera_far           = 1000.0f;
     m_quad_graph           = NULL;
-    m_animation_manager    = NULL;
     m_check_manager        = NULL;
     m_mini_map             = NULL;
     m_sky_dx               = 0.05f;
@@ -98,8 +96,6 @@ Track::~Track()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    if(m_animation_manager)
-        m_animation_manager->reset();
     if(m_check_manager)
         m_check_manager->reset(*this);
     item_manager->reset();
@@ -139,12 +135,6 @@ void Track::cleanup()
         irr_driver->removeMesh(m_all_meshes[i]);
     }
     m_all_meshes.clear();
-    
-    if(m_animation_manager)
-    {
-        delete m_animation_manager;
-        m_animation_manager = NULL;
-    }
 
     if(m_check_manager)
     {
@@ -618,8 +608,6 @@ void Track::update(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    if(m_animation_manager)
-        m_animation_manager->update(dt);
     if(m_check_manager)
         m_check_manager->update(dt);
     item_manager->update(dt);
@@ -825,10 +813,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="camera")
         {
             node->get("far", &m_camera_far);
-        }
-        else if(name=="animations")
-        {
-            m_animation_manager = new AnimationManager(*this, *node);
         }
         else if(name=="checks")
         {
