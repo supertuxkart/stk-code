@@ -36,13 +36,13 @@ private:
 public:
     
              GameTutorial();
-			 virtual ~GameTutorial() {};
+    virtual ~GameTutorial() {};
     
     // clock events
     /*virtual void countdownReachedZero();
     
     // overriding World methods
-	/*
+
     virtual void restartRace();
     virtual std::string getIdent() const;
     float   getClockStartTime();
