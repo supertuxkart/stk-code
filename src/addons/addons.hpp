@@ -22,6 +22,7 @@
 
 #include <string.h>
 #include <map>
+#include <pthread.h>
 #include <vector>
 
 struct addons_prop

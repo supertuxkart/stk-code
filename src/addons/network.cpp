@@ -16,15 +16,22 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef ADDONS_MANAGER
+#include "addons/network.hpp"
+
 #include <curl/curl.h>
 #include <stdio.h>
 #include <string>
-#include "addons/network.hpp"
-#include "config/user_config.hpp"
-#include "states_screens/main_menu_screen.hpp"
-#include "states_screens/addons_screen.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
 
+
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/addons_screen.hpp"
+#include "states_screens/main_menu_screen.hpp"
 
 pthread_mutex_t download_mutex;
 NetworkHttp * network_http = 0;
@@ -76,29 +83,34 @@ std::string NetworkHttp::downloadToStr(std::string url)
 {
 	CURL *session = curl_easy_init();
 
-	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + url).c_str());
+    std::string full_url=UserConfigParams::m_server_addons.toString()+"/"+url;
+	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	
 	std::string fout;
 	
 	//from and out
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA, &fout);
-	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
+	curl_easy_setopt(session, CURLOPT_WRITEDATA,     &fout                 );
+	curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
 	
-	int succes = curl_easy_perform(session);
+	int success = curl_easy_perform(session);
 	
 	//stop curl
 	curl_easy_cleanup(session);
 	
-	if (succes == 0) return fout;
+	if (success == 0) return fout;
 	else             return "";
 }
 
-// ------------------------------------------------------------------------------------------------------
-
-bool download(std::string file, std::string save, int * progress_data)
+// ----------------------------------------------------------------------------
+/** Download a file. The file name isn't absolute, the server in the config 
+ *  will be added to file. 
+ *  \param progress_data is used to have the state of the download (in %)
+ */
+bool download(std::string file, const std::string &save, int * progress_data)
 {
 	CURL *session = curl_easy_init();
-	curl_easy_setopt(session, CURLOPT_URL, std::string(UserConfigParams::m_server_addons.toString() + "/" + file).c_str());
+    std::string full_url=UserConfigParams::m_server_addons.toString()+"/"+file;
+	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	FILE * fout;
 	if(save != "")
 	    fout = fopen(std::string(file_manager->getConfigDir() + std::string("/") + save).c_str(), "w");
@@ -135,9 +147,10 @@ bool download(std::string file, std::string save, int * progress_data)
 
 //FIXME : this way is a bit ugly but the simplest at the moment
 int time_last_print = 0;
-int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+int progressDownload (void *clientp, float dltotal, float dlnow, 
+                      float ultotal, float ulnow)
 {
-    int progress = dlnow/dltotal*100;
+    int progress = (int)(dlnow/dltotal*100);
     if(isnan(dlnow/dltotal*100))
         progress = 0;
     pthread_mutex_lock(&download_mutex);

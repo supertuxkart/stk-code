@@ -906,14 +906,17 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
     
     // ---- Fog
-    // It's important to execute this BEFORE the code that creates the skycube, otherwise the skycube node
-    // could be modified to have fog enabled, which we don't want
+    // It's important to execute this BEFORE the code that creates the skycube,
+    // otherwise the skycube node could be modified to have fog enabled, which
+    // we don't want
     if (m_use_fog && !UserConfigParams::m_camera_debug)
     {
-        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start 
-         and end do not matter */
-        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, 
-                                             m_fog_start, m_fog_end, m_fog_density);
+        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
+           and end do not matter */
+        irr_driver->getVideoDriver()->setFog(m_fog_color, 
+                                             video::EFT_FOG_LINEAR, 
+                                             m_fog_start, m_fog_end,
+                                             m_fog_density);
     }
     
     // Enable for for all track nodes if fog is used

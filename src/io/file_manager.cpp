@@ -502,7 +502,7 @@ void FileManager::checkAndCreateConfigDir()
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32)
-//TODO
+    m_addons_dir  = m_config_dir;
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart";
@@ -707,6 +707,9 @@ bool FileManager::removeDirectory(char const *name)
 
 #else
 //FIXME : check this function, it is only for windows, but I'm on linux.
+    ::RemoveDirectory(name);
+    return true;
+#ifdef XX
 	SHFILEOPSTRUCT sh;
 	sh.hwnd = NULL;
 	sh.wFunc = FO_DELETE;
@@ -718,6 +721,7 @@ bool FileManager::removeDirectory(char const *name)
 	sh.hNameMappings = NULL;
 	
 	return (SHFileOperation(&sh)==0);
+#endif
 #endif
 }
 

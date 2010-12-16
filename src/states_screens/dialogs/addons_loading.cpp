@@ -187,7 +187,7 @@ void AddonsLoading::close()
 void * AddonsLoading::startInstall(void* pthis)
 {
     AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(!addons_manager->IsInstalledAsBool() or addons_manager->NeedUpdate())
+    if(!addons_manager->IsInstalledAsBool() || addons_manager->NeedUpdate())
     {
         addons_manager->Install();
     }

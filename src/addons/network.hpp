@@ -29,17 +29,18 @@ class NetworkHttp
     public:
         NetworkHttp();
         static void * checkNewServer(void * obj);
-        static size_t writeStr(char str [], size_t size, size_t nb_char, std::string * stream);
+        static size_t writeStr(char str [], size_t size, size_t nb_char, 
+                               std::string * stream);
         std::string downloadToStr(std::string url);
 };
 
-extern NetworkHttp * network_http;
-/* * Download a file. The file name isn't absolute, the server in the config will be added to file.
-   * progress_data is used to have the state of the download (in %)*/
-bool download(std::string file, std::string save = "", int * progress_data = 0);
+extern NetworkHttp *network_http;
+bool download(std::string file, const std::string &save = "", 
+              int *progress_data = 0);
 
 
-int progressDownload (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
+int progressDownload (void *clientp, float dltotal, float dlnow,
+                      float ultotal, float ulnow);
 
 extern pthread_mutex_t download_mutex;
 #endif
