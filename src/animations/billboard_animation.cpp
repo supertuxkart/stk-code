@@ -19,6 +19,8 @@
 
 #include "animations/billboard_animation.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 
 class XMLNode;
@@ -37,7 +39,8 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
         irr_driver->getTexture(file_manager->getTextureFile(texture_name));
     m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
                                                        texture);
-    m_node-> setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
+    Material *stk_material = material_manager->getMaterial(texture_name);
+    stk_material->setMaterialProperties(&(m_node->getMaterial(0)));
 
     m_node->setPosition(m_init_xyz);
 }   // BillboardAnimation
