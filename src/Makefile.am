@@ -191,6 +191,8 @@ supertuxkart_SOURCES = \
  karts/moveable.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
+ modes/game_tutorial.cpp \
+ modes/game_tutorial.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
  modes/profile_world.cpp \
@@ -374,6 +376,10 @@ supertuxkart_SOURCES = \
  tracks/track_object.hpp \
  tracks/track_object_manager.cpp \
  tracks/track_object_manager.hpp \
+ tutorial/tutorial_manager.hpp \
+ tutorial/tutorial.cpp \
+ tutorial/tutorial.hpp \
+ tutorial/tutorial_manager.cpp \
  utils/constants.hpp \
  utils/constants.cpp \
  utils/no_copy.hpp \
