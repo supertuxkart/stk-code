@@ -33,15 +33,13 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
     xml_node.get("texture", &texture_name);
     xml_node.get("width",   &width       );
     xml_node.get("height",  &height      );
-    core::vector3df xyz;
-    xml_node.getXYZ(&xyz);
     video::ITexture *texture = 
         irr_driver->getTexture(file_manager->getTextureFile(texture_name));
     m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
                                                        texture);
     m_node-> setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
 
-    m_node->setPosition(xyz);
+    m_node->setPosition(m_init_xyz);
 }   // BillboardAnimation
 
 // ----------------------------------------------------------------------------
@@ -49,11 +47,13 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
  *  \param dt Time since last call. */
 void BillboardAnimation::update(float dt)
 {
-    core::vector3df xyz(0, 0, 0);
+    core::vector3df xyz=m_node->getPosition();
+    // Rotation doesn't make too much sense for a billboard, 
+    // so just set it to 0
     core::vector3df hpr(0, 0, 0);
-    core::vector3df scale(1,1,1);
+    core::vector3df scale = m_node->getScale();
     AnimationBase::update(dt, &xyz, &hpr, &scale);
     m_node->setPosition(xyz);
-    m_node->setScale(xyz);
+    m_node->setScale(scale);
     // Setting rotation doesn't make sense
 }   // update
