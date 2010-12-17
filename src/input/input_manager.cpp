@@ -83,10 +83,10 @@ InputManager::~InputManager()
 //-----------------------------------------------------------------------------
 void InputManager::handleStaticAction(int key, int value)
 {
-#ifdef DEBUG
+
     static bool control_is_pressed=false;
     World *world=World::getWorld();
-#endif
+
     switch (key)
     {
 #ifdef DEBUG
