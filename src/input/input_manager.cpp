@@ -199,7 +199,7 @@ void InputManager::handleStaticAction(int key, int value)
             // Fall through to put the game into pause mode.
 #endif
         case KEY_F10:
-            history->Save();
+            if(world) history->Save();
             break;
         default:
             break;
