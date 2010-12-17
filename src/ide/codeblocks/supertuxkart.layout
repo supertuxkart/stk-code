@@ -37,11 +37,20 @@
 	<File name="../../states_screens/challenges.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="10" />
 	</File>
-	<File name="../../states_screens/tutorial_screen.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="2440" topLine="48" />
+	<File name="../../states_screens/main_menu_screen.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="8371" topLine="182" />
+	</File>
+	<File name="../../states_screens/tutorial_screen.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="91" topLine="54" />
 	</File>
 	<File name="../../states_screens/tutorial_screen.hpp" open="1" top="0" tabpos="1">
-		<Cursor position="985" topLine="5" />
+		<Cursor position="91" topLine="0" />
+	</File>
+	<File name="../../tutorial/tutorial.hpp" open="1" top="0" tabpos="4">
+		<Cursor position="0" topLine="45" />
+	</File>
+	<File name="../../tutorial/tutorial_manager.hpp" open="1" top="0" tabpos="5">
+		<Cursor position="421" topLine="0" />
 	</File>
 	<File name="../../utils/translation.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="1659" topLine="22" />

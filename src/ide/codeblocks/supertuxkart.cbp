@@ -98,65 +98,6 @@
 					<Add directory="../../../dependencies/lib" />
 				</Linker>
 			</Target>
-			<Target title="curl-debug Win32">
-				<Option output="./../../../supertuxkart_curl_d" prefix_auto="1" extension_auto="1" />
-				<Option object_output="curl-debug Win32" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-DBT_NO_PROFILE" />
-					<Add option="-DHAVE_OPENAL" />
-					<Add option="-DHAVE_OGGVORBIS" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_CONSOLE" />
-					<Add option="-DWIN32" />
-					<Add option="-DNOMINMAX" />
-					<Add option='-DVERSION=\&quot;SVN\&quot;' />
-					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DDEBUG" />
-					<Add option='-DPACKAGE=\&quot;supertuxkart\&quot;' />
-					<Add option="-DHAVE_GETTEXT" />
-					<Add option="-DENABLE_NLS" />
-					<Add option="-DHAVE_GLUT" />
-					<Add option="-D_CRTDBG_MAP_ALLOC" />
-					<Add option="-DENABLE_BIDI" />
-					<Add option="-DADDONS_MANAGER" />
-					<Add option="-W" />
-					<Add option="-g" />
-					<Add option="-O0" />
-					<Add directory="../../../src" />
-					<Add directory="../../../src/bullet/src" />
-					<Add directory="../../../src/enet/include" />
-					<Add directory="../../../dependencies/include" />
-					<Add directory="../../../dependencies/include/irrlicht" />
-				</Compiler>
-				<ResourceCompiler>
-					<Add directory="../../../src" />
-					<Add directory="../../../src/bullet/src" />
-					<Add directory="../../../src/enet/include" />
-					<Add directory="../../../dependencies/include" />
-					<Add directory="../../../dependencies/include/irrlicht" />
-				</ResourceCompiler>
-				<Linker>
-					<Add library="opengl32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winmm" />
-					<Add library="advapi32" />
-					<Add library="OpenAL32" />
-					<Add library="libogg" />
-					<Add library="libvorbis" />
-					<Add library="libvorbisfile" />
-					<Add library="intl" />
-					<Add library="Irrlicht" />
-					<Add library="ws2_32" />
-					<Add library="fribidi" />
-					<Add library="pthreadVC2" />
-					<Add library="libcurld_imp" />
-					<Add directory="../../../dependencies/lib" />
-				</Linker>
-			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="/usr/include/irrlicht" />
@@ -501,14 +442,8 @@
 		<Unit filename="../../states_screens/state_manager.hpp" />
 		<Unit filename="../../states_screens/tracks_screen.cpp" />
 		<Unit filename="../../states_screens/tracks_screen.hpp" />
-		<Unit filename="../../states_screens/tutorial_screen.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="../../states_screens/tutorial_screen.hpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="../../states_screens/tutorial_screen.cpp" />
+		<Unit filename="../../states_screens/tutorial_screen.hpp" />
 		<Unit filename="../../tracks/ambient_light_sphere.cpp" />
 		<Unit filename="../../tracks/ambient_light_sphere.hpp" />
 		<Unit filename="../../tracks/bezier_curve.cpp" />
@@ -541,6 +476,10 @@
 		<Unit filename="../../tracks/track_object.hpp" />
 		<Unit filename="../../tracks/track_object_manager.cpp" />
 		<Unit filename="../../tracks/track_object_manager.hpp" />
+		<Unit filename="../../tutorial/tutorial.cpp" />
+		<Unit filename="../../tutorial/tutorial.hpp" />
+		<Unit filename="../../tutorial/tutorial_manager.cpp" />
+		<Unit filename="../../tutorial/tutorial_manager.hpp" />
 		<Unit filename="../../utils/constants.cpp" />
 		<Unit filename="../../utils/constants.hpp" />
 		<Unit filename="../../utils/no_copy.hpp" />

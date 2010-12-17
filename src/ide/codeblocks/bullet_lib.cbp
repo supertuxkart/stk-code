@@ -45,26 +45,6 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
-			<Target title="curl-debug Win32">
-				<Option output="lib" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="" />
-				<Option object_output="curl-debug Win32" />
-				<Option type="2" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Compiler>
-					<Add option="-DWIN32" />
-					<Add option="-DBT_NO_PROFILE" />
-					<Add option="-DHAVE_GLUT" />
-					<Add option="-W" />
-					<Add option="-g" />
-					<Add option="-O0" />
-					<Add directory="../../bullet/src" />
-				</Compiler>
-				<ResourceCompiler>
-					<Add directory="../../bullet/src" />
-				</ResourceCompiler>
-			</Target>
 		</Build>
 		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp" />
 		<Unit filename="../../bullet/src/BulletCollision/BroadphaseCollision/btAxisSweep3.h" />
