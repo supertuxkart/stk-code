@@ -252,8 +252,6 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
-
-    printf("<%s> : %f, %f, %f\n", m_model_filename.c_str(), m_kart_width, m_kart_height, m_kart_length);
     
     // Now set default some default parameters (if not defined) that 
     // depend on the size of the kart model (wheel position, center
