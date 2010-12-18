@@ -275,7 +275,16 @@ public:
     MinorRaceModeType
                  getMinorMode()           const { return m_minor_mode;              }
     unsigned int getNumPlayers()          const { return m_player_karts.size();     }
-    int          getNumLaps()             const { return m_num_laps[m_track_number];}
+    /** Returns the number lf laps. In case of FTL or battle mode always 
+     *  return 9999, since they don't have laps. This avoids problems in FTL GP,
+     *  since in this case no laps would be set (otherwise we would need many
+     *  more tests in calls to getNumLaps). */
+    int          getNumLaps()             const 
+    {
+        if(m_minor_mode==MINOR_MODE_3_STRIKES || m_minor_mode==MINOR_MODE_FOLLOW_LEADER)
+            return 9999;
+        return m_num_laps[m_track_number];
+    }   // getNumLaps
     Difficulty   getDifficulty()          const { return m_difficulty;              }
     const std::string& getTrackName()     const { return m_tracks[m_track_number];  }
     const GrandPrixData  *getGrandPrix()  const { return &m_grand_prix;             }

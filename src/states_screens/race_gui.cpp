@@ -111,7 +111,9 @@ RaceGUI::RaceGUI()
     m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
     
     int w;
-    if (race_manager->getNumLaps() > 9)
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
+        race_manager->getNumLaps() > 9)
         w = font->getDimension(L"99/99").Width;
     else
         w = font->getDimension(L"9/9").Width;
