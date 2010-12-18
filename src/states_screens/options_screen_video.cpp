@@ -182,8 +182,8 @@ void OptionsScreenVideo::init()
         const int w = modes[n].width;
         const int h = modes[n].height;
         
-        char name[32];
-        sprintf( name, "%ix%i", w, h );
+        //char name[32];
+        //sprintf( name, "%ix%i", w, h );
         
         if(w == UserConfigParams::m_width && h == UserConfigParams::m_height)
         {
