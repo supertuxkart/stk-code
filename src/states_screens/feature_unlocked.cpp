@@ -318,8 +318,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
-    const float ANIM_FROM = 2.0f;
-    const float ANIM_TO = 5.5f;
+    const float ANIM_FROM = 1.0f;
+    const float ANIM_TO = 3.0f;
     const int last_image = m_chest->getEndFrame() - 1;
     
     if (m_global_time < ANIM_FROM)
@@ -339,7 +339,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
     m_chest->setCurrentFrame( current_frame );
        
     const int GIFT_EXIT_FROM = (int)ANIM_TO;
-    const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 12;
+    const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
