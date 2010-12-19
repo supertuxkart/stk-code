@@ -57,8 +57,6 @@ AIBaseController::AIBaseController(Kart *kart,
                              (r / (float)(RAND_MAX - 1)) * next.size()
                              );
             
-            if (next.size() > 1)
-                printf("Next road : %i mapped to %i -> %i\n", r, (int)next.size(), indx);
             m_successor_index.push_back(indx);
             m_next_node_index.push_back(next[indx]);
 
