@@ -27,12 +27,12 @@
 #include <vector>
 #include <fstream>
 #include <irrlicht.h>
+
 // SuperTuxKart includes
 #include "utils/no_copy.hpp"
 
-
 using namespace std; // To avoid using std:: all the time
-
+using namespace irr::core;
 class XMLNode;
 
 enum REWARD_TYPE
@@ -42,14 +42,14 @@ enum REWARD_TYPE
     UNLOCK_KART,
     UNLOCK_DIFFICULTY};
 
-struct UnlockableFeature
+/*struct UnlockableFeature
 {
     string name; // internal name
-    irr::core::stringw user_name; // not all types of feature have one
+    stringw user_name; // not all types of feature have one
     REWARD_TYPE type;
 
-    const irr::core::stringw getUnlockedMessage() const;
-};
+    const stringw getUnlockedMessage() const;
+};*/
 
 
 /**
@@ -59,61 +59,62 @@ struct UnlockableFeature
 class Tutorial : public NoCopy
 {
 private:
-    enum {CH_INACTIVE,                 // challenge not yet possible
+    // TBR ????
+    enum {CH_INACTIVE,                 // tutorial not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
 
-    string              m_Id;                    // short, internal name for this tutorial
-    irr::core::stringw       m_Name;                  // name used in menu for this tutorial
-    irr::core::stringw       m_challenge_description; // Message the user gets when the feature is not yet unlocked
-    vector<UnlockableFeature> m_feature;         // Features to unlock
-    vector<string> m_prerequisites;         // what needs to be done before accessing this tutorial
+    std::string              m_Id;                     // short, internal name for this tutorial
+    irr::core::stringw       m_Name;                   // name used in menu for this tutorial
+    irr::core::stringw       m_challenge_description;  // Message the user gets when the feature is not yet unlocked
+//    vector<UnlockableFeature> m_feature;    // Features to unlock
+//    vector<string> m_prerequisites;         // what needs to be done before accessing this tutorial
 
 public:
     // Constructors + Destructor
-             Tutorial(const string &id, const string &name);
+    Tutorial(const std::string &id, const std::string &name);
              Tutorial() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Tutorial() {};
 
-    const string &getId() const              { return m_Id;                  }
-    const irr::core::stringw &getName() const     { return m_Name;                }
-    void  setName(const irr::core::stringw & s)   { m_Name = s;                   }
-    void  setId(const string& s)             { m_Id = s;                     }
-    void  addUnlockTrackReward(const string &track_name);
-    void  addUnlockModeReward(const string &internal_mode_name,
+    const std::string &getId() const            { return m_Id;}
+    irr::core::stringw getName() const         { return m_Name;}
+    void  setName(const irr::core::stringw & s) { m_Name = s;}
+    void  setId(const std::string& s)           { m_Id = s;}
+    void  addUnlockTrackReward(const std::string &track_name);
+    void  addUnlockModeReward(const std::string &internal_mode_name,
                               const irr::core::stringw &user_mode_name);
-    void  addUnlockGPReward(const string &gp_name);
-    void  addUnlockDifficultyReward(const string &internal_name,
+  /*  void  addUnlockGPReward(const std::string &gp_name);
+    void  addUnlockDifficultyReward(const std::string &internal_name,
                                     const irr::core::stringw &user_name);
-    void  addUnlockKartReward(const string &internal_name,
+    void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
 
-    const vector<UnlockableFeature>&
+    /*const vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
     void  setChallengeDescription(const irr::core::stringw& d)
                                                  {m_challenge_description=d;      }
     const irr::core::stringw&
           getChallengeDescription() const        {return m_challenge_description; }
-    void  addDependency(const string id)    {m_prerequisites.push_back(id);  }
+    void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
     bool  isSolved() const                       {return m_state==CH_SOLVED;      }
     bool  isActive() const                       {return m_state==CH_ACTIVE;      }
     void  setSolved()                            {m_state = CH_SOLVED;            }
     void  setActive()                            {m_state = CH_ACTIVE;            }
-    const vector<string>&
+    const vector<std::string>&
           getPrerequisites() const               {return m_prerequisites;         }
     void  load(const XMLNode* config);
     void  save(ofstream& writer);
 
     // These functions are meant for customisation, e.g. load/save
-    // additional state information specific to the challenge
-    virtual void loadAdditionalInfo(const XMLNode* config) {};
-    virtual void saveAdditionalInfo(ofstream& writer)     {};
+    // additional state information specific to the tutorial
+    virtual void loadAdditionalInfo(const XMLNode* config)  {};
+    virtual void saveAdditionalInfo(ofstream& writer)       {};
 
     // These functions are called when a race/gp is finished. It allows
     // the challenge to unlock features (when returning true), otherwise
     // the feature remains locked.
     virtual bool raceFinished()                      {return false;}   // end of a race
-    virtual bool grandPrixFinished()                 {return false;}   // end of a GP
+    //virtual bool grandPrixFinished()                 {return false;}   // end of a GP
 
     /** sets the right parameters in RaceManager to try this tutorial */
     virtual void setRace() const = 0;

@@ -28,7 +28,6 @@
 class XMLNode;
 class SFXBase;
 
-using namespace std;
 /**
   * \brief main class to handle the tutorials list
   * \ingroup tutorial
@@ -36,11 +35,13 @@ using namespace std;
 class TutorialManager : public NoCopy
 {
 private:
-    SFXBase    *m_locked_sound;
-    typedef map<string, Tutorial*> AllChallengesType;
-    AllChallengesType             m_all_tutorial;
-    map<string, bool>   m_locked_tutorials;
-    vector<const Tutorial*> m_unlocked_tutorials;
+    typedef std::map<std::string, Tutorial*> AllTutorialsType;
+
+    SFXBase *m_locked_sound;    
+    AllTutorialsType m_all_tutorials;
+    std::map<std::string, bool> m_locked_tutorials;
+    std::vector<const Tutorial*> m_unlocked_tutorials;
+
     void       computeActive     ();
     void       load              ();
 
@@ -49,8 +50,8 @@ private:
 public:
                TutorialManager     ();
               ~TutorialManager     ();
-    void       addTutorial      (Tutorial *t);
-    void       addTutorial      (const string& filename);
+    void       addTutorial      (Tutorial * m_tutorial);
+    void       addTutorial      (const std::string& filename);
     void       save              ();
     vector<const Tutorial*> getActiveTutorials();
 
@@ -67,12 +68,12 @@ public:
     /** Returns the list of currently inaccessible (locked) challenges */
     const vector<const Tutorial*>   getLockedTutorials();
 
-    const Tutorial *getTutorial     (const string& id);
+    const Tutorial *getTutorial     (const std::string& id);
 
-    void       raceFinished      ();
+    /*void       raceFinished      ();
     void       grandPrixFinished ();
     void       lockFeature       (Tutorial* tutorial);
-    bool       isLocked          (const string& feature);
+    bool       isLocked          (const string& feature);*/
 
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;

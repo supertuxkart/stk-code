@@ -21,12 +21,25 @@
 #include "irrlicht.h"
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
+#include "guiengine/CGUISpriteBank.h"
 
+using namespace irr::core;
+
+const std::string BASIC_DRIVING = "bd";
+const std::string SHARP_TURN = "st";
+const std::string NITRO = "nt";
+const std::string COLLECTIBLE_WEAPONS = "cw";
+const std::string SHOOTING_BACKWARDS = "sb";
 
 class TutorialScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TutorialScreen>
-{
+{    
+    
+
     friend class GUIEngine::ScreenSingleton<TutorialScreen>;
     TutorialScreen();
+
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+
 
     public:
 
