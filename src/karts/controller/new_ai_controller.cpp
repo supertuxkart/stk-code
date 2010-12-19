@@ -548,8 +548,6 @@ void NewAIController::handleRaceStart()
     //5% in medium and less than 1% of the karts in hard.
     if( m_time_till_start <  0.0f )
     {
-        srand(( unsigned ) time( 0 ));
-
         //Each kart starts at a different, random time, and the time is
         //smaller depending on the difficulty.
         m_time_till_start = ( float ) rand() / RAND_MAX * m_max_start_delay;

@@ -639,6 +639,8 @@ void cleanTuxKart()
 
 int main(int argc, char *argv[] ) 
 {
+    srand(( unsigned ) time( 0 ));
+    
     try {
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must

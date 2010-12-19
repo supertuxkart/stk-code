@@ -44,7 +44,7 @@ AIBaseController::AIBaseController(Kart *kart,
         m_next_node_index.reserve(m_quad_graph->getNumNodes());
         m_successor_index.reserve(m_quad_graph->getNumNodes());
         std::vector<unsigned int> next;
-
+        
         for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
         {
             next.clear();
@@ -52,12 +52,18 @@ AIBaseController::AIBaseController(Kart *kart,
             // For now pick one part on random, which is not adjusted during the 
             // race. Long term statistics might be gathered to determine the
             // best way, potentially depending on race position etc.
-            int indx = rand() % next.size();
+            int r = rand();
+            int indx = (int)(
+                             (r / (float)(RAND_MAX - 1)) * next.size()
+                             );
+            
+            if (next.size() > 1)
+                printf("Next road : %i mapped to %i -> %i\n", r, (int)next.size(), indx);
             m_successor_index.push_back(indx);
             m_next_node_index.push_back(next[indx]);
 
         }
-
+        
         const unsigned int look_ahead=10;
         // Now compute for each node in the graph the list of the next 'look_ahead'
         // graph nodes. This is the list of node that is tested in checkCrashes.
