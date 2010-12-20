@@ -529,11 +529,13 @@ void RaceResultGUI::renderGlobal(float dt)
  */
 void RaceResultGUI::determineGPLayout()
 {
-    unsigned int num_karts = m_all_row_infos.size();
+    unsigned int num_karts = race_manager->getNumberOfKarts();
     std::vector<int> old_rank(num_karts, 0);
     for(unsigned int kart_id=0; kart_id<num_karts; kart_id++)
     {
         int rank             = race_manager->getKartGPRank(kart_id);
+        // In case of FTL mode: ignore the leader
+        if(rank<0) continue;
         old_rank[kart_id]    = rank;
         const Kart *kart     = World::getWorld()->getKart(kart_id);
         RowInfo *ri          = &(m_all_row_infos[rank]);
