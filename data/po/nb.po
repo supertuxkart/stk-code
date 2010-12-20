@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-09-30 23:46+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2010-12-18 17:15+0000\n"
+"Last-Translator: Magne Djupvik <Unknown>\n"
 "Language-Team: STK norwegian team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-14 21:48+0000\n"
+"X-Launchpad-Export-Date: 2010-12-19 05:03+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NORWAY\n"
 "X-Poedit-Language: Norwegian Bokmal\n"
@@ -108,7 +108,7 @@ msgstr "%s er en mektig pirat!"
 #: src/items/flyable.cpp:89
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr ""
+msgstr "%s øver seg med en stor, blå jo-jo"
 
 #: src/states_screens/kart_selection.cpp:508
 #, c-format
@@ -119,7 +119,7 @@ msgstr "%s er klar"
 #: src/items/flyable.cpp:91
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr ""
+msgstr "%s er verdensmester i bomerang-ball"
 
 #: src/items/powerup.cpp:47
 #, c-format
@@ -130,7 +130,7 @@ msgstr "%s betaler neste runde med grogg!"
 #: src/items/flyable.cpp:93
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
-msgstr ""
+msgstr "%s burde spille (gummi-)dart i stedet for bowling"
 
 #: src/modes/world.cpp:682
 #, c-format
@@ -151,7 +151,7 @@ msgstr "(flere spillere kan nå slutte seg til ved å trykke 'skyt')"
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:287
 msgid "(network play is not yet available)"
-msgstr ""
+msgstr "(nettverksmodus er foreløpig ikke tilgjengelig)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -168,6 +168,9 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
+"De fleste spillmoduser kan også spilles som Grand Prix: i stedet for å kjøre "
+"et enkelt løp, spiller du flere på rad. Jo bedre du rangerer, jo mer poeng "
+"får du. Til slutt er det spilleren med flest poeng som vinner turneringen."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:479
@@ -190,6 +193,8 @@ msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
+"'3 Strikes Battle': bare i flerspillermodus. Treff andre med våpen til de "
+"mister alle liv."
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:187
 msgid "= Highscores ="
@@ -285,19 +290,19 @@ msgstr "Anker - sakker den forreste føreren ned betraktelig"
 #. I18N: In the video settings
 #: data/po/gui_strings.h:549
 msgid "Animated Effects and Scenery"
-msgstr ""
+msgstr "Animerte effekter og omgivelser"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:545
 msgid "Animated Karts"
-msgstr ""
+msgstr "Animerte karter"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:561
 msgid "Apply new resolution"
-msgstr ""
+msgstr "Bruk ny skjerminstilling"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:416
@@ -509,7 +514,7 @@ msgstr "Samle blå bokser: de vil gi deg våpen eller andre fordeler"
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:708
 msgid "Collect fuel for your rocket"
-msgstr ""
+msgstr "Samle drivstoff for rakettfart"
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:660
@@ -532,6 +537,7 @@ msgstr ""
 #: data/po/gui_strings.h:645
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
+"Bli førstemann i 'At World's End' Grand Prix med 3 data-karter på Ekspert."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
@@ -588,7 +594,7 @@ msgstr "Rulletekst"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:315 data/po/gui_strings.h:347
 msgid "DEBUG"
-msgstr ""
+msgstr "DEBUG"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: To delete a keyboard configuration
@@ -610,7 +616,7 @@ msgstr "Beskrivelse: %i"
 #: src/states_screens/options_screen_input2.cpp:72
 #: src/states_screens/options_screen_input2.cpp:426
 msgid "Disable Device"
-msgstr ""
+msgstr "Slå av enhet"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -636,7 +642,7 @@ msgstr "Elephpant"
 #: src/states_screens/options_screen_input2.cpp:74
 #: src/states_screens/options_screen_input2.cpp:427
 msgid "Enable Device"
-msgstr ""
+msgstr "Slå på enhet"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -677,33 +683,35 @@ msgstr "Siste runde!"
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:693
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-msgstr ""
+msgstr "Fullfør 3 runder i 'Farm' med 3 enkle data-karter på under 2:30."
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
 #: data/po/gui_strings.h:723
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
+"Fullfør 3 runder i 'Lighthouse' med 3 data-karter på Ekspert på under 1:30."
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:687
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
+"Fullfør 3 runder i gruven med 3 data-karter på Ekspert på under 3 minutter."
 
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:690
 msgid "Finish Farm in 2:30"
-msgstr ""
+msgstr "Fullfør 'Farm' innen 2:30"
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
 #: data/po/gui_strings.h:720
 msgid "Finish Lighthouse in 1:30"
-msgstr ""
+msgstr "Fullfør 'Lighthouseæ innen 1:30"
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:684
 msgid "Finish Mines in 3:00"
-msgstr ""
+msgstr "Fullfør 'Old Mines' innen 3:00"
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
 #: data/po/gui_strings.h:663
@@ -711,6 +719,8 @@ msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr ""
+"Fullfør med minimum 12 nitro-poeng i 3 runder med 'Shifting Sands' på under "
+"2:20."
 
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:711
@@ -718,6 +728,7 @@ msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
 msgstr ""
+"Fullfør med minst 16 nitro-poeng i 2 runder med 'XR591' på under 2:30."
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:681
@@ -744,6 +755,12 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
+"Du trenger flere inndataenheter (å ha flere gamepads eller joysticks er den "
+"beste måten å spille med flere på). Gå til konfigurasjonsmenyen for "
+"inndataenheter og sett opp spillkontrollerne. Det er også mulig å spille på "
+"tastatur(er), men da må hver spiller bruke forskjellige taster. Dessuten er "
+"de fleste tastaturer ikke egnet for flerspillermodus fordi de ikke støtter "
+"at mange taster trykkes samtidig."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:147
@@ -753,7 +770,7 @@ msgstr "Følg lederen"
 #. I18N: ./data/tracks/lighthouse/lighthouse.challenge
 #: data/po/gui_strings.h:702
 msgid "Follow the Leader around the Solar System"
-msgstr ""
+msgstr "Følg lederen rundt i solsystemet"
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:648
@@ -854,7 +871,7 @@ msgstr "Grand Prix"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:541
 msgid "Graphical Effects Settings"
-msgstr ""
+msgstr "Instillinger for grafiske effekter"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -945,12 +962,12 @@ msgstr "Behold denne oppløsningen"
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:220
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr ""
+msgstr "Hold følge med lederkarten, men hold deg bak den!"
 
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:765
 msgid "Konqi"
-msgstr ""
+msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui.cpp:90
@@ -960,7 +977,7 @@ msgstr "Runde"
 #: src/modes/linear_world.cpp:311
 #, c-format
 msgid "Lap %i"
-msgstr ""
+msgstr "Runde %i"
 
 #: src/modes/follow_the_leader.cpp:190
 msgid "Leader"
@@ -1044,7 +1061,7 @@ msgstr "Mozilla"
 #: data/po/gui_strings.h:136 data/po/gui_strings.h:187
 #: data/po/gui_strings.h:235 data/po/gui_strings.h:281
 msgid "Multiplayer"
-msgstr ""
+msgstr "Flerspiller"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1120,7 +1137,7 @@ msgstr "Antall datamotstandere"
 
 #: src/states_screens/dialogs/message_dialog.cpp:57
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. I18N: message shown when a player that isn't game master tries to modify options that
 #. I18N: only the game master is allowed to
@@ -1289,6 +1306,7 @@ msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
 msgstr ""
+"Vanlig løp: alle metoder tillatt, så plukk opp våpen og bruk dem smart!"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:108
@@ -1432,7 +1450,7 @@ msgstr "Innstillinger i SuperTuxKart"
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:284
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr ""
+msgstr "SuperTuxKart kan spilles i flerspillermodus på samme datamaskin"
 
 #. I18N: ./data/gui/help3.stkgui
 #: data/po/gui_strings.h:238
@@ -1596,6 +1614,8 @@ msgid ""
 "keys that contain a character that is different in upper-case will stop "
 "working."
 msgstr ""
+"Advarsel: 'Shift' er ikke en anbefalt tast, fordi når den er i bruk vil alle "
+"tegn som er annerledes som stor bokstav slutte å virke."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1621,6 +1641,12 @@ msgid ""
 "kart. The game continues when everyone selected their kart. Note that the "
 "mouse may not be used for this operation."
 msgstr ""
+"Når inndataenheter er konfigurert, er alt klart til å spille. Start et nytt "
+"løp ved å velge løpsikonet i hovedmenyen. Når det er tid for å velge kart, "
+"kan alle spillere trykke 'Skyt'-knappen på spillkontrolleren sin for å "
+"slutte seg til spillet. Hver spiller kan bruke sin enhet for å velge kart. "
+"Spillet går videre når alle har gjort sitt valg. Vær opperksom på at "
+"datamusen ikke kan brukes til dette."
 
 #. I18N: ./data/karts/wilber/kart.xml
 #: data/po/gui_strings.h:783
@@ -1636,6 +1662,7 @@ msgstr "Vinn 'Penguin Playground' Grand Prix"
 #: data/po/gui_strings.h:639
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
 msgstr ""
+"Vinn 'Penguin Playground' Grand Prix med 3 datakarter på ekspertnivå."
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:654
@@ -1646,28 +1673,32 @@ msgstr "Vinn 'To the Moon and Back' Grand Prix"
 #: data/po/gui_strings.h:717
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
-msgstr ""
+msgstr "Vinn en runde mot 1 datakart på ekspertnivå i 'Secret Garden'."
 
 #. I18N: ./data/tracks/xr591/xr591.challenge
 #: data/po/gui_strings.h:729
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
-msgstr ""
+msgstr "Vinn et trerunders løp i juvet mot 4 datakarter på ekspertnivå."
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:669
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr ""
+"Vinn et trerunders løp i 'Fort Magma' mot 3 datakarter på ekspertnivå."
 
 #. I18N: ./data/tracks/islandtrack/island.challenge
 #: data/po/gui_strings.h:699
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
+"Vinn et trerunders løp i 'Snow Mountain' mot 3 viderekomne datakarter på "
+"under 3:05."
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:675
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
 msgstr ""
+"Vinn et trerunders løp i 'Tux Tollway' mot 4 datakarter på ekspertnivå."
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:651
@@ -1677,22 +1708,22 @@ msgstr "Vinn et 'Følg lederen'-løp med 3 datamotstandere på en øde øy."
 #. I18N: ./data/tracks/lighthouse/lighthouse.challenge
 #: data/po/gui_strings.h:705
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
-msgstr ""
+msgstr "Følg lederen med 5 datakarter i 'Star Track'"
 
 #. I18N: ./data/tracks/skyline/skyline.challenge
 #: data/po/gui_strings.h:714
 msgid "Win a Head to Head in the Secret Garden"
-msgstr ""
+msgstr "Vinn en duell i 'Secret Garden'"
 
 #. I18N: ./data/tracks/xr591/xr591.challenge
 #: data/po/gui_strings.h:726
 msgid "Win a race on Canyon"
-msgstr ""
+msgstr "Vinn et løp i 'Canyon'"
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:666
 msgid "Win a race on Fort Magma"
-msgstr ""
+msgstr "Vinn et løp i 'Fort Magma'"
 
 #. I18N: ./data/tracks/islandtrack/island.challenge
 #: data/po/gui_strings.h:696
@@ -1702,7 +1733,7 @@ msgstr "Vinn et løp i 'Snow Mountain'"
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:672
 msgid "Win a race on Tux Tollway"
-msgstr ""
+msgstr "Vinn et løp i 'Tux Tollway'"
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:642
@@ -1713,6 +1744,7 @@ msgstr "Vinn 'At World's End' Grand Prix"
 #: data/po/gui_strings.h:657
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
 msgstr ""
+"Vinn 'To the Moon and Back' Grand Prix' med 3 datamotstandere på ekspertnivå."
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -1722,7 +1754,7 @@ msgstr "Ja"
 
 #: src/states_screens/grand_prix_win.cpp:360
 msgid "You completed the Grand Prix!"
-msgstr ""
+msgstr "Du fullførte en Grand Prix!"
 
 #: src/karts/kart.cpp:523 src/karts/kart.cpp:542
 msgid "You finished the race!"
