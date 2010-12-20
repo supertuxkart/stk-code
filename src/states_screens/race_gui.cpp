@@ -936,19 +936,22 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart,
     static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
 
-    const int rank = kart->getPosition();
-        
-    font->draw(m_string_rank.c_str(), pos, color);
-    pos.UpperLeftCorner.Y  += font_height;
-    pos.LowerRightCorner.Y += font_height;
+    if (world->displayRank())
+    {
+        const int rank = kart->getPosition();
+            
+        font->draw(m_string_rank.c_str(), pos, color);
+        pos.UpperLeftCorner.Y  += font_height;
+        pos.LowerRightCorner.Y += font_height;
 
-    char str[256];
-    const unsigned int kart_amount = world->getCurrentNumKarts();
-    sprintf(str, "%d/%d", rank, kart_amount);
-    font->draw(core::stringw(str).c_str(), pos, color);
-    pos.UpperLeftCorner.Y  += font_height;
-    pos.LowerRightCorner.Y += font_height;
-
+        char str[256];
+        const unsigned int kart_amount = world->getCurrentNumKarts();
+        sprintf(str, "%d/%d", rank, kart_amount);
+        font->draw(core::stringw(str).c_str(), pos, color);
+        pos.UpperLeftCorner.Y  += font_height;
+        pos.LowerRightCorner.Y += font_height;
+    }
+    
     // Don't display laps in follow the leader mode
     if(world->raceHasLaps())
     {

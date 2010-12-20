@@ -31,10 +31,13 @@
  */
 class WorldWithRank : public World
 {
-private:
+protected:
     /** This contains a mapping from race position to kart index. */
     std::vector<int> m_position_index;
 
+    /** Whether to display the rank in the race GUI */
+    bool m_display_rank;
+    
 #ifdef DEBUG
     /** Used for debugging to help detect if the same kart position
      *  is used more than once. */
@@ -53,6 +56,8 @@ public:
         results will be incorrect */
     virtual void  init();
 
+    bool          displayRank() const { return m_display_rank; }
+    
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,
                                  unsigned int position);
