@@ -66,7 +66,7 @@ private:
 
     std::string              m_Id;                     // short, internal name for this tutorial
     irr::core::stringw       m_Name;                   // name used in menu for this tutorial
-    irr::core::stringw       m_challenge_description;  // Message the user gets when the feature is not yet unlocked
+    irr::core::stringw       m_tutorial_description;  // Message the user gets when the feature is not yet unlocked
 //    vector<UnlockableFeature> m_feature;    // Features to unlock
 //    vector<string> m_prerequisites;         // what needs to be done before accessing this tutorial
 
@@ -83,6 +83,8 @@ public:
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name,
                               const irr::core::stringw &user_mode_name);
+    void  setTutorialDescription(const irr::core::stringw& d)
+                                                 {m_tutorial_description=d;      }
   /*  void  addUnlockGPReward(const std::string &gp_name);
     void  addUnlockDifficultyReward(const std::string &internal_name,
                                     const irr::core::stringw &user_name);
@@ -91,8 +93,7 @@ public:
 
     /*const vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
-    void  setChallengeDescription(const irr::core::stringw& d)
-                                                 {m_challenge_description=d;      }
+    
     const irr::core::stringw&
           getChallengeDescription() const        {return m_challenge_description; }
     void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }

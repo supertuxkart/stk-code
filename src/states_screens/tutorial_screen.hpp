@@ -25,7 +25,7 @@
 
 using namespace irr::core;
 
-const std::string BASIC_DRIVING = "bd";
+const std::string BASIC_DRIVING = "basicdriving";
 const std::string SHARP_TURN = "st";
 const std::string NITRO = "nt";
 const std::string COLLECTIBLE_WEAPONS = "cw";

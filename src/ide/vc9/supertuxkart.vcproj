@@ -503,6 +503,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\tutorial_race.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\world.cpp"
 					>
 				</File>
@@ -1119,6 +1123,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tutorial\tutorial_data.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tutorial\tutorial_manager.cpp"
 					>
 				</File>
@@ -1418,6 +1426,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\three_strikes_battle.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\tutorial_race.hpp"
 					>
 				</File>
 				<File
@@ -2022,6 +2034,10 @@
 				>
 				<File
 					RelativePath="..\..\tutorial\tutorial.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tutorial\tutorial_data.hpp"
 					>
 				</File>
 				<File

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<tutorial
+    id="basicdriving"
+    name="Win the At World's End Grand Prix"
+    description="Come first in the At World's End Grand Prix with 3 Expert AI karts."
+    major="single"
+    minor="normal"
+    gp="canyon"
+    difficulty="easy"
+    karts="1"
+    position="1"
+    num_laps="99"
+    num_players="1"
+/>
