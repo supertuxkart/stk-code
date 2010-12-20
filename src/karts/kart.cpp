@@ -753,7 +753,7 @@ void Kart::update(float dt)
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
     if((fabs(getRoll())>60*DEGREE_TO_RAD && fabs(getSpeed())<3.0f) )
     {
-        forceRescue();
+        forceRescue(/*is_auto_rescue*/true);
     }
 
     btTransform trans=getTrans();

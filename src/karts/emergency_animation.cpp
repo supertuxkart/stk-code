@@ -22,6 +22,7 @@
 #include "graphics/stars.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -94,7 +95,7 @@ void EmergencyAnimation::eliminate()
  *  and saves the current pitch and roll (for the rescue animation). It
  *  also removes the kart from the physics world.
  */
-void EmergencyAnimation::forceRescue()
+void EmergencyAnimation::forceRescue(bool is_auto_rescue)
 {
     if(playingEmergencyAnimation()) return;
 
@@ -112,6 +113,15 @@ void EmergencyAnimation::forceRescue()
     m_curr_rotation.setHeading(m_kart->getHeading());
 
     World::getWorld()->getPhysics()->removeKart(m_kart);
+
+    // Add a hit unless it was auto-rescue
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+        !is_auto_rescue)
+    {
+        ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
+        world->kartHit(m_kart->getWorldKartId());
+    }
+
 }   // forceRescue
 
 //-----------------------------------------------------------------------------
@@ -181,7 +191,9 @@ void EmergencyAnimation::update(float dt)
     if(m_timer<0)
     {
         if(m_kart_mode==EA_RESCUE)
+        {
             World::getWorld()->moveKartAfterRescue(m_kart);
+        }
         World::getWorld()->getPhysics()->addKart(m_kart);
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
