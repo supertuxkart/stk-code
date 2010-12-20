@@ -326,7 +326,4 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
         fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
-    
-    //add hit to kart
-    kartHit(kart->getWorldKartId());
 }   // moveKartAfterRescue

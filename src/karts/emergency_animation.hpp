@@ -80,7 +80,7 @@ public:
          ~EmergencyAnimation();
     void  reset();
     void  handleExplosion(const Vec3& pos, bool direct_hit);
-    void  forceRescue();
+    void  forceRescue(bool is_auto_rescue=false);
     void  update(float dt);
     // ------------------------------------------------------------------------
     /** Returns true if an emergency animation is being played. */
