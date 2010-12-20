@@ -293,7 +293,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
                             fabs(kart_z - v.getZ());
         if(dist_n < smallest_distance_found || closest_id_found == -1)
         {
-            closest_id_found        = n+1;
+            closest_id_found        = n;
             smallest_distance_found = dist_n;
         }
     }
