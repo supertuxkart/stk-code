@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-14 02:42+0000\n"
+"PO-Revision-Date: 2010-12-15 02:13+0000\n"
 "Last-Translator: STK-team <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-14 21:48+0000\n"
+"X-Launchpad-Export-Date: 2010-12-16 05:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: CANADA\n"
 "X-Poedit-Language: French\n"
@@ -174,7 +174,7 @@ msgstr ""
 msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
-msgstr "＊「火」キーがゲームに参加するために押されからはどの設定推測されますを使用する。"
+msgstr ""
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:149
@@ -384,7 +384,7 @@ msgstr ""
 #: data/po/gui_strings.h:483 data/po/gui_strings.h:514
 #: data/po/gui_strings.h:565
 msgid "Back"
-msgstr "Back"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -462,7 +462,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:195
 msgid "Cancel/Back"
-msgstr "キャンセル・戻る"
+msgstr ""
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:103
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:118
@@ -481,7 +481,7 @@ msgstr ""
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:74
 msgid "Challenges : Trophy Room"
-msgstr "課題：トロフィールーム"
+msgstr ""
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -637,7 +637,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:693
 msgid "Energy"
-msgstr "エネルギー"
+msgstr ""
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -819,22 +819,22 @@ msgstr ""
 #. I18N: ./data/karts/gnu/kart.xml
 #: data/po/gui_strings.h:756
 msgid "Gnu"
-msgstr "GNU"
+msgstr ""
 
 #: src/states_screens/race_gui.cpp:98
 msgid "Go!"
-msgstr "実行！"
+msgstr ""
 
 #. I18N: ./data/karts/gooey/kart.xml
 #: data/po/gui_strings.h:759
 msgid "Gooey"
-msgstr "グーイ"
+msgstr ""
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:629
 msgid "Grand Prix"
-msgstr "グランプリ"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
@@ -856,7 +856,7 @@ msgstr ""
 #: data/po/gui_strings.h:456 data/po/gui_strings.h:490
 #: data/po/gui_strings.h:521
 msgid "Graphics"
-msgstr "グラフィック"
+msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -867,22 +867,22 @@ msgstr "グラフィック"
 #: data/po/gui_strings.h:327 data/po/gui_strings.h:363
 #: data/po/gui_strings.h:599
 msgid "Help"
-msgstr "ヘルプ"
+msgstr ""
 
 #. I18N: ./data/karts/hexley/kart.xml
 #: data/po/gui_strings.h:762
 msgid "Hexley"
-msgstr "ヘックスリー"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:217
 msgid "Highscores"
-msgstr "ハイスコア"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:229
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
-msgstr "武器とヒット他の人がすべての命を失うまで。（マルチプレイヤーゲームでのみ）"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -890,7 +890,7 @@ msgstr "武器とヒット他の人がすべての命を失うまで。（マル
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "あなたはこのようなロックのボタンが表示された場合、あなたはそれを解除への挑戦を完了する必要があります。"
+msgstr ""
 
 #. I18N: message shown when an input device is used but is not associated to any player
 #: src/input/input_manager.cpp:492
@@ -1736,5 +1736,6 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  386sky https://launchpad.net/~seotaewong40\n"
+"  Auria https://launchpad.net/~auria-mg\n"
 "  STK-team https://launchpad.net/~stk\n"
 "  xapantu https://launchpad.net/~xapantu"
