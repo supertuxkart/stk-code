@@ -151,6 +151,10 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
 
 // ----------------------------------------------------------------------------
 
+const float CAMERA_INITIAL_X = 0.0f;
+const float CAMERA_INITIAL_Y = 30.0f;
+const float CAMERA_INITIAL_Z = 70.0f;
+
 void FeatureUnlockedCutScene::init()
 {
     m_sky_angle = 0.0f;
@@ -172,7 +176,7 @@ void FeatureUnlockedCutScene::init()
 #ifdef DEBUG
     m_camera->setName("camera");
 #endif
-    m_camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
+    m_camera->setPosition( core::vector3df(CAMERA_INITIAL_X, CAMERA_INITIAL_Y, CAMERA_INITIAL_Z) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
@@ -309,6 +313,11 @@ T keepInRange(T from, T to, T value)
 
 // ----------------------------------------------------------------------------
 
+const float ANIM_FROM = 1.0f;
+const float ANIM_TO = 3.0f;
+const int GIFT_EXIT_FROM = (int)ANIM_TO;
+const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
+
 void FeatureUnlockedCutScene::onUpdate(float dt, 
                                        irr::video::IVideoDriver* driver)
 {
@@ -318,8 +327,6 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
-    const float ANIM_FROM = 1.0f;
-    const float ANIM_TO = 3.0f;
     const int last_image = m_chest->getEndFrame() - 1;
     
     if (m_global_time < ANIM_FROM)
@@ -331,15 +338,16 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
             keepInRange(80.0f, 160.0f, 80 + rotationProgression * 80);
         m_chest->setRotation( core::vector3df(0.0f, chest_rotation, 0.0f) );
     }
+    else
+    {
+        m_chest->setRotation( core::vector3df(0.0f, 160.0f, 0.0f) );
+    }
     
     const float current_frame = keepInRange(0.0f, (float)last_image,
                                             (float)(m_global_time - ANIM_FROM)
                                            /(ANIM_TO - ANIM_FROM) * last_image);
     //std::cout << "current_frame: " << current_frame << std::endl;
     m_chest->setCurrentFrame( current_frame );
-       
-    const int GIFT_EXIT_FROM = (int)ANIM_TO;
-    const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
@@ -591,17 +599,29 @@ bool FeatureUnlockedCutScene::onEscapePressed()
 
 void FeatureUnlockedCutScene::continueButtonPressed()
 {
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (m_global_time < GIFT_EXIT_TO)
     {
-        // in GP mode, continue GP after viewing this screen
-        StateManager::get()->popMenu();
-        race_manager->next();
+        // If animation was not over yet, the button is used to skip the animation
+        while (m_global_time < GIFT_EXIT_TO)
+        {
+            // simulate all the steps of the animation until we reach the end
+            onUpdate(0.4f, irr_driver->getVideoDriver());
+        }
     }
     else
     {
-        // back to menu
-        race_manager->exitRace();
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            // in GP mode, continue GP after viewing this screen
+            StateManager::get()->popMenu();
+            race_manager->next();
+        }
+        else
+        {
+            // back to menu
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        }
     }
     
 }   // continueButtonPressed
