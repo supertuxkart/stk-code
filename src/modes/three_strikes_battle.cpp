@@ -36,6 +36,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 void ThreeStrikesBattle::init()
 {
     WorldWithRank::init();
+    m_display_rank = false;
     
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())

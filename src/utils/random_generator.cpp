@@ -30,7 +30,6 @@ RandomGenerator::RandomGenerator()
     m_c = 12345;
     m_all_random_generators.push_back(this);
     m_random_value = 3141591;
-    std::srand((unsigned int)std::time(0));
 }   // RandomGenerator
 
 // ----------------------------------------------------------------------------

@@ -366,7 +366,6 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         else
             i++;
     }
-    std::srand((unsigned int)std::time(0));
     std::random_shuffle(karts.begin(), karts.end());
 
     // Loop over all karts to fill till either all slots are filled, or
