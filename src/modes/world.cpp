@@ -353,12 +353,6 @@ void World::resetAllKarts()
                                      m_track->getAngle(quad) );
                 kart->setRotation(heading);
 
-                // A certain epsilon is added here to the Z coordinate, in case
-                // that the drivelines are somewhat under the track. Otherwise,
-                // the kart might be placed a little bit under the track,
-                // triggering a rescue, ... (experimentally found value)
-                float epsilon = 0.5f * kart->getKartHeight();
-
                 btTransform pos;
                 pos.setOrigin(center+eps);
                 pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
