@@ -376,9 +376,11 @@ supertuxkart_SOURCES = \
  tracks/track_object.hpp \
  tracks/track_object_manager.cpp \
  tracks/track_object_manager.hpp \
- tutorial/tutorial_manager.hpp \
  tutorial/tutorial.cpp \
  tutorial/tutorial.hpp \
+ tutorial/tutorial_data.cpp \
+ tutorial/tutorial_data.hpp \
+ tutorial/tutorial_manager.hpp \
  tutorial/tutorial_manager.cpp \
  utils/constants.hpp \
  utils/constants.cpp \
