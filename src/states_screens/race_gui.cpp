@@ -52,9 +52,7 @@ using namespace irr;
  *  created, so only the race manager can be accessed safely.
  */
 RaceGUI::RaceGUI()
-{    
-    m_enabled = true;
-    
+{        
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -286,7 +284,6 @@ void RaceGUI::renderGlobal(float dt)
 
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
-    if (!m_enabled) return;
 
     drawGlobalTimer();
     if(world->getPhase() == WorldStatus::GO_PHASE ||
@@ -307,8 +304,6 @@ void RaceGUI::renderGlobal(float dt)
  */
 void RaceGUI::renderPlayerView(const Kart *kart)
 {
-    if (!m_enabled) return;
-    
     const core::recti &viewport    = kart->getCamera()->getViewport();
     core::vector2df scaling = kart->getCamera()->getScaling();
     //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
