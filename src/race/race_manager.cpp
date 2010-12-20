@@ -216,7 +216,12 @@ void RaceManager::startNew()
     assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
     // First add the AI karts (randomly chosen)
     // ----------------------------------------
-    int init_gp_rank = 0;
+
+    // GP ranks start with -1 for the leader.
+    int init_gp_rank = 
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER 
+        ? -1 
+        : 0;
     const unsigned int ai_kart_count = m_ai_kart_list.size();
     for(unsigned int i=0; i<ai_kart_count; i++)
     {
@@ -403,7 +408,8 @@ void RaceManager::computeGPRanks()
     
     for (unsigned int i=start; i < NUM_KARTS; ++i)
     {
-        //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i-start);
+        //printf("setting kart %s to rank %i\n", 
+        //    m_kart_status[position[i]].m_ident.c_str(), i-start);
         m_kart_status[position[i]].m_gp_rank = i - start;
     }
     // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_rank);

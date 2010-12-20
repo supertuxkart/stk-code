@@ -107,6 +107,8 @@ void FollowTheLeaderRace::countdownReachedZero()
             kart->setPosition(getCurrentNumKarts()+1);
             updateRacePosition();
         }
+        // Time doesn't make any sense in FTL (and it is not displayed)
+        kart->finishedRace(-1.0f);
     }
     
     // almost over, use fast music
