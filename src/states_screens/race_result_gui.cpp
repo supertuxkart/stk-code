@@ -91,10 +91,9 @@ void RaceResultGUI::enableAllButtons()
     {
         // In case of a GP:
         // ----------------
-        top->setText( _("Continue") );
-        top->setVisible(true);
+        top->setVisible(false);
 
-        middle->setText( _("Restart") );
+        middle->setText( _("Continue") );
         middle->setVisible(true);
 
         bottom->setText( _("Abort Grand Prix") );
@@ -154,17 +153,14 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // -----------------
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        StateManager::get()->popMenu();
-        if(name=="top")                 // Next GP
+        if (name == "middle")        // Next GP
         {
+            StateManager::get()->popMenu();
             race_manager->next();
         }
-        else if (name=="middle")        // Restart
+        else if (name == "bottom")        // Abort
         {
-            race_manager->rerunRace();
-        }
-        else if (name=="bottom")        // Abort
-        {
+            StateManager::get()->popMenu();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         }
