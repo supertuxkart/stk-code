@@ -292,12 +292,12 @@ bool ChallengeData::raceFinished()
     // ------------
     World *world = World::getWorld();
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!=m_track_name                      ) return false;    // wrong track
-    if((int)world->getNumKarts()<m_num_karts         ) return false;    // not enough AI karts
-
+    if(track_name!=m_track_name                         ) return false;
+    if((int)world->getNumKarts()<m_num_karts            ) return false;
     Kart* kart = world->getPlayerKart(0);
-    if(m_energy>0   && kart->getEnergy()  <m_energy  ) return false;  // not enough energy
-    if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
+    if(m_energy>0   && kart->getEnergy()  < m_energy    ) return false;
+    if(m_position>0 && kart->getPosition()> m_position  ) return false;
+    if(race_manager->getDifficulty()      < m_difficulty) return false;
 
     // Follow the leader
     // -----------------
@@ -327,7 +327,7 @@ bool ChallengeData::grandPrixFinished()
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
         race_manager->getGrandPrix()->getId() != m_gp_id                     ||
-        race_manager->getDifficulty()!= m_difficulty                         ||
+        race_manager->getDifficulty() < m_difficulty                         ||
         race_manager->getNumberOfKarts() < (unsigned int)m_num_karts         ||
         race_manager->getNumPlayers() > 1) return false;
 
