@@ -312,6 +312,14 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
             OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
         }
         break;
+            
+        case Input::IT_NONE:
+        case Input::IT_STICKHAT:
+        case Input::IT_MOUSEMOTION:
+        case Input::IT_MOUSEBUTTON:
+            // uninteresting (but we keep them here to explicitely state we do
+            // nothing with them, and thus to fix warnings)
+            break;
     }   // switch
 }   // inputSensing
 
