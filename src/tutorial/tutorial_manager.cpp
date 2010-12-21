@@ -181,9 +181,8 @@ void TutorialManager::addTutorial(const std::string& filename)
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
-std::vector<const Tutorial*> TutorialManager::getActiveTutorials()
+std::vector<const Tutorial*> TutorialManager::getTutorialsList()
 {
-    computeActive();
     std::vector<const Tutorial*> all_active;
     //for(AllChallengesType::iterator i =m_all_challenges.begin(); 
     //                                i!=m_all_challenges.end();  i++)
@@ -196,7 +195,7 @@ std::vector<const Tutorial*> TutorialManager::getActiveTutorials()
 //-----------------------------------------------------------------------------
 const Tutorial* TutorialManager::getTutorial(const std::string& id)
 {
-    if(m_all_tutorials.find(id)==m_all_tutorials.end()) return NULL;
+    if(m_all_tutorials.find(id) == m_all_tutorials.end()) return NULL;
     return m_all_tutorials[id];
 }   // getTutorial
 
@@ -205,11 +204,11 @@ const Tutorial* TutorialManager::getTutorial(const std::string& id)
 */
 void TutorialManager::load()
 {
-    const std::string filename=file_manager->getChallengeFile("challenges.xml");
+    const std::string filename=file_manager->getChallengeFile("tutorials.xml");
     XMLNode* root = file_manager->createXMLTree(filename);
-    if(!root || root->getName() != "challenges")
+    if(!root || root->getName() != "tutorials")
     {
-        std::cerr << "Challenge file '" << filename << "' will be created." 
+        std::cerr << "Tutorial file '" << filename << "' will be created." 
                   << std::endl;
         save();
         
@@ -230,8 +229,8 @@ void TutorialManager::load()
 //-----------------------------------------------------------------------------
 void TutorialManager::save()
 {
-    //std::ofstream challenge_file;
-    //std::string filename = file_manager->getChallengeFile("challenges.xml");
+    std::ofstream tutorial_file;
+    //std::string filename = file_manager->getChallengeFile("tutorial.xml");
     //challenge_file.open(filename.c_str());
 
     //if(!challenge_file.is_open())
@@ -253,10 +252,6 @@ void TutorialManager::save()
     //challenge_file.close();
 }   // save
 
-void TutorialManager::playLockSound() const
-{
-    m_locked_sound->play();
-}
 
 //-----------------------------------------------------------------------------
 void TutorialManager::computeActive()

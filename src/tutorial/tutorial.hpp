@@ -76,45 +76,44 @@ public:
              Tutorial() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Tutorial() {};
 
+    // Getters & Setters
     const std::string &getId() const            { return m_Id;}
-    irr::core::stringw getName() const         { return m_Name;}
+    irr::core::stringw getName() const          { return m_Name;}
+    const irr::core::stringw& 
+        getTutorialDescription() const         {return m_tutorial_description; }
     void  setName(const irr::core::stringw & s) { m_Name = s;}
     void  setId(const std::string& s)           { m_Id = s;}
-    void  addUnlockTrackReward(const std::string &track_name);
-    void  addUnlockModeReward(const std::string &internal_mode_name,
-                              const irr::core::stringw &user_mode_name);
+    void  setSolved()                           { m_state = CH_SOLVED;}
+    void  setActive()                           { m_state = CH_ACTIVE;}
+
+
+    void  addUnlockTrackReward  (const std::string &track_name);
+    void  addUnlockModeReward   (const std::string &internal_mode_name,
+                                 const irr::core::stringw &user_mode_name);
     void  setTutorialDescription(const irr::core::stringw& d)
-                                                 {m_tutorial_description=d;      }
-  /*  void  addUnlockGPReward(const std::string &gp_name);
+                                                 {m_tutorial_description=d;}
+    void  addUnlockGPReward(const std::string &gp_name);
     void  addUnlockDifficultyReward(const std::string &internal_name,
                                     const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
-
-    /*const vector<UnlockableFeature>&
-          getFeatures() const                    { return m_feature;             }
     
-    const irr::core::stringw&
-          getChallengeDescription() const        {return m_challenge_description; }
-    void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
     bool  isSolved() const                       {return m_state==CH_SOLVED;      }
     bool  isActive() const                       {return m_state==CH_ACTIVE;      }
-    void  setSolved()                            {m_state = CH_SOLVED;            }
-    void  setActive()                            {m_state = CH_ACTIVE;            }
-    const vector<std::string>&
-          getPrerequisites() const               {return m_prerequisites;         }
+
+    
+    // File operations
     void  load(const XMLNode* config);
     void  save(ofstream& writer);
-
     // These functions are meant for customisation, e.g. load/save
     // additional state information specific to the tutorial
     virtual void loadAdditionalInfo(const XMLNode* config)  {};
     virtual void saveAdditionalInfo(ofstream& writer)       {};
-
+    
     // These functions are called when a race/gp is finished. It allows
     // the challenge to unlock features (when returning true), otherwise
     // the feature remains locked.
-    virtual bool raceFinished()                      {return false;}   // end of a race
+    virtual bool raceFinished()         {return false;}   // end of a race
     //virtual bool grandPrixFinished()                 {return false;}   // end of a GP
 
     /** sets the right parameters in RaceManager to try this tutorial */

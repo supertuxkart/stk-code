@@ -48,7 +48,7 @@ TutorialData::TutorialData(const std::string& filename)
 
     XMLNode *root = new XMLNode( filename );
 
-    // Check if the file have been correctly load
+    // Check if the file have been load correctly 
     if(!root || root->getName()!="tutorial")
     {
         delete root;
@@ -61,8 +61,7 @@ TutorialData::TutorialData(const std::string& filename)
     int i_property;
     float f_property;
 
-    // Mode
-    
+    // Mode    
     root->get("major", &s_property);
     setMajor(s_property);
 

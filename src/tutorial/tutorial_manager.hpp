@@ -34,13 +34,13 @@ class SFXBase;
   */
 class TutorialManager : public NoCopy
 {
+
 private:
     typedef std::map<std::string, Tutorial*> AllTutorialsType;
 
     SFXBase *m_locked_sound;    
     AllTutorialsType m_all_tutorials;
     std::map<std::string, bool> m_locked_tutorials;
-    std::vector<const Tutorial*> m_unlocked_tutorials;
 
     void       computeActive     ();
     void       load              ();
@@ -53,31 +53,16 @@ public:
     void       addTutorial      (Tutorial * m_tutorial);
     void       addTutorial      (const std::string& filename);
     void       save              ();
-    vector<const Tutorial*> getActiveTutorials();
-
-    /** Returns the list of recently unlocked features (e.g. call at the end of a
-        race to know if any features were unlocked) */
-    const vector<const Tutorial*> getRecentlyUnlockedFeatures() {return m_unlocked_tutorials;}
-
-    /** Clear the list of recently unlocked challenges */
-    void       clearUnlocked     () {m_unlocked_tutorials.clear(); }
-
+    vector <const Tutorial*> getTutorialsList();
+    
     /** Returns a complete list of all solved challenges */
     const vector<const Tutorial*>   getUnlockedTutorials();
 
-    /** Returns the list of currently inaccessible (locked) challenges */
-    const vector<const Tutorial*>   getLockedTutorials();
-
     const Tutorial *getTutorial     (const std::string& id);
 
-    /*void       raceFinished      ();
-    void       grandPrixFinished ();
-    void       lockFeature       (Tutorial* tutorial);
-    bool       isLocked          (const string& feature);*/
-
-    /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
-    void       playLockSound() const;
-
+    void       raceFinished      ();    
+    
+    
 };   // UnlockManager
 
 //extern UnlockManager* unlock_manager;
