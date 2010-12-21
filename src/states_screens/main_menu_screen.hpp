@@ -34,13 +34,8 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 public:
     
 #ifdef ADDONS_MANAGER
-    void changeNewsText(std::string action, std::string content="");
-    pthread_mutex_t m_mutex_news_text;
-    pthread_t m_thread_news_text;
 
-    std::string m_news_text;
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver);
-    virtual void tearDown();
 #endif
     
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -50,11 +45,7 @@ public:
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
-    
-    /** This function is used to download a text from the server to show the news. */
-    static void * downloadNews(void *);
-    
+    virtual void init();    
 };
 
 #endif

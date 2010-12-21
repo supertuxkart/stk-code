@@ -63,30 +63,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
 }
 #endif
-#ifdef ADDONS_MANAGER
-void MainMenuScreen::changeNewsText(std::string action, std::string content)
-{
-    if(action == "news")
-    {        
-        pthread_testcancel(); // check if thread was cancelled
-        
-        // enter the mutex; this will prevent the shutdown procedure
-        // from continuing until this critical section is over
-        pthread_mutex_lock(&(this->m_mutex_news_text));
 
-        m_news_text = content;
-
-	    pthread_mutex_unlock(&(this->m_mutex_news_text));
-    }
-    if(action == "offline")
-    {
-        pthread_testcancel(); // check if thread was cancelled
-	    pthread_mutex_lock(&(this->m_mutex_news_text));
-        m_news_text = "offline";
-	    pthread_mutex_unlock(&(this->m_mutex_news_text));
-    }
-}
-#endif
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
@@ -117,13 +94,6 @@ void MainMenuScreen::init()
 	// the key bindings for the first player the default again.
 	input_manager->getDeviceList()->clearLatestUsedDevice();
     
-#ifdef ADDONS_MANAGER
-    // FIXME: this is wrong, init may be called several times in the object's
-    //        lifespan, and the pthread docs state that initing several times the same
-    //        mutex can cause undefined behavior
-    pthread_mutex_init(&(this->m_mutex_news_text), NULL);
-    pthread_create(&m_thread_news_text, NULL, &MainMenuScreen::downloadNews, this);
-#endif
 }
 
 #ifdef ADDONS_MANAGER
@@ -132,14 +102,13 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
     //FIXME:very bad for performance
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-	pthread_mutex_lock(&(this->m_mutex_news_text));
-	if(m_news_text == "offline")
+    const std::string &news_text = network_http->getNewsMessage();
+	if(news_text == "")
 	{
 	    w->setText("Can't access stkaddons server...");
 	}
 	else
-        w->setText(m_news_text.c_str());
-	pthread_mutex_unlock(&(this->m_mutex_news_text));
+        w->setText(news_text.c_str());
 }
 #endif
 // ------------------------------------------------------------------------------------------------------
@@ -238,47 +207,3 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
 #endif
 }
-
-#ifdef ADDONS_MANAGER
-// ------------------------------------------------------------------------------------------------------
-void * MainMenuScreen::downloadNews( void * pthis)
-{
-    // enable thread to be cancelled
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-
-    // FIXME: this code is wrong, "pt" might have been deleted by the
-    // time the download is done (by having switched to another screen,
-    // or exiting the game, etc...)
-    //MainMenuScreen * pt = (MainMenuScreen*)pthis;
-    
-    std::string news = network_http->downloadToStr("news");
-    if (news != "")
-    {
-        pthread_testcancel(); // check if thread was cancelled
-        MainMenuScreen * pt = (MainMenuScreen*)pthis;
-        pt->changeNewsText("news", news);
-    }
-    else
-    {
-        pthread_testcancel(); // check if thread was cancelled
-        MainMenuScreen * pt = (MainMenuScreen*)pthis;
-        pt->changeNewsText("offline");
-    }
-    return NULL;
-}
-#endif
-// ------------------------------------------------------------------------------------------------------
-#ifdef ADDONS_MANAGER
-void MainMenuScreen::tearDown()
-{
-    fprintf(stdout, "canceling the thread\n");
-    
-    // grab the mutex before returning to make sure the screen is not deleted while the thread is
-    // changing the text, which would result in weird results (tearDown does not automatically mean
-    // the screen is going to be destroyed but let's play on the safe side)
-    pthread_mutex_lock(&(this->m_mutex_news_text));
-    pthread_cancel(m_thread_news_text);
-    pthread_mutex_unlock(&(this->m_mutex_news_text));
-}
-#endif

@@ -21,6 +21,7 @@
 #include <curl/curl.h>
 #include <stdio.h>
 #include <string>
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define isnan _isnan
 #else
@@ -33,40 +34,151 @@
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+// Use Sleep, which takes time in msecs. It must be defined after the
+// includes, since otherwise irrlicht's sleep function is changed.
+#  define sleep(s) Sleep(1000*(s))
+#else
+#  include <unistd.h>
+#endif
+
+
 pthread_mutex_t download_mutex;
 NetworkHttp * network_http = 0;
 
-// ------------------------------------------------------------------------------------------------------
-
+// ----------------------------------------------------------------------------
+/** Create a thread that handles all network functions independent of the 
+ *  main program.
+ */
 NetworkHttp::NetworkHttp()
 {
-    pthread_t thread;
-    pthread_create(&thread, NULL, &NetworkHttp::checkNewServer, this);
-}
+    pthread_mutex_init(&m_mutex_news, NULL);
+    m_news_message = "";
+
+    pthread_mutex_init(&m_mutex_command, NULL);
+    pthread_cond_init(&m_cond_command, NULL);
+    m_command      = HC_SLEEP;
+    m_abort        = false;
+
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    pthread_create(&m_thread_id, &attr, &NetworkHttp::mainLoop, this);
+    pthread_attr_destroy(&attr);
+}   // NetworkHttp
 
 // ---------------------------------------------------------------------------
-
-void * NetworkHttp::checkNewServer(void * obj)
+/** The actual main loop, which is started as a separate thread from the
+ *  constructor. After testing for a new server, fetching news, the list 
+ *  of packages to download, it will wait for commands to be issued.
+ *  \param obj: A pointer to this object, passed on by pthread_create
+ */
+void *NetworkHttp::mainLoop(void *obj)
 {
-    NetworkHttp * pthis = (NetworkHttp *)obj;
-    std::string newserver = pthis->downloadToStr("redirect");
+    NetworkHttp *me=(NetworkHttp*)obj;
+    me->checkNewServer();
+    const std::string tmp_str = me->downloadToStr("news");
+
+    pthread_mutex_lock(&(me->m_mutex_news));
+    {
+        printf("tmp %s\n", tmp_str.c_str());
+        // Only lock the actual assignment, not the downloading!
+        me->m_news_message = tmp_str;
+    }
+    pthread_mutex_unlock(&(me->m_mutex_news));
+
+    // Allow this thread to be cancelled anytime
+    // FIXME: this mechanism will later not be necessary anymore!
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+
+    // Wait in the main loop till a command is received
+    // (atm only QUIT is used).
+    pthread_mutex_lock(&me->m_mutex_command);
+    while(1)
+    {
+        pthread_cond_wait(&me->m_cond_command, &me->m_mutex_command);
+        switch(me->m_command)
+        {
+        case HC_QUIT: 
+            pthread_exit(NULL);
+            break;
+        case HC_SLEEP: break;
+        case HC_NEWS:
+            const std::string tmp_str = me->downloadToStr("news");
+            pthread_mutex_lock(&(me->m_mutex_news));
+            {
+                me->m_news_message = tmp_str;
+            }
+            pthread_mutex_unlock(&(me->m_mutex_news));
+            break;
+        }   // switch(m_command)
+    }   // while !m_abort
+    return NULL;
+}   // mainLoop
+
+// ---------------------------------------------------------------------------
+/** Aborts the thread running here, and returns then.
+ */
+NetworkHttp::~NetworkHttp()
+{
+    m_abort=1;  // Doesn't really need a mutex
+
+    pthread_mutex_lock(&m_mutex_command);
+    {
+        m_command=HC_QUIT;
+        pthread_cond_signal(&m_cond_command);
+    }
+    pthread_mutex_unlock(&m_mutex_command);
+
+    void *result;
+    pthread_join(m_thread_id, &result);
+
+    pthread_mutex_destroy(&m_mutex_news);
+    pthread_mutex_destroy(&m_mutex_command);
+    pthread_cond_destroy(&m_cond_command);
+}   // ~NetworkHttp
+
+// ---------------------------------------------------------------------------
+/** Checks if a redirect is received, causing a new server to be used for
+ *  downloading addons.
+ */
+void NetworkHttp::checkNewServer()
+{
+    std::string newserver = downloadToStr("redirect");
     if (newserver != "")
     {
         newserver.replace(newserver.find("\n"), 1, "");
 
-        std::cout << "[Addons] Current server: " << UserConfigParams::m_server_addons.toString() << std::endl;
+        if(UserConfigParams::m_verbosity>=4)
+        {
+            std::cout << "[Addons] Current server: " 
+                      << UserConfigParams::m_server_addons.toString() 
+                      << std::endl
+                      << "[Addons] New server: " << newserver << std::endl;
+        }
         UserConfigParams::m_server_addons = newserver;
-        std::cout << "[Addons] New server: " << newserver << std::endl;
         user_config->saveConfig();
     }
-    else
+    else if(UserConfigParams::m_verbosity>=4)
     {
         std::cout << "[Addons] No new server." << std::endl;
     }
-    return NULL;
-}
+}   // checkNewServer
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Returns the last loaded news message (using mutex to make sure a valid
+ *  value is available).
+ */
+const std::string NetworkHttp::getNewsMessage() const
+{
+    pthread_mutex_lock(&m_mutex_news);
+    const std::string tmp_str = m_news_message;
+    pthread_mutex_unlock(&m_mutex_news);
+    return tmp_str;
+}   // getNewsMessage
+
+// ----------------------------------------------------------------------------
 
 size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::string * stream)
 {
@@ -113,9 +225,9 @@ bool download(std::string file, const std::string &save, int * progress_data)
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	FILE * fout;
 	if(save != "")
-	    fout = fopen(std::string(file_manager->getConfigDir() + "/" + save).c_str(), "w");
+	    fout = fopen((file_manager->getAddonsDir() + "/" + save).c_str(), "w");
     else
-    	fout = fopen(std::string(file_manager->getConfigDir() + "/" + file).c_str(), "w");
+        fout = fopen((file_manager->getAddonsDir() + "/" + file).c_str(), "w");
 	
 	
 	//from and out

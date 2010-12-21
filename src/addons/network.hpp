@@ -24,14 +24,50 @@
 #include <string>
 class NetworkHttp
 {
-    private:
-        
-    public:
-        NetworkHttp();
-        static void * checkNewServer(void * obj);
-        static size_t writeStr(char str [], size_t size, size_t nb_char, 
-                               std::string * stream);
-        std::string downloadToStr(std::string url);
+public:
+    /** List of 'http commands' for this object:
+     *  HC_SLEEP: No command, sleep
+     *  HC_QUIT:  Stop loop and terminate thread.
+     *  HC_NEWS:  Update the news
+     */
+    enum HttpCommands {HC_SLEEP,
+                       HC_QUIT,
+                       HC_NEWS    } ;
+private:
+
+    /** The news message from the server. This is guarded by m_mutex_news. */
+    std::string   m_news_message;
+
+    /** A mutex for accessing m_news_message. Exclude this so that
+     *  getter can be declared const. */
+    mutable pthread_mutex_t m_mutex_news;
+
+    /** Which command to execute next. Access to this variable is guarded
+     *  by m_mutex_command and m_cond_command. */
+    HttpCommands   m_command;
+    /** A mutex for accessing m_commands. */
+    pthread_mutex_t m_mutex_command;
+    /** A conditional variable to wake up the main loop. */
+    pthread_cond_t m_cond_command;
+
+    /** Thread id of the thread running in this object. */
+    pthread_t     m_thread_id;
+
+    /** Signals that the main loop is to be aborted. */
+    bool          m_abort;
+
+    static void  *mainLoop(void *obj);
+    void          checkNewServer();
+
+public:
+                  NetworkHttp();
+                 ~NetworkHttp();
+    static size_t writeStr(char str [], size_t size, size_t nb_char, 
+                           std::string * stream);
+    std::string   downloadToStr(std::string url);
+
+    const std::string 
+                  getNewsMessage() const;
 };
 
 extern NetworkHttp *network_http;
