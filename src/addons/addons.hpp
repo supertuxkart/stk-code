@@ -20,7 +20,7 @@
 #ifndef HEADER_ADDONS_HPP
 #define HEADER_ADDONS_HPP
 
-#include <string.h>
+#include <string>
 #include <map>
 #include <pthread.h>
 #include <vector>
