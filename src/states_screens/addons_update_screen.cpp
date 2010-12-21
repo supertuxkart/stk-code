@@ -50,7 +50,9 @@ void AddonsUpdateScreen::loadedFromFile()
 }
 // ------------------------------------------------------------------------------------------------------
 
-void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
+void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, 
+                                       const std::string& name, 
+                                       const int playerID)
 {
     if (name == "back")
     {
@@ -58,11 +60,11 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
     }
     else if (name == "list_addons")
     {
-        GUIEngine::ListWidget* list = this->getWidget<GUIEngine::ListWidget>("list_addons");
+        GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
         std::string addons = list->getSelectionInternalName();
 
-        addons_manager->SelectId(addons);
-        this->load = new AddonsLoading(0.8f, 0.8f);
+        addons_manager->selectId(addons);
+        m_load = new AddonsLoading(0.8f, 0.8f);
     }
     else if (name == "category")
     {
@@ -71,13 +73,13 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget, const std::str
         if (selection == "tab_track")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->type = "track";
+            AddonsScreen::getInstance()->m_type = "track";
             AddonsScreen::getInstance()->loadList();
         }
         else if (selection == "tab_kart")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->type = "kart";
+            AddonsScreen::getInstance()->m_type = "kart";
             AddonsScreen::getInstance()->loadList();
         }
     }
@@ -94,13 +96,14 @@ void AddonsUpdateScreen::init()
     w_list->clear();
     addons_manager->resetIndex();
 	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
-    while(addons_manager->Next())
+    while(addons_manager->next())
     {
-		if(addons_manager->IsInstalledAsBool() && addons_manager->GetInstalledVersion() < addons_manager->GetVersion())
+		if(addons_manager->isInstalledAsBool() && 
+            addons_manager->getInstalledVersion() < addons_manager->getVersion())
 		{
-			std::cout << addons_manager->GetName() << std::endl;
-			w_list->addItem(addons_manager->GetIdAsStr().c_str(),
-					addons_manager->GetName().c_str(), 0);
+			std::cout << addons_manager->getName() << std::endl;
+			w_list->addItem(addons_manager->getIdAsStr().c_str(),
+					addons_manager->getName().c_str(), 0);
 		}
     }
 }

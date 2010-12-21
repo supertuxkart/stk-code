@@ -19,13 +19,11 @@
 
 #include <iostream>
 #include <string>
-//#ifdef ADDONS_MANAGER
-//#  include <pthread.h>
-//#endif
 
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "states_screens/challenges.hpp"
@@ -35,7 +33,6 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "io/file_manager.hpp"
 
 //FIXME : remove, temporary tutorial test
 #include "states_screens/tutorial_screen.hpp"
@@ -100,7 +97,6 @@ void MainMenuScreen::init()
 // ------------------------------------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    //FIXME:very bad for performance
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const std::string &news_text = network_http->getNewsMessage();
 	if(news_text == "")

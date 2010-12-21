@@ -20,12 +20,14 @@
 #ifndef HEADER_ADDONS_SCREEN_HPP
 #define HEADER_ADDONS_SCREEN_HPP
 
-#include "guiengine/screen.hpp"
-#include "states_screens/dialogs/addons_loading.hpp"
-#include "addons/addons.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include <pthread.h>
 #include "irrlicht.h"
+
+#include "addons/addons.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "states_screens/dialogs/addons_loading.hpp"
+
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
@@ -35,23 +37,26 @@ namespace GUIEngine { class Widget; }
   * \brief Addons screen
   * \ingroup states_screens
   */
-class AddonsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<AddonsScreen>
+class AddonsScreen : public GUIEngine::Screen, 
+                     public GUIEngine::ScreenSingleton<AddonsScreen>
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 
     AddonsScreen();
-    Addons * addons;
-    AddonsLoading  * load;
-    void loadInformations();
+    Addons          *m_addons;
+    AddonsLoading   *m_load;
+    void             loadInformations();
     /** For the addons list, a package when it is installed. */
-    irr::gui::STKModifiedSpriteBank* m_icon_bank;
-    GUIEngine::LabelWidget* m_update_status;
+    irr::gui::STKModifiedSpriteBank
+                    *m_icon_bank;
+    GUIEngine::LabelWidget
+                    *m_update_status;
 
 public:
 
-    bool can_load_list;
-    pthread_mutex_t         mutex;
-    std::string type;
+    bool                    m_can_load_list;
+    pthread_mutex_t         m_mutex;
+    std::string             m_type;
 
     /** Load the addons into the main list.*/
     void loadList();
@@ -65,10 +70,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
 
-    friend void * startInstall(void *);
+    friend void *startInstall(void *);
 
-    /** This function is used to download a text from the server to show the news. */
-    static void * downloadList(void *);
+    static void *downloadList(void *);
 
     /** This function is used to handle the thread (load the new list, etc...). */
     virtual void onUpdate(float delta,  irr::video::IVideoDriver*);

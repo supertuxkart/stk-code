@@ -44,7 +44,7 @@ Addons* addons_manager = 0;
 
 Addons::Addons()
 {
-    this->index = -1;
+    m_index = -1;
     int download_state = 0;
     m_download_state = download_state;
     pthread_mutex_init(&m_str_mutex, NULL);
@@ -105,30 +105,32 @@ Addons::Addons()
                 }
                 addons.type = xml->getNodeName();
                 addons.installed = false;
-                this->m_addons_list.push_back(addons);
+                m_addons_list.push_back(addons);
             }
         }
     }
     delete xml;
 
-    this->file_installed = file_manager->getConfigDir() + "/" + "addons_installed.xml";
-    this->GetInstalledAddons();
-}
-void Addons::resetIndex()
-{
-    this->index = -1;
+    m_file_installed = file_manager->getConfigDir() 
+                     + "/" + "addons_installed.xml";
+    getInstalledAddons();
 }
 // ----------------------------------------------------------------------------
-void Addons::GetInstalledAddons()
+void Addons::resetIndex()
+{
+    m_index = -1;
+}
+// ----------------------------------------------------------------------------
+void Addons::getInstalledAddons()
 {
     std::string attribute_name;
-    int old_index = this->index;
+    int old_index = m_index;
 
     /* checking for installed addons */
 
     std::cout << "[Addons] Loading an xml file for installed addons: ";
-    std::cout << this->file_installed << std::endl;
-    IrrXMLReader* xml = createIrrXMLReader(this->file_installed.c_str());
+    std::cout << m_file_installed << std::endl;
+    IrrXMLReader* xml = createIrrXMLReader(m_file_installed.c_str());
 
     // parse the file until end reached
 
@@ -161,10 +163,10 @@ void Addons::GetInstalledAddons()
                             version = xml->getAttributeValueAsInt("version");
                         }
                     }
-                    if(this->SelectId(id))
+                    if(selectId(id))
                     {
-                        this->m_addons_list[this->index].installed = true;
-                        this->m_addons_list[this->index].installed_version = version;
+                        m_addons_list[m_index].installed = true;
+                        m_addons_list[m_index].installed_version = version;
                         std::cout << "[Addons] An addon is already installed: " << id << std::endl;
                     }
                     else
@@ -175,7 +177,7 @@ void Addons::GetInstalledAddons()
                         addons.installed_version = version;
                         addons.version = version;
                         addons.installed = true;
-                        this->m_addons_list.push_back(addons);
+                        m_addons_list.push_back(addons);
                     }
                 }
             }
@@ -184,142 +186,141 @@ void Addons::GetInstalledAddons()
         }
     }
     delete xml;
-    this->index = old_index;
+    m_index = old_index;
 }
 
 
 // ----------------------------------------------------------------------------
-bool Addons::Next()
+bool Addons::next()
 {
-    if(this->index + 1 < (int)this->m_addons_list.size())
+    if(m_index + 1 < (int)m_addons_list.size())
     {
-        this->index ++;
+        m_index ++;
         return true;
     }
-    this->index = -1;
+    m_index = -1;
     return false;
-}
+}   // next
+
 // ----------------------------------------------------------------------------
-bool Addons::NextType(std::string type)
+bool Addons::nextType(std::string type)
 {
-    while(this->Next())
+    while(next())
     {
-        if(this->m_addons_list[this->index].type == type)
+        if(m_addons_list[m_index].type == type)
             return true;
     }
-    while(this->Next())
+    while(next())
     {
-        if(this->m_addons_list[this->index].type == type)
+        if(m_addons_list[m_index].type == type)
             return false;
     }
     return false;
-}
+}   // nextType
+
 // ----------------------------------------------------------------------------
-bool Addons::Previous()
+bool Addons::previous()
 {
-    if(this->index - 1 > 0)
+    if(m_index - 1 > 0)
     {
-        this->index --;
+        m_index --;
         return true;
     }
-    this->index = this->m_addons_list.size() - 1;
+    m_index = m_addons_list.size() - 1;
     return false;
-}
+}   // previous
+
 // ----------------------------------------------------------------------------
-bool Addons::PreviousType(std::string type)
+bool Addons::previousType(std::string type)
 {
-    while(this->Previous())
+    while(previous())
     {
-        if(this->m_addons_list[this->index].type == type)
+        if(m_addons_list[m_index].type == type)
             return true;
     }
-    while(this->Previous())
+    while(previous())
     {
-        if(this->m_addons_list[this->index].type == type)
+        if(m_addons_list[m_index].type == type)
             return false;
     }
     return false;
-}
+}   // previousType
+
 // ----------------------------------------------------------------------------
-bool Addons::Select(std::string name)
+bool Addons::select(std::string name)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
+    for(unsigned int i = 0; i < m_addons_list.size(); i++)
         {
-            if(this->m_addons_list[i].name == name)
+            if(m_addons_list[i].name == name)
             {
-                this->index = i;
+                m_index = i;
                 return true;
             }
         }
     return false;
-}
+}   // select
+
 // ----------------------------------------------------------------------------
-bool Addons::SelectId(std::string id)
+bool Addons::selectId(std::string id)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
+    for(unsigned int i = 0; i < m_addons_list.size(); i++)
         {
-            if(this->m_addons_list[i].id == id)
+            if(m_addons_list[i].id == id)
             {
-                this->index = i;
+                m_index = i;
                 return true;
             }
         }
     return false;
-}
-
+}   // selectId
 
 // ----------------------------------------------------------------------------
 /* FIXME : remove this function */
-addons_prop Addons::GetAddons()
+addons_prop Addons::getAddons()
 {
-    return this->m_addons_list[this->index];
-}
+    return m_addons_list[m_index];
+}   // getAddons
+
 // ----------------------------------------------------------------------------
-std::string Addons::IsInstalled()
-{
-    if(this->m_addons_list[this->index].installed)
-    {
-        return "yes";
-    }
-    return "no";
-}
-// ----------------------------------------------------------------------------
-std::string Addons::GetVersionAsStr()
-{
-    //maybe it is dirty, FIXME ?
-    std::ostringstream os;
-    os << this->m_addons_list[this->index].version;
-    return os.str();
-}
-// ----------------------------------------------------------------------------
-std::string Addons::GetIdAsStr()
+std::string Addons::getVersionAsStr() const
 {
     std::ostringstream os;
-    os << this->m_addons_list[this->index].id;
+    os << m_addons_list[m_index].version;
     return os.str();
-}
+}   // getVersionAsStr
+
 // ----------------------------------------------------------------------------
-int Addons::GetInstalledVersion()
+std::string Addons::getIdAsStr() const
 {
-    if(this->m_addons_list[this->index].installed)
-        return this->m_addons_list[this->index].installed_version;
+    std::ostringstream os;
+    os << m_addons_list[m_index].id;
+    return os.str();
+}   // getIdAsStr
+
+// ----------------------------------------------------------------------------
+int Addons::getInstalledVersion() const
+{
+    if(m_addons_list[m_index].installed)
+        return m_addons_list[m_index].installed_version;
     return 0;
-}
+}   // getInstalledVersion
+
 // ----------------------------------------------------------------------------
-std::string Addons::GetInstalledVersionAsStr()
+std::string Addons::getInstalledVersionAsStr() const
 {
-    if(this->m_addons_list[this->index].installed)
+    if(m_addons_list[m_index].installed)
     {
         std::ostringstream os;
-        os << this->m_addons_list[this->index].installed_version;
+        os << m_addons_list[m_index].installed_version;
         return os.str();
     }
     return "";
-}
+}   // getInstalledVersionAsStr
+
 // ----------------------------------------------------------------------------
-void Addons::Install()
+void Addons::install()
 {
     //download of the addons file
     
@@ -327,9 +328,9 @@ void Addons::Install()
     m_str_state = "Downloading...";
     pthread_mutex_unlock(&m_str_mutex);
 
-    std::string file = "file/" + this->m_addons_list[this->index].file;
+    std::string file = "file/" + m_addons_list[m_index].file;
     bool success = download(file,
-                            this->m_addons_list[this->index].name, &m_download_state);
+                            m_addons_list[m_index].name, &m_download_state);
     
     if (!success)
     {
@@ -338,14 +339,14 @@ void Addons::Install()
         return;
     }
     
-    file_manager->checkAndCreateDirForAddons(this->m_addons_list[this->index].name,
-                                             this->m_addons_list[this->index].type + "s/");
+    file_manager->checkAndCreateDirForAddons(m_addons_list[m_index].name,
+                                             m_addons_list[m_index].type + "s/");
 
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->m_addons_list[this->index].type + "s/" +
-                this->m_addons_list[this->index].name + "/" ;
-    std::string from = file_manager->getConfigDir() + "/" + this->m_addons_list[this->index].name;
+                m_addons_list[m_index].type + "s/" +
+                m_addons_list[m_index].name + "/" ;
+    std::string from = file_manager->getConfigDir() + "/" + m_addons_list[m_index].name;
     std::string to = dest_file;
     
     pthread_mutex_lock(&m_str_mutex);
@@ -360,37 +361,38 @@ void Addons::Install()
         return;
     }
 
-    this->m_addons_list[this->index].installed = true;
-    this->m_addons_list[this->index].installed_version = this->m_addons_list[this->index].version;
+    m_addons_list[m_index].installed = true;
+    m_addons_list[m_index].installed_version = m_addons_list[m_index].version;
     
     pthread_mutex_lock(&m_str_mutex);
     m_str_state = "Reloading kart list...";
     pthread_mutex_unlock(&m_str_mutex);
-    this->SaveInstalled();
-}
+    saveInstalled();
+}   // install
+
 // ----------------------------------------------------------------------------
-void Addons::SaveInstalled()
+void Addons::saveInstalled()
 {
     //Put the addons in the xml file
     //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
-    std::ofstream xml_installed(this->file_installed.c_str());
+    std::ofstream xml_installed(m_file_installed.c_str());
 
     //write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;
     xml_installed << "<addons  xmlns='http://stkaddons.tuxfamily.org/'>"
                     << std::endl;
 
-    for(unsigned int i = 0; i < this->m_addons_list.size(); i++)
+    for(unsigned int i = 0; i < m_addons_list.size(); i++)
     {
-        if(this->m_addons_list[i].installed)
+        if(m_addons_list[i].installed)
         {
             std::ostringstream os;
-            os << this->m_addons_list[i].installed_version;
+            os << m_addons_list[i].installed_version;
 
             //transform the version (int) in string
-            xml_installed << "<"+ this->m_addons_list[i].type +" name=\"" +
-                        this->m_addons_list[i].name + "\" id=\"" +
-                        this->m_addons_list[i].id + "\"";
+            xml_installed << "<"+ m_addons_list[i].type +" name=\"" +
+                        m_addons_list[i].name + "\" id=\"" +
+                        m_addons_list[i].id + "\"";
             xml_installed << " version=\"" + os.str() + "\" />" << std::endl;
         }
     }
@@ -398,26 +400,26 @@ void Addons::SaveInstalled()
     xml_installed.close();
     kart_properties_manager->reLoadAllKarts();
 	track_manager->loadTrackList();
-}
-// ----------------------------------------------------------------------------
-void Addons::UnInstall()
-{
-    std::cout << "[Addons] Uninstalling <" << this->m_addons_list[this->index].name << ">\n";
+}   // saveInstalled
 
-    this->m_addons_list[this->index].installed = false;
+// ----------------------------------------------------------------------------
+void Addons::uninstall()
+{
+    std::cout << "[Addons] Uninstalling <" << m_addons_list[m_index].name << ">\n";
+
+    m_addons_list[m_index].installed = false;
     //write the xml file with the informations about installed karts
     std::string dest_file = file_manager->getAddonsDir() + "/" + "data" + "/" +
-                this->m_addons_list[this->index].type + "s/" +
-                this->m_addons_list[this->index].name + "/";
+                m_addons_list[m_index].type + "s/" +
+                m_addons_list[m_index].name + "/";
 
     //remove the addons directory
     file_manager->removeDirectory(dest_file.c_str());
-    this->SaveInstalled();
+    saveInstalled();
 
-}
+}   // uninstall
 
 // ----------------------------------------------------------------------------
-
 int Addons::getDownloadState()
 {
     pthread_mutex_lock(&download_mutex);
@@ -428,18 +430,18 @@ int Addons::getDownloadState()
 
 // ----------------------------------------------------------------------------
 
-std::string Addons::getDownloadStateAsStr()
+std::string Addons::getDownloadStateAsStr() const
 {
     pthread_mutex_lock(&m_str_mutex);
     std::string value = m_str_state;
     pthread_mutex_unlock(&m_str_mutex);
     return value;
-}
+}   // getDownloadStateAsStr
 
 // ----------------------------------------------------------------------------
 
-bool Addons::NeedUpdate()
+bool Addons::needUpdate() const
 {
-    return GetInstalledVersion() < GetVersion();
-}
+    return getInstalledVersion() < getVersion();
+}   // needUpdate
 #endif

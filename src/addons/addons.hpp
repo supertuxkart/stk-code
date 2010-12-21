@@ -41,79 +41,82 @@ class Addons
 {
     private:
         std::vector<addons_prop>    m_addons_list;
-        int                         index;
-        std::string                 file_installed;
-        void                        SaveInstalled();
-        void                        GetInstalledAddons();
-        std::string                 type;
+        int                         m_index;
+        std::string                 m_file_installed;
+        void                        saveInstalled();
+        void                        getInstalledAddons();
+        std::string                 m_type;
         int                         m_download_state;
-        pthread_mutex_t             m_str_mutex;
+        mutable pthread_mutex_t     m_str_mutex;
         std::string m_str_state;
     public:
         Addons();
 
         /** Select the next addons in the addons list. */
-        bool Next();
+        bool next();
         /** Select the next addons in the addons list. */
-        bool Previous();
+        bool previous();
 
         /** Get all the selected addon parameters. */
-        addons_prop GetAddons();
+        addons_prop getAddons();
 
         /** Select an addon with it name. */
-        bool Select(std::string);
+        bool select(std::string);
 
         /** Select an addon with it id. */
-        bool SelectId(std::string);
+        bool selectId(std::string);
 
         /** Get the name of the selected addon. */
-        std::string GetName(){ return this->m_addons_list[this->index].name; };
+        const std::string &getName() const 
+                                { return m_addons_list[m_index].name; };
 
         /** Get the version of the selected addon. */
-        int GetVersion(){ return this->m_addons_list[this->index].version; };
+        int getVersion() const { return m_addons_list[m_index].version; };
 
         /** Get the path of the addon icon. */
-        std::string GetIcon() { return this->m_addons_list[this->index].icon; };
+        const std::string &getIcon() const
+                               { return m_addons_list[m_index].icon; };
 
         /** Get the version of the selected addon as a string. */
-        std::string GetVersionAsStr();
+        std::string getVersionAsStr() const;
 
         /** Get the installed version of the selected addon. */
-        int GetInstalledVersion();
-        std::string GetInstalledVersionAsStr();
+        int getInstalledVersion() const;
+        std::string getInstalledVersionAsStr() const;
 
         /** Return a simple bool to know if the addon needs to be updated */
-        bool NeedUpdate();
+        bool needUpdate() const;
 
         /** Get the installed version of the selected addon. */
-        std::string GetIdAsStr();
+        std::string getIdAsStr() const;
 
         /** Get the description of the selected addons. */
-        std::string GetDescription(){ return this->m_addons_list[this->index].description; };
+        const std::string &getDescription() const 
+                                { return m_addons_list[m_index].description; };
 
-        std::string GetType(){ return this->m_addons_list[this->index].type; };
+        const std::string &getType() const 
+                                { return m_addons_list[m_index].type; };
         /** Install or upgrade the selected addon. */
-        void Install();
+        void install();
 
-        /** Uninstall the selected addon. This method will remove all the directory of the addon.*/
-        void UnInstall();
+        /** Uninstall the selected addon. This method will remove all the 
+         *  directory of the addon.*/
+        void uninstall();
 
         void resetIndex();
 
         /** Get the state of the addon: if it is installed or not.*/
-        std::string IsInstalled();
+        bool isInstalledAsBool() const 
+                            { return m_addons_list[m_index].installed; };
 
-        /** Get the state of the addon: if it is installed or not.*/
-        bool IsInstalledAsBool(){ return this->m_addons_list[this->index].installed; };
-
-        bool NextType(std::string type);
-        bool PreviousType(std::string type);
-        int getDownloadState();
+        bool nextType(std::string type);
+        bool previousType(std::string type);
+        int  getDownloadState();
 
         /** Get the install state (if it is the download, unzip...)*/
-        std::string getDownloadStateAsStr();
+        std::string getDownloadStateAsStr() const;
 
 };
-extern Addons * addons_manager;
+extern Addons *addons_manager;
 #endif
 #endif

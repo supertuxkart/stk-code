@@ -77,16 +77,7 @@ void *NetworkHttp::mainLoop(void *obj)
 {
     NetworkHttp *me=(NetworkHttp*)obj;
     me->checkNewServer();
-    const std::string tmp_str = me->downloadToStr("news");
-
-    pthread_mutex_lock(&(me->m_mutex_news));
-    {
-        printf("tmp %s\n", tmp_str.c_str());
-        // Only lock the actual assignment, not the downloading!
-        me->m_news_message = tmp_str;
-    }
-    pthread_mutex_unlock(&(me->m_mutex_news));
-
+    me->updateNews();
     // Allow this thread to be cancelled anytime
     // FIXME: this mechanism will later not be necessary anymore!
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
@@ -103,14 +94,10 @@ void *NetworkHttp::mainLoop(void *obj)
         case HC_QUIT: 
             pthread_exit(NULL);
             break;
-        case HC_SLEEP: break;
+        case HC_SLEEP: 
+            break;
         case HC_NEWS:
-            const std::string tmp_str = me->downloadToStr("news");
-            pthread_mutex_lock(&(me->m_mutex_news));
-            {
-                me->m_news_message = tmp_str;
-            }
-            pthread_mutex_unlock(&(me->m_mutex_news));
+            me->updateNews();
             break;
         }   // switch(m_command)
     }   // while !m_abort
@@ -165,6 +152,21 @@ void NetworkHttp::checkNewServer()
         std::cout << "[Addons] No new server." << std::endl;
     }
 }   // checkNewServer
+
+// ----------------------------------------------------------------------------
+/** Updates the 'news' string to be displayed in the main menu.
+ */
+void NetworkHttp::updateNews()
+{
+    const std::string tmp_str = downloadToStr("news");
+
+    pthread_mutex_lock(&m_mutex_news);
+    {
+        // Only lock the actual assignment, not the downloading!
+        m_news_message = tmp_str;
+    }
+    pthread_mutex_unlock(&m_mutex_news);
+}   // updateNews
 
 // ----------------------------------------------------------------------------
 /** Returns the last loaded news message (using mutex to make sure a valid

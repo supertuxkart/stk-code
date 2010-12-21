@@ -59,6 +59,8 @@ private:
     static void  *mainLoop(void *obj);
     void          checkNewServer();
 
+    void          updateNews();
+
 public:
                   NetworkHttp();
                  ~NetworkHttp();
