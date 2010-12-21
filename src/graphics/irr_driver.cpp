@@ -147,7 +147,7 @@ void IrrDriver::initDevice()
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
-            std::cout << "[IrrDriver] Tring to create device with " << bits << " bits\n";
+            std::cout << "[IrrDriver] Trying to create device with " << bits << " bits\n";
             m_device = createDevice(type,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
