@@ -264,6 +264,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
         }
         break;
     case Input::IT_STICKMOTION:
+        {
         std::cout << "%% storing new axis binding, value=" << value <<
             " deviceID=" << deviceID << " button=" << button << " axisDirection=" <<
             (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
@@ -312,7 +313,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
             OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
         }
         break;
-            
+        }
+
         case Input::IT_NONE:
         case Input::IT_STICKHAT:
         case Input::IT_MOUSEMOTION:
