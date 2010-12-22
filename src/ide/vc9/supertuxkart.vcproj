@@ -1103,7 +1103,7 @@
 				Name="addons"
 				>
 				<File
-					RelativePath="..\..\addons\addons.cpp"
+					RelativePath="..\..\addons\addons_manager.cpp"
 					>
 				</File>
 				<File
@@ -2017,7 +2017,7 @@
 				Name="addons"
 				>
 				<File
-					RelativePath="..\..\addons\addons.hpp"
+					RelativePath="..\..\addons\addons_manager.hpp"
 					>
 				</File>
 				<File

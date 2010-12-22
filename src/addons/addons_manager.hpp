@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
+//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
 
 #ifdef ADDONS_MANAGER
 
-#ifndef HEADER_ADDONS_HPP
-#define HEADER_ADDONS_HPP
+#ifndef HEADER_ADDONS_MANAGER_HPP
+#define HEADER_ADDONS_MANAGER_HPP
 
 #include <string>
 #include <map>
@@ -37,7 +37,7 @@ struct addons_prop
     bool installed;
     std::string type;
 };
-class Addons
+class AddonsManager
 {
     private:
         std::vector<addons_prop>    m_addons_list;
@@ -50,7 +50,7 @@ class Addons
         mutable pthread_mutex_t     m_str_mutex;
         std::string m_str_state;
     public:
-        Addons();
+        AddonsManager();
 
         /** Select the next addons in the addons list. */
         bool next();
@@ -117,6 +117,6 @@ class Addons
         std::string getDownloadStateAsStr() const;
 
 };
-extern Addons *addons_manager;
+extern AddonsManager *addons_manager;
 #endif
 #endif

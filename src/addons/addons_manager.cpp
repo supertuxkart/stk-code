@@ -19,30 +19,31 @@
   */
 #ifdef ADDONS_MANAGER
 
-#include <string.h>
-#include <map>
-#include <vector>
-#include <iostream>
-#include "addons/addons.hpp"
-#include "irrXML.h"
-#include "addons/network.hpp"
-#include "addons/zip.hpp"
+#include "addons/addons_manager.hpp"
 
 #include <fstream>
+#include <iostream>
+#include <map>
 #include <sstream>
-#include "io/file_manager.hpp"
+#include <string.h>
+#include <vector>
 
+#include "irrXML.h"
+
+#include "addons/network.hpp"
+#include "addons/zip.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "tracks/track_manager.hpp"
 #include "states_screens/kart_selection.hpp"
+#include "tracks/track_manager.hpp"
 
 using namespace irr; /* irrXML which is used to read (not write) xml file,
 is located in the namespace irr::io.*/
 using namespace io;
-Addons* addons_manager = 0;
+AddonsManager* addons_manager = 0;
 // ----------------------------------------------------------------------------
 
-Addons::Addons()
+AddonsManager::AddonsManager()
 {
     m_index = -1;
     int download_state = 0;
@@ -116,12 +117,12 @@ Addons::Addons()
     getInstalledAddons();
 }
 // ----------------------------------------------------------------------------
-void Addons::resetIndex()
+void AddonsManager::resetIndex()
 {
     m_index = -1;
 }
 // ----------------------------------------------------------------------------
-void Addons::getInstalledAddons()
+void AddonsManager::getInstalledAddons()
 {
     std::string attribute_name;
     int old_index = m_index;
@@ -191,7 +192,7 @@ void Addons::getInstalledAddons()
 
 
 // ----------------------------------------------------------------------------
-bool Addons::next()
+bool AddonsManager::next()
 {
     if(m_index + 1 < (int)m_addons_list.size())
     {
@@ -203,7 +204,7 @@ bool Addons::next()
 }   // next
 
 // ----------------------------------------------------------------------------
-bool Addons::nextType(std::string type)
+bool AddonsManager::nextType(std::string type)
 {
     while(next())
     {
@@ -219,7 +220,7 @@ bool Addons::nextType(std::string type)
 }   // nextType
 
 // ----------------------------------------------------------------------------
-bool Addons::previous()
+bool AddonsManager::previous()
 {
     if(m_index - 1 > 0)
     {
@@ -231,7 +232,7 @@ bool Addons::previous()
 }   // previous
 
 // ----------------------------------------------------------------------------
-bool Addons::previousType(std::string type)
+bool AddonsManager::previousType(std::string type)
 {
     while(previous())
     {
@@ -247,7 +248,7 @@ bool Addons::previousType(std::string type)
 }   // previousType
 
 // ----------------------------------------------------------------------------
-bool Addons::select(std::string name)
+bool AddonsManager::select(std::string name)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
@@ -262,7 +263,7 @@ bool Addons::select(std::string name)
 }   // select
 
 // ----------------------------------------------------------------------------
-bool Addons::selectId(std::string id)
+bool AddonsManager::selectId(std::string id)
 {
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
@@ -278,13 +279,13 @@ bool Addons::selectId(std::string id)
 
 // ----------------------------------------------------------------------------
 /* FIXME : remove this function */
-addons_prop Addons::getAddons()
+addons_prop AddonsManager::getAddons()
 {
     return m_addons_list[m_index];
 }   // getAddons
 
 // ----------------------------------------------------------------------------
-std::string Addons::getVersionAsStr() const
+std::string AddonsManager::getVersionAsStr() const
 {
     std::ostringstream os;
     os << m_addons_list[m_index].version;
@@ -292,7 +293,7 @@ std::string Addons::getVersionAsStr() const
 }   // getVersionAsStr
 
 // ----------------------------------------------------------------------------
-std::string Addons::getIdAsStr() const
+std::string AddonsManager::getIdAsStr() const
 {
     std::ostringstream os;
     os << m_addons_list[m_index].id;
@@ -300,7 +301,7 @@ std::string Addons::getIdAsStr() const
 }   // getIdAsStr
 
 // ----------------------------------------------------------------------------
-int Addons::getInstalledVersion() const
+int AddonsManager::getInstalledVersion() const
 {
     if(m_addons_list[m_index].installed)
         return m_addons_list[m_index].installed_version;
@@ -308,7 +309,7 @@ int Addons::getInstalledVersion() const
 }   // getInstalledVersion
 
 // ----------------------------------------------------------------------------
-std::string Addons::getInstalledVersionAsStr() const
+std::string AddonsManager::getInstalledVersionAsStr() const
 {
     if(m_addons_list[m_index].installed)
     {
@@ -320,7 +321,7 @@ std::string Addons::getInstalledVersionAsStr() const
 }   // getInstalledVersionAsStr
 
 // ----------------------------------------------------------------------------
-void Addons::install()
+void AddonsManager::install()
 {
     //download of the addons file
     
@@ -371,7 +372,7 @@ void Addons::install()
 }   // install
 
 // ----------------------------------------------------------------------------
-void Addons::saveInstalled()
+void AddonsManager::saveInstalled()
 {
     //Put the addons in the xml file
     //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
@@ -403,7 +404,7 @@ void Addons::saveInstalled()
 }   // saveInstalled
 
 // ----------------------------------------------------------------------------
-void Addons::uninstall()
+void AddonsManager::uninstall()
 {
     std::cout << "[Addons] Uninstalling <" << m_addons_list[m_index].name << ">\n";
 
@@ -420,7 +421,7 @@ void Addons::uninstall()
 }   // uninstall
 
 // ----------------------------------------------------------------------------
-int Addons::getDownloadState()
+int AddonsManager::getDownloadState()
 {
     pthread_mutex_lock(&download_mutex);
     int value = m_download_state;
@@ -430,7 +431,7 @@ int Addons::getDownloadState()
 
 // ----------------------------------------------------------------------------
 
-std::string Addons::getDownloadStateAsStr() const
+std::string AddonsManager::getDownloadStateAsStr() const
 {
     pthread_mutex_lock(&m_str_mutex);
     std::string value = m_str_state;
@@ -440,7 +441,7 @@ std::string Addons::getDownloadStateAsStr() const
 
 // ----------------------------------------------------------------------------
 
-bool Addons::needUpdate() const
+bool AddonsManager::needUpdate() const
 {
     return getInstalledVersion() < getVersion();
 }   // needUpdate

@@ -12,6 +12,12 @@ supertuxkart_SOURCES = \
  main.cpp \
  main_loop.cpp \
  main_loop.hpp \
+ addons/network.cpp \
+ addons/network.hpp \
+ addons/addons.cpp \
+ addons/addons.hpp \
+ addons/zip.cpp \
+ addons/zip.hpp \
  animations/animation_base.hpp \
  animations/animation_base.cpp \
  animations/billboard_animation.cpp \
@@ -393,13 +399,7 @@ supertuxkart_SOURCES = \
  utils/translation.cpp \
  utils/translation.hpp \
  utils/vec3.cpp \
- utils/vec3.hpp \
- addons/network.cpp \
- addons/network.hpp \
- addons/addons.cpp \
- addons/addons.hpp \
- addons/zip.cpp \
- addons/zip.hpp
+ utils/vec3.hpp
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \

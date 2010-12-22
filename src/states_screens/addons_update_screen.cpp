@@ -25,7 +25,7 @@
 #  include <sstream>
 
 
-#include "addons/addons.hpp"
+#include "addons/addons_manager.hpp"
 #include "addons/network.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"

@@ -71,7 +71,7 @@
 
 #ifdef ADDONS_MANAGER
 #include "addons/network.hpp"
-#include "addons/addons.hpp"
+#include "addons/addons_manager.hpp"
 #endif
 
 void cmdLineHelp (char* invocation)
@@ -576,7 +576,7 @@ void initRest()
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
     network_http            = new NetworkHttp          ();
-    addons_manager          = new Addons               ();
+    addons_manager          = new AddonsManager        ();
 
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
 	track_manager->addTrackSearchDir(file_manager->getAddonsDir() + "/data/tracks/");

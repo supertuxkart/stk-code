@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
+//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@
 #include <pthread.h>
 #include "irrlicht.h"
 
-#include "addons/addons.hpp"
+#include "addons/addons_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
@@ -43,7 +43,7 @@ class AddonsScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 
     AddonsScreen();
-    Addons          *m_addons;
+    AddonsManager   *m_addons;
     AddonsLoading   *m_load;
     void             loadInformations();
     /** For the addons list, a package when it is installed. */

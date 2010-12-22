@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
+//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 
 #include "irrlicht.h"
 
-#include "addons/addons.hpp"
+#include "addons/addons_manager.hpp"
 #include "addons/network.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"

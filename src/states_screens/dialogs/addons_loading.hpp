@@ -23,7 +23,7 @@
 
 #include "guiengine/modaldialog.hpp"
 
-#include "addons/addons.hpp"
+#include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
 #include <pthread.h>
 class AddonsLoading : public GUIEngine::ModalDialog
