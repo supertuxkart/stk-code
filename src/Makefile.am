@@ -14,8 +14,8 @@ supertuxkart_SOURCES = \
  main_loop.hpp \
  addons/network.cpp \
  addons/network.hpp \
- addons/addons.cpp \
- addons/addons.hpp \
+ addons/addons_manager.cpp \
+ addons/addons_manager.hpp \
  addons/zip.cpp \
  addons/zip.hpp \
  animations/animation_base.hpp \
