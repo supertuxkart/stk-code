@@ -240,8 +240,8 @@ public:
     /** Sets the position in race this kart has (1<=p<=n). */
     virtual void setPosition(int p)    
     {
-        m_race_position = p;
         m_controller->setPosition(p);
+        m_race_position = p;
     }   // setPosition
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
