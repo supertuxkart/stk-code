@@ -30,7 +30,7 @@
 
 #include "irrXML.h"
 
-#include "addons/network.hpp"
+#include "addons/network_http.hpp"
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"

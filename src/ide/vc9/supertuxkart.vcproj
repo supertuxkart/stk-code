@@ -1107,7 +1107,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\addons\network.cpp"
+					RelativePath="..\..\addons\network_http.cpp"
 					>
 				</File>
 				<File
@@ -2021,7 +2021,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\addons\network.hpp"
+					RelativePath="..\..\addons\network_http.hpp"
 					>
 				</File>
 				<File

@@ -41,7 +41,7 @@
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
-#include "addons/network.hpp"
+#include "addons/network_http.hpp"
 
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"

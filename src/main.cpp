@@ -70,7 +70,7 @@
 #include "utils/translation.hpp"
 
 #ifdef ADDONS_MANAGER
-#include "addons/network.hpp"
+#include "addons/network_http.hpp"
 #include "addons/addons_manager.hpp"
 #endif
 

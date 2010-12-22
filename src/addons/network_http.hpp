@@ -17,11 +17,12 @@
 
 #ifdef ADDONS_MANAGER
 
-#ifndef HEADER_NETWORK_HPP
-#define HEADER_NETWORK_HPP
+#ifndef HEADER_NETWORK_HTTP_HPP
+#define HEADER_NETWORK_HTTP_HPP
 
 #include <pthread.h>
 #include <string>
+
 class NetworkHttp
 {
 public:

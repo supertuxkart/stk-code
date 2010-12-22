@@ -23,7 +23,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
-#include "addons/network.hpp"
+#include "addons/network_http.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"

@@ -25,7 +25,7 @@
 #include "irrlicht.h"
 
 #include "addons/addons_manager.hpp"
-#include "addons/network.hpp"
+#include "addons/network_http.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/CGUISpriteBank.h"
