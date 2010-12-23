@@ -1113,8 +1113,9 @@ void RaceGUI::drawGlobalMusicDescription()
     core::stringw thetext_composer;
     if (mi->getComposer()!="")
     {
-        std::string s = "by "+mi->getComposer();
-        thetext_composer = s.c_str();
+        thetext_composer = _("by");
+        thetext_composer += " ";
+        thetext_composer += mi->getComposer().c_str();
         textWidth2 = font->getDimension(thetext_composer.c_str()).Width;
     }
     const int max_text_size = (int)(UserConfigParams::m_width*2.0f/3.0f);

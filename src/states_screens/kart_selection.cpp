@@ -213,7 +213,7 @@ public:
     
 
     LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
-    std::string deviceName;
+    core::stringw deviceName;
     std::string m_kartInternalName;
     
     PlayerKartWidget(KartSelectionScreen* parent, StateManager::ActivePlayer* associatedPlayer,
@@ -245,11 +245,11 @@ public:
         // ---- Player ID label
         if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
         {
-            deviceName += "keyboard";
+            deviceName += _("keyboard");
         }
         else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
         {
-            deviceName += "gamepad";
+            deviceName += _("gamepad");
         }
         
         m_player_ID_label = new LabelWidget(false, true);
