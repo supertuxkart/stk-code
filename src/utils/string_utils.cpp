@@ -282,14 +282,29 @@ namespace StringUtils
                 {
                     if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
                     {
-                        assert(all_vals.size() > insertValID);
-                        new_string += all_vals[insertValID] + sv[i].substr(2);
+                        if (insertValID >= all_vals.size())
+                        {
+                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid number of arguments in '%s'\n", s.c_str());
+                            new_string += "??" + sv[i].substr(2);
+                        }
+                        else
+                        {
+                            new_string += all_vals[insertValID] + sv[i].substr(2);
+                        }
+                        insertValID++;
                     }
                     else if(sv[i][1]>='0' && sv[i][1]<= '9')
                     {
                         const unsigned int index = sv[i][1] - '0';
-                        assert(all_vals.size() > index);
-                        new_string += all_vals[index] + sv[i].substr(2);
+                        if (index >= all_vals.size())
+                        {
+                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid argument index in '%s' for %i\n", s.c_str(), index);
+                            new_string += "??" + sv[i].substr(2);
+                        }
+                        else
+                        {
+                            new_string += all_vals[index] + sv[i].substr(2);
+                        }
                     }
                     else
                     {
@@ -326,15 +341,34 @@ namespace StringUtils
                 {
                     if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
                     {
-                        new_string += all_vals[insertValID].c_str();
-                        new_string += sv[i].subString(2, sv[i].size()-2);
+                        if (insertValID >= all_vals.size())
+                        {
+                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid number of arguments in '%s'\n",
+                                    irr::core::stringc(s.c_str()).c_str());
+                            new_string += "??";
+                            new_string += sv[i].subString(2, sv[i].size()-2);
+                        }
+                        else
+                        {
+                            new_string += all_vals[insertValID].c_str();
+                            new_string += sv[i].subString(2, sv[i].size()-2);
+                        }
                         insertValID++;
                     }
                     else if(irr::core::isdigit(sv[i][1]))
                     {
                         const unsigned int index = irr::core::stringc(sv[i].c_str()).c_str()[1] - '0';
-                        assert(all_vals.size() > index);
-                        new_string += all_vals[index] + sv[i].subString(2, sv[i].size()-2);
+                        if (index >= all_vals.size())
+                        {
+                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid argument ID in '%s' : %i\n",
+                                    irr::core::stringc(s.c_str()).c_str(), index);
+                            new_string += "??";
+                            new_string += sv[i].subString(2, sv[i].size()-2);
+                        }
+                        else
+                        {
+                            new_string += all_vals[index] + sv[i].subString(2, sv[i].size()-2);
+                        }
                     }
                     else
                     {
