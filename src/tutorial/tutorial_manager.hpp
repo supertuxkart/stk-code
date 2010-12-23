@@ -21,12 +21,13 @@
 #include <map>
 
 #include "tutorial/tutorial.hpp"
+#include "tutorial/tutorial_data.hpp"
+
 #include "utils/no_copy.hpp"
 
 #include <fstream>
 
 class XMLNode;
-class SFXBase;
 
 /**
   * \brief main class to handle the tutorials list
@@ -36,16 +37,11 @@ class TutorialManager : public NoCopy
 {
 
 private:
-    typedef std::map<std::string, Tutorial*> AllTutorialsType;
+    
+    typedef std::map<std::string, Tutorial*> TutorialsList;
+    TutorialsList m_tutorials_list;
 
-    SFXBase *m_locked_sound;    
-    AllTutorialsType m_all_tutorials;
-    std::map<std::string, bool> m_locked_tutorials;
-
-    void       computeActive     ();
     void       load              ();
-
-    void       unlockFeature     (Tutorial* t, bool do_save=true);
 
 public:
                TutorialManager     ();
@@ -53,17 +49,14 @@ public:
     void       addTutorial      (Tutorial * m_tutorial);
     void       addTutorial      (const std::string& filename);
     void       save              ();
+
     vector <const Tutorial*> getTutorialsList();
     
-    /** Returns a complete list of all solved challenges */
-    const vector<const Tutorial*>   getUnlockedTutorials();
-
     const Tutorial *getTutorial     (const std::string& id);
 
-    void       raceFinished      ();    
+    void       raceFinished      ();        
     
-    
-};   // UnlockManager
+};   // TutorialManager
 
-//extern UnlockManager* unlock_manager;
+extern TutorialManager * m_tutorial_manager;
 #endif // TUTORIALMANAGER_H

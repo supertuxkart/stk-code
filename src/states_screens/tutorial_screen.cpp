@@ -140,14 +140,10 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
         const std::string& selection = tutorials->getSelectionInternalName();
         if (selection == BASIC_DRIVING)
         {
-            //FIXME: simplify and centralize race start sequence!!
-
             // Verify the kart in the config exists
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-            {
                 UserConfigParams::m_default_kart.revertToDefaults();
-            }
-
+            
             // Use latest used device
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
 
@@ -170,8 +166,9 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
             network_manager->initCharacterDataStructures();
 
             // Launch tutorial
-            //tutorial_manager->getTutorial(selection)->setRace();
+            //m_tutorial_manager->getTutorial(selection)->setRace();
 
+            
             // FIXME this code have to be in Tutorial class (and loaded from file xD)
             RaceManager::MajorRaceModeType m_major;
             RaceManager::MinorRaceModeType m_minor;
@@ -189,9 +186,8 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
             race_manager->setNumLaps(1);
             race_manager->setNumKarts(1);
             race_manager->setNumPlayers(1);
-            race_manager->setNumLocalPlayers(1);
-              
-            //race_manager->setCoinTarget(m_energy);
+            race_manager->setNumLocalPlayers(1);              
+            //race_manager->setCoinTarget(m_energy);*/
 
             // Sets up kart info, including random list of kart for AI
             network_manager->setupPlayerKartInfo();

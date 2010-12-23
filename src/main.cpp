@@ -43,6 +43,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "tutorial/tutorial_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "config/player.hpp"
@@ -679,6 +680,7 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
+        //m_tutorial_manager      = new TutorialManager();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png")) );
         projectile_manager      -> loadData        ();
         

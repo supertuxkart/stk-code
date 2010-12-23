@@ -35,7 +35,7 @@ using namespace std; // To avoid using std:: all the time
 using namespace irr::core;
 class XMLNode;
 
-enum REWARD_TYPE
+/*enum REWARD_TYPE
    {UNLOCK_TRACK,
     UNLOCK_GP,
     UNLOCK_MODE,

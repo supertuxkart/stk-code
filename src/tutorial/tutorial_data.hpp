@@ -44,7 +44,7 @@ private:
     int                            m_energy;
     std::string                    m_filename;
 
-    void getUnlocks(const XMLNode *root, const std:: string type, REWARD_TYPE reward);
+//    void getUnlocks(const XMLNode *root, const std:: string type, REWARD_TYPE reward);
     void error(const char *id) const;
 
 public:

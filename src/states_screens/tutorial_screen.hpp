@@ -32,9 +32,8 @@ const std::string COLLECTIBLE_WEAPONS = "cw";
 const std::string SHOOTING_BACKWARDS = "sb";
 
 class TutorialScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TutorialScreen>
-{    
+{
     
-
     friend class GUIEngine::ScreenSingleton<TutorialScreen>;
     TutorialScreen();
 
@@ -42,7 +41,6 @@ class TutorialScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 
 
     public:
-
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
 
