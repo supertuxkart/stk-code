@@ -656,7 +656,7 @@ int main(int argc, char *argv[] )
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
             std::cout << "Error messages and other text output will be logged to " ;
-            std::cout << logoutfile << " and "<<logerrfile;
+            std::cout << logoutfile << " and "<<logerrfile<<"\n";
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
                 fprintf(stderr, "Can not open log file '%s'. Writing to stdout instead.\n",
