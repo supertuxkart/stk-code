@@ -382,7 +382,7 @@ void UserConfig::addDefaultPlayer()
     class GuestPlayerProfile : public PlayerProfile
     {
     public:
-        GuestPlayerProfile() : PlayerProfile("Guest") //TODO: i18n
+        GuestPlayerProfile() : PlayerProfile(core::stringc(_("Guest")).c_str())
         {
             m_is_guest_account = true;
         }
