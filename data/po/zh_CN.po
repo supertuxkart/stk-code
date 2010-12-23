@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-19 13:38+0000\n"
+"PO-Revision-Date: 2010-12-21 07:41+0000\n"
 "Last-Translator: acme_pjz <Unknown>\n"
 "Language-Team: acme_pjz <acme_pjz@hotmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-20 05:09+0000\n"
+"X-Launchpad-Export-Date: 2010-12-21 13:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-Language: Chinese\n"
@@ -168,9 +168,8 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
-"* "
-"大多数游戏模式也可以在锦标赛模式中使用：不仅仅是玩一个地图，而是玩一系列的地图。每场比赛您的排名越靠前，所获得的积分就越多。最后积分最高的玩家将赢得锦标赛"
-"。"
+"* 大多数游戏模式也可以在锦标赛模式中使用： 不仅仅是玩一个地图，而是玩一系列的地图。 每场比赛您的排名越靠前，所获得的积分就越多。 "
+"最后积分最高的玩家将赢得锦标赛。"
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:479
@@ -190,7 +189,7 @@ msgstr "三击对战"
 msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
-msgstr "三击对战：多人游戏中才有该模式。用道具来攻击其他玩家，直到对手丢掉 3 条命。"
+msgstr "三击对战：多人游戏中才有该模式。 用道具来攻击其他玩家，直到对手丢掉 3 条命。"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:187
 msgid "= Highscores ="
@@ -501,7 +500,7 @@ msgstr "在数学课上收集氮气"
 #. I18N: In the help menu
 #: data/po/gui_strings.h:144
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr "收集蓝色宝箱 - 它们是游戏道具，包含武器或者其它好东西。"
+msgstr "收集蓝色宝箱 - 它们是游戏道具， 包含武器或者其它好东西。"
 
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:708
@@ -520,12 +519,12 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
-msgstr "收集氮气作为燃料，当你按键使用它时，赛车可以获得很大的加速。你可以在屏幕右侧看到当前燃料的数量。"
+msgstr "收集氮气作为燃料， 当你按键使用它时， 赛车可以获得很大的加速。 你可以在屏幕右侧看到当前燃料的数量。"
 
 #. I18N: ./data/grandprix/alltracks.challenge
 #: data/po/gui_strings.h:645
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
-msgstr "在与 3 个专家级别电脑玩家的对决中赢得“在世界的尽头”锦标赛。"
+msgstr "在与 3 个专家级别电脑玩家的对决中， 赢得“在世界的尽头”锦标赛。"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
@@ -671,18 +670,18 @@ msgstr "最后一圈！"
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:693
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-msgstr "在与 3 个简单级别电脑玩家的对决中，于 2 分 30 秒之内跑完三圈“农场”地图。"
+msgstr "在与 3 个简单级别电脑玩家的对决中， 于 2 分 30 秒之内跑完三圈“农场”地图。"
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
 #: data/po/gui_strings.h:723
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
-msgstr "在与 3 个专家级别电脑玩家的对决中，于 1 分 30 秒之内跑完三圈“灯塔”地图。"
+msgstr "在与 3 个专家级别电脑玩家的对决中， 于 1 分 30 秒之内跑完三圈“灯塔”地图。"
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:687
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
-msgstr "在与 3 个专家级别电脑玩家的对决中，于 3 分钟之内跑完三圈“矿井”地图。"
+msgstr "在与 3 个专家级别电脑玩家的对决中， 于 3 分钟之内跑完三圈“矿井”地图。"
 
 #. I18N: ./data/tracks/hacienda/hacienda.challenge
 #: data/po/gui_strings.h:690
@@ -704,21 +703,21 @@ msgstr "在 3 分钟之内完成“矿井”地图"
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
-msgstr "在 2 分 20 秒之内在“漂移沙漠”跑三圈，完成比赛时留下至少 9 份的氮气。"
+msgstr "在 2 分 20 秒之内在“漂移沙漠”跑三圈， 完成比赛时留下至少 9 份的氮气。"
 
 #. I18N: ./data/tracks/mines/mines.challenge
 #: data/po/gui_strings.h:711
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
-msgstr "在 2 分 30 秒之内在XR591赛道跑两圈，完成比赛时留下至少 16 份的氮气。"
+msgstr "在 2 分 30 秒之内在XR591赛道跑两圈， 完成比赛时留下至少 16 份的氮气。"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:681
 msgid ""
 "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
-msgstr "在 52 秒之内在奥利弗的数学课跑三圈，完成比赛时留下至少 6 份的氮气。"
+msgstr "在 52 秒之内在奥利弗的数学课跑三圈， 完成比赛时留下至少 6 份的氮气。"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:162
@@ -895,7 +894,7 @@ msgstr "用道具攻击其他玩家直到对手丢掉所有的命。 只能在�
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "如果你看到一个按钮带有像这样的锁的图标，你就必须要完成一个特定挑战任务才能解锁。"
+msgstr "如果你看到一个按钮带有像这样的锁的图标， 你就必须要完成一个特定挑战任务才能解锁。"
 
 #. I18N: message shown when an input device is used but is not associated to any player
 #: src/input/input_manager.cpp:492
@@ -1183,7 +1182,7 @@ msgstr "请重新设置您的键位"
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight!"
-msgstr "马桶揣子 - 向前发射可以把前面玩家向后拉，你则得到加速；向后发射则可以把别人的挡风玻璃给挡住，让他们看不着方向！"
+msgstr "马桶揣子 - 向前发射可以把前面玩家向后拉， 你则得到加速； 向后发射则可以把别人的挡风玻璃给挡住， 让他们看不着方向！"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: When configuring input
@@ -1272,7 +1271,7 @@ msgstr "各就各位！"
 msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr "常规比赛：所有道具都可用，合理使用它们会有意想不到的效果哦！"
+msgstr "常规比赛：所有道具都可用， 合理使用它们会有意想不到的效果哦！"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:108
@@ -1575,7 +1574,9 @@ msgid ""
 "Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
 "keys that contain a character that is different in upper-case will stop "
 "working."
-msgstr "注意，不推荐使用“Shift”键：Shift 按下时，所有带字母的键会变换大小写而不能正常工作。"
+msgstr ""
+"注意，不推荐使用“Shift”键：\n"
+"Shift 按下时， 所有带字母的键会变换大小写， 因而不能正常工作。"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1601,8 +1602,8 @@ msgid ""
 "kart. The game continues when everyone selected their kart. Note that the "
 "mouse may not be used for this operation."
 msgstr ""
-"当输入设备配置好之后，你就可以开始游戏了。 选择主菜单的“单机游戏”即可开始新游戏。 当选择赛车的时候，每位玩家可以按他们各自的“开火”键来加入游戏。 "
-"每位玩家用自己的输入设备来选择自己的赛车。 当所有玩家都选择号赛车之后，游戏将会继续。 当多人游戏的时候，请不要用鼠标来选择赛车。"
+"当输入设备配置好之后，你就可以开始游戏了。 选择主菜单的“单机游戏”即可开始新游戏。 当选择赛车的时候， 每位玩家可以按他们各自的“开火”键来加入游戏。 "
+"每位玩家用自己的输入设备来选择自己的赛车。 当所有玩家都选择好赛车之后，游戏将会继续。 当多人游戏的时候，请不要用鼠标来选择赛车。"
 
 #. I18N: ./data/karts/wilber/kart.xml
 #: data/po/gui_strings.h:783
@@ -1617,7 +1618,7 @@ msgstr "赢得“企鹅游乐场”锦标赛"
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:639
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
-msgstr "在与 3 个专家级电脑玩家的对决中，赢得“企鹅游乐场”锦标赛。"
+msgstr "在与 3 个专家级电脑玩家的对决中， 赢得“企鹅游乐场”锦标赛。"
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:654
@@ -1633,23 +1634,23 @@ msgstr "在“秘密花园”与一个专家级电脑玩家火拼，并赢得比
 #. I18N: ./data/tracks/xr591/xr591.challenge
 #: data/po/gui_strings.h:729
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
-msgstr "与 4 个专家级电脑玩家对抗，在“大峡谷”地图跑三圈，并赢得比赛。"
+msgstr "与 4 个专家级电脑玩家对抗， 在“大峡谷”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/karts/gnu/gnu.challenge
 #: data/po/gui_strings.h:669
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
-msgstr "与 3 个专家级电脑玩家对抗，在“熔岩城堡”地图跑三圈，并赢得比赛。"
+msgstr "与 3 个专家级电脑玩家对抗， 在“熔岩城堡”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/tracks/islandtrack/island.challenge
 #: data/po/gui_strings.h:699
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
-msgstr "与 3 个中级电脑玩家对抗，在 3 分 05 秒之内跑完“雪山”地图。"
+msgstr "与 3 个中级电脑玩家对抗， 在 3 分 05 秒之内跑完“雪山”地图。"
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
 #: data/po/gui_strings.h:675
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
-msgstr "与 4 个专家级电脑玩家对抗，在“企鹅高速路”地图跑三圈，并赢得比赛。"
+msgstr "与 4 个专家级电脑玩家对抗， 在“企鹅高速路”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/grandprix/atworldsend.challenge
 #: data/po/gui_strings.h:651

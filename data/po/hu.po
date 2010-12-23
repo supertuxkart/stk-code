@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-16 19:53+0000\n"
-"Last-Translator: Balint <Unknown>\n"
+"PO-Revision-Date: 2010-12-22 20:34+0000\n"
+"Last-Translator: Papp Bence <papp.bence89@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-17 06:18+0000\n"
+"X-Launchpad-Export-Date: 2010-12-23 05:28+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
@@ -841,7 +841,7 @@ msgstr "Játékpad billentyű %d"
 #: src/input/binding.cpp:264
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Gamepad hat %d"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu

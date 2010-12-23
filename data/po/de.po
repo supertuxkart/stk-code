@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-13 06:56+0000\n"
-"Last-Translator: cmdrhenner <cmdrhenner@gmail.com>\n"
+"PO-Revision-Date: 2010-12-20 15:37+0000\n"
+"Last-Translator: Wolfs <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-15 05:50+0000\n"
+"X-Launchpad-Export-Date: 2010-12-21 13:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-"
 "vanilla/supertuxkart\n"
@@ -22,7 +22,7 @@ msgstr ""
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
 #: src/utils/translation.cpp:94 src/utils/translation.cpp:97
 msgid "   Is this a RTL language?"
-msgstr "   Ist dies eine RTL-Sprache?"
+msgstr "   N"
 
 #: src/states_screens/options_screen_input.cpp:94
 #, c-format
@@ -157,14 +157,14 @@ msgstr ""
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:287
 msgid "(network play is not yet available)"
-msgstr "(Das Spielen über Netzwerk ist noch nicht verfügbar)"
+msgstr "(Der Netzwerkmodus ist noch nicht verfügbar)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:164
 msgid "* Current key bindings can be seen/changed in menu Options"
 msgstr ""
-"Die aktuellen Tastenzuweisungen können im Menü Optionen eingesehen und "
+"* Die aktuellen Tastenzuweisungen können im Menü Optionen eingesehen und "
 "verändert werden."
 
 #. I18N: ./data/gui/help3.stkgui
@@ -546,7 +546,7 @@ msgstr ""
 #: data/po/gui_strings.h:645
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
-"Werde Erster beim Am Ende der Welt-Grand Prix mit 3 AI Karts der Stufe "
+"Werde Erster beim Am Ende der Welt-Grand Prix mit 3 KI Karts der Stufe "
 "Rennfahrer."
 
 #. I18N: In the player info dialog (when deleting)
@@ -694,7 +694,7 @@ msgstr "Letzte Runde!"
 #: data/po/gui_strings.h:693
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr ""
-"Beende 3 Runden auf dem Bauernhof mit 3 AI Karts der Stufe Anfänger in "
+"Beende 3 Runden auf dem Bauernhof mit 3 KI Karts der Stufe Anfänger in "
 "weniger als 2:30 Minuten."
 
 #. I18N: ./data/tracks/tuxtollway/tollway.challenge
@@ -702,14 +702,14 @@ msgstr ""
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
-"Beende 3 Runden am Leuchtturm mit 3 AI Karts der Stufe Rennfahrer in weniger "
+"Beende 3 Runden am Leuchtturm mit 3 KI Karts der Stufe Rennfahrer in weniger "
 "als 1:30 Minuten."
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
 #: data/po/gui_strings.h:687
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
-"Beende 3 Runden in der Mine mit 3 AI Karts der Stufe Rennfahrer in weniger "
+"Beende 3 Runden in der Mine mit 3 KI Karts der Stufe Rennfahrer in weniger "
 "als 3:00 Minuten."
 
 #. I18N: ./data/tracks/hacienda/hacienda.challenge

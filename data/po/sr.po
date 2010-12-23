@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-11-30 18:42-0500\n"
-"PO-Revision-Date: 2010-12-19 21:45+0000\n"
+"PO-Revision-Date: 2010-12-20 19:52+0000\n"
 "Last-Translator: dboki89 <Unknown>\n"
 "Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-20 05:09+0000\n"
+"X-Launchpad-Export-Date: 2010-12-21 13:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
@@ -1156,7 +1156,7 @@ msgstr "Само Мајстор игре може да делује у овом 
 #: data/po/gui_strings.h:323 data/po/gui_strings.h:359
 #: data/po/gui_strings.h:595
 msgid "Options"
-msgstr "Opcije"
+msgstr "Опције"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:206
