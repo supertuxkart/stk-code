@@ -71,6 +71,7 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
     {
         m_initial_speed = m_kart->getSpeed();
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
+        m_node->setAnimationSpeed(50); // .blend was created @25 (<10 real, slow computer), make it faster
     }
     m_node->setVisible(true);
 }   // set
