@@ -144,6 +144,8 @@ supertuxkart_SOURCES = \
  io/file_manager.hpp \
  io/xml_node.cpp \
  io/xml_node.hpp \
+ io/xml_writer.cpp \
+ io/xml_writer.hpp \
  items/attachment.cpp \
  items/attachment.hpp \
  items/attachment_manager.cpp \
