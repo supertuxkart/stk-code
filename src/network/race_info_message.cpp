@@ -46,7 +46,7 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
              + getCharLength()    // kart_info[i].getHostId())
              + getStringLength(kart_info[i].getKartName())
              + getCharLength()    // kart_info[i].getLocalPlayerId())
-             + getStringLength(kart_info[i].getPlayerName());
+             + kart_info[i].getPlayerName().size() + 1; // FIXME: encoding issues
     }
     const std::vector<std::string>& rkl=race_manager->getAIKartList();
     len += getStringVectorLength(rkl);
@@ -71,7 +71,7 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
         addChar(kart_info[i].getHostId());
         addString(kart_info[i].getKartName());
         addChar(kart_info[i].getLocalPlayerId());
-        addString(kart_info[i].getPlayerName());
+        addString( core::stringc(kart_info[i].getPlayerName().c_str()).c_str()); // FIXME: encoding issues
     }
     addStringVector(rkl);
 }   // RaceInfoMessage
@@ -103,7 +103,7 @@ RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
         kart_info[i].setHostId(getChar());
         kart_info[i].setKartName(getString());
         kart_info[i].setLocalPlayerId(getChar());
-        kart_info[i].setPlayerName(getString());
+        kart_info[i].setPlayerName( core::stringw(getString().c_str()) );
     }
 
     // Set the player kart information

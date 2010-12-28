@@ -23,6 +23,7 @@
 #include <fstream>
 
 #include "io/xml_node.hpp"
+#include "io/xml_writer.hpp"
 #include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ void Highscores::readEntry(const XMLNode &node)
  *  resulting in empty entries here.
  *  \param writer The file stream to write the data to.
  */
-void Highscores::writeEntry(std::ofstream &writer)
+void Highscores::writeEntry(XMLWriter &writer)
 {
     // Only
     bool one_is_set = false;
@@ -109,24 +110,24 @@ void Highscores::writeEntry(std::ofstream &writer)
         one_is_set |= m_time[i]>=0;
     if(!one_is_set) return;
 
-    writer << "  <highscore track-name    =\"" <<m_track          <<"\"\n";
-    writer << "             number-karts  =\"" <<m_number_of_karts<<"\"\n";
-    writer << "             difficulty    =\"" <<m_difficulty     <<"\"\n";
-    writer << "             hscore-type   =\"" <<m_highscore_type <<"\"\n";
-    writer << "             number-of-laps=\"" <<m_number_of_laps <<"\">\n";
+    writer << L"  <highscore track-name    =\"" << m_track.c_str()           << "\"\n";
+    writer << L"             number-karts  =\"" << m_number_of_karts         << "\"\n";
+    writer << L"             difficulty    =\"" << m_difficulty              << "\"\n";
+    writer << L"             hscore-type   =\"" << m_highscore_type.c_str()  << "\"\n";
+    writer << L"             number-of-laps=\"" << m_number_of_laps          << "\">\n";
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
         if (m_time[i] > 0.0f)
         {
             assert(m_kart_name[i].size() > 0);
-            writer << "             <entry time    =\""<<m_time[i]<<"\"\n";
-            writer << "                    name    =\""<<m_name[i]<<"\"\n";
-            writer << "                    kartname=\""<<m_kart_name[i]
-                   << "\"/>\n";
+            writer << L"             <entry time    =\"" << m_time[i] << L"\"\n";
+            writer << L"                    name    =\"" << m_name[i] << L"\"\n";
+            writer << L"                    kartname=\"" << m_kart_name[i].c_str()
+                   << L"\"/>\n";
         }
     }   // for i
-    writer << "  </highscore>\n";
+    writer << L"  </highscore>\n";
 }   // writeEntry
 
 // -----------------------------------------------------------------------------
@@ -148,7 +149,7 @@ int Highscores::matches(HighscoreType highscore_type,
  *  otherwise a 0.
  */
 int Highscores::addData(const std::string& kart_name,
-                            const std::string& name, const float time)
+                        const core::stringw& name, const float time)
 {
     int position=-1;
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -200,7 +201,7 @@ int Highscores::getNumberEntries() const
 
 // -----------------------------------------------------------------------------
 void Highscores::getEntry(int number, std::string &kart_name,
-                          std::string &name, float *const time) const
+                          core::stringw &name, float *const time) const
 {
     if(number<0 || number>getNumberEntries())
     {

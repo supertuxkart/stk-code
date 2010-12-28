@@ -225,15 +225,14 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             std::string timebuffer;
             for (unsigned int i=0; i<num_scores; i++)
             {            
-                std::string kart_name, name;
+                std::string kart_name;
+                core::stringw playerName;
                 float T;
-                hs->getEntry(i, kart_name, name, &T);
+                hs->getEntry(i, kart_name, playerName, &T);
                 timebuffer = StringUtils::timeToString(T);
                             
                 const int line_from = lines_from_y + text_height*(i*3);
-                
-                stringw playerName = name.c_str();
-                
+                                
                 core::rect< s32 > linearea(m_area.getWidth()*2/3, line_from,
                                            m_area.getWidth(), line_from + text_height);
                 GUIEngine::getGUIEnv()->addStaticText( playerName.c_str(),

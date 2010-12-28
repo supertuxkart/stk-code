@@ -54,6 +54,7 @@ public:
     const XMLNode     *getNode(unsigned int i) const;
     unsigned int       getNumNodes() const {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
+    int get(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, unsigned int *value) const;
     int get(const std::string &attribute, float *value) const;

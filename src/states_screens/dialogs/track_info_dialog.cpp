@@ -230,7 +230,7 @@ void TrackInfoDialog::updateHighScores()
     const int amount = highscores->getNumberEntries();
     
     std::string kart_name;
-    std::string name;
+    core::stringw name;
     float time;
     
     // fill highscore entries
@@ -244,7 +244,8 @@ void TrackInfoDialog::updateHighScores()
             char buffer[256];
             
             highscores->getEntry(n, kart_name, name, &time);
-            sprintf(buffer, "%s : %.2f s\n", name.c_str(), time);
+            
+            sprintf(buffer, " : %.2f s\n", time);
             
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
@@ -254,7 +255,7 @@ void TrackInfoDialog::updateHighScores()
                 ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
-            line = buffer;
+            line = name + buffer;
         }
         else
         {

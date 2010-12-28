@@ -46,12 +46,15 @@ const int CURRENT_CONFIG_VERSION = 8;
 #include <fstream>
 
 #include "irrlicht.h"
+using irr::core::stringc;
+using irr::core::stringw;
 
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;
+class XMLWriter;
 class PlayerProfile;
 
 /**
@@ -64,10 +67,10 @@ protected:
     std::string paramName, comment;
 public:
     virtual ~UserConfigParam();
-    virtual void write(std::ofstream& stream) const = 0;
+    virtual void write(XMLWriter& stream) const = 0;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
-    virtual std::string toString() const = 0;
+    virtual irr::core::stringw toString() const = 0;
 };
 
 class GroupUserConfigParam : public UserConfigParam
@@ -75,12 +78,12 @@ class GroupUserConfigParam : public UserConfigParam
     std::vector<UserConfigParam*> m_children;
 public:
     GroupUserConfigParam(const char* name, const char* comment=NULL);
-    void write(std::ofstream& stream) const;
+    void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
     void addChild(UserConfigParam* child);
-    std::string toString() const;
+    irr::core::stringw toString() const;
 };
 
 class IntUserConfigParam : public UserConfigParam
@@ -93,11 +96,11 @@ public:
     IntUserConfigParam(int defaultValue, const char* paramName, const char* comment = NULL);
     IntUserConfigParam(int defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
-    std::string toString() const;
+    irr::core::stringw toString() const;
     void revertToDefaults() { m_value = m_default_value; }
 
     operator int() const { return m_value; }
@@ -117,19 +120,45 @@ public:
     StringUserConfigParam(const char* defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
     
-    void write(std::ofstream& stream) const;
+    void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     void revertToDefaults() { m_value = m_default_value; }
     
-    std::string toString() const;
+    irr::core::stringw toString() const { return m_value.c_str(); }
     
     operator std::string() const { return m_value; }
     std::string& operator=(const std::string& v) { m_value = v; return m_value; }
     std::string& operator=(const StringUserConfigParam& v) { m_value = (std::string)v; return m_value; }
 
     const char* c_str() const { return m_value.c_str(); }
+};
+
+class WStringUserConfigParam : public UserConfigParam
+{
+    stringw m_value;
+    stringw m_default_value;
+    
+public:
+    
+    WStringUserConfigParam(const stringw& defaultValue, const char* paramName, const char* comment = NULL);
+    WStringUserConfigParam(const stringw& defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
+    
+    
+    void write(XMLWriter& stream) const;
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
+    
+    void revertToDefaults() { m_value = m_default_value; }
+    
+    irr::core::stringw toString() const { return m_value; }
+    
+    operator stringw() const { return m_value; }
+    stringw& operator=(const stringw& v) { m_value = v; return m_value; }
+    stringw& operator=(const WStringUserConfigParam& v) { m_value = (stringw)v; return m_value; }
+    
+    const wchar_t* c_str() const { return m_value.c_str(); }
 };
 
 class BoolUserConfigParam : public UserConfigParam
@@ -142,11 +171,11 @@ public:
     BoolUserConfigParam(bool defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
     
-    void write(std::ofstream& stream) const;
+    void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
-    std::string toString() const;
+    irr::core::stringw toString() const;
     void revertToDefaults() { m_value = m_default_value; }
     
     operator bool() const { return m_value; }
@@ -163,11 +192,11 @@ public:
     FloatUserConfigParam(float defaultValue, const char* paramName, const char* comment = NULL);
     FloatUserConfigParam(float defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
-    std::string toString() const;
+    irr::core::stringw toString() const;
     void revertToDefaults() { m_value = m_default_value; }
     
     operator float() const { return m_value; }

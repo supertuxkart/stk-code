@@ -140,7 +140,7 @@ void NetworkHttp::checkNewServer()
         if(UserConfigParams::m_verbosity>=4)
         {
             std::cout << "[Addons] Current server: " 
-                      << UserConfigParams::m_server_addons.toString() 
+                      << (std::string)UserConfigParams::m_server_addons 
                       << std::endl
                       << "[Addons] New server: " << newserver << std::endl;
         }
@@ -197,7 +197,7 @@ std::string NetworkHttp::downloadToStr(std::string url)
 {
 	CURL *session = curl_easy_init();
 
-    std::string full_url=UserConfigParams::m_server_addons.toString()+"/"+url;
+    std::string full_url = (std::string)UserConfigParams::m_server_addons + "/" + url;
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	
 	std::string fout;
@@ -223,7 +223,7 @@ std::string NetworkHttp::downloadToStr(std::string url)
 bool download(std::string file, const std::string &save, int * progress_data)
 {
 	CURL *session = curl_easy_init();
-    std::string full_url=UserConfigParams::m_server_addons.toString()+"/"+file;
+    std::string full_url = (std::string)UserConfigParams::m_server_addons + "/" + file;
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	FILE * fout;
 	if(save != "")

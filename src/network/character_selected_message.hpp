@@ -63,11 +63,11 @@ public:
 
         allocate(getCharLength()       // m_kart_info.getLocalPlayerId())
                 +getStringLength(m_kart_info.getKartName())
-                +getStringLength(m_kart_info.getPlayerName())
+                +m_kart_info.getPlayerName().size() + 1 // FIXME: encoding issues
                 +getCharLength());     // m_num_local_players)
         addChar(m_kart_info.getLocalPlayerId());
         addString(m_kart_info.getKartName());
-        addString(m_kart_info.getPlayerName());
+        addString(core::stringc(m_kart_info.getPlayerName().c_str()).c_str()); // FIXME: encoding issues
         // Piggy backing this information saves sending it as a separate 
         // message. It is actually only required in the first message
         if(host_id>-1)
@@ -86,7 +86,7 @@ public:
     {
         m_kart_info.setLocalPlayerId(getChar());
         m_kart_info.setKartName(getString());
-        m_kart_info.setPlayerName(getString());
+        m_kart_info.setPlayerName(core::stringw(getString().c_str())); // FIXME: encoding issues
         m_num_local_players = getChar();
     }   // CharacterSelectedMessage(EnetPacket)
 

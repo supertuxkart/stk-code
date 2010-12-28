@@ -23,6 +23,8 @@
 #include <string>
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
+#include "irrlicht.h"
+using namespace irr;
 
 /**
   * \brief Class for managing player profiles (name, control configuration, etc.)
@@ -37,7 +39,7 @@ protected:
     /** For saving to config file. */
     GroupUserConfigParam  m_player_group;
     
-    StringUserConfigParam m_name;
+    WStringUserConfigParam m_name;
     
     BoolUserConfigParam   m_is_guest_account;
         
@@ -52,10 +54,10 @@ public:
     /**
       * Constructor to create a new player that didn't exist before
       */
-    PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
-                                      m_name(name, "name", &m_player_group), //, m_last_kart_id(-1)
-                                      m_is_guest_account(false, "guest", &m_player_group),
-                                      m_use_frequency(0, "use_frequency", &m_player_group)
+    PlayerProfile(const core::stringw& name) : m_player_group("Player", "Represents one human player"),
+                                               m_name(name, "name", &m_player_group), //, m_last_kart_id(-1)
+                                               m_is_guest_account(false, "guest", &m_player_group),
+                                               m_use_frequency(0, "use_frequency", &m_player_group)
     {
 #ifdef DEBUG
         m_magic_number = 0xABCD1234;
@@ -77,36 +79,42 @@ public:
         m_is_guest_account.findYourDataInAnAttributeOf(node);
         m_use_frequency.findYourDataInAnAttributeOf(node);
         
-#ifdef DEBUG
+        #ifdef DEBUG
         m_magic_number = 0xABCD1234;
-#endif
+        #endif
     }
     
     
     ~PlayerProfile()
     {
-#ifdef DEBUG
+        #ifdef DEBUG
         m_magic_number = 0xDEADBEEF;
-#endif
+        #endif
     }
     
-    void setName(const std::string &name_) { 
-#ifdef DEBUG
+    void setName(const core::stringw& name)
+    { 
+        #ifdef DEBUG
 		assert(m_magic_number == 0xABCD1234);
-#endif
-		m_name = name_;  }
+        #endif
+		m_name = name;
+    }
 
-    const char* getName() const { 
-#ifdef DEBUG
-		assert(m_magic_number == 0xABCD1234);
-#endif
-		return m_name.c_str();     }
+    core::stringw getName() const
+    { 
+        #ifdef DEBUG
+        assert(m_magic_number == 0xABCD1234);
+        #endif
+		return m_name.c_str();
+    }
 
-    bool isGuestAccount() const { 
-#ifdef DEBUG
+    bool isGuestAccount() const
+    { 
+        #ifdef DEBUG
 		assert(m_magic_number == 0xABCD1234); 
-#endif
-		return m_is_guest_account; }
+        #endif
+		return m_is_guest_account;
+    }
     
     //int getLastKartId(){ return m_last_kart_id; }
     //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }

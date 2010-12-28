@@ -306,7 +306,7 @@ public:
         m_children.push_back(m_model_view);
         
         // Init kart model
-        const std::string default_kart = UserConfigParams::m_default_kart.toString();
+        const std::string default_kart = UserConfigParams::m_default_kart;
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
         if(!props)
         {
@@ -1147,8 +1147,8 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
         const std::string& selectedKart = selections[m_kart_widgets.get(n)];
         if (selectedKart.size() > 0)
         {
-            std::cout << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << " selected "
-                      << selectedKart.c_str() << "\n";
+            //std::cout << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << " selected "
+            //          << selectedKart.c_str() << "\n";
             const bool success = w->setSelection(selectedKart.c_str(), n, true);
             if (!success)
             {
@@ -1375,7 +1375,7 @@ void KartSelectionScreen::allPlayersDone()
         std::cout << "[KartSelectionScreen] " << players.size() << " players :\n";
         for (int n=0; n<players.size(); n++)
         {
-            std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
+            std::cout << "     Player " << n << " is " << core::stringc(players[n].getConstProfile()->getName().c_str()).c_str()
                 << " on " << players[n].getDevice()->m_name << std::endl;
         }
     }
@@ -1491,15 +1491,6 @@ bool KartSelectionScreen::validateIdentChoices()
             if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                 m_kart_widgets[m].getAssociatedPlayer()->getProfile())
             {
-                if (UserConfigParams::m_verbosity >= 5)
-                {
-                    printf("[KartSelectionScreen]  Identity conflict!!\n");
-                    std::cout << "    Player " << n << " chose "
-                              << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
-                    std::cout << "    Player " << m << " chose "
-                              << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
-                }
-                
                 // two players took the same name. check if one is ready
                 if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
                 {

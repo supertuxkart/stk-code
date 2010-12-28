@@ -69,7 +69,8 @@ void OptionsScreenPlayers::init()
     const int playerAmount = UserConfigParams::m_all_players.size();
     for(int n=0; n<playerAmount; n++)
     {
-        players->addItem( UserConfigParams::m_all_players[n].getName(),
+        // FIXME: encoding issues
+        players->addItem( core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
                           UserConfigParams::m_all_players[n].getName() );
     }
 }   // init
@@ -106,7 +107,8 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            players->addItem(UserConfigParams::m_all_players[n].getName(),
+            // FIXME: encoding issues
+            players->addItem(core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
                              UserConfigParams::m_all_players[n].getName());
         }
         
@@ -128,7 +130,7 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
     const int playerAmount =  UserConfigParams::m_all_players.size();
     for(int n=0; n<playerAmount; n++)
     {
-        players->addItem(UserConfigParams::m_all_players[n].getName(),
+        players->addItem(core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
                          UserConfigParams::m_all_players[n].getName());
     }
 }   // deletePlayer
@@ -168,7 +170,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         ListWidget* players = this->getWidget<ListWidget>("players");
         assert(players != NULL);
         
-        std::string selectedPlayer = stringc( players->getSelectionLabel().c_str() ).c_str();
+        core::stringw selectedPlayer = players->getSelectionLabel();
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
         {
