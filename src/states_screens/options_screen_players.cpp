@@ -90,11 +90,11 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         const int amount = UserConfigParams::m_all_players.size();
         for (int n=0; n<amount; n++)
         {
-            if (stringw(UserConfigParams::m_all_players[n].getName()) == newName) return false;
+            if (UserConfigParams::m_all_players[n].getName() == newName) return false;
         }
         
         // add new player
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(newNameC.c_str()) );
+        UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
         
         players->addItem( newNameC.c_str(), newNameC.c_str() );
     }
