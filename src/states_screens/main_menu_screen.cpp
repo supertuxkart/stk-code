@@ -91,11 +91,13 @@ void MainMenuScreen::init()
 	// the key bindings for the first player the default again.
 	input_manager->getDeviceList()->clearLatestUsedDevice();
 
+#ifdef ADDONS_MANAGER
     if(!addons_manager->onlineReady())
     {
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
     }
+#endif
 
 }
 

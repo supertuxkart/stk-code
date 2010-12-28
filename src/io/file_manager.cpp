@@ -573,7 +573,6 @@ const std::string &FileManager::getAddonsDir() const
 {
     return m_addons_dir;
 }   // getADdonsDir
-#endif
 
 //-----------------------------------------------------------------------------
 /** Returns a filename in the addons directory.
@@ -582,7 +581,9 @@ const std::string &FileManager::getAddonsDir() const
 std::string FileManager::getAddonsFile(const std::string &name)
 {
     return getAddonsDir()+"/"+name;
-}   
+}
+#endif
+
 //-----------------------------------------------------------------------------
 std::string FileManager::getConfigDir() const
 {
