@@ -26,12 +26,12 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
+#include "states_screens/addons_screen.hpp"
 #include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
-#include "states_screens/kart_selection.hpp"
 #include "states_screens/help_screen_1.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
-#include "states_screens/addons_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
 //FIXME : remove, temporary tutorial test
@@ -90,13 +90,26 @@ void MainMenuScreen::init()
 	// To avoid this, we will clean the last used device, making
 	// the key bindings for the first player the default again.
 	input_manager->getDeviceList()->clearLatestUsedDevice();
-    
+
+    if(!addons_manager->onlineReady())
+    {
+        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
+        w->setDeactivated();
+    }
+
 }
 
 #ifdef ADDONS_MANAGER
 // ------------------------------------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+    IconButtonWidget* icon = this->getWidget<IconButtonWidget>("addons");
+    if(!addons_manager->onlineReady())
+        icon->setDeactivated();
+    else
+        icon->setActivated();
+
+
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const std::string &news_text = network_http->getNewsMessage();
 	if(news_text == "")

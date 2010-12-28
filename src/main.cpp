@@ -214,7 +214,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 exit(EXIT_FAILURE);
             }
         }
-        else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
+        else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-V") )
         {
             printf("==============================\n");
 #ifdef VERSION
@@ -561,6 +561,13 @@ void initRest()
     video::IVideoDriver* driver = device->getVideoDriver();
     GUIEngine::init(device, driver, StateManager::get());
     
+#ifdef ADDONS_MANAGER
+    // This only initialises the non-network part of the addons manager. The
+    // online section of the addons manager will be initialised from a
+    // separate thread running in network http.
+    addons_manager          = new AddonsManager();
+    network_http            = new NetworkHttp();
+#endif
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -576,16 +583,16 @@ void initRest()
     highscore_manager       = new HighscoreManager     ();
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
-    network_http            = new NetworkHttp          ();
-    addons_manager          = new AddonsManager        ();
-
-    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsDir() + "/data/karts/");
-	track_manager->addTrackSearchDir(file_manager->getAddonsDir() + "/data/tracks/");
+    KartPropertiesManager::addKartSearchDir(
+                 file_manager->getAddonsFile("data/karts/")  );
+	track_manager->addTrackSearchDir(
+                 file_manager->getAddonsFile("/data/tracks/"));
 #endif
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("notes.png")) );
+    GUIEngine::addLoadingIcon( 
+        irr_driver->getTexture(file_manager->getTextureFile("notes.png")) );
     
     grand_prix_manager      = new GrandPrixManager     ();
     // Consistency check for challenges, and enable all challenges

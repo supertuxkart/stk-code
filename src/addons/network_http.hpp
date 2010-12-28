@@ -23,33 +23,44 @@
 #include <pthread.h>
 #include <string>
 
+#include "utils/synchronised.hpp"
+
 class NetworkHttp
 {
 public:
     /** List of 'http commands' for this object:
      *  HC_SLEEP: No command, sleep
+     *  HC_INIT: Object is being initialised
+     *  HC_DOWNLOAD_FILE : download a file
      *  HC_QUIT:  Stop loop and terminate thread.
      *  HC_NEWS:  Update the news
      */
     enum HttpCommands {HC_SLEEP,
                        HC_QUIT,
+                       HC_INIT,
+                       HC_DOWNLOAD_FILE,
                        HC_NEWS    } ;
 private:
 
-    /** The news message from the server. This is guarded by m_mutex_news. */
-    std::string   m_news_message;
-
-    /** A mutex for accessing m_news_message. Exclude this so that
-     *  getter can be declared const. */
-    mutable pthread_mutex_t m_mutex_news;
+    Synchronised<std::string> m_news;
 
     /** Which command to execute next. Access to this variable is guarded
      *  by m_mutex_command and m_cond_command. */
-    HttpCommands   m_command;
+    HttpCommands    m_command;
     /** A mutex for accessing m_commands. */
     pthread_mutex_t m_mutex_command;
     /** A conditional variable to wake up the main loop. */
-    pthread_cond_t m_cond_command;
+    pthread_cond_t  m_cond_command;
+
+    /** The file to download when a file download is triggered. */
+    std::string     m_file;
+
+    /** The name and path under which to save the downloaded file. */
+    std::string     m_save_filename;
+
+    /** Progress of a download in percent. It is guaranteed that
+     *  this value only becomes 1.0f, if the download is completed.*/
+    Synchronised<float>  m_progress;
 
     /** Thread id of the thread running in this object. */
     pthread_t     m_thread_id;
@@ -61,26 +72,27 @@ private:
     void          checkNewServer();
 
     void          updateNews();
+    std::string   downloadToStrInternal(std::string url);
+    bool          downloadFileInternal();
+    static int    progressDownload(void *clientp, float dltotal, float dlnow,
+                                   float ultotal, float ulnow);
 
 public:
                   NetworkHttp();
                  ~NetworkHttp();
     static size_t writeStr(char str [], size_t size, size_t nb_char, 
                            std::string * stream);
-    std::string   downloadToStr(std::string url);
+    void          downloadFileAsynchron(const std::string &file, 
+                                        const std::string &save = "");
+    bool          downloadFileSynchron(const std::string &file, 
+                                       const std::string &save = "");
 
     const std::string 
                   getNewsMessage() const;
+    float         getProgress() const;
 };
 
 extern NetworkHttp *network_http;
-bool download(std::string file, const std::string &save = "", 
-              int *progress_data = 0);
 
-
-int progressDownload (void *clientp, float dltotal, float dlnow,
-                      float ultotal, float ulnow);
-
-extern pthread_mutex_t download_mutex;
 #endif
 #endif

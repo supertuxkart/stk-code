@@ -30,7 +30,8 @@ namespace GUIEngine { class Widget; }
   * \brief Help screen, part 1
   * \ingroup states_screens
   */
-class AddonsUpdateScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<AddonsUpdateScreen>
+class AddonsUpdateScreen : public GUIEngine::Screen, 
+                           public GUIEngine::ScreenSingleton<AddonsUpdateScreen>
 {
     friend class GUIEngine::ScreenSingleton<AddonsUpdateScreen>;
     AddonsUpdateScreen();
@@ -45,7 +46,8 @@ public:
     virtual void loadedFromFile();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, 
+                               const std::string& name, const int playerID);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();

@@ -42,46 +42,48 @@ class FileManager : public NoCopy
 {
 private:
     /** Handle to irrlicht's file systems. */
-    io::IFileSystem            *m_file_system;
+    io::IFileSystem  *m_file_system;
     /** Pointer to the irrlicht device. This is necessary before reInit is
      *  called to store the NULL device initially created. See Constructor
      *  for details. */
-    IrrlichtDevice             *m_device;
+    IrrlichtDevice   *m_device;
 
-    bool                        m_is_full_path;
+    bool              m_is_full_path;
     /** Directory where user config files are stored. */
-    std::string                 m_config_dir;
+    std::string       m_config_dir;
     /** Directory where addons are stored. */
-    std::string                 m_addons_dir;
+    std::string       m_addons_dir;
     /** Root data directory. */
-    std::string                 m_root_dir;
-    std::vector<std::string>    m_texture_search_path,
-                                m_model_search_path,
-                                m_music_search_path;
-    bool findFile               (std::string& full_path,
-                                 const std::string& fname,
-                                 const std::vector<std::string>& search_path)
-                                 const;
-    void makePath               (std::string& path, const std::string& dir,
-                                 const std::string& fname) const;
-    bool            checkAndCreateDirectory(const std::string &path);
-    io::path        createAbsoluteFilename(const std::string &f);
-    void            checkAndCreateConfigDir();
+    std::string       m_root_dir;
+    std::vector<std::string>    
+                      m_texture_search_path,
+                      m_model_search_path,
+                      m_music_search_path;
+    bool              findFile(std::string& full_path,
+                               const std::string& fname,
+                               const std::vector<std::string>& search_path)
+                               const;
+    void              makePath(std::string& path, const std::string& dir,
+                               const std::string& fname) const;
+    bool              checkAndCreateDirectory(const std::string &path);
+    io::path          createAbsoluteFilename(const std::string &f);
+    void              checkAndCreateConfigDir();
 #ifdef ADDONS_MANAGER
-    void            checkAndCreateAddonsDir();
+    void              checkAndCreateAddonsDir();
 #endif
 public:
-                    FileManager(char *argv[]);
-                   ~FileManager();
-    void            setDevice(IrrlichtDevice *device);
-    void            dropFileSystem();
-    io::IXMLReader *createXMLReader(const std::string &filename);
-    XMLNode        *createXMLTree(const std::string &filename);
+                      FileManager(char *argv[]);
+                     ~FileManager();
+    void              setDevice(IrrlichtDevice *device);
+    void              dropFileSystem();
+    io::IXMLReader   *createXMLReader(const std::string &filename);
+    XMLNode          *createXMLTree(const std::string &filename);
 
-    std::string     getConfigDir () const;
-    bool            checkAndCreateDirectoryP(const std::string &path);
+    std::string       getConfigDir() const;
+    bool              checkAndCreateDirectoryP(const std::string &path);
 #ifdef ADDONS_MANAGER
-    std::string getAddonsDir     () const;
+    const std::string &getAddonsDir() const;
+    std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(std::string addons_name,
                                     std::string addons_type);
     bool removeDirectory(char const *name);

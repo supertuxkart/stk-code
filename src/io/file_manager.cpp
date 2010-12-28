@@ -568,13 +568,21 @@ void FileManager::checkAndCreateAddonsDir()
 }   // checkAndCreateAddonsDir
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getAddonsDir() const
+/** Returns the directory for addon files. */
+const std::string &FileManager::getAddonsDir() const
 {
     return m_addons_dir;
 }   // getADdonsDir
-/* see l450: to avoid the compilation of unused methods. */
 #endif
 
+//-----------------------------------------------------------------------------
+/** Returns a filename in the addons directory.
+ *  \param name Name of the file.
+ */
+std::string FileManager::getAddonsFile(const std::string &name)
+{
+    return getAddonsDir()+"/"+name;
+}   
 //-----------------------------------------------------------------------------
 std::string FileManager::getConfigDir() const
 {
@@ -666,10 +674,10 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
                                              std::string addons_type)
 {
-    bool success = checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type);
+    bool success = checkAndCreateDirectory(getAddonsDir() + addons_type);
     if(!success)
         std::cout << "There is a problem with the addons dir." << std::endl;
-    checkAndCreateDirectory(getAddonsDir() + "/data/" + addons_type + addons_name);
+    checkAndCreateDirectory(getAddonsDir() + addons_type + addons_name);
 
 }
 bool FileManager::removeDirectory(char const *name)

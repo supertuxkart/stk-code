@@ -66,7 +66,8 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == "category")
     {
-        std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = 
+            ((GUIEngine::RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if (selection == "tab_track")
         {
@@ -96,12 +97,12 @@ void AddonsUpdateScreen::init()
 	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
     while(addons_manager->next())
     {
-		if(addons_manager->isInstalledAsBool() && 
+		if(addons_manager->isInstalled() && 
             addons_manager->getInstalledVersion() < addons_manager->getVersion())
 		{
 			std::cout << addons_manager->getName() << std::endl;
-			w_list->addItem(addons_manager->getIdAsStr().c_str(),
-					addons_manager->getName().c_str(), 0);
+			w_list->addItem(addons_manager->getIdAsStr(),
+					        addons_manager->getName().c_str(), 0);
 		}
     }
 }

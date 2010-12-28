@@ -1,0 +1,82 @@
+//  $Id$
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2010 Joerg Henrichs
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#ifndef HEADER_SYNCHRONISED_HPP
+#define HEADER_SYNCHRONISED_HPP
+
+#include <pthread.h>
+
+template<typename TYPE>
+
+/** A variable that is automatically synchronised using pthreads mutex.
+ */
+class Synchronised
+{
+private:
+    /** The mutex to protect this variable with. */
+    mutable pthread_mutex_t  m_mutex;
+    /** The actual data to be used. */
+    TYPE                     m_data;                        
+public:
+    /** Initialise the data and the mutex. */
+    Synchronised(const TYPE &v)
+    {
+        m_data = v;
+        pthread_mutex_init(&m_mutex, NULL);
+    }   // Synchronised
+
+    // ------------------------------------------------------------------------
+    /** Destroy this mutex.
+     */
+    ~Synchronised()
+    {
+        pthread_mutex_destroy(&m_mutex);
+    }   // ~Synchronised
+
+    // ------------------------------------------------------------------------
+    /** Sets the value of this variable using a mutex. 
+     *  \param v Value to be set. 
+     */
+    void set(const TYPE &v)
+    {
+        pthread_mutex_lock(&m_mutex);
+        m_data = v;
+        pthread_mutex_unlock(&m_mutex);
+    }   // set
+
+    // ------------------------------------------------------------------------
+    /** Returns a copy of this variable. 
+     */
+    TYPE get() const 
+    {
+        TYPE v;
+        pthread_mutex_lock(&m_mutex);
+        v = m_data;
+        pthread_mutex_unlock(&m_mutex);
+        return v;
+    }   // get
+
+private:
+    // Make sure that no actual copying is taking place
+    // ------------------------------------------------------------------------
+    void operator=(const Synchronised<TYPE>& v) {}
+};
+
+
+#endif

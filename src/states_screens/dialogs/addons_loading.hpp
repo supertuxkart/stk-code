@@ -21,26 +21,27 @@
 #ifndef HEADER_ADDONS_LOADING_HPP
 #define HEADER_ADDONS_LOADING_HPP
 
-#include "guiengine/modaldialog.hpp"
 
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
+#include "guiengine/modaldialog.hpp"
 #include <pthread.h>
+
 class AddonsLoading : public GUIEngine::ModalDialog
 {
 //virtual void escapePressed() {};
 private:
-    GUIEngine::LabelWidget *            name;
-    GUIEngine::LabelWidget *            description;
-    GUIEngine::LabelWidget *            version;
-    GUIEngine::LabelWidget *            author;
-    GUIEngine::LabelWidget *            m_state;
-    GUIEngine::ProgressBarWidget *      m_progress;
-    GUIEngine::ButtonWidget *           m_back_button;
-    GUIEngine::ButtonWidget *           install_button;
-    GUIEngine::IconButtonWidget *       icon;
-    GUIEngine::IconButtonWidget *       m_next;
-    GUIEngine::IconButtonWidget *       m_previous;
+    GUIEngine::LabelWidget       *m_name;
+    GUIEngine::LabelWidget       *m_description;
+    GUIEngine::LabelWidget       *m_version;
+    GUIEngine::LabelWidget       *m_author;
+    GUIEngine::LabelWidget       *m_state;
+    GUIEngine::ProgressBarWidget *m_progress;
+    GUIEngine::ButtonWidget      *m_back_button;
+    GUIEngine::ButtonWidget      *m_install_button;
+    GUIEngine::IconButtonWidget  *m_icon;
+    GUIEngine::IconButtonWidget  *m_next;
+    GUIEngine::IconButtonWidget  *m_previous;
     
     /**
      * This function is called when the user click on 'Install', 'Uninstall', or

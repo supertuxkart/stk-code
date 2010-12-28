@@ -42,22 +42,21 @@
 #  include <unistd.h>
 #endif
 
-
-pthread_mutex_t download_mutex;
-NetworkHttp * network_http = 0;
+NetworkHttp *network_http;
 
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the 
- *  main program.
+ *  main program. NetworkHttp supports only a single thread (i.e. it's not
+ *  possible to download two addons at the same time), which makes handling
+ *  and synchronisation a lot easier (otherwise all objects using this object
+ *  would need an additional handle to get the right data back).
+ *  This separate thread is running in NetworkHttp::mainLoop, and is being 
+ *  waken up if a command is issued (e.g. using downloadFileAsynchronous).
  */
-NetworkHttp::NetworkHttp()
+NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f)
 {
-    pthread_mutex_init(&m_mutex_news, NULL);
-    m_news_message = "";
-
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
-    m_command      = HC_SLEEP;
     m_abort        = false;
 
     pthread_attr_t  attr;
@@ -76,16 +75,21 @@ NetworkHttp::NetworkHttp()
 void *NetworkHttp::mainLoop(void *obj)
 {
     NetworkHttp *me=(NetworkHttp*)obj;
+
+    // FIXME: this needs better error handling!
     me->checkNewServer();
     me->updateNews();
-    // Allow this thread to be cancelled anytime
-    // FIXME: this mechanism will later not be necessary anymore!
+
+    // Initialise the online portion of the addons manager.
+    addons_manager->initOnline();
+
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     // Wait in the main loop till a command is received
     // (atm only QUIT is used).
     pthread_mutex_lock(&me->m_mutex_command);
+    me->m_command = HC_SLEEP;
     while(1)
     {
         pthread_cond_wait(&me->m_cond_command, &me->m_mutex_command);
@@ -99,8 +103,12 @@ void *NetworkHttp::mainLoop(void *obj)
         case HC_NEWS:
             me->updateNews();
             break;
+        case HC_DOWNLOAD_FILE:
+            me->downloadFileInternal();
         }   // switch(m_command)
+        me->m_command = HC_SLEEP;
     }   // while !m_abort
+    pthread_mutex_unlock(&me->m_mutex_command);
     return NULL;
 }   // mainLoop
 
@@ -121,7 +129,6 @@ NetworkHttp::~NetworkHttp()
     void *result;
     pthread_join(m_thread_id, &result);
 
-    pthread_mutex_destroy(&m_mutex_news);
     pthread_mutex_destroy(&m_mutex_command);
     pthread_cond_destroy(&m_cond_command);
 }   // ~NetworkHttp
@@ -132,7 +139,7 @@ NetworkHttp::~NetworkHttp()
  */
 void NetworkHttp::checkNewServer()
 {
-    std::string newserver = downloadToStr("redirect");
+    std::string newserver = downloadToStrInternal("redirect");
     if (newserver != "")
     {
         newserver.replace(newserver.find("\n"), 1, "");
@@ -158,14 +165,10 @@ void NetworkHttp::checkNewServer()
  */
 void NetworkHttp::updateNews()
 {
-    const std::string tmp_str = downloadToStr("news");
+    // Only lock the actual assignment, not the downloading!
+    const std::string tmp_str = downloadToStrInternal("news");
+    m_news.set(tmp_str);
 
-    pthread_mutex_lock(&m_mutex_news);
-    {
-        // Only lock the actual assignment, not the downloading!
-        m_news_message = tmp_str;
-    }
-    pthread_mutex_unlock(&m_mutex_news);
 }   // updateNews
 
 // ----------------------------------------------------------------------------
@@ -174,30 +177,28 @@ void NetworkHttp::updateNews()
  */
 const std::string NetworkHttp::getNewsMessage() const
 {
-    pthread_mutex_lock(&m_mutex_news);
-    const std::string tmp_str = m_news_message;
-    pthread_mutex_unlock(&m_mutex_news);
-    return tmp_str;
+    return m_news.get();
 }   // getNewsMessage
 
 // ----------------------------------------------------------------------------
 
-size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, std::string * stream)
+size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, 
+                             std::string * stream)
 {
-    static std::string str = std::string(ptr);
-    *stream = str;
+    *stream = std::string(ptr);
     
     //needed, otherwise, the download failed
     return nb_char;
-}
+}   // writeStr
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-std::string NetworkHttp::downloadToStr(std::string url)
+std::string NetworkHttp::downloadToStrInternal(std::string url)
 {
 	CURL *session = curl_easy_init();
 
-    std::string full_url = (std::string)UserConfigParams::m_server_addons + "/" + url;
+    std::string full_url = (std::string)UserConfigParams::m_server_addons 
+                         + "/" + url;
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
 	
 	std::string fout;
@@ -213,39 +214,33 @@ std::string NetworkHttp::downloadToStr(std::string url)
 	
 	if (success == 0) return fout;
 	else             return "";
-}
+}   // downloadToStrInternal
 
 // ----------------------------------------------------------------------------
 /** Download a file. The file name isn't absolute, the server in the config 
  *  will be added to file. 
  *  \param progress_data is used to have the state of the download (in %)
  */
-bool download(std::string file, const std::string &save, int * progress_data)
+bool NetworkHttp::downloadFileInternal()
 {
+    m_progress.set(0.0f);
+
 	CURL *session = curl_easy_init();
-    std::string full_url = (std::string)UserConfigParams::m_server_addons + "/" + file;
+    std::string full_url = (std::string)UserConfigParams::m_server_addons 
+                         + "/" + m_file;
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-	FILE * fout;
-	if(save != "")
-	    fout = fopen((file_manager->getAddonsDir() + "/" + save).c_str(), "w");
-    else
-        fout = fopen((file_manager->getAddonsDir() + "/" + file).c_str(), "w");
-	
+    FILE * fout = fopen(file_manager->getAddonsFile(m_save_filename).c_str(),
+                         "w");
 	
 	//from and out
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA, fout);
+	curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-	
-	//init the mutex for the progress function
-    pthread_mutex_init(&download_mutex, NULL);
-    
-	curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, &progressDownload);
-	//needed, else, the progress function doesn't work
+	    
+    curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
+                     &NetworkHttp::progressDownload);
+	// Necessary, oyherwise the progress function doesn't work
 	curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
-	
-	//to update the progress bar
-	curl_easy_setopt(session,  CURLOPT_PROGRESSDATA, progress_data);
-	
+		
 	int success = curl_easy_perform(session);
 	
 	//close the file where we downloaded the content
@@ -253,30 +248,79 @@ bool download(std::string file, const std::string &save, int * progress_data)
 	
 	//stop curl
 	curl_easy_cleanup(session);
-	
-    return (success == 0);
-}
 
-// ------------------------------------------------------------------------------------------------------
+    m_progress.set( (success==CURLE_OK) ? 1.0f : -1.0f );
+    return success==CURLE_OK;
+}   // downloadFileInternal
 
-//FIXME : this way is a bit ugly but the simplest at the moment
-int time_last_print = 0;
-int progressDownload (void *clientp, float dltotal, float dlnow, 
-                      float ultotal, float ulnow)
+// ----------------------------------------------------------------------------
+/** External interface to download a file synchronously, i.e. it will only 
+ *  return once the download is complete. 
+ *  \param file The file from the server to download.
+ *  \param save The name to save the downloaded file under. Defaults to
+ *              the name given in file.
+ */
+bool NetworkHttp::downloadFileSynchron(const std::string &file, 
+                                       const std::string &save)
 {
-    int progress = (int)(dlnow/dltotal*100);
-    if(isnan(dlnow/dltotal*100))
-        progress = 0;
-    pthread_mutex_lock(&download_mutex);
-    if(clientp != NULL)
+    m_file          = file;
+    m_save_filename = (save!="") ? save : file;
+
+    return downloadFileInternal();
+}   // downloadFileSynchron
+
+// ----------------------------------------------------------------------------
+/** External interface to download a file asynchronously. This will wake up 
+ *  the thread and schedule it to download the file. The calling program has 
+ *  to poll using getProgress() to find out if the download has finished.
+ *  \param file The file from the server to download.
+ *  \param save The name to save the downloaded file under. Defaults to
+ *              the name given in file.
+ */
+void NetworkHttp::downloadFileAsynchron(const std::string &file, 
+                                        const std::string &save)
+{
+    m_progress.set(0.0f);
+    m_file          = file;
+    m_save_filename = (save!="") ? save : file;
+
+    // Wake up the network http thread
+    pthread_mutex_lock(&m_mutex_command);
     {
-        int * progress_data = (int*)clientp;
-        *progress_data = progress;
+        m_command = HC_DOWNLOAD_FILE;
+        pthread_cond_signal(&m_cond_command);
     }
-    pthread_mutex_unlock(&download_mutex);
+    pthread_mutex_unlock(&m_mutex_command);
+}   // downloadFileAsynchron
+
+// ----------------------------------------------------------------------------
+/** Callback function from curl: inform about progress.
+ *  \param clientp 
+ *  \param download_total Total size of data to download.
+ *  \param download_now   How much has been downloaded so far.
+ *  \param upload_total   Total amount of upload.
+ *  \param upload_now     How muc has been uploaded so far.
+ */
+int NetworkHttp::progressDownload(void *clientp, 
+                                  float download_total, float download_now, 
+                                  float upload_total,   float upload_now)
+{
+    float f;
+    if(download_now < download_total)
+    {
+        f = download_now / download_total;
+        // In case of floating point rouding errors make sure that 
+        // 1.0 is only reached when downloadFileInternal is finished
+        if (f>=1.0f) f=0.99f;
+    }
+    else
+        f=1.0f;
+    network_http->m_progress.set(f);
+
+    static int time_last_print=0;
     if(time_last_print > 10)
     {
-        std::cout << "Download progress: " << progress << "%" << std::endl;
+        std::cout << "Download progress: " << f << "%" << std::endl;
         time_last_print = 0;
     }
     else
@@ -284,5 +328,15 @@ int progressDownload (void *clientp, float dltotal, float dlnow,
         time_last_print += 1;
     }
     return 0;
-}
+}   // progressDownload
+
+// ----------------------------------------------------------------------------
+/** Returns the progress of a download that has been started.
+ *  \return <0 in case of an error, between 0 and smaller than 1 while the
+ *  download is in progress, and 1.0f if the download has finished.
+ */
+float NetworkHttp::getProgress() const
+{
+    return m_progress.get();
+}   // getProgress
 #endif

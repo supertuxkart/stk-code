@@ -862,6 +862,10 @@
 					RelativePath="..\..\io\xml_node.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\io\xml_writer.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="input"
@@ -1361,6 +1365,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\synchronised.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\translation.hpp"
 					>
 				</File>
@@ -1762,6 +1770,10 @@
 				</File>
 				<File
 					RelativePath="..\..\io\xml_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\io\xml_writer.hpp"
 					>
 				</File>
 			</Filter>

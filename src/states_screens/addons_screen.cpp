@@ -72,13 +72,13 @@ void AddonsScreen::loadList()
     while(addons_manager->nextType(m_type))
     {
         std::cout << addons_manager->getName() << std::endl;
-        if(addons_manager->isInstalledAsBool() && 
+        if(addons_manager->isInstalled() && 
             addons_manager->getInstalledVersion() < addons_manager->getVersion())
         {
         	w_list->addItem(addons_manager->getIdAsStr().c_str(),
         	        addons_manager->getName().c_str(), 2 /* icon installed */);
         }
-	    else if(addons_manager->isInstalledAsBool())
+	    else if(addons_manager->isInstalled())
         {
         	w_list->addItem(addons_manager->getIdAsStr().c_str(),
         	        addons_manager->getName().c_str(), 0 /* icon installed */);

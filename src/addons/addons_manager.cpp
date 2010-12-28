@@ -28,94 +28,96 @@
 #include <string.h>
 #include <vector>
 
-#include "irrXML.h"
-
 #include "addons/network_http.hpp"
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track_manager.hpp"
 
-using namespace irr; /* irrXML which is used to read (not write) xml file,
-is located in the namespace irr::io.*/
-using namespace io;
 AddonsManager* addons_manager = 0;
-// ----------------------------------------------------------------------------
 
-AddonsManager::AddonsManager()
+// ----------------------------------------------------------------------------
+/** Initialises the non-online component of the addons manager (i.e. handling
+ *  the list of already installed addons). The online component is initialised
+ *  later from a separate thread in network_http (once network_http is setup).
+ */
+AddonsManager::AddonsManager() : m_state(STATE_INIT)
 {
     m_index = -1;
-    int download_state = 0;
-    m_download_state = download_state;
-    pthread_mutex_init(&m_str_mutex, NULL);
-
-    // FIXME: It is _very_ dirty to save the list as a locale file since we have a
-    //        function to load it directly in a string.
-    const bool success = download("list");
-    if (!success)
-    {
-        fprintf(stderr, "Downloading 'list' failed\n");
-    }
-    
-    std::string xml_file = file_manager->getConfigDir() + "/" + "list";
-    std::cout << "[Addons] Using file '" << xml_file << "'\n";
-    IrrXMLReader* xml = createIrrXMLReader(xml_file.c_str());
-
-    // strings for storing the data we want to get out of the file
-    std::string attribute_name;
-
-    // parse the file until end reached
-
-    while(xml && xml->read())
-    {
-        /*only if it is a node*/
-        if(xml->getNodeType() == EXN_ELEMENT)
-        {
-            if (!strcmp("kart", xml->getNodeName()) || !strcmp("track", xml->getNodeName()))
-            {
-                addons_prop addons;
-                //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-                for(unsigned int i = 0; i < xml->getAttributeCount(); i++)
-                {
-                    attribute_name = xml->getAttributeName(i);
-                    if(attribute_name == "name")
-                    {
-                        addons.name = xml->getAttributeValue("name");
-                    }
-                    if(attribute_name == "version")
-                    {
-                        addons.version = atoi(xml->getAttributeValue("version"));
-                    }
-                    if(attribute_name == "file")
-                    {
-                        addons.file = xml->getAttributeValue("file");
-                    }
-                    if(attribute_name == "description")
-                    {
-                        addons.description = xml->getAttributeValue("description");
-                    }
-                    if(attribute_name == "icon")
-                    {
-                        addons.icon = xml->getAttributeValue("icon");
-                    }
-                    if(attribute_name == "id")
-                    {
-                        addons.id = xml->getAttributeValue("id");
-                    }
-                }
-                addons.type = xml->getNodeName();
-                addons.installed = false;
-                m_addons_list.push_back(addons);
-            }
-        }
-    }
-    delete xml;
 
     m_file_installed = file_manager->getConfigDir() 
                      + "/" + "addons_installed.xml";
     getInstalledAddons();
-}
+}   // AddonsManager
+
+// ----------------------------------------------------------------------------
+/** This initialises the online portion of the addons manager. It downloads
+ *  the list of available addons. This is called by network_http before it
+ *  goes into command-receiving mode, so we can't use any asynchronous calls
+ *  here (though this is being called from a separate thread anyway, so the
+ *  main GUI is not blocked). This function will update the state variable
+ *  
+ */
+void AddonsManager::initOnline()
+{
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Init online addons manager\n");
+    int download_state = 0;
+    m_download_state = download_state;
+
+    // FIXME: It is _very_ dirty to save the list as a locale file 
+    //   since we have a function to load it directly in a string.
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Addons manager downloading list\n");
+    if(!network_http->downloadFileSynchron("list"))
+    {
+        m_state.set(STATE_ERROR);
+        return;
+    }
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Addons manager list downloaded\n");
+
+    std::string xml_file = file_manager->getAddonsFile("list");
+
+    const XMLNode *xml = new XMLNode(xml_file);
+    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    {
+        const XMLNode *node = xml->getNode(i);
+        if(node->getName()=="track")
+        {
+            AddonsProp addons(*node);
+            m_addons_list.push_back(addons);
+        }
+        else if(node->getName()=="kart")
+        {
+            AddonsProp addons(*node);
+            m_addons_list.push_back(addons);
+        }
+        else
+        {
+            fprintf(stderr, 
+                    "Found invalid node '%s' while downloading addons.\n",
+                    node->getName().c_str());
+            fprintf(stderr, "Ignored.\n");
+        }
+    }   // for i<xml->getNumNodes
+    delete xml;
+
+    m_state.set(STATE_READY);
+}   // initOnline
+
+// ----------------------------------------------------------------------------
+/** Returns true if the list of online addons has been downloaded. This is 
+ *  used to grey out the 'addons' entry till a network connections could be
+ *  established.
+ */
+bool AddonsManager::onlineReady()
+{
+    return m_state.get()==STATE_READY;
+}   // onlineReady
+
 // ----------------------------------------------------------------------------
 void AddonsManager::resetIndex()
 {
@@ -131,7 +133,7 @@ void AddonsManager::getInstalledAddons()
 
     std::cout << "[Addons] Loading an xml file for installed addons: ";
     std::cout << m_file_installed << std::endl;
-    IrrXMLReader* xml = createIrrXMLReader(m_file_installed.c_str());
+    io::IrrXMLReader* xml = io::createIrrXMLReader(m_file_installed.c_str());
 
     // parse the file until end reached
 
@@ -142,12 +144,14 @@ void AddonsManager::getInstalledAddons()
         int version = 0;
         switch(xml->getNodeType())
         {
-        case EXN_ELEMENT:
+        case io::EXN_ELEMENT:
             {
-                if (!strcmp("kart", xml->getNodeName()) || !strcmp("track", xml->getNodeName()))
+                if (!strcmp("kart",  xml->getNodeName()) || 
+                    !strcmp("track", xml->getNodeName())   )
                 {
                     std::cout << xml->getAttributeCount() << std::endl;
-                    //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
+                    //the unsigned is to remove the compiler warnings, 
+                    // maybe it is a bad idea ?
                     for(unsigned int i = 0; i < xml->getAttributeCount(); i++)
                     {
                         attribute_name = xml->getAttributeName(i);
@@ -166,18 +170,19 @@ void AddonsManager::getInstalledAddons()
                     }
                     if(selectId(id))
                     {
-                        m_addons_list[m_index].installed = true;
-                        m_addons_list[m_index].installed_version = version;
-                        std::cout << "[Addons] An addon is already installed: " << id << std::endl;
+                        m_addons_list[m_index].m_installed = true;
+                        m_addons_list[m_index].m_installed_version = version;
+                        std::cout << "[Addons] An addon is already installed: " 
+                                  << id << std::endl;
                     }
                     else
                     {
-                        addons_prop addons;
-                        addons.type = xml->getNodeName();
-                        addons.name = name;
-                        addons.installed_version = version;
-                        addons.version = version;
-                        addons.installed = true;
+                        AddonsProp addons;
+                        addons.m_type = xml->getNodeName();
+                        addons.m_name = name;
+                        addons.m_installed_version = version;
+                        addons.m_version = version;
+                        addons.m_installed = true;
                         m_addons_list.push_back(addons);
                     }
                 }
@@ -208,12 +213,12 @@ bool AddonsManager::nextType(std::string type)
 {
     while(next())
     {
-        if(m_addons_list[m_index].type == type)
+        if(m_addons_list[m_index].m_type == type)
             return true;
     }
     while(next())
     {
-        if(m_addons_list[m_index].type == type)
+        if(m_addons_list[m_index].m_type == type)
             return false;
     }
     return false;
@@ -236,12 +241,12 @@ bool AddonsManager::previousType(std::string type)
 {
     while(previous())
     {
-        if(m_addons_list[m_index].type == type)
+        if(m_addons_list[m_index].m_type == type)
             return true;
     }
     while(previous())
     {
-        if(m_addons_list[m_index].type == type)
+        if(m_addons_list[m_index].m_type == type)
             return false;
     }
     return false;
@@ -253,7 +258,7 @@ bool AddonsManager::select(std::string name)
     //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
         {
-            if(m_addons_list[i].name == name)
+            if(m_addons_list[i].m_name == name)
             {
                 m_index = i;
                 return true;
@@ -265,21 +270,20 @@ bool AddonsManager::select(std::string name)
 // ----------------------------------------------------------------------------
 bool AddonsManager::selectId(std::string id)
 {
-    //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
+    {
+        if(m_addons_list[i].m_id == id)
         {
-            if(m_addons_list[i].id == id)
-            {
-                m_index = i;
-                return true;
-            }
+            m_index = i;
+            return true;
         }
+    }
     return false;
 }   // selectId
 
 // ----------------------------------------------------------------------------
 /* FIXME : remove this function */
-addons_prop AddonsManager::getAddons()
+const AddonsManager::AddonsProp& AddonsManager::getAddons() const
 {
     return m_addons_list[m_index];
 }   // getAddons
@@ -288,7 +292,7 @@ addons_prop AddonsManager::getAddons()
 std::string AddonsManager::getVersionAsStr() const
 {
     std::ostringstream os;
-    os << m_addons_list[m_index].version;
+    os << m_addons_list[m_index].m_version;
     return os.str();
 }   // getVersionAsStr
 
@@ -296,25 +300,25 @@ std::string AddonsManager::getVersionAsStr() const
 std::string AddonsManager::getIdAsStr() const
 {
     std::ostringstream os;
-    os << m_addons_list[m_index].id;
+    os << m_addons_list[m_index].m_id;
     return os.str();
 }   // getIdAsStr
 
 // ----------------------------------------------------------------------------
 int AddonsManager::getInstalledVersion() const
 {
-    if(m_addons_list[m_index].installed)
-        return m_addons_list[m_index].installed_version;
+    if(m_addons_list[m_index].m_installed)
+        return m_addons_list[m_index].m_installed_version;
     return 0;
 }   // getInstalledVersion
 
 // ----------------------------------------------------------------------------
 std::string AddonsManager::getInstalledVersionAsStr() const
 {
-    if(m_addons_list[m_index].installed)
+    if(m_addons_list[m_index].m_installed)
     {
         std::ostringstream os;
-        os << m_addons_list[m_index].installed_version;
+        os << m_addons_list[m_index].m_installed_version;
         return os.str();
     }
     return "";
@@ -325,14 +329,12 @@ void AddonsManager::install()
 {
     //download of the addons file
     
-    pthread_mutex_lock(&m_str_mutex);
     m_str_state = "Downloading...";
-    pthread_mutex_unlock(&m_str_mutex);
 
-    std::string file = "file/" + m_addons_list[m_index].file;
-    bool success = download(file,
-                            m_addons_list[m_index].name, &m_download_state);
-    
+    std::string file = "file/" + m_addons_list[m_index].m_file;
+    network_http->downloadFileAsynchron(file, m_addons_list[m_index].m_name);
+    //FIXME , &m_download_state);
+    bool success=true;
     if (!success)
     {
         // TODO: show a message in the interface
@@ -340,34 +342,32 @@ void AddonsManager::install()
         return;
     }
     
-    file_manager->checkAndCreateDirForAddons(m_addons_list[m_index].name,
-                                             m_addons_list[m_index].type + "s/");
+    file_manager->checkAndCreateDirForAddons(m_addons_list[m_index].m_name,
+                                             m_addons_list[m_index].m_type + "s/");
 
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                m_addons_list[m_index].type + "s/" +
-                m_addons_list[m_index].name + "/" ;
-    std::string from = file_manager->getConfigDir() + "/" + m_addons_list[m_index].name;
+                m_addons_list[m_index].m_type + "s/" +
+                m_addons_list[m_index].m_name + "/" ;
+    std::string from = file_manager->getConfigDir() + "/" 
+                     + m_addons_list[m_index].m_name;
     std::string to = dest_file;
     
-    pthread_mutex_lock(&m_str_mutex);
     m_str_state = "Unzip the addons...";
-    pthread_mutex_unlock(&m_str_mutex);
 
     success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface
-        std::cerr << "[Addons] Failed to unzip '" << from << "' to '" << to << "'\n";
+        std::cerr << "[Addons] Failed to unzip '" << from << "' to '" 
+                  << to << "'\n";
         return;
     }
 
-    m_addons_list[m_index].installed = true;
-    m_addons_list[m_index].installed_version = m_addons_list[m_index].version;
+    m_addons_list[m_index].m_installed = true;
+    m_addons_list[m_index].m_installed_version = m_addons_list[m_index].m_version;
     
-    pthread_mutex_lock(&m_str_mutex);
     m_str_state = "Reloading kart list...";
-    pthread_mutex_unlock(&m_str_mutex);
     saveInstalled();
 }   // install
 
@@ -385,15 +385,15 @@ void AddonsManager::saveInstalled()
 
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
     {
-        if(m_addons_list[i].installed)
+        if(m_addons_list[i].m_installed)
         {
             std::ostringstream os;
-            os << m_addons_list[i].installed_version;
+            os << m_addons_list[i].m_installed_version;
 
             //transform the version (int) in string
-            xml_installed << "<"+ m_addons_list[i].type +" name=\"" +
-                        m_addons_list[i].name + "\" id=\"" +
-                        m_addons_list[i].id + "\"";
+            xml_installed << "<"+ m_addons_list[i].m_type +" name=\"" +
+                        m_addons_list[i].m_name + "\" id=\"" +
+                        m_addons_list[i].m_id + "\"";
             xml_installed << " version=\"" + os.str() + "\" />" << std::endl;
         }
     }
@@ -406,13 +406,14 @@ void AddonsManager::saveInstalled()
 // ----------------------------------------------------------------------------
 void AddonsManager::uninstall()
 {
-    std::cout << "[Addons] Uninstalling <" << m_addons_list[m_index].name << ">\n";
+    std::cout << "[Addons] Uninstalling <" 
+              << m_addons_list[m_index].m_name << ">\n";
 
-    m_addons_list[m_index].installed = false;
+    m_addons_list[m_index].m_installed = false;
     //write the xml file with the informations about installed karts
     std::string dest_file = file_manager->getAddonsDir() + "/" + "data" + "/" +
-                m_addons_list[m_index].type + "s/" +
-                m_addons_list[m_index].name + "/";
+                m_addons_list[m_index].m_type + "s/" +
+                m_addons_list[m_index].m_name + "/";
 
     //remove the addons directory
     file_manager->removeDirectory(dest_file.c_str());
@@ -423,20 +424,15 @@ void AddonsManager::uninstall()
 // ----------------------------------------------------------------------------
 int AddonsManager::getDownloadState()
 {
-    pthread_mutex_lock(&download_mutex);
     int value = m_download_state;
-    pthread_mutex_unlock(&download_mutex);
     return value;
 }
 
 // ----------------------------------------------------------------------------
 
-std::string AddonsManager::getDownloadStateAsStr() const
+const std::string& AddonsManager::getDownloadStateAsStr() const
 {
-    pthread_mutex_lock(&m_str_mutex);
-    std::string value = m_str_state;
-    pthread_mutex_unlock(&m_str_mutex);
-    return value;
+    return m_str_state;
 }   // getDownloadStateAsStr
 
 // ----------------------------------------------------------------------------

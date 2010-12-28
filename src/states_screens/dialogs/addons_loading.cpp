@@ -37,25 +37,22 @@ using namespace irr::gui;
 
 // ------------------------------------------------------------------------------------------------------
 
-AddonsLoading::AddonsLoading(const float w, const float h) :
-        ModalDialog(w, h)
+AddonsLoading::AddonsLoading(const float w, const float h) 
+             : ModalDialog(w, h)
 {
     loadFromFile("addons_view_dialog.stkgui");
-    m_can_install = false;
-	m_can_load_icon = false;
+    m_can_install    = false;
+	m_can_load_icon  = false;
     m_percent_update = false;
     pthread_mutex_init(&m_mutex_can_install, NULL);
 
     /*Init the icon here to be able to load a single image*/
-    icon = getWidget<IconButtonWidget>("icon");
-
-    name = getWidget<LabelWidget>("name");
-
-    description = getWidget<LabelWidget>("description");
+    m_icon        = getWidget<IconButtonWidget>("icon");
+    m_name        = getWidget<LabelWidget>("name");
+    m_description = getWidget<LabelWidget>("description");    
+    m_version     = getWidget<LabelWidget>("version");
     
-    version = getWidget<LabelWidget>("version");
-    
-    if(addons_manager->isInstalledAsBool())
+    if(addons_manager->isInstalled())
     {
         if(addons_manager->getInstalledVersion() < addons_manager->getVersion())
             getWidget<ButtonWidget>("install")->setLabel(_("Update"));
@@ -67,11 +64,11 @@ AddonsLoading::AddonsLoading(const float w, const float h) :
 }
 void AddonsLoading::loadInfo()
 {
-    name->setText(StringUtils::insertValues(_("Name: %i"),
+    m_name->setText(StringUtils::insertValues(_("Name: %i"),
                                             addons_manager->getName().c_str()));
-    description->setText(StringUtils::insertValues(_("Description: %i"),
+    m_description->setText(StringUtils::insertValues(_("Description: %i"),
                                             addons_manager->getDescription().c_str()));
-    version->setText(StringUtils::insertValues(_("Version: %i"),
+    m_version->setText(StringUtils::insertValues(_("Version: %i"),
                                             addons_manager->getVersionAsStr().c_str()));
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
@@ -83,13 +80,14 @@ void * AddonsLoading::downloadIcon( void * pthis)
     AddonsLoading * pt = (AddonsLoading*)pthis;
     
     std::string iconPath = "icon/" + addons_manager->getIcon();
-	if (download(iconPath, addons_manager->getName() + ".png"))
+	network_http->downloadFileAsynchron(iconPath, addons_manager->getName() + ".png");
+// FIXME if (network_http->downloadFile(iconPath, addons_manager->getName() + ".png"))
     {
         pthread_mutex_lock(&(pt->m_mutex_can_install));
         pt->m_can_load_icon = true;
         pthread_mutex_unlock(&(pt->m_mutex_can_install));
 	}
-    else
+//    else
     {
         fprintf(stderr, "[Addons] Download icon '%s' failed\n", iconPath.c_str());
     }
@@ -170,7 +168,7 @@ void AddonsLoading::onUpdate(float delta)
     }
     if(m_can_load_icon)
     {
-		icon->setImage(  (file_manager->getConfigDir() + "/" 
+		m_icon->setImage(  (file_manager->getConfigDir() + "/" 
                           +  addons_manager->getName() + ".png").c_str(),
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
@@ -192,7 +190,7 @@ void AddonsLoading::close()
 void * AddonsLoading::startInstall(void* pthis)
 {
     AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(!addons_manager->isInstalledAsBool() || addons_manager->needUpdate())
+    if(!addons_manager->isInstalled() || addons_manager->needUpdate())
     {
         addons_manager->install();
     }
