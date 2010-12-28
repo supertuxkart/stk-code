@@ -609,10 +609,15 @@ EventPropagation InputManager::input(const SEvent& event)
         for(int i=0; i<gp->m_button_count; i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
-
+            
             // Only report button events when the state of the button changes
             if ((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
             {
+                if (UserConfigParams::m_gamepad_debug)
+                {
+                    printf("button %i, status=%i\n", i, isButtonPressed);
+                }
+                
                 dispatchInput(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, Input::AD_POSITIVE,
                               isButtonPressed ? Input::MAX_VALUE : 0);
             }
