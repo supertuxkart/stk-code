@@ -154,6 +154,11 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         
         UserConfigParams::m_sfx = w->getState();
         sfx_manager->soundToggled(UserConfigParams::m_sfx);
+        
+        if (UserConfigParams::m_sfx)
+        {
+            sfx_manager->quickSound("beep");
+        }
     }
 }   // eventCallback
 
