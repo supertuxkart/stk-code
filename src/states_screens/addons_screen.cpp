@@ -67,26 +67,26 @@ void AddonsScreen::loadList()
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
-    addons_manager->resetIndex();
-	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
-    while(addons_manager->nextType(m_type))
+    for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
-        std::cout << addons_manager->getName() << std::endl;
-        if(addons_manager->isInstalled() && 
-            addons_manager->getInstalledVersion() < addons_manager->getVersion())
+        const AddonsManager::AddonsProp &addons = addons_manager->getAddons(i);
+
+        std::cout << addons.getName()<< std::endl;
+        if(addons.isInstalled() && 
+            addons.getInstalledVersion() < addons.getVersion())
         {
-        	w_list->addItem(addons_manager->getIdAsStr().c_str(),
-        	        addons_manager->getName().c_str(), 2 /* icon installed */);
+        	w_list->addItem(addons.getId(), addons.getName().c_str(), 
+                            2 /* icon installed */);
         }
-	    else if(addons_manager->isInstalled())
+	    else if(addons.isInstalled())
         {
-        	w_list->addItem(addons_manager->getIdAsStr().c_str(),
+        	w_list->addItem(addons.getId(),
         	        addons_manager->getName().c_str(), 0 /* icon installed */);
         }
 	    else
         {
-        	w_list->addItem(addons_manager->getIdAsStr().c_str(),
-        	        addons_manager->getName().c_str(), 1 /* icon unsinstalled*/);
+        	w_list->addItem(addons.getId(), addons.getName().c_str(),
+        	                1 /* icon unsinstalled*/);
         }
     }
 

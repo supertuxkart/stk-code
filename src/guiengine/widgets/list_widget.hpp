@@ -79,7 +79,8 @@ namespace GUIEngine
          * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
          * \precondition may only be called after the widget has been added to the screen with add()
          */
-        void addItem(const std::string internalName, const irr::core::stringw name, const int icon=-1);
+        void addItem(const std::string& internal_name, 
+                     const irr::core::stringw &name, const int icon=-1);
         
         /**
           * \brief erases all items in the list

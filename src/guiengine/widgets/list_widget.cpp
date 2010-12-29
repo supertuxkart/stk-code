@@ -92,7 +92,8 @@ void ListWidget::clear()
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::addItem(const std::string internalName, const irr::core::stringw name, const int icon)
+void ListWidget::addItem(const std::string& internalName, 
+                         const irr::core::stringw& name, const int icon)
 {
     ListItem newItem;
     newItem.m_label = name;

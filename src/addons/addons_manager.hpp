@@ -29,6 +29,7 @@
 
 class AddonsManager
 {
+public:
     class AddonsProp
     {
     public:
@@ -42,18 +43,37 @@ class AddonsManager
         bool        m_installed;
         std::string m_type;
         AddonsProp() {};
-        AddonsProp(const XMLNode &xml)
+        /** Initialises the object from an XML node. */
+        AddonsProp(const XMLNode &xml, bool installed=false)
         {
-            m_installed         = false;
+            m_installed         = installed;
             m_installed_version = 0;
-            m_type        = xml.getName();
-            m_name        = ""; xml.get("name",        &m_name       );
-            m_version     = 0 ; xml.get("version",     &m_version    );
-            m_file        = ""; xml.get("file",        &m_file       );
-            m_description = ""; xml.get("description", &m_description);
-            m_icon        = ""; xml.get("icon",        &m_icon       );
-            m_id          = ""; xml.get("id",          &m_id         );
+            m_type              = xml.getName();
+            m_name              = ""; xml.get("name",        &m_name       );
+            m_version           = 0 ; xml.get("version",     &m_version    );
+            m_file              = ""; xml.get("file",        &m_file       );
+            m_description       = ""; xml.get("description", &m_description);
+            m_icon              = ""; xml.get("icon",        &m_icon       );
+            m_id                = ""; xml.get("id",          &m_id         );
         };   // AddonsProp(const XML&)
+        // --------------------------------------------------------------------
+        /** Returns the name of the addon. */
+        const std::string& getName() const {return m_name; }
+        // --------------------------------------------------------------------
+        /** Returns if the addon is installed. */
+        bool  isInstalled() const {return m_installed; }
+        // --------------------------------------------------------------------
+        /** Returns the installed version of an addon. */
+        int   getInstalledVersion() const {return m_installed_version; }
+        // --------------------------------------------------------------------
+        /** Returns the latest version of this addon. 
+         *  m_version>m_installed_version if a newer version is available 
+         *  online. */
+        int   getVersion() const {return m_version; }
+        // --------------------------------------------------------------------
+        /** Returns the ID of this addon. */
+        const std::string& getId() const {return m_id; }
+        // --------------------------------------------------------------------
     };
 
     private:
@@ -61,7 +81,7 @@ class AddonsManager
         int                         m_index;
         std::string                 m_file_installed;
         void                        saveInstalled();
-        void                        getInstalledAddons();
+        void                        loadInstalledAddons();
         std::string                 m_type;
         int                         m_download_state;
         std::string                 m_str_state;
@@ -79,6 +99,13 @@ class AddonsManager
 
         void initOnline();
         bool onlineReady();
+
+        /** Returns the list of addons (installed and uninstalled). */
+        unsigned int getNumAddons() const { return m_addons_list.size(); }
+
+        /** Returns the i-th addons. */
+        const AddonsProp& getAddons(unsigned int i) { return m_addons_list[i];}
+
         /** Select the next addons in the addons list. */
         bool next();
         /** Select the next addons in the addons list. */

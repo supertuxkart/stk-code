@@ -49,7 +49,7 @@ AddonsManager::AddonsManager() : m_state(STATE_INIT)
 
     m_file_installed = file_manager->getConfigDir() 
                      + "/" + "addons_installed.xml";
-    getInstalledAddons();
+    loadInstalledAddons();
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
@@ -124,76 +124,47 @@ void AddonsManager::resetIndex()
     m_index = -1;
 }
 // ----------------------------------------------------------------------------
-void AddonsManager::getInstalledAddons()
+void AddonsManager::loadInstalledAddons()
 {
-    std::string attribute_name;
-    int old_index = m_index;
-
     /* checking for installed addons */
-
     std::cout << "[Addons] Loading an xml file for installed addons: ";
     std::cout << m_file_installed << std::endl;
-    io::IrrXMLReader* xml = io::createIrrXMLReader(m_file_installed.c_str());
+    const XMLNode *xml = file_manager->createXMLTree(m_file_installed);
+    if(!xml)
+        return;
 
-    // parse the file until end reached
+    int old_index = m_index;
 
-    while(xml && xml->read())
+    for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
-        std::string name;
-        std::string id;
-        int version = 0;
-        switch(xml->getNodeType())
+        const XMLNode *node=xml->getNode(i);
+        if(node->getName()=="kart"   ||
+            node->getName()=="track"    )
         {
-        case io::EXN_ELEMENT:
+            std::string name="";
+            std::string id="";
+            int version = 0;
+            node->get("id",      &id     );
+            node->get("name",    &name   );
+            node->get("version", &version);
+            if(selectId(id))
             {
-                if (!strcmp("kart",  xml->getNodeName()) || 
-                    !strcmp("track", xml->getNodeName())   )
-                {
-                    std::cout << xml->getAttributeCount() << std::endl;
-                    //the unsigned is to remove the compiler warnings, 
-                    // maybe it is a bad idea ?
-                    for(unsigned int i = 0; i < xml->getAttributeCount(); i++)
-                    {
-                        attribute_name = xml->getAttributeName(i);
-                        if(attribute_name == "id")
-                        {
-                            id = xml->getAttributeValue("id");
-                        }
-                        if(attribute_name == "name")
-                        {
-                            name = xml->getAttributeValue("name");
-                        }
-                        if(attribute_name == "version")
-                        {
-                            version = xml->getAttributeValueAsInt("version");
-                        }
-                    }
-                    if(selectId(id))
-                    {
-                        m_addons_list[m_index].m_installed = true;
-                        m_addons_list[m_index].m_installed_version = version;
-                        std::cout << "[Addons] An addon is already installed: " 
-                                  << id << std::endl;
-                    }
-                    else
-                    {
-                        AddonsProp addons;
-                        addons.m_type = xml->getNodeName();
-                        addons.m_name = name;
-                        addons.m_installed_version = version;
-                        addons.m_version = version;
-                        addons.m_installed = true;
-                        m_addons_list.push_back(addons);
-                    }
-                }
+                m_addons_list[m_index].m_installed = true;
+                m_addons_list[m_index].m_installed_version = version;
+                std::cout << "[Addons] An addon is already installed: " 
+                    << id << std::endl;
             }
-            break;
-        default : break;
+            else
+            {
+                AddonsProp addons(*xml, /* installed= */ true);
+                m_addons_list.push_back(addons);
+            }
         }
-    }
+    }   // for i <= xml->getNumNodes()
+
     delete xml;
     m_index = old_index;
-}
+}   // loadInstalledAddons
 
 
 // ----------------------------------------------------------------------------
