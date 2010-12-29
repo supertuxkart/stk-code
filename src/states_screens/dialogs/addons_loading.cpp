@@ -198,11 +198,11 @@ void * AddonsLoading::startInstall(void* pthis)
     AddonsLoading * obj = (AddonsLoading*)pthis;
     if(!obj->m_addon.isInstalled() || obj->m_addon.needsUpdate())
     {
-        addons_manager->install();
+        addons_manager->install(obj->m_addon);
     }
     else
     {
-        addons_manager->uninstall();
+        addons_manager->uninstall(obj->m_addon);
     }
     pthread_mutex_lock(&(obj->m_mutex_can_install));
     obj->m_can_install = true;

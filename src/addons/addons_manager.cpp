@@ -45,8 +45,6 @@ AddonsManager* addons_manager = 0;
  */
 AddonsManager::AddonsManager() : m_state(STATE_INIT)
 {
-    m_index = -1;
-
     m_file_installed = file_manager->getConfigDir() 
                      + "/" + "addons_installed.xml";
     loadInstalledAddons();
@@ -128,8 +126,6 @@ void AddonsManager::loadInstalledAddons()
     if(!xml)
         return;
 
-    int old_index = m_index;
-
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node=xml->getNode(i);
@@ -142,11 +138,11 @@ void AddonsManager::loadInstalledAddons()
             node->get("id",      &id     );
             node->get("name",    &name   );
             node->get("version", &version);
-            
-            if(getAddon(id))
+            int index = getAddonIndex(id);            
+            if(index>0)
             {
-                m_addons_list[m_index].m_installed = true;
-                m_addons_list[m_index].m_installed_version = version;
+                m_addons_list[index].m_installed = true;
+                m_addons_list[index].m_installed_version = version;
                 std::cout << "[Addons] An addon is already installed: " 
                     << id << std::endl;
             }
@@ -159,37 +155,7 @@ void AddonsManager::loadInstalledAddons()
     }   // for i <= xml->getNumNodes()
 
     delete xml;
-    m_index = old_index;
 }   // loadInstalledAddons
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::select(std::string name)
-{
-    //the unsigned is to remove the compiler warnings, maybe it is a bad idea ?
-    for(unsigned int i = 0; i < m_addons_list.size(); i++)
-        {
-            if(m_addons_list[i].m_name == name)
-            {
-                m_index = i;
-                return true;
-            }
-        }
-    return false;
-}   // select
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::selectId(std::string id)
-{
-    for(unsigned int i = 0; i < m_addons_list.size(); i++)
-    {
-        if(m_addons_list[i].m_id == id)
-        {
-            m_index = i;
-            return true;
-        }
-    }
-    return false;
-}   // selectId
 
 // ----------------------------------------------------------------------------
 /** Returns an addon with a given id. Raises an assertion if the id is not 
@@ -216,42 +182,14 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 }   // getAddonIndex
 
 // ----------------------------------------------------------------------------
-std::string AddonsManager::getIdAsStr() const
-{
-    std::ostringstream os;
-    os << m_addons_list[m_index].m_id;
-    return os.str();
-}   // getIdAsStr
-
-// ----------------------------------------------------------------------------
-int AddonsManager::getInstalledVersion() const
-{
-    if(m_addons_list[m_index].m_installed)
-        return m_addons_list[m_index].m_installed_version;
-    return 0;
-}   // getInstalledVersion
-
-// ----------------------------------------------------------------------------
-std::string AddonsManager::getInstalledVersionAsStr() const
-{
-    if(m_addons_list[m_index].m_installed)
-    {
-        std::ostringstream os;
-        os << m_addons_list[m_index].m_installed_version;
-        return os.str();
-    }
-    return "";
-}   // getInstalledVersionAsStr
-
-// ----------------------------------------------------------------------------
-void AddonsManager::install()
+void AddonsManager::install(const Addon &addon)
 {
     //download of the addons file
     
     m_str_state = "Downloading...";
 
-    std::string file = "file/" + m_addons_list[m_index].m_file;
-    network_http->downloadFileAsynchron(file, m_addons_list[m_index].m_name);
+    std::string file = "file/" + addon.getFile();
+    network_http->downloadFileAsynchron(file, addon.getName());
     //FIXME , &m_download_state);
     bool success=true;
     if (!success)
@@ -261,15 +199,13 @@ void AddonsManager::install()
         return;
     }
     
-    file_manager->checkAndCreateDirForAddons(m_addons_list[m_index].m_name,
-                                             m_addons_list[m_index].m_type + "s/");
+    file_manager->checkAndCreateDirForAddons(addon.getName(),
+                                             addon.getType()+ "s/");
 
     //extract the zip in the addons folder called like the addons name    
-    std::string dest_file =file_manager->getAddonsDir() + "/" + "data" + "/" +
-                m_addons_list[m_index].m_type + "s/" +
-                m_addons_list[m_index].m_name + "/" ;
-    std::string from = file_manager->getConfigDir() + "/" 
-                     + m_addons_list[m_index].m_name;
+    std::string dest_file = file_manager->getAddonsDir() + "/"
+                          + addon.getType()+ "s/" + addon.getName() + "/" ;
+    std::string from = file_manager->getConfigDir() + "/" + addon.getName();
     std::string to = dest_file;
     
     m_str_state = "Unzip the addons...";
@@ -283,8 +219,9 @@ void AddonsManager::install()
         return;
     }
 
-    m_addons_list[m_index].m_installed = true;
-    m_addons_list[m_index].m_installed_version = m_addons_list[m_index].m_version;
+    int index = getAddonIndex(addon.getId());
+    assert(index>=0 && index < (int)m_addons_list.size());
+    m_addons_list[index].setInstalled(true);
     
     m_str_state = "Reloading kart list...";
     saveInstalled();
@@ -323,16 +260,20 @@ void AddonsManager::saveInstalled()
 }   // saveInstalled
 
 // ----------------------------------------------------------------------------
-void AddonsManager::uninstall()
+void AddonsManager::uninstall(const Addon &addon)
 {
     std::cout << "[Addons] Uninstalling <" 
-              << m_addons_list[m_index].m_name << ">\n";
+              << addon.getName() << ">\n";
 
-    m_addons_list[m_index].m_installed = false;
+    // addon is a const reference, and to avoid removing the const, we
+    // find the proper index again to modify the installed state
+    int index = getAddonIndex(addon.getId());
+    assert(index>=0 && index < (int)m_addons_list.size());
+    m_addons_list[index].setInstalled(false);
+
     //write the xml file with the informations about installed karts
-    std::string dest_file = file_manager->getAddonsDir() + "/" + "data" + "/" +
-                m_addons_list[m_index].m_type + "s/" +
-                m_addons_list[m_index].m_name + "/";
+    std::string dest_file = file_manager->getAddonsDir() + "/"
+                          + addon.getType()+ "s/" + addon.getName()+ "/";
 
     //remove the addons directory
     file_manager->removeDirectory(dest_file.c_str());

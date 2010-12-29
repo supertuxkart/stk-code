@@ -41,30 +41,33 @@ public:
     Addon() {};
     /** Initialises the object from an XML node. */
     Addon(const XMLNode &xml, bool installed=false);
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const std::string& getName() const {return m_name; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const {return m_type; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Returns the filename of the addon. */
+    const std::string& getFile() const {return m_file; }
+    // ------------------------------------------------------------------------
     /** Returns the name of the icon of this addon. */
     const std::string& getIcon() const {return m_icon; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const std::string& getDescription() const {return m_description; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if the addon is installed. */
     bool  isInstalled() const {return m_installed; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the installed version of an addon. */
     int   getInstalledVersion() const {return m_installed_version; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the latest version of this addon. 
     *  m_version>m_installed_version if a newer version is available 
     *  online. */
     int   getVersion() const {return m_version; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the version as string. */
     std::string getVersionAsStr() const
     {
@@ -72,16 +75,26 @@ public:
         os << m_version;
         return os.str();
     }   // getVersionAsStr
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the ID of this addon. */
     const std::string& getId() const {return m_id; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
     {
         return getInstalledVersion() < getVersion();
     }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Marks this addon to be installed. If the addon is marked as being
+     *  installed, it also updates the installed  version number to be the 
+     *  same as currently available version number. */
+    void setInstalled(bool state)
+    {
+        m_installed         = state;
+        if(state)
+            m_installed_version = m_version;
+    }   // setInstalled
+    // ------------------------------------------------------------------------
 };   // Addon
 
 

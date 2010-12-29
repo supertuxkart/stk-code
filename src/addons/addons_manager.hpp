@@ -32,7 +32,6 @@ class AddonsManager
 {
 private:
     std::vector<Addon>      m_addons_list;
-    int                     m_index;
     std::string             m_file_installed;
     void                    saveInstalled();
     void                    loadInstalledAddons();
@@ -65,38 +64,12 @@ public:
     /** Get all the selected addon parameters. */
     const Addon &getAddons() const;
 
-    /** Select an addon with it name. */
-    bool select(std::string);
-
-    /** Select an addon with it id. */
-    bool selectId(std::string);
-
-    /** Get the version of the selected addon as a string. */
-    std::string getVersionAsStr() const;
-
-    /** Get the installed version of the selected addon. */
-    int getInstalledVersion() const;
-    std::string getInstalledVersionAsStr() const;
-
-    /** Get the installed version of the selected addon. */
-    std::string getIdAsStr() const;
-
-    /** Get the description of the selected addons. */
-    const std::string &getDescription() const 
-    { return m_addons_list[m_index].m_description; };
-
-    const std::string &getType() const 
-    { return m_addons_list[m_index].m_type; };
     /** Install or upgrade the selected addon. */
-    void install();
+    void install(const Addon &addon);
 
     /** Uninstall the selected addon. This method will remove all the 
     *  directory of the addon.*/
-    void uninstall();
-
-    /** Get the state of the addon: if it is installed or not.*/
-    bool isInstalled() const 
-    { return m_addons_list[m_index].m_installed; };
+    void uninstall(const Addon &addon);
 
     int  getDownloadState();
 
