@@ -35,11 +35,13 @@
 using namespace GUIEngine;
 using namespace irr::gui;
 
-// ------------------------------------------------------------------------------------------------------
-
-AddonsLoading::AddonsLoading(const float w, const float h) 
+// ----------------------------------------------------------------------------
+AddonsLoading::AddonsLoading(const float w, const float h,
+                             const std::string &addon_name)
              : ModalDialog(w, h)
 {
+    m_addon = *(addons_manager->getAddon(addon_name));
+
     loadFromFile("addons_view_dialog.stkgui");
     m_can_install    = false;
 	m_can_load_icon  = false;
@@ -52,9 +54,9 @@ AddonsLoading::AddonsLoading(const float w, const float h)
     m_description = getWidget<LabelWidget>("description");    
     m_version     = getWidget<LabelWidget>("version");
     
-    if(addons_manager->isInstalled())
+    if(m_addon.isInstalled())
     {
-        if(addons_manager->getInstalledVersion() < addons_manager->getVersion())
+        if(m_addon.needsUpdate())
             getWidget<ButtonWidget>("install")->setLabel(_("Update"));
         else
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
@@ -62,14 +64,16 @@ AddonsLoading::AddonsLoading(const float w, const float h)
     
     loadInfo();
 }
+
+// ----------------------------------------------------------------------------
 void AddonsLoading::loadInfo()
 {
     m_name->setText(StringUtils::insertValues(_("Name: %i"),
-                                            addons_manager->getName().c_str()));
+                                            m_addon.getName().c_str()));
     m_description->setText(StringUtils::insertValues(_("Description: %i"),
-                                            addons_manager->getDescription().c_str()));
+                                            m_addon.getDescription().c_str()));
     m_version->setText(StringUtils::insertValues(_("Version: %i"),
-                                            addons_manager->getVersionAsStr().c_str()));
+                                            m_addon.getVersionAsStr().c_str()));
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
 }
@@ -79,8 +83,8 @@ void * AddonsLoading::downloadIcon( void * pthis)
 {
     AddonsLoading * pt = (AddonsLoading*)pthis;
     
-    std::string iconPath = "icon/" + addons_manager->getIcon();
-	network_http->downloadFileAsynchron(iconPath, addons_manager->getName() + ".png");
+    std::string iconPath = "icon/" + pt->m_addon.getIcon();
+	network_http->downloadFileAsynchron(iconPath, pt->m_addon.getName() + ".png");
 // FIXME if (network_http->downloadFile(iconPath, addons_manager->getName() + ".png"))
     {
         pthread_mutex_lock(&(pt->m_mutex_can_install));
@@ -106,12 +110,14 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     }
     else if(eventSource == "next")
     {
-        addons_manager->nextType(addons_manager->getType());
+        // addons_manager->nextType(addons_manager->getType());
+        assert(false);
         loadInfo();
     }
     else if(eventSource == "previous")
     {
-        addons_manager->previousType(addons_manager->getType());
+        // FIXME: addons_manager->previousType(addons_manager->getType());
+        assert(false);
         loadInfo();
     }
     if(eventSource == "install")
@@ -169,7 +175,7 @@ void AddonsLoading::onUpdate(float delta)
     if(m_can_load_icon)
     {
 		m_icon->setImage(  (file_manager->getConfigDir() + "/" 
-                          +  addons_manager->getName() + ".png").c_str(),
+                          +  m_addon.getName() + ".png").c_str(),
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
     pthread_mutex_unlock(&(m_mutex_can_install));
@@ -190,7 +196,7 @@ void AddonsLoading::close()
 void * AddonsLoading::startInstall(void* pthis)
 {
     AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(!addons_manager->isInstalled() || addons_manager->needUpdate())
+    if(!obj->m_addon.isInstalled() || obj->m_addon.needsUpdate())
     {
         addons_manager->install();
     }

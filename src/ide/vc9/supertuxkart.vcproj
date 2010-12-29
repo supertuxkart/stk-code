@@ -1107,6 +1107,10 @@
 				Name="addons"
 				>
 				<File
+					RelativePath="..\..\addons\addon.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\addons\addons_manager.cpp"
 					>
 				</File>
@@ -2028,6 +2032,10 @@
 			<Filter
 				Name="addons"
 				>
+				<File
+					RelativePath="..\..\addons\addon.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\addons\addons_manager.hpp"
 					>

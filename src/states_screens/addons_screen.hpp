@@ -59,7 +59,7 @@ public:
     std::string             m_type;
 
     /** Load the addons into the main list.*/
-    void loadList();
+    void loadList(const std::string &type);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();

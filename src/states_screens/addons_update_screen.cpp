@@ -61,8 +61,7 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
         GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
         std::string addons = list->getSelectionInternalName();
 
-        addons_manager->selectId(addons);
-        m_load = new AddonsLoading(0.8f, 0.8f);
+        m_load = new AddonsLoading(0.8f, 0.8f, addons);
     }
     else if (name == "category")
     {
@@ -73,13 +72,13 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
             AddonsScreen::getInstance()->m_type = "track";
-            AddonsScreen::getInstance()->loadList();
+            AddonsScreen::getInstance()->loadList("track");
         }
         else if (selection == "tab_kart")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
             AddonsScreen::getInstance()->m_type = "kart";
-            AddonsScreen::getInstance()->loadList();
+            AddonsScreen::getInstance()->loadList("kart");
         }
     }
 }
@@ -93,18 +92,16 @@ void AddonsUpdateScreen::init()
 
     GUIEngine::ListWidget* w_list = this->getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
-    addons_manager->resetIndex();
-	//w_list->addItem("kart", _("Karts:"), -1 /* no icon */);
-    while(addons_manager->next())
+
+    for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
-		if(addons_manager->isInstalled() && 
-            addons_manager->getInstalledVersion() < addons_manager->getVersion())
+        const Addon &addon = addons_manager->getAddon(i);
+        if(addon.isInstalled() && addon.needsUpdate())
 		{
-			std::cout << addons_manager->getName() << std::endl;
-			w_list->addItem(addons_manager->getIdAsStr(),
-					        addons_manager->getName().c_str(), 0);
+			std::cout << addon.getName() << std::endl;
+			w_list->addItem(addon.getId(), addon.getName().c_str(), 0);
 		}
-    }
+    }   // for i<getNumAddons
 }
 
 #endif

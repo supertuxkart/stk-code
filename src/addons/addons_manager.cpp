@@ -87,13 +87,13 @@ void AddonsManager::initOnline()
         const XMLNode *node = xml->getNode(i);
         if(node->getName()=="track")
         {
-            AddonsProp addons(*node);
-            m_addons_list.push_back(addons);
+            Addon addon(*node);
+            m_addons_list.push_back(addon);
         }
         else if(node->getName()=="kart")
         {
-            AddonsProp addons(*node);
-            m_addons_list.push_back(addons);
+            Addon addon(*node);
+            m_addons_list.push_back(addon);
         }
         else
         {
@@ -119,11 +119,6 @@ bool AddonsManager::onlineReady()
 }   // onlineReady
 
 // ----------------------------------------------------------------------------
-void AddonsManager::resetIndex()
-{
-    m_index = -1;
-}
-// ----------------------------------------------------------------------------
 void AddonsManager::loadInstalledAddons()
 {
     /* checking for installed addons */
@@ -147,7 +142,8 @@ void AddonsManager::loadInstalledAddons()
             node->get("id",      &id     );
             node->get("name",    &name   );
             node->get("version", &version);
-            if(selectId(id))
+            
+            if(getAddon(id))
             {
                 m_addons_list[m_index].m_installed = true;
                 m_addons_list[m_index].m_installed_version = version;
@@ -156,8 +152,8 @@ void AddonsManager::loadInstalledAddons()
             }
             else
             {
-                AddonsProp addons(*xml, /* installed= */ true);
-                m_addons_list.push_back(addons);
+                Addon addon(*xml, /* installed= */ true);
+                m_addons_list.push_back(addon);
             }
         }
     }   // for i <= xml->getNumNodes()
@@ -165,63 +161,6 @@ void AddonsManager::loadInstalledAddons()
     delete xml;
     m_index = old_index;
 }   // loadInstalledAddons
-
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::next()
-{
-    if(m_index + 1 < (int)m_addons_list.size())
-    {
-        m_index ++;
-        return true;
-    }
-    m_index = -1;
-    return false;
-}   // next
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::nextType(std::string type)
-{
-    while(next())
-    {
-        if(m_addons_list[m_index].m_type == type)
-            return true;
-    }
-    while(next())
-    {
-        if(m_addons_list[m_index].m_type == type)
-            return false;
-    }
-    return false;
-}   // nextType
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::previous()
-{
-    if(m_index - 1 > 0)
-    {
-        m_index --;
-        return true;
-    }
-    m_index = m_addons_list.size() - 1;
-    return false;
-}   // previous
-
-// ----------------------------------------------------------------------------
-bool AddonsManager::previousType(std::string type)
-{
-    while(previous())
-    {
-        if(m_addons_list[m_index].m_type == type)
-            return true;
-    }
-    while(previous())
-    {
-        if(m_addons_list[m_index].m_type == type)
-            return false;
-    }
-    return false;
-}   // previousType
 
 // ----------------------------------------------------------------------------
 bool AddonsManager::select(std::string name)
@@ -253,19 +192,28 @@ bool AddonsManager::selectId(std::string id)
 }   // selectId
 
 // ----------------------------------------------------------------------------
-/* FIXME : remove this function */
-const AddonsManager::AddonsProp& AddonsManager::getAddons() const
+/** Returns an addon with a given id. Raises an assertion if the id is not 
+ *  found!
+ *  \param id The id to search for.
+ */
+const Addon* AddonsManager::getAddon(const std::string &id) const
 {
-    return m_addons_list[m_index];
-}   // getAddons
+    int i = getAddonIndex(id);
+    return (i<0) ? NULL : &(m_addons_list[i]);
+}   // getAddon
 
 // ----------------------------------------------------------------------------
-std::string AddonsManager::getVersionAsStr() const
+int AddonsManager::getAddonIndex(const std::string &id) const
 {
-    std::ostringstream os;
-    os << m_addons_list[m_index].m_version;
-    return os.str();
-}   // getVersionAsStr
+    for(unsigned int i = 0; i < m_addons_list.size(); i++)
+    {
+        if(m_addons_list[i].getId()== id)
+        {
+            return i;
+        }
+    }
+    return -1;
+}   // getAddonIndex
 
 // ----------------------------------------------------------------------------
 std::string AddonsManager::getIdAsStr() const
@@ -406,10 +354,4 @@ const std::string& AddonsManager::getDownloadStateAsStr() const
     return m_str_state;
 }   // getDownloadStateAsStr
 
-// ----------------------------------------------------------------------------
-
-bool AddonsManager::needUpdate() const
-{
-    return getInstalledVersion() < getVersion();
-}   // needUpdate
 #endif

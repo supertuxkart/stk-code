@@ -21,7 +21,7 @@
 #ifndef HEADER_ADDONS_LOADING_HPP
 #define HEADER_ADDONS_LOADING_HPP
 
-
+#include "addons/addon.hpp"
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -43,6 +43,8 @@ private:
     GUIEngine::IconButtonWidget  *m_next;
     GUIEngine::IconButtonWidget  *m_previous;
     
+    /** The addon to load. */
+    Addon                         m_addon;
     /**
      * This function is called when the user click on 'Install', 'Uninstall', or
      * 'Update'. It is started using a thread.
@@ -70,8 +72,9 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     pthread_mutex_t m_mutex_can_install;
-    AddonsLoading(const float percentWidth, const float percentHeight);
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    AddonsLoading(const float percent_width, const float percent_height,
+                  const std::string &addon_name);
+    GUIEngine::EventPropagation processEvent(const std::string& event_source);
     
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_install, m_can_load_icon and

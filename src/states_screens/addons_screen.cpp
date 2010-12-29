@@ -61,7 +61,30 @@ void AddonsScreen::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon3);
 }
 // ----------------------------------------------------------------------------
-void AddonsScreen::loadList()
+
+void AddonsScreen::init()
+{
+    Screen::init();
+	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
+    m_type = "kart";
+
+    pthread_mutex_init(&m_mutex, NULL);
+    std::cout << "[Addons] Using directory <" + file_manager->getAddonsDir() 
+              << ">\n";
+    GUIEngine::ListWidget* w_list = 
+        getWidget<GUIEngine::ListWidget>("list_addons");
+    w_list->setIcons(m_icon_bank);
+    //w_list->clear();
+    std::cout << "icon bank" << std::endl;
+	m_can_load_list = false;
+
+    getWidget<GUIEngine::LabelWidget>("update_status")
+        ->setText(_("Updating the list..."));
+    pthread_t thread;
+    pthread_create(&thread, NULL, &AddonsScreen::downloadList, this);
+}
+// ----------------------------------------------------------------------------
+void AddonsScreen::loadList(const std::string &type)
 {
 	std::cout << "load list" << std::endl;
     GUIEngine::ListWidget* w_list = 
@@ -69,23 +92,22 @@ void AddonsScreen::loadList()
     w_list->clear();
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
-        const AddonsManager::AddonsProp &addons = addons_manager->getAddons(i);
-
-        std::cout << addons.getName()<< std::endl;
-        if(addons.isInstalled() && 
-            addons.getInstalledVersion() < addons.getVersion())
+        const Addon &addon = addons_manager->getAddon(i);
+        if(addon.getType()!=type) continue;
+        std::cout << addon.getName()<< std::endl;
+        if(addon.isInstalled() && addon.needsUpdate())
         {
-        	w_list->addItem(addons.getId(), addons.getName().c_str(), 
+        	w_list->addItem(addon.getId(), addon.getName().c_str(), 
                             2 /* icon installed */);
         }
-	    else if(addons.isInstalled())
+	    else if(addon.isInstalled())
         {
-        	w_list->addItem(addons.getId(),
-        	        addons_manager->getName().c_str(), 0 /* icon installed */);
+        	w_list->addItem(addon.getId(), addon.getName().c_str(),
+        	                0 /* icon installed */);
         }
 	    else
         {
-        	w_list->addItem(addons.getId(), addons.getName().c_str(),
+        	w_list->addItem(addon.getId(), addon.getName().c_str(),
         	                1 /* icon unsinstalled*/);
         }
     }
@@ -116,8 +138,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             getWidget<GUIEngine::ListWidget>("list_addons");
         std::string addons = list->getSelectionInternalName();
 
-        addons_manager->selectId(addons);
-        m_load = new AddonsLoading(0.8f, 0.8f);
+        m_load = new AddonsLoading(0.8f, 0.8f, addons);
     }
     if (name == "category")
     {
@@ -129,12 +150,12 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         else if (selection == "tab_track")
         {
             m_type = "track";
-            loadList();
+            loadList("track");
         }
         else if (selection == "tab_kart")
         {
             m_type = "kart";
-            loadList();
+            loadList("kart");
         }
     }
 }
@@ -146,34 +167,11 @@ void AddonsScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 	pthread_mutex_lock(&m_mutex);
     if(m_can_load_list)
     {
-        loadList();
+        loadList(m_type);
     }
 	pthread_mutex_unlock(&m_mutex);
 }
 
-// ----------------------------------------------------------------------------
-
-void AddonsScreen::init()
-{
-    Screen::init();
-	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
-    m_type = "kart";
-
-    pthread_mutex_init(&m_mutex, NULL);
-    std::cout << "[Addons] Using directory <" + file_manager->getAddonsDir() 
-              << ">\n";
-    GUIEngine::ListWidget* w_list = 
-        getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->setIcons(m_icon_bank);
-    //w_list->clear();
-    std::cout << "icon bank" << std::endl;
-	m_can_load_list = false;
-
-    getWidget<GUIEngine::LabelWidget>("update_status")
-        ->setText(_("Updating the list..."));
-    pthread_t thread;
-    pthread_create(&thread, NULL, &AddonsScreen::downloadList, this);
-}
 
 // ----------------------------------------------------------------------------
 

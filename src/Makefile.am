@@ -12,10 +12,12 @@ supertuxkart_SOURCES = \
  main.cpp \
  main_loop.cpp \
  main_loop.hpp \
- addons/network_http.cpp \
- addons/network_http.hpp \
+ addons/addon.cpp \
+ addons/addon.hpp \
  addons/addons_manager.cpp \
  addons/addons_manager.hpp \
+ addons/network_http.cpp \
+ addons/network_http.hpp \
  addons/zip.cpp \
  addons/zip.hpp \
  animations/animation_base.hpp \

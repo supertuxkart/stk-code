@@ -24,153 +24,87 @@
 #include <map>
 #include <vector>
 
+#include "addons/addon.hpp"
 #include "io/xml_node.hpp"
 #include "utils/synchronised.hpp"
 
 class AddonsManager
 {
+private:
+    std::vector<Addon>      m_addons_list;
+    int                     m_index;
+    std::string             m_file_installed;
+    void                    saveInstalled();
+    void                    loadInstalledAddons();
+    std::string             m_type;
+    int                     m_download_state;
+    std::string             m_str_state;
+
+    /** Which state the addons manager is:
+    *  INIT:  Waiting to download the list of addons.
+    *  READY: List is downloaded, manager is ready.
+    *  ERROR: Error downloading the list, no addons available. */
+    enum  STATE_TYPE {STATE_INIT, STATE_READY, STATE_ERROR};
+    // Synchronise the state between threads (e.g. GUI and update thread)
+    Synchronised<STATE_TYPE> m_state;
+
 public:
-    class AddonsProp
-    {
-    public:
-        std::string m_name;
-        int         m_version;
-        int         m_installed_version;
-        std::string m_description;
-        std::string m_icon;
-        std::string m_file;
-        std::string m_id;
-        bool        m_installed;
-        std::string m_type;
-        AddonsProp() {};
-        /** Initialises the object from an XML node. */
-        AddonsProp(const XMLNode &xml, bool installed=false)
-        {
-            m_installed         = installed;
-            m_installed_version = 0;
-            m_type              = xml.getName();
-            m_name              = ""; xml.get("name",        &m_name       );
-            m_version           = 0 ; xml.get("version",     &m_version    );
-            m_file              = ""; xml.get("file",        &m_file       );
-            m_description       = ""; xml.get("description", &m_description);
-            m_icon              = ""; xml.get("icon",        &m_icon       );
-            m_id                = ""; xml.get("id",          &m_id         );
-        };   // AddonsProp(const XML&)
-        // --------------------------------------------------------------------
-        /** Returns the name of the addon. */
-        const std::string& getName() const {return m_name; }
-        // --------------------------------------------------------------------
-        /** Returns if the addon is installed. */
-        bool  isInstalled() const {return m_installed; }
-        // --------------------------------------------------------------------
-        /** Returns the installed version of an addon. */
-        int   getInstalledVersion() const {return m_installed_version; }
-        // --------------------------------------------------------------------
-        /** Returns the latest version of this addon. 
-         *  m_version>m_installed_version if a newer version is available 
-         *  online. */
-        int   getVersion() const {return m_version; }
-        // --------------------------------------------------------------------
-        /** Returns the ID of this addon. */
-        const std::string& getId() const {return m_id; }
-        // --------------------------------------------------------------------
-    };
+    AddonsManager();
 
-    private:
-        std::vector<AddonsProp>     m_addons_list;
-        int                         m_index;
-        std::string                 m_file_installed;
-        void                        saveInstalled();
-        void                        loadInstalledAddons();
-        std::string                 m_type;
-        int                         m_download_state;
-        std::string                 m_str_state;
+    void initOnline();
+    bool onlineReady();
 
-        /** Which state the addons manager is:
-         *  INIT:  Waiting to download the list of addons.
-         *  READY: List is downloaded, manager is ready.
-         *  ERROR: Error downloading the list, no addons available. */
-        enum  STATE_TYPE {STATE_INIT, STATE_READY, STATE_ERROR};
-        // Synchronise the state between threads (e.g. GUI and update thread)
-        Synchronised<STATE_TYPE> m_state;
+    /** Returns the list of addons (installed and uninstalled). */
+    unsigned int getNumAddons() const { return m_addons_list.size(); }
 
-    public:
-             AddonsManager();
+    /** Returns the i-th addons. */
+    const Addon& getAddon(unsigned int i) { return m_addons_list[i];}
+    const Addon* getAddon(const std::string &id) const;
+    int   getAddonIndex(const std::string &id) const;
 
-        void initOnline();
-        bool onlineReady();
+    /** Get all the selected addon parameters. */
+    const Addon &getAddons() const;
 
-        /** Returns the list of addons (installed and uninstalled). */
-        unsigned int getNumAddons() const { return m_addons_list.size(); }
+    /** Select an addon with it name. */
+    bool select(std::string);
 
-        /** Returns the i-th addons. */
-        const AddonsProp& getAddons(unsigned int i) { return m_addons_list[i];}
+    /** Select an addon with it id. */
+    bool selectId(std::string);
 
-        /** Select the next addons in the addons list. */
-        bool next();
-        /** Select the next addons in the addons list. */
-        bool previous();
+    /** Get the version of the selected addon as a string. */
+    std::string getVersionAsStr() const;
 
-        /** Get all the selected addon parameters. */
-        const AddonsProp &getAddons() const;
+    /** Get the installed version of the selected addon. */
+    int getInstalledVersion() const;
+    std::string getInstalledVersionAsStr() const;
 
-        /** Select an addon with it name. */
-        bool select(std::string);
+    /** Get the installed version of the selected addon. */
+    std::string getIdAsStr() const;
 
-        /** Select an addon with it id. */
-        bool selectId(std::string);
+    /** Get the description of the selected addons. */
+    const std::string &getDescription() const 
+    { return m_addons_list[m_index].m_description; };
 
-        /** Get the name of the selected addon. */
-        const std::string &getName() const 
-                                { return m_addons_list[m_index].m_name; };
+    const std::string &getType() const 
+    { return m_addons_list[m_index].m_type; };
+    /** Install or upgrade the selected addon. */
+    void install();
 
-        /** Get the version of the selected addon. */
-        int getVersion() const { return m_addons_list[m_index].m_version; };
+    /** Uninstall the selected addon. This method will remove all the 
+    *  directory of the addon.*/
+    void uninstall();
 
-        /** Get the path of the addon icon. */
-        const std::string &getIcon() const
-                               { return m_addons_list[m_index].m_icon; };
+    /** Get the state of the addon: if it is installed or not.*/
+    bool isInstalled() const 
+    { return m_addons_list[m_index].m_installed; };
 
-        /** Get the version of the selected addon as a string. */
-        std::string getVersionAsStr() const;
+    int  getDownloadState();
 
-        /** Get the installed version of the selected addon. */
-        int getInstalledVersion() const;
-        std::string getInstalledVersionAsStr() const;
-
-        /** Return a simple bool to know if the addon needs to be updated */
-        bool needUpdate() const;
-
-        /** Get the installed version of the selected addon. */
-        std::string getIdAsStr() const;
-
-        /** Get the description of the selected addons. */
-        const std::string &getDescription() const 
-                                { return m_addons_list[m_index].m_description; };
-
-        const std::string &getType() const 
-                                { return m_addons_list[m_index].m_type; };
-        /** Install or upgrade the selected addon. */
-        void install();
-
-        /** Uninstall the selected addon. This method will remove all the 
-         *  directory of the addon.*/
-        void uninstall();
-
-        void resetIndex();
-
-        /** Get the state of the addon: if it is installed or not.*/
-        bool isInstalled() const 
-                            { return m_addons_list[m_index].m_installed; };
-
-        bool nextType(std::string type);
-        bool previousType(std::string type);
-        int  getDownloadState();
-
-        /** Get the install state (if it is the download, unzip...)*/
-        const std::string& getDownloadStateAsStr() const;
+    /** Get the install state (if it is the download, unzip...)*/
+    const std::string& getDownloadStateAsStr() const;
 
 };
+
 extern AddonsManager *addons_manager;
 #endif
 #endif
