@@ -61,9 +61,6 @@ public:
     const Addon* getAddon(const std::string &id) const;
     int   getAddonIndex(const std::string &id) const;
 
-    /** Get all the selected addon parameters. */
-    const Addon &getAddons() const;
-
     /** Install or upgrade the selected addon. */
     void install(const Addon &addon);
 

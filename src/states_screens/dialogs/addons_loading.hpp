@@ -31,9 +31,6 @@ class AddonsLoading : public GUIEngine::ModalDialog
 {
 //virtual void escapePressed() {};
 private:
-    GUIEngine::LabelWidget       *m_name;
-    GUIEngine::LabelWidget       *m_description;
-    GUIEngine::LabelWidget       *m_version;
     GUIEngine::LabelWidget       *m_author;
     GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;

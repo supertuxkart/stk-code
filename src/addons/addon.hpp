@@ -22,7 +22,7 @@
 #ifndef HEADER_ADDON_HPP
 #define HEADER_ADDON_HPP
 
-#include <sstream>
+#include <string>
 
 class XMLNode;
 
@@ -67,14 +67,6 @@ public:
     *  m_version>m_installed_version if a newer version is available 
     *  online. */
     int   getVersion() const {return m_version; }
-    // ------------------------------------------------------------------------
-    /** Returns the version as string. */
-    std::string getVersionAsStr() const
-    {
-        std::ostringstream os;
-        os << m_version;
-        return os.str();
-    }   // getVersionAsStr
     // ------------------------------------------------------------------------
     /** Returns the ID of this addon. */
     const std::string& getId() const {return m_id; }

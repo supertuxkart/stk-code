@@ -133,9 +133,9 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     {
         GUIEngine::ListWidget* list = 
             getWidget<GUIEngine::ListWidget>("list_addons");
-        std::string addons = list->getSelectionInternalName();
+        std::string id = list->getSelectionInternalName();
 
-        new AddonsLoading(0.8f, 0.8f, addons);
+        new AddonsLoading(0.8f, 0.8f, id);
     }
     if (name == "category")
     {

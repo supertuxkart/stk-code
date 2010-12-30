@@ -37,10 +37,10 @@ using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
 AddonsLoading::AddonsLoading(const float w, const float h,
-                             const std::string &addon_name)
+                             const std::string &id)
              : ModalDialog(w, h)
 {
-    m_addon = *(addons_manager->getAddon(addon_name));
+    m_addon = *(addons_manager->getAddon(id));
 
     loadFromFile("addons_view_dialog.stkgui");
     m_can_install    = false;
@@ -50,9 +50,6 @@ AddonsLoading::AddonsLoading(const float w, const float h,
 
     /*Init the icon here to be able to load a single image*/
     m_icon        = getWidget<IconButtonWidget>("icon");
-    m_name        = getWidget<LabelWidget>("name");
-    m_description = getWidget<LabelWidget>("description");    
-    m_version     = getWidget<LabelWidget>("version");
     
     if(m_addon.isInstalled())
     {
@@ -68,12 +65,18 @@ AddonsLoading::AddonsLoading(const float w, const float h,
 // ----------------------------------------------------------------------------
 void AddonsLoading::loadInfo()
 {
-    m_name->setText(StringUtils::insertValues(_("Name: %i"),
-                                            m_addon.getName().c_str()));
-    m_description->setText(StringUtils::insertValues(_("Description: %i"),
-                                            m_addon.getDescription().c_str()));
-    m_version->setText(StringUtils::insertValues(_("Version: %i"),
-                                            m_addon.getVersionAsStr().c_str()));
+    core::stringw name = StringUtils::insertValues(_("Name: %i"),
+                                                   m_addon.getName().c_str() );
+    getWidget<LabelWidget>("name")->setText(name);
+
+    core::stringw desc = StringUtils::insertValues(_("Description: %i"),
+                                             m_addon.getDescription().c_str());
+    getWidget<LabelWidget>("description")->setText(desc);
+
+    core::stringw version = StringUtils::insertValues(_("Version: %d"),
+                                            m_addon.getVersion());
+    getWidget<LabelWidget>("version")->setText(version);
+
     pthread_t thread;
     pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
 }
