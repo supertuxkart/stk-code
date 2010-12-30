@@ -73,7 +73,9 @@ private:
 
     void          updateNews();
     std::string   downloadToStrInternal(std::string url);
-    bool          downloadFileInternal();
+    bool          downloadFileInternal(const std::string &file,
+                                       const std::string &save_filename,
+                                       bool is_asynchron);
     static int    progressDownload(void *clientp, float dltotal, float dlnow,
                                    float ultotal, float ulnow);
 

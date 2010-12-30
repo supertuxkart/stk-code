@@ -39,17 +39,17 @@ using namespace irr::gui;
 AddonsLoading::AddonsLoading(const float w, const float h,
                              const std::string &id)
              : ModalDialog(w, h)
+             , m_icon_loaded(ICON_NOT_LOADED)
 {
     m_addon = *(addons_manager->getAddon(id));
 
     loadFromFile("addons_view_dialog.stkgui");
     m_can_install    = false;
-	m_can_load_icon  = false;
     m_percent_update = false;
     pthread_mutex_init(&m_mutex_can_install, NULL);
 
     /*Init the icon here to be able to load a single image*/
-    m_icon        = getWidget<IconButtonWidget>("icon");
+    m_icon = getWidget<IconButtonWidget>("icon");
     
     if(m_addon.isInstalled())
     {
@@ -59,12 +59,6 @@ AddonsLoading::AddonsLoading(const float w, const float h,
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
     }
     
-    loadInfo();
-}
-
-// ----------------------------------------------------------------------------
-void AddonsLoading::loadInfo()
-{
     core::stringw name = StringUtils::insertValues(_("Name: %i"),
                                                    m_addon.getName().c_str() );
     getWidget<LabelWidget>("name")->setText(name);
@@ -77,51 +71,50 @@ void AddonsLoading::loadInfo()
                                             m_addon.getVersion());
     getWidget<LabelWidget>("version")->setText(version);
 
-    pthread_t thread;
-    pthread_create(&thread, NULL, &AddonsLoading::downloadIcon, this);
-}
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, &AddonsLoading::downloadIcon, this);
+}   // AddonsLoading
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void * AddonsLoading::downloadIcon( void * pthis)
 {
-    AddonsLoading * pt = (AddonsLoading*)pthis;
-    
-    std::string iconPath = "icon/" + pt->m_addon.getIcon();
-	network_http->downloadFileAsynchron(iconPath, pt->m_addon.getName() + ".png");
-// FIXME if (network_http->downloadFile(iconPath, addons_manager->getName() + ".png"))
+    AddonsLoading *me     = (AddonsLoading*)pthis;
+    std::string icon_name = StringUtils::getBasename(me->m_addon.getIcon());
+    std::string icon_path = "icon/" + me->m_addon.getIcon();
+
+	if(network_http->downloadFileSynchron(icon_path, icon_name))
     {
-        pthread_mutex_lock(&(pt->m_mutex_can_install));
-        pt->m_can_load_icon = true;
-        pthread_mutex_unlock(&(pt->m_mutex_can_install));
-	}
-//    else
+        me->m_icon_loaded.set(ICON_LOADED);
+    }
+    else
     {
-        fprintf(stderr, "[Addons] Download icon '%s' failed\n", iconPath.c_str());
+        fprintf(stderr, "[Addons] Download icon '%s' failed\n", 
+                icon_path.c_str());
     }
     return NULL;
-}
+}   // downloadIcon
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation 
+                    AddonsLoading::processEvent(const std::string& eventSource)
 {
     if(eventSource == "cancel")
     {
-        //input_manager->setMode(InputManager::MENU);
         dismiss();
-        //return GUIEngine::EVENT_BLOCK;
+        return GUIEngine::EVENT_BLOCK;
     }
     else if(eventSource == "next")
     {
         // addons_manager->nextType(addons_manager->getType());
         assert(false);
-        loadInfo();
+        //loadInfo();
     }
     else if(eventSource == "previous")
     {
         // FIXME: addons_manager->previousType(addons_manager->getType());
         assert(false);
-        loadInfo();
+        //loadInfo();
     }
     if(eventSource == "install")
     {
@@ -160,8 +153,9 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         pthread_create(&thread, NULL, &AddonsLoading::startInstall, this);
     }
     return GUIEngine::EVENT_LET;
-}
-// ------------------------------------------------------------------------------------------------------
+}   // processEvent
+
+// ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
 
@@ -175,23 +169,25 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue(addons_manager->getDownloadState());
         m_state->setText(addons_manager->getDownloadStateAsStr().c_str());
     }
-    if(m_can_load_icon)
+    if(m_icon_loaded.get()==ICON_LOADED)
     {
-		m_icon->setImage(  (file_manager->getConfigDir() + "/" 
-                          +  m_addon.getName() + ".png").c_str(),
-                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        const std::string icon = StringUtils::getBasename(m_addon.getIcon());
+        m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
+                          IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
+        m_icon_loaded.set(ICON_SHOWN);
     }
     pthread_mutex_unlock(&(m_mutex_can_install));
-}
+}   // onUpdate
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void AddonsLoading::close()
 {
     AddonsScreen* curr_screen = AddonsScreen::getInstance();
 	((AddonsScreen*)curr_screen)->m_can_load_list = true;
     dismiss();
-}
-// ------------------------------------------------------------------------------------------------------
+}   // close
+
+// ----------------------------------------------------------------------------
 
 void * AddonsLoading::startInstall(void* pthis)
 {
@@ -209,5 +205,5 @@ void * AddonsLoading::startInstall(void* pthis)
     obj->m_percent_update = false;
     pthread_mutex_unlock(&(obj->m_mutex_can_install));
     return NULL;
-}
+}   // startInstall
 #endif

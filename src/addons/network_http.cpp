@@ -104,7 +104,8 @@ void *NetworkHttp::mainLoop(void *obj)
             me->updateNews();
             break;
         case HC_DOWNLOAD_FILE:
-            me->downloadFileInternal();
+            me->downloadFileInternal(me->m_file, me->m_save_filename,
+                                     /*is_asynchron*/true    );
         }   // switch(m_command)
         me->m_command = HC_SLEEP;
     }   // while !m_abort
@@ -221,25 +222,29 @@ std::string NetworkHttp::downloadToStrInternal(std::string url)
  *  will be added to file. 
  *  \param progress_data is used to have the state of the download (in %)
  */
-bool NetworkHttp::downloadFileInternal()
+bool NetworkHttp::downloadFileInternal(const std::string &file,
+                                       const std::string &save_filename,
+                                       bool is_asynchron)
 {
-    m_progress.set(0.0f);
 
 	CURL *session = curl_easy_init();
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
-                         + "/" + m_file;
+                         + "/" + file;
 	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-    FILE * fout = fopen(file_manager->getAddonsFile(m_save_filename).c_str(),
-                         "w");
+    FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
+                         "wb");
 	
 	//from and out
 	curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
 	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
 	    
-    curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
-                     &NetworkHttp::progressDownload);
-	// Necessary, oyherwise the progress function doesn't work
-	curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
+    if(is_asynchron)
+    {
+        curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
+            &NetworkHttp::progressDownload);
+        // Necessary, oyherwise the progress function doesn't work
+        curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
+    }
 		
 	int success = curl_easy_perform(session);
 	
@@ -249,7 +254,8 @@ bool NetworkHttp::downloadFileInternal()
 	//stop curl
 	curl_easy_cleanup(session);
 
-    m_progress.set( (success==CURLE_OK) ? 1.0f : -1.0f );
+    if(is_asynchron)
+        m_progress.set( (success==CURLE_OK) ? 1.0f : -1.0f );
     return success==CURLE_OK;
 }   // downloadFileInternal
 
@@ -263,10 +269,10 @@ bool NetworkHttp::downloadFileInternal()
 bool NetworkHttp::downloadFileSynchron(const std::string &file, 
                                        const std::string &save)
 {
-    m_file          = file;
-    m_save_filename = (save!="") ? save : file;
+    const std::string &save_filename = (save!="") ? save : file;
 
-    return downloadFileInternal();
+    return downloadFileInternal(file, save_filename,
+                                /*is_asynchron*/false);
 }   // downloadFileSynchron
 
 // ----------------------------------------------------------------------------

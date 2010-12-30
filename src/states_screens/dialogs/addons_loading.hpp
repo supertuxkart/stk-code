@@ -21,11 +21,13 @@
 #ifndef HEADER_ADDONS_LOADING_HPP
 #define HEADER_ADDONS_LOADING_HPP
 
+#include <pthread.h>
+
 #include "addons/addon.hpp"
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
-#include <pthread.h>
+#include "utils/synchronised.hpp"
 
 class AddonsLoading : public GUIEngine::ModalDialog
 {
@@ -53,16 +55,17 @@ private:
      * 'm_can_load_icon' and the onUpdate function reload the icon
      * */
     static void * downloadIcon(void*);
-    void loadInfo();
     
     /* These three bool are some flags.
      * m_can_install : when the installation is finidhed, onUpdate close the
      * dialog.
-     * m_percent_update : to reload the download percent
-     * m_can_load_icon see above (function downloadIcon)*/
+     * m_percent_update : to reload the download percent */
     bool m_can_install;
     bool m_percent_update;
-	bool m_can_load_icon;
+
+    /** True if the icon was successfully downloaded. */
+    enum IconState {ICON_NOT_LOADED, ICON_LOADED, ICON_SHOWN};
+	Synchronised<IconState> m_icon_loaded;
 
 public:
     /**
