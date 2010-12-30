@@ -51,6 +51,7 @@
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
+		9538A56012CD094200CE3220 /* addon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538A55E12CD094200CE3220 /* addon.cpp */; };
 		9538E2B912C25D6800172896 /* addons_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538E2B512C25D6800172896 /* addons_manager.cpp */; };
 		9538E2BA12C25D6800172896 /* network_http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538E2B712C25D6800172896 /* network_http.cpp */; };
 		9538E2E912C2682B00172896 /* IrrFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9538E2E812C2682B00172896 /* IrrFramework.framework */; };
@@ -420,6 +421,8 @@
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
 		953789810FC7831400DD1F8E /* quad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad.cpp; path = ../../tracks/quad.cpp; sourceTree = SOURCE_ROOT; };
+		9538A55E12CD094200CE3220 /* addon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addon.cpp; path = ../../addons/addon.cpp; sourceTree = SOURCE_ROOT; };
+		9538A55F12CD094200CE3220 /* addon.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addon.hpp; path = ../../addons/addon.hpp; sourceTree = SOURCE_ROOT; };
 		9538E2B512C25D6800172896 /* addons_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_manager.cpp; path = ../../addons/addons_manager.cpp; sourceTree = SOURCE_ROOT; };
 		9538E2B612C25D6800172896 /* addons_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_manager.hpp; path = ../../addons/addons_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9538E2B712C25D6800172896 /* network_http.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network_http.cpp; path = ../../addons/network_http.cpp; sourceTree = SOURCE_ROOT; };
@@ -1287,6 +1290,8 @@
 		9551B27311DC0D6A002DD140 /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				9538A55E12CD094200CE3220 /* addon.cpp */,
+				9538A55F12CD094200CE3220 /* addon.hpp */,
 				9538E2B512C25D6800172896 /* addons_manager.cpp */,
 				9538E2B612C25D6800172896 /* addons_manager.hpp */,
 				9538E2B712C25D6800172896 /* network_http.cpp */,
@@ -2726,6 +2731,7 @@
 				9538E2B912C25D6800172896 /* addons_manager.cpp in Sources */,
 				9538E2BA12C25D6800172896 /* network_http.cpp in Sources */,
 				951B50AE12C9698B004F6993 /* xml_writer.cpp in Sources */,
+				9538A56012CD094200CE3220 /* addon.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
