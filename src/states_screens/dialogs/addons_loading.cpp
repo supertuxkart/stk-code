@@ -184,11 +184,8 @@ void AddonsLoading::onUpdate(float delta)
 // ------------------------------------------------------------------------------------------------------
 void AddonsLoading::close()
 {
-
     AddonsScreen* curr_screen = AddonsScreen::getInstance();
-	pthread_mutex_lock(&(((AddonsScreen*)curr_screen)->m_mutex));
 	((AddonsScreen*)curr_screen)->m_can_load_list = true;
-	pthread_mutex_unlock(&(((AddonsScreen*)curr_screen)->m_mutex));
     dismiss();
 }
 // ------------------------------------------------------------------------------------------------------

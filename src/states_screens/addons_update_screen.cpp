@@ -61,7 +61,7 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
         GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
         std::string addons = list->getSelectionInternalName();
 
-        m_load = new AddonsLoading(0.8f, 0.8f, addons);
+        new AddonsLoading(0.8f, 0.8f, addons);
     }
     else if (name == "category")
     {

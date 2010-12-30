@@ -20,7 +20,6 @@
 #ifndef HEADER_ADDONS_SCREEN_HPP
 #define HEADER_ADDONS_SCREEN_HPP
 
-#include <pthread.h>
 #include "irrlicht.h"
 
 #include "addons/addons_manager.hpp"
@@ -46,7 +45,12 @@ class AddonsScreen : public GUIEngine::Screen,
     AddonsManager   *m_addons;
     AddonsLoading   *m_load;
     void             loadInformations();
-    /** For the addons list, a package when it is installed. */
+    /** Icon for installed addon, which can be updated. */
+    int              m_icon_needs_update;
+    /** Icon for installed addons, no update available. */
+    int              m_icon_installed;
+    /** Icon for is not installed yet. */
+    int              m_icon_not_installed;
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
     GUIEngine::LabelWidget
@@ -55,7 +59,6 @@ class AddonsScreen : public GUIEngine::Screen,
 public:
 
     bool                    m_can_load_list;
-    pthread_mutex_t         m_mutex;
     std::string             m_type;
 
     /** Load the addons into the main list.*/
@@ -67,15 +70,10 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
 
     friend void *startInstall(void *);
 
-    static void *downloadList(void *);
-
-    /** This function is used to handle the thread (load the new list, etc...). */
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver*);
 };
 
 #endif

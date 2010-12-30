@@ -34,10 +34,8 @@ class AddonsUpdateScreen : public GUIEngine::Screen,
                            public GUIEngine::ScreenSingleton<AddonsUpdateScreen>
 {
     friend class GUIEngine::ScreenSingleton<AddonsUpdateScreen>;
-    AddonsUpdateScreen();
-    Addons         *m_addons;
-    /*uneeded*/
-    AddonsLoading  *m_load;
+
+         AddonsUpdateScreen();
     void loadInformations();
     
 public:
