@@ -59,7 +59,6 @@ class AddonsScreen : public GUIEngine::Screen,
 public:
 
     bool                    m_can_load_list;
-    std::string             m_type;
 
     /** Load the addons into the main list.*/
     void loadList(const std::string &type);

@@ -71,13 +71,11 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
         if (selection == "tab_track")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->m_type = "track";
             AddonsScreen::getInstance()->loadList("track");
         }
         else if (selection == "tab_kart")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->m_type = "kart";
             AddonsScreen::getInstance()->loadList("kart");
         }
     }

@@ -64,7 +64,6 @@ void AddonsScreen::init()
 {
     Screen::init();
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
-    m_type = "kart";
 
     std::cout << "[Addons] Using directory <" + file_manager->getAddonsDir() 
               << ">\n";
@@ -80,6 +79,10 @@ void AddonsScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
+/** Loads the list of all addons of the given type. The gui element will be
+ *  updated.
+ *  \param type Must be 'kart' or 'track'.
+ */
 void AddonsScreen::loadList(const std::string &type)
 {
     GUIEngine::ListWidget* w_list = 
@@ -88,23 +91,19 @@ void AddonsScreen::loadList(const std::string &type)
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
         const Addon &addon = addons_manager->getAddon(i);
+        // Ignore addons of a different type
         if(addon.getType()!=type) continue;
-        std::cout << addon.getName()<< std::endl;
+        
+        // Get the right icon to display
+        int icon;
         if(addon.isInstalled() && addon.needsUpdate())
-        {
-        	w_list->addItem(addon.getId(), addon.getName().c_str(), 
-                            m_icon_needs_update);
-        }
-	    else if(addon.isInstalled())
-        {
-        	w_list->addItem(addon.getId(), addon.getName().c_str(),
-        	                m_icon_installed);
-        }
+            icon = addon.needsUpdate() ? m_icon_needs_update 
+                                       : m_icon_installed;
 	    else
-        {
-        	w_list->addItem(addon.getId(), addon.getName().c_str(),
-                            m_icon_not_installed);
-        }
+        	icon = m_icon_not_installed;
+
+        w_list->addItem(addon.getId(), addon.getName().c_str(), 
+                        icon);
     }
 
 	m_can_load_list = false;
@@ -147,12 +146,10 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
         else if (selection == "tab_track")
         {
-            m_type = "track";
             loadList("track");
         }
         else if (selection == "tab_kart")
         {
-            m_type = "kart";
             loadList("kart");
         }
     }
