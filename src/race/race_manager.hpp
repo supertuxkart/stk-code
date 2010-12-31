@@ -260,7 +260,7 @@ public:
     void         setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki);
     void         kartFinishedRace(const Kart* kart, float time);
     void         setTrack(const std::string& track);
-    void         setGrandPrix(const GrandPrixData &gp){ m_grand_prix = gp;          }
+    void         setGrandPrix(const GrandPrixData &gp){ m_grand_prix = gp; m_coin_target = 0; }
     void         setDifficulty(Difficulty diff);
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }

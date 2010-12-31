@@ -161,6 +161,8 @@ void RaceManager::setTrack(const std::string& track)
 {
     m_tracks.clear();
     m_tracks.push_back(track);
+    
+    m_coin_target = 0;
 }   // setTrack
 
 //-----------------------------------------------------------------------------
@@ -322,7 +324,7 @@ void RaceManager::startNextRace()
  *  calls exitRace to finish the race.
  */
 void RaceManager::next()
-{
+{    
     World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
