@@ -329,9 +329,12 @@ namespace StringUtils
         {
             unsigned int insertValID = 0;
 
-            std::vector<irr::core::stringw> sv = StringUtils::split(s, '%', true);
+            const std::vector<irr::core::stringw> sv = StringUtils::split(s, '%', true);
+            
             irr::core::stringw new_string="";
-            for (unsigned int i=0; i<sv.size(); i++)
+            
+            const unsigned int size = sv.size();
+            for (unsigned int i=0; i<size; i++)
             {
                 if(sv[i][0] != '%')
                 {
@@ -357,17 +360,26 @@ namespace StringUtils
                     }
                     else if(irr::core::isdigit(sv[i][1]))
                     {
-                        const unsigned int index = irr::core::stringc(sv[i].c_str()).c_str()[1] - '0';
+                        irr::core::stringw rest = sv[i].subString(2, sv[i].size()-2);
+                        int delta = 0;
+                        
+                        if (sv[i].size() >= 4 && sv[i][2]=='$')
+                        {
+                            rest = sv[i].subString(4, sv[i].size()-4);
+                            delta = -1;
+                        }
+                        
+                        const unsigned int index = irr::core::stringc(sv[i].c_str()).c_str()[1] - '0' + delta;
                         if (index >= all_vals.size())
                         {
                             fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid argument ID in '%s' : %i\n",
                                     irr::core::stringc(s.c_str()).c_str(), index);
                             new_string += "??";
-                            new_string += sv[i].subString(2, sv[i].size()-2);
+                            new_string += rest;
                         }
                         else
                         {
-                            new_string += all_vals[index] + sv[i].subString(2, sv[i].size()-2);
+                            new_string += all_vals[index] + rest;
                         }
                     }
                     else
