@@ -450,7 +450,13 @@ void KartProperties::getAllData(const XMLNode * root)
         std::string s;
         sounds_node->get("engine", &s);
         if      (s == "large") m_engine_sfx_type = "engine_large";
-        else if (s== "small")  m_engine_sfx_type = "engine_small";
+        else if (s == "small") m_engine_sfx_type = "engine_small";
+        else
+        {
+            std::cerr << "[KartProperties::getAllData()] WARNING : Kart " << temp_name
+                      << " has invalid engine : " << s << "\n";
+            m_engine_sfx_type = "engine_small";
+        }
 
 #ifdef WILL_BE_ENABLED_ONCE_DONE_PROPERLY
         // Load custom kart SFX files (TODO: enable back when it's implemented properly)
