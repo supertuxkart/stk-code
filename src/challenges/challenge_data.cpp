@@ -144,7 +144,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     if (getFeatures().size() == 0)
     {
-        error("missing unlocked features");
+        error("features to unlock");
     }
     
     std::vector< std::string > deps;
