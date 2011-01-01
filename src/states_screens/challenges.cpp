@@ -128,7 +128,7 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
         {
             unlock_manager->playLockSound();
         }
-        else if (!selection.empty())
+        else if (!selection.empty() && selection != RibbonWidget::NO_ITEM_ID)
         {
             //FIXME: simplify and centralize race start sequence!!
 

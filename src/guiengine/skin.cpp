@@ -813,6 +813,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         {
             if (use_glow)
             {
+                // don't mark filler items as focused
+                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID) return;
+                
                 int grow = 45;
                 static float glow_effect = 0;
                 
