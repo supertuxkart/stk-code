@@ -138,6 +138,13 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
                 UserConfigParams::m_default_kart.revertToDefaults();
             }
             
+            const Challenge* c = unlock_manager->getChallenge(selection);
+            if (c == NULL)
+            {
+                std::cerr << "[ChallengesScreen] ERROR: cannot find challenge '" << selection.c_str() << "'!\n";
+                return;
+            }
+            
             // Use latest used device
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             
@@ -160,7 +167,7 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
             network_manager->initCharacterDataStructures();
             
             // Launch challenge
-            unlock_manager->getChallenge(selection)->setRace();
+            c->setRace();
 
             // Sets up kart info, including random list of kart for AI
             network_manager->setupPlayerKartInfo();
