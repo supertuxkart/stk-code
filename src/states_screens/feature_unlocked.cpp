@@ -133,7 +133,13 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
                                                  float w, float h, 
                                                  irr::core::stringw msg)
 {
-    assert(picture != NULL);
+    if (picture == NULL)
+    {
+        std::cerr << "[FeatureUnlockedCutScene::addUnlockedPicture] WARNING: unlockable has no picture : "
+                  << core::stringc(msg.c_str()).c_str() << "\n";
+        picture = irr_driver->getTexture(file_manager->getGUIDir() + "/main_help.png");
+
+    }
 
     m_unlocked_stuff.push_back( new UnlockedThing(picture, w, h, msg) );
 }   // addUnlockedPicture
