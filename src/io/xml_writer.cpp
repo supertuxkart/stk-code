@@ -21,7 +21,48 @@
 #include <wchar.h>
 #include <string>
 #include <stdexcept>
+using namespace irr;
 
+// ----------------------------------------------------------------------------
+
+XMLWriter::XMLWriter(const char* dest) : m_base(dest, std::ios::out | std::ios::binary)
+{
+    if (!m_base.is_open())
+    {
+        throw std::runtime_error("Failed to open file for writing : " + std::string(dest));
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+XMLWriter& XMLWriter::operator<< (const irr::core::stringw& txt)
+{
+    core::stringc s( txt.c_str() );
+    m_base.write((char *) s.c_str(), s.size());
+    return *this;
+}
+
+// ----------------------------------------------------------------------------
+
+XMLWriter& XMLWriter::operator<< (const wchar_t*txt)
+{
+    core::stringc s( txt );
+    m_base.write((char *) s.c_str(), s.size());
+    return *this;
+}
+
+// ----------------------------------------------------------------------------
+
+void XMLWriter::close()
+{
+    m_base.close();
+}
+
+// ----------------------------------------------------------------------------
+
+
+// UNICODE version below, deactivated until irrlicht devs fix their XML reading bug...
+#if 0
 // ----------------------------------------------------------------------------
 
 XMLWriter::XMLWriter(const char* dest) : m_base(dest, std::ios::out | std::ios::binary)
@@ -62,4 +103,4 @@ void XMLWriter::close()
 }
 
 // ----------------------------------------------------------------------------
-
+#endif
