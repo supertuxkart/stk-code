@@ -168,39 +168,6 @@ void SFXManager::loadSfx()
    }   // loadSfx
 
 // -----------------------------------------------------------------------------
-/*
-
-getCustomTagName(int id)
-
-
-    Uses CustomSFX as input (see sfx_manager.hpp) and returns associated config
-    string tag.  Used when loading custom sfx in KartProperties::getAllData().
-
-    TODO: Fix this to take advantage of some string array initialization trick
-          I'm just too stupid with C++ to figure it out.  The switch code is
-          less then ideal.
-*/
-/*
-const char *SFXManager::getCustomTagName(int id)
-{
-    switch (id)
-    {
-        case CUSTOM_HORN:    return "horn-sound";       // Replaces horn
-        case CUSTOM_CRASH:   return "crash-sound";      // Played when colliding with another kart
-        case CUSTOM_WIN:     return "win-sound";        // Played when racer wins (not yet implemented)
-        case CUSTOM_EXPLODE: return "explode-sound";    // Played when kart explodes
-        case CUSTOM_GOO:     return "goo-sound";        // Played when driving through goo
-        case CUSTOM_PASS:    return "pass-sound";       // Played when passing another kart (not yet implemented)
-        case CUSTOM_ZIPPER:  return "zipper-sound";     // Played when kart hits zipper
-        case CUSTOM_NAME:    return "name-sound";       // Introduction "I'm Tux!" (not yet implemented)
-        case CUSTOM_ATTACH:  return "attach-sound";     // Played when something is attached to kart
-        case CUSTOM_SHOOT:   return "shoot-sound";      // Played when weapon is used
-    };
-    return "";
-} // getCustomTagName
-*/
-
-// -----------------------------------------------------------------------------
 /** Introduces a mechanism by which one can load sound effects beyond the basic
  *  enumerated types.  This will be used when loading custom sound effects for
  *  individual karts (character voices) so that we can avoid creating an
