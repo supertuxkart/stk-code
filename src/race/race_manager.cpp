@@ -59,15 +59,13 @@ RaceManager::RaceManager()
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
-/** Destroys the race manager.
- */
+
 RaceManager::~RaceManager()
 {
 }   // ~RaceManager
 
 //-----------------------------------------------------------------------------
-/** Resets the race manager. It is called by world when restarting a race.
- */
+
 void RaceManager::reset()
 {
     m_num_finished_karts   = 0;
@@ -75,20 +73,14 @@ void RaceManager::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
-/** Sets a player kart (local and non-local).
- *  \param player_id Id of the player.
- *  \param ki Kart info structure for this player.
- */
+
 void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki)
 {
     m_player_karts[player_id] = ki;
 }   // setPlayerKart
 
 // ----------------------------------------------------------------------------
-/** Stores the information which local players uses which karts.
- *  \param player_id  Id of the local player for which the kart is set.
- *  \param kart Kart name this player is using.
- */
+
 void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& kart)
 {
     assert(0<=player_id && player_id <m_local_player_karts.size());
@@ -100,9 +92,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
-/** Returns the kart with a given GP rank (or NULL if no such kart exists).
- *  \param n Rank (0<=n<num_karts) to look for.
- */
+
 const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
@@ -112,6 +102,7 @@ const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 }   // getKLartWithGPRank
 
 //-----------------------------------------------------------------------------
+
 int RaceManager::getLocalPlayerGPRank(const int playerID) const
 {
     const int amount = m_kart_status.size();
@@ -126,10 +117,7 @@ int RaceManager::getLocalPlayerGPRank(const int playerID) const
 }   // getLocalPlayerGPRank
 
 //-----------------------------------------------------------------------------
-/** Sets the number of local players playing on this computer (including
- *  split screen).
- *  \param n Number of local players.
- */
+
 void RaceManager::setNumLocalPlayers(unsigned int n)
 {
     m_local_player_karts.resize(n);
@@ -145,18 +133,14 @@ void RaceManager::setNumPlayers(int num)
 }   // setNumPlayers
 
 //-----------------------------------------------------------------------------
-/** Sets the difficulty.
- *  \param diff Difficulty.
- */
+
 void RaceManager::setDifficulty(Difficulty diff)
 {
     m_difficulty = diff;
 }   // setDifficulty
 
 //-----------------------------------------------------------------------------
-/** In case of non GP mode set the track to use.
- *  \param track Pointer to the track to use.
- */
+
 void RaceManager::setTrack(const std::string& track)
 {
     m_tracks.clear();
@@ -166,8 +150,7 @@ void RaceManager::setTrack(const std::string& track)
 }   // setTrack
 
 //-----------------------------------------------------------------------------
-/** Computes the list of random karts to be used for the AI.
-*/
+/** \brief Computes the list of random karts to be used for the AI. */
 void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - m_player_karts.size();
@@ -188,14 +171,7 @@ void RaceManager::computeRandomKartList()
 }   // computeRandomKartList
 
 //-----------------------------------------------------------------------------
-/** Starts a new race or GP (or other mode). It sets up the list of player
- *  karts, AI karts, laps etc., and then uses startNextRace to actually start
- *  the race.6
- * \pre The list of AI karts to use must be set up first. This is usually being
- *       done by a call to computeRandomKartList() from 
- *       NetworkManager::setupPlayerKartInfo, but could be done differently 
- *       (e.g. depending on user command line options to test certain AIs)
- */
+
 void RaceManager::startNew()
 {
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
@@ -253,7 +229,8 @@ void RaceManager::startNew()
 }   // startNew
 
 //-----------------------------------------------------------------------------
-/** Starts the next (or first) race. It sorts the kart status data structure
+/** \brief Starts the next (or first) race.
+ *  It sorts the kart status data structure
  *  according to the number of points, and then creates the world().
  */
 void RaceManager::startNextRace()
@@ -320,9 +297,7 @@ void RaceManager::startNextRace()
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
-/** If there are more races to do, it starts the next race, otherwise it
- *  calls exitRace to finish the race.
- */
+
 void RaceManager::next()
 {    
     World::deleteWorld();
@@ -350,9 +325,7 @@ void RaceManager::next()
 }   // next
 
 //-----------------------------------------------------------------------------
-/**
-  * Sets/updates the m_gp_rank status of each KartStatus object
-  */
+
 void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
@@ -421,8 +394,7 @@ void RaceManager::computeGPRanks()
 }
 
 //-----------------------------------------------------------------------------
-/** In GP displays the GP result screen, and then deletes the world.
- */
+
 void RaceManager::exitRace()
 {
     // Only display the grand prix result screen if all tracks 
@@ -521,9 +493,7 @@ void RaceManager::kartFinishedRace(const Kart *kart, float time)
 }   // kartFinishedRace
 
 //-----------------------------------------------------------------------------
-/** Reruns the last race. This is called after a race is finished, and it will
- *  adjust the number of points and the overall time before restarting the race.
- */
+
 void RaceManager::rerunRace()
 {
     // Subtract last score from all karts:

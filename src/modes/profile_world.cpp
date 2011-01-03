@@ -33,7 +33,6 @@ float ProfileWorld::m_time   = 0.0f;
  */
 ProfileWorld::ProfileWorld()
 {
-    race_manager->setNumPlayers(0);
     race_manager->setNumLocalPlayers(0);
     // Set number of laps so that the end of the race can be detected by 
     // quering the number of finished karts from the race manager (in laps

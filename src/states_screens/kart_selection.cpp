@@ -1385,7 +1385,6 @@ void KartSelectionScreen::allPlayersDone()
         StateManager::get()->getActivePlayer(n)->getProfile()->m_use_frequency++;
     }
     // ---- Give player info to race manager
-    race_manager->setNumPlayers( players.size() );
     race_manager->setNumLocalPlayers( players.size() );
     
     // ---- Manage 'random kart' selection(s)

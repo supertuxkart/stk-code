@@ -259,22 +259,40 @@ private:
 public:
                  RaceManager();
                 ~RaceManager();
+    
+    /** Resets the race manager. It is called by world when restarting a race. */
     void         reset();
-    void         setLocalKartInfo(unsigned int player_id, const std::string& kart);
-    const RemoteKartInfo& 
-                 getLocalKartInfo(unsigned int n) const {return m_local_player_karts[n];}
-    void         setNumLocalPlayers(unsigned int n);
-    unsigned int getNumLocalPlayers() const  {return m_local_player_karts.size(); };
-    /** Returns the selected number of karts (selected=number of players and 
-     *  AI karts. */
-    unsigned int getNumberOfKarts()   const  {return m_num_karts; }
 
-    void         setNumPlayers(int num);
-    void         setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki);
-    void         kartFinishedRace(const Kart* kart, float time);
+
+    /**
+      * \{
+      * \name Setting race parameters
+      */
+    
+    /** \brief Stores the information which local players uses which karts.
+      * \param player_id  Id of the local player for which the kart is set.
+      * \param kart       Kart name this player is using.
+      */
+    void         setLocalKartInfo(unsigned int player_id, const std::string& kart);
+    
+    /** Sets the number of local players playing on this computer (including
+      * split screen).
+      * \param n Number of local players.
+      */
+    void         setNumLocalPlayers(unsigned int n);
+    
+    /** In case of non GP mode set the track to use.
+     *  \param track Pointer to the track to use.
+     */
     void         setTrack(const std::string& track);
+    
     void         setGrandPrix(const GrandPrixData &gp){ m_grand_prix = gp; m_coin_target = 0; }
+    
+    /** \brief Sets the difficulty.
+      * \param diff Difficulty.
+      */
     void         setDifficulty(Difficulty diff);
+    
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
     void         setMajorMode(MajorRaceModeType mode)
@@ -283,31 +301,58 @@ public:
                                                 { m_minor_mode = mode;              }
     void         setNumKarts(int num)           { m_num_karts = num;                }
     void         setCoinTarget(int num)         { m_coin_target = num;              }
+    
+    /** \} */
+    
+    /** Sort karts and update the m_gp_rank KartStatus member, in preparation
+      * for future calls to RaceManager::getKartGPRank or RaceManager::getKartWithGPRank
+      */
+    void         computeGPRanks();
+    
+    /** \{
+      * \name Getters
+      * Get current race manager state and settings
+      */
+    const RemoteKartInfo& 
+         getLocalKartInfo(unsigned int n) const { return m_local_player_karts[n];     }
+    unsigned int getNumLocalPlayers()     const { return m_local_player_karts.size(); }
+    
+    /** Returns the selected number of karts (selected number of players and 
+     *  AI karts. */
+    unsigned int getNumberOfKarts()       const {return m_num_karts; }
+    
     MajorRaceModeType
                  getMajorMode()           const { return m_major_mode;              }
     MinorRaceModeType
                  getMinorMode()           const { return m_minor_mode;              }
     unsigned int getNumPlayers()          const { return m_player_karts.size();     }
-    /** Returns the number lf laps. In case of FTL or battle mode always 
-     *  return 9999, since they don't have laps. This avoids problems in FTL GP,
-     *  since in this case no laps would be set (otherwise we would need many
-     *  more tests in calls to getNumLaps). */
+    
+    /** \brief Returns the number lf laps.
+      * In case of FTL or battle mode always return 9999, since they don't have laps.
+      * This avoids problems in FTL GP, since in this case no laps would be set
+      * (otherwise we would need many more tests in calls to getNumLaps).
+      */
     int          getNumLaps()             const 
     {
         if(m_minor_mode==MINOR_MODE_3_STRIKES || m_minor_mode==MINOR_MODE_FOLLOW_LEADER)
             return 9999;
         return m_num_laps[m_track_number];
     }   // getNumLaps
+    
     Difficulty   getDifficulty()          const { return m_difficulty;              }
     const std::string& getTrackName()     const { return m_tracks[m_track_number];  }
     const GrandPrixData  *getGrandPrix()  const { return &m_grand_prix;             }
     unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
     
-    void         computeGPRanks();
     int          getKartGPRank(const int kart_id)
                                           const { return m_kart_status[kart_id].m_gp_rank; }
+    
+    /** \brief Returns the kart with a given GP rank (or NULL if no such kart exists).
+     *  \param n Rank (0<=n<num_karts) to look for.
+     */
     const Kart*  getKartWithGPRank(unsigned int n);
+    
     /** \return the GP rank of a local player, or -1 if the given player ID doesn't exist */
     int          getLocalPlayerGPRank(const int playerID) const;
     
@@ -323,62 +368,38 @@ public:
     KartType     getKartType(int kart)    const { return m_kart_status[kart].m_kart_type;}
     int          getCoinTarget()          const { return m_coin_target;                  }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
-    bool         allPlayerFinished()      const {return 
-                                           m_num_finished_players==m_player_karts.size();}
+
     const std::vector<std::string>&
                  getAIKartList()          const { return m_ai_kart_list;                  }
-    void         setAIKartList(const std::vector<std::string>& rkl)
-                                                { m_ai_kart_list = rkl;                     }
-    void         computeRandomKartList();
-    void         startNew();         // start new race/GP/...
-    void         next();             // start the next race or go back to the start screen
-    void         rerunRace();        // Rerun the same race again
-    void         exitRace();         // exit a race (and don't start the next one)
     
-    /**
-      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
-      */
-    void         startGP(const GrandPrixData* gp);
-
-    /**
-      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
-      * \param trackIdent Internal name of the track to race on
-      * \param num_laps   Number of laps to race, or -1 if number of laps is not relevant in current mode
-      */
-    void         startSingleRace(const std::string trackIdent, const int num_laps);
-
-    
-    /** get information about given mode (returns true if 'mode' is of linear races type)
-     *  info is stored in its ID for conveniance, see the macros LINEAR_RACE and
-     *  BATTLE_ARENA above for exact meaning.
-     */
+    /** \brief get information about given mode (returns true if 'mode' is of linear races type) */
     bool isLinearRaceMode()
     {
         const int id = (int)m_minor_mode;
+        // info is stored in its ID for conveniance, see the macros LINEAR_RACE
+        // and BATTLE_ARENA above for exact meaning.
         if(id > 999 && id < 2000) return true;
         else return false;
     }
-
+    
     // ------------------------------------------------------------------------
-    /** Returns true if the current mode is a battle mode. This uses the 
-     *  numerical id of the mode, see the macros LINEAR_RACE and BATTLE_ARENA 
-     *  above for exact meaning.
-     */
+    /** \brief Returns true if the current mode is a battle mode. */
     bool isBattleMode()
     {
         const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros LINEAR_RACE and
+        // BATTLE_ARENA above for exact meaning.
         if (id >= 2000) return true;
         else            return false;
     }
     
     // ------------------------------------------------------------------------
-    /** Returns true if the current mode has laps. If uses the numeric id based
-     *  on the macros
-        */
+    /** \brief Returns true if the current mode has laps. */
     bool modeHasLaps()
     {
         if (isBattleMode()) return false;
         const int id = (int)m_minor_mode;
+        // See meaning of IDs above
         const int answer = (id-1000)/100;
         return answer!=0;
     }
@@ -393,6 +414,87 @@ public:
         return m_minor_mode != MINOR_MODE_3_STRIKES && 
                m_minor_mode != MINOR_MODE_FOLLOW_LEADER;
     }
+
+    /** \} */
+    
+    /**
+      * \{
+      * \name Controlling race
+      * Start, stop, continue, restart races
+      */
+    
+    /**
+     *  \brief Starts a new race or GP (or other mode).
+     *  It sets up the list of player karts, AI karts, GP tracks if relevant etc.
+     *  \pre The list of AI karts to use must be set up first. This is usually being
+     *       done by a call to computeRandomKartList() from 
+     *       NetworkManager::setupPlayerKartInfo, but could be done differently 
+     *       (e.g. depending on user command line options to test certain AIs)
+     */
+    void         startNew();
+    
+    /** \brief Start the next race or go back to the start screen
+      * If there are more races to do, starts the next race, otherwise
+      * calls exitRace to finish the race.
+      */
+    void         next();
+    
+    /** \brief Rerun the same race again
+      * This is called after a race is finished, and it will adjust
+      * the number of points and the overall time before restarting the race.
+      */
+    void         rerunRace();
+    
+    /** \brief Exit a race (and don't start the next one)
+      * \note In GP, displays the GP result screen first
+      * \note Deletes the world.
+      */
+    void         exitRace();
+    
+    /**
+      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
+      */
+    void         startGP(const GrandPrixData* gp);
+
+    /**
+      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
+      * \param trackIdent Internal name of the track to race on
+      * \param num_laps   Number of laps to race, or -1 if number of laps is not relevant in current mode
+      */
+    void         startSingleRace(const std::string trackIdent, const int num_laps);
+
+    /** \} */
+    
+    /**
+      * \{
+      * \name Callbacks from the race classes
+      * These methods are to be used by the classes that manage the various races, to let
+      * the race manager know about current status
+      */
+    bool         allPlayerFinished()      const {return m_num_finished_players==m_player_karts.size();}
+    void         kartFinishedRace(const Kart* kart, float time);
+
+    /** \} */
+    
+    /**
+     * \{
+     * \name For internal use
+     * Functions for internal use by RaceManager or its close friends;
+     * You shouldn't need to call any of those from higher-level code.
+     */
+    void         setNumPlayers(int num);
+    
+    /** \brief Sets a player kart (local and non-local).
+     *  \param player_id  Id of the player.
+     *  \param ki         Kart info structure for this player.
+     */
+    void         setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki);
+    
+    void         setAIKartList(const std::vector<std::string>& rkl)
+                    { m_ai_kart_list = rkl;                     }
+    void         computeRandomKartList();
+    /** \} */
+    
 };
 
 extern RaceManager *race_manager;

@@ -348,7 +348,6 @@ int handleCmdLine(int argc, char **argv)
                 // kart choice will be picked up upon player creation.
                 if (StateManager::get()->activePlayerCount() > 0)
                 {
-                    race_manager->setNumLocalPlayers(1);
                     race_manager->setLocalKartInfo(0, argv[i+1]);
                 }
                 fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
@@ -630,7 +629,7 @@ void initRest()
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
-    race_manager->setNumPlayers(1);
+    race_manager->setNumLocalPlayers(1);
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
@@ -759,7 +758,6 @@ int main(int argc, char *argv[] )
             StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
 
             // Set up race manager appropriately
-            race_manager->setNumLocalPlayers(1);
             race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
 
             // ASSIGN should make sure that only input from assigned devices

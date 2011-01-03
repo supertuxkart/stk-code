@@ -285,7 +285,7 @@ void History::Load()
         fprintf(stderr,"WARNING: No number of players found in history file.\n");
         exit(-2);
     }
-    race_manager->setNumPlayers(n);
+    race_manager->setNumLocalPlayers(n);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "difficulty: %d",&n)!=1)

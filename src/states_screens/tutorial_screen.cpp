@@ -185,7 +185,6 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
             race_manager->setDifficulty(m_difficulty);
             race_manager->setNumLaps(1);
             race_manager->setNumKarts(1);
-            race_manager->setNumPlayers(1);
             race_manager->setNumLocalPlayers(1);              
             //race_manager->setCoinTarget(m_energy);*/
 
