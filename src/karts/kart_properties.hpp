@@ -52,7 +52,7 @@ private:
     /** Base directory for this kart. */
     std::string              m_root;
 
-    /** The icon texture to use. */
+    /** The absolute path of the icon texture to use. */
     Material                *m_icon_material;
 
     /** The minimap icon file. */
@@ -313,8 +313,8 @@ public:
     /** Returns the shadow texture to use. */
     video::ITexture *getShadowTexture() const {return m_shadow_texture;       }
 
-    /** Returns the icon file of this kart. */
-    const std::string& getIconFile   () const {return m_icon_file;            }
+    /** Returns the absolute path of the icon file of this kart. */
+    const std::string& getAbsoluteIconFile() const      { return m_icon_file; }
 
     /** Returns custom sound effects for this kart. */
     const int          getCustomSfxId (SFXManager::CustomSFX type) 

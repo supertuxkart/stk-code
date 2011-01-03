@@ -1629,17 +1629,16 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(n);
-            std::string icon_path = prop->getKartDir()+"/"+ prop->getIconFile();
-
             if (unlock_manager->isLocked(prop->getIdent()))
             {
-                w->addItem( _("Locked : solve active challenges to gain access to more!"),
-                           "locked", icon_path, LOCKED_BADGE);
+                w->addItem( 
+                    _("Locked : solve active challenges to gain access to more!"),
+                    "locked", prop->getAbsoluteIconFile(), LOCKED_BADGE);
             }
             else
             {
                 w->addItem(prop->getName().c_str(), prop->getIdent(), 
-                           icon_path, 0, 
+                           prop->getAbsoluteIconFile(), 0, 
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
                 usableKartCount++;
             }
@@ -1659,7 +1658,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            std::string icon_path = prop->getKartDir() + "/" + prop->getIconFile();
+            const std::string &icon_path = prop->getAbsoluteIconFile();
 
             if (unlock_manager->isLocked(prop->getIdent()))
             {

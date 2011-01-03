@@ -604,8 +604,10 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
                                                   source_rect, NULL, NULL, 
                                                   true);
-        current_x += m_width_icon + m_width_column_space;
     }
+
+    current_x += m_width_icon + m_width_column_space;
+
     // Draw the name
     // -------------
     core::recti pos_name(current_x, y,

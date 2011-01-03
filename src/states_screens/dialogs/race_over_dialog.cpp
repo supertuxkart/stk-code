@@ -179,10 +179,9 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
                                                           time_string.c_str());
         }
         
-        const KartProperties* prop = current_kart->getKartProperties();
-        std::string icon_path = file_manager->getDataDir() ;
-        icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-        ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+        const KartProperties* prop   = current_kart->getKartProperties();
+        const std::string &icon_path = prop->getAbsoluteIconFile();
+        ITexture* kart_icon_texture  = irr_driver->getTexture( icon_path );
         
         const int entry_width = (show_highscores?  m_area.getWidth()*2/3 :  m_area.getWidth());
         
@@ -277,8 +276,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             
             const Kart *current_kart = world->getKart(i);
             const KartProperties* prop = current_kart->getKartProperties();
-            std::string icon_path = file_manager->getDataDir() ;
-            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            const std::string &icon_path = prop->getAbsoluteIconFile();
             ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
                     
             
@@ -661,10 +659,9 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     {
         const Kart* current_kart = world->getKart(k);
 
-        const KartProperties* prop = current_kart->getKartProperties();
-        std::string icon_path = file_manager->getDataDir() ;
-        icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-        ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+        const KartProperties* prop   = current_kart->getKartProperties();
+        const std::string& icon_path = prop->getAbsoluteIconFile();
+        ITexture* kart_icon_texture  = irr_driver->getTexture( icon_path );
         
         /*
         draw2DImage  (const video::ITexture  *texture, const core::rect<  s32  > &destRect,
