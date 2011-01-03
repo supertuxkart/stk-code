@@ -60,74 +60,15 @@ UnlockManager::UnlockManager()
     // Read challenges from .../data/tracks/*
     // --------------------------------------
     const std::vector<std::string> *all_track_dirs = track_manager->getAllTrackDirs();
-    for(std::vector<std::string>::const_iterator dir=all_track_dirs->begin();
-        dir!=all_track_dirs->end(); dir++)
-    {
-        std::set<std::string> all_files;
-        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
-        for(std::set<std::string>::iterator file=all_files.begin(); 
-            file!=all_files.end(); file++)
-        {
-            if(!StringUtils::hasSuffix(*file,".challenge")) continue;
-            std::string filename=*dir+"/"+*file;
-            FILE *f=fopen(filename.c_str(), "r");
-            if(f)
-            {
-                fclose(f);
-                ChallengeData* newChallenge = NULL;
-                try
-                {
-                    newChallenge = new ChallengeData(filename);
-                }
-                catch (std::runtime_error& ex)
-                {
-                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
-                              << ex.what() << " : challenge will be ignored.\n\n"; 
-                    continue;
-                }
-                addChallenge(newChallenge);
-
-            }   // if file
-        }   // for file in files
-    }   // for dir in all_track_dirs
-
-    // Load challenges from .../data/karts (FIXME: the code below is just copied and pasted from above xD)
-    // -----------------------------------
-    const std::vector<std::string> *all_kart_dirs = 
-        kart_properties_manager->getAllKartDirs();
-
-    // Find out which characters are available and load them
-    for(std::vector<std::string>::const_iterator dir  = all_kart_dirs->begin();
-                                                 dir != all_kart_dirs->end();  dir++)
-    {
-        std::set<std::string> all_files;
-        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
-        for(std::set<std::string>::iterator file=all_files.begin(); 
-            file!=all_files.end(); file++)
-        {
-            if(!StringUtils::hasSuffix(*file,".challenge")) continue;
-            std::string filename=*dir+"/"+*file;
-            FILE *f=fopen(filename.c_str(), "r");
-            if(f)
-            {
-                fclose(f);
-                
-                ChallengeData* newChallenge = NULL;
-                try
-                {
-                    newChallenge = new ChallengeData(filename);
-                }
-                catch (std::runtime_error& ex)
-                {
-                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
-                    << ex.what() << " : challenge will be ignored.\n\n"; 
-                    continue;
-                }
-                addChallenge(newChallenge);
-            }   // if file
-        }   // for file in files
-    }   // for dir in all_karts_dirs
-
+    readAllChallengesInDirs(all_track_dirs);
+    
+    
+    // Read challenges from .../data/karts/*
+    // --------------------------------------
+    const std::vector<std::string> *all_kart_dirs  = kart_properties_manager->getAllKartDirs();
+    readAllChallengesInDirs(all_kart_dirs);
+    
+    
     // Challenges from .../data/grandprix
     // ----------------------------------
     file_manager->listFiles(result, "data/grandprix");
@@ -140,7 +81,6 @@ UnlockManager::UnlockManager()
 
     // Hard coded challenges can be added here.
 
-    computeActive(); //FIXME: 'load' calls 'computeActive', not sure this call here is needed 
     load();
 
 }   // UnlockManager
@@ -155,6 +95,45 @@ UnlockManager::~UnlockManager()
     // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
     // sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
+
+//-----------------------------------------------------------------------------
+
+void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_dirs)
+{
+    for(std::vector<std::string>::const_iterator dir = all_dirs->begin();
+        dir != all_dirs->end(); dir++)
+    {
+        std::set<std::string> all_files;
+        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        
+        for(std::set<std::string>::iterator file = all_files.begin(); 
+            file != all_files.end(); file++)
+        {
+            if (!StringUtils::hasSuffix(*file,".challenge")) continue;
+            
+            std::string filename = *dir + "/" + *file;
+            
+            FILE* f = fopen(filename.c_str(), "r");
+            if (f)
+            {
+                fclose(f);
+                ChallengeData* newChallenge = NULL;
+                try
+                {
+                    newChallenge = new ChallengeData(filename);
+                }
+                catch (std::runtime_error& ex)
+                {
+                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
+                              << ex.what() << " : challenge will be ignored.\n\n"; 
+                    continue;
+                }
+                addChallenge(newChallenge);
+            }   // if file
+            
+        }   // for file in files
+    }   // for dir in all_track_dirs
+}
 
 //-----------------------------------------------------------------------------
 void UnlockManager::addChallenge(Challenge *c)

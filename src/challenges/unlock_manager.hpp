@@ -46,7 +46,8 @@ private:
     void       load              ();
     
     void       unlockFeature     (Challenge* c, bool do_save=true);
-
+    void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
+    
 public:
                UnlockManager     ();
               ~UnlockManager     ();
