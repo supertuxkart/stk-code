@@ -120,6 +120,7 @@ void ItemManager::loadDefaultItems()
         // don't look smooth, so for now generally disable lighting
         // FIXME : re-export models with normals instead
         mesh->setMaterialFlag(video::EMF_LIGHTING, false);
+        mesh->setMaterialFlag(video::EMF_FOG_ENABLE, true);
         std::string shortName = 
             StringUtils::getBasename(StringUtils::removeExtension(model_filename));
         m_all_meshes[shortName] = mesh;
