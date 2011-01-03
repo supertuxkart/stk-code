@@ -140,6 +140,12 @@ namespace GUIEngine
           * \return the minimum value the spinner can take
           */
         int  getMin()   const { return m_min;   }
+        
+        /** Override method from base class Widget */
+        virtual void setActivated();
+        
+        /** Override method from base class Widget */
+        virtual void setDeactivated();
     };
     
 }

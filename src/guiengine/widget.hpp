@@ -308,10 +308,10 @@ namespace GUIEngine
          */
         
         /** \brief undos setDeactivated() */
-        void setActivated();
+        virtual void setActivated();
         
         /** \brief greys out the widget, making it not clickable for the user */
-        void setDeactivated();
+        virtual void setDeactivated();
         
         
         /**

@@ -376,3 +376,21 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
 
 // -----------------------------------------------------------------------------
 
+void SpinnerWidget::setActivated()
+{
+    Widget::setActivated();
+    
+    setText(L"");
+    setValue( getValue() ); // Update the display
+}
+
+// -----------------------------------------------------------------------------
+
+void SpinnerWidget::setDeactivated()
+{
+    Widget::setDeactivated();
+    
+    setText(L"-");
+    setValue( getValue() ); // Update the display
+}
+

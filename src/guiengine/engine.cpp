@@ -137,7 +137,8 @@
  the -\>addLabel(...) method in code to do this.
  It can also display arbitrary text containing the value; just define the 
  PROP_TEXT property to contain the text you want, including a format string %i
- where the value should appear.
+ where the value should appear (a string that does not contain %i will result
+ in the same text being displayed in the spinner no matter the current value).
  \note The "gauge" variant behaves similarly, but a fill band shows how close 
        to the max the value is.
  

@@ -156,17 +156,10 @@ void RaceSetupScreen::onGameModeChanged()
     if (!RaceManager::hasAI(gamemode))
     {
         kartamount->setDeactivated();
-        
-        // dirty trick to hide the number inside the spinner (FIXME)
-        kartamount->setText(L"-");
-        kartamount->setValue( kartamount->getValue() );
     }
     else
     {
         kartamount->setActivated();
-        
-        kartamount->setText(L"");
-        kartamount->setValue( kartamount->getValue() );
     }
 }
 
@@ -181,7 +174,7 @@ void RaceSetupScreen::init()
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
-    kartamount->setText(L""); // FIXME: dirty trick (see below)
+    
     // Avoid negative numbers (which can happen if e.g. the number of karts
     // in a previous race was lower than the number of players now.
     int num_ai = race_manager->getNumberOfKarts()-race_manager->getNumPlayers();
