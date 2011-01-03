@@ -42,8 +42,6 @@
 #endif
 
 #ifdef WIN32
-/* FIXME : for the remove directory function*/
-// FIXME: doesn't work, many errors  #  include <shellapi.h>
 #  include <io.h>
 #  include <stdio.h>
 #  ifndef __CYGWIN__
@@ -68,8 +66,6 @@
 #ifdef __APPLE__
 // dynamic data path detection onmac
 #  include <CoreFoundation/CoreFoundation.h>
-
-
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
@@ -737,10 +733,9 @@ bool FileManager::removeDirectory(char const *name)
     return true;
 
 #else
-//FIXME : check this function, it is only for windows, but I'm on linux.
     ::RemoveDirectory(name);
     return true;
-#ifdef XX
+#if 0
 	SHFILEOPSTRUCT sh;
 	sh.hwnd = NULL;
 	sh.wFunc = FO_DELETE;

@@ -429,7 +429,6 @@ public:
     {
         assert(m_magic_number == 0x33445566);
         
-        // FIXME: debug, remove
         assert(KartSelectionScreen::getInstance()->m_kart_widgets.contains(this));
         bool mineInList = false;
         for (int p=0; p<StateManager::get()->activePlayerCount(); p++)

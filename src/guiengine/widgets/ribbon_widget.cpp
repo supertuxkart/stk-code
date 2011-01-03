@@ -80,7 +80,6 @@ void RibbonWidget::add()
     int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
     {
-        // FIXME: a little unclean to invoke layout code here?
         LayoutManager::readCoords(m_children.get(i), NULL, this);
         
         if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
@@ -331,7 +330,6 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     }
     
     // if we reached a filler item, move again (but don't warp)
-    // FIXME: why is a constant from DynamicRibbon used here??
     if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID) 
     {
         if (m_selection[playerID] + 1 < m_children.size())

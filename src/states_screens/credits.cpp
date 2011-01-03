@@ -106,7 +106,7 @@ bool getWideLine(std::ifstream& file, stringw* out)
             //std::cout << buff[0] << ", " << buff[1]
             //          << "(" << std::hex << (unsigned)buff[0] << ", " << std::hex << (unsigned)buff[1] << ")\n";
             
-            // FIXME: endianness issues possible here?
+            // We got no complaints so I assume the endianness code here is OK
             wide_char = unsigned(buff[0] & 0xFF) | (unsigned(buff[1] & 0xFF) << 8);
             line += wide_char;
             //std::cout << "Read char " << (char)(wide_char) << " (" << std::hex << wide_char << ")" << std::endl;

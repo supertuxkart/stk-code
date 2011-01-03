@@ -60,7 +60,7 @@ PowerupManager::~PowerupManager()
 }   // ~PowerupManager
 
 //-----------------------------------------------------------------------------
-/** Removes any textures so that they can be reloaded. FIXME: missing atm.
+/** Removes any textures so that they can be reloaded.
  */
 void PowerupManager::unloadPowerups()
 {
