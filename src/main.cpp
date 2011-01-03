@@ -609,9 +609,9 @@ void initRest()
     network_manager         = new NetworkManager       ();
 #ifdef ADDONS_MANAGER
     KartPropertiesManager::addKartSearchDir(
-                 file_manager->getAddonsFile("data/karts/")  );
+                 file_manager->getAddonsFile("karts"));
     track_manager->addTrackSearchDir(
-                 file_manager->getAddonsFile("/data/tracks/"));
+                 file_manager->getAddonsFile("tracks"));
 #endif
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
