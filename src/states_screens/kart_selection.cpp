@@ -1629,7 +1629,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(n);
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            std::string icon_path = prop->getKartDir()+"/"+ prop->getIconFile();
 
             if (unlock_manager->isLocked(prop->getIdent()))
             {
@@ -1638,7 +1638,9 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             }
             else
             {
-                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                w->addItem(prop->getName().c_str(), prop->getIdent(), 
+                           icon_path, 0, 
+                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
                 usableKartCount++;
             }
         }
@@ -1648,23 +1650,6 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         unlock_manager->playLockSound();
     }
-#ifdef ADDONS_MANAGER
-    else if (selected_kart_group == "addons")
-    {
-        std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
-        const int kart_amount = group.size();
-        
-        
-        for (int n=0; n<kart_amount; n++)
-        {
-            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            std::string icon_path = file_manager->getAddonsDir() + "/data/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            std::cout << icon_path << std::endl;
-            w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str(), 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            usableKartCount++;
-        }
-    }
-#endif
     else if (selected_kart_group != RibbonWidget::NO_ITEM_ID)
     {        
         std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
@@ -1674,7 +1659,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            std::string icon_path = prop->getKartDir() + "/" + prop->getIconFile();
 
             if (unlock_manager->isLocked(prop->getIdent()))
             {
@@ -1683,7 +1668,9 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             }
             else
             {
-                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                w->addItem(prop->getName().c_str(), prop->getIdent(), 
+                           icon_path, 0, 
+                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
                 usableKartCount++;
             }
         }
