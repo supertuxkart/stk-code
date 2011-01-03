@@ -151,6 +151,19 @@ public:
         }
     }
     
+    static bool hasAI(const MinorRaceModeType mode)
+    {
+        switch (mode)
+        {
+            case MINOR_MODE_NORMAL_RACE:    return true;
+            case MINOR_MODE_TIME_TRIAL:     return true;
+            case MINOR_MODE_FOLLOW_LEADER:  return true;
+            case MINOR_MODE_3_STRIKES:      return false;
+            default: assert(false); return NULL;
+        }
+    }
+                          
+    
     // ------------------------------------------------------------------------
     /** Returns the minor mode id from a string identifier. This function is
      *  used from challenge_data, which reads the mode from a challenge file.

@@ -26,16 +26,12 @@
 #include "io/file_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "utils/string_utils.hpp"
 
 DEFINE_SCREEN_SINGLETON( RaceResultGUI );
-
-// FIXME: debug only!!!!!!!!!
-#include "karts/kart_properties_manager.hpp"
-#include "states_screens/feature_unlocked.hpp"
-// FIXME: debug end
 
 /** Constructor, initialises internal data structures.
  */

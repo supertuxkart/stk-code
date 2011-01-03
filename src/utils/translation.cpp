@@ -73,7 +73,6 @@ Translations::Translations()
 
     if (sizeof(wchar_t) == 4)
     {
-        // FIXME: will probably not work on PPC maccs
         if (IS_LITTLE_ENDIAN) bind_textdomain_codeset(PACKAGE, "UTF-32LE");
         else                  bind_textdomain_codeset(PACKAGE, "UTF-32BE");
     }
@@ -187,7 +186,7 @@ const wchar_t* Translations::w_gettext(const char* original)
         }
         //std::cout << " (len=" << len << ")\n";
 
-        FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; //FIXME: what's that?
+        FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; // Not sure what's that for, but it seems to work...
 
         static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
         for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }

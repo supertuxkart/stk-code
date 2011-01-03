@@ -99,19 +99,19 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
         const std::string selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
-        if (selectedMode == "normal")
+        if (selectedMode == IDENT_STD)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
             UserConfigParams::m_game_mode = CONFIG_CODE_NORMAL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
-        else if (selectedMode == "timetrial")
+        else if (selectedMode == IDENT_TTRIAL)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
-        else if (selectedMode == "ftl")
+        else if (selectedMode == FTL_IDENT)
         {
             // Make sure there are at least three karts, otherwise FTL doesn't
             if(race_manager->getNumberOfKarts()<3)
@@ -121,7 +121,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
-        else if (selectedMode == "3strikes")
+        else if (selectedMode == STRIKES_IDENT)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
@@ -148,12 +148,12 @@ void RaceSetupScreen::onGameModeChanged()
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
     
-    std::string gamemode = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    std::string gamemode_str = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    RaceManager::MinorRaceModeType gamemode = RaceManager::getModeIDFromInternalName(gamemode_str.c_str());
     
     // deactivate the AI karts count widget for modes for which we have no AI
-    //FIXME? Don't hardcode here which modes have an AI and which don't
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
-    if (gamemode == "3strikes")
+    if (!RaceManager::hasAI(gamemode))
     {
         kartamount->setDeactivated();
         
@@ -199,13 +199,13 @@ void RaceSetupScreen::init()
     //FIXME: avoid duplicating descriptions from the help menu!
     name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
     
-    w2->addItem( name1, "normal", RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
+    w2->addItem( name1, IDENT_STD, RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
     
     irr::core::stringw name2 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name2 += _("Contains no powerups, so only your driving skills matter!");
-    w2->addItem( name2, "timetrial", RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
+    w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
     
     if (unlock_manager->isLocked("followtheleader"))
     {
@@ -218,7 +218,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
         //I18N: short definition for follow-the-leader game mode
         name3 += _("Keep up with the leader kart but don't overtake it!");
-        w2->addItem(name3, "ftl", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
+        w2->addItem(name3, FTL_IDENT, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
     
     if (race_manager->getNumPlayers() > 1)
@@ -227,7 +227,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
-        w2->addItem( name4, "3strikes", RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
+        w2->addItem( name4, STRIKES_IDENT, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
     
 
@@ -237,16 +237,16 @@ void RaceSetupScreen::init()
     switch (UserConfigParams::m_game_mode)
     {
         case CONFIG_CODE_NORMAL :
-            w2->setSelection("normal", PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(IDENT_STD, PLAYER_ID_GAME_MASTER, true);
             break;
         case CONFIG_CODE_TIMETRIAL :
-            w2->setSelection("timetrial", PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(IDENT_TTRIAL, PLAYER_ID_GAME_MASTER, true);
             break;
         case CONFIG_CODE_FTL :
-            w2->setSelection("ftl", PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(FTL_IDENT, PLAYER_ID_GAME_MASTER, true);
             break;
         case CONFIG_CODE_3STRIKES :
-            w2->setSelection("3strikes", PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(STRIKES_IDENT, PLAYER_ID_GAME_MASTER, true);
             break;
     }
     

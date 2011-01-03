@@ -393,10 +393,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     // overwrite the elements on the diagonal, making any rotation incorrect.
     mat_scale.setScale(scale);
     mat *= mat_scale;
-    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
+    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
+    {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
-        if(mb->getVertexType()!=video::EVT_STANDARD) {
+        if(mb->getVertexType()!=video::EVT_STANDARD)
+        {
             fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
                 mb->getVertexType());
             continue;

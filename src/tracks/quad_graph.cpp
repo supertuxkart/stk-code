@@ -552,7 +552,6 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 
 //-----------------------------------------------------------------------------
 /** Takes a snapshot of the driveline quads so they can be used as minimap.
- *  \param where the top left and lower right corner for the mini map. ??? FIXME
  */
 video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                         const std::string &name,

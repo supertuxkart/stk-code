@@ -70,24 +70,24 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 
 }   // getPoint 
 // -----------------------------------------------------------------------------
-void QuadSet::load(const std::string &filename) {
+void QuadSet::load(const std::string &filename)
+{
     m_min = Vec3( 99999,  99999,  99999);
     m_max = Vec3(-99999, -99999, -99999);
 
     XMLNode *xml = file_manager->createXMLTree(filename);
     if(!xml || xml->getName()!="quads") 
     {
-        fprintf(stderr, "QuadSet '%s' not found.\n", filename.c_str());
+        fprintf(stderr, "[QuadSet::load] ERROR : QuadSet '%s' not found.\n", filename.c_str());
         return;
-        //FIXME exit(-1);
     }
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *xml_node = xml->getNode(i);
         if(xml_node->getName()!="quad")
         {
-            printf("Unsupported node type '%s' found in '%s' - ignored.\n",
-                xml_node->getName().c_str(), filename.c_str());
+            printf("[QuadSet::load] WARNING: Unsupported node type '%s' found in '%s' - ignored.\n",
+                   xml_node->getName().c_str(), filename.c_str());
             continue;
         }
         Vec3 p0, p1, p2, p3;
