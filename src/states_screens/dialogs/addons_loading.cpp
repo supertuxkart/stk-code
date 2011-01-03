@@ -41,9 +41,10 @@ AddonsLoading::AddonsLoading(const float w, const float h,
              : ModalDialog(w, h)
              , m_icon_loaded(ICON_NOT_LOADED)
 {
-    m_addon = *(addons_manager->getAddon(id));
-
     loadFromFile("addons_view_dialog.stkgui");
+
+    m_addon          = *(addons_manager->getAddon(id));
+    m_progress       = NULL;
     m_can_install    = false;
     m_percent_update = false;
     pthread_mutex_init(&m_mutex_can_install, NULL);
@@ -118,6 +119,7 @@ GUIEngine::EventPropagation
     }
     if(eventSource == "install")
     {
+        assert(m_progress==NULL);
         m_progress = new ProgressBarWidget();
         m_progress->m_x = 180;
         m_progress->m_y = m_area.getHeight()-45;
@@ -149,8 +151,7 @@ GUIEngine::EventPropagation
         */
         getWidget<ButtonWidget>("install")->setDeactivated();
         m_percent_update = true;
-        pthread_t thread;
-        pthread_create(&thread, NULL, &AddonsLoading::startInstall, this);
+        startInstall();
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -158,6 +159,37 @@ GUIEngine::EventPropagation
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
+    if(m_progress)
+    {
+        float progress = network_http->getProgress();
+        m_progress->setValue((int)(progress*100.0f));
+        if(progress<0)
+        {
+            // TODO: show a message in the interface
+            fprintf(stderr, "[Addons] Failed to download '%s'\n", 
+                    m_addon.getFile().c_str());
+            dismiss();
+            return;
+        }
+        else if(progress>=1.0f)
+        {
+            printf("Download finished.\n");
+            endInstall();
+            dismiss();
+            return;
+        }
+    }
+
+    // See if the icon is loaded (but not yet displayed)
+    if(m_icon_loaded.get()==ICON_LOADED)
+    {
+        const std::string icon = StringUtils::getBasename(m_addon.getIcon());
+        m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
+                          IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
+        m_icon_loaded.set(ICON_SHOWN);
+    }
+
+    return;
 
     pthread_mutex_lock(&(m_mutex_can_install));
     if(m_can_install)
@@ -168,13 +200,6 @@ void AddonsLoading::onUpdate(float delta)
     {
         m_progress->setValue(addons_manager->getDownloadState());
         m_state->setText(addons_manager->getDownloadStateAsStr().c_str());
-    }
-    if(m_icon_loaded.get()==ICON_LOADED)
-    {
-        const std::string icon = StringUtils::getBasename(m_addon.getIcon());
-        m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
-                          IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
-        m_icon_loaded.set(ICON_SHOWN);
     }
     pthread_mutex_unlock(&(m_mutex_can_install));
 }   // onUpdate
@@ -188,22 +213,26 @@ void AddonsLoading::close()
 }   // close
 
 // ----------------------------------------------------------------------------
-
-void * AddonsLoading::startInstall(void* pthis)
+/** This function is called when the user click on 'Install', 'Uninstall', or
+ *  'Update'.
+ **/
+void AddonsLoading::startInstall()
 {
-    AddonsLoading * obj = (AddonsLoading*)pthis;
-    if(!obj->m_addon.isInstalled() || obj->m_addon.needsUpdate())
+    std::string file = "file/" + m_addon.getFile();
+    std::string save = StringUtils::getBasename(m_addon.getFile());
+    network_http->downloadFileAsynchron(file, save);
+}   // startInstall
+
+// ----------------------------------------------------------------------------
+void AddonsLoading::endInstall()
+{
+    if(!m_addon.isInstalled() || m_addon.needsUpdate())
     {
-        addons_manager->install(obj->m_addon);
+        addons_manager->install(m_addon);
     }
     else
     {
-        addons_manager->uninstall(obj->m_addon);
+        addons_manager->uninstall(m_addon);
     }
-    pthread_mutex_lock(&(obj->m_mutex_can_install));
-    obj->m_can_install = true;
-    obj->m_percent_update = false;
-    pthread_mutex_unlock(&(obj->m_mutex_can_install));
-    return NULL;
-}   // startInstall
+}   // endInstall
 #endif

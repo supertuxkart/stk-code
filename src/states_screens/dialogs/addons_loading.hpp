@@ -44,11 +44,9 @@ private:
     
     /** The addon to load. */
     Addon                         m_addon;
-    /**
-     * This function is called when the user click on 'Install', 'Uninstall', or
-     * 'Update'. It is started using a thread.
-     * */
-    static void * startInstall(void*);
+    void startInstall();
+    void endInstall();
+
     /**
      * This function handle the downllading of the addons icon.
      * It is started using a thread. When it is ended, it change the flag

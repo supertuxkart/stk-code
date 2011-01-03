@@ -35,6 +35,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 
 AddonsManager* addons_manager = 0;
 
@@ -184,20 +185,7 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 // ----------------------------------------------------------------------------
 void AddonsManager::install(const Addon &addon)
 {
-    //download of the addons file
-    
-    m_str_state = "Downloading...";
-
-    std::string file = "file/" + addon.getFile();
-    network_http->downloadFileAsynchron(file, addon.getName());
-    //FIXME , &m_download_state);
     bool success=true;
-    if (!success)
-    {
-        // TODO: show a message in the interface
-        fprintf(stderr, "[Addons] Failed to download '%s'\n", file.c_str());
-        return;
-    }
     
     file_manager->checkAndCreateDirForAddons(addon.getName(),
                                              addon.getType()+ "s/");
@@ -205,8 +193,9 @@ void AddonsManager::install(const Addon &addon)
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file = file_manager->getAddonsDir() + "/"
                           + addon.getType()+ "s/" + addon.getName() + "/" ;
-    std::string from = file_manager->getConfigDir() + "/" + addon.getName();
-    std::string to = dest_file;
+    std::string base_name = StringUtils::getBasename(addon.getFile());
+    std::string from      = file_manager->getAddonsFile(base_name);
+    std::string to        = dest_file;
     
     m_str_state = "Unzip the addons...";
 
