@@ -250,7 +250,6 @@ void RaceSetupScreen::init()
             break;
     }
     
-    //FIXME: it's unclear to me whether I must add a listener everytime init is called or not
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
 }

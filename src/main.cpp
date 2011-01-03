@@ -92,7 +92,8 @@ void cmdLineHelp (char* invocation)
     "       --list-karts       Show available karts.\n"
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
-    //FIXME"     --players n             Define number of players to between 1 and 4.\n"
+    // TODO: add back "--players" switch
+    //"     --players n             Define number of players to between 1 and 4.\n"
     "       --item STYLE       Use STYLE as your item style.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
@@ -443,9 +444,11 @@ int handleCmdLine(int argc, char **argv)
                      || !strcmp(argv[i], "-N")                )
         {
             UserConfigParams::m_no_start_screen = true;
-            //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
-            //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
-            //FIXME:raceSetup.reverse = 1;
+        
+        // TODO: reverse switch
+        //} else if ( !strcmp(argv[i], "--reverse") ) {
+        //fprintf ( stdout, "Enabling reverse mode.\n" ) ;
+        //raceSetup.reverse = 1;
         }
         else if ( !strcmp(argv[i], "--mirror") )
         {
@@ -463,7 +466,7 @@ int handleCmdLine(int argc, char **argv)
             race_manager->setNumLaps(atoi(argv[i+1]));
             i++;
         }
-        /* FIXME:
+        /* TODO: add back --players" switch
         else if ( !strcmp(argv[i], "--players") && i+1<argc ) {
           raceSetup.numPlayers = atoi(argv[i+1]);
 
