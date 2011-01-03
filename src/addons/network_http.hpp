@@ -76,9 +76,8 @@ private:
     bool          downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
                                        bool is_asynchron);
-    static int    progressDownload(void *clientp, float dltotal, float dlnow,
-                                   float ultotal, float ulnow);
-
+    static int    progressDownload(void *clientp, double dltotal, double dlnow,
+                                   double ultotal, double ulnow);
 public:
                   NetworkHttp();
                  ~NetworkHttp();

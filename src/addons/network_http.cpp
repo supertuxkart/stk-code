@@ -308,8 +308,8 @@ void NetworkHttp::downloadFileAsynchron(const std::string &file,
  *  \param upload_now     How muc has been uploaded so far.
  */
 int NetworkHttp::progressDownload(void *clientp, 
-                                  float download_total, float download_now, 
-                                  float upload_total,   float upload_now)
+                                  double download_total, double download_now, 
+                                  double upload_total,   double upload_now)
 {
     float f;
     if(download_now < download_total)
@@ -319,8 +319,12 @@ int NetworkHttp::progressDownload(void *clientp,
         // 1.0 is only reached when downloadFileInternal is finished
         if (f>=1.0f) f=0.99f;
     }
-    else
-        f=1.0f;
+    else 
+    {
+        // Don't set progress to 1.0f; this is done in loadFileInternal
+        // after checking curls return code!
+        f= download_total==0 ? 0 : 0.99f;
+    }
     network_http->m_progress.set(f);
 
     static int time_last_print=0;
