@@ -1116,7 +1116,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     GUIEngine::focusNothingForPlayer(playerID);
     
     // delete a previous removed widget that didn't have time to fully shrink yet
-    // FIXME: handle multiple shrinking widgets gracefully?
+    // TODO: handle multiple shrinking widgets gracefully?
     if (m_removed_widget != NULL)
     {
         manualRemoveWidget(m_removed_widget);
@@ -1296,18 +1296,17 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         RandomGenerator random;
         
-        // update players selections (FIXME: don't hardcode player 0 below)
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
         {
-            // player 0 is the one that can change the groups, leave his focus on the tabs
+            // The game master is the one that can change the groups, leave his focus on the tabs
             // for others, remove focus from kart that might no more exist in this tab.
-            if (n > 0) GUIEngine::focusNothingForPlayer(n);
+            if (n != PLAYER_ID_GAME_MASTER) GUIEngine::focusNothingForPlayer(n);
             
-            // try to preserve the same kart for each player (except for player 0, since it's the one 
-            // that can change the groups, so focus for player 0 must remain on the tabs)
+            // try to preserve the same kart for each player (except for game master, since it's the one 
+            // that can change the groups, so focus for this player must remain on the tabs)
             const std::string& selected_kart = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selected_kart, n, n>0 ))
+            if (!w->setSelection( selected_kart, n, n != PLAYER_ID_GAME_MASTER))
             {
                 // if we get here, it means one player "lost" his kart in the tab switch
                 if (UserConfigParams::m_verbosity>=5)
@@ -1322,7 +1321,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                     
                     // select kart for players > 0 (player 0 is the one that can change the groups,
                     // so focus for player 0 must remain on the tabs)
-                    const bool success = w->setSelection( randomID, n, n>0 );
+                    const bool success = w->setSelection( randomID, n, n != PLAYER_ID_GAME_MASTER );
                     if (!success) std::cerr << "[KartSelectionScreen] WARNING: setting kart of player " << n << " failed :(\n";
                 }
                 else
@@ -1616,9 +1615,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
-    
-    // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
-    
+        
     int usableKartCount = 0;
 
     if (selected_kart_group == ALL_KART_GROUPS_ID)
@@ -1642,11 +1639,6 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 usableKartCount++;
             }
         }
-    }
-    //FIXME: what does this do there???
-    else if (selected_kart_group == "locked")
-    {
-        unlock_manager->playLockSound();
     }
     else if (selected_kart_group != RibbonWidget::NO_ITEM_ID)
     {        
