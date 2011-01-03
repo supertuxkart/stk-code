@@ -77,6 +77,10 @@ namespace GUIEngine
         /** Used for ribbon grids that have a label at the bottom */
         bool m_has_label;
         irr::gui::IGUIStaticText* m_label;
+        
+        /** Height of ONE label text line (if label is multiline only one line is measured here).
+          * If there is no label, will be 0.
+          */
         int m_label_height;
         
         /** Whether this ribbon contains at least one animated item */

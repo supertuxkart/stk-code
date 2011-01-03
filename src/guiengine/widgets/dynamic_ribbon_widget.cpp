@@ -101,7 +101,7 @@ void DynamicRibbonWidget::add()
     
     if (m_has_label)
     {
-        // FIXME - won't work with multiline labels.
+        // m_label_height contains the height of ONE text line
         m_label_height = GUIEngine::getFontHeight();
     }
     else
@@ -112,7 +112,7 @@ void DynamicRibbonWidget::add()
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
-        // leave room for many lines, just in case (FIXME: remove this hack)
+        // leave room for many lines, just in case
         rect<s32> label_size = rect<s32>(m_x,
                                          m_y + m_h - m_label_height,
                                          m_x + m_w,
