@@ -653,7 +653,7 @@ public:
         
         // -- sizes
         player_id_w = w;
-        player_id_h = 25; // FIXME : don't hardcode font size
+        player_id_h = GUIEngine::getFontHeight();
         
         player_name_h = 40;
         player_name_w = std::min(400, w);
@@ -900,7 +900,6 @@ void KartSelectionScreen::init()
     assert( tabs != NULL );
     tabs->setActivated();
     
-    // FIXME: Reload previous kart selection screen state
     m_kart_widgets.clearAndDeleteAll();
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
@@ -918,16 +917,17 @@ void KartSelectionScreen::init()
     
     /*
      
-     TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
+     TODO: Ultimately, it'd be nice to *not* clear m_kart_widgets so that
      when players return to the kart selection screen, it will appear as
      it did when they left (at least when returning from the track menu).
      Rebuilding the screen is a little tricky.
      
      */
     
+    /*
     if (m_kart_widgets.size() > 0)
     {
-        // FIXME: trying to rebuild the screen
+        // trying to rebuild the screen
         for (int n = 0; n < m_kart_widgets.size(); n++)
         {
             PlayerKartWidget *pkw;
@@ -937,7 +937,8 @@ void KartSelectionScreen::init()
         }
         
     }
-    else // For now this is what will happen
+    else */
+    // For now this is what will happen
     {
         playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
         w->updateItemDisplay();
@@ -1109,7 +1110,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
         std::cout << "playerQuit( " << playerID << " )\n";
 
     // Just a cheap way to check if there is any discrepancy 
-    // between g_player_karts and the active player array
+    // between m_kart_widgets and the active player array
     assert( m_kart_widgets.size() == StateManager::get()->activePlayerCount() );
 
     // unset selection of this player
@@ -1389,7 +1390,7 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Manage 'random kart' selection(s)
     RandomGenerator random;
     
-    //g_player_karts.clearAndDeleteAll();      
+    //m_kart_widgets.clearAndDeleteAll();      
     //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
     
     std::vector<ItemDescription> items = w->getItems();
