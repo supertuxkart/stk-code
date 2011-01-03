@@ -286,7 +286,11 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                 int proportion = 1;
                 std::istringstream myStream(prop);
                 if (!(myStream >> proportion))
-                    std::cerr << "/!\\ Warning /!\\ : proportion  '" << prop.c_str() << "' is not a number in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                {
+                    std::cerr << "/!\\ Warning /!\\ : proportion  '" << prop.c_str()
+                              << "' is not a number for widget " << widgets[n].m_properties[PROP_ID].c_str()
+                              << std::endl;
+                }
                 
                 const float fraction = (float)proportion/(float)total_proportion;
                 
@@ -296,23 +300,43 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if (align.size() < 1)
-                    {        
-                        if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                    {
+                        std::string prop_y = widgets[n].m_properties[ PROP_Y ];
+                        if (prop_y.size() > 0)
                         {
-                            // FIXME: percentages won't work here
-                            widgets[n].m_y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                            if (prop_y[ prop_y.size()-1 ] == '%')
+                            {
+                                prop_y = prop_y.substr(0, prop_y.size() - 1);
+                                widgets[n].m_y = y + atoi(prop_y.c_str())/100.0f * h;
+                            }
+                            else
+                            {
+                                widgets[n].m_y = y + atoi(prop_y.c_str());
+                            }
                         }
                         else
                         {
                             widgets[n].m_y = y;
                         }
                     }
-                    else if (align == "top")     widgets[n].m_y = y;
-                    else if (align == "center")  widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
-                    else if (align == "bottom")  widgets[n].m_y = y + h - widgets[n].m_h;
-                    else std::cerr  << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                        <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
-                        << "', in a horiozntal-row layout)\n";
+                    else if (align == "top")
+                    {
+                        widgets[n].m_y = y;
+                    }
+                    else if (align == "center")
+                    {
+                        widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
+                    }
+                    else if (align == "bottom")
+                    {
+                        widgets[n].m_y = y + h - widgets[n].m_h;
+                    }
+                    else
+                    {
+                        std::cerr  << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                   <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
+                                   << "', in a horiozntal-row layout)\n";
+                    }
                     
                     widgets[n].m_w = (int)(left_space*fraction);
                     if (widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
@@ -335,23 +359,43 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if (align.size() < 1)
-                    {                        
-                        if (widgets[n].m_properties[ PROP_X ].size() > 0)
+                    {
+                        std::string prop_x = widgets[n].m_properties[ PROP_X ];
+                        if (prop_x.size() > 0)
                         {
-                            // FIXME: percentages won't work here
-                            widgets[n].m_x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
+                            if (prop_x[ prop_x.size()-1 ] == '%')
+                            {
+                                prop_x = prop_x.substr(0, prop_x.size() - 1);
+                                widgets[n].m_x = x + atoi(prop_x.c_str())/100.0f * w;
+                            }
+                            else
+                            {
+                                widgets[n].m_x = x + atoi(prop_x.c_str());
+                            }
                         }
                         else
                         {
                             widgets[n].m_x = x;
                         }
                     }
-                    else if (align == "left")   widgets[n].m_x = x;
-                    else if (align == "center") widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
-                    else if (align == "right")  widgets[n].m_x = x + w - widgets[n].m_w;
-                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                        <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
-                        << "', in a vertical-row layout)\n";
+                    else if (align == "left")
+                    {
+                        widgets[n].m_x = x;
+                    }
+                    else if (align == "center")
+                    {
+                        widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
+                    }
+                    else if (align == "right") 
+                    {
+                        widgets[n].m_x = x + w - widgets[n].m_w;
+                    }
+                    else
+                    {
+                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                  <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
+                                  << "', in a vertical-row layout)\n";
+                    }
                     widgets[n].m_y = y;
                     
                     y += widgets[n].m_h;
@@ -369,45 +413,88 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     
                     if (align.size() < 1)
                     {
-                        if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                        std::string prop_y = widgets[n].m_properties[ PROP_Y ];
+                        
+                        if (prop_y.size() > 0)
                         {
-                            // FIXME: percentages won't work here
-                            widgets[n].m_y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                            if (prop_y[ prop_y.size()-1 ] == '%')
+                            {
+                                prop_y = prop_y.substr(0, prop_y.size() - 1);
+                                widgets[n].m_y = y + atoi(prop_y.c_str())/100.0f * h;
+                            }
+                            else
+                            {
+                                widgets[n].m_y = y + atoi(prop_y.c_str());
+                            }
                         }
                         else
                         {
                             widgets[n].m_y = y;
                         }
                     }
-                    else if (align == "top")    widgets[n].m_y = y;
-                    else if (align == "center") widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
-                    else if (align == "bottom") widgets[n].m_y = y + h - widgets[n].m_h;
-                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str() << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                    else if (align == "top")
+                    {
+                        widgets[n].m_y = y;
+                    }
+                    else if (align == "center")
+                    {
+                        widgets[n].m_y = y + h/2 - widgets[n].m_h/2;
+                    }
+                    else if (align == "bottom")
+                    {
+                        widgets[n].m_y = y + h - widgets[n].m_h;
+                    }
+                    else
+                    {
+                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                  << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str()
+                                  << std::endl;
+                    }
                     
                     x += widgets[n].m_w;
                 }
                 else
-                {
-                    //widgets[n].h = abs_var;
-                    
+                {                    
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     
                     if (align.size() < 1)
                     {
-                        if (widgets[n].m_properties[ PROP_X ].size() > 0)
+                        std::string prop_x = widgets[n].m_properties[ PROP_X ];
+                        
+                        if (prop_x.size() > 0)
                         {
-                            // FIXME: percentages won't work here
-                            widgets[n].m_x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
+                            if (prop_x[ prop_x.size()-1 ] == '%')
+                            {
+                                prop_x = prop_x.substr(0, prop_x.size() - 1);
+                                widgets[n].m_x = x + atoi(prop_x.c_str())/100.0f * w;
+                            }
+                            else
+                            {
+                                widgets[n].m_x = x + atoi(prop_x.c_str());
+                            }
                         }
                         else
                         {
                             widgets[n].m_x = x;
                         }
                     }
-                    else if (align == "left")   widgets[n].m_x = x;
-                    else if (align == "center") widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
-                    else if (align == "right")  widgets[n].m_x = x + w - widgets[n].m_w;
-                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str() << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                    else if (align == "left")
+                    {
+                        widgets[n].m_x = x;
+                    }
+                    else if (align == "center")
+                    {
+                        widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
+                    }
+                    else if (align == "right")
+                    {
+                        widgets[n].m_x = x + w - widgets[n].m_w;
+                    }
+                    else
+                    {
+                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                  << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                    }
                     widgets[n].m_y = y;
                     
                     y += widgets[n].m_h;
