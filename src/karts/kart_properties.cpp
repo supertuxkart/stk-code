@@ -168,7 +168,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*is_full+path*/true, 
                                                     /*make_permanent*/true);
     if(m_minimap_icon_file!="")
-        m_minimap_icon = irr_driver->getTexture(m_minimap_icon_file);
+        m_minimap_icon = irr_driver->getTexture(m_root+"/"+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
 
