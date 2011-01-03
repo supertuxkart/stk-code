@@ -110,8 +110,13 @@ bool extract_zip(std::string from, std::string to)
             current_file = "";
         }
     }
-    //remove the zip from the filesystem to save memory and avoid problem with a name conflict
-    pfs->removeFileArchive(from.c_str());
+    //remove the zip from the filesystem to save memory and avoid 
+    // problem with a name conflict. Note that we have to convert
+    // the path using getAbsolutePath, otherwise windows name
+    // will not be detected correctly (e.g. if from=c:\...  the
+    // stored filename will be c:/..., which then does not match
+    // on removing it. getAbsolutePath will convert all \ to /.
+    pfs->removeFileArchive(pfs->getAbsolutePath(from.c_str()));
     
     return true;
 }
