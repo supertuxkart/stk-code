@@ -99,7 +99,7 @@ void ItemManager::loadDefaultItems()
     // in item.hpp. Note that bubblegum strictly isn't an item,
     // it is implemented as one, and so loaded here, too.
     static const std::string item_names[] = {"bonus-box", "banana",
-                                             "nitro-big", "nitro-small", 
+                                             "nitro-big", "nitro-small",
                                              "bubblegum" };
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
@@ -116,12 +116,13 @@ void ItemManager::loadDefaultItems()
                     item_names[i].c_str());
             exit(-1);
         }
-        // If lighting would be enabled certain items (esp. bananas)
-        // don't look smooth, so for now generally disable lighting
-        // FIXME : re-export models with normals instead
-        mesh->setMaterialFlag(video::EMF_LIGHTING, false);
+        // If items show the polygons instead of being smooth re-export with
+        // normals (that was bananas' problem) but do not disable this flag
+        //mesh->setMaterialFlag(video::EMF_LIGHTING, false);
+        // FIXME this should check if current track uses fog or not
+        // otherwise items look wrong when far away and track has no fog
         mesh->setMaterialFlag(video::EMF_FOG_ENABLE, true);
-        std::string shortName = 
+        std::string shortName =
             StringUtils::getBasename(StringUtils::removeExtension(model_filename));
         m_all_meshes[shortName] = mesh;
         m_item_mesh[i]          = mesh;

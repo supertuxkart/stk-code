@@ -90,7 +90,9 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         m_node->setPosition(m_init_xyz);
         m_node->setRotation(m_init_hpr);
         m_node->setScale(m_init_scale);
-        m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+        // FIXME (to-be-removed) If something looks polygonal
+        // re-export with normals instead of setting false here
+        //m_node->setMaterialFlag(video::EMF_LIGHTING, false);
     }
     reset();
 }   // TrackObject
