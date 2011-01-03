@@ -16,10 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef ADDONS_MANAGER
 #include "irrlicht.h"
-#include "graphics/irr_driver.hpp"
 #include <string.h>
 #include <iostream>
 #include <fstream> 
+
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 
 using namespace irr;
 using namespace io;
@@ -28,11 +30,11 @@ s32 IFileSystem_copyFileToFile(IWriteFile* dst, IReadFile* src)
   char buf[1024];
   const s32 sz = sizeof(buf) / sizeof(*buf);
 
-  s32 r, rx = src->getSize();
-  for (r = 0; r < rx; /**/)
+  s32 rx = src->getSize();
+  for (s32 r = 0; r < rx; /**/)
   {
-    s32 w, wx = src->read(buf, sz);
-    for (w = 0; w < wx; /**/)
+    s32 wx = src->read(buf, sz);
+    for (s32 w = 0; w < wx; /**/)
     {
       s32 n = dst->write(buf + w, wx - w);
       if (n < 0)
@@ -40,84 +42,52 @@ s32 IFileSystem_copyFileToFile(IWriteFile* dst, IReadFile* src)
       else
         w += n;
     }
-    r += w;
+    r += wx;
   }
+  return rx;
+}   // IFileSystem_copyFileToFile
 
-  return r;
-}
-
-bool extract_zip(std::string from, std::string to)
+// ----------------------------------------------------------------------------
+/** Extracts all files from the zip archive 'from' to the directory 'to'.
+ *  \param from A zip archive.
+ *  \param to The destination directory.
+ */
+bool extract_zip(const std::string &from, const std::string &to)
 {
-    //get the stk irrlicht device
-    IrrlichtDevice * device = irr_driver->getDevice();
-
-    //get the filesystem from the device
-    IFileSystem*  pfs = device->getFileSystem();
     //Add the zip to the file system
-    pfs->addZipFileArchive(from.c_str());
+    IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
+    file_system->addZipFileArchive(from.c_str());
 
-    //IFileArchive * zipfile = pfs->getFileArchive(0);
-    //extract the file where there is the others file name
-    IReadFile* srcFile = pfs->createAndOpenFile("file_list");
-    if (srcFile == NULL)
+    // Get the recently added archive, which is necessary to get a 
+    // list of file in the zip archive.
+    io::IFileArchive *zip_archive = 
+        file_system->getFileArchive(file_system->getFileArchiveCount()-1);
+    const io::IFileList *zip_file_list = zip_archive->getFileList();
+    // Copy all files from the zip archive to the destination
+    for(unsigned int i=0; i<zip_file_list->getFileCount(); i++)
     {
-        std::cerr << "Could not open 'file_list', sorry. @" 
-                  << __FILE__ << ":" << __LINE__ << std::endl;
-        return false;
-    }
-    IWriteFile* dstFile = pfs->createAndWriteFile(std::string(to + "file_list").c_str());
-    if (dstFile == NULL)
-    {
-        std::cerr << "Could not create '" << std::string(to + "file_list").c_str() << "', sorry. @" 
-                  << __FILE__ << ":" << __LINE__ << std::endl;
-        if (srcFile != NULL) srcFile->drop();
-        return false;
-    }
-    std::cout << from.c_str() << std::endl;
-    //....
-    if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
-    {
-        std::cerr << "IFileSystem_copyFileToFile failed @" << __FILE__ << ":" << __LINE__ << std::endl;
-        if (srcFile != NULL) srcFile->drop();
-        if (dstFile != NULL) dstFile->drop();
-        return false;
-    }
-    srcFile->drop();
-    dstFile->drop();
-
-    std::string file_list;
-    std::string buff;
-    std::ifstream entree(std::string(to + "file_list").c_str(), std::ios::in);
-    while (entree >> buff)
-        file_list += buff;
-    std::cout << file_list << std::endl;
-    std::string current_file;
-    for(unsigned int i=0; i < file_list.size(); i++)
-    {
-        if(file_list.c_str()[i] != '\\')
+        const std::string current_file=zip_file_list->getFileName(i).c_str();
+        std::cout << current_file << std::endl;
+        IReadFile* srcFile  = file_system->createAndOpenFile(current_file.c_str());
+        IWriteFile* dstFile = 
+            file_system->createAndWriteFile((to+"/"+current_file).c_str());
+        if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
         {
-            current_file += file_list[i];
+            printf("Could not copy '%s' from archive '%s'.\n",
+                    current_file.c_str(), from.c_str());
+            printf("This is ignored, but the addon might not work.\n");
         }
-        else
-        {
-            std::cout << current_file << std::endl;
-                IReadFile* srcFile = pfs->createAndOpenFile(current_file.c_str());
-                IWriteFile* dstFile = pfs->createAndWriteFile(std::string(to + current_file).c_str());
-                if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
-                ; // error
-                srcFile->drop();
-                dstFile->drop();
-            current_file = "";
-        }
+        srcFile->drop();
+        dstFile->drop();
     }
-    //remove the zip from the filesystem to save memory and avoid 
+    // Remove the zip from the filesystem to save memory and avoid 
     // problem with a name conflict. Note that we have to convert
     // the path using getAbsolutePath, otherwise windows name
     // will not be detected correctly (e.g. if from=c:\...  the
     // stored filename will be c:/..., which then does not match
     // on removing it. getAbsolutePath will convert all \ to /.
-    pfs->removeFileArchive(pfs->getAbsolutePath(from.c_str()));
+    file_system->removeFileArchive(file_system->getAbsolutePath(from.c_str()));
     
     return true;
-}
+}   // extract_zip
 #endif
