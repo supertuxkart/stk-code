@@ -535,4 +535,36 @@ void RaceManager::rerunRace()
     World::getWorld()->restartRace();
 }   // rerunRace
 
+//-----------------------------------------------------------------------------
+
+void RaceManager::startGP(const GrandPrixData* gp)
+{
+    assert(gp != NULL);
+
+    StateManager::get()->enterGameState();
+    setGrandPrix(*gp);
+    setCoinTarget( 0 ); // Might still be set from a previous challenge
+    network_manager->setupPlayerKartInfo();
+    
+    setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+    startNew();
+}
+
+//-----------------------------------------------------------------------------
+
+void RaceManager::startSingleRace(const std::string trackIdent, const int num_laps)
+{
+    StateManager::get()->enterGameState();
+    setTrack(trackIdent.c_str());
+    
+    if (num_laps != -1) setNumLaps( num_laps );
+    
+    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    
+    setCoinTarget( 0 ); // Might still be set from a previous challenge
+    network_manager->setupPlayerKartInfo();
+    
+    startNew();
+}
+
 /* EOF */

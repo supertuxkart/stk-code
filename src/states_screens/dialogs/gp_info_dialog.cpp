@@ -178,34 +178,12 @@ GPInfoDialog::~GPInfoDialog()
     
 }
 
-
-// ------------------------------------------------------------------------------------------------------
-
-// FIXME : this probably doesn't belong here
-void startGPGame(const GrandPrixData* gp)
-{
-    assert(gp != NULL);
-    ModalDialog::dismiss();
-    
-    //FIXME: simplify and centralize race start sequence!!
-    
-    StateManager::get()->enterGameState();
-    //race_manager->setDifficulty(RaceManager::RD_HARD);
-    race_manager->setGrandPrix(*gp);
-    race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-    //race_manager->setNumKarts( 1 );
-    network_manager->setupPlayerKartInfo();
-    //race_manager->getKartType(1) = KT_PLAYER;
-    
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-    race_manager->startNew();
-}
-
 // ------------------------------------------------------------------------------------------------------
 
 void GPInfoDialog::onEnterPressedInternal()
 {
-    startGPGame(grand_prix_manager->getGrandPrix(m_gp_ident));
+    ModalDialog::dismiss();
+    race_manager->startGP(grand_prix_manager->getGrandPrix(m_gp_ident));
 }
 
 // ------------------------------------------------------------------------------------------------------   
@@ -214,7 +192,8 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
 {
     if (eventSource == "start")
     {
-        startGPGame(grand_prix_manager->getGrandPrix(m_gp_ident));
+        ModalDialog::dismiss();
+        race_manager->startGP(grand_prix_manager->getGrandPrix(m_gp_ident));
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "cannot_start")

@@ -335,6 +335,19 @@ public:
     void         rerunRace();        // Rerun the same race again
     void         exitRace();         // exit a race (and don't start the next one)
     
+    /**
+      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
+      */
+    void         startGP(const GrandPrixData* gp);
+
+    /**
+      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
+      * \param trackIdent Internal name of the track to race on
+      * \param num_laps   Number of laps to race, or -1 if number of laps is not relevant in current mode
+      */
+    void         startSingleRace(const std::string trackIdent, const int num_laps);
+
+    
     /** get information about given mode (returns true if 'mode' is of linear races type)
      *  info is stored in its ID for conveniance, see the macros LINEAR_RACE and
      *  BATTLE_ARENA above for exact meaning.

@@ -275,40 +275,12 @@ void TrackInfoDialog::updateHighScores()
 
 // ------------------------------------------------------------------------------------------------------
 
-// FIXME : this probably doesn't belong here
-/**
-  * Start a race, using the settings set through previous menus, plus which track
-  * plus number of laps if relevant
-  *
-  * \param trackIdent  Internal name of the track to race on
-  * \param num_laps    Number of laps to do, or -1 if not relevant
-  */
-void startGame(const std::string trackIdent, const int num_laps)
-{
-    //FIXME: simplify and centralize race start sequence!!
-
-    ModalDialog::dismiss();
-    
-    StateManager::get()->enterGameState();
-    //race_manager->setDifficulty(RaceManager::RD_HARD);
-    race_manager->setTrack(trackIdent.c_str());
-    
-    if (num_laps != -1) race_manager->setNumLaps( num_laps );
-    
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
-
-    race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-    network_manager->setupPlayerKartInfo();
-    
-    race_manager->startNew();
-}
-
-// ------------------------------------------------------------------------------------------------------
-
 void TrackInfoDialog::onEnterPressedInternal()
 {
+    ModalDialog::dismiss();
+    
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-    startGame(m_track_ident, num_laps);
+    race_manager->startSingleRace(m_track_ident, num_laps);
 }
 
 // ------------------------------------------------------------------------------------------------------   
@@ -317,8 +289,10 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
 {
     if (eventSource == "start" )
     {
+        ModalDialog::dismiss();
+        
         const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-        startGame(m_track_ident, num_laps);
+        race_manager->startSingleRace(m_track_ident, num_laps);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "lapcountspinner")
