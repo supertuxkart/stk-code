@@ -633,8 +633,9 @@ std::string FileManager::getChallengeFile(const std::string &fname) const
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
-void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,
-                            bool is_full_path, bool make_full_path) const
+void FileManager::listFiles(std::set<std::string>& result, 
+                            const std::string& dir, bool is_full_path, 
+                            bool make_full_path) const
 {
     result.clear();
 
@@ -675,12 +676,17 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
                                              std::string addons_type)
 {
-    bool success = checkAndCreateDirectory(getAddonsDir() + addons_type);
+    std::string path = getAddonsFile(addons_type);
+    bool success = checkAndCreateDirectory(path);
     if(!success)
+    {
         std::cout << "There is a problem with the addons dir." << std::endl;
-    checkAndCreateDirectory(getAddonsDir() + addons_type + addons_name);
+        return;
+    }
+    checkAndCreateDirectory(path+"/"+addons_name);
+}   // checkAndCreateDirForAddons
 
-}
+// ----------------------------------------------------------------------------
 bool FileManager::removeDirectory(char const *name)
 {
 #ifndef WIN32
@@ -706,7 +712,8 @@ bool FileManager::removeDirectory(char const *name)
 
         /*this condition handles if it is the current directory (.) or the 
         parent directory (..), these names work only on unix-based I think*/
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        if (strcmp(entry->d_name, ".") == 0 || 
+            strcmp(entry->d_name, "..") == 0)
         {
             continue;
         }
