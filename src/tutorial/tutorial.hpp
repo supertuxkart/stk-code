@@ -41,6 +41,7 @@ class XMLNode;
     UNLOCK_MODE,
     UNLOCK_KART,
     UNLOCK_DIFFICULTY};
+ */
 
 /*struct UnlockableFeature
 {

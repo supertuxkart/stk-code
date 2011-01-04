@@ -117,6 +117,7 @@ void TutorialScreen::init()
         
     }
   //  tutorials_list->updateItemDisplay();
+     */
 
    /* if (tutorials_list->getItems().empty())
     {
@@ -225,7 +226,7 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
 
         // only player 0 can start a challenge (i.e. we have no multiplayer tutorial)
         std::string selection = w->getSelectionIDString( PLAYER_ID_GAME_MASTER );
-
+*/
         /*if (selection == "locked")
         {
             unlock_manager->playLockSound();
