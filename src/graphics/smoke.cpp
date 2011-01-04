@@ -45,11 +45,13 @@ Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m_node->setMaterialTexture(0, m->getTexture());
 
     m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
-                                           5, 10,
-                                           video::SColor(255,0,0,0),
-                                           video::SColor(255,255,255,255),
-                                           300, 500,
-                                           20  // max angle
+                                           5, // minParticlesPerSecond
+                                           10, // maxParticlesPerSecond
+                                           video::SColor(255,0,0,0), // minStartColor
+                                           video::SColor(255,255,255,255), // maxStartColor
+                                           300, // lifeTimeMin
+                                           500, // lifeTimeMax
+                                           20  // max angle (degrees)
                                            );
     m_emitter->setMinStartSize(core::dimension2df(m_particle_size/1.5f, m_particle_size/1.5f));
     m_emitter->setMaxStartSize(core::dimension2df(m_particle_size*1.5f, m_particle_size*1.5f));
