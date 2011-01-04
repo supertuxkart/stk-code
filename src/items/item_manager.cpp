@@ -116,12 +116,6 @@ void ItemManager::loadDefaultItems()
                     item_names[i].c_str());
             exit(-1);
         }
-        // If items show the polygons instead of being smooth re-export with
-        // normals (that was bananas' problem) but do not disable this flag
-        //mesh->setMaterialFlag(video::EMF_LIGHTING, false);
-        // FIXME this should check if current track uses fog or not
-        // otherwise items look wrong when far away and track has no fog
-        mesh->setMaterialFlag(video::EMF_FOG_ENABLE, true);
         std::string shortName =
             StringUtils::getBasename(StringUtils::removeExtension(model_filename));
         m_all_meshes[shortName] = mesh;

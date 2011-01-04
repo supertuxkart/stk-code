@@ -21,6 +21,8 @@
 
 #include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
 
@@ -48,6 +50,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setName(debug_name.c_str());
 #endif
 
+    World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     m_node->setRotation(hpr.toIrrHPR());
