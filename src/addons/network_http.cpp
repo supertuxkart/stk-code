@@ -314,7 +314,7 @@ int NetworkHttp::progressDownload(void *clientp,
     float f;
     if(download_now < download_total)
     {
-        f = download_now / download_total;
+        f = (float)download_now / (float)download_total;
         // In case of floating point rouding errors make sure that 
         // 1.0 is only reached when downloadFileInternal is finished
         if (f>=1.0f) f=0.99f;

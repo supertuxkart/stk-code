@@ -307,7 +307,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_y[ prop_y.size()-1 ] == '%')
                             {
                                 prop_y = prop_y.substr(0, prop_y.size() - 1);
-                                widgets[n].m_y = y + atoi(prop_y.c_str())/100.0f * h;
+                                widgets[n].m_y = (int)(y + atoi(prop_y.c_str())/100.0f * h);
                             }
                             else
                             {
@@ -366,7 +366,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_x[ prop_x.size()-1 ] == '%')
                             {
                                 prop_x = prop_x.substr(0, prop_x.size() - 1);
-                                widgets[n].m_x = x + atoi(prop_x.c_str())/100.0f * w;
+                                widgets[n].m_x = (int)(x + atoi(prop_x.c_str())/100.0f * w);
                             }
                             else
                             {
@@ -420,7 +420,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_y[ prop_y.size()-1 ] == '%')
                             {
                                 prop_y = prop_y.substr(0, prop_y.size() - 1);
-                                widgets[n].m_y = y + atoi(prop_y.c_str())/100.0f * h;
+                                widgets[n].m_y = (int)(y + atoi(prop_y.c_str())/100.0f * h);
                             }
                             else
                             {
@@ -466,7 +466,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_x[ prop_x.size()-1 ] == '%')
                             {
                                 prop_x = prop_x.substr(0, prop_x.size() - 1);
-                                widgets[n].m_x = x + atoi(prop_x.c_str())/100.0f * w;
+                                widgets[n].m_x = (int)(x + atoi(prop_x.c_str())/100.0f * w);
                             }
                             else
                             {
