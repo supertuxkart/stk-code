@@ -30,11 +30,10 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/nitro.hpp"
+#include "graphics/particle_emitter.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
-#include "graphics/smoke.hpp"
 #include "graphics/water_splash.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
@@ -55,6 +54,8 @@
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
 #endif
+
+const float SMOKE_PARTICLE_SIZE = 0.33f;
 
 /** The kart constructor. 
  *  \param ident  The identifier for the kart model to use.
@@ -730,11 +731,11 @@ void Kart::update(float dt)
     //smoke drawing control point
     if ( UserConfigParams::m_graphical_effects )
     {
-        m_smoke_system->update(dt);
+        m_smoke_system->update();
         m_water_splash_system->update(dt);
     }  // UserConfigParams::m_graphical_effects
 
-    m_nitro->update(dt);
+    m_nitro->update();
     
     updatePhysics(dt);
 
@@ -1439,13 +1440,29 @@ void Kart::loadData()
     createPhysics();
 
     // Attach Particle System
-    if ( UserConfigParams::m_graphical_effects )
+    if (UserConfigParams::m_graphical_effects)
     {
-        m_smoke_system        = new Smoke(this);
+        core::vector3df position(-getKartWidth()*0.35f, SMOKE_PARTICLE_SIZE*0.25f, -getKartLength()*0.5f);
+        m_smoke_system = new ParticleEmitter(SMOKE_PARTICLE_SIZE, position, material_manager->getMaterial("smoke.png"),
+                                             5 /* min particles */, 10 /* max particles */,
+                                             video::SColor(255,0,0,0) /* min color */,
+                                             video::SColor(255,255,255,255) /* max color */,
+                                             300 /* lifeTimeMin */, 500 /* lifeTimeMax */, 20 /* max angle */,
+                                             500 /* fade-out time */, 0.003f, SMOKE_PARTICLE_SIZE/1.5f, SMOKE_PARTICLE_SIZE*1.5f);
     }
     m_water_splash_system = new WaterSplash(this);
-    m_nitro               = new Nitro(this);
-    m_slipstream          = new SlipStream(this);
+    
+    const float particle_size = 0.25f;
+    core::vector3df position(0, particle_size*0.25f, -getKartLength()*0.5f);
+    m_nitro  = new ParticleEmitter(particle_size, position, material_manager->getMaterial("nitro-particle.png"),
+                                   5 /* min particles */, 10 /* max particles */,
+                                   video::SColor(255,0,0,0) /* min color */,
+                                   video::SColor(255,255,255,255) /* max color */,
+                                   150 /* lifeTimeMin */, 250 /* lifeTimeMax */, 40 /* max angle */,
+                                   2500 /* fade-out time */, 0.003f, particle_size/1.5f, particle_size*2.0f,
+                                   getNode());
+    
+    m_slipstream = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
@@ -1533,6 +1550,18 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             isOnGround()                                  )
             f=250.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
+        
+        static int left = 1;
+        left = 1 - left;
+        const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + left);
+        Vec3 c = wi.m_raycastInfo.m_contactPointWS;
+        
+        // FIXME: instead of constantly moving the emitter around, just make it a child of the kart node
+        // FIXME: the X position is not yet always accurate.
+        m_smoke_system->setPosition(core::vector3df(c.getX() + SMOKE_PARTICLE_SIZE*0.25f * (left ? +1 : -1),
+                                                    c.getY(),
+                                                    c.getZ() + SMOKE_PARTICLE_SIZE*0.25f));
+        
     }
     if(m_water_splash_system)
     {
@@ -1541,11 +1570,13 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                 : 0.0f;
         m_water_splash_system->setCreationRate(f);
     }
-    if(m_nitro)
+    if (m_nitro)
+    {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
         m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && m_collected_energy>0
                                  ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
+    }
 
     // For testing purposes mis-use the nitro graphical effects to show
     // then the slipstream becomes usable.

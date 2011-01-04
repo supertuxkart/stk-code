@@ -42,14 +42,13 @@ class btUprightConstraint;
 class btVehicleTuning;
 class Camera;
 class Item;
-class Nitro;
 class Quad;
 class Shadow;
 class SFXBase;
 class SkidMarks;
 class SlipStream;
-class Smoke;
 class WaterSplash;
+class ParticleEmitter;
 
 /** The main kart class. All type of karts are of this object, but with 
  *  different controllers. The controllers are what turn a kart into a 
@@ -127,36 +126,37 @@ private:
     // Graphical effects
     // -----------------
     /** The shadow of a kart. */
-    Shadow       *m_shadow;
+    Shadow          *m_shadow;
     
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
-    bool          m_shadow_enabled;
+    bool             m_shadow_enabled;
     
     /** Smoke from skidding. */
-    Smoke        *m_smoke_system;
+    ParticleEmitter *m_smoke_system;
     
     /** Water splash when driving in water. */
-    WaterSplash  *m_water_splash_system;
+    WaterSplash     *m_water_splash_system;
 
     /** Graphical effect when using a nitro. */
-    Nitro        *m_nitro;
+    ParticleEmitter *m_nitro;
 
     /** Handles all slipstreaming. */
-    SlipStream   *m_slipstream;
+    SlipStream      *m_slipstream;
 
-    float         m_wheel_rotation;
+    float           m_wheel_rotation;
+    
     /** For each wheel it stores the suspension length after the karts are at 
      *  the start position, i.e. the suspension will be somewhat compressed.
      *  The bullet suspensionRestLength is the value when the suspension is not
      *  at all compressed. */
-    float         m_default_suspension_length[4];
+    float           m_default_suspension_length[4];
 
     /** The skidmarks object for this kart. */
-    SkidMarks    *m_skidmarks;
+    SkidMarks      *m_skidmarks;
 
-    float         m_finish_time;
-    bool          m_finished_race;
+    float           m_finish_time;
+    bool            m_finished_race;
 
     /** When a kart has its view blocked by the plunger, this variable will be 
      *  > 0 the number it contains is the time left before removing plunger. */

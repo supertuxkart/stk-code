@@ -1,7 +1,7 @@
-//  $Id: dust_cloud.hpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,29 +25,41 @@
 #include "irrlicht.h"
 using namespace irr;
 
-class Kart;
+class Material;
 
 /**
-  * \brief manages smoke particle effects
-  * \ingroup graphics
-  */
-class Smoke : public NoCopy
+ * \brief manages smoke particle effects
+ * \ingroup graphics
+ */
+class ParticleEmitter : public NoCopy
 {
 private:
-    /** The kart to which this smoke belongs. */
-    const Kart                      *m_kart;
+    
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node; /* left wheel */
+    
     /** The emitters. Access to these is needed to adjust the number of
      *  particles per second. */
     scene::IParticleEmitter         *m_emitter;
+    
     /** Size of the particles. */
-    const float                      m_particle_size;
+    float                            m_particle_size;
+    
+    float                            m_direction_multiplier;
+    
 public:
-                 Smoke          (Kart* kart);
-    virtual     ~Smoke          ();
-    virtual void update         (float t);
+    ParticleEmitter             (float particleSize, core::vector3df position, Material* material,
+                                 int minParticlesPerSeconds, int maxParticlesPerSecond,
+                                 video::SColor minStartColor, video::SColor maxStartColor,
+                                 int lifeTimeMin, int lifeTimeMax, int maxAngle, int fadeOutTime,
+                                 float directionMultiplier, float minSize, float maxSize,
+                                 scene::ISceneNode* parent = NULL);
+    virtual     ~ParticleEmitter();
+    virtual void update         ();
     void         setCreationRate(float f);
+    
+    void         setPosition(core::vector3df pos);
 };
 #endif
+
 

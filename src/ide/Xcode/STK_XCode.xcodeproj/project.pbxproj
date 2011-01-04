@@ -43,10 +43,8 @@
 		952A1549103F66D600B1895D /* material_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1535103F66D600B1895D /* material_manager.cpp */; };
 		952A154A103F66D600B1895D /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1537103F66D600B1895D /* mesh_tools.cpp */; };
 		952A154B103F66D600B1895D /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1539103F66D600B1895D /* moving_texture.cpp */; };
-		952A154C103F66D600B1895D /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153B103F66D600B1895D /* nitro.cpp */; };
 		952A154D103F66D600B1895D /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153D103F66D600B1895D /* shadow.cpp */; };
 		952A154E103F66D600B1895D /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153F103F66D600B1895D /* skid_marks.cpp */; };
-		952A154F103F66D600B1895D /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1541103F66D600B1895D /* smoke.cpp */; };
 		952A1550103F66D600B1895D /* water_splash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1543103F66D600B1895D /* water_splash.cpp */; };
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
@@ -58,6 +56,7 @@
 		95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95395A75129DFE130079BCE7 /* message_dialog.cpp */; };
 		953C304E12BEF384005BB4CD /* tutorial_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C304C12BEF384005BB4CD /* tutorial_data.cpp */; };
 		953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F8B1F11F7C13C00205E66 /* scalable_font.cpp */; };
+		9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FC7512D3BDB000C00366 /* particle_emitter.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
@@ -405,14 +404,10 @@
 		952A1538103F66D600B1895D /* mesh_tools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mesh_tools.hpp; path = ../../graphics/mesh_tools.hpp; sourceTree = SOURCE_ROOT; };
 		952A1539103F66D600B1895D /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = ../../graphics/moving_texture.cpp; sourceTree = SOURCE_ROOT; };
 		952A153A103F66D600B1895D /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = ../../graphics/moving_texture.hpp; sourceTree = SOURCE_ROOT; };
-		952A153B103F66D600B1895D /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
-		952A153C103F66D600B1895D /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = ../../graphics/nitro.hpp; sourceTree = SOURCE_ROOT; };
 		952A153D103F66D600B1895D /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
 		952A153E103F66D600B1895D /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
 		952A153F103F66D600B1895D /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
 		952A1540103F66D600B1895D /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
-		952A1541103F66D600B1895D /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../graphics/smoke.cpp; sourceTree = SOURCE_ROOT; };
-		952A1542103F66D600B1895D /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../graphics/smoke.hpp; sourceTree = SOURCE_ROOT; };
 		952A1543103F66D600B1895D /* water_splash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = water_splash.cpp; path = ../../graphics/water_splash.cpp; sourceTree = SOURCE_ROOT; };
 		952A1544103F66D600B1895D /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
 		952A1552103F68D000B1895D /* profile_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profile_world.cpp; path = ../../modes/profile_world.cpp; sourceTree = SOURCE_ROOT; };
@@ -442,6 +437,8 @@
 		953F8B2011F7C13C00205E66 /* scalable_font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scalable_font.hpp; path = ../../guiengine/scalable_font.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../utils/ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
+		9542FC7512D3BDB000C00366 /* particle_emitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_emitter.cpp; path = ../../graphics/particle_emitter.cpp; sourceTree = SOURCE_ROOT; };
+		9542FC7612D3BDB000C00366 /* particle_emitter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_emitter.hpp; path = ../../graphics/particle_emitter.hpp; sourceTree = SOURCE_ROOT; };
 		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
 		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -1252,16 +1249,14 @@
 				952A1538103F66D600B1895D /* mesh_tools.hpp */,
 				952A1539103F66D600B1895D /* moving_texture.cpp */,
 				952A153A103F66D600B1895D /* moving_texture.hpp */,
-				952A153B103F66D600B1895D /* nitro.cpp */,
-				952A153C103F66D600B1895D /* nitro.hpp */,
+				9542FC7512D3BDB000C00366 /* particle_emitter.cpp */,
+				9542FC7612D3BDB000C00366 /* particle_emitter.hpp */,
 				952A153D103F66D600B1895D /* shadow.cpp */,
 				952A153E103F66D600B1895D /* shadow.hpp */,
 				952A153F103F66D600B1895D /* skid_marks.cpp */,
 				952A1540103F66D600B1895D /* skid_marks.hpp */,
 				95DFC5001106933B00A043A9 /* slip_stream.cpp */,
 				95DFC5011106933B00A043A9 /* slip_stream.hpp */,
-				952A1541103F66D600B1895D /* smoke.cpp */,
-				952A1542103F66D600B1895D /* smoke.hpp */,
 				95C9C97010E93456005A418D /* stars.cpp */,
 				95C9C97110E93456005A418D /* stars.hpp */,
 				952A1543103F66D600B1895D /* water_splash.cpp */,
@@ -2659,10 +2654,8 @@
 				952A1549103F66D600B1895D /* material_manager.cpp in Sources */,
 				952A154A103F66D600B1895D /* mesh_tools.cpp in Sources */,
 				952A154B103F66D600B1895D /* moving_texture.cpp in Sources */,
-				952A154C103F66D600B1895D /* nitro.cpp in Sources */,
 				952A154D103F66D600B1895D /* shadow.cpp in Sources */,
 				952A154E103F66D600B1895D /* skid_marks.cpp in Sources */,
-				952A154F103F66D600B1895D /* smoke.cpp in Sources */,
 				952A1550103F66D600B1895D /* water_splash.cpp in Sources */,
 				952A1554103F68D000B1895D /* profile_world.cpp in Sources */,
 				9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */,
@@ -2732,6 +2725,7 @@
 				9538E2BA12C25D6800172896 /* network_http.cpp in Sources */,
 				951B50AE12C9698B004F6993 /* xml_writer.cpp in Sources */,
 				9538A56012CD094200CE3220 /* addon.cpp in Sources */,
+				9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
