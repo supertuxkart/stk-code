@@ -29,18 +29,33 @@ class XMLNode;
 class Addon
 {
 public:
+    /** The name to be displayed. */
     std::string m_name;
-    int         m_version;
-    int         m_installed_version;
-    std::string m_description;
-    std::string m_icon;
-    std::string m_file;
+    /** Internal id for this addon, which is the name in lower case.
+     *  This is used to create a subdirectory for this addon. */
     std::string m_id;
+    /** The (highest) version available online. */
+    int         m_version;
+    /** The currently installed version. */
+    int         m_installed_version;
+    /** A description of this addon. */
+    std::string m_description;
+    /** Name of the icon to use. */
+    std::string m_icon;
+    /** The name of the zip file on the addon server. */
+    std::string m_zip_file;
+    /** True if the addon is installed. */
     bool        m_installed;
+    /** Type, must be 'kart' or 'track'. */
     std::string m_type;
+
     Addon() {};
     /** Initialises the object from an XML node. */
     Addon(const XMLNode &xml, bool installed=false);
+    // ------------------------------------------------------------------------
+    void writeXML(std::ofstream *out_stram);
+    // ------------------------------------------------------------------------
+    void copyInstallData(const Addon &addon);
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const std::string& getName() const {return m_name; }
@@ -48,8 +63,8 @@ public:
     /** Returns the type of the addon. */
     const std::string& getType() const {return m_type; }
     // ------------------------------------------------------------------------
-    /** Returns the filename of the addon. */
-    const std::string& getFile() const {return m_file; }
+    /** Returns the filename of the zip file with the addon. */
+    const std::string& getZipFileName() const {return m_zip_file; }
     // ------------------------------------------------------------------------
     /** Returns the name of the icon of this addon. */
     const std::string& getIcon() const {return m_icon; }

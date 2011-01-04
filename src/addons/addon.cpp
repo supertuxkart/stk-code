@@ -20,8 +20,13 @@
 #ifdef ADDONS_MANAGER
 
 #include "addons/addon.hpp"
+
+#include <fstream>
+//#include <iostream>
+
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/string_utils.hpp"
 
 Addon::Addon(const XMLNode &xml, bool installed)
 {
@@ -29,17 +34,53 @@ Addon::Addon(const XMLNode &xml, bool installed)
     m_installed_version = 0;
     m_name              = "";
     m_version           = 0 ;
-    m_file              = "";
+    m_zip_file          = "";
     m_description       = "";
     m_icon              = "";
     m_id                = "";
     m_type              = xml.getName();
-
-    xml.get("name",        &m_name       );
-    xml.get("version",     &m_version    );
-    xml.get("file",        &m_file       );
-    xml.get("description", &m_description);
-    xml.get("icon",        &m_icon       );
-    xml.get("id",          &m_id         );
+    
+    xml.get("name",        &m_name);
+    if(m_installed)
+    {
+        xml.get("installed-version", &m_installed_version);
+        xml.get("id",      &m_id             );
+    }
+    else   // not installed
+    {
+        xml.get("file",        &m_zip_file   );
+        xml.get("description", &m_description);
+        xml.get("icon",        &m_icon       );
+        xml.get("version",     &m_version    );
+        // The online list has a numeric id, which is not used.
+        // So ignore it.
+        m_id = StringUtils::toLowerCase(m_name);
+    }   // if installed
 };   // Addon(const XML&)
+
+// ----------------------------------------------------------------------------
+/** Copies the installation data (like description, version, icon) from the 
+ *  downloaded online list to this entry.
+*/
+void Addon::copyInstallData(const Addon &addon)
+{
+    m_description = addon.m_description;
+    m_version     = addon.m_version;
+    m_zip_file    = addon.m_zip_file;
+    m_icon        = addon.m_icon;
+}   // copyInstallData
+
+// ----------------------------------------------------------------------------
+/** Writes information about an installed addon (it is only called for 
+ *  installed addons).
+ *  \param out_stream Output stream to write to.
+ */
+void Addon::writeXML(std::ofstream *out_stream)
+{
+    (*out_stream) << "  <" << m_type << " name=\"" << m_name 
+                  << "\" id=\"" << m_id << "\" installed-version=\""
+                  << m_installed_version << "\"/>\n";
+}   // writeXML
+
 #endif
+

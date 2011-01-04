@@ -40,7 +40,7 @@ class AddonsScreen : public GUIEngine::Screen,
                      public GUIEngine::ScreenSingleton<AddonsScreen>
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
-
+private:
     AddonsScreen();
     AddonsManager   *m_addons;
     AddonsLoading   *m_load;
@@ -55,13 +55,15 @@ class AddonsScreen : public GUIEngine::Screen,
                     *m_icon_bank;
     GUIEngine::LabelWidget
                     *m_update_status;
+    /** Currently selected type. */
+    std::string      m_type;
 
 public:
 
     bool                    m_can_load_list;
 
     /** Load the addons into the main list.*/
-    void loadList(const std::string &type);
+    void loadList();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();

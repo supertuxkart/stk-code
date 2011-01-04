@@ -167,7 +167,7 @@ void AddonsLoading::onUpdate(float delta)
         {
             // TODO: show a message in the interface
             fprintf(stderr, "[Addons] Failed to download '%s'\n", 
-                    m_addon.getFile().c_str());
+                    m_addon.getZipFileName().c_str());
             dismiss();
             return;
         }
@@ -218,12 +218,14 @@ void AddonsLoading::close()
  **/
 void AddonsLoading::startInstall()
 {
-    std::string file = "file/" + m_addon.getFile();
-    std::string save = StringUtils::getBasename(m_addon.getFile());
+    std::string file = "file/" + m_addon.getZipFileName();
+    std::string save = StringUtils::getBasename(m_addon.getZipFileName());
     network_http->downloadFileAsynchron(file, save);
 }   // startInstall
 
 // ----------------------------------------------------------------------------
+/** Called when the asynchronous download of the addon finished.
+ */
 void AddonsLoading::endInstall()
 {
     if(!m_addon.isInstalled() || m_addon.needsUpdate())
@@ -234,5 +236,8 @@ void AddonsLoading::endInstall()
     {
         addons_manager->uninstall(m_addon);
     }
+    // The list of the addon screen needs to be updated to correctly
+    // display the newly (un)installed addon.
+    AddonsScreen::getInstance()->loadList();
 }   // endInstall
 #endif

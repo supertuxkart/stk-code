@@ -75,7 +75,8 @@ void AddonsScreen::init()
 
     getWidget<GUIEngine::LabelWidget>("update_status")
         ->setText(_("Updating the list..."));
-    loadList("kart");
+    m_type = "kart";
+    loadList();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -83,7 +84,7 @@ void AddonsScreen::init()
  *  updated.
  *  \param type Must be 'kart' or 'track'.
  */
-void AddonsScreen::loadList(const std::string &type)
+void AddonsScreen::loadList()
 {
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -92,11 +93,11 @@ void AddonsScreen::loadList(const std::string &type)
     {
         const Addon &addon = addons_manager->getAddon(i);
         // Ignore addons of a different type
-        if(addon.getType()!=type) continue;
+        if(addon.getType()!=m_type) continue;
         
         // Get the right icon to display
         int icon;
-        if(addon.isInstalled() && addon.needsUpdate())
+        if(addon.isInstalled())
             icon = addon.needsUpdate() ? m_icon_needs_update 
                                        : m_icon_installed;
 	    else
@@ -109,10 +110,10 @@ void AddonsScreen::loadList(const std::string &type)
 	m_can_load_list = false;
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
 	getWidget<GUIEngine::LabelWidget>("update_status")->setText("");
-	if(type == "kart")
+	if(m_type == "kart")
     	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart", 
                                                         PLAYER_ID_GAME_MASTER);
-	else if(type == "track")
+	else if(m_type == "track")
     	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track", 
                                                         PLAYER_ID_GAME_MASTER);
     else
@@ -146,11 +147,13 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
         else if (selection == "tab_track")
         {
-            loadList("track");
+            m_type = "track";
+            loadList();
         }
         else if (selection == "tab_kart")
         {
-            loadList("kart");
+            m_type = "kart";
+            loadList();
         }
     }
 }   // eventCallback

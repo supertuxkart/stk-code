@@ -112,6 +112,16 @@ namespace StringUtils
         return name;
     }   // toUpperCase
     
+    //-------------------------------------------------------------------------
+    /** Returns a string converted to lower case.
+     */
+    std::string toLowerCase(const std::string& str)
+    {
+        std::string name = str;
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        return name;
+    }   // toLowerCase
+
     //-----------------------------------------------------------------------------
     /** Splits a string into substrings separated by a certain character, and 
      *  returns a std::vector of all those substring. E.g.:

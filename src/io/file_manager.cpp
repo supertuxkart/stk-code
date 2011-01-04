@@ -490,7 +490,7 @@ void FileManager::checkAndCreateConfigDir()
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32)
-    m_addons_dir  = m_config_dir;
+    m_addons_dir  = m_config_dir+"/addons";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart";

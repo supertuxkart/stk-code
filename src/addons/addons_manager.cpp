@@ -46,8 +46,7 @@ AddonsManager* addons_manager = 0;
  */
 AddonsManager::AddonsManager() : m_state(STATE_INIT)
 {
-    m_file_installed = file_manager->getConfigDir() 
-                     + "/" + "addons_installed.xml";
+    m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
     loadInstalledAddons();
 }   // AddonsManager
 
@@ -84,15 +83,14 @@ void AddonsManager::initOnline()
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
-        if(node->getName()=="track")
+        if(node->getName()=="track" || node->getName()=="kart")
         {
             Addon addon(*node);
-            m_addons_list.push_back(addon);
-        }
-        else if(node->getName()=="kart")
-        {
-            Addon addon(*node);
-            m_addons_list.push_back(addon);
+            int index = getAddonIndex(addon.getId());
+            if(index>=0)
+                m_addons_list[index].copyInstallData(addon);
+            else
+                m_addons_list.push_back(addon);
         }
         else
         {
@@ -118,6 +116,10 @@ bool AddonsManager::onlineReady()
 }   // onlineReady
 
 // ----------------------------------------------------------------------------
+/** Loads the installed addons from .../addons/addons_installed.xml. This is
+ *  called before network_http is constructed (so no need to protect 
+ *  m_addons_list with a mutex).
+ */
 void AddonsManager::loadInstalledAddons()
 {
     /* checking for installed addons */
@@ -133,25 +135,8 @@ void AddonsManager::loadInstalledAddons()
         if(node->getName()=="kart"   ||
             node->getName()=="track"    )
         {
-            std::string name="";
-            std::string id="";
-            int version = 0;
-            node->get("id",      &id     );
-            node->get("name",    &name   );
-            node->get("version", &version);
-            int index = getAddonIndex(id);            
-            if(index>0)
-            {
-                m_addons_list[index].m_installed = true;
-                m_addons_list[index].m_installed_version = version;
-                std::cout << "[Addons] An addon is already installed: " 
-                    << id << std::endl;
-            }
-            else
-            {
-                Addon addon(*xml, /* installed= */ true);
-                m_addons_list.push_back(addon);
-            }
+            Addon addon(*node, /*installed*/ true);
+            m_addons_list.push_back(addon);
         }
     }   // for i <= xml->getNumNodes()
 
@@ -186,14 +171,13 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 void AddonsManager::install(const Addon &addon)
 {
     bool success=true;
-    
-    file_manager->checkAndCreateDirForAddons(addon.getName(),
-                                             addon.getType()+ "s/");
+    std::string id = StringUtils::toLowerCase(addon.getName());
+    file_manager->checkAndCreateDirForAddons(id, addon.getType()+ "s/");
 
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file = file_manager->getAddonsDir() + "/"
                           + addon.getType()+ "s/" + addon.getName() + "/" ;
-    std::string base_name = StringUtils::getBasename(addon.getFile());
+    std::string base_name = StringUtils::getBasename(addon.getZipFileName());
     std::string from      = file_manager->getAddonsFile(base_name);
     std::string to        = dest_file;
     
@@ -232,14 +216,7 @@ void AddonsManager::saveInstalled()
     {
         if(m_addons_list[i].m_installed)
         {
-            std::ostringstream os;
-            os << m_addons_list[i].m_installed_version;
-
-            //transform the version (int) in string
-            xml_installed << "<"+ m_addons_list[i].m_type +" name=\"" +
-                        m_addons_list[i].m_name + "\" id=\"" +
-                        m_addons_list[i].m_id + "\"";
-            xml_installed << " version=\"" + os.str() + "\" />" << std::endl;
+            m_addons_list[i].writeXML(&xml_installed);
         }
     }
     xml_installed << "</addons>" << std::endl;

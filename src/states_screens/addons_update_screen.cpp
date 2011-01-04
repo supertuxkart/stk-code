@@ -71,15 +71,15 @@ void AddonsUpdateScreen::eventCallback(GUIEngine::Widget* widget,
         if (selection == "tab_track")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->loadList("track");
+            AddonsScreen::getInstance()->loadList();
         }
         else if (selection == "tab_kart")
         {
             StateManager::get()->replaceTopMostScreen(AddonsScreen::getInstance());
-            AddonsScreen::getInstance()->loadList("kart");
+            AddonsScreen::getInstance()->loadList();
         }
     }
-}
+}   // eventCallback
 
 // ------------------------------------------------------------------------------------------------------
 

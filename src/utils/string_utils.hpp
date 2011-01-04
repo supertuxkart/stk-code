@@ -76,6 +76,7 @@ namespace StringUtils
     }
 
     std::string                     toUpperCase(const std::string&);
+    std::string                     toLowerCase(const std::string&);
     std::vector<std::string>        split(const std::string& s, char c, 
                                           bool keepSplitChar=false);
     std::vector<irr::core::stringw> split(const irr::core::stringw& s, 
