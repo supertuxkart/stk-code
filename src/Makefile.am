@@ -71,16 +71,14 @@ supertuxkart_SOURCES = \
  graphics/mesh_tools.hpp \
  graphics/moving_texture.cpp \
  graphics/moving_texture.hpp \
- graphics/nitro.cpp \
- graphics/nitro.hpp \
+ graphics/particle_emitter.cpp \
+ graphics/particle_emitter.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
  graphics/slip_stream.cpp \
  graphics/slip_stream.hpp \
- graphics/smoke.cpp \
- graphics/smoke.hpp \
  graphics/stars.cpp \
  graphics/stars.hpp \
  graphics/water_splash.hpp \
