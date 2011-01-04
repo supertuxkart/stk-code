@@ -88,14 +88,11 @@ public:
                                     std::string addons_type);
     bool removeDirectory(char const *name);
 #endif
-    std::string getKartDir       () const;
     std::string getDataDir       () const;
     std::string getTranslationDir() const;
     std::string getGUIDir        () const;
     std::vector<std::string>getMusicDirs() const;
     std::string getTextureFile   (const std::string& fname) const;
-    std::string getKartFile      (const std::string& fname,
-                                  const std::string& kart="") const;
     std::string getDataFile      (const std::string& fname) const;
     std::string getHighscoreFile (const std::string& fname) const;
     std::string getChallengeFile (const std::string& fname) const;

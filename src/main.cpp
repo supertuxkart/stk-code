@@ -339,8 +339,8 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");
-            if(filename!="")
+            const KartProperties *prop = kart_properties_manager->getKart(argv[i+1]);
+            if(prop)
             {
                 UserConfigParams::m_default_kart = argv[i+1];
 

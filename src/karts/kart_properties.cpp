@@ -152,9 +152,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
 
     // Load material
-    std::string materials_file = file_manager->getKartFile("materials.xml",getIdent());
-    file_manager->pushModelSearchPath(file_manager->getKartFile("", getIdent()));
-    file_manager->pushTextureSearchPath(file_manager->getKartFile("", getIdent()));
+    std::string materials_file = m_root+"/materials.xml";
+    file_manager->pushModelSearchPath  (m_root);
+    file_manager->pushTextureSearchPath(m_root);
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);

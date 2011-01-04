@@ -329,11 +329,6 @@ std::string FileManager::getGUIDir() const
 {
     return m_root_dir+"/data/gui/";
 }
-//-----------------------------------------------------------------------------
-std::string FileManager::getKartDir() const
-{
-    return m_root_dir+"/data/karts/";
-}   // getKartDir
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getTranslationDir() const
@@ -346,18 +341,6 @@ std::vector<std::string> FileManager::getMusicDirs() const
 {
     return m_music_search_path;
 }   // getMusicDirs
-
-//-----------------------------------------------------------------------------
-std::string FileManager::getKartFile(const std::string& fname,
-                                     const std::string& kart_name) const
-{
-    // kart file are in data/karts/KARTNAME/KARTNAME.ext
-    // but if a kart name is supplied use it (which is necessary
-    // e.g. to load a model from a kart directory
-    std::string basename = (kart_name!="") ? kart_name
-                           : StringUtils::removeExtension(fname);
-    return getKartDir()+basename+"/"+fname;
-}   // getKartFile
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getDataFile(const std::string& fname) const
