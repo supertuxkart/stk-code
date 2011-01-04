@@ -289,10 +289,12 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
 {
     if (eventSource == "start" )
     {
-        ModalDialog::dismiss();
-        
+        // Create a copy of member variables we still need, since they will
+        // not be accessible after dismiss:
         const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-        race_manager->startSingleRace(m_track_ident, num_laps);
+        std::string track_ident = m_track_ident;
+        ModalDialog::dismiss();
+        race_manager->startSingleRace(track_ident, num_laps);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "lapcountspinner")
