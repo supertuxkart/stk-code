@@ -47,7 +47,6 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_progress       = NULL;
     m_can_install    = false;
     m_percent_update = false;
-    pthread_mutex_init(&m_mutex_can_install, NULL);
 
     /*Init the icon here to be able to load a single image*/
     m_icon = getWidget<IconButtonWidget>("icon");
@@ -83,6 +82,7 @@ void * AddonsLoading::downloadIcon( void * pthis)
     std::string icon_name = StringUtils::getBasename(me->m_addon.getIcon());
     std::string icon_path = "icon/" + me->m_addon.getIcon();
 
+    // FIXME: addons_loading might be removed before this finishes!
 	if(network_http->downloadFileSynchron(icon_path, icon_name))
     {
         me->m_icon_loaded.set(ICON_LOADED);
@@ -98,60 +98,52 @@ void * AddonsLoading::downloadIcon( void * pthis)
 // ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation 
-                    AddonsLoading::processEvent(const std::string& eventSource)
+                    AddonsLoading::processEvent(const std::string& event_source)
 {
-    if(eventSource == "cancel")
+    if(event_source == "cancel")
     {
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "next")
+    else if(event_source == "install")
     {
-        // addons_manager->nextType(addons_manager->getType());
-        assert(false);
-        //loadInfo();
-    }
-    else if(eventSource == "previous")
-    {
-        // FIXME: addons_manager->previousType(addons_manager->getType());
-        assert(false);
-        //loadInfo();
-    }
-    if(eventSource == "install")
-    {
-        assert(m_progress==NULL);
-        m_progress = new ProgressBarWidget();
-        m_progress->m_x = 180;
-        m_progress->m_y = m_area.getHeight()-45;
-        m_progress->m_w = 250;
-        m_progress->m_h = 35;
-        m_progress->setParent(m_irrlicht_window);
+        // Only display the progress bar etc. if we are
+        // not uninstalling an addon.
+        if(!m_addon.isInstalled() || m_addon.needsUpdate())
+        {
+            assert(m_progress==NULL);
+            m_progress = new ProgressBarWidget();
+            m_progress->m_x = 180;
+            m_progress->m_y = m_area.getHeight()-45;
+            m_progress->m_w = 250;
+            m_progress->m_h = 35;
+            m_progress->setParent(m_irrlicht_window);
 
-        m_widgets.push_back(m_progress);
-        m_progress->add();
+            m_widgets.push_back(m_progress);
+            m_progress->add();
 
-        /*This widget will show some text as "downloading..." or "installing".*/
-        m_state = new LabelWidget();
-        m_state->m_properties[PROP_TEXT_ALIGN] = "center";
-        /* Center the widget*/
-        m_state->m_x = 10;
-        m_state->m_y = getHeight()-125;
-        m_state->m_w = getWidth() - 20;
-        m_state->m_h = 35;
-        m_state->setParent(m_irrlicht_window);
+            /*This widget will show some text as "downloading..." or "installing".*/
+            m_state = new LabelWidget();
+            m_state->m_properties[PROP_TEXT_ALIGN] = "center";
+            /* Center the widget*/
+            m_state->m_x = 10;
+            m_state->m_y = getHeight()-125;
+            m_state->m_w = getWidth() - 20;
+            m_state->m_h = 35;
+            m_state->setParent(m_irrlicht_window);
 
-        m_widgets.push_back(m_state);
-        m_state->add();
+            m_widgets.push_back(m_state);
+            m_state->add();
 
-        getWidget<ButtonWidget>("cancel")->setDeactivated();
-        //FIXME : re-implement this buttons
-        /*
-        m_next->setDeactivated();
-        m_previous->setDeactivated();
-        */
-        getWidget<ButtonWidget>("install")->setDeactivated();
-        m_percent_update = true;
-        startInstall();
+            getWidget<ButtonWidget>("cancel")->setDeactivated();
+            getWidget<ButtonWidget>("install")->setDeactivated();
+            m_percent_update = true;
+            startInstall();
+        }
+        else   // uninstall
+        {
+            endInstall();
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -191,24 +183,16 @@ void AddonsLoading::onUpdate(float delta)
 
     return;
 
-    pthread_mutex_lock(&(m_mutex_can_install));
     if(m_can_install)
     {
         close();
     }
-    if(m_percent_update)
-    {
-        m_progress->setValue(addons_manager->getDownloadState());
-        m_state->setText(addons_manager->getDownloadStateAsStr().c_str());
-    }
-    pthread_mutex_unlock(&(m_mutex_can_install));
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::close()
 {
     AddonsScreen* curr_screen = AddonsScreen::getInstance();
-	((AddonsScreen*)curr_screen)->m_can_load_list = true;
     dismiss();
 }   // close
 

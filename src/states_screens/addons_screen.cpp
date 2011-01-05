@@ -106,7 +106,6 @@ void AddonsScreen::loadList()
                         icon);
     }
 
-	m_can_load_list = false;
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
 	getWidget<GUIEngine::LabelWidget>("update_status")->setText("");
 	if(m_type == "kart")

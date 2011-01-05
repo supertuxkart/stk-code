@@ -69,7 +69,6 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    pthread_mutex_t m_mutex_can_install;
     AddonsLoading(const float percent_width, const float percent_height,
                   const std::string &addon_name);
     GUIEngine::EventPropagation processEvent(const std::string& event_source);

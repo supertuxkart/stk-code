@@ -60,8 +60,6 @@ private:
 
 public:
 
-    bool                    m_can_load_list;
-
     /** Load the addons into the main list.*/
     void loadList();
 

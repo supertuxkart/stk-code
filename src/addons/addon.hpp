@@ -89,7 +89,7 @@ public:
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
     {
-        return getInstalledVersion() < getVersion();
+        return m_installed && getInstalledVersion() < getVersion();
     }
     // ------------------------------------------------------------------------
     /** Marks this addon to be installed. If the addon is marked as being
