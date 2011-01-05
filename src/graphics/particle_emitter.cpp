@@ -47,6 +47,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     m_node->setName(debug_name.c_str());
 #endif
     
+    
     if (parent != NULL)
     {
         m_node->setParent(parent);
@@ -59,6 +60,8 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     m_node->setPosition(position);
     material->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, material->getTexture());
+    
+    printf("==== %s ====\n", material->getTexFname().c_str());
     
     // FIXME: does the maxAngle param work at all??
     // FIXME: the min and max color params don't appear to work

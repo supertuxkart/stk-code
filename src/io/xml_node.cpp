@@ -283,8 +283,10 @@ int XMLNode::get(const std::string &attribute, float *value) const
 int XMLNode::get(const std::string &attribute, bool *value) const
 {
     std::string s;
+    
+    // FIXME: for some reason, missing attributes don't trigger that if???
     if(!get(attribute, &s)) return 0;
-    *value = s==""     || s[0]=='T' || s[0]=='t' || s[0]=='Y' || s[0]=='y' ||
+    *value = s[0]=='T' || s[0]=='t' || s[0]=='Y' || s[0]=='y' ||
              s=="#t"   || s   =="#T";
     return 1;
 }   // get(bool)

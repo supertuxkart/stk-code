@@ -15,12 +15,11 @@
     <!-- Size of the particles -->
     <size      min="0.2"
                max="0.66"        />
-    
-    <!-- Doesn't seem to work -->
+
     <color     min="255 255 255"
                max="255 255 255" />
 
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="1500"       />
+    <fadeout   time="900"       />
 
 </particles>

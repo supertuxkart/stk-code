@@ -49,6 +49,8 @@ private:
     bool             m_zipper;
     bool             m_resetter;
     bool             m_ignore;
+    bool             m_add;
+    
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
     bool             m_lighting;

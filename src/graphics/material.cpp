@@ -46,8 +46,9 @@ Material::Material(const XMLNode *node, int index)
     if (m_texname=="")
     {
         throw std::runtime_error("No texture name specified in %s file\n");
-    }
+    }    
     init(index);
+    
     bool b = false;
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP;
     b = false;
@@ -60,6 +61,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("friction",         &m_friction          );
     node->get("ignore",           &m_ignore            );
     node->get("reset",            &m_resetter          );
+    node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("anisotropic",      &m_anisotropic       );
@@ -135,6 +137,7 @@ void Material::init(unsigned int index)
     m_friction                  = 1.0f;
     m_ignore                    = false;
     m_resetter                  = false;
+    m_add                       = false;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
@@ -240,6 +243,8 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
  */
 void  Material::setMaterialProperties(video::SMaterial *m) const
 {
+    int modes = 0;
+    
     if (m_alpha_testing)
     {
         // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
@@ -248,18 +253,33 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         // updates of the Z buffer of the material. Since the _REF 
         // approach is faster (and looks better imho), this is used for now.
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        
+        modes++;
     }
-    else if (m_alpha_blending)
+    if (m_alpha_blending)
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        modes++;
     }
-    else if (m_sphere_map) 
+    if (m_sphere_map) 
     {
         m->MaterialType = video::EMT_SPHERE_MAP;
+        modes++;
     }
-    else if (m_lightmap)
+    if (m_lightmap)
     {
         m->MaterialType = video::EMT_LIGHTMAP;
+        modes++;
+    }
+    if (m_add)
+    {
+        m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+        modes++;
+    }
+    
+    if (modes > 1)
+    {
+        std::cerr << "[Material::setMaterialProperties] More than one main mode set for " << m_texname.c_str() << "\n";
     }
 
     if (!m_lighting)
