@@ -73,6 +73,8 @@ supertuxkart_SOURCES = \
  graphics/moving_texture.hpp \
  graphics/particle_emitter.cpp \
  graphics/particle_emitter.hpp \
+ graphics/particle_kind.cpp \
+ graphics/particle_kind.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \

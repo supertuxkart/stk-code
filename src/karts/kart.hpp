@@ -106,6 +106,9 @@ private:
      *  determine startup boost. */
     bool         m_has_started;
 
+    /** For skidding smoke */
+    int          m_wheel_toggle;
+    
     float        m_max_gear_rpm;       /**<Maximum engine rpm's for the current gear*/
     float        m_bounce_back_time;   /**<A short time after a collision acceleration
                                         *  is disabled to allow the karts to bounce back*/

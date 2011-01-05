@@ -21,18 +21,26 @@
 
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/particle_kind.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
-ParticleEmitter::ParticleEmitter(float particleSize, core::vector3df position, Material* material,
-                                 int minParticlesPerSecond, int maxParticlesPerSecond,
-                                 video::SColor minStartColor, video::SColor maxStartColor,
-                                 int lifeTimeMin, int lifeTimeMax, int maxAngle, int fadeOutTime,
-                                 float directionMultiplier, float minSize, float maxSize, scene::ISceneNode* parent)
+ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
+                                 scene::ISceneNode* parent)
 {
-    m_direction_multiplier = directionMultiplier;
     m_node = irr_driver->addParticleNode();
+    m_particle_type = type;
+    
+    Material* material    = type->getMaterial();
+    const float minSize   = type->getMinSize();
+    const float maxSize   = type->getMaxSize();
+    const int lifeTimeMin = type->getMinLifetime();
+    const int lifeTimeMax = type->getMaxLifetime();
+    
+    assert(material->getTexture() != NULL);
+    assert(maxSize >= minSize);
+    assert(lifeTimeMax >= lifeTimeMin);
     
 #ifdef DEBUG
     std::string debug_name = std::string("particles(") + material->getTexture()->getName().getPath().c_str() + ")";
@@ -53,20 +61,22 @@ ParticleEmitter::ParticleEmitter(float particleSize, core::vector3df position, M
     m_node->setMaterialTexture(0, material->getTexture());
     
     // FIXME: does the maxAngle param work at all??
-    
-    m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.3f, 0.0f),   // velocity in m/ms
-                                           minParticlesPerSecond, maxParticlesPerSecond,
-                                           minStartColor, maxStartColor,
+    // FIXME: the min and max color params don't appear to work
+    m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+                                           type->getMinRate(), type->getMaxRate(),
+                                           type->getMinColor(), type->getMaxColor(),
                                            lifeTimeMin, lifeTimeMax,
-                                           maxAngle
+                                           0 /* angle */
                                            );
     m_emitter->setMinStartSize(core::dimension2df(minSize, minSize));
     m_emitter->setMaxStartSize(core::dimension2df(maxSize, maxSize));
     m_node->setEmitter(m_emitter); // this grabs the emitter
     m_emitter->drop();             // so we can drop our references
     
-    // FIXME: fade-out color doesn't seem to quite work
-    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), fadeOutTime);
+    // FIXME: this is ridiculous, the fadeout time should be equal to the lifetime, except that the
+    //        lifetime is random...
+    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0),
+                                                                                type->getFadeoutTime());
     m_node->addAffector(af);
     af->drop();
     
@@ -86,12 +96,14 @@ void ParticleEmitter::update()
     // No particles to emit, no need to change the speed
     if (m_emitter->getMinParticlesPerSecond() == 0) return;
     
+    const float spreading = m_particle_type->getSpreadFactor();
+    
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
-    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*m_direction_multiplier,
-             sin(DEGREE_TO_RAD*(rand()%100))*m_direction_multiplier,
-             sin(DEGREE_TO_RAD*(rand()%180))*m_direction_multiplier);
+    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*spreading,
+             sin(DEGREE_TO_RAD*(rand()%100))*spreading,
+             sin(DEGREE_TO_RAD*(rand()%180))*spreading);
     
     m_emitter->setDirection(dir.toIrrVector());
 }   // update

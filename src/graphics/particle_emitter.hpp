@@ -26,6 +26,7 @@
 using namespace irr;
 
 class Material;
+class ParticleKind;
 
 /**
  * \brief manages smoke particle effects
@@ -41,18 +42,12 @@ private:
     /** The emitters. Access to these is needed to adjust the number of
      *  particles per second. */
     scene::IParticleEmitter         *m_emitter;
-    
-    /** Size of the particles. */
-    float                            m_particle_size;
-    
-    float                            m_direction_multiplier;
+
+    ParticleKind                    *m_particle_type;
     
 public:
-    ParticleEmitter             (float particleSize, core::vector3df position, Material* material,
-                                 int minParticlesPerSeconds, int maxParticlesPerSecond,
-                                 video::SColor minStartColor, video::SColor maxStartColor,
-                                 int lifeTimeMin, int lifeTimeMax, int maxAngle, int fadeOutTime,
-                                 float directionMultiplier, float minSize, float maxSize,
+    
+    ParticleEmitter             (ParticleKind* type, core::vector3df position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
     virtual void update         ();

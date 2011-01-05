@@ -255,6 +255,8 @@ int XMLNode::get(const std::string &attribute, int *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
+    // FIXME: don't use "atoi", if the number in the attribute is not an int we want an error message,
+    //        not silently return 0... easy to get bitten by this
     *value = atoi(s.c_str());
     return 1;
 }   // get(int)

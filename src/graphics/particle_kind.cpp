@@ -1,0 +1,154 @@
+//  $Id$
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "graphics/particle_kind.hpp"
+
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
+#include "utils/constants.hpp"
+
+#include <stdexcept>
+
+ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255), m_max_start_color(255,255,255,255)
+{
+    // ---- Initial values to prevent readin uninitialized values
+    m_max_size      = 0.5;
+    m_min_size      = 0.5;
+    m_spread_factor = 0.001;
+    m_shape         = EMITTER_POINT;
+    m_material      = NULL;
+    m_min_rate      = 10;
+    m_max_rate      = 10;
+    m_lifetime_min  = 400;
+    m_lifetime_max  = 400;
+    m_fadeout_time  = 400;
+
+    
+    // ----- Read XML file
+    
+    //std::cout << "==== READING " << file << " ====\n";
+    
+    XMLNode* xml = file_manager->createXMLTree(file);
+    
+    if (xml == NULL)
+    {
+        throw std::runtime_error("[ParticleKind] Cannot find file " + file);
+    }
+    
+    if (xml->getName() != "particles")
+    {
+        delete xml;
+        throw std::runtime_error("[ParticleKind] No <particles> main node in smoke.xml");
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    std::string emitterShape = "point";
+    xml->get("emitter", &emitterShape);
+    
+    if (emitterShape == "point")
+    {
+        m_shape = EMITTER_POINT;
+    }
+    else if (emitterShape == "box")
+    {
+        m_shape = EMITTER_BOX;
+    }
+    else
+    {
+        std::cerr << "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n";
+        m_shape = EMITTER_POINT;
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* spreading = xml->getNode("spreading");
+    spreading->get("value", &m_spread_factor);
+    
+    //std::cout << "m_spread_factor = " << m_spread_factor << "\n";
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* material = xml->getNode("material");
+    std::string materialFile;
+    material->get("file", &materialFile);
+    
+    if (materialFile.size() == 0)
+    {
+        delete xml;
+        throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
+    }
+    
+    m_material = material_manager->getMaterial(materialFile);
+    if (m_material->getTexture() == NULL)
+    {
+        throw std::runtime_error("[ParticleKind] Cannot locate file " + materialFile);
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* rate = xml->getNode("rate");
+    rate->get("min", &m_min_rate);
+    rate->get("max", &m_max_rate);
+    
+    //std::cout << "m_min_rate = " << m_min_rate << "\n";
+    //std::cout << "m_max_rate = " << m_max_rate << "\n";
+
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* lifetime = xml->getNode("lifetime");
+    lifetime->get("min", &m_lifetime_min);
+    lifetime->get("max", &m_lifetime_max);
+    
+    //std::cout << "m_lifetime_min = " << m_lifetime_min << "\n";
+    //std::cout << "m_lifetime_max = " << m_lifetime_max << "\n";
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* size = xml->getNode("size");
+    //size->get("default", &m_particle_size);
+    size->get("min", &m_min_size);
+    size->get("max", &m_max_size);
+    
+    //std::cout << "m_particle_size = " << m_particle_size << "\n";
+    //std::cout << "m_min_size = " << m_min_size << "\n";
+    //std::cout << "m_max_size = " << m_max_size << "\n";
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* color = xml->getNode("color");
+    video::SColor minColor;
+    video::SColor maxColor;
+    color->get("min", &m_min_start_color);
+    color->get("max", &m_max_start_color);
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* fadeout = xml->getNode("fadeout");
+    fadeout->get("time", &m_fadeout_time);
+    
+    //std::cout << "m_fadeout_time = " << m_fadeout_time << "\n";
+    
+    // ------------------------------------------------------------------------
+    
+    delete xml;
+}
