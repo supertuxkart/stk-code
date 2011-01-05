@@ -125,7 +125,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
-            race_manager->setNumKarts( race_manager->getNumPlayers() ); // no AI karts;
+            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == "locked")
@@ -136,8 +136,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     else if (name == "aikartamount")
     {
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
-        
-        race_manager->setNumKarts( race_manager->getNumPlayers() + w->getValue() );
+        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + w->getValue() );
     }
 }
 
@@ -174,13 +173,13 @@ void RaceSetupScreen::init()
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
-    
+        
     // Avoid negative numbers (which can happen if e.g. the number of karts
     // in a previous race was lower than the number of players now.
-    int num_ai = race_manager->getNumberOfKarts()-race_manager->getNumPlayers();
+    int num_ai = race_manager->getNumberOfKarts()-race_manager->getNumLocalPlayers();
     if(num_ai<0) num_ai = 0;
     kartamount->setValue(num_ai);
-    kartamount->setMax(stk_config->m_max_karts - race_manager->getNumPlayers() );
+    kartamount->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
