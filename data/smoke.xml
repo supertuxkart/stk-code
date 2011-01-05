@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<particles emitter="box">
+<particles emitter="point">
 
     <spreading value="0.003"     />
     <material  file="smoke.png"  />
