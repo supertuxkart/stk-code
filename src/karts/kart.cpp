@@ -1444,8 +1444,10 @@ void Kart::loadData()
     {
         try
         {
-            core::vector3df position(-getKartWidth()*0.35f, 0.06, -getKartLength()*0.5f);
-            m_smoke_system = new ParticleEmitter(new ParticleKind(file_manager->getDataFile("smoke.xml")), position);
+            core::vector3df position(-getKartWidth()*0.35f, 0.06f, -getKartLength()*0.5f);
+            m_smoke_system = new ParticleEmitter(
+                                 new ParticleKind(file_manager->getDataFile("smoke.xml")),
+                                 position);
         }
         catch (std::runtime_error& e)
         {
@@ -1459,7 +1461,9 @@ void Kart::loadData()
     
     try
     {
-        m_nitro  = new ParticleEmitter(new ParticleKind(file_manager->getDataFile("nitro.xml")), position, getNode());
+        m_nitro  = new ParticleEmitter(
+                        new ParticleKind(file_manager->getDataFile("nitro.xml")),
+                        position, getNode());
     }
     catch (std::runtime_error& e)
     {

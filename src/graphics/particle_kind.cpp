@@ -31,9 +31,9 @@
 ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255), m_max_start_color(255,255,255,255)
 {
     // ---- Initial values to prevent readin uninitialized values
-    m_max_size      = 0.5;
-    m_min_size      = 0.5;
-    m_spread_factor = 0.001;
+    m_max_size      = 0.5f;
+    m_min_size      = 0.5f;
+    m_spread_factor = 0.001f;
     m_shape         = EMITTER_POINT;
     m_material      = NULL;
     m_min_rate      = 10;

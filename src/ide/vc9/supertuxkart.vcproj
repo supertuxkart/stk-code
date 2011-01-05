@@ -695,7 +695,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\nitro.cpp"
+					RelativePath="..\..\graphics\particle_emitter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\particle_kind.cpp"
 					>
 				</File>
 				<File
@@ -708,10 +712,6 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\slip_stream.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\smoke.cpp"
 					>
 				</File>
 				<File
@@ -956,10 +956,6 @@
 				>
 				<File
 					RelativePath="..\..\states_screens\addons_screen.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\states_screens\addons_update_screen.cpp"
 					>
 				</File>
 				<File
@@ -1645,7 +1641,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\nitro.hpp"
+					RelativePath="..\..\graphics\particle_emitter.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\particle_kind.hpp"
 					>
 				</File>
 				<File
@@ -1658,10 +1658,6 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\slip_stream.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\smoke.hpp"
 					>
 				</File>
 				<File
@@ -1878,10 +1874,6 @@
 				>
 				<File
 					RelativePath="..\..\states_screens\addons_screen.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\states_screens\addons_update_screen.hpp"
 					>
 				</File>
 				<File
