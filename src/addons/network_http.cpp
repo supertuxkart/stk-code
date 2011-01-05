@@ -326,17 +326,6 @@ int NetworkHttp::progressDownload(void *clientp,
         f= download_total==0 ? 0 : 0.99f;
     }
     network_http->m_progress.set(f);
-
-    static int time_last_print=0;
-    if(time_last_print > 10)
-    {
-        std::cout << "Download progress: " << f << "%" << std::endl;
-        time_last_print = 0;
-    }
-    else
-    {
-        time_last_print += 1;
-    }
     return 0;
 }   // progressDownload
 
