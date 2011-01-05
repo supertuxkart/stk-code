@@ -70,6 +70,7 @@ private:
     void              checkAndCreateConfigDir();
 #ifdef ADDONS_MANAGER
     void              checkAndCreateAddonsDir();
+    bool              isDirectory(const std::string &path) const;
 #endif
 public:
                       FileManager(char *argv[]);
@@ -86,7 +87,7 @@ public:
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(std::string addons_name,
                                     std::string addons_type);
-    bool removeDirectory(char const *name);
+    bool removeDirectory(const std::string &name);
 #endif
     std::string getDataDir       () const;
     std::string getTranslationDir() const;

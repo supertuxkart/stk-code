@@ -30,6 +30,7 @@
 
 #include "addons/network_http.hpp"
 #include "addons/zip.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -65,8 +66,6 @@ void AddonsManager::initOnline()
     int download_state = 0;
     m_download_state = download_state;
 
-    // FIXME: It is _very_ dirty to save the list as a locale file 
-    //   since we have a function to load it directly in a string.
     if(UserConfigParams::m_verbosity>=3)
         printf("[addons] Addons manager downloading list\n");
     if(!network_http->downloadFileSynchron("list"))
@@ -171,7 +170,7 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 void AddonsManager::install(const Addon &addon)
 {
     bool success=true;
-    std::string id = StringUtils::toLowerCase(addon.getName());
+    const std::string &id = addon.getId();
     file_manager->checkAndCreateDirForAddons(id, addon.getType()+ "s/");
 
     //extract the zip in the addons folder called like the addons name    
@@ -197,6 +196,17 @@ void AddonsManager::install(const Addon &addon)
     m_addons_list[index].setInstalled(true);
     
     m_str_state = "Reloading kart list...";
+    if(addon.getType()=="kart")
+    {
+        // We have to remove the mesh of the kart since otherwise it remains
+        // cashed, and will therefore be found again when reloading the karts.
+        // This is important on one hand since we reload all karts (this
+        // function is easily available) and existing karts will not reload
+        // their meshes.
+        const KartProperties *prop = kart_properties_manager->getKart(addon.getId());
+        const KartModel &model = prop->getMasterKartModel();
+        irr_driver->removeMesh(model.getModel());
+    }
     saveInstalled();
 }   // install
 
@@ -238,11 +248,11 @@ void AddonsManager::uninstall(const Addon &addon)
     m_addons_list[index].setInstalled(false);
 
     //write the xml file with the informations about installed karts
-    std::string dest_file = file_manager->getAddonsDir() + "/"
-                          + addon.getType()+ "s/" + addon.getName()+ "/";
+    std::string name=addon.getType()+"s/"+addon.getId();
+    std::string dest_file = file_manager->getAddonsFile(name);
 
     //remove the addons directory
-    file_manager->removeDirectory(dest_file.c_str());
+    file_manager->removeDirectory(dest_file);
     saveInstalled();
 
 }   // uninstall

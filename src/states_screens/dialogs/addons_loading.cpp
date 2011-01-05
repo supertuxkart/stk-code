@@ -167,7 +167,6 @@ void AddonsLoading::onUpdate(float delta)
         {
             printf("Download finished.\n");
             endInstall();
-            dismiss();
             return;
         }
     }
@@ -223,5 +222,6 @@ void AddonsLoading::endInstall()
     // The list of the addon screen needs to be updated to correctly
     // display the newly (un)installed addon.
     AddonsScreen::getInstance()->loadList();
+    dismiss();
 }   // endInstall
 #endif

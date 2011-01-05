@@ -46,7 +46,7 @@
 #  include <stdio.h>
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
-     //   Some portabilty defines
+#    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
 #  endif
 #else
 #  include <unistd.h>
@@ -56,6 +56,7 @@
 #include "irrlicht.h"
 #include "btBulletDynamicsCommon.h"
 
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -495,6 +496,7 @@ void FileManager::checkAndCreateConfigDir()
     return;
 }   // checkAndCreateConfigDir
 
+// ----------------------------------------------------------------------------
 #ifdef ADDONS_MANAGER
 void FileManager::checkAndCreateAddonsDir()
 {
@@ -543,16 +545,17 @@ void FileManager::checkAndCreateAddonsDir()
                 m_addons_dir.c_str());
         m_config_dir = ".";
     }
-    else
+
+    if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
     {
-        //we hope that there will be no problem since we created the other dir
-        if (!checkAndCreateDirectory(m_addons_dir + "/data/"))
-        {
-            fprintf(stderr, "Failed to create add-ons data dir at '%s'\n",
-                    (m_addons_dir + "/data/").c_str());
-        }
+        fprintf(stderr, "Failed to create add-ons icon dir at '%s'\n",
+            (m_addons_dir + "/icons/").c_str());
     }
-    return;
+    if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
+    {
+        fprintf(stderr, "Failed to create add-ons tmp dir at '%s'\n",
+            (m_addons_dir + "/tmp/").c_str());
+    }
 }   // checkAndCreateAddonsDir
 
 //-----------------------------------------------------------------------------
@@ -621,6 +624,18 @@ std::string FileManager::getChallengeFile(const std::string &fname) const
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
+/** Returns true if the given name is a directory.
+ *  \param path File name to test.
+ */
+bool FileManager::isDirectory(const std::string &path) const
+{
+    struct stat mystat;
+
+    if(stat(path.c_str(), &mystat) < 0) return false;
+    return S_ISDIR(mystat.st_mode);
+}   // isDirectory
+
+//-----------------------------------------------------------------------------
 void FileManager::listFiles(std::set<std::string>& result, 
                             const std::string& dir, bool is_full_path, 
                             bool make_full_path) const
@@ -634,10 +649,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 #endif
     //printf("******* Path : %s \n", path.c_str());
 
-    struct stat mystat;
-
-    if(stat(path.c_str(), &mystat) < 0) return;
-    if(! S_ISDIR(mystat.st_mode))       return;
+    if(!isDirectory(path)) return;
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 
@@ -675,72 +687,41 @@ void FileManager::checkAndCreateDirForAddons(std::string addons_name,
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
-bool FileManager::removeDirectory(char const *name)
+/** Removes a directory (including all files contained). The function could
+ *  easily recursively delete further subdirectories, but this is commented
+ *  out atm (to limit the amount of damage in case of a bug).
+ *  \param name Directory name to remove.
+ */
+bool FileManager::removeDirectory(const std::string &name)
 {
-#ifndef WIN32
-    // DIR etc. do not exist like this in windows,
-    // file system specific calls should be moved into
-    // the file manager!!
-
-    DIR *directory;
-    struct dirent *entry;
-    struct stat file_stat;
-
-    char buffer[1024] = {0};
-
-    directory = opendir(name);
-    if ( directory == NULL )
+    std::set<std::string> files;
+    listFiles(files, name, /*is full path*/ true);
+    for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
     {
-        fprintf(stderr, "cannot open directory %s\n", name);
-        return false;
-    }
-
-    while ((entry = readdir(directory)) != NULL)
-    {
-
-        /*this condition handles if it is the current directory (.) or the 
-        parent directory (..), these names work only on unix-based I think*/
-        if (strcmp(entry->d_name, ".") == 0 || 
-            strcmp(entry->d_name, "..") == 0)
+        if((*i)=="." || (*i)=="..") continue;
+        if(UserConfigParams::m_verbosity>=3)
+            printf("Deleting directory '%s'.\n", (*i).c_str());
+        std::string full_path=name+"/"+*i;
+        if(isDirectory(full_path))
         {
-            continue;
+            // This should not be necessary (since this function is only
+            // used to remove addons), and it limits the damage in case
+            // of any bugs - i.e. if name should be "/" or so.
+            // removeDirectory(full_path);
         }
-
-        snprintf(buffer, 1024, "%s/%s", name, entry->d_name);
-
-        stat(buffer, &file_stat);
-
-        if (S_ISREG(file_stat.st_mode))
+        else
         {
-            remove(buffer);
-        }
-        else if (S_ISDIR(file_stat.st_mode))
-        {
-            this->removeDirectory(buffer);
+            struct stat mystat;
+            if(stat(full_path.c_str(), &mystat) < 0) return false;
+            if( S_ISREG(mystat.st_mode))
+                remove(full_path.c_str());
         }
     }
-    closedir(directory);
-
-    remove(name);
-    return true;
-
+#ifdef WIN32
+    return ::RemoveDirectory(name.c_str())==TRUE;
 #else
-    ::RemoveDirectory(name);
-    return true;
-#if 0
-    SHFILEOPSTRUCT sh;
-    sh.hwnd = NULL;
-    sh.wFunc = FO_DELETE;
-    sh.pFrom = repertoire;
-    sh.pTo = NULL;
-    sh.fFlags = FOF_NOCONFIRMATION|FOF_SILENT;
-    sh.fAnyOperationsAborted = FALSE;
-    sh.lpszProgressTitle = NULL;
-    sh.hNameMappings = NULL;
-        
-    return (SHFileOperation(&sh)==0);
+    return remove(name.c_str());
 #endif
-#endif
-}
+}   // remove directory
 
 #endif
