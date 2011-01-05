@@ -1444,6 +1444,10 @@ void Kart::loadData()
     {
         try
         {
+            // Note: the smoke system is NOT child of the kart, since bullet
+            // gives the position of the wheels on the ground in world coordinates.
+            // So it's easier not to move the particle system with the kart, and set 
+            // the position directly from the wheel coordinates.
             core::vector3df position(-getKartWidth()*0.35f, 0.06f, -getKartLength()*0.5f);
             m_smoke_system = new ParticleEmitter(
                                  new ParticleKind(file_manager->getDataFile("smoke.xml")),
@@ -1563,7 +1567,6 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
         const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
         Vec3 c = wi.m_raycastInfo.m_contactPointWS;
         
-        // FIXME: instead of constantly moving the emitter around, just make it a child of the kart node
         // FIXME: the X position is not yet always accurate.
         m_smoke_system->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
                                                     c.getY(),

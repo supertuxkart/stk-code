@@ -53,13 +53,13 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
         m_node->setParent(parent);
     }
     
-    // Note: the smoke system is NOT child of the kart, since bullet
-    // gives the position of the wheels on the ground in world coordinates.
-    // So it's easier not to move the particle system with the kart, and set 
-    // the position directly from the wheel coordinates.
     m_node->setPosition(position);
-    material->setMaterialProperties(&(m_node->getMaterial(0)));
+    //material->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, material->getTexture());
+    
+    m_node->getMaterial(0).MaterialType = video::EMT_ONETEXTURE_BLEND ;
+    m_node->getMaterial(0).MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_ONE_MINUS_SRC_ALPHA); 
+    m_node->getMaterial(0).ZWriteEnable = false; // disable z-buffer writes
     
     switch (type->getShape())
     {
