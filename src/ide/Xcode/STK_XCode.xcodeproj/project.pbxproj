@@ -65,7 +65,6 @@
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
 		954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */; };
 		9551B27111DC0D4D002DD140 /* addons_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B26D11DC0D4D002DD140 /* addons_screen.cpp */; };
-		9551B27211DC0D4D002DD140 /* addons_update_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */; };
 		9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551B27811DC0D6A002DD140 /* zip.cpp */; };
 		9551C8270FC1B72500DB481B /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
@@ -455,8 +454,6 @@
 		954E4C2C0FF98B6E0047FE3E /* three_d_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = three_d_animation.hpp; path = ../../animations/three_d_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9551B26D11DC0D4D002DD140 /* addons_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_screen.cpp; path = ../../states_screens/addons_screen.cpp; sourceTree = SOURCE_ROOT; };
 		9551B26E11DC0D4D002DD140 /* addons_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_screen.hpp; path = ../../states_screens/addons_screen.hpp; sourceTree = SOURCE_ROOT; };
-		9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_update_screen.cpp; path = ../../states_screens/addons_update_screen.cpp; sourceTree = SOURCE_ROOT; };
-		9551B27011DC0D4D002DD140 /* addons_update_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_update_screen.hpp; path = ../../states_screens/addons_update_screen.hpp; sourceTree = SOURCE_ROOT; };
 		9551B27811DC0D6A002DD140 /* zip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = zip.cpp; path = ../../addons/zip.cpp; sourceTree = SOURCE_ROOT; };
 		9551B27911DC0D6A002DD140 /* zip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip.hpp; path = ../../addons/zip.hpp; sourceTree = SOURCE_ROOT; };
 		9551C7F90FC1B63C00DB481B /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = /Library/Frameworks/Ogg.framework; sourceTree = "<absolute>"; };
@@ -1377,8 +1374,6 @@
 				95833236101243ED00C5137E /* dialogs */,
 				9551B26D11DC0D4D002DD140 /* addons_screen.cpp */,
 				9551B26E11DC0D4D002DD140 /* addons_screen.hpp */,
-				9551B26F11DC0D4D002DD140 /* addons_update_screen.cpp */,
-				9551B27011DC0D4D002DD140 /* addons_update_screen.hpp */,
 				956541B910DD5F0A00C83E99 /* arenas_screen.cpp */,
 				956541BA10DD5F0A00C83E99 /* arenas_screen.hpp */,
 				951B7D18108E52C900BC03AE /* challenges.cpp */,
@@ -2706,7 +2701,6 @@
 				9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */,
 				9525B71411C851D30094BD96 /* CBatchingMesh.cpp in Sources */,
 				9551B27111DC0D4D002DD140 /* addons_screen.cpp in Sources */,
-				9551B27211DC0D4D002DD140 /* addons_update_screen.cpp in Sources */,
 				9551B27C11DC0D6A002DD140 /* zip.cpp in Sources */,
 				95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */,
 				9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */,
