@@ -203,9 +203,14 @@ void AddonsManager::install(const Addon &addon)
         // This is important on one hand since we reload all karts (this
         // function is easily available) and existing karts will not reload
         // their meshes.
-        const KartProperties *prop = kart_properties_manager->getKart(addon.getId());
-        const KartModel &model = prop->getMasterKartModel();
-        irr_driver->removeMesh(model.getModel());
+        const KartProperties *prop = 
+            kart_properties_manager->getKart(addon.getId());
+        // If the model already exist (i.e. it's an update, not a new install
+        if(prop)
+        {
+            const KartModel &model = prop->getMasterKartModel();
+            irr_driver->removeMesh(model.getModel());
+        }
     }
     saveInstalled();
 }   // install
