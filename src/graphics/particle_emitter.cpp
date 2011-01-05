@@ -64,6 +64,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     switch (type->getShape())
     {
         case EMITTER_POINT:
+        {
             // FIXME: does the maxAngle param work at all??
             // FIXME: the min and max color params don't appear to work
             m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
@@ -73,8 +74,10 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
                                                    0 /* angle */
                                                    );
             break;
-        
+        }
+            
         case EMITTER_BOX:
+        {
             // FIXME: does the maxAngle param work at all??
             // FIXME: the min and max color params don't appear to work
             const float box_x = type->getBoxSizeX()/2.0f;
@@ -90,10 +93,13 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
                                                  0 /* angle */
                                                  );
             break;
+        }
         
         default:
+        {
             fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
             return;
+        }
     }
     
     m_emitter->setMinStartSize(core::dimension2df(minSize, minSize));
