@@ -176,7 +176,7 @@ void AddonsManager::install(const Addon &addon)
 
     //extract the zip in the addons folder called like the addons name    
     std::string dest_file = file_manager->getAddonsDir() + "/"
-                          + addon.getType()+ "s/" + addon.getName() + "/" ;
+                          + addon.getType()+ "s/" + id + "/" ;
     std::string base_name = StringUtils::getBasename(addon.getZipFileName());
     std::string from      = file_manager->getAddonsFile(base_name);
     std::string to        = dest_file;
