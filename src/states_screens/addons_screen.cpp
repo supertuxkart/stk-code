@@ -28,7 +28,6 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "io/file_manager.hpp"
-#include "states_screens/addons_update_screen.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -143,9 +142,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         std::string selection = ((GUIEngine::RibbonWidget*)widget)
                          ->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         std::cout << selection << std::endl;
-        if (selection == "tab_update") 
-            StateManager::get()->replaceTopMostScreen(AddonsUpdateScreen::getInstance());
-        else if (selection == "tab_track")
+        if (selection == "tab_track")
         {
             m_type = "track";
             loadList();
