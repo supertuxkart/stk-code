@@ -60,9 +60,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     m_node->setPosition(position);
     material->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, material->getTexture());
-    
-    printf("==== %s ====\n", material->getTexFname().c_str());
-    
+        
     // FIXME: does the maxAngle param work at all??
     // FIXME: the min and max color params don't appear to work
     m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
