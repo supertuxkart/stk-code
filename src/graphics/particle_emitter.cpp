@@ -82,7 +82,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
             const float box_z = type->getBoxSizeZ()/2.0f;
             m_node->setPosition(core::vector3df(position.X + box_x, position.Y + box_y, position.Z + box_z));
             m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_x, -box_y, -box_z,
-                                                                  box_x,  box_x,  box_x),
+                                                                  box_x,  box_y,  box_z),
                                                  core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
                                                  type->getMinRate(), type->getMaxRate(),
                                                  type->getMinColor(), type->getMaxColor(),
