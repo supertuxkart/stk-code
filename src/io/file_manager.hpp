@@ -68,9 +68,9 @@ private:
     bool              checkAndCreateDirectory(const std::string &path);
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
+    bool              isDirectory(const std::string &path) const;
 #ifdef ADDONS_MANAGER
     void              checkAndCreateAddonsDir();
-    bool              isDirectory(const std::string &path) const;
 #endif
 public:
                       FileManager(char *argv[]);
