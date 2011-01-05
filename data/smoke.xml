@@ -20,6 +20,6 @@
                max="255 255 255" />
 
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="900"       />
+    <fadeout   time="500"       />
 
 </particles>
