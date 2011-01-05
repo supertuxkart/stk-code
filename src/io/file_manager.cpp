@@ -129,13 +129,13 @@ FileManager::FileManager(char *argv[])
     m_file_system  = m_device->getFileSystem();
     m_is_full_path = false;
 
-	irr::io::path exe_path;
+    irr::io::path exe_path;
 
     // Also check for data dirs relative to the path of the executable.
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
-	if(m_file_system->existFile(argv[0]))
-		exe_path = m_file_system->getFileDir(argv[0]);
+    if(m_file_system->existFile(argv[0]))
+        exe_path = m_file_system->getFileDir(argv[0]);
 
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
@@ -409,72 +409,81 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 /** Checks if the config directory exists, and it not, tries to create it. */
 void FileManager::checkAndCreateConfigDir()
 {
-#if defined(WIN32)
-    // Try to use the APPDATA directory to store config files and highscore
-    // lists. If not defined, used the current directory.
-    if(getenv("APPDATA")!=NULL)
+    if(getenv("SUPERTUXKART_SAVEDIR") && 
+        checkAndCreateDirectory(getenv("SUPERTUXKART_SAVEDIR")) )
     {
-        m_config_dir  = getenv("APPDATA");
-        if(!checkAndCreateDirectory(m_config_dir))
+        m_config_dir = getenv("SUPERTUXKART_SAVEDIR");
+    }
+    else
+    {
+#if defined(WIN32)
+        // Try to use the APPDATA directory to store config files and highscore
+        // lists. If not defined, used the current directory.
+        if(getenv("APPDATA")!=NULL)
         {
-            fprintf(stderr, 
+            m_config_dir  = getenv("APPDATA");
+            if(!checkAndCreateDirectory(m_config_dir))
+            {
+                fprintf(stderr, 
                     "Can't create config dir '%s', falling back to '.'.\n",
                     m_config_dir.c_str());
+                m_config_dir = ".";
+            }
+        }
+        else
+            m_config_dir = ".";
+        const std::string CONFIGDIR("supertuxkart");
+
+        m_config_dir += "/";
+        m_config_dir += CONFIGDIR;
+#elif defined(__APPLE__)
+        if (getenv("HOME")!=NULL)
+        {
+            m_config_dir = getenv("HOME");
+        }
+        else
+        {
+            std::cerr << "No home directory, this should NOT happen!\n";
+            // Fall back to system-wide app data (rather than user-specific data),
+            // but should not happen anyway.
+            m_config_dir = "";
+        }
+        m_config_dir += "/Library/Application Support/";
+        const std::string CONFIGDIR("SuperTuxKart");
+        m_config_dir += CONFIGDIR;
+#  else
+        // Remaining unix variants. Use the new standards for config directory
+        // i.e. either XDG_CONFIG_HOME or $HOME/.config
+        if (getenv("XDG_CONFIG_HOME")!=NULL){
+            m_config_dir = getenv("XDG_CONFIG_HOME");
+        }
+        else if (!getenv("HOME"))
+        {
+            std::cerr << "No home directory, this should NOT happen "
+                << "- trying '.' for config files!\n";
             m_config_dir = ".";
         }
-    }
-    else
-        m_config_dir = ".";
-    const std::string CONFIGDIR("supertuxkart");
-
-    m_config_dir += "/";
-    m_config_dir += CONFIGDIR;
-#elif defined(__APPLE__)
-    if (getenv("HOME")!=NULL)
-    {
-        m_config_dir = getenv("HOME");
-    }
-    else
-    {
-        std::cerr << "No home directory, this should NOT happen!\n";
-        // Fall back to system-wide app data (rather than user-specific data),
-        // but should not happen anyway.
-        m_config_dir = "";
-	}
-    m_config_dir += "/Library/Application Support/";
-    const std::string CONFIGDIR("SuperTuxKart");
-    m_config_dir += CONFIGDIR;
-#  else
-    // Remaining unix variants. Use the new standards for config directory
-    // i.e. either XDG_CONFIG_HOME or $HOME/.config
-	if (getenv("XDG_CONFIG_HOME")!=NULL){
-		m_config_dir = getenv("XDG_CONFIG_HOME");
-	}
-    else if (!getenv("HOME"))
-    {
-	    std::cerr << "No home directory, this should NOT happen "
-                  << "- trying '.' for config files!\n";
-        m_config_dir = ".";
-    }
-    else
-    {
-		m_config_dir  = getenv("HOME");
-		m_config_dir += "/.config";
-        if(!checkAndCreateDirectory(m_config_dir))
+        else
         {
-            // If $HOME/.config can not be created:
-            fprintf(stderr, 
+            m_config_dir  = getenv("HOME");
+            m_config_dir += "/.config";
+            if(!checkAndCreateDirectory(m_config_dir))
+            {
+                // If $HOME/.config can not be created:
+                fprintf(stderr, 
                     "Can't create dir '%s', falling back to use '%s'.\n",
                     m_config_dir.c_str(), getenv("HOME"));
-            m_config_dir = getenv("HOME");
-            m_config_dir += ".";
+                m_config_dir = getenv("HOME");
+                m_config_dir += ".";
+            }
         }
-    }
-    const std::string CONFIGDIR("supertuxkart");
+        const std::string CONFIGDIR("supertuxkart");
 
-    m_config_dir += "/";
-    m_config_dir += CONFIGDIR;
+        m_config_dir += "/";
+        m_config_dir += CONFIGDIR;
 #endif
+    }   // if(getenv("SUPERTUXKART_SAVEDIR") && checkAndCreateDirectory(...))
+
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
@@ -497,19 +506,19 @@ void FileManager::checkAndCreateAddonsDir()
 #else
     // Remaining unix variants. Use the new standards for config directory
     // i.e. either XDG_CONFIG_HOME or $HOME/.config
-	if (getenv("XDG_DATA_HOME")!=NULL){
-		m_addons_dir = getenv("XDG_DATA_HOME");
-	}
+    if (getenv("XDG_DATA_HOME")!=NULL){
+        m_addons_dir = getenv("XDG_DATA_HOME");
+    }
     else if (!getenv("HOME"))
     {
-	    std::cerr << "No home directory, this should NOT happen "
+        std::cerr << "No home directory, this should NOT happen "
                   << "- trying '.addons' for addons files!\n";
         m_addons_dir = "stkaddons";
     }
     else
     {
-		m_addons_dir  = getenv("HOME");
-		m_addons_dir += "/.local/share";
+        m_addons_dir  = getenv("HOME");
+        m_addons_dir += "/.local/share";
         if(!checkAndCreateDirectory(m_config_dir))
         {
             // If $HOME/.config can not be created:
@@ -719,17 +728,17 @@ bool FileManager::removeDirectory(char const *name)
     ::RemoveDirectory(name);
     return true;
 #if 0
-	SHFILEOPSTRUCT sh;
-	sh.hwnd = NULL;
-	sh.wFunc = FO_DELETE;
-	sh.pFrom = repertoire;
-	sh.pTo = NULL;
-	sh.fFlags = FOF_NOCONFIRMATION|FOF_SILENT;
-	sh.fAnyOperationsAborted = FALSE;
-	sh.lpszProgressTitle = NULL;
-	sh.hNameMappings = NULL;
-	
-	return (SHFileOperation(&sh)==0);
+    SHFILEOPSTRUCT sh;
+    sh.hwnd = NULL;
+    sh.wFunc = FO_DELETE;
+    sh.pFrom = repertoire;
+    sh.pTo = NULL;
+    sh.fFlags = FOF_NOCONFIRMATION|FOF_SILENT;
+    sh.fAnyOperationsAborted = FALSE;
+    sh.lpszProgressTitle = NULL;
+    sh.hNameMappings = NULL;
+        
+    return (SHFileOperation(&sh)==0);
 #endif
 #endif
 }
