@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<particles emitter="box">
+<particles emitter="box" box_x="0.5" box_y="0.1" box_z="0.5">
 
     <spreading value="0.002"      />
     <material  file="nitro-particle.png"  />
@@ -7,7 +7,7 @@
     <!-- Amount of particles emitted per second -->
     <rate      min="5"
                max="10"          />
-               
+    
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="1000"
                max="2000"         />

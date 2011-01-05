@@ -41,7 +41,9 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_lifetime_min  = 400;
     m_lifetime_max  = 400;
     m_fadeout_time  = 400;
-
+    m_box_x         = 0.5f;
+    m_box_y         = 0.5f;
+    m_box_z         = 0.5f;
     
     // ----- Read XML file
     
@@ -72,6 +74,10 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     else if (emitterShape == "box")
     {
         m_shape = EMITTER_BOX;
+        
+        xml->get("box_x", &m_box_x);
+        xml->get("box_y", &m_box_y);
+        xml->get("box_z", &m_box_z);
     }
     else
     {

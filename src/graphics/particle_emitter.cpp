@@ -60,15 +60,42 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     m_node->setPosition(position);
     material->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, material->getTexture());
+    
+    switch (type->getShape())
+    {
+        case EMITTER_POINT:
+            // FIXME: does the maxAngle param work at all??
+            // FIXME: the min and max color params don't appear to work
+            m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+                                                   type->getMinRate(), type->getMaxRate(),
+                                                   type->getMinColor(), type->getMaxColor(),
+                                                   lifeTimeMin, lifeTimeMax,
+                                                   0 /* angle */
+                                                   );
+            break;
         
-    // FIXME: does the maxAngle param work at all??
-    // FIXME: the min and max color params don't appear to work
-    m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
-                                           type->getMinRate(), type->getMaxRate(),
-                                           type->getMinColor(), type->getMaxColor(),
-                                           lifeTimeMin, lifeTimeMax,
-                                           0 /* angle */
-                                           );
+        case EMITTER_BOX:
+            // FIXME: does the maxAngle param work at all??
+            // FIXME: the min and max color params don't appear to work
+            const float box_x = type->getBoxSizeX()/2.0f;
+            const float box_y = type->getBoxSizeY()/2.0f;
+            const float box_z = type->getBoxSizeZ()/2.0f;
+            m_node->setPosition(core::vector3df(position.X + box_x, position.Y + box_y, position.Z + box_z));
+            m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_x, -box_y, -box_z,
+                                                                  box_x,  box_x,  box_x),
+                                                 core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+                                                 type->getMinRate(), type->getMaxRate(),
+                                                 type->getMinColor(), type->getMaxColor(),
+                                                 lifeTimeMin, lifeTimeMax,
+                                                 0 /* angle */
+                                                 );
+            break;
+        
+        default:
+            fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
+            return;
+    }
+    
     m_emitter->setMinStartSize(core::dimension2df(minSize, minSize));
     m_emitter->setMaxStartSize(core::dimension2df(maxSize, maxSize));
     m_node->setEmitter(m_emitter); // this grabs the emitter

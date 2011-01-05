@@ -67,6 +67,9 @@ private:
     video::SColor m_min_start_color;
     video::SColor m_max_start_color;
     
+    /** For box emitters only */
+    float m_box_x, m_box_y, m_box_z;
+    
 public:
     
     ParticleKind(const std::string file);
@@ -93,6 +96,10 @@ public:
     
     video::SColor getMinColor() const { return m_min_start_color; }
     video::SColor getMaxColor() const { return m_max_start_color; }
+    
+    float     getBoxSizeX    () const { return m_box_x;           }
+    float     getBoxSizeY    () const { return m_box_y;           }
+    float     getBoxSizeZ    () const { return m_box_z;           }
 };
 #endif
 
