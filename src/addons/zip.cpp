@@ -71,14 +71,23 @@ bool extract_zip(const std::string &from, const std::string &to)
         IReadFile* srcFile  = file_system->createAndOpenFile(current_file.c_str());
         IWriteFile* dstFile = 
             file_system->createAndWriteFile((to+"/"+current_file).c_str());
-        if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
+        if(dstFile == NULL)
         {
-            printf("Could not copy '%s' from archive '%s'.\n",
-                    current_file.c_str(), from.c_str());
-            printf("This is ignored, but the addon might not work.\n");
+            printf("Couldn't open the file '%s', and copy the archive files in it.\n",
+                    (to+"/"+current_file).c_str());
+            printf("The directory might not exist.\n");
+        }
+        else
+        {
+            if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
+            {
+                printf("Could not copy '%s' from archive '%s'.\n",
+                        current_file.c_str(), from.c_str());
+                printf("This is ignored, but the addon might not work.\n");
+            }
+            dstFile->drop();
         }
         srcFile->drop();
-        dstFile->drop();
     }
     // Remove the zip from the filesystem to save memory and avoid 
     // problem with a name conflict. Note that we have to convert
