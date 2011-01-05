@@ -56,7 +56,7 @@ bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    file_system->addZipFileArchive(from.c_str());
+    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false);
 
     // Get the recently added archive, which is necessary to get a 
     // list of file in the zip archive.
