@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <particles emitter="point">
 
-    <spreading x="120"
-               y="180"
-               z="120"           />
+    <spreading xangle="120"      />
     
     <velocity  x="0.003"
                y="0.003"
@@ -27,6 +25,6 @@
                max="255 255 255" />
 
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="500"       />
+    <fadeout   time="500"        />
 
 </particles>
