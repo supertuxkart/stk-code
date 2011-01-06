@@ -68,11 +68,13 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
         {
             // FIXME: does the maxAngle param work at all??
             // FIXME: the min and max color params don't appear to work
-            m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 5.0f),   // velocity in m/ms
+            m_emitter = m_node->createPointEmitter(core::vector3df(m_particle_type->getVelocityX(),
+                                                                   m_particle_type->getVelocityY(),
+                                                                   m_particle_type->getVelocityZ()),   // velocity in m/ms
                                                    type->getMinRate(), type->getMaxRate(),
                                                    type->getMinColor(), type->getMaxColor(),
                                                    lifeTimeMin, lifeTimeMax,
-                                                   0 /* angle */
+                                                   m_particle_type->getAngleSpreadX() /* angle */
                                                    );
             break;
         }
@@ -86,15 +88,17 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
             const float box_size_z = type->getBoxSizeZ()/2.0f;
             m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -box_size_z,
                                                                   box_size_x,  box_size_y,  box_size_z),
-                                                 core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+                                                 core::vector3df(m_particle_type->getVelocityX(),
+                                                                 m_particle_type->getVelocityY(),
+                                                                 m_particle_type->getVelocityZ()),   // velocity in m/ms
                                                  type->getMinRate(), type->getMaxRate(),
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
-                                                 0 /* angle */
+                                                 m_particle_type->getAngleSpreadX() /* angle */
                                                  );
             
-            //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,
-            //                                                core::vector3df(box_size_x, box_size_y, box_size_z));
+            irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,
+                                                            core::vector3df(box_size_x, box_size_y, box_size_z));
             
             break;
         }
@@ -137,14 +141,15 @@ void ParticleEmitter::update()
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
+    /*
     const int x = m_particle_type->getAngleSpreadX();
     const int y = m_particle_type->getAngleSpreadY();
     const int z = m_particle_type->getAngleSpreadZ();
     Vec3 dir(cos(DEGREE_TO_RAD*(rand()%x - x/2))*m_particle_type->getVelocityX(),
              sin(DEGREE_TO_RAD*(rand()%y - x/2))*m_particle_type->getVelocityY(),
              sin(DEGREE_TO_RAD*(rand()%z - x/2))*m_particle_type->getVelocityZ());
-    
     m_emitter->setDirection(dir.toIrrVector());
+     */
 }   // update
 
 //-----------------------------------------------------------------------------

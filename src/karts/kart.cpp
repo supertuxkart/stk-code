@@ -1461,7 +1461,7 @@ void Kart::loadData()
     m_water_splash_system = new WaterSplash(this);
     
     const float particle_size = 0.25f;
-    core::vector3df position(0, particle_size*0.25f, -getKartLength()*0.5f);
+    core::vector3df position(0, particle_size, -getKartLength()*0.5f);
     
     try
     {
