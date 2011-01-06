@@ -83,7 +83,7 @@ void * AddonsLoading::downloadIcon( void * pthis)
     std::string icon_path = me->m_addon.getIcon();
 
     // FIXME: addons_loading might be removed before this finishes!
-	if(network_http->downloadFileSynchron(icon_path, icon_name))
+	if(network_http->downloadFileSynchron(icon_path, "icons/"+icon_name))
     {
         me->m_icon_loaded.set(ICON_LOADED);
     }
@@ -175,7 +175,8 @@ void AddonsLoading::onUpdate(float delta)
     // See if the icon is loaded (but not yet displayed)
     if(m_icon_loaded.get()==ICON_LOADED)
     {
-        const std::string icon = StringUtils::getBasename(m_addon.getIcon());
+        const std::string icon = "icons/"
+                               + StringUtils::getBasename(m_addon.getIcon());
         m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
         m_icon_loaded.set(ICON_SHOWN);
@@ -203,7 +204,8 @@ void AddonsLoading::close()
 void AddonsLoading::startInstall()
 {
     std::string file = m_addon.getZipFileName();
-    std::string save = StringUtils::getBasename(m_addon.getZipFileName());
+    std::string save = "tmp/"
+                     + StringUtils::getBasename(m_addon.getZipFileName());
     network_http->downloadFileAsynchron(file, save);
 }   // startInstall
 
