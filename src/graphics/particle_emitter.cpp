@@ -74,7 +74,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
                                                    type->getMinRate(), type->getMaxRate(),
                                                    type->getMinColor(), type->getMaxColor(),
                                                    lifeTimeMin, lifeTimeMax,
-                                                   m_particle_type->getAngleSpreadX() /* angle */
+                                                   m_particle_type->getAngleSpread() /* angle */
                                                    );
             break;
         }
@@ -94,7 +94,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
                                                  type->getMinRate(), type->getMaxRate(),
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
-                                                 m_particle_type->getAngleSpreadX() /* angle */
+                                                 m_particle_type->getAngleSpread() /* angle */
                                                  );
             
             //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,

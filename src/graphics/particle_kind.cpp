@@ -31,21 +31,19 @@
 ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255), m_max_start_color(255,255,255,255)
 {
     // ---- Initial values to prevent readin uninitialized values
-    m_max_size      = 0.5f;
-    m_min_size      = 0.5f;
-    m_shape         = EMITTER_POINT;
-    m_material      = NULL;
-    m_min_rate      = 10;
-    m_max_rate      = 10;
-    m_lifetime_min  = 400;
-    m_lifetime_max  = 400;
-    m_fadeout_time  = 400;
-    m_box_x         = 0.5f;
-    m_box_y         = 0.5f;
-    m_box_z         = 0.5f;
-    m_angle_spread_x = 90;
-    m_angle_spread_y = 90;
-    m_angle_spread_z = 90;
+    m_max_size       = 0.5f;
+    m_min_size       = 0.5f;
+    m_shape          = EMITTER_POINT;
+    m_material       = NULL;
+    m_min_rate       = 10;
+    m_max_rate       = 10;
+    m_lifetime_min   = 400;
+    m_lifetime_max   = 400;
+    m_fadeout_time   = 400;
+    m_box_x          = 0.5f;
+    m_box_y          = 0.5f;
+    m_box_z          = 0.5f;
+    m_angle_spread   = 45;
     m_velocity_x     = 0.001f;
     m_velocity_y     = 0.001f;
     m_velocity_z     = 0.001f;
@@ -93,9 +91,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* spreading = xml->getNode("spreading");
-    spreading->get("x", &m_angle_spread_x);
-    spreading->get("y", &m_angle_spread_y);
-    spreading->get("z", &m_angle_spread_z);
+    spreading->get("angle", &m_angle_spread);
     
     //std::cout << "m_spread_factor = " << m_spread_factor << "\n";
     

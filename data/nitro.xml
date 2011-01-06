@@ -1,13 +1,11 @@
 <?xml version="1.0"?>
 <particles emitter="box" box_x="0.5" box_y="0.1" box_z="0.5">
 
-    <spreading x="120"
-               y="100"
-               z="120"           />
+    <spreading angle="40"         />
     
-    <velocity  x="0.002"
-               y="0.002"
-               z="0.002"         />
+    <velocity  x="0.000"
+               y="0.000"
+               z="0.002"          />
     
     <material  file="nitro-particle.png"  />
     
@@ -21,10 +19,10 @@
     
     <!-- Size of the particles -->
     <size      min="0.22"
-               max="0.5"       />
+               max="0.5"          />
     
     <color     min="255 255 255"
-               max="255 255 255" />
+               max="255 255 255"  />
     
     <!-- How much time in milliseconds before the particle is fully faded out  -->
     <fadeout   time="1000"        />

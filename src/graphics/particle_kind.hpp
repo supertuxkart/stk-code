@@ -47,9 +47,7 @@ private:
     float     m_max_size;
     float     m_min_size;
     
-    int       m_angle_spread_x;
-    int       m_angle_spread_y;
-    int       m_angle_spread_z;
+    int       m_angle_spread;
     
     float     m_velocity_x;
     float     m_velocity_y;
@@ -105,10 +103,8 @@ public:
     float     getBoxSizeY    () const { return m_box_y;           }
     float     getBoxSizeZ    () const { return m_box_z;           }
     
-    int       getAngleSpreadX() const { return m_angle_spread_x;  }
-    int       getAngleSpreadY() const { return m_angle_spread_y;  }
-    int       getAngleSpreadZ() const { return m_angle_spread_z;  }
-    
+    int       getAngleSpread () const { return m_angle_spread;    }
+
     float     getVelocityX   () const { return m_velocity_x;      }
     float     getVelocityY   () const { return m_velocity_y;      }
     float     getVelocityZ   () const { return m_velocity_z;      }
