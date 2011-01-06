@@ -171,10 +171,18 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_F8:
-            if(value && control_is_pressed)
+            if(value)
             {
-                RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-                if (gui != NULL) gui->m_enabled = !gui->m_enabled;
+                if (control_is_pressed)
+                {
+                    RaceGUIBase* gui = World::getWorld()->getRaceGUI();
+                    if (gui != NULL) gui->m_enabled = !gui->m_enabled;
+                }
+                else
+                {
+                    Kart* kart = world->getLocalPlayerKart(0);
+                    kart->setEnergy(100.0f);
+                }
             }
             break;
             

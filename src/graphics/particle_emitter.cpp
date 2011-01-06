@@ -68,7 +68,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
         {
             // FIXME: does the maxAngle param work at all??
             // FIXME: the min and max color params don't appear to work
-            m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+            m_emitter = m_node->createPointEmitter(core::vector3df(0.0f, 0.0f, 5.0f),   // velocity in m/ms
                                                    type->getMinRate(), type->getMaxRate(),
                                                    type->getMinColor(), type->getMaxColor(),
                                                    lifeTimeMin, lifeTimeMax,
@@ -87,7 +87,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
             m_node->setPosition(core::vector3df(position.X + box_x, position.Y + box_y, position.Z + box_z));
             m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_x, -box_y, -box_z,
                                                                   box_x,  box_y,  box_z),
-                                                 core::vector3df(0.0f, 0.0f, 0.0f),   // velocity in m/ms
+                                                 core::vector3df(0.0f, 0.0f, 5.0f),   // velocity in m/ms
                                                  type->getMinRate(), type->getMaxRate(),
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
@@ -110,7 +110,7 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
     
     // FIXME: this is ridiculous, the fadeout time should be equal to the lifetime, except that the
     //        lifetime is random...
-    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0),
+    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 255, 255),
                                                                                 type->getFadeoutTime());
     m_node->addAffector(af);
     af->drop();

@@ -398,6 +398,8 @@ public:
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     // ------------------------------------------------------------------------
+    
+    void           setEnergy        (float val) { m_collected_energy = val; }
 };
 
 
