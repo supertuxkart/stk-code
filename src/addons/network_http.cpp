@@ -57,7 +57,6 @@ NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f)
 {
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
-    m_abort        = false;
 
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
@@ -108,7 +107,7 @@ void *NetworkHttp::mainLoop(void *obj)
                                      /*is_asynchron*/true    );
         }   // switch(m_command)
         me->m_command = HC_SLEEP;
-    }   // while !m_abort
+    }   // while 1
     pthread_mutex_unlock(&me->m_mutex_command);
     return NULL;
 }   // mainLoop
@@ -118,8 +117,6 @@ void *NetworkHttp::mainLoop(void *obj)
  */
 NetworkHttp::~NetworkHttp()
 {
-    m_abort=1;  // Doesn't really need a mutex
-
     pthread_mutex_lock(&m_mutex_command);
     {
         m_command=HC_QUIT;

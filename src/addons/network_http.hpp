@@ -65,9 +65,6 @@ private:
     /** Thread id of the thread running in this object. */
     pthread_t     m_thread_id;
 
-    /** Signals that the main loop is to be aborted. */
-    bool          m_abort;
-
     static void  *mainLoop(void *obj);
     void          checkNewServer();
 
