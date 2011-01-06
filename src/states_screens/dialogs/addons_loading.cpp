@@ -144,6 +144,7 @@ GUIEngine::EventPropagation
         {
             endInstall();
         }
+        return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
