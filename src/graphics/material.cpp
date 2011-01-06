@@ -79,7 +79,7 @@ Material::Material(const XMLNode *node, int index)
     else
         m_graphical_effect = GE_NONE;
 
-    node->get("alpha", &s);
+    node->get("compositing", &s);
     if      (s == "blend")    m_alpha_blending = true;
     else if (s == "test")     m_alpha_testing = true;
     else if (s == "additive") m_add = true;
