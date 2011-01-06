@@ -1,7 +1,14 @@
 <?xml version="1.0"?>
 <particles emitter="box" box_x="0.5" box_y="0.1" box_z="0.5">
 
-    <spreading value="0.002"      />
+    <spreading x="120"
+               y="100"
+               z="120"           />
+    
+    <velocity  x="0.002"
+               y="0.002"
+               z="0.002"         />
+    
     <material  file="nitro-particle.png"  />
     
     <!-- Amount of particles emitted per second -->

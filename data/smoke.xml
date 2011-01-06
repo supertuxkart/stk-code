@@ -1,7 +1,14 @@
 <?xml version="1.0"?>
 <particles emitter="point">
 
-    <spreading value="0.003"     />
+    <spreading x="120"
+               y="180"
+               z="120"           />
+    
+    <velocity  x="0.003"
+               y="0.003"
+               z="0.003"         />
+    
     <material  file="smoke.png"  />
     
     <!-- Amount of particles emitted per second -->

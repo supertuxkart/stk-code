@@ -47,8 +47,14 @@ private:
     float     m_max_size;
     float     m_min_size;
     
-    float     m_spread_factor;
-
+    int       m_angle_spread_x;
+    int       m_angle_spread_y;
+    int       m_angle_spread_z;
+    
+    float     m_velocity_x;
+    float     m_velocity_y;
+    float     m_velocity_z;
+    
     EmitterShape m_shape;
     
     Material* m_material;
@@ -83,8 +89,6 @@ public:
     int       getMinRate     () const { return m_min_rate;        }
     int       getMaxRate     () const { return m_max_rate;        }
     
-    float     getSpreadFactor() const { return m_spread_factor;   }
-    
     EmitterShape getShape    () const { return m_shape;           }
     
     Material* getMaterial    () const { return m_material;        }
@@ -100,6 +104,14 @@ public:
     float     getBoxSizeX    () const { return m_box_x;           }
     float     getBoxSizeY    () const { return m_box_y;           }
     float     getBoxSizeZ    () const { return m_box_z;           }
+    
+    int       getAngleSpreadX() const { return m_angle_spread_x;  }
+    int       getAngleSpreadY() const { return m_angle_spread_y;  }
+    int       getAngleSpreadZ() const { return m_angle_spread_z;  }
+    
+    float     getVelocityX   () const { return m_velocity_x;      }
+    float     getVelocityY   () const { return m_velocity_y;      }
+    float     getVelocityZ   () const { return m_velocity_z;      }
 };
 #endif
 

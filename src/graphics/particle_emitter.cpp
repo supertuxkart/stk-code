@@ -130,15 +130,13 @@ void ParticleEmitter::update()
 {
     // No particles to emit, no need to change the speed
     if (m_emitter->getMinParticlesPerSecond() == 0) return;
-    
-    const float spreading = m_particle_type->getSpreadFactor();
-    
+        
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
-    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*spreading,
-             sin(DEGREE_TO_RAD*(rand()%100))*spreading,
-             sin(DEGREE_TO_RAD*(rand()%180))*spreading);
+    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%m_particle_type->getAngleSpreadX()))*m_particle_type->getVelocityX(),
+             sin(DEGREE_TO_RAD*(rand()%m_particle_type->getAngleSpreadY()))*m_particle_type->getVelocityY(),
+             sin(DEGREE_TO_RAD*(rand()%m_particle_type->getAngleSpreadZ()))*m_particle_type->getVelocityZ());
     
     m_emitter->setDirection(dir.toIrrVector());
 }   // update

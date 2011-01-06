@@ -33,7 +33,6 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ---- Initial values to prevent readin uninitialized values
     m_max_size      = 0.5f;
     m_min_size      = 0.5f;
-    m_spread_factor = 0.001f;
     m_shape         = EMITTER_POINT;
     m_material      = NULL;
     m_min_rate      = 10;
@@ -44,6 +43,12 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_box_x         = 0.5f;
     m_box_y         = 0.5f;
     m_box_z         = 0.5f;
+    m_angle_spread_x = 90;
+    m_angle_spread_y = 90;
+    m_angle_spread_z = 90;
+    m_velocity_x     = 0.001f;
+    m_velocity_y     = 0.001f;
+    m_velocity_z     = 0.001f;
     
     // ----- Read XML file
     
@@ -88,9 +93,18 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* spreading = xml->getNode("spreading");
-    spreading->get("value", &m_spread_factor);
+    spreading->get("x", &m_angle_spread_x);
+    spreading->get("y", &m_angle_spread_y);
+    spreading->get("z", &m_angle_spread_z);
     
     //std::cout << "m_spread_factor = " << m_spread_factor << "\n";
+    
+    // ------------------------------------------------------------------------
+
+    const XMLNode* velocity = xml->getNode("velocity");
+    velocity->get("x", &m_velocity_x);
+    velocity->get("y", &m_velocity_y);
+    velocity->get("z", &m_velocity_z);
     
     // ------------------------------------------------------------------------
     
