@@ -97,8 +97,8 @@ ParticleEmitter::ParticleEmitter(ParticleKind* type, core::vector3df position,
                                                  m_particle_type->getAngleSpreadX() /* angle */
                                                  );
             
-            irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,
-                                                            core::vector3df(box_size_x, box_size_y, box_size_z));
+            //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,
+            //                                                core::vector3df(box_size_x, box_size_y, box_size_z));
             
             break;
         }
