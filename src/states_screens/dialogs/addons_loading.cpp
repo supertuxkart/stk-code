@@ -80,7 +80,7 @@ void * AddonsLoading::downloadIcon( void * pthis)
 {
     AddonsLoading *me     = (AddonsLoading*)pthis;
     std::string icon_name = StringUtils::getBasename(me->m_addon.getIcon());
-    std::string icon_path = "icon/" + me->m_addon.getIcon();
+    std::string icon_path = me->m_addon.getIcon();
 
     // FIXME: addons_loading might be removed before this finishes!
 	if(network_http->downloadFileSynchron(icon_path, icon_name))
@@ -202,7 +202,7 @@ void AddonsLoading::close()
  **/
 void AddonsLoading::startInstall()
 {
-    std::string file = "file/" + m_addon.getZipFileName();
+    std::string file = m_addon.getZipFileName();
     std::string save = StringUtils::getBasename(m_addon.getZipFileName());
     network_http->downloadFileAsynchron(file, save);
 }   // startInstall
