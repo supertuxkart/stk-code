@@ -62,7 +62,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     if (xml->getName() != "particles")
     {
         delete xml;
-        throw std::runtime_error("[ParticleKind] No <particles> main node in smoke.xml");
+        throw std::runtime_error("[ParticleKind] No <particles> main node in " + file);
     }
     
     // ------------------------------------------------------------------------
@@ -105,6 +105,12 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* material = xml->getNode("material");
+    if (material == NULL)
+    {
+        delete xml;
+        throw std::runtime_error("[ParticleKind] No <material> node in " + file);
+    }
+    
     std::string materialFile;
     material->get("file", &materialFile);
     
@@ -123,8 +129,11 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* rate = xml->getNode("rate");
-    rate->get("min", &m_min_rate);
-    rate->get("max", &m_max_rate);
+    if (rate != NULL)
+    {
+        rate->get("min", &m_min_rate);
+        rate->get("max", &m_max_rate);
+    }
     
     //std::cout << "m_min_rate = " << m_min_rate << "\n";
     //std::cout << "m_max_rate = " << m_max_rate << "\n";
@@ -132,8 +141,11 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* lifetime = xml->getNode("lifetime");
-    lifetime->get("min", &m_lifetime_min);
-    lifetime->get("max", &m_lifetime_max);
+    if (lifetime != NULL)
+    {
+        lifetime->get("min", &m_lifetime_min);
+        lifetime->get("max", &m_lifetime_max);
+    }
     
     //std::cout << "m_lifetime_min = " << m_lifetime_min << "\n";
     //std::cout << "m_lifetime_max = " << m_lifetime_max << "\n";
@@ -141,9 +153,11 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* size = xml->getNode("size");
-    //size->get("default", &m_particle_size);
-    size->get("min", &m_min_size);
-    size->get("max", &m_max_size);
+    if (size != NULL)
+    {
+        size->get("min", &m_min_size);
+        size->get("max", &m_max_size);
+    }
     
     //std::cout << "m_particle_size = " << m_particle_size << "\n";
     //std::cout << "m_min_size = " << m_min_size << "\n";
@@ -152,16 +166,20 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     const XMLNode* color = xml->getNode("color");
-    video::SColor minColor;
-    video::SColor maxColor;
-    color->get("min", &m_min_start_color);
-    color->get("max", &m_max_start_color);
+    if (color != NULL)
+    {
+        color->get("min", &m_min_start_color);
+        color->get("max", &m_max_start_color);
+    }
     
     // ------------------------------------------------------------------------
     
     const XMLNode* fadeout = xml->getNode("fadeout");
-    fadeout->get("time", &m_fadeout_time);
-    
+    if (fadeout != NULL)
+    {
+        fadeout->get("time", &m_fadeout_time);
+    }
+        
     //std::cout << "m_fadeout_time = " << m_fadeout_time << "\n";
     
     // ------------------------------------------------------------------------
