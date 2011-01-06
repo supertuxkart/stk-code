@@ -258,7 +258,14 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     if (m_alpha_blending)
     {
-        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        //m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        
+        // EMT_TRANSPARENT_ALPHA_CHANNEL does include vertex color alpha into account, which
+        // messes up fading in/out effects. So we use the more customizable EMT_ONETEXTURE_BLEND instead
+        m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
+        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_ONE_MINUS_SRC_ALPHA,
+                                                    video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
+        
         modes++;
     }
     if (m_sphere_map) 
@@ -273,7 +280,13 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     if (m_add)
     {
-        m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+        //m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+        
+        // EMT_TRANSPARENT_ADD_COLOR does include vertex color alpha into account, which
+        // messes up fading in/out effects. So we use the more customizable EMT_ONETEXTURE_BLEND instead
+        m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
+        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_DST_ALPHA,
+                                                    video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
         modes++;
     }
     
