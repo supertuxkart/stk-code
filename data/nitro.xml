@@ -12,8 +12,8 @@
     <material  file="nitro-particle.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="5"
-               max="10"          />
+    <rate      min="130"
+               max="160"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="1000"

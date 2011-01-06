@@ -54,6 +54,8 @@ public:
     void         setCreationRate(float f);
     
     void         setPosition(core::vector3df pos);
+    
+    ParticleKind* getParticlesInfo() { return m_particle_type; }
 };
 #endif
 
