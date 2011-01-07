@@ -75,6 +75,8 @@ supertuxkart_SOURCES = \
  graphics/particle_emitter.hpp \
  graphics/particle_kind.cpp \
  graphics/particle_kind.hpp \
+ graphics/particle_kind_manager.cpp \
+ graphics/particle_kind_manager.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \
