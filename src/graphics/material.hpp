@@ -29,6 +29,7 @@ using namespace irr;
 
 class XMLNode;
 class SFXBase;
+class ParticleKind;
 
 /**
   * \ingroup graphics
@@ -36,8 +37,16 @@ class SFXBase;
 class Material : public NoCopy
 {
 public:
-    enum GraphicalEffect {GE_NONE, GE_SMOKE, GE_WATER};
+    enum GraphicalEffect {GE_NONE, GE_WATER};
 
+    enum ParticleConditions
+    {
+        EMIT_ON_DRIVE = 0,
+        EMIT_ON_SKID,
+        
+        EMIT_KINDS_COUNT
+    };
+    
 private:
     video::ITexture *m_texture;
     unsigned int     m_index;
@@ -50,6 +59,8 @@ private:
     bool             m_resetter;
     bool             m_ignore;
     bool             m_add;
+    
+    ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
     
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
@@ -101,6 +112,8 @@ private:
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
     void  initCustomSFX(const XMLNode *sfx);
+    void  initParticlesEffect(const XMLNode *node);
+    
 public:
           Material(const XMLNode *node, int index);
           Material(const std::string& fname, int index, 
@@ -130,7 +143,7 @@ public:
     float getSlowDownTime() const { return m_slowdown_time;          }
     // ------------------------------------------------------------------------
     /** Returns true if this material should have smoke effect. */
-    bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
+    //bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
     // ------------------------------------------------------------------------
     /** Returns true if this material should have water splashes. */
     bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}
@@ -139,6 +152,13 @@ public:
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &
          getSFXName          () const { return m_sfx_name; }
+    
+    /**
+      * \brief Get the kind of particles that are to be used on this material, in the given conditions
+      * \return The particles to use, or NULL if none
+      */
+    const ParticleKind* getParticlesWhen(ParticleConditions cond) const { return m_particles_effects[cond]; }
+    
     // ------------------------------------------------------------------------
     /** Returns the zipper parametersfor the current material. */
     void getZipperParameter(float *zipper_max_speed_increase,

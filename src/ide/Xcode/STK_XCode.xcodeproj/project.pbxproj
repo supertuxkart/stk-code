@@ -35,6 +35,7 @@
 		95263DEF0FD7471900CF5F92 /* highscores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE60FD7471900CF5F92 /* highscores.cpp */; };
 		95263DF00FD7471900CF5F92 /* history.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE80FD7471900CF5F92 /* history.cpp */; };
 		95263DF10FD7471900CF5F92 /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DEA0FD7471900CF5F92 /* race_manager.cpp */; };
+		9528C71612D69494006E9167 /* particle_kind_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9528C71412D69494006E9167 /* particle_kind_manager.cpp */; };
 		9528CC241291E7A10078A5EF /* binding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9528CC221291E7A10078A5EF /* binding.cpp */; };
 		952A1545103F66D600B1895D /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A152D103F66D600B1895D /* camera.cpp */; };
 		952A1546103F66D600B1895D /* explosion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A152F103F66D600B1895D /* explosion.cpp */; };
@@ -388,6 +389,8 @@
 		95263DE90FD7471900CF5F92 /* history.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = history.hpp; path = ../../race/history.hpp; sourceTree = SOURCE_ROOT; };
 		95263DEA0FD7471900CF5F92 /* race_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_manager.cpp; path = ../../race/race_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95263DEB0FD7471900CF5F92 /* race_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_manager.hpp; path = ../../race/race_manager.hpp; sourceTree = SOURCE_ROOT; };
+		9528C71412D69494006E9167 /* particle_kind_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_kind_manager.cpp; path = ../../graphics/particle_kind_manager.cpp; sourceTree = SOURCE_ROOT; };
+		9528C71512D69494006E9167 /* particle_kind_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_kind_manager.hpp; path = ../../graphics/particle_kind_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9528CC221291E7A10078A5EF /* binding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = binding.cpp; path = ../../input/binding.cpp; sourceTree = SOURCE_ROOT; };
 		9528CC231291E7A10078A5EF /* binding.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = binding.hpp; path = ../../input/binding.hpp; sourceTree = SOURCE_ROOT; };
 		952A152D103F66D600B1895D /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = ../../graphics/camera.cpp; sourceTree = SOURCE_ROOT; };
@@ -1253,6 +1256,8 @@
 				9542FC7612D3BDB000C00366 /* particle_emitter.hpp */,
 				9542FD4A12D3E0D700C00366 /* particle_kind.cpp */,
 				9542FD4B12D3E0D700C00366 /* particle_kind.hpp */,
+				9528C71412D69494006E9167 /* particle_kind_manager.cpp */,
+				9528C71512D69494006E9167 /* particle_kind_manager.hpp */,
 				952A153D103F66D600B1895D /* shadow.cpp */,
 				952A153E103F66D600B1895D /* shadow.hpp */,
 				952A153F103F66D600B1895D /* skid_marks.cpp */,
@@ -2726,6 +2731,7 @@
 				9538A56012CD094200CE3220 /* addon.cpp in Sources */,
 				9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */,
 				9542FD4C12D3E0D700C00366 /* particle_kind.cpp in Sources */,
+				9528C71612D69494006E9167 /* particle_kind_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -32,6 +32,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -89,7 +90,7 @@ Kart::Kart (const std::string& ident, int position,
     m_finish_time          = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
-    m_smoke_system         = NULL;
+    m_terrain_particles         = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_slipstream           = NULL;
@@ -317,7 +318,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_beep_sound   );
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-    if(m_smoke_system)        delete m_smoke_system;
+    if(m_terrain_particles)        delete m_terrain_particles;
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
     if(m_slipstream)          delete m_slipstream;
@@ -729,9 +730,9 @@ void Kart::update(float dt)
     m_attachment->update(dt);
 
     //smoke drawing control point
-    if ( UserConfigParams::m_graphical_effects )
+    if (UserConfigParams::m_graphical_effects && m_terrain_particles)
     {
-        m_smoke_system->update();
+        m_terrain_particles->update();
         m_water_splash_system->update(dt);
     }  // UserConfigParams::m_graphical_effects
 
@@ -1449,9 +1450,8 @@ void Kart::loadData()
             // So it's easier not to move the particle system with the kart, and set 
             // the position directly from the wheel coordinates.
             core::vector3df position(-getKartWidth()*0.35f, 0.06f, -getKartLength()*0.5f);
-            m_smoke_system = new ParticleEmitter(
-                                 new ParticleKind(file_manager->getDataFile("smoke.xml")),
-                                 position);
+            m_terrain_particles = new ParticleEmitter(ParticleKindManager::get()->getParticles("smoke.xml"),
+                                                      position);
         }
         catch (std::runtime_error& e)
         {
@@ -1553,24 +1553,51 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                -m_kart_model->getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
 
-    if(m_smoke_system)
+    if (m_terrain_particles)
     {
-        float f=0.0f;
-        if(getMaterial() && getMaterial()->hasSmoke() && 
-            fabsf(m_controls.m_steer) > 0.8           &&
-            isOnGround()                                  )
-            f=250.0f;
-        m_smoke_system->setCreationRate((m_skidding-1)*f);
+        float f = 0.0f;
+        const Material* material = getMaterial();
         
-        m_wheel_toggle = 1 - m_wheel_toggle;
-        const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
-        Vec3 c = wi.m_raycastInfo.m_contactPointWS;
-        
-        // FIXME: the X position is not yet always accurate.
-        m_smoke_system->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
-                                                    c.getY(),
-                                                    c.getZ() + 0.06f));
-        
+        if (material != NULL)
+        {
+            if (m_skidding)
+            {
+                const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_SKID);
+                if (pk != NULL)
+                {
+                    m_terrain_particles->setParticleType(pk);
+                    
+                    if (fabsf(m_controls.m_steer) > 0.8 && isOnGround()) f = 250.0f;
+                
+                    m_terrain_particles->setCreationRate((m_skidding-1)*f);
+                    
+                    m_wheel_toggle = 1 - m_wheel_toggle;
+                    const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
+                    Vec3 c = wi.m_raycastInfo.m_contactPointWS;
+                    
+                    // FIXME: the X position is not yet always accurate.
+                    m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
+                                                                     c.getY(),
+                                                                     c.getZ() + 0.06f));
+                }
+                else
+                {
+                    m_terrain_particles->setCreationRate(0);
+                }
+            }
+            else // not skidding
+            {
+                const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_DRIVE);
+                if (pk != NULL)
+                {
+                    m_terrain_particles->setParticleType(pk);
+                }
+                else
+                {
+                    m_terrain_particles->setCreationRate(0);
+                }
+            }
+        }
     }
     if(m_water_splash_system)
     {

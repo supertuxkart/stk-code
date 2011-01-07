@@ -135,8 +135,8 @@ private:
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
     
-    /** Smoke from skidding. */
-    ParticleEmitter *m_smoke_system;
+    /** Particle emitter used for terrain-specific effects (including but not limited too skidding). */
+    ParticleEmitter *m_terrain_particles;
     
     /** Water splash when driving in water. */
     WaterSplash     *m_water_splash_system;

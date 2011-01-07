@@ -76,11 +76,15 @@ private:
     
 public:
     
+    /**
+      * @brief Load a XML file describing a type of particles
+      * @param file Name of the file to load (no full path)
+      * @throw std::runtime_error If the file cannot be found or is heavily malformed
+      */
     ParticleKind(const std::string file);
     virtual     ~ParticleKind() {}
 
     
-    //float     getParticleSize() const { return m_particle_size;   }
     float     getMaxSize     () const { return m_max_size;        }
     float     getMinSize     () const { return m_min_size;        }
     

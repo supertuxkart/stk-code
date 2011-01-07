@@ -39,15 +39,19 @@ private:
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node; /* left wheel */
     
+    core::vector3df                  m_position;
+    
+    scene::ISceneNode*               m_parent;
+    
     /** The emitters. Access to these is needed to adjust the number of
      *  particles per second. */
     scene::IParticleEmitter         *m_emitter;
 
-    ParticleKind                    *m_particle_type;
+    const ParticleKind              *m_particle_type;
     
 public:
     
-    ParticleEmitter             (ParticleKind* type, core::vector3df position,
+    ParticleEmitter             (const ParticleKind* type, core::vector3df position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
     virtual void update         ();
@@ -55,7 +59,9 @@ public:
     
     void         setPosition(core::vector3df pos);
     
-    ParticleKind* getParticlesInfo() { return m_particle_type; }
+    const ParticleKind* getParticlesInfo() const { return m_particle_type; }
+    
+    void         setParticleType(const ParticleKind* p);
 };
 #endif
 

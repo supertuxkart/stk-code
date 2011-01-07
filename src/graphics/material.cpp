@@ -26,6 +26,7 @@
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
@@ -70,8 +71,6 @@ Material::Material(const XMLNode *node, int index)
     node->get("graphical-effect", &s                   );
     if(s=="water")
         m_graphical_effect = GE_WATER;
-    else if(s=="smoke")
-        m_graphical_effect = GE_SMOKE;
     else if (s!="")
         fprintf(stderr, 
             "Invalid graphical effect specification: '%s' - ignored.\n", 
@@ -79,11 +78,13 @@ Material::Material(const XMLNode *node, int index)
     else
         m_graphical_effect = GE_NONE;
 
-    node->get("compositing", &s);
-    if      (s == "blend")    m_alpha_blending = true;
-    else if (s == "test")     m_alpha_testing = true;
-    else if (s == "additive") m_add = true;
-    else if (s != "none")     fprintf(stderr, "[Material] WARNING: Unknown alpha mode '%s'\n", s.c_str());
+    if (node->get("compositing", &s))
+    {
+        if      (s == "blend")    m_alpha_blending = true;
+        else if (s == "test")     m_alpha_testing = true;
+        else if (s == "additive") m_add = true;
+        else if (s != "none")     fprintf(stderr, "[Material] WARNING: Unknown compositing mode '%s'\n", s.c_str());
+    }
     
     node->get("zipper",                    &m_zipper                   );
     node->get("zipper-duration",           &m_zipper_duration          );
@@ -92,22 +93,26 @@ Material::Material(const XMLNode *node, int index)
     node->get("zipper-speed-gain",         &m_zipper_speed_gain        );
 
     // Terrain-specifc sound effect
-    for(unsigned int i=0; i<node->getNumNodes(); i++)
+    const unsigned int children_count = node->getNumNodes();
+    for (unsigned int i=0; i<children_count; i++)
     {
-        const XMLNode *sfx= node->getNode(i);
-        if(sfx->getName()!="sfx")
+        const XMLNode *child_node = node->getNode(i);
+        
+        if (child_node->getName() == "sfx")
         {
-            printf("Warning: unknown node type '%s' for texture '%s' - ignored.\n",
-                    sfx->getName().c_str(), m_texname.c_str());
-            continue;
+          
+            initCustomSFX(child_node);
         }
-        if(m_sfx_name!="")
+        else if (child_node->getName() == "particles")
         {
-            printf("Warning: more than one sfx specified for texture '%s' - ignored.\n",
-                   m_texname.c_str());
-            continue;
+            initParticlesEffect(child_node);
         }
-        initCustomSFX(sfx);
+        else
+        {
+            fprintf(stderr, "[Material] WARNING: unknown node type '%s' for texture '%s' - ignored.\n",
+                    child_node->getName().c_str(), m_texname.c_str());
+        }
+
     }   // for i <node->getNumNodes()
     install(/*is_full_path*/false);
 }   // Material
@@ -157,6 +162,11 @@ void Material::init(unsigned int index)
     m_zipper_fade_out_time      = -1.0f;
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
+    
+    for (int n=0; n<EMIT_KINDS_COUNT; n++)
+    {
+        m_particles_effects[n] = NULL;
+    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -212,6 +222,62 @@ void Material::initCustomSFX(const XMLNode *sfx)
         sfx_manager->loadSingleSfx(sfx, full_path);
     }
 }   // initCustomSFX
+
+//-----------------------------------------------------------------------------
+
+void Material::initParticlesEffect(const XMLNode *node)
+{
+    ParticleKindManager* pkm = ParticleKindManager::get();
+    
+    std::string base;
+    node->get("base", &base);
+    if (base.size() < 1)
+    {
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Invalid particle settings for material '%s'\n",
+                m_texname.c_str());
+        return;
+    }
+    
+    ParticleKind* particles = NULL;
+    try
+    {
+        particles = pkm->getParticles(base.c_str());
+    }
+    catch (...)
+    {
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Cannot find particles '%s' for material '%s'\n",
+                base.c_str(), m_texname.c_str());
+        return;
+    }
+    
+    std::vector<std::string> conditions;
+    node->get("condition", &conditions);
+    
+    const int count = conditions.size();
+    
+    if (count == 0)
+    {
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles '%s' for material '%s' are declared but not used\n",
+                base.c_str(), m_texname.c_str());
+    }
+    
+    for (int c=0; c<count; c++)
+    {
+        if (conditions[c] == "skid")
+        {
+            m_particles_effects[EMIT_ON_SKID] = particles;
+        }
+        else if (conditions[c] == "drive")
+        {
+            m_particles_effects[EMIT_ON_DRIVE] = particles;
+        }
+        else
+        {
+            fprintf(stderr, "[Material::initParticlesEffect] WARNING: Unknown condition '%s' for material '%s'\n",
+                    conditions[c].c_str(), m_texname.c_str());
+        }
+    }
+} // initParticlesEffect
 
 //-----------------------------------------------------------------------------
 /** Adjusts the pitch of the given sfx depending on the given speed.
