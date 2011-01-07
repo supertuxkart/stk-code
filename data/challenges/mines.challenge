@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<challenge
+    id="energyxr591"
+    name="Collect fuel for your rocket"
+    description="Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 minutes."
+    unlock-track="mines"
+    depend-on="lighthousetime canyon"
+    major="single"
+    minor="quickrace"
+    track="xr591"
+    difficulty="hard"
+    karts="1"
+    laps="2"
+    energy="16"
+    time="150"
+/>
+

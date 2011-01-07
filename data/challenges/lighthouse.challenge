@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<challenge
+    id="starfollow"
+    name="Follow the Leader around the Solar System"
+    description="Win a Follow the Leader race with 5 AI karts on Star track"
+    unlock-track="lighthouse"
+    depend-on="farmtracktime penguinplaygroundgp"
+    major="single"
+    minor="followtheleader"
+    track="startrack"
+    difficulty="medium"
+    laps="3"
+    karts="6"
+    position="2"
+/>
+
+

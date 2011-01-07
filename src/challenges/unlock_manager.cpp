@@ -46,38 +46,27 @@ UnlockManager::UnlockManager()
 
     m_locked_sound = sfx_manager->createSoundSource("locked");
     
-    // Read challenges from .../data
-    // -----------------------------
+
+    // Read challenges from .../data/challenges
+    // ----------------------------------------
     std::set<std::string> result;
-    file_manager->listFiles(result, "data");
+    file_manager->listFiles(result, "data/challenges");
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
         if (StringUtils::hasSuffix(*i, ".challenge")) 
-            addChallenge(file_manager->getDataFile(*i));
+            addChallenge(file_manager->getDataFile("challenges/"+*i));
     }   // for i
 
     // Read challenges from .../data/tracks/*
     // --------------------------------------
     const std::vector<std::string> *all_track_dirs = track_manager->getAllTrackDirs();
     readAllChallengesInDirs(all_track_dirs);
-    
-    
+
     // Read challenges from .../data/karts/*
     // --------------------------------------
     const std::vector<std::string> *all_kart_dirs  = kart_properties_manager->getAllKartDirs();
     readAllChallengesInDirs(all_kart_dirs);
-    
-    
-    // Challenges from .../data/grandprix
-    // ----------------------------------
-    file_manager->listFiles(result, "data/grandprix");
-    for(std::set<std::string>::iterator i  = result.begin();
-                                        i != result.end()  ; i++)
-    {
-        if (StringUtils::hasSuffix(*i, ".challenge")) 
-            addChallenge(file_manager->getDataFile("grandprix/"+*i));
-    }   // for i
 
     // Hard coded challenges can be added here.
 

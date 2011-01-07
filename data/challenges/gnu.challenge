@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<challenge
+    id="fortmagma"
+    name="Win a race on Fort Magma"
+    description="Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
+    depend-on="worldsend"
+    unlock-kart="gnu"
+    major="single"
+    minor="quickrace"
+    track="fortmagma"
+    difficulty="hard"
+    laps="3"
+    karts="4"
+    position="1"
+/>
+

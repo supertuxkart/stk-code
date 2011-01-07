@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<challenge
+    id="minestime"
+    name="Finish Mines in 3:00"
+    description="Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
+    depend-on="energyxr591"
+    unlock-track="fortmagma"
+    major="single"
+    minor="quickrace"
+    track="mines"
+    difficulty="hard"
+    laps="3"
+    karts="4"
+    time="180"
+/>
+

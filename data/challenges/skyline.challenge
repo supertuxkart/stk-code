@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<challenge
+    id="gardenhead"
+    name="Win a Head to Head in the Secret Garden"
+    description="Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+    depend-on="snowmountain"
+    unlock-track="skyline"
+    major="single"
+    minor="timetrial"
+    track="secretgarden"
+    difficulty="hard"
+    laps="1"
+    karts="2"
+    position="1"
+/>
+
