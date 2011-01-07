@@ -58,6 +58,8 @@ public:
     void      addSharedMaterial(const std::string& filename);
     bool      pushTempMaterial (const std::string& filename);
     void      popTempMaterial  ();
+    
+    bool      hasMaterial(const std::string& fname);
 };
 
 extern MaterialManager *material_manager;

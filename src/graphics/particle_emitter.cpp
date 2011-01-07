@@ -30,6 +30,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type, core::vector3df posit
                                  scene::ISceneNode* parent) : m_position(position)
 {
     m_node = NULL;
+    m_particle_type = NULL;
     m_parent = parent;
     setParticleType(type);
     
@@ -81,7 +82,7 @@ void ParticleEmitter::setPosition(core::vector3df pos)
 //-----------------------------------------------------------------------------
 
 void ParticleEmitter::setParticleType(const ParticleKind* type)
-{
+{    
     if (m_particle_type == type) return; // already the right type
     
     if (m_node != NULL)
@@ -116,11 +117,13 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     m_node->setName(debug_name.c_str());
 #endif
     
+    video::SMaterial& mat0 = m_node->getMaterial(0);
+    
     m_node->setPosition(m_position);
-    material->setMaterialProperties(&(m_node->getMaterial(0)));
+    material->setMaterialProperties(&mat0);
     m_node->setMaterialTexture(0, material->getTexture());
     
-    m_node->getMaterial(0).ZWriteEnable = false; // disable z-buffer writes
+    mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
     
     switch (type->getShape())
     {

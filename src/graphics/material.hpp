@@ -133,6 +133,9 @@ public:
     const std::string& 
           getTexFname        () const { return m_texname;            }
     int   getIndex           () const { return m_index;              }
+    
+    bool  isTransparent      () const { return m_alpha_testing || m_alpha_blending || m_add; }
+    
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }

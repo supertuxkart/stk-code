@@ -229,3 +229,15 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     return m ;
 }   // getMaterial
 
+
+bool MaterialManager::hasMaterial(const std::string& fname)
+{
+    std::string basename=StringUtils::getBasename(fname);
+    
+    // Search backward so that temporary (track) textures are found first
+    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    {
+        if(m_materials[i]->getTexFname()==basename) return true;
+    }
+    return false;
+}

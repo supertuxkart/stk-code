@@ -120,10 +120,17 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
     }
     
-    m_material = material_manager->getMaterial(materialFile);
-    if (m_material->getTexture() == NULL)
+    if (material_manager->hasMaterial(materialFile))
     {
-        throw std::runtime_error("[ParticleKind] Cannot locate file " + materialFile);
+        m_material = material_manager->getMaterial(materialFile);
+        if (m_material->getTexture() == NULL)
+        {
+            throw std::runtime_error("[ParticleKind] Cannot locate file " + materialFile);
+        }
+    }
+    else
+    {
+        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of currently known materials, it will be opaque", materialFile.c_str());
     }
     
     // ------------------------------------------------------------------------
