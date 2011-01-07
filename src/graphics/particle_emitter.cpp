@@ -84,9 +84,21 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 {
     if (m_particle_type == type) return; // already the right type
     
-    if (m_node != NULL) m_node->remove();
+    if (m_node != NULL)
+    {
+        m_node->removeAll();
+        m_node->removeAllAffectors();
+    }
+    else
+    {
+        m_node = irr_driver->addParticleNode();
+        
+        if (m_parent != NULL)
+        {
+            m_node->setParent(m_parent);
+        }
+    }
     
-    m_node = irr_driver->addParticleNode();
     m_particle_type = type;
     
     Material* material    = type->getMaterial();
@@ -103,12 +115,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     std::string debug_name = std::string("particles(") + material->getTexture()->getName().getPath().c_str() + ")";
     m_node->setName(debug_name.c_str());
 #endif
-    
-    
-    if (m_parent != NULL)
-    {
-        m_node->setParent(m_parent);
-    }
     
     m_node->setPosition(m_position);
     material->setMaterialProperties(&(m_node->getMaterial(0)));
