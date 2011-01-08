@@ -1555,7 +1555,6 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     
     if (m_terrain_particles)
     {
-        float f = 0.0f;
         const Material* material = getMaterial();
         
         if (material != NULL)
@@ -1567,18 +1566,24 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                 {
                     m_terrain_particles->setParticleType(pk);
                     
-                    if (fabsf(m_controls.m_steer) > 0.8 && isOnGround()) f = 250.0f;
-                
-                    m_terrain_particles->setCreationRate((m_skidding-1)*f);
-                    
-                    m_wheel_toggle = 1 - m_wheel_toggle;
-                    const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
-                    Vec3 c = wi.m_raycastInfo.m_contactPointWS;
-                    
-                    // FIXME: the X position is not yet always accurate.
-                    m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
-                                                                     c.getY(),
-                                                                     c.getZ() + 0.06f));
+                    if (fabsf(m_controls.m_steer) > 0.8 && isOnGround())
+                    {
+                        float rate = m_skidding - 1;
+                        m_terrain_particles->setCreationRate(pk->getMinRate() + rate*(pk->getMaxRate() - pk->getMinRate()));
+                        
+                        m_wheel_toggle = 1 - m_wheel_toggle;
+                        const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
+                        Vec3 c = wi.m_raycastInfo.m_contactPointWS;
+                        
+                        // FIXME: the X position is not yet always accurate.
+                        m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
+                                                                         c.getY(),
+                                                                         c.getZ() + 0.06f));
+                    }
+                    else
+                    {
+                        m_terrain_particles->setCreationRate(0.0f);
+                    }
                 }
                 else
                 {
