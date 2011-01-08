@@ -1552,7 +1552,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             - (m_kart_model->getWheelGraphicsRadius(0)
                -m_kart_model->getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
-
+    
     if (m_terrain_particles)
     {
         float f = 0.0f;
@@ -1560,7 +1560,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
         
         if (material != NULL)
         {
-            if (m_skidding)
+            if (m_skidding > 1.0f)
             {
                 const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_SKID);
                 if (pk != NULL)
@@ -1590,10 +1590,32 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                 const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_DRIVE);
                 if (pk != NULL)
                 {
+                    //printf("Setting DRIVING particles\n");
                     m_terrain_particles->setParticleType(pk);
+                    
+                    m_wheel_toggle = 1 - m_wheel_toggle;
+                    const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
+                    Vec3 c = wi.m_raycastInfo.m_contactPointWS;
+                    
+                    // FIXME: the X position is not yet always accurate.
+                    m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
+                                                                     c.getY(),
+                                                                     c.getZ() + 0.06f));
+                    
+                    const float speed = fabsf(getSpeed());
+                    if (speed < 0.5f)
+                    {
+                        m_terrain_particles->setCreationRate(0);
+                    }
+                    else
+                    {
+                        float rate = (speed/m_kart_properties->getMaxSpeed());
+                        m_terrain_particles->setCreationRate(pk->getMinRate() + rate*(pk->getMaxRate() - pk->getMinRate()));
+                    }
                 }
                 else
                 {
+                    //printf("No DRIVING particles\n");
                     m_terrain_particles->setCreationRate(0);
                 }
             }
