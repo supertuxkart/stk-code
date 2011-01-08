@@ -703,6 +703,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\particle_kind_manager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\shadow.cpp"
 					>
 				</File>
@@ -1646,6 +1650,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\particle_kind.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\particle_kind_manager.hpp"
 					>
 				</File>
 				<File
