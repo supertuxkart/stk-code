@@ -47,9 +47,19 @@ ParticleEmitter::~ParticleEmitter()
 //-----------------------------------------------------------------------------
 void ParticleEmitter::update()
 {
-    // No particles to emit, no need to change the speed
+    // No particles to emit, nothing to do
     if (m_emitter->getMinParticlesPerSecond() == 0) return;
-        
+    
+    // the emission direction does not automatically follow the orientation of
+    // the node so fix that manually...
+    core::matrix4 	transform = m_node->getAbsoluteTransformation();
+    core::vector3df velocity(m_particle_type->getVelocityX(),
+                             m_particle_type->getVelocityY(),
+                             m_particle_type->getVelocityZ());
+    
+    transform.rotateVect(velocity);
+    m_emitter->setDirection(velocity);
+    
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
