@@ -98,7 +98,20 @@ Translations::Translations()
 
     //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
     const char* isRtl = gettext("   Is this a RTL language?");
-    m_rtl = (isRtl[0] == 'Y');
+    const wchar_t* isRtlW = reinterpret_cast<const wchar_t*>(isRtl);
+    
+    m_rtl = false;
+    
+    for (int n=0; isRtlW[n] != 0; n++)
+    {
+        if (isRtlW[n] == 'Y')
+        {
+            m_rtl = true;
+            break;
+        }
+    }
+    
+    //m_rtl = (isRtl[0] == 'Y');
 
 #endif
 
