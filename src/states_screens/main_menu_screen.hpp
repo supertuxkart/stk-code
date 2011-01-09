@@ -18,7 +18,6 @@
 #ifndef HEADER_MAIN_MENU_SCREEN_HPP
 #define HEADER_MAIN_MENU_SCREEN_HPP
 
-#include <pthread.h>
 #include "guiengine/screen.hpp"
 
 namespace GUIEngine { class Widget; }
