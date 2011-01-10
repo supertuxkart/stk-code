@@ -49,12 +49,7 @@ Material::Material(const XMLNode *node, int index)
         throw std::runtime_error("[Material] No texture name specified in file\n");
     }
     init(index);
-    
-    if (m_texname == "smoke.png")
-    {
-        printf("breakpoint here\n");
-    }
-    
+
     bool b = false;
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP;
     b = false;
