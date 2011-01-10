@@ -604,8 +604,8 @@ void Kart::collectedItem(Item *item, int add_info)
         race_state->itemCollected(getWorldKartId(), item->getItemId());
     }
 
-    if ( m_collected_energy > MAX_ITEMS_COLLECTED )
-        m_collected_energy = MAX_ITEMS_COLLECTED;
+    if ( m_collected_energy > MAX_NITRO )
+        m_collected_energy = MAX_NITRO;
     m_controller->collectedItem(*item, add_info, old_energy);
 
 }   // collectedItem

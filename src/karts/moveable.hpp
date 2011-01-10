@@ -32,10 +32,7 @@ using namespace irr;
 
 class Material;
 
-/* Limits of Kart performance */
-#define CRASH_PITCH          -45.0f
-
-#define MAX_ITEMS_COLLECTED    20
+const int MAX_NITRO = 16;
 
 /**
   * \ingroup karts

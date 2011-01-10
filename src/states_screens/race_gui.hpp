@@ -100,6 +100,10 @@ private:
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go;
     
+    video::ITexture *m_gauge_empty;
+    video::ITexture *m_gauge_full;
+    video::ITexture *m_gauge_goal;
+
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */

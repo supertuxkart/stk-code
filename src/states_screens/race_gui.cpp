@@ -85,6 +85,10 @@ RaceGUI::RaceGUI()
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
     m_music_icon       = material_manager->getMaterial("notes.png");
     createMarkerTexture();
+    
+    m_gauge_full      = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_full.png" );
+    m_gauge_empty     = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_empty.png" );
+    m_gauge_goal      = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_goal.png" );
 
     // Translate strings only one in constructor to avoid calling
     // gettext in each frame.
@@ -736,64 +740,52 @@ void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
-    float state = (float)(kart->getEnergy()) / MAX_ITEMS_COLLECTED;
-    // Don't scale width, it looks too small otherwise
-    int w = 16;
+    float state = (float)(kart->getEnergy()) / MAX_NITRO;
+    if (state < 0.0f) state = 0.0f;
+    else if (state > 1.0f) state = 1.0f;
+    
     int h = (int)(viewport.getHeight()/3);
-
-    // Move energy bar slighty 'into' the speedometer. Leave 10 points
-    // between right edge of viewport and energy meter, and don't scale.
-    x    -= w+10;
-    y    -= (int)(30*scaling.Y);
+    int w = h/4; // gauge image is so 1:4
     
-    float coin_target = (float)race_manager->getCoinTarget();
-    int th = (int)(h*(coin_target/MAX_ITEMS_COLLECTED));
+    x    -= w;
     
-    video::SColor black_border(255, 0, 0, 0);
-    video::SColor white_border(255, 255, 255, 255);
-    video::IVideoDriver *video = irr_driver->getVideoDriver();
-#define LINE(x0,y0,x1,y1, color) video->draw2DLine(core::position2di(x0,y0), \
-                                                   core::position2di(x1,y1), color)
-
-    // Left side:
-    LINE(x-1,   y+1,   x-1,   y-h-1, black_border);
-    LINE(x,     y,     x,     y-h-2, white_border);
- 
-    // Right side:
-    LINE(x+w,   y+1,   x+w,   y-h-1, black_border);
-    LINE(x+w+1, y,     x+w+1, y-h-2, white_border);
- 
-    // Bottom
-    LINE(x,     y+1,   x+w,   y+1,   black_border);
-    LINE(x+1,   y,     x+w+1, y,     white_border);
- 
-    // Top
-    LINE(x,     y-h,   x+w,   y-h,   black_border);
-    LINE(x,     y-h-1, x+w,   y-h-1, white_border);
-
-    const int GRADS = (int)(MAX_ITEMS_COLLECTED/5);  // each graduation equals 5 items
-    int gh = (int)(h/GRADS);  //graduation height
-
-    // 'Meter marks;
-    int gh_incr = gh;
-    for (int i=0; i<GRADS-1; i++)
+    // Background
+    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+                                              core::rect<s32>(0, 0, 64, 256) /* source rect */,
+                                              NULL /* clip rect */, NULL /* colors */,
+                                              true /* alpha */);
+    
+    // Target
+    if (race_manager->getCoinTarget() > 0)
     {
-        LINE(x+1, y-1-gh, x+1+w, y-1-gh, white_border);
-        gh+=gh_incr;
+        float coin_target = (float)race_manager->getCoinTarget() / MAX_NITRO;
+        
+        const int EMPTY_TOP_PIXELS = 4;
+        const int EMPTY_BOTTOM_PIXELS = 3;
+        int y1 = y + EMPTY_TOP_PIXELS + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)*(1.0f - coin_target);
+        if (state >= 1.0f) y1 = y;
+        
+        core::rect<s32> clip(x, y1, x + w, y + h);
+        irr_driver->getVideoDriver()->draw2DImage(m_gauge_goal, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+                                                  core::rect<s32>(0, 0, 64, 256) /* source rect */,
+                                                  &clip, NULL /* colors */, true /* alpha */);
     }
-
-    //Target line
-    if (coin_target > 0)
+    
+    // Filling (current state)
+    if (state > 0.0f)
     {
-        LINE(x+1, y-1-th, x+1+w, y-1-th, video::SColor(255, 255, 0, 0));
+        const int EMPTY_TOP_PIXELS = 4;
+        const int EMPTY_BOTTOM_PIXELS = 3;
+        int y1 = y + EMPTY_TOP_PIXELS + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)*(1.0f - state);
+        if (state >= 1.0f) y1 = y;
+        
+        core::rect<s32> clip(x, y1, x + w, y + h);
+        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+                                                  core::rect<s32>(0, 0, 64, 256) /* source rect */,
+                                                  &clip, NULL /* colors */, true /* alpha */);
     }
-#undef LINE
-
-    // The actual energy meter
-    core::rect<s32> energy(x+1, y-1-(int)(state*h), x+1+w, y-1);
-    video::SColor bottom(255, 240, 0,   0);
-    video::SColor top   (160, 240, 200, 0);
-    video->draw2DRectangle(energy, top, top, bottom, bottom);
+    
+    
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -805,17 +797,18 @@ void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
-    core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 15.0f*scaling.X;
-    offset.Y = viewport.LowerRightCorner.Y-10*scaling.Y;
 
-    
     drawEnergyMeter(viewport.LowerRightCorner.X, 
-                    viewport.LowerRightCorner.Y - meter_height, kart,
+                    viewport.LowerRightCorner.Y - meter_height*2, kart,
                     viewport, scaling);
     
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
+    
+    core::vector2df offset;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 15.0f*scaling.X;
+    offset.Y = viewport.LowerRightCorner.Y-10*scaling.Y;
+    
     video::IVideoDriver *video = irr_driver->getVideoDriver();
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
