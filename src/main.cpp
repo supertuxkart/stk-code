@@ -70,10 +70,145 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <IEventReceiver.h>
+
 #ifdef ADDONS_MANAGER
 #include "addons/network_http.hpp"
 #include "addons/addons_manager.hpp"
 #endif
+
+// ============================================================================
+//                        gamepad visualisation screen
+// ============================================================================
+
+void gamepadVisualisation()
+{
+    
+    core::array<SJoystickInfo>          irrlicht_gamepads;
+    irr_driver->getDevice()->activateJoysticks(irrlicht_gamepads);
+
+        
+    struct Gamepad
+    {
+        s16 	m_axis[SEvent::SJoystickEvent::NUMBER_OF_AXES];
+        bool 	m_button_state[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
+    };
+    
+    #define GAMEPAD_COUNT 8 // const won't work
+    
+    class EventReceiver : public IEventReceiver
+    {
+    public:
+        Gamepad m_gamepads[GAMEPAD_COUNT];
+        
+        EventReceiver()
+        {
+            for (int n=0; n<GAMEPAD_COUNT; n++)
+            {
+                Gamepad& g = m_gamepads[n];
+                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++) g.m_axis[i] = 0;
+                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++) g.m_button_state[i] = false;
+            }
+        }
+        
+        virtual bool OnEvent (const irr::SEvent &event)
+        {
+            switch (event.EventType)
+            {
+                case EET_JOYSTICK_INPUT_EVENT :
+                {
+                    const SEvent::SJoystickEvent& evt = event.JoystickEvent;
+                    if (evt.Joystick >= GAMEPAD_COUNT) return true;
+                    
+                    Gamepad& g = m_gamepads[evt.Joystick];
+                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++)
+                    {
+                        g.m_axis[i] = evt.Axis[i];
+                    }
+                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
+                    {
+                        g.m_button_state[i] = evt.IsButtonPressed(i);
+                    }
+                    break;
+                }
+                
+                default:
+                    // don't care about others
+                    break;
+            }
+            return true;
+        }
+    };
+    
+    EventReceiver* events = new EventReceiver();
+    irr_driver->getDevice()->setEventReceiver(events);
+    
+    while (true)
+    {
+        if (!irr_driver->getDevice()->run()) break;
+        
+        video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        const core::dimension2d<u32> size = driver ->getCurrentRenderTargetSize();
+        
+        driver->beginScene(true, true, video::SColor(255,0,0,0));
+        
+        for (int n=0; n<GAMEPAD_COUNT; n++)
+        {
+            Gamepad& g = events->m_gamepads[n];
+            
+            const int MARGIN = 10;
+            const int x = (n & 1 ? size.Width/2 + MARGIN : MARGIN );
+            const int w = size.Width/2 - MARGIN*2;
+            const int h = size.Height/(GAMEPAD_COUNT/2) - MARGIN*2;
+            const int y = size.Height/(GAMEPAD_COUNT/2)*(n/2) + MARGIN;
+
+            driver->draw2DRectangleOutline( core::recti(x, y, x+w, y+h) );
+
+            const int btn_y = y + 5;
+            const int btn_x = x + 5;
+            const int BTN_SIZE = (w - 10)/SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
+            
+            for (int b=0; b<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; b++)
+            {
+                position2di pos(btn_x + b*BTN_SIZE, btn_y);
+                dimension2di size(BTN_SIZE, BTN_SIZE);
+                
+                if (g.m_button_state[b])
+                {
+                    driver->draw2DRectangle (video::SColor(255,255,0,0), core::recti(pos, size));
+                }
+                
+                driver->draw2DRectangleOutline( core::recti(pos, size) );
+            }
+                        
+            const int axis_y = btn_y + BTN_SIZE + 5;
+            const int axis_x = btn_x;
+            const int axis_w = w - 10;
+            const int axis_h = (h - BTN_SIZE - 15) / SEvent::SJoystickEvent::NUMBER_OF_AXES;
+            
+            for (int a=0; a<SEvent::SJoystickEvent::NUMBER_OF_AXES; a++)
+            {
+                const float rate = g.m_axis[a] / 32767.0f;
+                
+                position2di pos(axis_x, axis_y + a*axis_h);
+                dimension2di size(axis_w, axis_h);
+                
+                const bool deadzone = (abs(g.m_axis[a]) < DEADZONE_JOYSTICK);
+                
+                core::recti fillbar(position2di(axis_x + axis_w/2, axis_y + a*axis_h),
+                                    dimension2di((axis_w/2)*rate, axis_h));
+                fillbar.repair(); // dimension may be negative
+                driver->draw2DRectangle (deadzone ? video::SColor(255,255,0,0) : video::SColor(255,0,255,0),
+                                         fillbar);
+                driver->draw2DRectangleOutline( core::recti(pos, size) );
+            }
+        }
+        
+        driver->endScene();
+    }
+}
+// ============================================================================
+
 
 void cmdLineHelp (char* invocation)
 {
@@ -149,6 +284,10 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             cmdLineHelp(argv[0]);
             exit(0);
+        }
+        else if(!strcmp(argv[i], "--gamepad-visualisation"))
+        {
+            UserConfigParams::m_gamepad_visualisation=true;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
@@ -586,6 +725,13 @@ void initRest()
     // Init GUI
     IrrlichtDevice* device = irr_driver->getDevice();
     video::IVideoDriver* driver = device->getVideoDriver();
+    
+    if (UserConfigParams::m_gamepad_visualisation)
+    {
+        gamepadVisualisation();
+        exit(0);
+    }
+    
     GUIEngine::init(device, driver, StateManager::get());
 
 #ifdef ADDONS_MANAGER
