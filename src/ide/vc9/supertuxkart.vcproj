@@ -43,7 +43,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.7alpha3\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.7alpha3\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC;ENABLE_BIDI"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib fribidi.lib"
 				OutputFile="./../../../$(ProjectName)_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../dependencies/lib"
@@ -131,7 +131,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.7alpha3\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;IRR_SVN"
+				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.7alpha3\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;IRR_SVN;ENABLE_BIDI"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib.release ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib.release ws2_32.lib fribidi.lib"
 				OutputFile="./../../../$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../dependencies/lib"
