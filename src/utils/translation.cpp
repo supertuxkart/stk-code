@@ -179,7 +179,6 @@ const wchar_t* Translations::w_gettext(const char* original)
     {
         const int FRIBIDI_BUFFER_SIZE = 512;
         FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-
         int len = 0;
         int n = 0;
         //std::cout << "fribidi input : ";
@@ -199,7 +198,8 @@ const wchar_t* Translations::w_gettext(const char* original)
         }
         //std::cout << " (len=" << len << ")\n";
 
-        FriBidiCharType pbase_dir = FRIBIDI_TYPE_ON; // Not sure what's that for, but it seems to work...
+        // Assume right to left as start direction.
+        FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
 
         static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
         for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
@@ -225,9 +225,19 @@ const wchar_t* Translations::w_gettext(const char* original)
         //    std::cout << (int)fribidiOutput[n] << " ";
         //}
         //std::cout << "\n";
-
-
+#ifdef WIN32
+        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+        // So we simply copy the characters over here (note that this
+        // is technically incorrect, all characters we use/support fit
+        // in 16 bits, which is what irrlicht supports atm).
+        static wchar_t out[FRIBIDI_BUFFER_SIZE];
+        for(int i=0; i<len; i++)
+            out[i]=fribidiOutput[i];
+        out[len]=0;
+        return out;
+#else
         return (const wchar_t*)fribidiOutput;
+#endif
     }
 
 #endif
