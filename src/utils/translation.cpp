@@ -199,7 +199,14 @@ const wchar_t* Translations::w_gettext(const char* original)
         //std::cout << " (len=" << len << ")\n";
 
         // Assume right to left as start direction.
+#if FRIBIDI_MINOR_VERSION==10
+	// While the doc for older fribidi versions is somewhat sparse,
+	// using the RIGHT-TO-LEFT EMBEDDING character here appears to
+	// work correct.
+        FriBidiCharType pbase_dir = L'\u202B';
+#else
         FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
+#endif
 
         static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
         for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
