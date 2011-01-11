@@ -113,6 +113,7 @@ void *NetworkHttp::mainLoop(void *obj)
             pthread_exit(NULL);
             break;
         case HC_SLEEP: 
+	case HC_INIT:
             break;
         case HC_NEWS:
             assert(false);
