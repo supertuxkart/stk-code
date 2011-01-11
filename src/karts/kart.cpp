@@ -1637,13 +1637,14 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        const float minRate = m_nitro->getParticlesInfo()->getMinRate();
-        const float maxRate = m_nitro->getParticlesInfo()->getMaxRate();
+        const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
+        const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
         const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
         assert(rate >= 0.0f); // allow for rounding errors...
         //assert(rate <= 2.0f); // max speed is not always respected it seems...
-        m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && m_collected_energy>0
-                                 ? (minRate + rate*(maxRate - minRate)) : 0);
+        m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && 
+                                 m_collected_energy>0
+                                 ? (min_rate + rate*(max_rate - min_rate)) : 0);
     }
 
     // For testing purposes mis-use the nitro graphical effects to show
