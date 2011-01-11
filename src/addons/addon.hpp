@@ -38,10 +38,16 @@ public:
     int         m_version;
     /** The currently installed version. */
     int         m_installed_version;
+    /** The version of the icon that was downloaded. */
+    int         m_icon_version;
     /** A description of this addon. */
     std::string m_description;
+    /** The URL of the icon (relative to the server) */
+    std::string m_icon_url;
     /** Name of the icon to use. */
-    std::string m_icon;
+    std::string m_icon_basename;
+    /** True if the icon is cached/loaded and can be displayed. */
+    bool        m_icon_ready;
     /** The name of the zip file on the addon server. */
     std::string m_zip_file;
     /** True if the addon is installed. */
@@ -58,39 +64,51 @@ public:
     void copyInstallData(const Addon &addon);
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getName() const {return m_name; }
+    const std::string& getName() const { return m_name; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
-    const std::string& getType() const {return m_type; }
+    const std::string& getType() const { return m_type; }
     // ------------------------------------------------------------------------
     /** Returns the filename of the zip file with the addon. */
-    const std::string& getZipFileName() const {return m_zip_file; }
+    const std::string& getZipFileName() const { return m_zip_file; }
     // ------------------------------------------------------------------------
     /** Returns the name of the icon of this addon. */
-    const std::string& getIcon() const {return m_icon; }
+    const std::string& getIconURL() const { return m_icon_url; }
+    // ------------------------------------------------------------------------
+    /** Returns the name of the icon (i.e. the basename of the url). */
+    const std::string getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getDescription() const {return m_description; }
+    const std::string& getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
     /** Returns if the addon is installed. */
-    bool  isInstalled() const {return m_installed; }
+    bool  isInstalled() const { return m_installed; }
     // ------------------------------------------------------------------------
     /** Returns the installed version of an addon. */
-    int   getInstalledVersion() const {return m_installed_version; }
+    int   getInstalledVersion() const { return m_installed_version; }
     // ------------------------------------------------------------------------
     /** Returns the latest version of this addon. 
     *  m_version>m_installed_version if a newer version is available 
     *  online. */
-    int   getVersion() const {return m_version; }
+    int   getVersion() const { return m_version; }
     // ------------------------------------------------------------------------
     /** Returns the ID of this addon. */
-    const std::string& getId() const {return m_id; }
+    const std::string& getId() const { return m_id; }
     // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
     {
         return m_installed && getInstalledVersion() < getVersion();
-    }
+    }   // needsUpdate
+    // ------------------------------------------------------------------------
+    /** Returns true if the (cached) icon needs to be updated. This is the
+     *  case if the addon version number is higher than the version number
+     *  of the icon (this leaves some chance of false positives - i.e. icons
+     *  that were not changed will still be downloaded). */
+    bool iconNeedsUpdate() const
+    {
+        return m_version > m_icon_version;
+    }   // iconNeedsUpdate
     // ------------------------------------------------------------------------
     /** Marks this addon to be installed. If the addon is marked as being
      *  installed, it also updates the installed  version number to be the 
@@ -101,6 +119,17 @@ public:
         if(state)
             m_installed_version = m_version;
     }   // setInstalled
+    // ------------------------------------------------------------------------
+    /** Returns true if the icon of this addon was downloaded and is ready 
+     *  to be displayed. */
+    bool iconReady() const { return m_icon_ready; }
+    // ------------------------------------------------------------------------
+    /** Marks that the icon for this addon can be displayed. */
+    void setIconReady() 
+    { 
+        m_icon_version = m_version;
+        m_icon_ready=true; 
+    }   // setIconReady
     // ------------------------------------------------------------------------
 };   // Addon
 

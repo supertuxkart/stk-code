@@ -22,6 +22,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
 
 using namespace irr;
 using namespace io;
@@ -56,7 +57,7 @@ bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false);
+    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false, false);
 
     // Get the recently added archive, which is necessary to get a 
     // list of file in the zip archive.
@@ -68,26 +69,37 @@ bool extract_zip(const std::string &from, const std::string &to)
     {
         const std::string current_file=zip_file_list->getFileName(i).c_str();
         std::cout << current_file << std::endl;
-        IReadFile* srcFile  = file_system->createAndOpenFile(current_file.c_str());
-        IWriteFile* dstFile = 
-            file_system->createAndWriteFile((to+"/"+current_file).c_str());
-        if(dstFile == NULL)
+        if(zip_file_list->isDirectory(i)) continue;
+        if(current_file[0]=='.') continue;
+
+        IReadFile* src_file  = 
+            file_system->createAndOpenFile(current_file.c_str());
+        if(!src_file)
         {
-            printf("Couldn't open the file '%s', and copy the archive files in it.\n",
+            printf("Can't read file '%s'.\n", current_file.c_str());
+            printf("This is ignored, but the addon might not work.\n");
+            continue;
+        }
+
+        IWriteFile* dst_file = 
+            file_system->createAndWriteFile((to+"/"+current_file).c_str());
+        if(dst_file == NULL)
+        {
+            printf("Couldn't create the file '%s'.\n",
                     (to+"/"+current_file).c_str());
             printf("The directory might not exist.\n");
+            printf("This is ignored, but the addon might not work.\n");
+            continue;
         }
-        else
+
+        if (IFileSystem_copyFileToFile(dst_file, src_file) < 0)
         {
-            if (IFileSystem_copyFileToFile(dstFile, srcFile) < 0)
-            {
-                printf("Could not copy '%s' from archive '%s'.\n",
-                        current_file.c_str(), from.c_str());
-                printf("This is ignored, but the addon might not work.\n");
-            }
-            dstFile->drop();
+            printf("Could not copy '%s' from archive '%s'.\n",
+                   current_file.c_str(), from.c_str());
+            printf("This is ignored, but the addon might not work.\n");
         }
-        srcFile->drop();
+        dst_file->drop();
+        src_file->drop();
     }
     // Remove the zip from the filesystem to save memory and avoid 
     // problem with a name conflict. Note that we have to convert

@@ -24,6 +24,8 @@
 #include <map>
 #include <vector>
 
+#include <pthread.h>
+
 #include "addons/addon.hpp"
 #include "io/xml_node.hpp"
 #include "utils/synchronised.hpp"
@@ -33,11 +35,20 @@ class AddonsManager
 private:
     std::vector<Addon>      m_addons_list;
     std::string             m_file_installed;
-    void                    saveInstalled();
+    void                    saveInstalled(const std::string &type="");
     void                    loadInstalledAddons();
     std::string             m_type;
     int                     m_download_state;
-    std::string             m_str_state;
+
+    /** List of loaded icons. */
+    std::vector<std::string> m_icon_list;
+
+    /** Queue of icons to download. This queue is used by the
+     *  GUI to increase priority of icons that are needed now. */
+    std::vector<const std::string> m_icon_queue;
+
+    /** Mutex to protect access to icon_list. */
+    pthread_mutex_t         m_mutex_icon;
 
     /** Which state the addons manager is:
     *  INIT:  Waiting to download the list of addons.
@@ -47,11 +58,14 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
-public:
-    AddonsManager();
+    static void *downloadIcons(void *obj);
 
-    void initOnline();
+public:
+         AddonsManager();
+    void initOnline(const XMLNode *xml);
     bool onlineReady();
+    /** Marks addon as not being available. */
+    void setErrorState() { m_state.set(STATE_ERROR); }
 
     /** Returns the list of addons (installed and uninstalled). */
     unsigned int getNumAddons() const { return m_addons_list.size(); }
@@ -67,8 +81,6 @@ public:
     /** Uninstall the selected addon. This method will remove all the 
     *  directory of the addon.*/
     void uninstall(const Addon &addon);
-
-    int  getDownloadState();
 
     /** Get the install state (if it is the download, unzip...)*/
     const std::string& getDownloadStateAsStr() const;

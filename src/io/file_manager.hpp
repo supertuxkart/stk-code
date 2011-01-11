@@ -87,7 +87,8 @@ public:
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(std::string addons_name,
                                     std::string addons_type);
-    bool removeDirectory(const std::string &name);
+    bool removeFile(const std::string &name) const;
+    bool removeDirectory(const std::string &name) const;
 #endif
     std::string getDataDir       () const;
     std::string getTranslationDir() const;

@@ -33,6 +33,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 // Use Sleep, which takes time in msecs. It must be defined after the
@@ -75,12 +76,26 @@ void *NetworkHttp::mainLoop(void *obj)
 {
     NetworkHttp *me=(NetworkHttp*)obj;
 
-    // FIXME: this needs better error handling!
-    me->checkNewServer();
-    me->updateNews();
-
     // Initialise the online portion of the addons manager.
-    addons_manager->initOnline();
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Downloading list.\n");
+    if(me->downloadFileSynchron("list"))
+    {
+        std::string xml_file = file_manager->getAddonsFile("list");
+
+        const XMLNode *xml = new XMLNode(xml_file);
+        me->checkNewServer(xml);
+        me->updateNews(xml);
+        addons_manager->initOnline(xml);
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Addons manager list downloaded\n");
+    }
+    else
+    {
+        addons_manager->setErrorState();
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Can't download addons list.\n");
+    }
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -100,7 +115,7 @@ void *NetworkHttp::mainLoop(void *obj)
         case HC_SLEEP: 
             break;
         case HC_NEWS:
-            me->updateNews();
+            assert(false);
             break;
         case HC_DOWNLOAD_FILE:
             me->downloadFileInternal(me->m_file, me->m_save_filename,
@@ -135,38 +150,37 @@ NetworkHttp::~NetworkHttp()
 /** Checks if a redirect is received, causing a new server to be used for
  *  downloading addons.
  */
-void NetworkHttp::checkNewServer()
+void NetworkHttp::checkNewServer(const XMLNode *xml)
 {
-    std::string newserver = downloadToStrInternal("redirect");
-    if (newserver != "")
+    std::string new_server;
+    int result = xml->get("redirect", &new_server);
+    if(result==1 && new_server!="")
     {
-        newserver.replace(newserver.find("\n"), 1, "");
-
-        if(UserConfigParams::m_verbosity>=4)
+        if(UserConfigParams::m_verbosity>=3)
         {
             std::cout << "[Addons] Current server: " 
                       << (std::string)UserConfigParams::m_server_addons 
                       << std::endl
-                      << "[Addons] New server: " << newserver << std::endl;
+                      << "[Addons] New server: " << new_server << std::endl;
         }
-        UserConfigParams::m_server_addons = newserver;
+        UserConfigParams::m_server_addons = new_server;
         user_config->saveConfig();
-    }
-    else if(UserConfigParams::m_verbosity>=4)
-    {
-        std::cout << "[Addons] No new server." << std::endl;
     }
 }   // checkNewServer
 
 // ----------------------------------------------------------------------------
 /** Updates the 'news' string to be displayed in the main menu.
  */
-void NetworkHttp::updateNews()
+void NetworkHttp::updateNews(const XMLNode *xml)
 {
-    // Only lock the actual assignment, not the downloading!
-    const std::string tmp_str = downloadToStrInternal("news");
-    m_news.set(tmp_str);
-
+    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    {
+        const XMLNode *node = xml->getNode(i);
+        if(node->getName()!="news") continue;
+        std::string news;
+        node->get("text", &news);
+        m_news.set(news);
+    }
 }   // updateNews
 
 // ----------------------------------------------------------------------------
@@ -223,7 +237,7 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
                                        bool is_asynchron)
 {
-
+printf("Downloading %s\n", file.c_str());
 	CURL *session = curl_easy_init();
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;
@@ -335,4 +349,5 @@ float NetworkHttp::getProgress() const
 {
     return m_progress.get();
 }   // getProgress
+
 #endif

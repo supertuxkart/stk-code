@@ -59,37 +59,59 @@ AddonsManager::AddonsManager() : m_state(STATE_INIT)
  *  main GUI is not blocked). This function will update the state variable
  *  
  */
-void AddonsManager::initOnline()
+void AddonsManager::initOnline(const XMLNode *xml)
 {
-    if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Init online addons manager\n");
-    int download_state = 0;
-    m_download_state = download_state;
-
-    if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Addons manager downloading list\n");
-    if(!network_http->downloadFileSynchron("list"))
-    {
-        m_state.set(STATE_ERROR);
-        return;
-    }
-    if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Addons manager list downloaded\n");
-
-    std::string xml_file = file_manager->getAddonsFile("list");
-
-    const XMLNode *xml = new XMLNode(xml_file);
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
+        const std::string &name = node->getName();
+        // Ignore news/redirect, which is handled by network_http
+        if(name=="news" || name=="redirect") continue;
         if(node->getName()=="track" || node->getName()=="kart")
         {
             Addon addon(*node);
             int index = getAddonIndex(addon.getId());
+
+            float stk_version=0;
+            node->get("stkversion", &stk_version);
+            int   testing=-1;
+            node->get("testing", &testing);
+
+            bool wrong_version=false;
+#ifdef WHILE_WEBPAGE_IS_NOT_UPDATED_YET
+            if(addon.getType()=="kart")
+                wrong_version = stk_version <stk_config->m_min_kart_version ||
+                                stk_version >stk_config->m_max_kart_version   ;
+            else
+                wrong_version = stk_version <stk_config->m_min_track_version ||
+                                stk_version >stk_config->m_max_track_version   ;
+#endif
+            // Check which version to use: only for this stk version,
+            // and not addons that are marked as hidden (testing=0)
+            if(stk_version!=0.7f || testing==0)
+            {
+                // If the version is too old (e.g. after an update of stk)
+                // remove a cached icon.
+                std::string full_path = 
+                    file_manager->getAddonsFile("icons/"
+                                                +addon.getIconBasename());
+                if(file_manager->fileExists(full_path))
+                {
+                    if(UserConfigParams::m_verbosity>=3)
+                        printf("Removing cached icon '%s'.\n", 
+                               addon.getIconBasename());
+                    file_manager->removeFile(full_path);
+                }
+                continue;
+            }
+
             if(index>=0)
                 m_addons_list[index].copyInstallData(addon);
             else
+            {
                 m_addons_list.push_back(addon);
+                index = m_addons_list.size()-1;
+            }
         }
         else
         {
@@ -102,7 +124,81 @@ void AddonsManager::initOnline()
     delete xml;
 
     m_state.set(STATE_READY);
+
+    pthread_mutex_init(&m_mutex_icon, NULL);
+
+    pthread_t      id;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_create(&id, &attr, downloadIcons, this);
+
 }   // initOnline
+
+// ----------------------------------------------------------------------------
+/** A separate thread to download all necessary icons (i.e. icons that are
+ *  either missing or have been updated since they were downloaded).
+ */
+void *AddonsManager::downloadIcons(void *obj)
+{
+    AddonsManager *me=(AddonsManager*)obj;
+
+    me->m_icon_queue.clear();
+
+    for(unsigned int i=0; i<me->m_addons_list.size(); i++)
+    {
+        const Addon &addon      = me->m_addons_list[i];
+        const std::string &icon = addon.getIconBasename();
+        if(addon.iconNeedsUpdate())
+        {
+            pthread_mutex_lock(&(me->m_mutex_icon));
+            me->m_icon_queue.push_back(addon.getId());
+            pthread_mutex_unlock(&(me->m_mutex_icon));
+            continue;
+        }
+        std::string icon_path=file_manager->getAddonsFile("icons/"+icon);
+        if(!file_manager->fileExists(icon_path))
+        {
+            pthread_mutex_lock(&(me->m_mutex_icon));
+            me->m_icon_queue.push_back(addon.getId());
+            pthread_mutex_unlock(&(me->m_mutex_icon));
+            continue;
+        }
+        me->m_addons_list[i].setIconReady();
+    }   // for i<m_addons_list.size()
+
+    pthread_mutex_lock(&(me->m_mutex_icon));
+    int count = me->m_icon_queue.size();
+    pthread_mutex_unlock(&(me->m_mutex_icon));
+    while(count!=0)
+    {
+        pthread_mutex_lock(&(me->m_mutex_icon));
+            unsigned int indx = me->getAddonIndex(me->m_icon_queue[0]);
+            Addon *addon      = &(me->m_addons_list[indx]);
+            me->m_icon_queue.erase(me->m_icon_queue.begin());
+            count --;
+        pthread_mutex_unlock(&(me->m_mutex_icon));
+
+        const std::string &url = addon->getIconURL();
+        const std::string &icon = addon->getIconBasename();
+        std::string save = "icons/"+icon;
+        if(network_http->downloadFileSynchron(url, save))
+        {
+            addon->setIconReady();
+        }
+        else
+        {
+            printf("[addons] Could not download icon '%s' from '%s'.\n",
+                   icon.c_str(), url.c_str());
+        }
+    }   // while count!=0
+    for(unsigned int i=0; i<me->m_addons_list.size(); i++)
+    {
+        if(!me->m_addons_list[i].iconReady())
+            printf("No icon for '%s'.\n", me->m_addons_list[i].getId());
+    }
+    me->saveInstalled();
+    return NULL;
+}   // downloadIcons
 
 // ----------------------------------------------------------------------------
 /** Returns true if the list of online addons has been downloaded. This is 
@@ -179,8 +275,6 @@ void AddonsManager::install(const Addon &addon)
     std::string to        = file_manager->getAddonsDir() + "/"
                           + addon.getType()+ "s/" + id + "/" ;
     
-    m_str_state = "Unzip the addons...";
-
     success = extract_zip(from, to);
     if (!success)
     {
@@ -194,7 +288,6 @@ void AddonsManager::install(const Addon &addon)
     assert(index>=0 && index < (int)m_addons_list.size());
     m_addons_list[index].setInstalled(true);
     
-    m_str_state = "Reloading kart list...";
     if(addon.getType()=="kart")
     {
         // We have to remove the mesh of the kart since otherwise it remains
@@ -211,11 +304,11 @@ void AddonsManager::install(const Addon &addon)
             irr_driver->removeMesh(model.getModel());
         }
     }
-    saveInstalled();
+    saveInstalled(addon.getType());
 }   // install
 
 // ----------------------------------------------------------------------------
-void AddonsManager::saveInstalled()
+void AddonsManager::saveInstalled(const std::string &type)
 {
     //Put the addons in the xml file
     //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
@@ -228,18 +321,23 @@ void AddonsManager::saveInstalled()
 
     for(unsigned int i = 0; i < m_addons_list.size(); i++)
     {
-        if(m_addons_list[i].m_installed)
+        //if(m_addons_list[i].m_installed)
         {
             m_addons_list[i].writeXML(&xml_installed);
         }
     }
     xml_installed << "</addons>" << std::endl;
     xml_installed.close();
-    kart_properties_manager->reLoadAllKarts();
-	track_manager->loadTrackList();
+    if(type=="kart")
+        kart_properties_manager->reLoadAllKarts();
+    else if(type=="track")
+	    track_manager->loadTrackList();
 }   // saveInstalled
 
 // ----------------------------------------------------------------------------
+/** Removes all files froma login.
+   \param addon The addon to be removed.
+ */
 void AddonsManager::uninstall(const Addon &addon)
 {
     std::cout << "[Addons] Uninstalling <" 
@@ -257,22 +355,9 @@ void AddonsManager::uninstall(const Addon &addon)
 
     //remove the addons directory
     file_manager->removeDirectory(dest_file);
-    saveInstalled();
+    saveInstalled(addon.getType());
 
 }   // uninstall
 
-// ----------------------------------------------------------------------------
-int AddonsManager::getDownloadState()
-{
-    int value = m_download_state;
-    return value;
-}
-
-// ----------------------------------------------------------------------------
-
-const std::string& AddonsManager::getDownloadStateAsStr() const
-{
-    return m_str_state;
-}   // getDownloadStateAsStr
 
 #endif

@@ -762,7 +762,9 @@ void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
         
         const int EMPTY_TOP_PIXELS = 4;
         const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + EMPTY_TOP_PIXELS + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)*(1.0f - coin_target);
+        int y1 = y + (int)(EMPTY_TOP_PIXELS + 
+                             (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
+                            *(1.0f - coin_target)                        );
         if (state >= 1.0f) y1 = y;
         
         core::rect<s32> clip(x, y1, x + w, y + h);
@@ -776,7 +778,9 @@ void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
     {
         const int EMPTY_TOP_PIXELS = 4;
         const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + EMPTY_TOP_PIXELS + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)*(1.0f - state);
+        int y1 = y + (int)(EMPTY_TOP_PIXELS 
+                           + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
+                              *(1.0f - state)                             );
         if (state >= 1.0f) y1 = y;
         
         core::rect<s32> clip(x, y1, x + w, y + h);

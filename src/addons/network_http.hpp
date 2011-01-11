@@ -25,6 +25,8 @@
 
 #include "utils/synchronised.hpp"
 
+class XMLNode;
+
 class NetworkHttp
 {
 public:
@@ -66,15 +68,16 @@ private:
     pthread_t     m_thread_id;
 
     static void  *mainLoop(void *obj);
-    void          checkNewServer();
+    void          checkNewServer(const XMLNode *xml);
 
-    void          updateNews();
+    void          updateNews(const XMLNode *xml);
     std::string   downloadToStrInternal(std::string url);
     bool          downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
                                        bool is_asynchron);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
+
 public:
                   NetworkHttp();
                  ~NetworkHttp();
@@ -88,7 +91,8 @@ public:
     const std::string 
                   getNewsMessage() const;
     float         getProgress() const;
-};
+
+};   // NetworkHttp
 
 extern NetworkHttp *network_http;
 

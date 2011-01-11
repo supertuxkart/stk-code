@@ -36,7 +36,10 @@ Addon::Addon(const XMLNode &xml, bool installed)
     m_version           = 0 ;
     m_zip_file          = "";
     m_description       = "";
-    m_icon              = "";
+    m_icon_url          = "";
+    m_icon_basename     = "";
+    m_icon_version      = 0;
+    m_icon_ready        = false;
     m_id                = "";
     m_type              = xml.getName();
     
@@ -44,17 +47,19 @@ Addon::Addon(const XMLNode &xml, bool installed)
     if(m_installed)
     {
         xml.get("installed-version", &m_installed_version);
-        xml.get("id",      &m_id             );
+        xml.get("id",                &m_id               );
+        xml.get("icon-version",      &m_icon_version     );
     }
     else   // not installed
     {
         xml.get("file",        &m_zip_file   );
         xml.get("description", &m_description);
-        xml.get("icon",        &m_icon       );
+        xml.get("icon",        &m_icon_url   );
         xml.get("version",     &m_version    );
         // The online list has a numeric id, which is not used.
         // So ignore it.
         m_id = StringUtils::toLowerCase(m_name);
+        m_icon_basename = StringUtils::getBasename(m_icon_url);
     }   // if installed
 };   // Addon(const XML&)
 
@@ -64,10 +69,12 @@ Addon::Addon(const XMLNode &xml, bool installed)
 */
 void Addon::copyInstallData(const Addon &addon)
 {
-    m_description = addon.m_description;
-    m_version     = addon.m_version;
-    m_zip_file    = addon.m_zip_file;
-    m_icon        = addon.m_icon;
+    m_description   = addon.m_description;
+    m_version       = addon.m_version;
+    m_zip_file      = addon.m_zip_file;
+    m_icon_url      = addon.m_icon_url;
+    m_icon_basename = addon.m_icon_basename;
+    m_icon_version  = addon.m_version;
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
@@ -77,9 +84,13 @@ void Addon::copyInstallData(const Addon &addon)
  */
 void Addon::writeXML(std::ofstream *out_stream)
 {
-    (*out_stream) << "  <" << m_type << " name=\"" << m_name 
-                  << "\" id=\"" << m_id << "\" installed-version=\""
-                  << m_installed_version << "\"/>\n";
+    (*out_stream) << "  <"                     << m_type 
+                  << " name=\""                << m_name 
+                  << "\" id=\""                << m_id 
+                  << "\" installed=\""         << m_installed
+                  << "\" installed-version=\"" << m_installed_version 
+                  <<"\" icon-version=\""       << m_icon_version 
+                  << "\"/>\n";
 }   // writeXML
 
 #endif

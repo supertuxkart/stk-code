@@ -687,12 +687,25 @@ void FileManager::checkAndCreateDirForAddons(std::string addons_name,
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
+/** Removes the specified file, returns true if successful, or false
+ *  if the file is not a regular file or can not be removed.
+ */
+bool FileManager::removeFile(const std::string &name) const
+{
+    struct stat mystat;
+    if(stat(name.c_str(), &mystat) < 0) return false;
+    if( S_ISREG(mystat.st_mode))
+        return remove(name.c_str())==0;
+    return false;
+}   // removeFile
+
+// ----------------------------------------------------------------------------
 /** Removes a directory (including all files contained). The function could
  *  easily recursively delete further subdirectories, but this is commented
  *  out atm (to limit the amount of damage in case of a bug).
  *  \param name Directory name to remove.
  */
-bool FileManager::removeDirectory(const std::string &name)
+bool FileManager::removeDirectory(const std::string &name) const
 {
     std::set<std::string> files;
     listFiles(files, name, /*is full path*/ true);
@@ -711,10 +724,7 @@ bool FileManager::removeDirectory(const std::string &name)
         }
         else
         {
-            struct stat mystat;
-            if(stat(full_path.c_str(), &mystat) < 0) return false;
-            if( S_ISREG(mystat.st_mode))
-                remove(full_path.c_str());
+            removeFile(full_path);
         }
     }
 #ifdef WIN32

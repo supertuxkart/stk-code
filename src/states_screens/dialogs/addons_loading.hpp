@@ -44,15 +44,8 @@ private:
     
     /** The addon to load. */
     Addon                         m_addon;
-    void startInstall();
-    void endInstall();
-
-    /**
-     * This function handle the downllading of the addons icon.
-     * It is started using a thread. When it is ended, it change the flag
-     * 'm_can_load_icon' and the onUpdate function reload the icon
-     * */
-    static void * downloadIcon(void*);
+    void startDownload();
+    void doInstall();
     
     /* These three bool are some flags.
      * m_can_install : when the installation is finidhed, onUpdate close the
@@ -61,9 +54,8 @@ private:
     bool m_can_install;
     bool m_percent_update;
 
-    /** True if the icon was successfully downloaded. */
-    enum IconState {ICON_NOT_LOADED, ICON_LOADED, ICON_SHOWN};
-	Synchronised<IconState> m_icon_loaded;
+    /** True if the icon is being displayed. */
+    bool m_icon_shown;
 
 public:
     /**
@@ -79,9 +71,7 @@ public:
      * */
     void onUpdate(float delta);
     
-    /** To close the dialog when the (un)installation is finished.*/
-    void close();
-};
+};   // AddonsLoading
 
 #endif
 #endif
