@@ -195,10 +195,13 @@ void gamepadVisualisation()
                 
                 const bool deadzone = (abs(g.m_axis[a]) < DEADZONE_JOYSTICK);
                 
-                core::recti fillbar(position2di(axis_x + axis_w/2, axis_y + a*axis_h),
-                                    dimension2di((axis_w/2)*rate, axis_h));
+                core::recti fillbar(position2di(axis_x + axis_w/2, 
+                                                axis_y + a*axis_h),
+                                    dimension2di( (int)(axis_w/2*rate), 
+                                                  axis_h)               );
                 fillbar.repair(); // dimension may be negative
-                driver->draw2DRectangle (deadzone ? video::SColor(255,255,0,0) : video::SColor(255,0,255,0),
+                driver->draw2DRectangle (deadzone ? video::SColor(255,255,0,0)
+                                                  : video::SColor(255,0,255,0),
                                          fillbar);
                 driver->draw2DRectangleOutline( core::recti(pos, size) );
             }
