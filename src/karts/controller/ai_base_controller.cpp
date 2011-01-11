@@ -78,6 +78,7 @@ AIBaseController::AIBaseController(Kart *kart,
             int current = i;
             for(unsigned int j=0; j<look_ahead; j++)
             {
+                assert(current < (int)m_next_node_index.size());
                 l.push_back(m_next_node_index[current]);
                 current = m_next_node_index[current];
             }   // for j<look_ahead
