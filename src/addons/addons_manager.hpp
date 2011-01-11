@@ -45,7 +45,7 @@ private:
 
     /** Queue of icons to download. This queue is used by the
      *  GUI to increase priority of icons that are needed now. */
-    std::vector<const std::string> m_icon_queue;
+    std::vector<std::string> m_icon_queue;
 
     /** Mutex to protect access to icon_list. */
     pthread_mutex_t         m_mutex_icon;
