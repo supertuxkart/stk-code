@@ -54,7 +54,7 @@ AIBaseController::AIBaseController(Kart *kart,
             // best way, potentially depending on race position etc.
             int r = rand();
             int indx = (int)(
-                             (r / (float)(RAND_MAX - 1)) * next.size()
+                             (r / (float)(RAND_MAX+1)) * next.size()
                              );
             
             m_successor_index.push_back(indx);
