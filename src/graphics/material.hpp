@@ -75,6 +75,9 @@ private:
     /** Whether to use anisotropic filtering for this texture */
     bool             m_anisotropic;
     
+    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
+    bool             m_disable_z_write;
+    
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
     float            m_friction;

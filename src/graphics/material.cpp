@@ -67,6 +67,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("anisotropic",      &m_anisotropic       );
     node->get("backface-culling", &m_backface_culling  );
+    node->get("disable-z-write",  &m_disable_z_write   );
     std::string s("");
     node->get("graphical-effect", &s                   );
     if(s=="water")
@@ -149,6 +150,7 @@ void Material::init(unsigned int index)
     m_ignore                    = false;
     m_resetter                  = false;
     m_add                       = false;
+    m_disable_z_write           = false;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
@@ -360,6 +362,11 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_ONE,
                                                     video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
         modes++;
+    }
+    
+    if (m_disable_z_write)
+    {
+        m->ZWriteEnable = false;
     }
     
     if (modes > 1)
