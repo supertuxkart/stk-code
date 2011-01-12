@@ -71,6 +71,12 @@ private:
     video::SColor m_min_start_color;
     video::SColor m_max_start_color;
     
+    /** Strength of gravity, not sure what the units are. Make it 0 to disable */
+    float    m_gravity_strength;
+    
+    /** Time it takes for gravity to completely replace the emission force */
+    int      m_force_lost_to_gravity_time;
+    
     /** For box emitters only */
     float m_box_x, m_box_y, m_box_z;
     
@@ -112,6 +118,13 @@ public:
     float     getVelocityX   () const { return m_velocity_x;      }
     float     getVelocityY   () const { return m_velocity_y;      }
     float     getVelocityZ   () const { return m_velocity_z;      }
+    
+    /** Get the strength of gravity, not sure what the units are. Will be 0 if disabled. */
+    float     getGravityStrength() const { return m_gravity_strength; }
+    
+    /** Get the time it takes for gravity to completely replace the emission force. Meaningless if gravity is disabled. */
+    int       getForceLostToGravityTime() const { return m_force_lost_to_gravity_time; }
+    
 };
 #endif
 

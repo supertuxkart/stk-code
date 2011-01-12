@@ -1656,7 +1656,11 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             }
             else
             {
-                if (m_camera != NULL) m_camera->setFallMode(false);
+                if (m_camera != NULL && m_camera->getMode() == Camera::CM_FALLING)
+                {
+                    m_camera->setFallMode(false);
+                }
+                
                 m_water_splash_system->setCreationRate(0);
             }
         }

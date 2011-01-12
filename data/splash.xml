@@ -14,8 +14,8 @@
                max="1200"         />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="600"
-               max="900"         />
+    <lifetime  min="1600"
+               max="1900"         />
     
     <!-- Size of the particles -->
     <size      min="0.60"
@@ -27,4 +27,6 @@
     <!-- How much time in milliseconds before the particle is fully faded out  -->
     <fadeout   time="500"        />
 
+    <gravity   strength="-0.01"
+               only-force-time="1000" />
 </particles>

@@ -209,4 +209,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                                                 type->getFadeoutTime());
     m_node->addAffector(af);
     af->drop();
+    
+    if (type->getGravityStrength() != 0)
+    {
+        scene::IParticleGravityAffector *gaf = m_node->createGravityAffector(core::vector3df(00.0f, type->getGravityStrength(), 0.0f),
+                                                                             type->getForceLostToGravityTime());
+        m_node->addAffector(gaf);
+        gaf->drop();
+    }
 }

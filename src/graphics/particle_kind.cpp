@@ -47,6 +47,9 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_velocity_x     = 0.001f;
     m_velocity_y     = 0.001f;
     m_velocity_z     = 0.001f;
+    m_gravity_strength = -0.03f;
+    m_force_lost_to_gravity_time = 1000;
+    
     
     // ----- Read XML file
     
@@ -189,6 +192,14 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         
     //std::cout << "m_fadeout_time = " << m_fadeout_time << "\n";
     
+    // ------------------------------------------------------------------------
+    const XMLNode* gravity = xml->getNode("gravity");
+    if (gravity != NULL)
+    {
+        gravity->get("strength",        &m_gravity_strength);
+        gravity->get("only-force-time", &m_force_lost_to_gravity_time);
+    }
+        
     // ------------------------------------------------------------------------
     
     delete xml;
