@@ -1565,7 +1565,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             if (m_skidding > 1.0f)
             {
                 const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_SKID);
-                if (pk != NULL)
+                if (pk != NULL && isOnGround())
                 {
                     m_terrain_particles->setParticleType(pk);
                     
@@ -1596,7 +1596,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             else // not skidding
             {
                 const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_DRIVE);
-                if (pk != NULL)
+                if (pk != NULL && isOnGround())
                 {
                     //printf("Setting DRIVING particles\n");
                     m_terrain_particles->setParticleType(pk);
