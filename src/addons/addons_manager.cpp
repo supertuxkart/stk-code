@@ -99,7 +99,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
                 {
                     if(UserConfigParams::m_verbosity>=3)
                         printf("Removing cached icon '%s'.\n", 
-                               addon.getIconBasename());
+                               addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
                 }
                 continue;
@@ -194,7 +194,7 @@ void *AddonsManager::downloadIcons(void *obj)
     for(unsigned int i=0; i<me->m_addons_list.size(); i++)
     {
         if(!me->m_addons_list[i].iconReady())
-            printf("No icon for '%s'.\n", me->m_addons_list[i].getId());
+            printf("No icon for '%s'.\n", me->m_addons_list[i].getId().c_str());
     }
     me->saveInstalled();
     return NULL;
@@ -331,7 +331,7 @@ void AddonsManager::saveInstalled(const std::string &type)
     if(type=="kart")
         kart_properties_manager->reLoadAllKarts();
     else if(type=="track")
-	    track_manager->loadTrackList();
+        track_manager->loadTrackList();
 }   // saveInstalled
 
 // ----------------------------------------------------------------------------
