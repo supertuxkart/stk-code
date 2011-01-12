@@ -1637,7 +1637,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
         {
             const float hot = getHoT();
 
-            if (m->hasWaterSplash() && hot != Track::NOHIT)
+            if (m->hasWaterSplash() && hot != Track::NOHIT && !m_flying)
             {
                 const float hat = getXYZ().getY() - hot;
                 
