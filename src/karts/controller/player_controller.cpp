@@ -314,9 +314,14 @@ void PlayerController::update(float dt)
     // if automatic reverse camera is active
     if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
         m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
+    {
         m_kart->getCamera()->setMode(Camera::CM_REVERSE);
+    }
     else
-        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+    {
+        if (m_kart->getCamera()->getMode() == Camera::CM_REVERSE)
+            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+    }
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end

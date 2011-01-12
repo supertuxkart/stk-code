@@ -285,24 +285,26 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
 {
     *wanted_target = m_kart->getXYZ();
     wanted_target->setY(wanted_target->getY()+ 0.75f);
+    
     // This first line moves the camera around behind the kart, pointing it 
     // towards where the kart is turning (and turning even more while skidding).
     // The skidding effect is dampened.
     float steering = m_kart->getSteerPercent() 
-                   * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+    * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
     // quadratically to dampen small variations (but keep sign)
     float dampened_steer =  fabsf(steering) * steering; 
     float angle_around = m_kart->getHeading() 
-                       + m_rotation_range * dampened_steer * 0.5f;
+    + m_rotation_range * dampened_steer * 0.5f;
     float angle_up     = m_kart->getKartProperties()->getCameraForwardUpAngle()
-                       - m_kart->getPitch() ;
-
+                         - m_kart->getPitch() ;
+    
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY( sin(angle_up)    );
     wanted_position->setZ(-cos(angle_around));
     
     *wanted_position *= m_distance;
     *wanted_position += *wanted_target;
+
 }   // computeNormalCameraPosition
 
 //-----------------------------------------------------------------------------
@@ -333,6 +335,18 @@ void Camera::update(float dt)
     case CM_NORMAL:
         {
             computeNormalCameraPosition(&wanted_position, &wanted_target);
+            smoothMoveCamera(dt, wanted_position, wanted_target);
+            break;
+        }
+    case CM_FALLING:
+        {
+            Vec3 previous_wanted_position = wanted_position;
+            
+            computeNormalCameraPosition(&wanted_position, &wanted_target);
+            //const float previousY = wanted_position.getY();
+            //wanted_position.setY(m_camera->getPosition().Y - (m_camera->getPosition().Y - previousY)*dt);
+            
+            wanted_position = m_camera->getPosition();
             smoothMoveCamera(dt, wanted_position, wanted_target);
             break;
         }
@@ -481,3 +495,11 @@ void Camera::activate()
     irr_driver->getVideoDriver()->setViewPort(m_viewport);
 
 }   // activate
+
+// ----------------------------------------------------------------------------
+
+void Camera::setFallMode(bool mode)
+{
+    if (mode) m_mode = CM_FALLING;
+    else      m_mode = CM_NORMAL;
+}

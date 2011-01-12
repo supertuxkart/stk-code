@@ -46,7 +46,8 @@ public:
         CM_REVERSE,       //!< Looking backwards
         CM_LEADER_MODE,   //!< for deleted player karts in follow the leader
         CM_FINAL,         //!< Final camera
-        CM_SIMPLE_REPLAY
+        CM_SIMPLE_REPLAY,
+        CM_FALLING
     };
 
 private:
@@ -95,7 +96,7 @@ private:
 
     /** Velocity of the target of the camera, only used for end camera. */
     core::vector3df m_target_velocity;
-
+    
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
     class EndCameraInformation
@@ -194,6 +195,10 @@ public:
     /** Returns the scaling in x/y direction for this camera. */
     const core::vector2df& getScaling() const {return m_scaling; }
 
+    /** In "fall mode", the camera stays up and looks down at the falling kart
+        (mainly to avoid following the kart underwater) */
+    void setFallMode(bool fallMode);
+    
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() 
     {

@@ -88,10 +88,6 @@ private:
     /** Current race position (1-num_karts). */
     int          m_race_position;
 
-    /** The camera for each kart. Not all karts have cameras (e.g. AI karts
-     *  usually don't), but there are exceptions: e.g. after the end of a
-     *  race an AI kart is replacing the kart for a player.
-     */
 
 protected:       // Used by the AI atm
     
@@ -99,6 +95,10 @@ protected:       // Used by the AI atm
     Powerup      m_powerup;
     Attachment  *m_attachment;
     
+    /** The camera for each kart. Not all karts have cameras (e.g. AI karts
+     *  usually don't), but there are exceptions: e.g. after the end of a
+     *  race an AI kart is replacing the kart for a player.
+     */
     Camera      *m_camera;
     
 private:
@@ -139,7 +139,7 @@ private:
     ParticleEmitter *m_terrain_particles;
     
     /** Water splash when driving in water. */
-    WaterSplash     *m_water_splash_system;
+    ParticleEmitter *m_water_splash_system;
 
     /** Graphical effect when using a nitro. */
     ParticleEmitter *m_nitro;

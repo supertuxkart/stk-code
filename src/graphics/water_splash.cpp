@@ -26,7 +26,7 @@
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 
-WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
+WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.75f)
 {
     m_node = irr_driver->addParticleNode();
 #ifdef DEBUG
@@ -45,12 +45,12 @@ WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, m->getTexture());
 
-    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
+    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0.05, 0),   // velocity in m/ms
                                            5, 10,
                                            video::SColor(255,0,0,0),
                                            video::SColor(255,255,255,255),
                                            300, 500,
-                                           20  // max angle
+                                           60  // max angle
                                            );
     m_emitter->setMinStartSize(core::dimension2df(m_particle_size/1.5f, m_particle_size/1.5f));
     m_emitter->setMaxStartSize(core::dimension2df(m_particle_size*1.5f, m_particle_size*1.5f));
@@ -96,16 +96,6 @@ void WaterSplash::update(float t)
     m_node->setPosition(core::vector3df(c.getX()+ m_particle_size*0.25f * (left?+1:-1),
                                         c.getY(),
                                         c.getZ()+m_particle_size*0.25f));
-
-    // There seems to be no way to randomise the velocity for particles,
-    // so we have to do this manually, by changing the default velocity.
-    // Irrlicht expects velocity (called 'direction') in m/ms!!
-    float f=m_kart->getSpeed();
-    if(f<1) return;  // avoid problem with modulo 0
-    Vec3 dir((rand()%int(f))*(left?-1:1)*0.004f,
-             sin(DEGREE_TO_RAD*(rand()%180))*0.004f,
-             sin(DEGREE_TO_RAD*(rand()%100))*0.004f);
-    m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
 //-----------------------------------------------------------------------------

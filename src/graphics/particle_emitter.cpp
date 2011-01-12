@@ -137,7 +137,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     assert(lifeTimeMax >= lifeTimeMin);
     
 #ifdef DEBUG
-    std::string debug_name = std::string("particles(") + material->getTexture()->getName().getPath().c_str() + ")";
+    video::ITexture* tex = material->getTexture();
+    assert(tex != NULL);
+    const io::SNamedPath& name = tex->getName();
+    const io::path& tpath = name.getPath();
+    
+    std::string debug_name = std::string("particles(") + tpath.c_str() + ")";
     m_node->setName(debug_name.c_str());
 #endif
     

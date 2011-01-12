@@ -44,8 +44,9 @@ public:
 
     virtual void update(const Vec3 &pos);
 
-    /** Returns the height above the terrain. */
+    /** Returns the height of the terrain. we're currently above */
     float getHoT()                       const {return m_HoT;          }
+    
     /** Returns the current material the kart is on. */
     const Material *getMaterial()        const {return m_material;     }
     /** Returns the previous material the kart was one (which might be

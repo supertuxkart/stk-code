@@ -733,7 +733,7 @@ void Kart::update(float dt)
     if (UserConfigParams::m_graphical_effects && m_terrain_particles)
     {
         m_terrain_particles->update();
-        m_water_splash_system->update(dt);
+        m_water_splash_system->update();
     }  // UserConfigParams::m_graphical_effects
 
     m_nitro->update();
@@ -1458,7 +1458,10 @@ void Kart::loadData()
             std::cerr << e.what() << std::endl;
         }
     }
-    m_water_splash_system = new WaterSplash(this);
+    //m_water_splash_system = new WaterSplash(this);
+    
+    m_water_splash_system = new ParticleEmitter(ParticleKindManager::get()->getParticles("splash.xml"),
+                                                core::vector3df(0.0f, 0.0f, 0.0f), getNode());
     
     core::vector3df position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
     
@@ -1626,12 +1629,40 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             }
         }
     }
+    
     if(m_water_splash_system)
     {
-        float f = getMaterial() && getMaterial()->hasWaterSplash() && isOnGround()
-                ? sqrt(getSpeed())*40.0f
-                : 0.0f;
-        m_water_splash_system->setCreationRate(f);
+        const Material* m = getMaterial();
+        if (m != NULL)
+        {
+            const float hot = getHoT();
+
+            if (m->hasWaterSplash() && hot != Track::NOHIT)
+            {
+                const int hat = getXYZ().getY() - hot;
+                
+                // TODO: don't hardcode height, get from exporter
+                if (hat < 4.0f && hat > 2.0f)
+                {
+                    m_water_splash_system->setCreationRate(m_water_splash_system->getParticlesInfo()->getMaxRate());
+                }
+                else
+                {
+                    if (m_camera != NULL) m_camera->setFallMode(true);
+                    m_water_splash_system->setCreationRate(0);
+                }
+            }
+            else
+            {
+                if (m_camera != NULL) m_camera->setFallMode(false);
+                m_water_splash_system->setCreationRate(0);
+            }
+        }
+        
+        //float f = getMaterial() && getMaterial()->hasWaterSplash() && isOnGround()
+        //        ? sqrt(getSpeed())*40.0f
+        //        : 0.0f;
+        //m_water_splash_system->setCreationRate(f);
     }
     if (m_nitro)
     {
