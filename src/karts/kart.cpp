@@ -1639,12 +1639,14 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
 
             if (m->hasWaterSplash() && hot != Track::NOHIT)
             {
-                const int hat = getXYZ().getY() - hot;
+                const float hat = getXYZ().getY() - hot;
                 
                 // TODO: don't hardcode height, get from exporter
                 if (hat < 4.0f && hat > 2.0f)
                 {
-                    m_water_splash_system->setCreationRate(m_water_splash_system->getParticlesInfo()->getMaxRate());
+                    m_water_splash_system->setCreationRate(
+                        (float)m_water_splash_system->getParticlesInfo()->getMaxRate()
+                        );
                 }
                 else
                 {
