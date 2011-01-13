@@ -35,7 +35,7 @@ private:
     /** Vector containing the stars */
     std::vector<scene::ISceneNode*> m_nodes;
     
-    /** The scene node of the kart to which this shadow belongs. */
+    /** The scene node of the kart to which the stars belong. */
     scene::ISceneNode  *m_parent_kart_node;
     
     /** Center around which stars rotate */
