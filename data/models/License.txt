@@ -28,6 +28,9 @@
 * shroom_color* textures by Julius Krischan Makowka, released un CC-BY-SA 3.0
 
 * door.png by Marianne Gagnon, released under CC-BY-SA 3.0, based on a public domain image
-  from BurningWell.
+    from BurningWell.
 
-Others are GPL.
+* zipper_collect
+    by Dakal, released under CC-BY-SA 3.0
+
+Others are GPL, by the original (super)TuxKart team
