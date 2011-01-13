@@ -289,6 +289,9 @@ namespace GUIEngine
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
         void setVisible(bool visible);
+
+        /** Returns if the element is visible. */
+        bool isVisible() const {return m_element && m_element->isVisible(); }
         
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
