@@ -71,7 +71,30 @@ public:
         pthread_mutex_unlock(&m_mutex);
         return v;
     }   // get
-
+    // ------------------------------------------------------------------------
+    /** Returns a reference to the original data file. NOTE: all access to
+     *  the data files happen without mutex protection, so calls to lock
+     *  and unlock are necessary. This method is useful in cases that several
+     *  operations on the class must happen atomic.
+     */
+    TYPE &getData()
+    {
+        return m_data;
+    }   // getData
+    // ------------------------------------------------------------------------
+    const TYPE &getData() const
+    {
+        return m_data;
+    }   // getData
+    // ------------------------------------------------------------------------
+    /** Locks the mutex. Note that calls to get() or set() will fail, since
+     *  they will try to lock the mutex as well!
+     */
+    void lock() { pthread_mutex_lock(&m_mutex); }
+    // ------------------------------------------------------------------------
+    /** Unlocks the mutex. 
+     */
+    void unlock() {pthread_mutex_unlock(&m_mutex); }
 private:
     // Make sure that no actual copying is taking place
     // ------------------------------------------------------------------------
