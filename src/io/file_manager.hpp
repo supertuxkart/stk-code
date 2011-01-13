@@ -98,6 +98,7 @@ public:
     std::string getDataFile      (const std::string& fname) const;
     std::string getHighscoreFile (const std::string& fname) const;
     std::string getChallengeFile (const std::string& fname) const;
+    std::string getTutorialFile (const std::string& fname) const;
     std::string getLogFile       (const std::string& fname) const;
     std::string getItemFile      (const std::string& fname) const;
     std::string getMusicFile     (const std::string& fname) const;

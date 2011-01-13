@@ -41,15 +41,14 @@ TutorialManager::TutorialManager()
     // in main).
     m_tutorial_manager = this;
         
-    // FIXME : Read tutorials from .../data
     // -----------------------------
     std::set<std::string> result;
-    file_manager->listFiles(result, "data/grandprix");
+    file_manager->listFiles(result, "data/tutorials");
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
         if (StringUtils::hasSuffix(*i, ".tutorial")) 
-            addTutorial(file_manager->getDataFile("grandprix/"+*i));
+            addTutorial(file_manager->getDataFile("tutorials/"+*i));
     }  
 
     // Hard coded challenges can be added here.
@@ -125,7 +124,7 @@ void TutorialManager::load()
     {
         std::cerr << "Tutorial file '" << filename << "' will be created." 
                   << std::endl;
-        save();
+        //save();
         
         if (root) delete root;
         return;
@@ -139,10 +138,11 @@ void TutorialManager::load()
     delete root;
 }   // load
 
+
 //-----------------------------------------------------------------------------
-void TutorialManager::save()
-{
-    std::ofstream tutorial_file;
+//void TutorialManager::save()
+//{
+//    std::ofstream tutorial_file;
     //std::string filename = file_manager->getChallengeFile("tutorial.xml");
     //challenge_file.open(filename.c_str());
 
@@ -163,6 +163,6 @@ void TutorialManager::save()
     //
     //challenge_file << "</challenges>\n\n";
     //challenge_file.close();
-}   // save
+//}   // save
 
 

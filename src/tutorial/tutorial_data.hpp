@@ -43,6 +43,8 @@ private:
     std::string                    m_track_name;
     int                            m_energy;
     std::string                    m_filename;
+    int                            m_num_players;
+
 
 //    void getUnlocks(const XMLNode *root, const std:: string type, REWARD_TYPE reward);
     void error(const char *id) const;
@@ -66,6 +68,7 @@ public:
     void setMajor(std::string major);
     void setMinor(std::string minor);
     void setNumKarts(int num_karts);
+    void setNumPlayers(int num_players);
 
     virtual void check() const;
     virtual bool raceFinished();

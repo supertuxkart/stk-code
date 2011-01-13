@@ -624,6 +624,14 @@ std::string FileManager::getChallengeFile(const std::string &fname) const
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
+/** Returns the full path of the tutorial file. */
+std::string FileManager::getTutorialFile(const std::string &fname) const
+{
+    return getConfigDir()+"/"+fname;
+}   // getTutorialFile
+
+
+//-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.
  *  \param path File name to test.
  */

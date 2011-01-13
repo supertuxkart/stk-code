@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<challenge
+    id="basic_driving"
+    name="Basic Driving tutorial"
+    description="Come first in the At World's End Grand Prix with 3 Expert AI karts."
+    major="grandprix"
+    minor="timetrial"
+	track="canyon"
+    difficulty="easy"
+    karts="1"
+	num_players="1"
+/>

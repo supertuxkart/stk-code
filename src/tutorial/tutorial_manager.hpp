@@ -48,7 +48,6 @@ public:
               ~TutorialManager     ();
     void       addTutorial      (Tutorial * m_tutorial);
     void       addTutorial      (const std::string& filename);
-    void       save              ();
 
     vector <const Tutorial*> getTutorialsList();
     

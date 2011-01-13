@@ -45,8 +45,12 @@ TutorialData::TutorialData(const std::string& filename)
     m_track_name  = "";
     m_gp_id       = "";
     m_energy      = -1;
+    
+    std::string s_property;
+    int         i_property;
+    float       f_property;
 
-    XMLNode *root = new XMLNode( filename );
+    XMLNode     *root = new XMLNode( filename );
 
     // Check if the file have been load correctly 
     if(!root || root->getName()!="tutorial")
@@ -56,66 +60,40 @@ TutorialData::TutorialData(const std::string& filename)
         msg << "Couldn't load tutorial '" << filename << "': no tutorial node.";
         throw std::runtime_error(msg.str());
     }
-
-    std::string s_property;
-    int i_property;
-    float f_property;
-
-    // Mode    
-    root->get("major", &s_property);
-    setMajor(s_property);
-
-    // Minor
-    root->get("minor", &s_property);
-    setMinor(s_property);
-
-    // Name
-    if(!root->get("name", &s_property) ) 
-        error("name");    
-    setName( _(s_property.c_str()) );
+    // Start the loading process (ordered as it is on the file)
 
     // ID
     if(!root->get("id", &s_property) ) 
         error("id");
     setId(s_property);
 
+    // Name
+    if(!root->get("name", &s_property) ) 
+        error("name");    
+    setName( _(s_property.c_str()) );
+
     // Description
     if(!root->get("s_property", &s_property) ) 
         error("description");
     setTutorialDescription( _(s_property.c_str()) );
+
+    // Major    
+    root->get("major", &s_property);
+    setMajor(s_property);
+
+    // Minor
+    root->get("minor", &s_property);
+    setMinor(s_property);
     
     // Karts
     if(!root->get("karts", &i_property)  ) 
         error("karts");
     setNumKarts(i_property);
+    
 
     // Difficulty
     root->get("difficulty", &s_property);
     setDifficulty(s_property);
-
-    // Time
-    root->get("time", &f_property);  // one of time/position
-    setTime(f_property);
-
-    // Position
-    root->get("position", &m_position );  // must be set
-    if(m_time<0 && m_position<0) 
-        error("position/time");
-
-    // Energy
-    root->get("energy", & i_property ); // This is optional
-    setEnergy(i_property);
-
-    // FIXME do we need position for the tutorials???????
-    // Position is optional except in GP and FTL
-    /*if(!root->get("position", &s_property))
-        error("position");
-        set
-        &&
-       //RaceManager::getWorld()->areKartsOrdered() ) // FIXME - order and optional are not the same thing
-        (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-         m_major==RaceManager::MAJOR_MODE_GRAND_PRIX))
-                                           error("position");*/
 
     if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
@@ -123,18 +101,11 @@ TutorialData::TutorialData(const std::string& filename)
         if (!root->get("track",  &s_property ))        
             error("track");     
         setTrack(s_property);       
-        
-        if (!root->get("laps", &i_property))
-           error("laps");        
-        setLaps(i_property);
-    }
-    else   // GP
-    {
-        if (!root->get("gp",   &m_gp_id ))                     error("gp");
-        if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
     }
 
-
+    // Num Players
+    root->get("num_players", &i_property);
+    setNumPlayers(i_property);
     delete root;
 
 }   // TutorialData
@@ -152,7 +123,7 @@ void TutorialData::error(const char *id) const
 }   // error
 
 // ----------------------------------------------------------------------------
-/** Checks if this challenge is valid, i.e. contains a valid track or a valid
+/** Checks if this tutorial is valid, i.e. contains a valid track or a valid
  *  GP. If incorrect data are found, STK is aborted with an error message. 
  *  (otherwise STK aborts when trying to do this challenge, which is worse).
  */
@@ -333,4 +304,9 @@ void TutorialData::setTime (float time)
 void TutorialData::setEnergy(int energy)
 {
     m_energy = energy;    
+}
+
+void TutorialData::setNumPlayers (int num_players)
+{
+    this->m_num_players = num_players;
 }

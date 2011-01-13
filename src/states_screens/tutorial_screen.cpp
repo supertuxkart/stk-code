@@ -168,7 +168,6 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
 
             // Launch tutorial
             //m_tutorial_manager->getTutorial(selection)->setRace();
-
             
             // FIXME this code have to be in Tutorial class (and loaded from file xD)
             RaceManager::MajorRaceModeType m_major;
