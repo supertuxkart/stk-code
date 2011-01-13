@@ -45,7 +45,7 @@ WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.75f)
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, m->getTexture());
 
-    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0.05, 0),   // velocity in m/ms
+    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0.05f, 0),   // velocity in m/ms
                                            5, 10,
                                            video::SColor(255,0,0,0),
                                            video::SColor(255,255,255,255),
