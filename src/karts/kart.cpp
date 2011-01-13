@@ -874,6 +874,11 @@ void Kart::update(float dt)
     if (emergency)
     {
         m_view_blocked_by_plunger = 0.0f;
+        if (m_flying)
+        {
+            stopFlying();
+            m_flying = false;
+        }
     }
     
     // Remove the shadow if the kart is not on the ground (if a kart
