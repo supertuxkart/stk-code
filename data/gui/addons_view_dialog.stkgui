@@ -1,7 +1,7 @@
 <stkgui>
 
 <div x="5%" width="90%" height="90%" layout="vertical-row">
-  <label x="0" width="100%" id="name" align="center" width="100%" text="Name:" proportion="1" />
+  <label width="100%" id="name" text_align="center" text="Name:" proportion="1" />
   <div x="5%" y="0%" width="90%" height="80%" layout="horizontal-row" >
     <div width="50%" height="100%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png"/>
