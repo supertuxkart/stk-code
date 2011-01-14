@@ -380,7 +380,7 @@ void RaceGUI::drawGlobalTimer()
     }
     
     gui::ScalableFont* font = GUIEngine::getFont();
-    font->draw(sw.c_str(), pos, time_color);
+    font->draw(sw.c_str(), pos, time_color, false, false, NULL, true /* ignore RTL */);
 }   // drawGlobalTimer
 
 //-----------------------------------------------------------------------------
@@ -564,7 +564,8 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s=info[kart_id].m_text.c_str();
-            font->draw(s.c_str(), pos, color);
+
+            font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
         }
 
         if (info[kart_id].special_title.size() > 0)
@@ -573,7 +574,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s(info[kart_id].special_title.c_str());
-            font->draw(s.c_str(), pos, color);
+            font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
         }
 
         // draw icon
