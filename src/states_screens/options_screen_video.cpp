@@ -44,7 +44,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 // Look-up table for GFX levels
 const bool GFX_ANIM_KARTS[] = {false, true,  true};
 const bool GFX           [] = {false, false, true};
-const bool GFX_WHEATHER  [] = {false, false, true};
+const bool GFX_WEATHER   [] = {false, false, true};
 const int  GFX_LEVEL_AMOUNT = 3;
 
 // -----------------------------------------------------------------------------
@@ -221,7 +221,7 @@ void OptionsScreenVideo::init()
     {
         if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l] &&
             UserConfigParams::m_graphical_effects        == GFX[l] &&
-            UserConfigParams::m_wheather_effects         == GFX_WHEATHER[l])
+            UserConfigParams::m_weather_effects          == GFX_WEATHER[l])
         {
             gfx->setValue(l+1);
             break;
@@ -286,7 +286,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         
         UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
         UserConfigParams::m_graphical_effects        = GFX[level-1];
-        UserConfigParams::m_wheather_effects         = GFX_WHEATHER[level-1];
+        UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
     }
 
     
