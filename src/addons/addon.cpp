@@ -28,11 +28,12 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
-Addon::Addon(const XMLNode &xml, bool installed)
+Addon::Addon(const XMLNode &xml)
 {
-    m_installed         = installed;
-    m_installed_version = 0;
     m_name              = "";
+    m_id                = "";
+    m_installed         = false;
+    m_installed_version = 0;
     m_version           = 0 ;
     m_zip_file          = "";
     m_description       = "";
@@ -40,27 +41,19 @@ Addon::Addon(const XMLNode &xml, bool installed)
     m_icon_basename     = "";
     m_icon_version      = 0;
     m_icon_ready        = false;
-    m_id                = "";
     m_type              = xml.getName();
-    
-    xml.get("name",        &m_name);
-    if(m_installed)
-    {
-        xml.get("installed-version", &m_installed_version);
-        xml.get("id",                &m_id               );
-        xml.get("icon-version",      &m_icon_version     );
-    }
-    else   // not installed
-    {
-        xml.get("file",        &m_zip_file   );
-        xml.get("description", &m_description);
-        xml.get("icon",        &m_icon_url   );
-        xml.get("version",     &m_version    );
-        // The online list has a numeric id, which is not used.
-        // So ignore it.
-        m_id = StringUtils::toLowerCase(m_name);
-        m_icon_basename = StringUtils::getBasename(m_icon_url);
-    }   // if installed
+
+    xml.get("name",              &m_name             );
+    m_id                = StringUtils::toLowerCase(m_name);
+    xml.get("id",                &m_id);
+    xml.get("installed",         &m_installed        );
+    xml.get("installed-version", &m_installed_version);
+    xml.get("version",           &m_version          );
+    xml.get("file",              &m_zip_file         );
+    xml.get("description",       &m_description      );
+    xml.get("icon",              &m_icon_url         );
+    xml.get("icon-version",      &m_icon_version     );
+    m_icon_basename = StringUtils::getBasename(m_icon_url);
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------

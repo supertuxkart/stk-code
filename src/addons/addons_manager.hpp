@@ -24,8 +24,6 @@
 #include <map>
 #include <vector>
 
-#include <pthread.h>
-
 #include "addons/addon.hpp"
 #include "io/xml_node.hpp"
 #include "utils/synchronised.hpp"
@@ -33,22 +31,21 @@
 class AddonsManager
 {
 private:
-    std::vector<Addon>      m_addons_list;
-    std::string             m_file_installed;
-    void                    saveInstalled(const std::string &type="");
-    void                    loadInstalledAddons();
-    std::string             m_type;
-    int                     m_download_state;
+    /** The list of all addons - installed or uninstalled. The list is
+     *  combined from the addons_installed.xml file first, then information
+     *  from the downloaded list of items is merged/added to that. */
+    Synchronised<std::vector<Addon> >  m_addons_list;
+    /** Full filename of the addons_installed.xml file. */
+    std::string                        m_file_installed;
+    std::string                        m_type;
+    int                                m_download_state;
 
     /** List of loaded icons. */
     std::vector<std::string> m_icon_list;
 
     /** Queue of icons to download. This queue is used by the
      *  GUI to increase priority of icons that are needed now. */
-    std::vector<std::string> m_icon_queue;
-
-    /** Mutex to protect access to icon_list. */
-    pthread_mutex_t         m_mutex_icon;
+    Synchronised<std::vector<std::string> > m_icon_queue;
 
     /** Which state the addons manager is:
     *  INIT:  Waiting to download the list of addons.
@@ -58,6 +55,8 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
+    void         saveInstalled(const std::string &type="");
+    void         loadInstalledAddons();
     static void *downloadIcons(void *obj);
 
 public:
@@ -68,10 +67,13 @@ public:
     void setErrorState() { m_state.set(STATE_ERROR); }
 
     /** Returns the list of addons (installed and uninstalled). */
-    unsigned int getNumAddons() const { return m_addons_list.size(); }
+    unsigned int getNumAddons() const 
+    {
+        return m_addons_list.getData().size(); 
+    }
 
     /** Returns the i-th addons. */
-    const Addon& getAddon(unsigned int i) { return m_addons_list[i];}
+    const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}
     const Addon* getAddon(const std::string &id) const;
     int   getAddonIndex(const std::string &id) const;
 

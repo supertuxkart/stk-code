@@ -45,10 +45,12 @@ AddonsManager* addons_manager = 0;
  *  the list of already installed addons). The online component is initialised
  *  later from a separate thread in network_http (once network_http is setup).
  */
-AddonsManager::AddonsManager() : m_state(STATE_INIT)
+AddonsManager::AddonsManager() : m_state(STATE_INIT),
+                                 m_icon_queue(std::vector<std::string>() ),
+                                 m_addons_list(std::vector<Addon>() )
 {
     m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
-    loadInstalledAddons();
+
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
@@ -61,6 +63,10 @@ AddonsManager::AddonsManager() : m_state(STATE_INIT)
  */
 void AddonsManager::initOnline(const XMLNode *xml)
 {
+    m_addons_list.lock();
+    loadInstalledAddons();
+    m_addons_list.unlock();
+
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
@@ -105,13 +111,15 @@ void AddonsManager::initOnline(const XMLNode *xml)
                 continue;
             }
 
+            m_addons_list.lock();
             if(index>=0)
-                m_addons_list[index].copyInstallData(addon);
+                m_addons_list.getData()[index].copyInstallData(addon);
             else
             {
-                m_addons_list.push_back(addon);
-                index = m_addons_list.size()-1;
+                m_addons_list.getData().push_back(addon);
+                index = m_addons_list.getData().size()-1;
             }
+            m_addons_list.unlock();
         }
         else
         {
@@ -124,8 +132,6 @@ void AddonsManager::initOnline(const XMLNode *xml)
     delete xml;
 
     m_state.set(STATE_READY);
-
-    pthread_mutex_init(&m_mutex_icon, NULL);
 
     pthread_t      id;
     pthread_attr_t attr;
@@ -141,42 +147,44 @@ void AddonsManager::initOnline(const XMLNode *xml)
 void *AddonsManager::downloadIcons(void *obj)
 {
     AddonsManager *me=(AddonsManager*)obj;
+    me->m_icon_queue.lock();
+    me->m_icon_queue.getData().clear();
+    me->m_icon_queue.unlock();
 
-    me->m_icon_queue.clear();
-
-    for(unsigned int i=0; i<me->m_addons_list.size(); i++)
+    for(unsigned int i=0; i<me->m_addons_list.getData().size(); i++)
     {
-        const Addon &addon      = me->m_addons_list[i];
+        const Addon &addon      = me->m_addons_list.getData()[i];
         const std::string &icon = addon.getIconBasename();
         if(addon.iconNeedsUpdate())
         {
-            pthread_mutex_lock(&(me->m_mutex_icon));
-            me->m_icon_queue.push_back(addon.getId());
-            pthread_mutex_unlock(&(me->m_mutex_icon));
+            me->m_icon_queue.lock();
+            me->m_icon_queue.getData().push_back(addon.getId());
+            me->m_icon_queue.unlock();
             continue;
         }
         std::string icon_path=file_manager->getAddonsFile("icons/"+icon);
         if(!file_manager->fileExists(icon_path))
         {
-            pthread_mutex_lock(&(me->m_mutex_icon));
-            me->m_icon_queue.push_back(addon.getId());
-            pthread_mutex_unlock(&(me->m_mutex_icon));
+            me->m_icon_queue.lock();
+            me->m_icon_queue.getData().push_back(addon.getId());
+            me->m_icon_queue.unlock();
             continue;
         }
-        me->m_addons_list[i].setIconReady();
+        me->m_addons_list.getData()[i].setIconReady();
     }   // for i<m_addons_list.size()
 
-    pthread_mutex_lock(&(me->m_mutex_icon));
-    int count = me->m_icon_queue.size();
-    pthread_mutex_unlock(&(me->m_mutex_icon));
+    me->m_icon_queue.lock();
+    int count = me->m_icon_queue.getData().size();
+    me->m_icon_queue.unlock();
     while(count!=0)
     {
-        pthread_mutex_lock(&(me->m_mutex_icon));
-            unsigned int indx = me->getAddonIndex(me->m_icon_queue[0]);
-            Addon *addon      = &(me->m_addons_list[indx]);
-            me->m_icon_queue.erase(me->m_icon_queue.begin());
+        me->m_icon_queue.lock();
+        std::vector<std::string> &icon_queue = me->m_icon_queue.getData();
+            unsigned int indx = me->getAddonIndex(icon_queue[0]);
+            Addon *addon      = &(me->m_addons_list.getData()[indx]);
+            icon_queue.erase(icon_queue.begin());
             count --;
-        pthread_mutex_unlock(&(me->m_mutex_icon));
+        me->m_icon_queue.unlock();
 
         const std::string &url = addon->getIconURL();
         const std::string &icon = addon->getIconBasename();
@@ -191,10 +199,14 @@ void *AddonsManager::downloadIcons(void *obj)
                    icon.c_str(), url.c_str());
         }
     }   // while count!=0
-    for(unsigned int i=0; i<me->m_addons_list.size(); i++)
+
+    // Now check if we have any entries in m_addons_list, that is not
+    // in the online list anymore 
+    for(unsigned int i=0; i<me->m_addons_list.getData().size(); i++)
     {
-        if(!me->m_addons_list[i].iconReady())
-            printf("No icon for '%s'.\n", me->m_addons_list[i].getId().c_str());
+        if(!me->m_addons_list.getData()[i].iconReady())
+            printf("No icon for '%s'.\n", 
+                    me->m_addons_list.getData()[i].getId().c_str());
     }
     me->saveInstalled();
     return NULL;
@@ -230,8 +242,8 @@ void AddonsManager::loadInstalledAddons()
         if(node->getName()=="kart"   ||
             node->getName()=="track"    )
         {
-            Addon addon(*node, /*installed*/ true);
-            m_addons_list.push_back(addon);
+            Addon addon(*node);
+            m_addons_list.getData().push_back(addon);
         }
     }   // for i <= xml->getNumNodes()
 
@@ -246,15 +258,15 @@ void AddonsManager::loadInstalledAddons()
 const Addon* AddonsManager::getAddon(const std::string &id) const
 {
     int i = getAddonIndex(id);
-    return (i<0) ? NULL : &(m_addons_list[i]);
+    return (i<0) ? NULL : &(m_addons_list.getData()[i]);
 }   // getAddon
 
 // ----------------------------------------------------------------------------
 int AddonsManager::getAddonIndex(const std::string &id) const
 {
-    for(unsigned int i = 0; i < m_addons_list.size(); i++)
+    for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)
     {
-        if(m_addons_list[i].getId()== id)
+        if(m_addons_list.getData()[i].getId()== id)
         {
             return i;
         }
@@ -285,8 +297,8 @@ void AddonsManager::install(const Addon &addon)
     }
 
     int index = getAddonIndex(addon.getId());
-    assert(index>=0 && index < (int)m_addons_list.size());
-    m_addons_list[index].setInstalled(true);
+    assert(index>=0 && index < (int)m_addons_list.getData().size());
+    m_addons_list.getData()[index].setInstalled(true);
     
     if(addon.getType()=="kart")
     {
@@ -319,11 +331,11 @@ void AddonsManager::saveInstalled(const std::string &type)
     xml_installed << "<addons  xmlns='http://stkaddons.tuxfamily.org/'>"
                     << std::endl;
 
-    for(unsigned int i = 0; i < m_addons_list.size(); i++)
+    for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)
     {
         //if(m_addons_list[i].m_installed)
         {
-            m_addons_list[i].writeXML(&xml_installed);
+            m_addons_list.getData()[i].writeXML(&xml_installed);
         }
     }
     xml_installed << "</addons>" << std::endl;
@@ -346,8 +358,8 @@ void AddonsManager::uninstall(const Addon &addon)
     // addon is a const reference, and to avoid removing the const, we
     // find the proper index again to modify the installed state
     int index = getAddonIndex(addon.getId());
-    assert(index>=0 && index < (int)m_addons_list.size());
-    m_addons_list[index].setInstalled(false);
+    assert(index>=0 && index < (int)m_addons_list.getData().size());
+    m_addons_list.getData()[index].setInstalled(false);
 
     //write the xml file with the informations about installed karts
     std::string name=addon.getType()+"s/"+addon.getId();

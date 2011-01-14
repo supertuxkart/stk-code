@@ -57,7 +57,7 @@ public:
 
     Addon() {};
     /** Initialises the object from an XML node. */
-    Addon(const XMLNode &xml, bool installed=false);
+    Addon(const XMLNode &xml);
     // ------------------------------------------------------------------------
     void writeXML(std::ofstream *out_stram);
     // ------------------------------------------------------------------------

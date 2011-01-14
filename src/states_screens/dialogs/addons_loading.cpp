@@ -42,13 +42,13 @@ AddonsLoading::AddonsLoading(const float w, const float h,
 {
     loadFromFile("addons_view_dialog.stkgui");
     m_addon          = *(addons_manager->getAddon(id));
-    m_progress       = NULL;
-    m_can_install    = false;
-    m_percent_update = false;
     m_icon_shown     = false;
 
     /*Init the icon here to be able to load a single image*/
-    m_icon = getWidget<IconButtonWidget>("icon");
+    m_icon     = getWidget<IconButtonWidget>("icon");
+    m_progress = getWidget<ProgressBarWidget>("progress");
+    if(m_progress)
+        m_progress->setVisible(false);
     
     if(m_addon.isInstalled())
     {
@@ -88,16 +88,8 @@ GUIEngine::EventPropagation
         // not uninstalling an addon.
         if(!m_addon.isInstalled() || m_addon.needsUpdate())
         {
-            assert(m_progress==NULL);
-            m_progress = new ProgressBarWidget();
-            m_progress->m_x = 180;
-            m_progress->m_y = m_area.getHeight()-45;
-            m_progress->m_w = 250;
-            m_progress->m_h = 35;
-            m_progress->setParent(m_irrlicht_window);
-
-            m_widgets.push_back(m_progress);
-            m_progress->add();
+            m_progress->setValue(0);
+            m_progress->setVisible(true);
 
             /*This widget will show some text as "downloading..." or "installing".*/
             m_state = new LabelWidget();
@@ -112,9 +104,7 @@ GUIEngine::EventPropagation
             m_widgets.push_back(m_state);
             m_state->add();
 
-            getWidget<ButtonWidget>("cancel")->setDeactivated();
             getWidget<ButtonWidget>("install")->setDeactivated();
-            m_percent_update = true;
             startDownload();
         }
         else   // uninstall
@@ -129,7 +119,7 @@ GUIEngine::EventPropagation
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
-    if(m_progress)
+    if(m_progress->isVisible())
     {
         float progress = network_http->getProgress();
         m_progress->setValue((int)(progress*100.0f));

@@ -47,13 +47,6 @@ private:
     void startDownload();
     void doInstall();
     
-    /* These three bool are some flags.
-     * m_can_install : when the installation is finidhed, onUpdate close the
-     * dialog.
-     * m_percent_update : to reload the download percent */
-    bool m_can_install;
-    bool m_percent_update;
-
     /** True if the icon is being displayed. */
     bool m_icon_shown;
 
@@ -66,8 +59,8 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& event_source);
     
     /** This function is called by the GUI, all the frame (or somthing like
-     * that). It checks the flags (m_can_install, m_can_load_icon and
-     * m_percent_update) and do the necessary.
+     * that). It checks the flags (m_can_load_icon and
+     *  and do the necessary.
      * */
     void onUpdate(float delta);
     
