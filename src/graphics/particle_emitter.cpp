@@ -29,13 +29,13 @@
 class FadeAwayAffector : public scene::IParticleAffector
 {
     /** (Squared) distance from camera at which a particle started being faded out */
-    int m_start_fading;
+    float m_start_fading;
     
     /** (Squared) distance from camera at which a particle is completely faded out */
-    int m_end_fading;
+    float m_end_fading;
     
 public:
-    FadeAwayAffector(int start, int end)
+    FadeAwayAffector(float start, float end)
     {
         m_start_fading = start;
         m_end_fading = end;
@@ -54,7 +54,7 @@ public:
             const float x = diff.X;
             const float y = diff.Y;
             const float z = diff.Z;
-            const int distance_squared = x*x + y*y + z*z;
+            const float distance_squared = x*x + y*y + z*z;
             
             if (distance_squared < m_start_fading)
             {
@@ -66,7 +66,8 @@ public:
             }
             else
             {
-                curr.color.setAlpha((distance_squared - m_start_fading) / (m_end_fading - m_start_fading));
+                curr.color.setAlpha((int)((distance_squared - m_start_fading) 
+                                        / (m_end_fading - m_start_fading)));
             }
         }
     }
