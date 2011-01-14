@@ -1,8 +1,10 @@
 <stkgui>
 
-<div x="5%" width="90%" height="90%" layout="vertical-row">
+<div x="5%" y="5%" width="90%" height="90%" layout="vertical-row">
+  
   <label width="100%" id="name" text_align="center" text="Name:" proportion="1" />
-  <div x="5%" y="0%" width="90%" height="80%" layout="horizontal-row" >
+  
+  <div x="5%" y="0%" width="90%" proportion="6" layout="horizontal-row" >
     <div width="50%" height="100%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png"/>
         <spacer proportion="1" /> 
@@ -13,10 +15,16 @@
         <label id="version" width="100%" text="Version:" proportion="1" />
     </div>
   </div>
-  <button      id="install"  x="5%" y="85%" width="70%"   I18N="Addons" text="Install" align="center"/>
-  <progressbar id="progress" x="5%" y="85%" width="70%" height="5%"  />
-  <spacer proportion="1" />
-  <button      id="cancel"   x="5%" width="70%"   I18N="Addons" text="Back" align="center"/>
-  <label       id="state"    x="5%" text="Status" proportion="1" />
+  
+  <div width="70%" proportion="1" align="center">
+    <button      id="install"  x="0" y="0" width="100%" height="100%" I18N="Addons" text="Install"/>
+    <progressbar id="progress" x="0" y="20%" width="100%" height="60%"  />
+  </div>
+  
+  <spacer height="10" />
+  
+  <button      id="cancel"   proportion="1" x="5%" width="70%" I18N="Addons" text="Back" align="center"/>
+  
+  <label       id="state"    proportion="1" width="100%" text="Status" text_align="center" />
 </div>
 </stkgui>
