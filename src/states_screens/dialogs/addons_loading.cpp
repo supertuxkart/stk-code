@@ -45,8 +45,9 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_icon_shown     = false;
 
     /*Init the icon here to be able to load a single image*/
-    m_icon     = getWidget<IconButtonWidget>("icon");
-    m_progress = getWidget<ProgressBarWidget>("progress");
+    m_icon           = getWidget<IconButtonWidget> ("icon"    );
+    m_progress       = getWidget<ProgressBarWidget>("progress");
+    m_install_button = getWidget<ButtonWidget>     ("install" );
     if(m_progress)
         m_progress->setVisible(false);
     
@@ -90,21 +91,11 @@ GUIEngine::EventPropagation
         {
             m_progress->setValue(0);
             m_progress->setVisible(true);
-
-            /*This widget will show some text as "downloading..." or "installing".*/
-            m_state = new LabelWidget();
-            m_state->m_properties[PROP_TEXT_ALIGN] = "center";
-            /* Center the widget*/
-            m_state->m_x = 10;
-            m_state->m_y = getHeight()-125;
-            m_state->m_w = getWidth() - 20;
-            m_state->m_h = 35;
-            m_state->setParent(m_irrlicht_window);
-
-            m_widgets.push_back(m_state);
-            m_state->add();
-
-            getWidget<ButtonWidget>("install")->setDeactivated();
+            //m_progress->m_h = m_install_button->m_h;
+            //m_progress->m_x = m_install_button->m_x;
+            //m_progress->m_y = m_install_button->m_y;
+            //m_progress->m_w = m_install_button->m_w;
+            m_install_button->setVisible(false);
             startDownload();
         }
         else   // uninstall

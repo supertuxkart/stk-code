@@ -33,14 +33,12 @@ class AddonsLoading : public GUIEngine::ModalDialog
 {
 //virtual void escapePressed() {};
 private:
-    GUIEngine::LabelWidget       *m_author;
     GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::ButtonWidget      *m_back_button;
     GUIEngine::ButtonWidget      *m_install_button;
+
     GUIEngine::IconButtonWidget  *m_icon;
-    GUIEngine::IconButtonWidget  *m_next;
-    GUIEngine::IconButtonWidget  *m_previous;
     
     /** The addon to load. */
     Addon                         m_addon;
