@@ -1467,6 +1467,7 @@ void Kart::loadData()
     
     m_water_splash_system = new ParticleEmitter(ParticleKindManager::get()->getParticles("splash.xml"),
                                                 core::vector3df(0.0f, 0.0f, 0.0f), getNode());
+    m_water_splash_system->setCreationRate(0);
     
     core::vector3df position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
     
