@@ -274,8 +274,8 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx", &m_video_group) );
     
-    PARAM_PREFIX BoolUserConfigParam        m_wheather_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "wheather_gfx", &m_video_group) );
+    PARAM_PREFIX BoolUserConfigParam        m_weather_effects
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", &m_video_group) );
     
     PARAM_PREFIX BoolUserConfigParam        m_show_steering_animations
             PARAM_DEFAULT(  BoolUserConfigParam(true, "steering_animations", &m_video_group, "Display steering animations in race") );
