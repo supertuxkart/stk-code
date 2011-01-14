@@ -36,17 +36,8 @@
                 
                 <label width="100%" I18N="In the graphics settings" text="Graphical Effects Settings"/>
                 
-                <div width="100%" proportion="1" layout="horizontal-row" >
-                    <checkbox id="anim" width="40" height="40" />
-                    <spacer width="20" height="100%" />
-                    <label proportion="1" height="100%" I18N="In the video settings" text="Animated Karts"/>
-                </div>
-                
-                <div width="100%" proportion="1" layout="horizontal-row" >
-                    <checkbox id="gfx" width="40" height="40" />
-                    <spacer width="20" height="100%" />
-                    <label proportion="1" height="100%" I18N="In the video settings" text="Animated Effects and Scenery"/>
-                </div>
+                <!-- FIXME: don't hardcode size -->
+                <gauge id="gfx_level" min_value="1" max_value="3" width="300" height="50"/>
             </div>
         </div>
         

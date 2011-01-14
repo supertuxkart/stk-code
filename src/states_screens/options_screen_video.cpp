@@ -41,6 +41,12 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
+// Look-up table for GFX levels
+const bool GFX_ANIM_KARTS[] = {false, true,  true};
+const bool GFX           [] = {false, false, true};
+const bool GFX_WHEATHER  [] = {false, false, true};
+const int  GFX_LEVEL_AMOUNT = 3;
+
 // -----------------------------------------------------------------------------
 
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui")
@@ -107,11 +113,8 @@ void OptionsScreenVideo::init()
     
     GUIEngine::ButtonWidget* applyBtn = this->getWidget<GUIEngine::ButtonWidget>("apply_resolution");
     assert( applyBtn != NULL );
-    
-    GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
-    assert( animatedKarts != NULL );
-    
-    GUIEngine::CheckBoxWidget* gfx = this->getWidget<GUIEngine::CheckBoxWidget>("gfx");
+
+    GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
     
     // ---- video modes
@@ -162,7 +165,6 @@ void OptionsScreenVideo::init()
         res->setDeactivated();
         full->setDeactivated();
         applyBtn->setDeactivated();
-        animatedKarts->setDeactivated();
         gfx->setDeactivated();
     }
     else
@@ -170,7 +172,6 @@ void OptionsScreenVideo::init()
         res->setActivated();
         full->setActivated();
         applyBtn->setActivated();
-        animatedKarts->setActivated();
         gfx->setActivated();
     }
     
@@ -216,8 +217,16 @@ void OptionsScreenVideo::init()
     }
     
     // --- set gfx settings values
-    animatedKarts->setState( UserConfigParams::m_show_steering_animations );
-    gfx->setState( UserConfigParams::m_graphical_effects );
+    for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
+    {
+        if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l] &&
+            UserConfigParams::m_graphical_effects        == GFX[l] &&
+            UserConfigParams::m_wheather_effects         == GFX_WHEATHER[l])
+        {
+            gfx->setValue(l+1);
+            break;
+        }
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -268,18 +277,18 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
     }
-    else if (name == "anim")
+    else if (name == "gfx_level")
     {
-        GUIEngine::CheckBoxWidget* animatedKarts = this->getWidget<GUIEngine::CheckBoxWidget>("anim");
-        assert( animatedKarts != NULL );
-        UserConfigParams::m_show_steering_animations = animatedKarts->getState();
+        GUIEngine::SpinnerWidget* gfx_level = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+        assert( gfx_level != NULL );
+        
+        const int level = gfx_level->getValue();
+        
+        UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
+        UserConfigParams::m_graphical_effects        = GFX[level-1];
+        UserConfigParams::m_wheather_effects         = GFX_WHEATHER[level-1];
     }
-    else if (name == "gfx")
-    {
-        GUIEngine::CheckBoxWidget* gfx = this->getWidget<GUIEngine::CheckBoxWidget>("gfx");
-        assert( gfx != NULL );
-        UserConfigParams::m_graphical_effects = gfx->getState();
-    }
+
     
 }   // eventCallback
 
