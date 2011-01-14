@@ -747,6 +747,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
     int h = (int)(viewport.getHeight()/3);
     int w = h/4; // gauge image is so 1:4
     
+    y -= h;
+    
     x    -= w;
     
     // Background
@@ -803,7 +805,7 @@ void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
 
     drawEnergyMeter(viewport.LowerRightCorner.X, 
-                    viewport.LowerRightCorner.Y - meter_height*2, kart,
+                    viewport.LowerRightCorner.Y - meter_height*0.75f, kart,
                     viewport, scaling);
     
     // First draw the meter (i.e. the background which contains the numbers etc.
