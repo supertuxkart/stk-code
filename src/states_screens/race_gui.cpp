@@ -1004,8 +1004,8 @@ void RaceGUI::drawAllMessages(const Kart* kart,
 {    
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
           
-    const int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
+    const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
+    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
     
     // draw less important first, at the very top of the screen
     for (AllMessageType::const_iterator i = m_messages.begin(); 
