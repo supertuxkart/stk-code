@@ -245,6 +245,7 @@ void cmdLineHelp (char* invocation)
     "       --animations=n     Play karts' animations (Enable: 1, Disable: 0).\n"
     "       --gfx=n            Play other graphical effects like impact stars dance,\n"
     "                           water animations or explosions (Enable: 1, Disable: 0).\n"
+    "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
     // should not be used by unaware users:u
     // "  --profile            Enable automatic driven profile mode for 20 seconds.\n"
     // "  --profile=n          Enable automatic driven profile mode for n seconds.\n"
@@ -466,6 +467,17 @@ int handleCmdLine(int argc, char **argv)
             else
             {
                 UserConfigParams::m_graphical_effects = false;
+            }
+        }
+        else if ( sscanf(argv[i], "--weather=%d", &n) )
+        {
+            if (n)
+            {
+                UserConfigParams::m_weather_effects = true;
+            }
+            else
+            {
+                UserConfigParams::m_weather_effects = false;
             }
         }
         else if ( sscanf(argv[i], "--animations=%d", &n) )
