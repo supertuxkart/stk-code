@@ -48,22 +48,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='curl-debug|Win32'">$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='curl-debug|Win32'">..\..\../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='curl-debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='curl-debug|Win32'">true</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='curl-debug|Win32'">$(ProjectName)_curl_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION="0.7alpha3";_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION="0.7alpha3";_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <MinimalRebuild>true</MinimalRebuild>
@@ -76,8 +78,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;intl.lib;Irrlicht.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./../../../$(ProjectName)_d.exe</OutputFile>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;intl.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)/$(ProjectName)_d.exe</OutputFile>
       <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -100,7 +102,7 @@
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION="0.7alpha3";_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;IRR_SVN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION="0.7alpha3";_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;IRR_SVN;ENABLE_BIDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -108,8 +110,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;intl.lib;Irrlicht.lib.release;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./../../../$(ProjectName).exe</OutputFile>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;intl.lib;Irrlicht.lib.release;ws2_32.lib;fribidi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)/$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -141,7 +143,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;intl.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurld_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./../../../$(ProjectName)_curl_d.exe</OutputFile>
+      <OutputFile>$(TargetPath)</OutputFile>
       <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
