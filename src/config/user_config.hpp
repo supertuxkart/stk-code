@@ -271,9 +271,11 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", &m_video_group) );
     
-    // TODO : adapt to be more powerful with irrlicht
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx", &m_video_group) );
+    
+    PARAM_PREFIX BoolUserConfigParam        m_wheater_effects
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "wheater_gfx", &m_video_group) );
     
     PARAM_PREFIX BoolUserConfigParam        m_show_steering_animations
             PARAM_DEFAULT(  BoolUserConfigParam(true, "steering_animations", &m_video_group, "Display steering animations in race") );

@@ -985,7 +985,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
 
-    if (UserConfigParams::m_graphical_effects && m_sky_particles != NULL)
+    if (UserConfigParams::m_wheater_effects && m_sky_particles != NULL)
     {
         const float x = (m_aabb_max.getX() + m_aabb_min.getX())/2.0f;
         const float z = (m_aabb_max.getZ() + m_aabb_min.getZ())/2.0f;
