@@ -133,6 +133,9 @@ void Track::cleanup()
     }
     m_all_nodes.clear();
 
+    if (m_sky_particles_emitter) delete m_sky_particles_emitter;
+    m_sky_particles_emitter = NULL;
+    
     // The meshes stored in the scene nodes are dropped now.
     // But to really remove all track meshes from memory
     // they have to be removed from the cache.
@@ -988,12 +991,11 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         const float z = (m_aabb_max.getZ() + m_aabb_min.getZ())/2.0f;
         const float size_x = m_aabb_max.getX() - m_aabb_min.getX();
         const float size_z = m_aabb_max.getZ() - m_aabb_min.getZ();
-        m_sky_particles->setBoxSizeX(size_x);
-        m_sky_particles->setBoxSizeZ(size_z);
+        m_sky_particles->setBoxSizeX(size_x*0.5f); // FIXME: don't hardcode size reduction. We need to set the emission area in blender
+        m_sky_particles->setBoxSizeZ(size_z*0.5f);
         
-        // FIXME: don't hardcode height
-        printf("&&&& %f %f\n", m_aabb_min.getY(), m_aabb_max.getY());
-        m_sky_particles_emitter = new ParticleEmitter(m_sky_particles, core::vector3df(x, 25.0f, z));
+        // FIXME: don't hardcode height We need to set the emission area in blender
+        m_sky_particles_emitter = new ParticleEmitter(m_sky_particles, core::vector3df(x, m_aabb_max.getY()*0.75f, z));
     }
     
     // Only print warning if not in battle mode, since battle tracks don't have

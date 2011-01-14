@@ -6,27 +6,28 @@
     <spreading angle="3"           />
     
     <velocity  x="0.0"
-               y="-0.01"
+               y="-0.04"
                z="0.0"             />
     
-    <material  file="snowflake.png"/>
+    <material  file="rain.png"/>
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="900"
-               max="900"           />
+    <rate      min="800"
+               max="900"            />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="9000"
-               max="9000"          />
+    <lifetime  min="4000"
+               max="5000"           />
     
     <!-- Size of the particles -->
-    <size      min="0.40"
-               max="0.60"          />
+    <size      min="16.00"
+               max="16.00"          />
     
     <color     min="255 255 255"
-               max="255 255 255"   />
-    
-    <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="100"          />
+               max="255 255 255"    />
+
+    <!-- Distance at which the particles fade out -->
+    <fade-away start="50"
+               end="100"            />
 
 </particles>

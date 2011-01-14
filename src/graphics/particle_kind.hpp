@@ -80,6 +80,9 @@ private:
     /** For box emitters only */
     float m_box_x, m_box_y, m_box_z;
     
+    /** Distance from camera at which particles start fading out, or negative if disabled */
+    float m_fade_away_start, m_fade_away_end;
+    
 public:
     
     /**
@@ -125,9 +128,12 @@ public:
     /** Get the time it takes for gravity to completely replace the emission force. Meaningless if gravity is disabled. */
     int       getForceLostToGravityTime() const { return m_force_lost_to_gravity_time; }
     
-    void      setBoxSizeX    (float newVal) { m_box_x = newVal;   }
-    void      setBoxSizeY    (float newVal) { m_box_y = newVal;   }
-    void      setBoxSizeZ    (float newVal) { m_box_z = newVal;   }
+    float     getFadeAwayStart() const { return m_fade_away_start; }
+    float     getFadeAwayEnd  () const { return m_fade_away_end;   }
+    
+    void      setBoxSizeX    (float newVal) { m_box_x = newVal;    }
+    void      setBoxSizeY    (float newVal) { m_box_y = newVal;    }
+    void      setBoxSizeZ    (float newVal) { m_box_z = newVal;    }
 };
 
 #endif

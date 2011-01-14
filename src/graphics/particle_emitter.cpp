@@ -26,6 +26,60 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
+class FadeAwayAffector : public scene::IParticleAffector
+{
+    /** (Squared) distance from camera at which a particle started being faded out */
+    int m_start_fading;
+    
+    /** (Squared) distance from camera at which a particle is completely faded out */
+    int m_end_fading;
+    
+public:
+    FadeAwayAffector(int start, int end)
+    {
+        m_start_fading = start;
+        m_end_fading = end;
+        assert(m_end_fading >= m_start_fading);
+    }
+    
+    virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
+    {
+        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+        const core::vector3df& cam_pos = curr_cam->getPosition();
+        
+        for (unsigned int n=0; n<count; n++)
+        {
+            scene::SParticle& curr = particlearray[n];
+            core::vector3df diff = curr.pos - cam_pos;
+            const float x = diff.X;
+            const float y = diff.Y;
+            const float z = diff.Z;
+            const int distance_squared = x*x + y*y + z*z;
+            
+            if (distance_squared < m_start_fading)
+            {
+                curr.color.setAlpha(255);
+            }
+            else if (distance_squared > m_end_fading)
+            {
+                curr.color.setAlpha(0);
+            }
+            else
+            {
+                curr.color.setAlpha((distance_squared - m_start_fading) / (m_end_fading - m_start_fading));
+            }
+        }
+    }
+    
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        // FIXME: this method seems to make sense only for built-in affectors
+        return scene::EPAT_FADE_OUT;
+    }
+    
+};
+
+
 ParticleEmitter::ParticleEmitter(const ParticleKind* type, core::vector3df position,
                                  scene::ISceneNode* parent) : m_position(position)
 {
@@ -185,8 +239,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                  m_particle_type->getAngleSpread() /* angle */
                                                  );
             
-            //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, parent, -1, position, core::vector3df(0, 0, 0) /* rotation */,
-            //                                                core::vector3df(box_size_x, box_size_y, box_size_z));
+            //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, m_parent, -1, m_position, core::vector3df(0, 0, 0) /* rotation */,
+            //                                                core::vector3df(box_size_x*2, box_size_y*2, box_size_z*2));
             
             break;
         }
@@ -216,5 +270,14 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                                              type->getForceLostToGravityTime());
         m_node->addAffector(gaf);
         gaf->drop();
+    }
+    
+    const float fas = type->getFadeAwayStart();
+    const float fae = type->getFadeAwayEnd();
+    if (fas > 0.0f && fae > 0.0f)
+    {
+        FadeAwayAffector* faa = new FadeAwayAffector(fas*fas, fae*fae);
+        m_node->addAffector(faa);
+        faa->drop();
     }
 }
