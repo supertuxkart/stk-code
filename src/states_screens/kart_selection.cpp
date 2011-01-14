@@ -1653,8 +1653,10 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 
             if (unlock_manager->isLocked(prop->getIdent()))
             {
-                w->addItem( _("Locked : solve active challenges to gain access to more!"),
-                            "locked", icon_path, LOCKED_BADGE);
+                w->addItem( 
+                    _("Locked : solve active challenges to gain access to more!"),
+                    "locked", icon_path, LOCKED_BADGE, 
+                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
             {
