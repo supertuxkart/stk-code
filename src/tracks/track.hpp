@@ -37,6 +37,7 @@ class AnimationManager;
 class BezierCurve;
 class CheckManager;
 class MovingTexture;
+class ParticleKind;
 class PhysicalObject;
 class TrackObjectManager;
 class TriangleMesh;
@@ -119,6 +120,11 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
+    /** Particles emitted from the sky (e.g. rain or snow) */
+    ParticleKind*            m_sky_particles;
+    
+    ParticleEmitter*         m_sky_particles_emitter;
+    
     /** A simple class to keep information about a track mode. */
     class TrackMode
     {

@@ -125,7 +125,11 @@ public:
     /** Get the time it takes for gravity to completely replace the emission force. Meaningless if gravity is disabled. */
     int       getForceLostToGravityTime() const { return m_force_lost_to_gravity_time; }
     
+    void      setBoxSizeX    (float newVal) { m_box_x = newVal;   }
+    void      setBoxSizeY    (float newVal) { m_box_y = newVal;   }
+    void      setBoxSizeZ    (float newVal) { m_box_z = newVal;   }
 };
+
 #endif
 
 

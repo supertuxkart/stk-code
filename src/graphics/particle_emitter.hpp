@@ -37,7 +37,7 @@ class ParticleEmitter : public NoCopy
 private:
     
     /** Irrlicht's particle systems. */
-    scene::IParticleSystemSceneNode *m_node; /* left wheel */
+    scene::IParticleSystemSceneNode *m_node;
     
     core::vector3df                  m_position;
     
@@ -62,6 +62,8 @@ public:
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
     
     void         setParticleType(const ParticleKind* p);
+    
+    scene::IParticleSystemSceneNode* getNode() { return m_node; }
 };
 #endif
 

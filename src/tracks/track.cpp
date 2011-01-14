@@ -36,6 +36,9 @@ using namespace irr;
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/particle_kind.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -59,22 +62,24 @@ const float Track::NOHIT           = -99999.9f;
 // ----------------------------------------------------------------------------
 Track::Track(std::string filename)
 {
-    m_filename             = filename;
-    m_root                 = StringUtils::getPath(StringUtils::removeExtension(m_filename));
-    m_ident                = StringUtils::getBasename(m_root);
-    m_designer             = "";
-    m_screenshot           = "";
-    m_version              = 0;
-    m_track_mesh           = new TriangleMesh();
+    m_filename              = filename;
+    m_root                  = StringUtils::getPath(StringUtils::removeExtension(m_filename));
+    m_ident                 = StringUtils::getBasename(m_root);
+    m_designer              = "";
+    m_screenshot            = "";
+    m_version               = 0;
+    m_track_mesh            = new TriangleMesh();
     m_all_nodes.clear();
     m_all_meshes.clear();
-    m_is_arena             = false;
-    m_camera_far           = 1000.0f;
-    m_quad_graph           = NULL;
-    m_check_manager        = NULL;
-    m_mini_map             = NULL;
-    m_sky_dx               = 0.05f;
-    m_sky_dy               = 0.0f;
+    m_is_arena              = false;
+    m_camera_far            = 1000.0f;
+    m_quad_graph            = NULL;
+    m_check_manager         = NULL;
+    m_mini_map              = NULL;
+    m_sky_particles         = NULL;
+    m_sky_particles_emitter = NULL;
+    m_sky_dx                = 0.05f;
+    m_sky_dy                = 0.0f;
     loadTrackInfo();
 }   // Track
 
@@ -85,6 +90,7 @@ Track::~Track()
     if(m_quad_graph)    delete m_quad_graph;
     if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
+    if(m_sky_particles_emitter) delete m_sky_particles_emitter;
     delete m_track_mesh;
 }   // ~Track
 
@@ -947,6 +953,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         parent->setClearbackBufferColor(m_sky_color);
     }
 
+    
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
@@ -975,6 +982,20 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
 
+    if (UserConfigParams::m_graphical_effects && m_sky_particles != NULL)
+    {
+        const float x = (m_aabb_max.getX() + m_aabb_min.getX())/2.0f;
+        const float z = (m_aabb_max.getZ() + m_aabb_min.getZ())/2.0f;
+        const float size_x = m_aabb_max.getX() - m_aabb_min.getX();
+        const float size_z = m_aabb_max.getZ() - m_aabb_min.getZ();
+        m_sky_particles->setBoxSizeX(size_x);
+        m_sky_particles->setBoxSizeZ(size_z);
+        
+        // FIXME: don't hardcode height
+        printf("&&&& %f %f\n", m_aabb_min.getY(), m_aabb_max.getY());
+        m_sky_particles_emitter = new ParticleEmitter(m_sky_particles, core::vector3df(x, 25.0f, z));
+    }
+    
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
     if(!m_check_manager && race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
@@ -1021,6 +1042,13 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         xml_node.get("texture-percent", &m_sky_texture_percent);
         xml_node.get("speed-x", &m_sky_dx );
         xml_node.get("speed-y", &m_sky_dy);
+        
+        std::string sky_particles;
+        xml_node.get("particles", &sky_particles);
+        if (sky_particles.size() > 0)
+        {
+            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
+        }
 
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")
@@ -1039,12 +1067,25 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         {
             m_sky_type = SKY_BOX;
         }
+        
+        std::string sky_particles;
+        xml_node.get("particles", &sky_particles);
+        if (sky_particles.size() > 0)
+        {
+            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
+        }
     }
     else if (xml_node.getName() == "sky-color")
     {
         m_sky_type = SKY_COLOR;
         xml_node.get("rgb", &m_sky_color);
         
+        std::string sky_particles;
+        xml_node.get("particles", &sky_particles);
+        if (sky_particles.size() > 0)
+        {
+            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
+        }
     }   // if sky-box
 }   // handleSky
 
