@@ -22,6 +22,7 @@
 
 #include "irrlicht.h"
 #include <vector>
+#include <string>
 
 #if ENABLE_NLS
 #  ifdef __APPLE__
