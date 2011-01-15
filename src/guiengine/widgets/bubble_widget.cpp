@@ -17,6 +17,7 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
+#include "utils/translation.hpp"
 
 #include <irrlicht.h>
 using namespace irr::core;
