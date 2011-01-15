@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class Widget; class ListWidget; }
 
 /**
   * \brief Handles the main menu
@@ -29,7 +29,13 @@ namespace GUIEngine { class Widget; }
 class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
 {
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
+    
+    GUIEngine::ListWidget* m_lang_popup;
+    
     MainMenuScreen();
+    
+    void closeLangPopup();
+    
 public:
     
 #ifdef ADDONS_MANAGER
@@ -44,7 +50,16 @@ public:
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();    
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
+    
+    /** 
+     * \brief  Called when escape is pressed.
+     * \return true if the screen should be closed, false if you handled the press another way
+     */
+    virtual bool onEscapePressed();
 };
 
 #endif

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -45,6 +46,7 @@
 
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
 
 using namespace GUIEngine;
 
@@ -65,6 +67,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 
 void MainMenuScreen::loadedFromFile()
 {
+    m_lang_popup = NULL;
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -120,34 +123,110 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 	}
 	else
         w->setText(news_text.c_str());
+    
+    IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
+    irr::gui::ScalableFont* font = GUIEngine::getFont();
+    
+    // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
+    font->draw(_("English"),
+               core::rect<s32>(lang_combo->m_x, lang_combo->m_y,
+                               lang_combo->m_x + lang_combo->m_w*0.9f, // multiply to not go over combo arrow
+                               lang_combo->m_y + lang_combo->m_h),
+               video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
+    
+    // Close popup when focus lost
+    if (m_lang_popup != NULL && !m_lang_popup->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+    {
+        closeLangPopup();
+    }
 }
 #endif
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
+    // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
-    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    if (ribbon == NULL)
+    {
+        // Language selection combo
+        if (name == "lang_combo")
+        {
+            // When the combo is clicked, show a pop-up list with the choices
+            IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
+            
+            m_lang_popup = new ListWidget();
+            m_lang_popup->m_properties[PROP_ID] = "lang_popup";
+            const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
+            
+            const int width = frame_size.Width*0.4f;
+            
+            const int MARGIN_ABOVE_POPUP = 50;
+            const int CLEAR_BOTTOM = 15;
+
+            const int height = lang_combo->m_y - MARGIN_ABOVE_POPUP - CLEAR_BOTTOM;
+            
+            m_lang_popup->m_x = lang_combo->m_x;
+            m_lang_popup->m_y = lang_combo->m_y - height - CLEAR_BOTTOM;
+            m_lang_popup->m_w = width;
+            m_lang_popup->m_h = height;
+            
+            m_lang_popup->add();
+
+            m_lang_popup->m_properties[PROP_ID] = "language_popup";
+            m_lang_popup->addItem("en",    L"English");
+            m_lang_popup->addItem("zh_CN", L"Chinese");
+            m_lang_popup->addItem("ru",    L"Russian");
+            m_lang_popup->addItem("fr",    L"French");
+            m_lang_popup->addItem("he",    L"Hebrew");
+            
+            manualAddWidget(m_lang_popup);
+            
+            m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            m_lang_popup->setSelectionID(0); // TODO: select current language, not first
+            
+            /*
+            delete translations;
+            static int cycle = 0;
+            cycle++;
+            if (cycle > 5) cycle = 1;
+            
+            if (cycle == 1) putenv("LANGUAGE=he");
+            if (cycle == 2) putenv("LANGUAGE=zh_CN");
+            if (cycle == 3) putenv("LANGUAGE=fr");
+            if (cycle == 4) putenv("LANGUAGE=ru");
+            if (cycle == 5) putenv("LANGUAGE=en");
+            
+            translations  = new Translations();
+            GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
+             */
+        }
+        else if (name == "language_popup")
+        {
+            std::string selection = m_lang_popup->getSelectionInternalName();
+
+            closeLangPopup();
+            
+            delete translations;
+            
+            char buffer[1024];
+            snprintf(buffer, 1024, "LANGUAGE=%s", selection.c_str());
+            putenv( buffer );
+            
+            translations = new Translations();
+            GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
+        }
+        
+        return;
+    }
     
+    // ---- A ribbon icon was clicked
+    
+    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     if (selection == "network")
     {
-        delete translations;
-        static int cycle = 0;
-        cycle++;
-        if (cycle > 5) cycle = 1;
-        
-        if (cycle == 1) putenv("LANGUAGE=he");
-        if (cycle == 2) putenv("LANGUAGE=zh_CN");
-        if (cycle == 3) putenv("LANGUAGE=fr");
-        if (cycle == 4) putenv("LANGUAGE=ru");
-        if (cycle == 5) putenv("LANGUAGE=en");
-        
-        translations  = new Translations();
-        GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-        return;
-        
+        // The DEBUG item
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
         static int i = 1;
@@ -195,8 +274,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             scene->setKarts( losers );
         }
     }
-    
-    if (selection == "new")
+    else if (selection == "new")
     {
         StateManager::get()->pushScreen( KartSelectionScreen::getInstance() );
     }
@@ -232,4 +310,40 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
 #endif
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void MainMenuScreen::tearDown()
+{
+    if (m_lang_popup != NULL)
+    {
+        closeLangPopup();
+    }
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+bool MainMenuScreen::onEscapePressed()
+{
+    if (m_lang_popup != NULL)
+    {
+        closeLangPopup();
+        return false;
+    }
+    
+    return true;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void MainMenuScreen::closeLangPopup()
+{
+    assert(m_lang_popup != NULL);
+    
+    m_lang_popup->getIrrlichtElement()->remove();
+    m_lang_popup->elementRemoved();
+    manualRemoveWidget(m_lang_popup);
+    delete m_lang_popup;
+    m_lang_popup = NULL;
 }

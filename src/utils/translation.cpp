@@ -110,8 +110,6 @@ Translations::Translations()
             break;
         }
     }
-    
-    //m_rtl = (isRtl[0] == 'Y');
 
 #endif
 

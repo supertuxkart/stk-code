@@ -31,11 +31,18 @@
         
         <spacer width="10" proportion="1"/>
         
-        <bottombar layout="vertical-row" width="100%" height="10%">
-            <label width="100%" height="100%" id="info_addons"
-               I18N="In the main screen"
-               text="Loading news from stkaddons..."
-               align="center" text_align="center" />
+        <bottombar width="100%" height="10%" layout="horizontal-row">
+            <div proportion="1" height="100%" layout="horizontal-row">
+                <icon-button id="lang_combo" icon="gui/dropdown.png" height="100%" align="center"/>
+            </div>
+            
+            <label proportion="3" height="100%" id="info_addons"
+                   I18N="In the main screen"
+                   text="Loading news from stkaddons..."
+                   align="center" text_align="center" />
+               
+            <placeholder id="empty_for_now" proportion="1">
+            </placeholder>
         </bottombar>
         
     </div>
