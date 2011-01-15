@@ -724,8 +724,16 @@ int handleCmdLine(int argc, char **argv)
 void initUserConfig(char *argv[])
 {
     file_manager            = new FileManager(argv);
-    translations            = new Translations();   // needs file_manager
     user_config             = new UserConfig();     // needs file_manager
+
+    if (UserConfigParams::m_language.toString() != "system")
+    {
+        char buffer[1024];
+        snprintf(buffer, 1024, "LANGUAGE=%s", UserConfigParams::m_language.c_str());
+        putenv( buffer );
+    }
+    
+    translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
 }   // initUserConfig

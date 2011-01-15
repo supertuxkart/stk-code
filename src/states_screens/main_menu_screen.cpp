@@ -126,19 +126,22 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         w->setText(news_text.c_str());
     
     IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-    irr::gui::ScalableFont* font = GUIEngine::getFont();
-    
-    // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-    font->draw(_("English"),
-               core::rect<s32>(lang_combo->m_x, lang_combo->m_y,
-                               lang_combo->m_x + lang_combo->m_w*0.9f, // multiply to not go over combo arrow
-                               lang_combo->m_y + lang_combo->m_h),
-               video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
-    
-    // Close popup when focus lost
-    if (m_lang_popup != NULL && !m_lang_popup->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+    if (lang_combo != NULL)
     {
-        closeLangPopup();
+        irr::gui::ScalableFont* font = GUIEngine::getFont();
+        
+        // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
+        font->draw(_("English"),
+                   core::rect<s32>(lang_combo->m_x, lang_combo->m_y,
+                                   lang_combo->m_x + lang_combo->m_w*0.9f, // multiply to not go over combo arrow
+                                   lang_combo->m_y + lang_combo->m_h),
+                   video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
+        
+        // Close popup when focus lost
+        if (m_lang_popup != NULL && !m_lang_popup->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        {
+            closeLangPopup();
+        }
     }
 }
 #endif
@@ -151,7 +154,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     if (ribbon == NULL)
     {
         // Language selection combo
-        if (name == "lang_combo")
+        if (name == "lang_combo" && m_lang_popup == NULL)
         {
             // When the combo is clicked, show a pop-up list with the choices
             IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
@@ -176,6 +179,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 
             m_lang_popup->m_properties[PROP_ID] = "language_popup";
             
+            // I18N: in the language choice, to select the same language as the OS
+            m_lang_popup->addItem("system", _("System Language"));
+
             const std::vector<std::string>* lang_list = translations->getLanguageList();
             const int amount = lang_list->size();
             for (int n=0; n<amount; n++)
@@ -219,12 +225,22 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             
             delete translations;
             
-            char buffer[1024];
-            snprintf(buffer, 1024, "LANGUAGE=%s", selection.c_str());
-            putenv( buffer );
+            if (selection == "system")
+            {
+                putenv( "LANGUAGE=" );
+            }
+            else
+            {
+                char buffer[1024];
+                snprintf(buffer, 1024, "LANGUAGE=%s", selection.c_str());
+                putenv( buffer );
+            }
             
             translations = new Translations();
             GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
+            
+            UserConfigParams::m_language = selection.c_str();
+            user_config->saveConfig();
         }
         
         return;

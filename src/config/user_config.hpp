@@ -225,7 +225,6 @@ public:
   */
 namespace UserConfigParams
 {
-
     // ---- Audio
     PARAM_PREFIX GroupUserConfigParam        m_audio_group
             PARAM_DEFAULT( GroupUserConfigParam("Audio", "Audio Settings") );
@@ -318,6 +317,8 @@ namespace UserConfigParams
      *  must always be printed. */
     PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
 
+    PARAM_PREFIX bool                       m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
+
     // ---- Networking
     PARAM_PREFIX StringUserConfigParam      m_server_address
             PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress", "Information about last server used") );
@@ -363,7 +364,9 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_server_addons
             PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
 
-    PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
+    PARAM_PREFIX StringUserConfigParam         m_language
+            PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );
+    
     
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
