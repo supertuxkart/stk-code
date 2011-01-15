@@ -42,10 +42,10 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
 // Look-up table for GFX levels
-const bool GFX_ANIM_KARTS[] = {false, true,  true};
-const bool GFX           [] = {false, false, true};
-const bool GFX_WEATHER   [] = {false, false, true};
-const int  GFX_LEVEL_AMOUNT = 3;
+const bool GFX           [] = {false, true,  true,  true};
+const bool GFX_ANIM_KARTS[] = {false, false, true,  true};
+const bool GFX_WEATHER   [] = {false, false, false, true};
+const int  GFX_LEVEL_AMOUNT = 4;
 
 // -----------------------------------------------------------------------------
 

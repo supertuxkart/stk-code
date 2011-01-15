@@ -37,7 +37,7 @@
                 <label width="100%" I18N="In the graphics settings" text="Graphical Effects Settings"/>
                 
                 <!-- FIXME: don't hardcode size -->
-                <gauge id="gfx_level" min_value="1" max_value="3" width="300" height="50"/>
+                <gauge id="gfx_level" min_value="1" max_value="4" width="300" height="50"/>
             </div>
         </div>
         
