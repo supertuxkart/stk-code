@@ -1275,7 +1275,8 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
                 ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "bar.png" );
                 irr_driver->getVideoDriver()->draw2DImage(tex, core::rect<s32>(0, widget.m_y - 40*y_size,
                                                                                framesize.Width, framesize.Height),
-                                                          core::rect<s32>(core::dimension2di(0,0), tex->getSize())
+                                                          core::rect<s32>(core::dimension2di(0,0), tex->getSize()),
+                                                          0, 0, true /* alpha */
                                                           );
             }
             else
