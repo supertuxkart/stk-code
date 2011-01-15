@@ -154,68 +154,53 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     if (ribbon == NULL)
     {
         // Language selection combo
-        if (name == "lang_combo" && m_lang_popup == NULL)
+        if (name == "lang_combo")
         {
-            // When the combo is clicked, show a pop-up list with the choices
-            IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-            
-            m_lang_popup = new ListWidget();
-            m_lang_popup->m_properties[PROP_ID] = "lang_popup";
-            const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
-            
-            const int width = frame_size.Width*0.4f;
-            
-            const int MARGIN_ABOVE_POPUP = 50;
-            const int CLEAR_BOTTOM = 15;
-
-            const int height = lang_combo->m_y - MARGIN_ABOVE_POPUP - CLEAR_BOTTOM;
-            
-            m_lang_popup->m_x = lang_combo->m_x;
-            m_lang_popup->m_y = lang_combo->m_y - height - CLEAR_BOTTOM;
-            m_lang_popup->m_w = width;
-            m_lang_popup->m_h = height;
-            
-            m_lang_popup->add();
-
-            m_lang_popup->m_properties[PROP_ID] = "language_popup";
-            
-            // I18N: in the language choice, to select the same language as the OS
-            m_lang_popup->addItem("system", _("System Language"));
-
-            const std::vector<std::string>* lang_list = translations->getLanguageList();
-            const int amount = lang_list->size();
-            for (int n=0; n<amount; n++)
+            if (m_lang_popup == NULL)
             {
-                // TODO: retrieve a nice name for each language instead of displaying the language code
-                m_lang_popup->addItem((*lang_list)[n], core::stringw((*lang_list)[n].c_str()));
+                // When the combo is clicked, show a pop-up list with the choices
+                IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
+                
+                m_lang_popup = new ListWidget();
+                m_lang_popup->m_properties[PROP_ID] = "lang_popup";
+                const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
+                
+                const int width = frame_size.Width*0.4f;
+                
+                const int MARGIN_ABOVE_POPUP = 50;
+                const int CLEAR_BOTTOM = 15;
+
+                const int height = lang_combo->m_y - MARGIN_ABOVE_POPUP - CLEAR_BOTTOM;
+                
+                m_lang_popup->m_x = lang_combo->m_x;
+                m_lang_popup->m_y = lang_combo->m_y - height - CLEAR_BOTTOM;
+                m_lang_popup->m_w = width;
+                m_lang_popup->m_h = height;
+                
+                m_lang_popup->add();
+
+                m_lang_popup->m_properties[PROP_ID] = "language_popup";
+                
+                // I18N: in the language choice, to select the same language as the OS
+                m_lang_popup->addItem("system", _("System Language"));
+
+                const std::vector<std::string>* lang_list = translations->getLanguageList();
+                const int amount = lang_list->size();
+                for (int n=0; n<amount; n++)
+                {
+                    // TODO: retrieve a nice name for each language instead of displaying the language code
+                    m_lang_popup->addItem((*lang_list)[n], core::stringw((*lang_list)[n].c_str()));
+                }
+
+                manualAddWidget(m_lang_popup);
+                
+                m_lang_popup->setSelectionID( m_lang_popup->getItemID(UserConfigParams::m_language) );
+                m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
             }
-            /*
-            m_lang_popup->addItem("en",    L"English");
-            m_lang_popup->addItem("zh_CN", L"Chinese");
-            m_lang_popup->addItem("ru",    L"Russian");
-            m_lang_popup->addItem("fr",    L"French");
-            m_lang_popup->addItem("he",    L"Hebrew");
-            */
-            manualAddWidget(m_lang_popup);
-            
-            m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            m_lang_popup->setSelectionID(0); // TODO: select current language, not first
-            
-            /*
-            delete translations;
-            static int cycle = 0;
-            cycle++;
-            if (cycle > 5) cycle = 1;
-            
-            if (cycle == 1) putenv("LANGUAGE=he");
-            if (cycle == 2) putenv("LANGUAGE=zh_CN");
-            if (cycle == 3) putenv("LANGUAGE=fr");
-            if (cycle == 4) putenv("LANGUAGE=ru");
-            if (cycle == 5) putenv("LANGUAGE=en");
-            
-            translations  = new Translations();
-            GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-             */
+            else
+            {
+                closeLangPopup();
+            }
         }
         else if (name == "language_popup")
         {
