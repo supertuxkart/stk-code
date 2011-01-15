@@ -22,6 +22,8 @@
 
 #include <vector>
 #include <string>
+#include "guiengine/engine.hpp"
+#include "guiengine/screen.hpp"
 
 /**
   * \ingroup guiengine
@@ -115,6 +117,25 @@ namespace GUIEngine
         
         /** \brief to be called after e.g. a resolution switch */
         void reshowTopMostMenu();
+        
+        template<typename T>
+        void hardResetAndGoToScreen()
+        {                        
+            if (m_game_mode != GAME) GUIEngine::getCurrentScreen()->tearDown();
+            m_menu_stack.clear();
+            
+            GUIEngine::clearScreenCache();
+            
+            T* instance = T::getInstance();
+            
+            m_menu_stack.push_back(instance->getName());
+            setGameState(MENU);
+            
+            switchToScreen(instance->getName().c_str());
+            getCurrentScreen()->init();
+            
+            onTopMostScreenChanged();
+        }
         
         /*  ***********************************
          * methods to override in children *

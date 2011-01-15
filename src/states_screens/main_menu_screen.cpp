@@ -133,6 +133,21 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
     if (selection == "network")
     {
+        delete translations;
+        static int cycle = 0;
+        cycle++;
+        if (cycle > 5) cycle = 1;
+        
+        if (cycle == 1) putenv("LANGUAGE=he");
+        if (cycle == 2) putenv("LANGUAGE=zh_CN");
+        if (cycle == 3) putenv("LANGUAGE=fr");
+        if (cycle == 4) putenv("LANGUAGE=ru");
+        if (cycle == 5) putenv("LANGUAGE=en");
+        
+        translations  = new Translations();
+        GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
+        return;
+        
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
         static int i = 1;

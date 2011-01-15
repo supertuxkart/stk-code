@@ -719,6 +719,15 @@ namespace GUIEngine
     }   // cleanForGame
     
     // ------------------------------------------------------------------------
+    
+    void clearScreenCache()
+    {
+        g_loaded_screens.clearAndDeleteAll();
+        g_current_screen = NULL;
+    }
+    
+    // ------------------------------------------------------------------------
+    
     void switchToScreen(const char* screen_name)
     {    
         needsUpdate.clearWithoutDeleting();

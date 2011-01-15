@@ -148,6 +148,8 @@ namespace GUIEngine
       */
     inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
     
+    void clearScreenCache();
+    
     /**
       * \precondition GUIEngine::init must have been called first
       * \return       the skin object used to render widgets
