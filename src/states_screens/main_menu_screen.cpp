@@ -21,6 +21,7 @@
 #include <string>
 
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -174,12 +175,21 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             m_lang_popup->add();
 
             m_lang_popup->m_properties[PROP_ID] = "language_popup";
+            
+            const std::vector<std::string>* lang_list = translations->getLanguageList();
+            const int amount = lang_list->size();
+            for (int n=0; n<amount; n++)
+            {
+                // TODO: retrieve a nice name for each language instead of displaying the language code
+                m_lang_popup->addItem((*lang_list)[n], core::stringw((*lang_list)[n].c_str()));
+            }
+            /*
             m_lang_popup->addItem("en",    L"English");
             m_lang_popup->addItem("zh_CN", L"Chinese");
             m_lang_popup->addItem("ru",    L"Russian");
             m_lang_popup->addItem("fr",    L"French");
             m_lang_popup->addItem("he",    L"Hebrew");
-            
+            */
             manualAddWidget(m_lang_popup);
             
             m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);

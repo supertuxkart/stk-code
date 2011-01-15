@@ -33,6 +33,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <vector>
 
 #include "irrlicht.h"
 
@@ -46,18 +47,50 @@
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
 
-Translations* translations=NULL;
-bool remove_bom = false;
+Translations* translations = NULL;
+const bool REMOVE_BOM = false;
 
 #ifdef LINUX // m_debug
 #define PACKAGE "supertuxkart"
 #endif
+
+/** The list of available languages; this is global so that it is cached (and remains
+    even if the translations object is deleted and re-created) */
+std::vector<std::string> g_language_list;
+
+// Note : this method is not static because 'g_language_list' is initialized
+//        the first time Translations is constructed (despite being a global)
+const std::vector<std::string>* Translations::getLanguageList() const
+{
+    return &g_language_list;
+}
 
 // ----------------------------------------------------------------------------
 Translations::Translations()
 {
 #ifdef ENABLE_NLS
 
+    if (g_language_list.size() == 0)
+    {
+        std::set<std::string> flist;
+        file_manager->listFiles(flist,
+                                file_manager->getTranslationDir(),
+                                true);
+        
+        // English is always there but won't be found on file system
+        g_language_list.push_back("en");
+        
+        std::set<std::string>::iterator it;
+        for ( it=flist.begin() ; it != flist.end(); it++ )
+        {
+            if (file_manager->fileExists(file_manager->getTranslationDir() + "/" + (*it).c_str() + "/LC_MESSAGES/supertuxkart.mo"))
+            {
+                g_language_list.push_back( *it );
+                // printf("Lang : <%s>\n", (*it).c_str());
+            }
+        }
+    }
+    
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
@@ -165,7 +198,7 @@ const wchar_t* Translations::w_gettext(const char* original)
     //for (int n=0;; n+=4)
 
     wchar_t* out_ptr = (wchar_t*)original_t;
-    if (remove_bom) out_ptr++;
+    if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;

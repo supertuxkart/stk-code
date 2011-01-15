@@ -21,6 +21,7 @@
 #define TRANSLATION_HPP
 
 #include "irrlicht.h"
+#include <vector>
 
 #if ENABLE_NLS
 #  ifdef __APPLE__
@@ -51,6 +52,8 @@ public:
                        Translations();
     const wchar_t     *w_gettext(const char* original);
     bool               isRTLLanguage() const;
+    
+    const std::vector<std::string>* getLanguageList() const;
 };   // Translations
 
 
