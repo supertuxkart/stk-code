@@ -230,6 +230,8 @@ namespace GUIEngine
         /** Set to false if widget is something that should not receive focus */
         bool m_focusable;
         
+        bool m_bottom_bar;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -304,6 +306,8 @@ namespace GUIEngine
           * is kept)
           */
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
+        
+        bool isBottomBar() const { return m_bottom_bar; }
         
         /**
          * \{

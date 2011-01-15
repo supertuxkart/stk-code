@@ -1264,6 +1264,20 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
                                                   SkinConfig::m_render_params["section::neutral"]);
                 }
             }
+            else if (widget.isBottomBar())
+            {
+                const core::dimension2d<u32> framesize = irr_driver->getFrameSize();
+                
+                // bar.png is 128 pixels high
+                const float y_size = (framesize.Height - widget.m_y) / 128.0f;
+                
+                // there's about 40 empty pixels at the top of bar.png
+                ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "bar.png" );
+                irr_driver->getVideoDriver()->draw2DImage(tex, core::rect<s32>(0, widget.m_y - 40*y_size,
+                                                                               framesize.Width, framesize.Height),
+                                                          core::rect<s32>(core::dimension2di(0,0), tex->getSize())
+                                                          );
+            }
             else
             {
                 renderSections( &widget.m_children );

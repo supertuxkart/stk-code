@@ -72,6 +72,12 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& 
                     w->m_show_bounding_box = true;
                     append_to.push_back(w);
                 }
+                else if (!strcmp("bottombar", xml->getNodeName()))
+                {
+                    Widget* w = new Widget(WTYPE_DIV);
+                    w->m_bottom_bar = true;
+                    append_to.push_back(w);
+                }
                 else if (!strcmp("roundedbox", xml->getNodeName()))
                 {
                     Widget* w = new Widget(WTYPE_DIV);
