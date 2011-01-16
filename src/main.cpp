@@ -717,12 +717,9 @@ int handleCmdLine(int argc, char **argv)
 void initUserConfig(char *argv[])
 {
     file_manager            = new FileManager(argv);
-    
-    // FIXME: in which order do we call those? -.-
-    //        the translation manager needs the user config to know if a language preference is set
-    //        the user config needs the translation to translate "Guest"
     user_config             = new UserConfig();     // needs file_manager
-
+    const bool config_ok    = user_config->loadConfig();
+    
     if (UserConfigParams::m_language.toString() != "system")
     {
         char buffer[1024];
@@ -733,6 +730,13 @@ void initUserConfig(char *argv[])
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
+    
+    if (!config_ok || UserConfigParams::m_all_players.size() == 0)
+    {
+        user_config->addDefaultPlayer();
+        user_config->saveConfig();
+    }
+    
 }   // initUserConfig
 
 //=============================================================================

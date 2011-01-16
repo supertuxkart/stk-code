@@ -395,8 +395,8 @@ private:
     std::string        m_filename;
     irr::core::stringw m_warning;
 
-    void  addDefaultPlayer();
 public:
+          /** Create the user config object; does not actually load it, UserConfig::loadConfig needs to be called */
           UserConfig();
          ~UserConfig();
 
@@ -407,6 +407,8 @@ public:
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
     
+    void  addDefaultPlayer();
+
 };   // UserConfig
 
 

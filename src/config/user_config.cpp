@@ -393,11 +393,7 @@ UserConfig::UserConfig()
     m_filename = "config.xml";
     m_warning  = "";
     //m_blacklist_res.clear();
-    if(!loadConfig() || UserConfigParams::m_all_players.size() == 0)
-    {
-        addDefaultPlayer();
-        saveConfig();
-    }
+
 }   // UserConfig
 
 // -----------------------------------------------------------------------------
@@ -423,7 +419,7 @@ void UserConfig::addDefaultPlayer()
     class GuestPlayerProfile : public PlayerProfile
     {
     public:
-        GuestPlayerProfile() : PlayerProfile(L"Guest")
+        GuestPlayerProfile() : PlayerProfile(_("Guest"))
         {
             m_is_guest_account = true;
         }
