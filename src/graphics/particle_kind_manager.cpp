@@ -19,6 +19,7 @@
 
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
+#include <stdexcept>
 
 // ----------------------------------------------------------------------------
 
@@ -50,9 +51,16 @@ ParticleKind* ParticleKindManager::getParticles(const char* name)
     std::map<std::string, ParticleKind*>::iterator i = m_kinds.find(name);
     if (i == m_kinds.end())
     {
-        ParticleKind* newkind = new ParticleKind(file_manager->getDataFile(name));
-        m_kinds[name] = newkind;
-        return newkind;
+        try
+        {
+            ParticleKind* newkind = new ParticleKind(file_manager->getDataFile(name));
+            m_kinds[name] = newkind;
+            return newkind;
+        }
+        catch (std::runtime_error& e)
+        {
+            return NULL;
+        }
     }
     else
     {
