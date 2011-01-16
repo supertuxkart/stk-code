@@ -133,7 +133,8 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
         font->draw(_("English"),
                    core::rect<s32>(lang_combo->m_x, lang_combo->m_y,
-                                   lang_combo->m_x + lang_combo->m_w*0.9f, // multiply to not go over combo arrow
+                                   (int)(lang_combo->m_x 
+                                         + lang_combo->m_w*0.9f), // multiply to not go over combo arrow
                                    lang_combo->m_y + lang_combo->m_h),
                    video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
         
@@ -165,7 +166,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
                 m_lang_popup->m_properties[PROP_ID] = "lang_popup";
                 const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
                 
-                const int width = frame_size.Width*0.4f;
+                const int width = (int)(frame_size.Width*0.4f);
                 
                 const int MARGIN_ABOVE_POPUP = 50;
                 const int CLEAR_BOTTOM = 15;
