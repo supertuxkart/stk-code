@@ -110,10 +110,12 @@ void XMLNode::readXML(io::IXMLReader *xml)
         switch (xml->getNodeType()) 
         {
         case io::EXN_ELEMENT:
-            XMLNode* n = new XMLNode(xml);
-            n->m_file_name = m_file_name;
-            m_nodes.push_back(n);
-            break;
+            {
+                XMLNode* n = new XMLNode(xml);
+                n->m_file_name = m_file_name;
+                m_nodes.push_back(n);
+                break;
+            }
         case io::EXN_ELEMENT_END:
             // End of this element found.
             return;
