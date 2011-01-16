@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-15 15:50-0500\n"
+"POT-Creation-Date: 2011-01-16 11:56-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
-#: src/utils/translation.cpp:97 src/utils/translation.cpp:100
+#: src/utils/translation.cpp:130 src/utils/translation.cpp:133
 msgid "   Is this a RTL language?"
 msgstr ""
 
@@ -134,7 +134,7 @@ msgstr ""
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr ""
 
-#: src/modes/world.cpp:740
+#: src/modes/world.cpp:742
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr ""
@@ -628,7 +628,7 @@ msgid "Energy"
 msgstr ""
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:131
+#: src/states_screens/main_menu_screen.cpp:134
 msgid "English"
 msgstr ""
 
@@ -851,7 +851,7 @@ msgstr ""
 msgid "Graphics"
 msgstr ""
 
-#: src/config/user_config.cpp:426
+#: src/config/user_config.cpp:422
 msgid "Guest"
 msgstr ""
 
@@ -1428,6 +1428,11 @@ msgid ""
 "time"
 msgstr ""
 
+#. I18N: in the language choice, to select the same language as the OS
+#: src/states_screens/main_menu_screen.cpp:186
+msgid "System Language"
+msgstr ""
+
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:730
 msgid "Test"
@@ -1700,11 +1705,11 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/karts/kart.cpp:528 src/karts/kart.cpp:547
+#: src/karts/kart.cpp:531 src/karts/kart.cpp:550
 msgid "You finished the race!"
 msgstr ""
 
-#: src/modes/world.cpp:736
+#: src/modes/world.cpp:738
 msgid "You have been eliminated!"
 msgstr ""
 
@@ -1713,17 +1718,17 @@ msgstr ""
 msgid "You unlocked a new feature!"
 msgstr ""
 
-#: src/karts/kart.cpp:528 src/karts/kart.cpp:547
+#: src/karts/kart.cpp:531 src/karts/kart.cpp:550
 msgid "You won the race!"
 msgstr ""
 
-#: src/config/user_config.cpp:465
+#: src/config/user_config.cpp:461
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
 
-#: src/config/user_config.cpp:475
+#: src/config/user_config.cpp:471
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
@@ -1738,7 +1743,8 @@ msgstr ""
 msgid "[none]"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:1116
+#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
+#: src/states_screens/race_gui.cpp:1117
 msgid "by"
 msgstr ""
 
