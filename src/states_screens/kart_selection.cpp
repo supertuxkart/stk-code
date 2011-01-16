@@ -68,11 +68,16 @@ class FocusDispatcher : public Widget
 {
     KartSelectionScreen* m_parent;
     int m_reserved_id;
+    
+    bool m_is_initialised;
+    
 public:
+    
     FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUTTON)
     {
         m_parent = parent;
         m_supports_multiplayer = true;
+        m_is_initialised = false;
         
         m_x = 0;
         m_y = 0;
@@ -85,11 +90,15 @@ public:
     void setRootID(const int reservedID)
     {
         assert(reservedID != -1);
+        
         m_reserved_id = reservedID;
+        
         if (m_element != NULL)
         {
             m_element->setID(m_reserved_id);
         }
+        
+        m_is_initialised = true;
     }
     
     virtual void add()
@@ -878,6 +887,7 @@ void KartSelectionScreen::loadedFromFile()
 void KartSelectionScreen::init()
 {
     Screen::init();
+    
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
     
@@ -1687,6 +1697,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 // FIXME : clean this mess, this file should not contain so many classes spread all over the place
 EventPropagation FocusDispatcher::focused(const int playerID)
 { 
+    if (!m_is_initialised) return EVENT_LET;
+    
     if(UserConfigParams::m_verbosity>=5)
         std::cout << "[KartSelectionScreen] FocusDispatcher focused by player " << playerID << std::endl;
 
