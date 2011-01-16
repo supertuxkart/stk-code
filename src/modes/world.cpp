@@ -199,6 +199,8 @@ Kart *World::createKart(const std::string &kart_ident, int index,
         break;
     }
     
+    new_kart->setController(controller);
+    
     return new_kart;
 }   // createKart
 
