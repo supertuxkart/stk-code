@@ -229,8 +229,8 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
     float x, y, z;
     
     if (StringUtils::parseString<float>(v[0], &x) &&
-        StringUtils::parseString<float>(v[0], &x) &&
-        StringUtils::parseString<float>(v[0], &x) )
+        StringUtils::parseString<float>(v[1], &y) &&
+        StringUtils::parseString<float>(v[2], &z) )
     {
         value->setX(x);
         value->setY(y);
