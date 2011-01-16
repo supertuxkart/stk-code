@@ -219,10 +219,30 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
     if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=3) return 0;
-    value->setX((float)atof(v[0].c_str()));
-    value->setY((float)atof(v[1].c_str()));
-    value->setZ((float)atof(v[2].c_str()));
+    if (v.size() != 3)
+    {
+        fprintf(stderr, "[XMLNode] WARNING: Expected 3 floating-point values, but found '%s' in file %s\n",
+                s.c_str(), m_file_name.c_str());
+        return 0;
+    }
+    
+    float x, y, z;
+    
+    if (StringUtils::parseString<float>(v[0], &x) &&
+        StringUtils::parseString<float>(v[0], &x) &&
+        StringUtils::parseString<float>(v[0], &x) )
+    {
+        value->setX(x);
+        value->setY(y);
+        value->setZ(z);
+    }
+    else
+    {
+        fprintf(stderr, "[XMLNode] WARNING: Expected 3 floating-point values, but found '%s' in file %s\n",
+                s.c_str(), m_file_name.c_str());
+        return 0;
+    }
+    
     return 1;
 }   // get(Vec3)
 

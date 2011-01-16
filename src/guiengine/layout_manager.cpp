@@ -34,12 +34,28 @@ using namespace gui;
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/string_utils.hpp"
 
 using namespace GUIEngine;
 
 #ifndef round
 # define round(x)  (floor(x+0.5f))
 #endif
+
+/** Like atoi, but on error prints an error message to stderr */
+int atoi_p(const char* val)
+{
+    int i;
+    if (StringUtils::parseString<int>(val, &i))
+    {
+        return i;
+    }
+    else
+    {
+        fprintf(stderr, "[LayoutManager] WARNING: Invalid value '%s' found in XML file where integer was expected\n", val);
+        return 0;
+    }
+}
 
 // ----------------------------------------------------------------------------
 
@@ -210,13 +226,13 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
     // ------ check for given max size
     if (self->m_properties[PROP_MAX_WIDTH].size() > 0)
     {
-        const int max_width = atoi( self->m_properties[PROP_MAX_WIDTH].c_str() );
+        const int max_width = atoi_p( self->m_properties[PROP_MAX_WIDTH].c_str() );
         if (self->m_w > max_width) self->m_w = max_width;
     }
     
     if (self->m_properties[PROP_MAX_HEIGHT].size() > 0)
     {
-        const int max_height = atoi( self->m_properties[PROP_MAX_HEIGHT].c_str() );
+        const int max_height = atoi_p( self->m_properties[PROP_MAX_HEIGHT].c_str() );
         if (self->m_h > max_height) self->m_h = max_height;
     }
 }
@@ -266,7 +282,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
             std::string prop = widgets[n].m_properties[ PROP_PROPORTION ];
             if(prop.size() != 0)
             {
-                total_proportion += atoi( prop.c_str() );
+                total_proportion += atoi_p( prop.c_str() );
                 continue;
             }
             
@@ -307,11 +323,11 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_y[ prop_y.size()-1 ] == '%')
                             {
                                 prop_y = prop_y.substr(0, prop_y.size() - 1);
-                                widgets[n].m_y = (int)(y + atoi(prop_y.c_str())/100.0f * h);
+                                widgets[n].m_y = (int)(y + atoi_p(prop_y.c_str())/100.0f * h);
                             }
                             else
                             {
-                                widgets[n].m_y = y + atoi(prop_y.c_str());
+                                widgets[n].m_y = y + atoi_p(prop_y.c_str());
                             }
                         }
                         else
@@ -341,7 +357,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     widgets[n].m_w = (int)(left_space*fraction);
                     if (widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
                     {
-                        const int max_width = atoi( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
+                        const int max_width = atoi_p( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
                         if (widgets[n].m_w > max_width) widgets[n].m_w = max_width;
                     }
                     
@@ -353,7 +369,7 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                     
                     if (widgets[n].m_properties[PROP_MAX_HEIGHT].size() > 0)
                     {
-                        const int max_height = atoi( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
+                        const int max_height = atoi_p( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
                         if (widgets[n].m_h > max_height) widgets[n].m_h = max_height;
                     }
                     
@@ -366,11 +382,11 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_x[ prop_x.size()-1 ] == '%')
                             {
                                 prop_x = prop_x.substr(0, prop_x.size() - 1);
-                                widgets[n].m_x = (int)(x + atoi(prop_x.c_str())/100.0f * w);
+                                widgets[n].m_x = (int)(x + atoi_p(prop_x.c_str())/100.0f * w);
                             }
                             else
                             {
-                                widgets[n].m_x = x + atoi(prop_x.c_str());
+                                widgets[n].m_x = x + atoi_p(prop_x.c_str());
                             }
                         }
                         else
@@ -420,11 +436,11 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_y[ prop_y.size()-1 ] == '%')
                             {
                                 prop_y = prop_y.substr(0, prop_y.size() - 1);
-                                widgets[n].m_y = (int)(y + atoi(prop_y.c_str())/100.0f * h);
+                                widgets[n].m_y = (int)(y + atoi_p(prop_y.c_str())/100.0f * h);
                             }
                             else
                             {
-                                widgets[n].m_y = y + atoi(prop_y.c_str());
+                                widgets[n].m_y = y + atoi_p(prop_y.c_str());
                             }
                         }
                         else
@@ -466,11 +482,11 @@ void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLeve
                             if (prop_x[ prop_x.size()-1 ] == '%')
                             {
                                 prop_x = prop_x.substr(0, prop_x.size() - 1);
-                                widgets[n].m_x = (int)(x + atoi(prop_x.c_str())/100.0f * w);
+                                widgets[n].m_x = (int)(x + atoi_p(prop_x.c_str())/100.0f * w);
                             }
                             else
                             {
-                                widgets[n].m_x = x + atoi(prop_x.c_str());
+                                widgets[n].m_x = x + atoi_p(prop_x.c_str());
                             }
                         }
                         else
