@@ -238,7 +238,10 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     }
     catch (std::runtime_error& e)
     {
-        fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
+        if (UserConfigParams::m_verbosity >= 3)
+        {
+            fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
+        }
         return NULL;
     }
 }   // getXMLTree
