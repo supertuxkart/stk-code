@@ -416,11 +416,14 @@ void KartProperties::getAllData(const XMLNode * root)
         plunger_node->get("in-face-time",    &v);
         if(v.size()!=3)
         {
-            printf("Invalid plunger in-face-time specification.");
+            fprintf(stderr, "[KartProperties] ERROR: Invalid plunger in-face-time specification.");
         }
-        m_plunger_in_face_duration[0] = v[0];
-        m_plunger_in_face_duration[1] = v[1];
-        m_plunger_in_face_duration[2] = v[2];
+        else
+        {
+            m_plunger_in_face_duration[0] = v[0];
+            m_plunger_in_face_duration[1] = v[1];
+            m_plunger_in_face_duration[2] = v[2];
+        }
     }
 
     if(const XMLNode *zipper_node= root->getNode("zipper"))

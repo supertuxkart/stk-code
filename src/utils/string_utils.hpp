@@ -318,6 +318,26 @@ namespace StringUtils
         std::string s(chars);
         return insertValues(s, v1);
     }
+
+    template<typename T>
+    bool parseString(const char* input, T* output)
+    {
+        std::istringstream conv(input);
+        conv >> *output;
+        
+        // check reading worked correctly and everything was read
+        if (conv.fail() || !conv.eof())
+        {
+            return false;
+        }
+        return true;
+    }
+
+    template<typename T>
+    bool parseString(const std::string& input, T* output)
+    {
+        return parseString(input.c_str(), output);
+    }
     
 } // namespace StringUtils
 

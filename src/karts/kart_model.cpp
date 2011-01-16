@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
+#include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
 float KartModel::UNDEFINED = -99.9f;
@@ -55,7 +56,8 @@ float KartModel::UNDEFINED = -99.9f;
 KartModel::KartModel(bool is_master)
 {
     m_is_master = is_master;
-
+    m_kart = NULL;
+    
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
@@ -188,7 +190,21 @@ KartModel* KartModel::makeCopy()
 void KartModel::attachModel(scene::ISceneNode **node)
 {
     assert(!m_is_master);
-    if(UserConfigParams::m_show_steering_animations)
+    
+    bool animations = true;
+    
+    const int anims = UserConfigParams::m_show_steering_animations;
+    if (anims == ANIMS_NONE)
+    {
+        animations = false;
+    }
+    else if (anims == ANIMS_PLAYERS_ONLY && m_kart != NULL && m_kart->getController() != NULL &&
+             !m_kart->getController()->isPlayerController())
+    {
+        animations = false;
+    }
+    
+    if (animations)
     {
         *node = irr_driver->addAnimatedMesh(m_mesh);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
@@ -202,6 +218,7 @@ void KartModel::attachModel(scene::ISceneNode **node)
         int straight_frame = m_animation_frame[AF_STRAIGHT]>=0 
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
+        printf("straight_frame = %i\n", straight_frame);
         *node = irr_driver->addMesh(m_mesh->getMesh(straight_frame));
     }
 #ifdef DEBUG
@@ -239,7 +256,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     }
     else
     {
-        if (!UserConfigParams::m_show_steering_animations)
+        const int anims = UserConfigParams::m_show_steering_animations;
+        if (anims == ANIMS_NONE ||
+            (anims == ANIMS_PLAYERS_ONLY && m_kart != NULL && m_kart->getController() != NULL &&
+             !m_kart->getController()->isPlayerController()))
         {
             m_mesh->setHardwareMappingHint(scene::EHM_STATIC);
         }
@@ -352,8 +372,11 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
  */
 void KartModel::setAnimation(AnimationFrameType type)
 {
-    if(!UserConfigParams::m_show_steering_animations) return;
-
+    const int anims = UserConfigParams::m_show_steering_animations;
+    if (anims == ANIMS_NONE) return;
+    if (m_kart != NULL && anims == ANIMS_PLAYERS_ONLY&& m_kart->getController() != NULL &&
+        !m_kart->getController()->isPlayerController()) return;
+    
     m_current_animation = type;
     if(m_current_animation==AF_DEFAULT)
     {
@@ -472,7 +495,10 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
 
     if(m_animation_frame[AF_LEFT]<0) return;   // no animations defined
 
-    if(!UserConfigParams::m_show_steering_animations) return;
+    const int anims = UserConfigParams::m_show_steering_animations;
+    if (anims == ANIMS_NONE) return;
+    if (m_kart != NULL && anims == ANIMS_PLAYERS_ONLY && m_kart->getController() != NULL &&
+        !m_kart->getController()->isPlayerController()) return;
 
     // Update animation if necessary
     // -----------------------------

@@ -242,7 +242,7 @@ void cmdLineHelp (char* invocation)
     "                          (Default: 0, OpenGL: 1, Direct3D9: 2, \n"
     "                           Direct3D8: 3, Software: 4, \n"
     "                           Burning's Software: 5, Null device: 6).\n"
-    "       --animations=n     Play karts' animations (Enable: 1, Disable: 0).\n"
+    "       --animations=n     Play karts' animations (Enable for All : 2, Enable for humans only: 1, Disable for all: 0).\n"
     "       --gfx=n            Play other graphical effects like impact stars dance,\n"
     "                           water animations or explosions (Enable: 1, Disable: 0).\n"
     "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
@@ -482,14 +482,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( sscanf(argv[i], "--animations=%d", &n) )
         {
-            if (n)
-            {
-                UserConfigParams::m_show_steering_animations = true;
-            }
-            else
-            {
-                UserConfigParams::m_show_steering_animations = false;
-            }
+            UserConfigParams::m_show_steering_animations = n;
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
@@ -724,6 +717,10 @@ int handleCmdLine(int argc, char **argv)
 void initUserConfig(char *argv[])
 {
     file_manager            = new FileManager(argv);
+    
+    // FIXME: in which order do we call those? -.-
+    //        the translation manager needs the user config to know if a language preference is set
+    //        the user config needs the translation to translate "Guest"
     user_config             = new UserConfig();     // needs file_manager
 
     if (UserConfigParams::m_language.toString() != "system")

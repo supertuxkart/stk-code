@@ -43,10 +43,17 @@ private:
     std::map<std::string, core::stringw> m_attributes;
     /** List of all sub nodes. */
     std::vector<XMLNode *>               m_nodes;
+    
     void readXML(io::IXMLReader *xml);
+    
+    std::string                          m_file_name;
+    
 public:
          XMLNode(io::IXMLReader *xml);
+    
+         /** \throw runtime_error if the file is not found */
          XMLNode(const std::string &filename);
+    
         ~XMLNode();
     const std::string &getName() const {return m_name; }
     const XMLNode     *getNode(const std::string &name) const;

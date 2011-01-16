@@ -28,6 +28,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+class Kart;
 class KartProperties;
 class XMLNode;
 
@@ -130,6 +131,8 @@ private:
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
+    Kart* m_kart;
+    
 public:
                   KartModel(bool is_master);
                  ~KartModel();
@@ -175,5 +178,8 @@ public:
 
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);
+    
+    /** Sets the kart this model is currently used for */
+    void  setKart(Kart* k) { m_kart = k; }
 };   // KartModel
 #endif

@@ -69,10 +69,10 @@ void STKConfig::load(const std::string &filename)
 
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing KartProperties '%s':\n",
-                filename.c_str());
-        fprintf(stderr, "%s", err.what());
+        fprintf(stderr, "FATAL ERROR while reading StkConfig '%s':\n", filename.c_str());
+        fprintf(stderr, "    %s", err.what());
         fprintf(stderr, "\n");
+        exit(1);
     }
     delete root;
 

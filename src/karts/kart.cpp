@@ -71,9 +71,10 @@ Kart::Kart (const std::string& ident, int position,
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
 #endif
-{
-    m_kart_properties      = kart_properties_manager->getKart(ident);
+{    
+    m_kart_properties = kart_properties_manager->getKart(ident);
     assert(m_kart_properties != NULL);
+    
     // We have to take a copy of the kart model, since otherwise
     // the animations will be mixed up (i.e. different instances of
     // the same model will set different animation frames).
@@ -110,6 +111,8 @@ Kart::Kart (const std::string& ident, int position,
     m_speed                   = 0.0f;
     m_wheel_rotation          = 0;
 
+    m_kart_model->setKart(this);
+    
     // Create SFXBase for each custom sound (TODO: add back when properly done)
     /*
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)

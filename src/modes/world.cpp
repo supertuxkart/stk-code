@@ -198,7 +198,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_LEADER:
         break;
     }
-    new_kart->setController(controller);
+    
     return new_kart;
 }   // createKart
 

@@ -423,7 +423,7 @@ void UserConfig::addDefaultPlayer()
     class GuestPlayerProfile : public PlayerProfile
     {
     public:
-        GuestPlayerProfile() : PlayerProfile(_("Guest"))
+        GuestPlayerProfile() : PlayerProfile(L"Guest")
         {
             m_is_guest_account = true;
         }

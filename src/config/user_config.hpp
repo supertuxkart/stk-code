@@ -204,6 +204,9 @@ public:
     float& operator=(const FloatUserConfigParam& v) { m_value = (float)v; return m_value; }
 };
 
+const int ANIMS_NONE = 0;
+const int ANIMS_PLAYERS_ONLY = 1;
+const int ANIMS_ALL = 2;
 
 /**
   * Using X-macros for setting-possible values is not very pretty, but it's a no-maintenance case :
@@ -276,8 +279,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", &m_video_group) );
     
-    PARAM_PREFIX BoolUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "steering_animations", &m_video_group, "Display steering animations in race") );
+    PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
+            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, "steering_animations", &m_video_group,
+                                               "Whether to display kart animations (0=disabled for all; "
+                                               "1=disabled for humans, disabled for AIs; 2=enabled for all") );
 
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );
@@ -326,6 +331,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", "Information about last server used") );
     
     // ---- Graphic Quality
+    // FIXME: those are probably not needed...
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
     
@@ -334,7 +340,7 @@ namespace UserConfigParams
                                                "Whether anisotropic filtering is allowed to be used (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
         PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
-                                       "Whether trilinear filtering is allowed to be used (true or false)") );
+                                           "Whether trilinear filtering is allowed to be used (true or false)") );
     
 
     // ---- Misc

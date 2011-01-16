@@ -43,7 +43,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
 // Look-up table for GFX levels
 const bool GFX           [] = {false, true,  true,  true};
-const bool GFX_ANIM_KARTS[] = {false, false, true,  true};
+const int  GFX_ANIM_KARTS[] = {0,     0,     2,     2   }; // TODO: use new limited anims mode
 const bool GFX_WEATHER   [] = {false, false, false, true};
 const int  GFX_LEVEL_AMOUNT = 4;
 

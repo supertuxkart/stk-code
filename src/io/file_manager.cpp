@@ -231,11 +231,16 @@ io::IXMLReader *FileManager::createXMLReader(const std::string &filename)
  */
 XMLNode *FileManager::createXMLTree(const std::string &filename)
 {
-    io::IXMLReader *xml_reader = createXMLReader(filename);
-    if(!xml_reader) return NULL;
-    XMLNode* node = new XMLNode(xml_reader);
-    xml_reader->drop();
-    return node;
+    try
+    {
+        XMLNode* node = new XMLNode(filename);
+        return node;
+    }
+    catch (std::runtime_error& e)
+    {
+        fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
+        return NULL;
+    }
 }   // getXMLTree
 
 //-----------------------------------------------------------------------------

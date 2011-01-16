@@ -22,8 +22,12 @@
 #include "utils/string_utils.hpp"
 #include "utils/vec3.hpp"
 
+#include <stdexcept>
+
 XMLNode::XMLNode(io::IXMLReader *xml)
 {
+    m_file_name = "[unknown]";
+    
     while(xml->getNodeType()!=io::EXN_ELEMENT && xml->read());
     readXML(xml);
 }   // XMLNode
@@ -34,7 +38,15 @@ XMLNode::XMLNode(io::IXMLReader *xml)
  */
 XMLNode::XMLNode(const std::string &filename)
 {
+    m_file_name = filename;
+    
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
+    
+    if (xml == NULL)
+    {
+        throw std::runtime_error("Cannot find file "+filename);
+    }
+    
     bool is_first_element = true;
     while(xml->read())
     {
@@ -98,7 +110,9 @@ void XMLNode::readXML(io::IXMLReader *xml)
         switch (xml->getNodeType()) 
         {
         case io::EXN_ELEMENT:
-            m_nodes.push_back(new XMLNode(xml));
+            XMLNode* n = new XMLNode(xml);
+            n->m_file_name = m_file_name;
+            m_nodes.push_back(n);
             break;
         case io::EXN_ELEMENT_END:
             // End of this element found.
@@ -255,9 +269,14 @@ int XMLNode::get(const std::string &attribute, int *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    // FIXME: don't use "atoi", if the number in the attribute is not an int we want an error message,
-    //        not silently return 0... easy to get bitten by this
-    *value = atoi(s.c_str());
+
+    if (!StringUtils::parseString<int>(s, value))
+    {
+        fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s\n",
+                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+    
     return 1;
 }   // get(int)
 
@@ -266,7 +285,14 @@ int XMLNode::get(const std::string &attribute, unsigned int *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    *value = atoi(s.c_str());
+    
+    if (!StringUtils::parseString<unsigned int>(s, value))
+    {
+        fprintf(stderr, "[XMLNode] WARNING: Expected uint but found '%s' for attribute '%s' of node '%s' in file %s\n",
+                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+    
     return 1;
 }   // get(unsigned int)
 
@@ -275,7 +301,14 @@ int XMLNode::get(const std::string &attribute, float *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    *value = (float)atof(s.c_str());
+    
+    if (!StringUtils::parseString<float>(s, value))
+    {
+        fprintf(stderr, "[XMLNode] WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s\n",
+                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+        
     return 1;
 }   // get(int)
 
@@ -323,9 +356,19 @@ int XMLNode::get(const std::string &attribute,
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
-    for(unsigned int i=0; i<v.size(); i++)
+    
+    const unsigned int count = v.size();
+    for (unsigned int i=0; i<count; i++)
     {
-        value->push_back((float)atof(v[i].c_str()));
+        float curr;
+        if (!StringUtils::parseString<float>(v[i], &curr))
+        {
+            fprintf(stderr, "[XMLNode] WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s\n",
+                    v[i].c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+            return 0;
+        }
+        
+        value->push_back(curr);
     }
     return value->size();
 }   // get(vector<float>)
@@ -344,9 +387,19 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
-    for(unsigned int i=0; i<v.size(); i++)
+    
+    const unsigned int count = v.size();
+    for (unsigned int i=0; i<count; i++)
     {
-        value->push_back(atoi(v[i].c_str()));
+        int val;
+        if (!StringUtils::parseString<int>(v[i], &val))
+        {
+            fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s'\n",
+                    v[i].c_str(), attribute.c_str(), m_name.c_str());
+            return 0;
+        }
+        
+        value->push_back(val);
     }
     return value->size();
 }   // get(vector<int>)
