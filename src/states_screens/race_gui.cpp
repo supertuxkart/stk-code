@@ -1113,6 +1113,7 @@ void RaceGUI::drawGlobalMusicDescription()
     core::stringw thetext_composer;
     if (mi->getComposer()!="")
     {
+        // I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
         thetext_composer = _("by");
         thetext_composer += " ";
         thetext_composer += mi->getComposer().c_str();
