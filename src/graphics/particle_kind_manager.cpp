@@ -59,6 +59,7 @@ ParticleKind* ParticleKindManager::getParticles(const char* name)
         }
         catch (std::runtime_error& e)
         {
+            (void)e;  // avoid compiler warning
             return NULL;
         }
     }
