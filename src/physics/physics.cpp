@@ -21,6 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "network/race_state.hpp"
+#include "graphics/stars.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -135,6 +136,11 @@ void Physics::update(float dt)
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
+                // Only explode a bowling ball if the target does not 
+                // the stars shown
+                if(p->a->getPointerFlyable()->getType()
+                    !=PowerupManager::POWERUP_BOWLING                     ||
+                    !p->b->getPointerKart()->getStarEffect()->isEnabled()    )
                 p->a->getPointerFlyable()->hit(p->b->getPointerKart());
             }
             else                                     // projectile hits projectile

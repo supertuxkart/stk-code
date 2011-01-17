@@ -96,6 +96,8 @@ public:
     const float getAnimationTimer() const {return m_timer;}
     /** Returns true if the kart is eliminated. */
     bool        isEliminated     () const {return m_eliminated;}
+    /** Returns a pointer to the stars effect. */
+    const Stars *getStarEffect   () const {return m_stars_effect; }
     void        eliminate        ();
 
 };   // EmergencyAnimation

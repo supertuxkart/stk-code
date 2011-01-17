@@ -158,6 +158,9 @@ public:
     void         setHasHit   () { m_has_hit_something = true; }
     void         reset       () { Moveable::reset();          }
     bool         isOwnerImmunity(const Kart *kart_hit) const;
+    /** Returns the type of flyable. */
+    PowerupManager::PowerupType
+                  getType() const {return m_type;}
     virtual const char*  getExplosionSound() const { return "explosion"; }
     /** Indicates if an explosion needs to be added if this flyable
       * is removed. */
