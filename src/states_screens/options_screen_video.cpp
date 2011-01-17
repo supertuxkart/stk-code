@@ -134,11 +134,37 @@ void OptionsScreenVideo::init()
         
         const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
         const int amount = modes.size();
+        
+        bool found_config_res = false;
+        
+        // for some odd reason, irrlicht sometimes fails to erport the good old standard resolutions
+        // those are always useful for windowed mode
+        bool found_800_600 = false;
+        bool found_1024_640 = false;
+        bool found_1024_768 = false;
+        
         for(int n=0; n<amount; n++)
         {
             const int w = modes[n].width;
             const int h = modes[n].height;
             const float ratio = (float)w / h;
+            
+            if (w == UserConfigParams::m_width && h == UserConfigParams::m_height)
+            {
+                found_config_res = true;
+            }
+            else if (w == 800 && h == 600)
+            {
+                found_800_600 = true;
+            }
+            else if (w == 1024 && h == 640)
+            {
+                found_1024_640 = true;
+            }
+            else if (w == 1024 && h == 768)
+            {
+                found_1024_768 = true;
+            }
             
             char name[32];
             sprintf( name, "%ix%i", w, h );
@@ -154,6 +180,40 @@ void OptionsScreenVideo::init()
             else                                          res->addItem(name, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
         } // next resolution
+        
+        if (!found_config_res)
+        {
+            const int w = UserConfigParams::m_width;
+            const int h = UserConfigParams::m_height;
+            const float ratio = (float)w / h;
+            
+            char name[32];
+            sprintf( name, "%ix%i", w, h );
+            
+#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
+            
+            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(name, name, "/gui/screen54.png");
+            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(name, name, "/gui/screen43.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(name, name, "/gui/screen1610.png");
+            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(name, name, "/gui/screen53.png");
+            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(name, name, "/gui/screen32.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(name, name, "/gui/screen169.png");
+            else                                          res->addItem(name, name, "/gui/screen_other.png");
+#undef ABOUT_EQUAL
+        }
+        
+        if (!found_800_600)
+        {
+            res->addItem("800x600", "800x600", "/gui/screen43.png");
+        }
+        if (!found_1024_640)
+        {
+            res->addItem("1024x640", "1024x640", "/gui/screen1610.png");
+        }
+        if (!found_1024_768)
+        {
+            res->addItem("1024x768", "1024x768", "/gui/screen43.png");
+        }
         
     } // end if not inited
     
@@ -176,19 +236,16 @@ void OptionsScreenVideo::init()
     }
     
     // ---- select current resolution every time
-    const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
-    const int amount = modes.size();
-    for(int n=0; n<amount; n++)
+    const std::vector<ItemDescription>& items = res->getItems();
+    const int amount = items.size();
+    
+    char searching_for[32];
+    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_width, (int)UserConfigParams::m_height);
+    
+    for (int n=0; n<amount; n++)
     {
-        const int w = modes[n].width;
-        const int h = modes[n].height;
-        
-        //char name[32];
-        //sprintf( name, "%ix%i", w, h );
-        
-        if(w == UserConfigParams::m_width && h == UserConfigParams::m_height)
+        if (items[n].m_code_name == searching_for)
         {
-            //std::cout << "************* Detected right resolution!!! " << n << "\n";
             // that's the current one
             res->setSelection(n, PLAYER_ID_GAME_MASTER, false);
             break;
