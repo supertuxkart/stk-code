@@ -26,6 +26,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/stars.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
@@ -242,7 +243,10 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
         Kart *kart = world->getKart(i);
+        // If a kart has star effect shown, the kart is immune, so
+        // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner || 
+            kart->getStarEffect()->isEnabled()     ||
             kart->playingEmergencyAnimation() ) continue;
         btTransform t=kart->getTrans();
 
