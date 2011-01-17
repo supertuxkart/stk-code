@@ -52,13 +52,18 @@ s32 IFileSystem_copyFileToFile(IWriteFile* dst, IReadFile* src)
 /** Extracts all files from the zip archive 'from' to the directory 'to'.
  *  \param from A zip archive.
  *  \param to The destination directory.
+ *  \return True if successful.
  */
 bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false, 
-                                   /*ignorePath*/true);
+    if(!file_system->addZipFileArchive(from.c_str(), 
+                                       /*ignoreCase*/false, 
+                                       /*ignorePath*/true)  )
+    {
+        return false;
+    }
 
     // Get the recently added archive, which is necessary to get a 
     // list of file in the zip archive.
