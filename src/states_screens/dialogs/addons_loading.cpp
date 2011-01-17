@@ -96,10 +96,6 @@ GUIEngine::EventPropagation
             m_progress->setVisible(true);
             // Change the 'back' button into a 'cancel' button.
             m_back_button->setText(_("Cancel"));
-            //m_progress->m_h = m_install_button->m_h;
-            //m_progress->m_x = m_install_button->m_x;
-            //m_progress->m_y = m_install_button->m_y;
-            //m_progress->m_w = m_install_button->m_w;
             m_install_button->setVisible(false);
             startDownload();
         }
@@ -133,7 +129,7 @@ void AddonsLoading::onUpdate(float delta)
             doInstall();
             return;
         }
-    }
+    }   // if(m_progress->isVisible())
 
     // See if the icon is loaded (but not yet displayed)
     if(!m_icon_shown && m_addon.iconReady())
@@ -166,19 +162,31 @@ void AddonsLoading::doInstall()
     if(!m_addon.isInstalled() || m_addon.needsUpdate())
     {
         error = !addons_manager->install(m_addon);
+        if(error)
+        {
+            core::stringw msg = StringUtils::insertValues(
+                _("Problems installing the addon '%s'."),
+                core::stringw(m_addon.getName().c_str()));
+            m_state->setText(msg.c_str());
+        }
     }
     else
     {
         error = !addons_manager->uninstall(m_addon);
+        if(error)
+        {
+            core::stringw msg = StringUtils::insertValues(
+                _("Problems removing the addon '%s'."),
+                core::stringw(m_addon.getName().c_str()));
+            m_state->setText(msg.c_str());
+        }
     }
+
     if(error)
     {
-        core::stringw msg = StringUtils::insertValues(
-            _("Problems installing the addon '%s', it might not work."),
-            core::stringw(m_addon.getName().c_str()));
-        m_state->setText(msg.c_str());
         m_progress->setVisible(false);
         m_install_button->setVisible(true);
+        m_install_button->setText(_("Try again"));
     }
     else
     {
