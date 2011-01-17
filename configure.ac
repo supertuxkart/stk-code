@@ -365,7 +365,6 @@ fi
 # Bullet physics
 # ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
-SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
 bullet_LIBS="-Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
@@ -398,7 +397,6 @@ case "${host}" in
   enet_LIBS="-Lenet -lenet"
   ;;
 esac
-SUMMARY="$SUMMARY\nUsing enet network support."
 ENETTREE="src/enet"
 
 # =================
@@ -410,7 +408,7 @@ AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
               [This option is used to enable/disable addons support])])
 if test "x$with_addons" == "xyes" ; then
     PKG_CHECK_MODULES(LIBCURL, libcurl >= 0.1)
-    echo "STK will compile with addons support"
+    SUMMARY="$SUMMARY\nEnabling addons support."
     AC_DEFINE(ADDONS_MANAGER)
 fi
 # ==========================================
@@ -445,7 +443,9 @@ AC_SUBST(ENETTREE)
 AC_CONFIG_FILES([                   \
  Makefile                           \
  data/Makefile                      \
+ data/challenges/Makefile           \
  data/fonts/Makefile                \
+ data/gfx/Makefile                  \
  data/grandprix/Makefile            \
  data/gui/Makefile                  \
  data/karts/Makefile                \
