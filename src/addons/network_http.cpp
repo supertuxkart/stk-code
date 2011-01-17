@@ -174,6 +174,7 @@ void NetworkHttp::checkNewServer(const XMLNode *xml)
  */
 void NetworkHttp::updateNews(const XMLNode *xml)
 {
+    bool error = true;
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
@@ -181,7 +182,11 @@ void NetworkHttp::updateNews(const XMLNode *xml)
         std::string news;
         node->get("text", &news);
         m_news.set(news);
+        error = false;
     }
+    if(error)
+        m_news.set("Can't access stkaddons server...");
+    
 }   // updateNews
 
 // ----------------------------------------------------------------------------
@@ -238,7 +243,8 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
                                        bool is_asynchron)
 {
-printf("Downloading %s\n", file.c_str());
+    if(UserConfigParams::m_verbosity>=3)
+        printf("Downloading %s\n", file.c_str());
 	CURL *session = curl_easy_init();
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;

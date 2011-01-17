@@ -57,7 +57,8 @@ bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false, false);
+    file_system->addZipFileArchive(from.c_str(), /*ignoreCase*/false, 
+                                   /*ignorePath*/true);
 
     // Get the recently added archive, which is necessary to get a 
     // list of file in the zip archive.
@@ -65,12 +66,14 @@ bool extract_zip(const std::string &from, const std::string &to)
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
     const io::IFileList *zip_file_list = zip_archive->getFileList();
     // Copy all files from the zip archive to the destination
+    bool error = false;
     for(unsigned int i=0; i<zip_file_list->getFileCount(); i++)
     {
         const std::string current_file=zip_file_list->getFileName(i).c_str();
         std::cout << current_file << std::endl;
         if(zip_file_list->isDirectory(i)) continue;
         if(current_file[0]=='.') continue;
+        const std::string base = StringUtils::getBasename(current_file);
 
         IReadFile* src_file  = 
             file_system->createAndOpenFile(current_file.c_str());
@@ -78,17 +81,19 @@ bool extract_zip(const std::string &from, const std::string &to)
         {
             printf("Can't read file '%s'.\n", current_file.c_str());
             printf("This is ignored, but the addon might not work.\n");
+            error = true;
             continue;
         }
 
         IWriteFile* dst_file = 
-            file_system->createAndWriteFile((to+"/"+current_file).c_str());
+            file_system->createAndWriteFile((to+"/"+base).c_str());
         if(dst_file == NULL)
         {
             printf("Couldn't create the file '%s'.\n",
                     (to+"/"+current_file).c_str());
             printf("The directory might not exist.\n");
             printf("This is ignored, but the addon might not work.\n");
+            error = true;
             continue;
         }
 
@@ -97,6 +102,7 @@ bool extract_zip(const std::string &from, const std::string &to)
             printf("Could not copy '%s' from archive '%s'.\n",
                    current_file.c_str(), from.c_str());
             printf("This is ignored, but the addon might not work.\n");
+            error = true;
         }
         dst_file->drop();
         src_file->drop();
@@ -109,6 +115,6 @@ bool extract_zip(const std::string &from, const std::string &to)
     // on removing it. getAbsolutePath will convert all \ to /.
     file_system->removeFileArchive(file_system->getAbsolutePath(from.c_str()));
     
-    return true;
+    return !error;
 }   // extract_zip
 #endif

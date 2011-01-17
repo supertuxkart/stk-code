@@ -724,6 +724,7 @@ bool FileManager::removeFile(const std::string &name) const
  *  easily recursively delete further subdirectories, but this is commented
  *  out atm (to limit the amount of damage in case of a bug).
  *  \param name Directory name to remove.
+ *  \param return True if removal was successful.
  */
 bool FileManager::removeDirectory(const std::string &name) const
 {
@@ -750,7 +751,7 @@ bool FileManager::removeDirectory(const std::string &name) const
 #ifdef WIN32
     return ::RemoveDirectory(name.c_str())==TRUE;
 #else
-    return remove(name.c_str());
+    return remove(name.c_str())==0;
 #endif
 }   // remove directory
 

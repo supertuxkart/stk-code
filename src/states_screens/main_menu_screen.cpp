@@ -118,12 +118,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const std::string &news_text = network_http->getNewsMessage();
-	if(news_text == "")
-	{
-	    w->setText("Can't access stkaddons server...");
-	}
-	else
-        w->setText(news_text.c_str());
+    w->setText(news_text.c_str());
     
     IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
     if (lang_combo != NULL)

@@ -48,6 +48,9 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_icon           = getWidget<IconButtonWidget> ("icon"    );
     m_progress       = getWidget<ProgressBarWidget>("progress");
     m_install_button = getWidget<ButtonWidget>     ("install" );
+    m_back_button    = getWidget<ButtonWidget>     ("cancel"  );
+    m_state          = getWidget<LabelWidget>      ("state"   );
+
     if(m_progress)
         m_progress->setVisible(false);
     
@@ -91,6 +94,8 @@ GUIEngine::EventPropagation
         {
             m_progress->setValue(0);
             m_progress->setVisible(true);
+            // Change the 'back' button into a 'cancel' button.
+            m_back_button->setText(_("Cancel"));
             //m_progress->m_h = m_install_button->m_h;
             //m_progress->m_x = m_install_button->m_x;
             //m_progress->m_y = m_install_button->m_y;
@@ -116,15 +121,15 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
-            // TODO: show a message in the interface
-            fprintf(stderr, "[Addons] Failed to download '%s'\n", 
-                    m_addon.getZipFileName().c_str());
-            dismiss();
+            m_state->setText(_("Donwload failed.\n"));
+            m_back_button->setText(_("Back"));
             return;
         }
         else if(progress>=1.0f)
         {
-            printf("Download finished.\n");
+            m_back_button->setText(_("Back"));
+            // No sense to update state text, since it all
+            // happens before the GUI is refrehsed.
             doInstall();
             return;
         }
@@ -157,17 +162,30 @@ void AddonsLoading::startDownload()
  */
 void AddonsLoading::doInstall()
 {
+    bool error=false;
     if(!m_addon.isInstalled() || m_addon.needsUpdate())
     {
-        addons_manager->install(m_addon);
+        error = !addons_manager->install(m_addon);
     }
     else
     {
-        addons_manager->uninstall(m_addon);
+        error = !addons_manager->uninstall(m_addon);
     }
-    // The list of the addon screen needs to be updated to correctly
-    // display the newly (un)installed addon.
-    AddonsScreen::getInstance()->loadList();
-    dismiss();
+    if(error)
+    {
+        core::stringw msg = StringUtils::insertValues(
+            _("Problems installing the addon '%s', it might not work."),
+            core::stringw(m_addon.getName().c_str()));
+        m_state->setText(msg.c_str());
+        m_progress->setVisible(false);
+        m_install_button->setVisible(true);
+    }
+    else
+    {
+        // The list of the addon screen needs to be updated to correctly
+        // display the newly (un)installed addon.
+        AddonsScreen::getInstance()->loadList();
+        dismiss();
+    }
 }   // doInstall
 #endif

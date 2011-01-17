@@ -77,12 +77,11 @@ public:
     const Addon* getAddon(const std::string &id) const;
     int   getAddonIndex(const std::string &id) const;
 
-    /** Install or upgrade the selected addon. */
-    void install(const Addon &addon);
+    bool install(const Addon &addon);
 
     /** Uninstall the selected addon. This method will remove all the 
     *  directory of the addon.*/
-    void uninstall(const Addon &addon);
+    bool uninstall(const Addon &addon);
 
     /** Get the install state (if it is the download, unzip...)*/
     const std::string& getDownloadStateAsStr() const;

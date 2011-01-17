@@ -275,7 +275,13 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 }   // getAddonIndex
 
 // ----------------------------------------------------------------------------
-void AddonsManager::install(const Addon &addon)
+/** Installs or updates (i.e. = install on top of an existing installation) an 
+ *  addon. It checks for the directories and then unzips the file (which must 
+ *  already have been downloaded).
+ *  \param addon Addon data for the addon to install.
+ *  \return true if installation was successful.
+ */
+bool AddonsManager::install(const Addon &addon)
 {
     bool success=true;
     const std::string &id = addon.getId();
@@ -293,7 +299,7 @@ void AddonsManager::install(const Addon &addon)
         // TODO: show a message in the interface
         std::cerr << "[Addons] Failed to unzip '" << from << "' to '" 
                   << to << "'\n";
-        return;
+        return false;
     }
 
     int index = getAddonIndex(addon.getId());
@@ -317,7 +323,34 @@ void AddonsManager::install(const Addon &addon)
         }
     }
     saveInstalled(addon.getType());
+    return true;
 }   // install
+
+// ----------------------------------------------------------------------------
+/** Removes all files froma login.
+ *  \param addon The addon to be removed.
+ *  \return True if uninstallation was successful.
+ */
+bool AddonsManager::uninstall(const Addon &addon)
+{
+    std::cout << "[Addons] Uninstalling <" 
+              << addon.getName() << ">\n";
+
+    // addon is a const reference, and to avoid removing the const, we
+    // find the proper index again to modify the installed state
+    int index = getAddonIndex(addon.getId());
+    assert(index>=0 && index < (int)m_addons_list.getData().size());
+    m_addons_list.getData()[index].setInstalled(false);
+
+    //write the xml file with the informations about installed karts
+    std::string name      = addon.getType()+"s/"+addon.getId();
+    std::string dest_file = file_manager->getAddonsFile(name);
+
+    //remove the addons directory
+    bool error = !file_manager->removeDirectory(dest_file);
+    saveInstalled(addon.getType());
+    return !error;
+}   // uninstall
 
 // ----------------------------------------------------------------------------
 void AddonsManager::saveInstalled(const std::string &type)
@@ -345,31 +378,6 @@ void AddonsManager::saveInstalled(const std::string &type)
     else if(type=="track")
         track_manager->loadTrackList();
 }   // saveInstalled
-
-// ----------------------------------------------------------------------------
-/** Removes all files froma login.
-   \param addon The addon to be removed.
- */
-void AddonsManager::uninstall(const Addon &addon)
-{
-    std::cout << "[Addons] Uninstalling <" 
-              << addon.getName() << ">\n";
-
-    // addon is a const reference, and to avoid removing the const, we
-    // find the proper index again to modify the installed state
-    int index = getAddonIndex(addon.getId());
-    assert(index>=0 && index < (int)m_addons_list.getData().size());
-    m_addons_list.getData()[index].setInstalled(false);
-
-    //write the xml file with the informations about installed karts
-    std::string name=addon.getType()+"s/"+addon.getId();
-    std::string dest_file = file_manager->getAddonsFile(name);
-
-    //remove the addons directory
-    file_manager->removeDirectory(dest_file);
-    saveInstalled(addon.getType());
-
-}   // uninstall
 
 
 #endif
