@@ -786,9 +786,18 @@ public:
             // Random kart
             scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
             w3->clearModels();
-            w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f) );
+            w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f), Vec3(35.0f, 35.0f, 35.0f) );
             w3->update(0);
             m_parent->m_kart_widgets[playerID].m_kart_name->setText( _("Random Kart") );
+        }
+        else if (selectionID == "locked")
+        {
+            w3->clearModels();
+            w3->addModel(irr_driver->getAnimatedMesh( file_manager->getDataDir() + "/models/chest.b3d" )->getMesh(20),
+                         Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
+            w3->update(0);
+            
+            m_parent->m_kart_widgets[playerID].m_kart_name->setText( _("Locked : solve active challenges to gain access to more!") );
         }
         else
         {
@@ -799,7 +808,7 @@ public:
                 const KartModel &kart_model = kp->getMasterKartModel();
                 
                 w3->clearModels();
-                w3->addModel( kart_model.getModel(), Vec3(0,0,0), 
+                w3->addModel( kart_model.getModel(), Vec3(0,0,0), Vec3(35.0f, 35.0f, 35.0f),
                               kart_model.getBaseFrame() );
                 w3->addModel( kart_model.getWheelModel(0), 
                               kart_model.getWheelGraphicsPosition(0) );

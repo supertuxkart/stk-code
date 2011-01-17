@@ -45,6 +45,7 @@ namespace GUIEngine
         
         ptr_vector<scene::IMesh, REF> m_models;
         std::vector<Vec3> m_model_location;
+        std::vector<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
         
         video::ITexture* m_texture;
@@ -62,7 +63,11 @@ namespace GUIEngine
         
         void add();
         void clearModels();
-        void addModel(irr::scene::IMesh* mesh, const Vec3& location = Vec3(0,0,0), const int frame=-1);
+        void addModel(irr::scene::IMesh* mesh,
+                      const Vec3& location = Vec3(0,0,0),
+                      const Vec3& scale = Vec3(1,1,1),
+                      const int frame=-1);
+        
         void update(float delta);
         
         /** Disables any model rotation */

@@ -205,6 +205,7 @@ public:
           */
         void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
                            std::vector<Vec3>& mesh_location,
+                           std::vector<Vec3>& mesh_scale,
                            const std::vector<int>& model_frames);
         
         /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
