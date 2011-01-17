@@ -1477,7 +1477,7 @@ void Kart::loadData()
     try
     {
         m_nitro  = new ParticleEmitter(
-                        new ParticleKind(file_manager->getDataFile("nitro.xml")),
+                        new ParticleKind(file_manager->getGfxFile("nitro.xml")),
                         position, getNode());
     }
     catch (std::runtime_error& e)

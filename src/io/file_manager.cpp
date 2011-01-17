@@ -356,7 +356,11 @@ std::string FileManager::getDataFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
 }   // getDataFile
-
+//-----------------------------------------------------------------------------
+std::string FileManager::getGfxFile(const std::string& fname) const
+{
+    return m_root_dir+"/data/gfx/"+fname;
+}
 //-----------------------------------------------------------------------------
 /** If the directory specified in path does not exist, it is created.
  * \params path Directory to test.

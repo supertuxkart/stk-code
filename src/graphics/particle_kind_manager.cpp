@@ -53,7 +53,7 @@ ParticleKind* ParticleKindManager::getParticles(const char* name)
     {
         try
         {
-            ParticleKind* newkind = new ParticleKind(file_manager->getDataFile(name));
+            ParticleKind* newkind = new ParticleKind(file_manager->getGfxFile(name));
             m_kinds[name] = newkind;
             return newkind;
         }
