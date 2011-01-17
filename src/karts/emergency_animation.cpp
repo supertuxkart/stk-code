@@ -169,6 +169,7 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     {
         m_stars_effect->showFor(6.0f);
     }
+    m_kart->getAttachment()->clear();
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
