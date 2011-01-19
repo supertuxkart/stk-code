@@ -49,6 +49,7 @@ DEFINE_SCREEN_SINGLETON( TutorialScreen );
 
 TutorialScreen::TutorialScreen() : Screen("tutorial.stkgui")
 {
+    m_tutorial_manager = new TutorialManager();
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -85,24 +86,23 @@ void TutorialScreen::init()
 
     // Add the icons to our list
     tutorials_list->setIcons(m_icon_bank);
+
     // Re-build track list everytime (accounts for locking changes, etc.)
     //tutorials_list->clearItems();
 
-/*    const std::vector<const Challenge*>& activeTutorials = tutorial_manager->getActiveChallenges();
-    const std::vector<const Challenge*>& solvedTutorials = tutorial_manager->getUnlockedFeatures();
-    const std::vector<const Challenge*>& lockedTutorials = tutorial_manager->getLockedChallenges();
+    const std::vector<const Tutorial*>& m_tutorials_list = m_tutorial_manager->getTutorialsList();
 
-    const int activeTutorialAmount = activeTutorials.size();
-    const int solvedTutorialAmount = solvedTutorials.size();
-    const int lockedTutorialAmount = lockedTutorials.size();
-*/
 
+    for (int n=0; n<= (int)m_tutorials_list.size(); n++){
+        tutorials_list->addItem(BASIC_DRIVING, "  Basic Driving" , 0);
+    }
+    
     // FIXME Hard coded tutorial options
-    tutorials_list->addItem(BASIC_DRIVING, "  Basic Driving" , 0);
+    /*tutorials_list->addItem(BASIC_DRIVING, "  Basic Driving" , 0);
     tutorials_list->addItem(SHARP_TURN, "  Sharp Turn" , 0);
     tutorials_list->addItem(NITRO, "  Nitro" , 0 );
     tutorials_list->addItem(COLLECTIBLE_WEAPONS, "  Collectible Weapons" , 0);
-    tutorials_list->addItem(SHOOTING_BACKWARDS, "  Shooting Backwards" , 0);
+    tutorials_list->addItem(SHOOTING_BACKWARDS, "  Shooting Backwards" , 0);*/
 
     /*    for (int i=0;i<5;i++)
     {
@@ -165,9 +165,9 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
             // many if tests in other places (e.g. if network_game call
             // network_manager else call race_manager).
             network_manager->initCharacterDataStructures();
-
+            
             // Launch tutorial
-            //m_tutorial_manager->getTutorial(selection)->setRace();
+            m_tutorial_manager->getTutorial(selection)->setRace();
             
             // FIXME this code have to be in Tutorial class (and loaded from file xD)
             RaceManager::MajorRaceModeType m_major;
