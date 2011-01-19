@@ -78,6 +78,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
     m_original_type = m_type;
     setType(type);
     m_node->setMesh(mesh);
+    World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
@@ -94,6 +95,7 @@ void Item::switchBack()
     setType(m_original_type);
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);
+    World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setRotation(m_original_hpr.toIrrHPR());
 }   // switchBack
 
