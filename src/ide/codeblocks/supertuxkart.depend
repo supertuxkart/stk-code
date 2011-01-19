@@ -5114,7 +5114,7 @@
 
 1291818153 /home/aeonphyxius/projects/games/supertuxkart/src/addons/zip.hpp
 
-1292582203 /home/aeonphyxius/projects/games/supertuxkart/src/io/file_manager.hpp
+1295260963 /home/aeonphyxius/projects/games/supertuxkart/src/io/file_manager.hpp
 	<string>
 	<vector>
 	<set>
@@ -5122,7 +5122,7 @@
 	"io/xml_node.hpp"
 	"utils/no_copy.hpp"
 
-1291818096 /home/aeonphyxius/projects/games/supertuxkart/src/io/xml_node.hpp
+1295260963 /home/aeonphyxius/projects/games/supertuxkart/src/io/xml_node.hpp
 	"utils/no_copy.hpp"
 	<string>
 	<map>
@@ -5137,8 +5137,9 @@
 	"network/remote_kart_info.hpp"
 	"utils/no_copy.hpp"
 
-1291818091 /home/aeonphyxius/projects/games/supertuxkart/src/network/remote_kart_info.hpp
+1293539820 /home/aeonphyxius/projects/games/supertuxkart/src/network/remote_kart_info.hpp
 	<string>
+	"irrlicht.h"
 
 1291818080 /home/aeonphyxius/projects/games/supertuxkart/src/tracks/track_manager.hpp
 	<string>
@@ -5167,7 +5168,7 @@
 	"karts/kart_properties.hpp"
 	"utils/no_copy.hpp"
 
-1291818075 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties.hpp
+1294170373 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties.hpp
 	<string>
 	<vector>
 	"irrlicht.h"
@@ -5228,13 +5229,13 @@
 1291818090 /home/aeonphyxius/projects/games/supertuxkart/src/bullet/src/LinearMath/btQuaternion.h
 	"btVector3.h"
 
-1291818075 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_model.hpp
+1295260961 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_model.hpp
 	<string>
 	"irrlicht.h"
 	"utils/no_copy.hpp"
 	"utils/vec3.hpp"
 
-1291818155 /home/aeonphyxius/projects/games/supertuxkart/src/race/race_manager.hpp
+1294170376 /home/aeonphyxius/projects/games/supertuxkart/src/race/race_manager.hpp
 	<vector>
 	<algorithm>
 	<string>
@@ -5249,8 +5250,10 @@
 	<irrString.h>
 	<stdexcept>
 
-1291818093 /home/aeonphyxius/projects/games/supertuxkart/src/utils/translation.hpp
+1295260962 /home/aeonphyxius/projects/games/supertuxkart/src/utils/translation.hpp
 	"irrlicht.h"
+	<vector>
+	<string>
 	<libintl/libintl.h>
 	<libintl.h>
 
@@ -5265,7 +5268,7 @@
 	<iostream>
 	<assert.h>
 
-1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widget.hpp
+1295260964 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widget.hpp
 	<irrlicht.h>
 	<map>
 	"guiengine/event_handler.hpp"
@@ -5287,7 +5290,7 @@
 
 1291818093 /home/aeonphyxius/projects/games/supertuxkart/src/utils/constants.hpp
 
-1292582204 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/engine.hpp
+1295260964 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/engine.hpp
 	<irrlicht.h>
 	<string>
 	"utils/constants.hpp"
@@ -5299,16 +5302,19 @@
 	"utils/ptr_vector.hpp"
 	"config/player.hpp"
 
-1292582204 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/abstract_state_manager.hpp
+1295260964 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/abstract_state_manager.hpp
 	<vector>
 	<string>
+	"guiengine/engine.hpp"
+	"guiengine/screen.hpp"
 
-1292582203 /home/aeonphyxius/projects/games/supertuxkart/src/config/player.hpp
+1293539820 /home/aeonphyxius/projects/games/supertuxkart/src/config/player.hpp
 	<string>
 	"config/user_config.hpp"
 	"utils/no_copy.hpp"
+	"irrlicht.h"
 
-1291987222 /home/aeonphyxius/projects/games/supertuxkart/src/config/user_config.hpp
+1295260963 /home/aeonphyxius/projects/games/supertuxkart/src/config/user_config.hpp
 	<string>
 	<map>
 	<vector>
@@ -5329,23 +5335,23 @@
 	"states_screens/addons_screen.hpp"
 	"states_screens/main_menu_screen.hpp"
 
-1292582520 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/main_menu_screen.hpp
-	<pthread.h>
+1295260961 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/main_menu_screen.hpp
 	"guiengine/screen.hpp"
 
-1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/addons_screen.hpp
-	"guiengine/screen.hpp"
-	"states_screens/dialogs/addons_loading.hpp"
-	"addons/addons.hpp"
-	"guiengine/widgets/label_widget.hpp"
-	<pthread.h>
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/addons_screen.hpp
 	"irrlicht.h"
+	"addons/addons_manager.hpp"
+	"guiengine/screen.hpp"
+	"guiengine/widgets/label_widget.hpp"
+	"states_screens/dialogs/addons_loading.hpp"
 
-1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/addons_loading.hpp
-	"guiengine/modaldialog.hpp"
-	"addons/addons.hpp"
-	"guiengine/widgets.hpp"
+1294995505 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/addons_loading.hpp
 	<pthread.h>
+	"addons/addon.hpp"
+	"addons/addons_manager.hpp"
+	"guiengine/widgets.hpp"
+	"guiengine/modaldialog.hpp"
+	"utils/synchronised.hpp"
 
 1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/modaldialog.hpp
 	"irrlicht.h"
@@ -5391,12 +5397,12 @@
 	"guiengine/widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/list_widget.hpp
+1294170376 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/list_widget.hpp
 	<irrlicht.h>
 	"guiengine/widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/dynamic_ribbon_widget.hpp
+1294170376 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/dynamic_ribbon_widget.hpp
 	<irrlicht.h>
 	"guiengine/widget.hpp"
 	"guiengine/widgets/ribbon_widget.hpp"
@@ -5408,7 +5414,7 @@
 	"guiengine/widgets/icon_button_widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/spinner_widget.hpp
+1294170376 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/spinner_widget.hpp
 	<irrlicht.h>
 	"guiengine/widget.hpp"
 	"utils/ptr_vector.hpp"
@@ -5418,13 +5424,13 @@
 	"guiengine/widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/model_view_widget.hpp
+1295260964 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/model_view_widget.hpp
 	<irrlicht.h>
 	"graphics/irr_driver.hpp"
 	"guiengine/widgets/icon_button_widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818094 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/irr_driver.hpp
+1295260962 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/irr_driver.hpp
 	<string>
 	<vector>
 	"utils/no_copy.hpp"
@@ -5447,12 +5453,14 @@
 	"guiengine/widget.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818153 source:/home/aeonphyxius/projects/games/supertuxkart/src/addons/zip.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/addons/zip.cpp
 	"irrlicht.h"
-	"graphics/irr_driver.hpp"
 	<string.h>
 	<iostream>
 	<fstream>
+	"graphics/irr_driver.hpp"
+	"io/file_manager.hpp"
+	"utils/string_utils.hpp"
 
 1291818095 source:/home/aeonphyxius/projects/games/supertuxkart/src/animations/animation_base.cpp
 	"animations/animation_base.hpp"
@@ -5988,7 +5996,7 @@
 1291818091 /home/aeonphyxius/projects/games/supertuxkart/src/network/network_kart.hpp
 	"karts/kart.hpp"
 
-1292582168 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart.hpp
+1294830901 /home/aeonphyxius/projects/games/supertuxkart/src/karts/kart.hpp
 	"btBulletDynamicsCommon.h"
 	"items/attachment.hpp"
 	"items/powerup.hpp"
@@ -6070,13 +6078,13 @@
 1291818092 /home/aeonphyxius/projects/games/supertuxkart/src/enet/include/enet/callbacks.h
 	<stdlib.h>
 
-1291818075 /home/aeonphyxius/projects/games/supertuxkart/src/karts/emergency_animation.hpp
+1295359718 /home/aeonphyxius/projects/games/supertuxkart/src/karts/emergency_animation.hpp
 	"utils/no_copy.hpp"
 	"utils/vec3.hpp"
 
 1291818075 /home/aeonphyxius/projects/games/supertuxkart/src/karts/max_speed.hpp
 
-1291818075 /home/aeonphyxius/projects/games/supertuxkart/src/karts/moveable.hpp
+1294830901 /home/aeonphyxius/projects/games/supertuxkart/src/karts/moveable.hpp
 	"irrlicht.h"
 	"btBulletDynamicsCommon.h"
 	"physics/kart_motion_state.hpp"
@@ -6087,11 +6095,11 @@
 1291818073 /home/aeonphyxius/projects/games/supertuxkart/src/physics/kart_motion_state.hpp
 	"LinearMath/btMotionState.h"
 
-1291818080 /home/aeonphyxius/projects/games/supertuxkart/src/tracks/terrain_info.hpp
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/tracks/terrain_info.hpp
 	"graphics/material.hpp"
 	"utils/vec3.hpp"
 
-1291818094 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/material.hpp
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/material.hpp
 	"utils/no_copy.hpp"
 	<string>
 	"irrlicht.h"
@@ -6109,12 +6117,12 @@
 	"graphics/irr_driver.hpp"
 	"utils/vec3.hpp"
 
-1291818155 /home/aeonphyxius/projects/games/supertuxkart/src/race/highscores.hpp
+1293539820 /home/aeonphyxius/projects/games/supertuxkart/src/race/highscores.hpp
 	<string>
 	<vector>
 	<map>
-	<fstream>
 	"race/race_manager.hpp"
+	"irrlicht.h"
 
 1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_gui_base.hpp
 	"irrlicht.h"
@@ -6153,7 +6161,7 @@
 	<string>
 	"utils/no_copy.hpp"
 
-1292582169 /home/aeonphyxius/projects/games/supertuxkart/src/tracks/track.hpp
+1294995505 /home/aeonphyxius/projects/games/supertuxkart/src/tracks/track.hpp
 	<string>
 	<vector>
 	"irrlicht.h"
@@ -6164,7 +6172,7 @@
 	"tracks/quad_graph.hpp"
 	"utils/vec3.hpp"
 
-1291818072 /home/aeonphyxius/projects/games/supertuxkart/src/items/item.hpp
+1295446872 /home/aeonphyxius/projects/games/supertuxkart/src/items/item.hpp
 	"irrlicht.h"
 	"karts/kart.hpp"
 	"utils/no_copy.hpp"
@@ -6193,7 +6201,7 @@
 	"tracks/quad.hpp"
 	"utils/vec3.hpp"
 
-1291818093 /home/aeonphyxius/projects/games/supertuxkart/src/utils/string_utils.hpp
+1295260962 /home/aeonphyxius/projects/games/supertuxkart/src/utils/string_utils.hpp
 	<string>
 	<vector>
 	<sstream>
@@ -6254,7 +6262,7 @@
 	<AL/al.h>
 	<AL/alc.h>
 
-1291907153 source:/home/aeonphyxius/projects/games/supertuxkart/src/audio/sfx_manager.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/audio/sfx_manager.cpp
 	"audio/music_manager.hpp"
 	<sstream>
 	<stdexcept>
@@ -6308,7 +6316,7 @@
 	<string>
 	"race/grand_prix_data.hpp"
 
-1291818095 source:/home/aeonphyxius/projects/games/supertuxkart/src/challenges/challenge_data.cpp
+1294170375 source:/home/aeonphyxius/projects/games/supertuxkart/src/challenges/challenge_data.cpp
 	"challenges/challenge_data.hpp"
 	<stdexcept>
 	<sstream>
@@ -6334,11 +6342,11 @@
 	<vector>
 	"modes/world_with_rank.hpp"
 
-1291818096 /home/aeonphyxius/projects/games/supertuxkart/src/modes/world_with_rank.hpp
+1293111954 /home/aeonphyxius/projects/games/supertuxkart/src/modes/world_with_rank.hpp
 	<vector>
 	"modes/world.hpp"
 
-1292582203 source:/home/aeonphyxius/projects/games/supertuxkart/src/challenges/unlock_manager.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/challenges/unlock_manager.cpp
 	"challenges/unlock_manager.hpp"
 	<set>
 	<string>
@@ -6354,7 +6362,7 @@
 	"tracks/track_manager.hpp"
 	"utils/string_utils.hpp"
 
-1291818095 /home/aeonphyxius/projects/games/supertuxkart/src/challenges/unlock_manager.hpp
+1294170375 /home/aeonphyxius/projects/games/supertuxkart/src/challenges/unlock_manager.hpp
 	<map>
 	"challenges/challenge.hpp"
 	"utils/no_copy.hpp"
@@ -6380,7 +6388,7 @@
 	"input/input.hpp"
 	"utils/no_copy.hpp"
 
-1291818095 source:/home/aeonphyxius/projects/games/supertuxkart/src/config/stk_config.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/config/stk_config.cpp
 	"config/stk_config.hpp"
 	<stdexcept>
 	<stdio.h>
@@ -6397,11 +6405,12 @@
 	"items/item.hpp"
 	"utils/no_copy.hpp"
 
-1291818095 source:/home/aeonphyxius/projects/games/supertuxkart/src/config/user_config.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/config/user_config.cpp
 	<string>
 	<stdlib.h>
 	<fstream>
 	<vector>
+	"io/xml_writer.hpp"
 	"utils/ptr_vector.hpp"
 	"config/user_config.hpp"
 	"config/player.hpp"
@@ -6421,7 +6430,7 @@
 	"IMesh.h"
 	"SMeshBuffer.h"
 
-1291818094 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/camera.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/camera.cpp
 	"graphics/camera.hpp"
 	<math.h>
 	"audio/music_manager.hpp"
@@ -6434,7 +6443,7 @@
 	"tracks/track.hpp"
 	"utils/constants.hpp"
 
-1291818094 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/camera.hpp
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/camera.hpp
 	<vector>
 	"irrlicht.h"
 	"io/xml_node.hpp"
@@ -6455,7 +6464,7 @@
 	"utils/no_copy.hpp"
 	"irrlicht.h"
 
-1291818094 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/material_manager.hpp
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/material_manager.hpp
 	"utils/no_copy.hpp"
 	"irrlicht.h"
 	<string>
@@ -6468,7 +6477,7 @@
 	"items/powerup_manager.hpp"
 	"utils/no_copy.hpp"
 
-1291907153 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/irr_driver.cpp
+1295260962 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/irr_driver.cpp
 	"graphics/irr_driver.hpp"
 	"config/user_config.hpp"
 	"graphics/camera.hpp"
@@ -6511,18 +6520,19 @@
 	"config/player.hpp"
 	"guiengine/modaldialog.hpp"
 
-1291818094 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/material.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/material.cpp
 	"graphics/material.hpp"
 	<stdexcept>
 	"audio/sfx_base.hpp"
 	"config/user_config.hpp"
 	"config/stk_config.hpp"
 	"graphics/irr_driver.hpp"
+	"graphics/particle_kind_manager.hpp"
 	"io/file_manager.hpp"
 	"io/xml_node.hpp"
 	"utils/string_utils.hpp"
 
-1291818094 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/material_manager.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/material_manager.cpp
 	"graphics/material_manager.hpp"
 	<stdexcept>
 	<sstream>
@@ -6617,12 +6627,12 @@
 	"graphics/material_manager.hpp"
 	"utils/constants.hpp"
 
-1291818094 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/stars.hpp
+1295359718 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/stars.hpp
 	"utils/no_copy.hpp"
 	<vector>
 	"irrlicht.h"
 
-1291818094 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/water_splash.cpp
+1294939043 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/water_splash.cpp
 	"graphics/water_splash.hpp"
 	"graphics/material_manager.hpp"
 	"graphics/irr_driver.hpp"
@@ -6647,7 +6657,7 @@
 	<cassert>
 	"IGUISpriteBank.h"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/abstract_state_manager.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/abstract_state_manager.cpp
 	"guiengine/abstract_state_manager.hpp"
 	<vector>
 	"guiengine/engine.hpp"
@@ -6683,7 +6693,7 @@
 	<sstream>
 	"irrlicht.h"
 
-1292582204 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/engine.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/engine.cpp
 	"guiengine/engine.hpp"
 	<iostream>
 	<assert.h>
@@ -6709,7 +6719,7 @@
 	"input/input_manager.hpp"
 	"states_screens/state_manager.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/layout_manager.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/layout_manager.cpp
 	"guiengine/layout_manager.hpp"
 	<sstream>
 	"irrlicht.h"
@@ -6720,6 +6730,7 @@
 	"guiengine/widget.hpp"
 	"io/file_manager.hpp"
 	"utils/ptr_vector.hpp"
+	"utils/string_utils.hpp"
 
 1291818154 /home/aeonphyxius/projects/games/supertuxkart/src/guiengine/layout_manager.hpp
 	<cstring>
@@ -6764,7 +6775,7 @@
 	"states_screens/state_manager.hpp"
 	"utils/translation.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/screen_loader.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/screen_loader.cpp
 	"guiengine/screen.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/widgets.hpp"
@@ -6774,7 +6785,7 @@
 	<irrXML.h>
 	<sstream>
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/skin.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/skin.cpp
 	"guiengine/skin.hpp"
 	<cassert>
 	<stdexcept>
@@ -6789,7 +6800,7 @@
 	"io/file_manager.hpp"
 	"states_screens/state_manager.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widget.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widget.cpp
 	"guiengine/widget.hpp"
 	<iostream>
 	<sstream>
@@ -6802,9 +6813,10 @@
 	"utils/string_utils.hpp"
 	"utils/translation.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/bubble_widget.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/bubble_widget.cpp
 	"guiengine/engine.hpp"
 	"guiengine/widgets/bubble_widget.hpp"
+	"utils/translation.hpp"
 	<irrlicht.h>
 
 1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/button_widget.cpp
@@ -6815,7 +6827,7 @@
 	"guiengine/engine.hpp"
 	"guiengine/widgets/check_box_widget.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/dynamic_ribbon_widget.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/dynamic_ribbon_widget.cpp
 	"guiengine/engine.hpp"
 	"guiengine/widgets/dynamic_ribbon_widget.hpp"
 	"io/file_manager.hpp"
@@ -6836,14 +6848,14 @@
 	"guiengine/skin.hpp"
 	<assert.h>
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/list_widget.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/list_widget.cpp
 	"graphics/irr_driver.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/widgets/list_widget.hpp"
 	"io/file_manager.hpp"
 	"guiengine/CGUISpriteBank.h"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/model_view_widget.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/model_view_widget.cpp
 	"graphics/irr_driver.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/widgets/model_view_widget.hpp"
@@ -6854,7 +6866,7 @@
 	"utils/string_utils.hpp"
 	<string.h>
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/ribbon_widget.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/ribbon_widget.cpp
 	"guiengine/widgets/ribbon_widget.hpp"
 	<cmath>
 	"graphics/irr_driver.hpp"
@@ -6867,7 +6879,7 @@
 	"states_screens/state_manager.hpp"
 	"utils/string_utils.hpp"
 
-1291818154 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/spinner_widget.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/guiengine/widgets/spinner_widget.cpp
 	<iostream>
 	"graphics/irr_driver.hpp"
 	"guiengine/engine.hpp"
@@ -6912,7 +6924,7 @@
 	"config/player.hpp"
 	"karts/controller/controller.hpp"
 
-1291818093 source:/home/aeonphyxius/projects/games/supertuxkart/src/input/input_manager.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/input/input_manager.cpp
 	"input/input_manager.hpp"
 	<map>
 	<vector>
@@ -6951,7 +6963,7 @@
 	"config/player.hpp"
 	"guiengine/modaldialog.hpp"
 
-1292582203 source:/home/aeonphyxius/projects/games/supertuxkart/src/io/file_manager.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/io/file_manager.cpp
 	"io/file_manager.hpp"
 	<stdio.h>
 	<stdexcept>
@@ -6968,6 +6980,7 @@
 	<unistd.h>
 	"irrlicht.h"
 	"btBulletDynamicsCommon.h"
+	"config/user_config.hpp"
 	"graphics/irr_driver.hpp"
 	"graphics/material_manager.hpp"
 	"karts/kart_properties_manager.hpp"
@@ -6975,13 +6988,14 @@
 	"utils/string_utils.hpp"
 	<CoreFoundation/CoreFoundation.h>
 
-1291818096 source:/home/aeonphyxius/projects/games/supertuxkart/src/io/xml_node.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/io/xml_node.cpp
 	"io/file_manager.hpp"
 	"io/xml_node.hpp"
 	"utils/string_utils.hpp"
 	"utils/vec3.hpp"
+	<stdexcept>
 
-1291818072 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/attachment.cpp
+1294939042 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/attachment.cpp
 	"items/attachment.hpp"
 	<algorithm>
 	"config/stk_config.hpp"
@@ -7005,7 +7019,7 @@
 	"network/item_info.hpp"
 	"network/message.hpp"
 
-1291818072 /home/aeonphyxius/projects/games/supertuxkart/src/items/flyable.hpp
+1295359718 /home/aeonphyxius/projects/games/supertuxkart/src/items/flyable.hpp
 	"irrlicht.h"
 	"audio/sfx_manager.hpp"
 	"items/powerup_manager.hpp"
@@ -7050,11 +7064,12 @@
 	"irrlicht.h"
 	"items/flyable.hpp"
 
-1291818072 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/flyable.cpp
+1295359718 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/flyable.cpp
 	"items/flyable.hpp"
 	<math.h>
 	"graphics/irr_driver.hpp"
 	"graphics/mesh_tools.hpp"
+	"graphics/stars.hpp"
 	"io/xml_node.hpp"
 	"items/projectile_manager.hpp"
 	"karts/kart.hpp"
@@ -7064,14 +7079,16 @@
 	"utils/constants.hpp"
 	"utils/string_utils.hpp"
 
-1291818072 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/item.cpp
+1295446872 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/item.cpp
 	"items/item.hpp"
 	"graphics/irr_driver.hpp"
 	"karts/kart.hpp"
+	"modes/world.hpp"
+	"tracks/track.hpp"
 	"utils/constants.hpp"
 	"utils/vec3.hpp"
 
-1292582168 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/item_manager.cpp
+1294170373 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/item_manager.cpp
 	"items/item_manager.hpp"
 	<stdexcept>
 	<string>
@@ -7130,7 +7147,7 @@
 	"tracks/track.hpp"
 	"utils/string_utils.hpp"
 
-1292582168 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/powerup_manager.cpp
+1294170373 source:/home/aeonphyxius/projects/games/supertuxkart/src/items/powerup_manager.cpp
 	"items/powerup_manager.hpp"
 	<iostream>
 	<stdexcept>
@@ -7170,7 +7187,7 @@
 	"race/race_manager.hpp"
 	"utils/string_utils.hpp"
 
-1291818074 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/ai_base_controller.cpp
+1294830901 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/ai_base_controller.cpp
 	"karts/controller/ai_base_controller.hpp"
 	<assert.h>
 	"karts/kart.hpp"
@@ -7230,7 +7247,7 @@
 	<vector>
 	"guiengine/screen.hpp"
 
-1291818074 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/new_ai_controller.cpp
+1293111950 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/new_ai_controller.cpp
 	"karts/controller/new_ai_controller.hpp"
 	"irrlicht.h"
 	<cstdlib>
@@ -7249,7 +7266,7 @@
 	"karts/controller/ai_base_controller.hpp"
 	"utils/vec3.hpp"
 
-1291818074 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/player_controller.cpp
+1294830901 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/controller/player_controller.cpp
 	"karts/controller/player_controller.hpp"
 	"audio/sfx_base.hpp"
 	"audio/sfx_manager.hpp"
@@ -7264,16 +7281,17 @@
 	"utils/constants.hpp"
 	"utils/translation.hpp"
 
-1291818075 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/emergency_animation.cpp
+1295359718 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/emergency_animation.cpp
 	"karts/emergency_animation.hpp"
 	"graphics/stars.hpp"
 	"karts/kart.hpp"
 	"modes/world.hpp"
+	"modes/three_strikes_battle.hpp"
 	"physics/btKart.hpp"
 	"tracks/track.hpp"
 	"utils/constants.hpp"
 
-1292582168 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart.cpp
 	"karts/kart.hpp"
 	<math.h>
 	<iostream>
@@ -7284,11 +7302,12 @@
 	"config/user_config.hpp"
 	"graphics/camera.hpp"
 	"graphics/material_manager.hpp"
-	"graphics/nitro.hpp"
+	"graphics/particle_emitter.hpp"
+	"graphics/particle_kind.hpp"
+	"graphics/particle_kind_manager.hpp"
 	"graphics/shadow.hpp"
 	"graphics/skid_marks.hpp"
 	"graphics/slip_stream.hpp"
-	"graphics/smoke.hpp"
 	"graphics/water_splash.hpp"
 	"modes/world.hpp"
 	"io/file_manager.hpp"
@@ -7310,16 +7329,17 @@
 	"BulletDynamics/ConstraintSolver/btJacobianEntry.h"
 	"BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 
-1291818075 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_model.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_model.cpp
 	"karts/kart_model.hpp"
 	"config/stk_config.hpp"
 	"config/user_config.hpp"
 	"graphics/irr_driver.hpp"
 	"graphics/mesh_tools.hpp"
 	"io/xml_node.hpp"
+	"karts/kart.hpp"
 	"utils/constants.hpp"
 
-1291818075 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties.cpp
 	"karts/kart_properties.hpp"
 	<iostream>
 	<stdexcept>
@@ -7336,7 +7356,7 @@
 	"utils/string_utils.hpp"
 	"utils/translation.hpp"
 
-1291818075 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties_manager.cpp
+1294170373 source:/home/aeonphyxius/projects/games/supertuxkart/src/karts/kart_properties_manager.cpp
 	"karts/kart_properties_manager.hpp"
 	<algorithm>
 	<ctime>
@@ -7366,7 +7386,7 @@
 	"modes/world.hpp"
 	"tracks/track.hpp"
 
-1292582204 source:/home/aeonphyxius/projects/games/supertuxkart/src/main.cpp
+1295260964 source:/home/aeonphyxius/projects/games/supertuxkart/src/main.cpp
 	<unistd.h>
 	<windows.h>
 	<io.h>
@@ -7382,6 +7402,7 @@
 	"audio/music_manager.hpp"
 	"audio/sfx_manager.hpp"
 	"challenges/unlock_manager.hpp"
+	"tutorial/tutorial_manager.hpp"
 	"config/stk_config.hpp"
 	"config/user_config.hpp"
 	"config/player.hpp"
@@ -7407,8 +7428,9 @@
 	"tracks/track.hpp"
 	"tracks/track_manager.hpp"
 	"utils/translation.hpp"
-	"addons/network.hpp"
-	"addons/addons.hpp"
+	<IEventReceiver.h>
+	"addons/network_http.hpp"
+	"addons/addons_manager.hpp"
 
 1291818096 /home/aeonphyxius/projects/games/supertuxkart/src/modes/profile_world.hpp
 	"modes/standard_race.hpp"
@@ -7437,7 +7459,7 @@
 	"race/race_manager.hpp"
 	"states_screens/state_manager.hpp"
 
-1291818096 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/follow_the_leader.cpp
+1293111954 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/follow_the_leader.cpp
 	"modes/follow_the_leader.hpp"
 	"audio/music_manager.hpp"
 	"challenges/unlock_manager.hpp"
@@ -7465,7 +7487,7 @@
 	"utils/string_utils.hpp"
 	"utils/translation.hpp"
 
-1291818096 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/profile_world.cpp
+1294170375 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/profile_world.cpp
 	"modes/profile_world.hpp"
 	"graphics/camera.hpp"
 	"graphics/irr_driver.hpp"
@@ -7476,7 +7498,7 @@
 	"challenges/unlock_manager.hpp"
 	"config/user_config.hpp"
 
-1291818096 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/three_strikes_battle.cpp
+1293111954 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/three_strikes_battle.cpp
 	"modes/three_strikes_battle.hpp"
 	<string>
 	"states_screens/race_gui_base.hpp"
@@ -7488,7 +7510,7 @@
 	"modes/world_with_rank.hpp"
 	"states_screens/race_gui_base.hpp"
 
-1292582204 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/world.cpp
+1295260963 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/world.cpp
 	"modes/world.hpp"
 	<assert.h>
 	<sstream>
@@ -7524,7 +7546,7 @@
 	"utils/translation.hpp"
 	"utils/string_utils.hpp"
 
-1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_gui.hpp
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_gui.hpp
 	<string>
 	<vector>
 	"irrlicht.h"
@@ -7546,11 +7568,11 @@
 1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/race_over_dialog.hpp
 	"guiengine/modaldialog.hpp"
 
-1291818096 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/world_with_rank.cpp
+1293111954 source:/home/aeonphyxius/projects/games/supertuxkart/src/modes/world_with_rank.cpp
 	"modes/world_with_rank.hpp"
 	"race/history.hpp"
 
-1291818091 source:/home/aeonphyxius/projects/games/supertuxkart/src/network/connect_message.cpp
+1293539820 source:/home/aeonphyxius/projects/games/supertuxkart/src/network/connect_message.cpp
 	"network/connect_message.hpp"
 	<string>
 	<vector>
@@ -7616,7 +7638,7 @@
 	"karts/kart_properties_manager.hpp"
 	"network/message.hpp"
 
-1291818091 /home/aeonphyxius/projects/games/supertuxkart/src/network/character_selected_message.hpp
+1293539820 /home/aeonphyxius/projects/games/supertuxkart/src/network/character_selected_message.hpp
 	"network/message.hpp"
 	"network/remote_kart_info.hpp"
 	"race/race_manager.hpp"
@@ -7646,7 +7668,7 @@
 	<string>
 	"network/message.hpp"
 
-1291818091 source:/home/aeonphyxius/projects/games/supertuxkart/src/network/race_info_message.cpp
+1293539820 source:/home/aeonphyxius/projects/games/supertuxkart/src/network/race_info_message.cpp
 	"network/race_info_message.hpp"
 	"race/grand_prix_manager.hpp"
 	"race/race_manager.hpp"
@@ -7706,10 +7728,11 @@
 	"utils/constants.hpp"
 	"utils/string_utils.hpp"
 
-1291818073 source:/home/aeonphyxius/projects/games/supertuxkart/src/physics/physics.cpp
+1295359718 source:/home/aeonphyxius/projects/games/supertuxkart/src/physics/physics.cpp
 	"physics/physics.hpp"
 	"config/user_config.hpp"
 	"network/race_state.hpp"
+	"graphics/stars.hpp"
 	"physics/btKart.hpp"
 	"physics/btUprightConstraint.hpp"
 	"physics/irr_debug_drawer.hpp"
@@ -7739,24 +7762,26 @@
 	"io/file_manager.hpp"
 	"utils/string_utils.hpp"
 
-1291818155 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/highscore_manager.cpp
+1293539820 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/highscore_manager.cpp
 	"race/highscore_manager.hpp"
 	<stdexcept>
 	<fstream>
 	"config/user_config.hpp"
 	"io/file_manager.hpp"
+	"io/xml_writer.hpp"
 	"race/race_manager.hpp"
 	"utils/string_utils.hpp"
 	"utils/translation.hpp"
 
-1291818155 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/highscores.cpp
+1293539820 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/highscores.cpp
 	"race/highscores.hpp"
 	<stdexcept>
 	<fstream>
 	"io/xml_node.hpp"
+	"io/xml_writer.hpp"
 	"race/race_manager.hpp"
 
-1291987222 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/history.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/history.cpp
 	"race/history.hpp"
 	<stdio.h>
 	"io/file_manager.hpp"
@@ -7765,7 +7790,7 @@
 	"race/race_manager.hpp"
 	"tracks/track.hpp"
 
-1291907153 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/race_manager.cpp
+1294170376 source:/home/aeonphyxius/projects/games/supertuxkart/src/race/race_manager.cpp
 	"race/race_manager.hpp"
 	<iostream>
 	<algorithm>
@@ -7835,21 +7860,17 @@
 1291818093 /home/aeonphyxius/projects/games/supertuxkart/src/replay/replay_recorder.hpp
 	"replay/replay_base.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/addons_screen.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/addons_screen.cpp
 	"states_screens/addons_screen.hpp"
-	"states_screens/addons_update_screen.hpp"
-	"states_screens/dialogs/addons_loading.hpp"
+	<sstream>
+	"irrlicht.h"
+	"addons/addons_manager.hpp"
 	"guiengine/widget.hpp"
 	"guiengine/widgets/ribbon_widget.hpp"
-	"guiengine/widgets.hpp"
-	"states_screens/state_manager.hpp"
-	"addons/network.hpp"
 	"guiengine/CGUISpriteBank.h"
-	"addons/addons.hpp"
 	"io/file_manager.hpp"
-	"irrlicht.h"
-	<pthread.h>
-	<sstream>
+	"states_screens/dialogs/addons_loading.hpp"
+	"states_screens/state_manager.hpp"
 
 1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/addons_update_screen.hpp
 	"guiengine/screen.hpp"
@@ -7890,7 +7911,7 @@
 	"guiengine/modaldialog.hpp"
 	"guiengine/widgets/spinner_widget.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/challenges.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/challenges.cpp
 	"states_screens/challenges.hpp"
 	"challenges/unlock_manager.hpp"
 	"config/user_config.hpp"
@@ -7912,7 +7933,7 @@
 	"guiengine/screen.hpp"
 	"utils/ptr_vector.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/credits.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/credits.cpp
 	"states_screens/credits.hpp"
 	<fstream>
 	"irrString.h"
@@ -7959,18 +7980,18 @@
 	"irrlicht.h"
 	"guiengine/screen.hpp"
 
-1292582169 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/addons_loading.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/addons_loading.cpp
 	"states_screens/dialogs/addons_loading.hpp"
 	<pthread.h>
+	"addons/addons_manager.hpp"
+	"addons/network_http.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/widgets.hpp"
 	"input/input_manager.hpp"
-	"utils/translation.hpp"
-	"addons/addons.hpp"
-	"addons/network.hpp"
+	"io/file_manager.hpp"
 	"states_screens/addons_screen.hpp"
 	"utils/string_utils.hpp"
-	"io/file_manager.hpp"
+	"utils/translation.hpp"
 
 1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/confirm_resolution_dialog.cpp
 	"states_screens/dialogs/confirm_resolution_dialog.hpp"
@@ -7996,7 +8017,7 @@
 1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/enter_player_name_dialog.hpp
 	"guiengine/modaldialog.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/gp_info_dialog.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/gp_info_dialog.cpp
 	"guiengine/engine.hpp"
 	"guiengine/screen.hpp"
 	"guiengine/widgets/button_widget.hpp"
@@ -8055,7 +8076,7 @@
 1291818078 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/press_a_key_dialog.hpp
 	"guiengine/modaldialog.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/race_over_dialog.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/race_over_dialog.cpp
 	"states_screens/dialogs/race_over_dialog.hpp"
 	"challenges/unlock_manager.hpp"
 	"guiengine/engine.hpp"
@@ -8115,7 +8136,7 @@
 	"irrlicht.h"
 	"guiengine/screen.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/track_info_dialog.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/dialogs/track_info_dialog.cpp
 	"graphics/irr_driver.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/screen.hpp"
@@ -8136,7 +8157,7 @@
 	"utils/translation.hpp"
 	"irrlicht.h"
 
-1292582169 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/feature_unlocked.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/feature_unlocked.cpp
 	"states_screens/feature_unlocked.hpp"
 	<SColor.h>
 	"challenges/challenge.hpp"
@@ -8237,7 +8258,7 @@
 	"states_screens/help_screen_3.hpp"
 	"states_screens/state_manager.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/kart_selection.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/kart_selection.cpp
 	"challenges/unlock_manager.hpp"
 	"config/player.hpp"
 	"config/user_config.hpp"
@@ -8264,32 +8285,35 @@
 	"utils/string_utils.hpp"
 	<string>
 
-1292520536 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/main_menu_screen.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/main_menu_screen.cpp
 	"states_screens/main_menu_screen.hpp"
 	<iostream>
 	<string>
+	"guiengine/scalable_font.hpp"
+	"guiengine/widgets/list_widget.hpp"
 	"guiengine/widgets/ribbon_widget.hpp"
 	"input/device_manager.hpp"
 	"input/input_manager.hpp"
+	"io/file_manager.hpp"
 	"karts/kart_properties_manager.hpp"
 	"main_loop.hpp"
+	"states_screens/addons_screen.hpp"
 	"states_screens/challenges.hpp"
 	"states_screens/credits.hpp"
-	"states_screens/kart_selection.hpp"
 	"states_screens/help_screen_1.hpp"
+	"states_screens/kart_selection.hpp"
 	"states_screens/options_screen_video.hpp"
-	"states_screens/addons_screen.hpp"
 	"states_screens/state_manager.hpp"
-	"io/file_manager.hpp"
 	"states_screens/tutorial_screen.hpp"
 	"states_screens/feature_unlocked.hpp"
 	"states_screens/grand_prix_lose.hpp"
 	"states_screens/grand_prix_win.hpp"
-	"addons/network.hpp"
+	"addons/network_http.hpp"
 	"tracks/track_manager.hpp"
 	"tracks/track.hpp"
+	"utils/string_utils.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_audio.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_audio.cpp
 	"states_screens/options_screen_audio.hpp"
 	"audio/music_manager.hpp"
 	"audio/sfx_manager.hpp"
@@ -8361,7 +8385,7 @@
 	<sstream>
 	<set>
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_players.cpp
+1293539820 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_players.cpp
 	"states_screens/options_screen_players.hpp"
 	"config/player.hpp"
 	"config/device_config.hpp"
@@ -8380,7 +8404,7 @@
 	<iostream>
 	<sstream>
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_video.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/options_screen_video.cpp
 	"states_screens/options_screen_video.hpp"
 	"audio/music_manager.hpp"
 	"audio/sfx_manager.hpp"
@@ -8401,7 +8425,7 @@
 	<iostream>
 	<sstream>
 
-1291987222 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_gui.cpp
+1295260961 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_gui.cpp
 	"states_screens/race_gui.hpp"
 	"irrlicht.h"
 	"audio/music_manager.hpp"
@@ -8428,7 +8452,7 @@
 	"utils/string_utils.hpp"
 	"utils/translation.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_result_gui.cpp
+1294995505 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_result_gui.cpp
 	"states_screens/race_result_gui.hpp"
 	"challenges/unlock_manager.hpp"
 	"guiengine/engine.hpp"
@@ -8437,13 +8461,12 @@
 	"io/file_manager.hpp"
 	"modes/world_with_rank.hpp"
 	"states_screens/dialogs/race_over_dialog.hpp"
+	"states_screens/feature_unlocked.hpp"
 	"states_screens/main_menu_screen.hpp"
 	"states_screens/race_setup_screen.hpp"
 	"utils/string_utils.hpp"
-	"karts/kart_properties_manager.hpp"
-	"states_screens/feature_unlocked.hpp"
 
-1291818078 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_setup_screen.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/race_setup_screen.cpp
 	<irrlicht.h>
 	"challenges/unlock_manager.hpp"
 	"guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -8527,7 +8550,7 @@
 	"irrlicht.h"
 	"tracks/check_structure.hpp"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/check_line.cpp
+1292582169 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/check_line.cpp
 	"tracks/check_line.hpp"
 	<string>
 	"irrlicht.h"
@@ -8560,7 +8583,7 @@
 	"modes/world.hpp"
 	"race/race_manager.hpp"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/check_structure.cpp
+1292582169 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/check_structure.cpp
 	"tracks/check_structure.hpp"
 	<algorithm>
 	"modes/world.hpp"
@@ -8581,7 +8604,7 @@
 	"irrlicht.h"
 	"LinearMath/btTransform.h"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/quad_graph.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/quad_graph.cpp
 	"tracks/quad_graph.hpp"
 	"LinearMath/btTransform.h"
 	"config/user_config.hpp"
@@ -8591,7 +8614,7 @@
 	"tracks/check_line.hpp"
 	"tracks/quad_set.hpp"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/quad_set.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/quad_set.cpp
 	"tracks/quad_set.hpp"
 	<stdlib.h>
 	"io/file_manager.hpp"
@@ -8606,13 +8629,12 @@
 	"tracks/track.hpp"
 	"utils/constants.hpp"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/track.cpp
+1294995505 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/track.cpp
 	"tracks/track.hpp"
 	<iostream>
 	<stdexcept>
 	<sstream>
 	"irrlicht.h"
-	"animations/animation_manager.hpp"
 	"audio/music_manager.hpp"
 	"config/stk_config.hpp"
 	"config/user_config.hpp"
@@ -8622,6 +8644,9 @@
 	"graphics/material_manager.hpp"
 	"graphics/mesh_tools.hpp"
 	"graphics/moving_texture.hpp"
+	"graphics/particle_emitter.hpp"
+	"graphics/particle_kind.hpp"
+	"graphics/particle_kind_manager.hpp"
 	"io/file_manager.hpp"
 	"io/xml_node.hpp"
 	"items/item.hpp"
@@ -8655,7 +8680,7 @@
 	"io/file_manager.hpp"
 	"tracks/track.hpp"
 
-1291818080 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/track_object.cpp
+1294170374 source:/home/aeonphyxius/projects/games/supertuxkart/src/tracks/track_object.cpp
 	"tracks/track_object.hpp"
 	"graphics/irr_driver.hpp"
 	"io/file_manager.hpp"
@@ -8674,12 +8699,12 @@
 
 1291818093 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/constants.cpp
 
-1291818093 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/random_generator.cpp
+1293111951 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/random_generator.cpp
 	"utils/random_generator.hpp"
 	<stdlib.h>
 	<ctime>
 
-1291818093 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/string_utils.cpp
+1294830902 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/string_utils.cpp
 	"utils/string_utils.hpp"
 	"coreutil.h"
 	"math.h"
@@ -8689,7 +8714,7 @@
 	<exception>
 	<assert.h>
 
-1291820795 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/translation.cpp
+1295260962 source:/home/aeonphyxius/projects/games/supertuxkart/src/utils/translation.cpp
 	"utils/translation.hpp"
 	<assert.h>
 	<locale.h>
@@ -8698,6 +8723,7 @@
 	<string.h>
 	<stdlib.h>
 	<iostream>
+	<vector>
 	"irrlicht.h"
 	"io/file_manager.hpp"
 	"utils/constants.hpp"
@@ -8707,9 +8733,12 @@
 	"utils/vec3.hpp"
 	"utils/constants.hpp"
 
-1291987689 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/tutorial_screen.cpp
+1295446872 source:/home/aeonphyxius/projects/games/supertuxkart/src/states_screens/tutorial_screen.cpp
 	"states_screens/tutorial_screen.hpp"
-	"challenges/unlock_manager.hpp"
+	"guiengine/widgets/list_widget.hpp"
+	"utils/string_utils.hpp"
+	"graphics/irr_driver.hpp"
+	"tutorial/tutorial_manager.hpp"
 	"config/user_config.hpp"
 	"guiengine/engine.hpp"
 	"guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -8724,27 +8753,125 @@
 	<fstream>
 	"irrString.h"
 
-1291987685 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/tutorial_screen.hpp
+1293111950 /home/aeonphyxius/projects/games/supertuxkart/src/states_screens/tutorial_screen.hpp
 	"irrlicht.h"
 	"guiengine/screen.hpp"
 	"utils/ptr_vector.hpp"
+	"guiengine/CGUISpriteBank.h"
 
-1292007325 source:/home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial.cpp
+1292582204 source:/home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial.cpp
 	"tutorial.hpp"
 
-1292007289 /home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial.hpp
+1294170375 /home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial.hpp
 	<string>
 	<vector>
 	<fstream>
 	<irrlicht.h>
 	"utils/no_copy.hpp"
 
-1292005608 source:/home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_manager.cpp
-	"tutorial_manager.hpp"
+1294939043 source:/home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_manager.cpp
+	"tutorial/tutorial_manager.hpp"
+	<set>
+	<string>
+	<vector>
+	<stdio.h>
+	"audio/sfx_base.hpp"
+	"audio/sfx_manager.hpp"
+	"config/user_config.hpp"
+	"io/file_manager.hpp"
+	"karts/kart_properties_manager.hpp"
+	"race/race_manager.hpp"
+	"tracks/track_manager.hpp"
+	"utils/string_utils.hpp"
 
-1292007352 /home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_manager.hpp
+1294939043 /home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_manager.hpp
 	<map>
 	"tutorial/tutorial.hpp"
+	"tutorial/tutorial_data.hpp"
 	"utils/no_copy.hpp"
 	<fstream>
+
+1293539820 /home/aeonphyxius/projects/games/supertuxkart/src/io/xml_writer.hpp
+	<fstream>
+	<irrlicht.h>
+
+1294830902 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_kind_manager.hpp
+	"utils/no_copy.hpp"
+	"graphics/particle_kind.hpp"
+	<string>
+	<map>
+
+1294995505 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_kind.hpp
+	"utils/no_copy.hpp"
+	<string>
+	"irrlicht.h"
+
+1294995505 /home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_emitter.hpp
+	"utils/no_copy.hpp"
+	"irrlicht.h"
+
+1294939043 /home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_data.hpp
+	<string>
+	<vector>
+	<stdio.h>
+	<stdexcept>
+	"tutorial/tutorial.hpp"
+	"race/race_manager.hpp"
+
+1294830903 /home/aeonphyxius/projects/games/supertuxkart/src/addons/network_http.hpp
+	<pthread.h>
+	<string>
+	"utils/synchronised.hpp"
+
+1294939043 /home/aeonphyxius/projects/games/supertuxkart/src/utils/synchronised.hpp
+	<pthread.h>
+
+1295260963 /home/aeonphyxius/projects/games/supertuxkart/src/addons/addons_manager.hpp
+	<string>
+	<map>
+	<vector>
+	"addons/addon.hpp"
+	"io/xml_node.hpp"
+	"utils/synchronised.hpp"
+
+1294995505 /home/aeonphyxius/projects/games/supertuxkart/src/addons/addon.hpp
+	<string>
+
+1294939043 source:/home/aeonphyxius/projects/games/supertuxkart/src/tutorial/tutorial_data.cpp
+	"tutorial/tutorial_data.hpp"
+	<stdexcept>
+	<sstream>
+	"karts/kart.hpp"
+	"karts/kart_properties_manager.hpp"
+	"modes/linear_world.hpp"
+	"race/grand_prix_data.hpp"
+	"race/grand_prix_manager.hpp"
+	"race/race_manager.hpp"
+	"tracks/track.hpp"
+	"tracks/track_manager.hpp"
+	"utils/translation.hpp"
+
+1294995505 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_emitter.cpp
+	"graphics/particle_emitter.hpp"
+	"graphics/material.hpp"
+	"graphics/material_manager.hpp"
+	"graphics/particle_kind.hpp"
+	"graphics/irr_driver.hpp"
+	"io/file_manager.hpp"
+	"utils/constants.hpp"
+
+1294995505 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_kind.cpp
+	"graphics/particle_kind.hpp"
+	"graphics/material.hpp"
+	"graphics/material_manager.hpp"
+	"graphics/irr_driver.hpp"
+	"io/file_manager.hpp"
+	"io/xml_node.hpp"
+	"utils/constants.hpp"
+	<stdexcept>
+
+1295260962 source:/home/aeonphyxius/projects/games/supertuxkart/src/graphics/particle_kind_manager.cpp
+	"graphics/particle_kind_manager.hpp"
+	"io/file_manager.hpp"
+	<stdexcept>
 

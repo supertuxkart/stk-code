@@ -105,16 +105,10 @@
 		<Linker>
 			<Add directory="Debug" />
 		</Linker>
-		<Unit filename="../../addons/addons.cpp" />
-		<Unit filename="../../addons/addons.hpp" />
-		<Unit filename="../../addons/network.cpp" />
-		<Unit filename="../../addons/network.hpp" />
 		<Unit filename="../../addons/zip.cpp" />
 		<Unit filename="../../addons/zip.hpp" />
 		<Unit filename="../../animations/animation_base.cpp" />
 		<Unit filename="../../animations/animation_base.hpp" />
-		<Unit filename="../../animations/animation_manager.cpp" />
-		<Unit filename="../../animations/animation_manager.hpp" />
 		<Unit filename="../../animations/billboard_animation.cpp" />
 		<Unit filename="../../animations/billboard_animation.hpp" />
 		<Unit filename="../../animations/ipo.cpp" />
@@ -149,7 +143,6 @@
 		<Unit filename="../../config/user_config.cpp" />
 		<Unit filename="../../config/user_config.hpp" />
 		<Unit filename="../../graphics/CBatchingMesh.cpp" />
-		<Unit filename="../../graphics/CBatchingMesh.h" />
 		<Unit filename="../../graphics/camera.cpp" />
 		<Unit filename="../../graphics/camera.hpp" />
 		<Unit filename="../../graphics/explosion.cpp" />
@@ -164,16 +157,18 @@
 		<Unit filename="../../graphics/mesh_tools.hpp" />
 		<Unit filename="../../graphics/moving_texture.cpp" />
 		<Unit filename="../../graphics/moving_texture.hpp" />
-		<Unit filename="../../graphics/nitro.cpp" />
-		<Unit filename="../../graphics/nitro.hpp" />
+		<Unit filename="../../graphics/particle_emitter.cpp" />
+		<Unit filename="../../graphics/particle_emitter.hpp" />
+		<Unit filename="../../graphics/particle_kind.cpp" />
+		<Unit filename="../../graphics/particle_kind.hpp" />
+		<Unit filename="../../graphics/particle_kind_manager.cpp" />
+		<Unit filename="../../graphics/particle_kind_manager.hpp" />
 		<Unit filename="../../graphics/shadow.cpp" />
 		<Unit filename="../../graphics/shadow.hpp" />
 		<Unit filename="../../graphics/skid_marks.cpp" />
 		<Unit filename="../../graphics/skid_marks.hpp" />
 		<Unit filename="../../graphics/slip_stream.cpp" />
 		<Unit filename="../../graphics/slip_stream.hpp" />
-		<Unit filename="../../graphics/smoke.cpp" />
-		<Unit filename="../../graphics/smoke.hpp" />
 		<Unit filename="../../graphics/stars.cpp" />
 		<Unit filename="../../graphics/stars.hpp" />
 		<Unit filename="../../graphics/water_splash.cpp" />
@@ -238,6 +233,8 @@
 		<Unit filename="../../io/file_manager.hpp" />
 		<Unit filename="../../io/xml_node.cpp" />
 		<Unit filename="../../io/xml_node.hpp" />
+		<Unit filename="../../io/xml_writer.cpp" />
+		<Unit filename="../../io/xml_writer.hpp" />
 		<Unit filename="../../items/attachment.cpp" />
 		<Unit filename="../../items/attachment.hpp" />
 		<Unit filename="../../items/attachment_manager.cpp" />
@@ -373,8 +370,6 @@
 		<Unit filename="../../replay/replay_recorder.hpp" />
 		<Unit filename="../../states_screens/addons_screen.cpp" />
 		<Unit filename="../../states_screens/addons_screen.hpp" />
-		<Unit filename="../../states_screens/addons_update_screen.cpp" />
-		<Unit filename="../../states_screens/addons_update_screen.hpp" />
 		<Unit filename="../../states_screens/arenas_screen.cpp" />
 		<Unit filename="../../states_screens/arenas_screen.hpp" />
 		<Unit filename="../../states_screens/challenges.cpp" />
@@ -478,6 +473,8 @@
 		<Unit filename="../../tracks/track_object_manager.hpp" />
 		<Unit filename="../../tutorial/tutorial.cpp" />
 		<Unit filename="../../tutorial/tutorial.hpp" />
+		<Unit filename="../../tutorial/tutorial_data.cpp" />
+		<Unit filename="../../tutorial/tutorial_data.hpp" />
 		<Unit filename="../../tutorial/tutorial_manager.cpp" />
 		<Unit filename="../../tutorial/tutorial_manager.hpp" />
 		<Unit filename="../../utils/constants.cpp" />

@@ -16,11 +16,20 @@
 	<File name="../../challenges/unlock_manager.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1317" topLine="25" />
 	</File>
+	<File name="../../config/user_config.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="2247" topLine="51" />
+	</File>
 	<File name="../../io/file_manager.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="4834" topLine="123" />
 	</File>
 	<File name="../../items/bowling.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2000" topLine="33" />
+	</File>
+	<File name="../../karts/kart.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="55874" topLine="1458" />
+	</File>
+	<File name="../../karts/kart.hpp" open="1" top="0" tabpos="3">
+		<Cursor position="1298" topLine="6" />
 	</File>
 	<File name="../../../src/main.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="6812" topLine="177" />
@@ -31,25 +40,28 @@
 	<File name="../../network/message.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2505" topLine="68" />
 	</File>
+	<File name="../../race/highscores.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="3826" topLine="92" />
+	</File>
 	<File name="../../states_screens/challenges.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="2262" topLine="33" />
 	</File>
 	<File name="../../states_screens/challenges.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="10" />
 	</File>
-	<File name="../../states_screens/main_menu_screen.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="8371" topLine="182" />
+	<File name="../../states_screens/main_menu_screen.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="866" topLine="0" />
 	</File>
-	<File name="../../states_screens/tutorial_screen.cpp" open="1" top="0" tabpos="2">
+	<File name="../../states_screens/tutorial_screen.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="91" topLine="54" />
 	</File>
-	<File name="../../states_screens/tutorial_screen.hpp" open="1" top="0" tabpos="1">
+	<File name="../../states_screens/tutorial_screen.hpp" open="0" top="0" tabpos="1">
 		<Cursor position="91" topLine="0" />
 	</File>
-	<File name="../../tutorial/tutorial.hpp" open="1" top="0" tabpos="4">
+	<File name="../../tutorial/tutorial.hpp" open="0" top="0" tabpos="4">
 		<Cursor position="0" topLine="45" />
 	</File>
-	<File name="../../tutorial/tutorial_manager.hpp" open="1" top="0" tabpos="5">
+	<File name="../../tutorial/tutorial_manager.hpp" open="0" top="0" tabpos="5">
 		<Cursor position="421" topLine="0" />
 	</File>
 	<File name="../../utils/translation.cpp" open="0" top="0" tabpos="4">
