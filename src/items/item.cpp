@@ -34,7 +34,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_xyz               = xyz;
     m_deactive_time     = 0;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    Vec3  hpr           = Vec3(0, normal);
+    m_original_hpr      = Vec3(0, normal);
     m_item_id           = item_id;
     m_original_type     = ITEM_NONE;
     m_collected         = false;
@@ -53,7 +53,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
-    m_node->setRotation(hpr.toIrrHPR());
+    m_node->setRotation(m_original_hpr.toIrrHPR());
     m_node->grab();
 }   // Item
 
@@ -90,10 +90,11 @@ void Item::switchBack()
     // bubble gum has no original type.
     if(m_original_type==ITEM_NONE)
         return;
-
+    
     setType(m_original_type);
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);
+    m_node->setRotation(m_original_hpr.toIrrHPR());
 }   // switchBack
 
 //-----------------------------------------------------------------------------

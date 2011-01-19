@@ -64,6 +64,14 @@ private:
      *  It is ITEM_NONE if the item is not switched. */
     ItemType      m_original_type;
 
+    /** Stores the original rotation of an item. This is used in
+     *  case of a switch to restore the rotation of a bubble gum
+     *  (bubble gums don't rotate, but it will be replaced with
+     *  a nitro which rotates, and so overwrites the original 
+     *  rotation).
+    */
+    Vec3 m_original_hpr;
+
     /** True if item was collected & is not displayed. */
     bool          m_collected;
 
