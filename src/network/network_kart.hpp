@@ -29,7 +29,7 @@ private:
 public:
          NetworkKart(const std::string& kart_name, int position,
                      const btTransform& init_transform,
-                     int global_player_id);
+                     int global_player_id, RaceManager::KartType type);
     void setControl(const KartControl& kc);
     virtual bool isNetworkKart() const { return true; }
 };   // NetworkKart

@@ -91,7 +91,7 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                            race_manager->getNumberOfKarts()-1);
     btTransform init_pos   = m_track->getStartTransform(index);
 
-    Kart *new_kart         = new Kart(prof_kart_id, index+1, init_pos);
+    Kart *new_kart         = new Kart(prof_kart_id, index+1, init_pos, RaceManager::KT_AI);
 
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);

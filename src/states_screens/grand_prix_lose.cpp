@@ -314,12 +314,11 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             m_kart_y = KART_Y;
             m_kart_z = KART_Z;
             
-            kart_model->attachModel(&kart_main_node);
+            kart_model->attachModel(&kart_main_node, false);
             kart_main_node->setPosition( core::vector3df(m_kart_x, m_kart_y, m_kart_z) );
             //kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             kart_main_node->updateAbsolutePosition();
             kart_main_node->setRotation(vector3df(0, 90, 0));
-            kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
             kart_model->update(0.0f, 0.0f, susp);
         }

@@ -64,7 +64,7 @@
  *  \param init_transform  The initial position and rotation for this kart.
  */
 Kart::Kart (const std::string& ident, int position,
-            const btTransform& init_transform)
+            const btTransform& init_transform, RaceManager::KartType type)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
 
@@ -139,7 +139,18 @@ Kart::Kart (const std::string& ident, int position,
         fprintf(stdout, "Error: Could not allocate a sfx object for the kart. Further errors may ensue!\n");
     }
 
-    loadData();
+    bool animations = true;
+    const int anims = UserConfigParams::m_show_steering_animations;
+    if (anims == ANIMS_NONE)
+    {
+        animations = false;
+    }
+    else if (anims == ANIMS_PLAYERS_ONLY && type != RaceManager::KT_PLAYER)
+    {
+        animations = false;
+    }
+    
+    loadData(animations);
 
     reset();
 }   // Kart
@@ -1438,9 +1449,9 @@ void Kart::updatePhysics(float dt)
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
  */
-void Kart::loadData()
+void Kart::loadData(bool animatedModel)
 {
-    m_kart_model->attachModel(&m_node);
+    m_kart_model->attachModel(&m_node, animatedModel);
     // Attachment must be created after attachModel, since only then the
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which

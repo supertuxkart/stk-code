@@ -189,11 +189,11 @@ protected:
     
 public:
                    Kart(const std::string& ident, int position, 
-                        const btTransform& init_transform);
+                        const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
-    void           loadData();
+    void           loadData(bool animatedModel);
     virtual void   updateGraphics(const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     void           createPhysics    ();

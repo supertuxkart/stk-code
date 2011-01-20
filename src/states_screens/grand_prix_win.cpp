@@ -433,7 +433,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         {
             KartModel *kart_model = kp->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
-            kart_model->attachModel(&kart_main_node);
+            kart_model->attachModel(&kart_main_node, false);
             
             m_kart_x[n] = m_podium_x[n];
             m_kart_y[n] = INITIAL_Y + KARTS_DELTA_Y;
@@ -445,7 +445,6 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
                                                          m_kart_y[n],
                                                          m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
-            kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
             kart_model->update(0.0f, 0.0f, susp);
         }

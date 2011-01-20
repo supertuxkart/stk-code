@@ -25,8 +25,9 @@
     from the network manager.
     */
 NetworkKart::NetworkKart(const std::string &kart_name, int position, 
-                         const btTransform &init_transform, int global_player_id)
-                         : Kart(kart_name, position, init_transform)
+                         const btTransform &init_transform, int global_player_id,
+                         RaceManager::KartType type)
+                         : Kart(kart_name, position, init_transform, type)
 {
     m_global_player_id = global_player_id;
 }   // NetworkKart
