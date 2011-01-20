@@ -265,7 +265,11 @@ const wchar_t* Translations::w_gettext(const char* original)
         if(*c)
             while(*(c+1))
             {
-                if( (*c!='i' && *c!='s') ) continue;
+                if( (*c!='i' && *c!='s') ) 
+                {
+                    c++;
+                    continue;
+                }
                 if (*(c+1)=='%')
                 {
                     *(c+1) = *c;
