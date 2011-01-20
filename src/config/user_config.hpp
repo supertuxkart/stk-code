@@ -282,7 +282,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
             PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, "steering_animations", &m_video_group,
                                                "Whether to display kart animations (0=disabled for all; "
-                                               "1=disabled for humans, disabled for AIs; 2=enabled for all") );
+                                               "1=enabled for humans, disabled for AIs; 2=enabled for all") );
 
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );

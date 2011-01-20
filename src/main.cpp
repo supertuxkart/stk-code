@@ -242,7 +242,7 @@ void cmdLineHelp (char* invocation)
     "                          (Default: 0, OpenGL: 1, Direct3D9: 2, \n"
     "                           Direct3D8: 3, Software: 4, \n"
     "                           Burning's Software: 5, Null device: 6).\n"
-    "       --animations=n     Play karts' animations (Enable for All : 2, Enable for humans only: 1, Disable for all: 0).\n"
+    "       --animations=n     Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
     "       --gfx=n            Play other graphical effects like impact stars dance,\n"
     "                           water animations or explosions (Enable: 1, Disable: 0).\n"
     "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
