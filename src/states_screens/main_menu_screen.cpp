@@ -134,9 +134,16 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
                    video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
         
         // Close popup when focus lost
-        if (m_lang_popup != NULL && !m_lang_popup->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (m_lang_popup != NULL)
         {
-            closeLangPopup();
+            Widget* focus = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            const core::position2d<s32> mouse = irr_driver->getDevice()->getCursorControl()->getPosition();
+            if (mouse.X < m_lang_popup->m_x - 50 || mouse.X > m_lang_popup->m_x + m_lang_popup->m_w + 50 ||
+                mouse.Y < m_lang_popup->m_y - 50  || // we don't check if mouse Y is too large because the mouse will come from the bottom
+                (focus != NULL && focus->getType() == WTYPE_RIBBON))
+            {
+                closeLangPopup();
+            }
         }
     }
 }
