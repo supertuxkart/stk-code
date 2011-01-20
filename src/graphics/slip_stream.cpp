@@ -360,9 +360,11 @@ void SlipStream::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         m_target_kart= world->getKart(i);
-        // Don't test for slipstream with itself.
-        if(m_target_kart==m_kart         || 
-            m_target_kart->isEliminated()    ) continue;
+        // Don't test for slipstream with itself, a kart that is being
+        // rescued or exploding, or an eliminated kart
+        if(m_target_kart==m_kart                       || 
+            m_target_kart->playingEmergencyAnimation() ||
+            m_target_kart->isEliminated()                ) continue;
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
