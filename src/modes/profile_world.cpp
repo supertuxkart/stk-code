@@ -1,4 +1,4 @@
-//  $Id: profile_world.cpp 3882 2009-08-18 11:05:40Z davemk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs

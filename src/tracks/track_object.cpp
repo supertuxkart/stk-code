@@ -1,4 +1,4 @@
-//  $Id: track_object.cpp 4308 2009-12-17 00:22:29Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs

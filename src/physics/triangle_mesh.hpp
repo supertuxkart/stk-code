@@ -1,4 +1,4 @@
-//  $Id: triangle_mesh.hpp 839 2006-10-24 00:01:56Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

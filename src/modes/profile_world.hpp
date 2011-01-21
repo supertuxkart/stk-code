@@ -1,4 +1,4 @@
-//  $Id: profile_world.hpp 3849 2009-08-13 11:12:26Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs

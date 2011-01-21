@@ -1,4 +1,4 @@
-//  $Id: vec3.hpp 1954 2008-05-20 10:01:26Z scifly $
+//  $Id$
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3

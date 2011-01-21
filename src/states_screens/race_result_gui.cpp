@@ -1,4 +1,4 @@
-//  $Id: race_result_gui.cpp 5424 2010-05-10 23:53:32Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Joerg Henrichs

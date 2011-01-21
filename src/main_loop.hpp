@@ -1,4 +1,4 @@
-//  $Id: main_loop.hpp 855 2006-11-17 01:50:37Z coz $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>

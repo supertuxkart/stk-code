@@ -1,4 +1,4 @@
-//  $Id: randum_number.hpp 2163 2008-07-14 03:40:58Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008  Joerg Henrichs

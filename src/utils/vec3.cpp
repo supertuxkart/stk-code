@@ -1,4 +1,4 @@
-//  $Id: vec3.cpp 1954 2008-05-20 10:01:26Z scifly $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

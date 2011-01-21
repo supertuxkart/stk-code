@@ -1,4 +1,4 @@
-//  $Id: bezier.hpp 3527 2009-05-22 03:23:48Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs

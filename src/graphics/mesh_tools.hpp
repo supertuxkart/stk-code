@@ -1,4 +1,4 @@
-//  $Id: mesh_tools.hpp 3001 2009-01-20 13:51:08Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs

@@ -1,4 +1,4 @@
-//  $Id: three_strikes_battle.hpp 2326 2008-10-04 18:50:45Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 SuperTuxKart-Team

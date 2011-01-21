@@ -1,4 +1,4 @@
- //  $Id: highscores.hpp 921 2007-02-28 05:43:34Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

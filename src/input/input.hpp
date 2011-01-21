@@ -1,4 +1,4 @@
-//  $Id: input.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007-2008 Robert Schuster <robertschuster@fsfe.org>

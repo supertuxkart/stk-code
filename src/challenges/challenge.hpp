@@ -1,4 +1,4 @@
-//  $Id: challenge.hpp 1259 2007-09-24 12:28:19Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

@@ -1,4 +1,4 @@
-//  $Id: max_speed.cpp 6306 2010-10-18 06:04:05Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010  Joerg Henrichs

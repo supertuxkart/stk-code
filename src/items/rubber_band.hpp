@@ -1,4 +1,4 @@
-//  $Id: rubber_band.hpp 2458 2008-11-15 02:12:28Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

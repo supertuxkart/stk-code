@@ -1,4 +1,4 @@
-//  $Id: font.cpp 3625 2009-06-21 01:10:43Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 

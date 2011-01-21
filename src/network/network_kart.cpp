@@ -1,4 +1,4 @@
-//  $Id: network_kart.cpp 2173 2008-07-21 01:55:41Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>

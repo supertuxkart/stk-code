@@ -1,4 +1,4 @@
-//  $Id: plibdrv.cpp 757 2006-09-11 22:27:39Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //

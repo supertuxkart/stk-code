@@ -1,4 +1,4 @@
-//  $Id: kart_model.hpp 2400 2008-10-30 02:02:56Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

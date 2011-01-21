@@ -1,4 +1,4 @@
-//  $Id: race_result_gui.hpp 5310 2010-04-28 18:26:23Z auria $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Joerg Henrichs

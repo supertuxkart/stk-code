@@ -1,4 +1,4 @@
-//  $Id: attachment_manager.cpp 808 2006-10-03 20:17:37Z coz $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

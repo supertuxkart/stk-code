@@ -1,4 +1,4 @@
-//  $Id: music_information.hpp 1610 2008-03-01 03:18:53Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

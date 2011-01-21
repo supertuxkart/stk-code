@@ -1,4 +1,4 @@
-//  $Id: terrain_info.hpp 1284 2007-11-08 12:31:54Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs

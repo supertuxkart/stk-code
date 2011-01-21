@@ -1,4 +1,4 @@
-//  $Id: binding.hpp 6504 2010-11-11 20:59:49Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Marianne Gagnon

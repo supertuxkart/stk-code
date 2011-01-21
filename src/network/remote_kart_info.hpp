@@ -1,4 +1,4 @@
-//  $Id: remote_kart_information.hpp 2190 2008-07-29 05:38:30Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008  Joerg Henrichs

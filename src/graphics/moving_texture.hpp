@@ -1,4 +1,4 @@
-//  $Id: moving_texture.hpp 796 2006-09-27 07:06:34Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

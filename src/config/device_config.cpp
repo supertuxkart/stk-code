@@ -1,4 +1,4 @@
-// $Id: player.hpp 6767 2010-11-29 10:02:47Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 SuperTuxKart-Team

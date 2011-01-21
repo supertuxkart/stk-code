@@ -1,4 +1,4 @@
-//  $Id: character_info_message.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
