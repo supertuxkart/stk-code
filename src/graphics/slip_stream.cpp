@@ -366,6 +366,12 @@ void SlipStream::update(float dt)
             m_target_kart->playingEmergencyAnimation() ||
             m_target_kart->isEliminated()                ) continue;
 
+        float diff = fabsf(m_target_kart->getXYZ().getY() 
+                           - m_kart->getXYZ().getY()      );
+        // If the kart is 'on top' of this kart (e.g. up on a bridge),
+        // don't consider it for slipstreaming.
+
+        if(diff>6.0f) continue;
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
         // against the minimum slipstream speed kart of this kart - not 
