@@ -23,6 +23,7 @@
 #include "irrlicht.h"
 #include <vector>
 #include <string>
+#include "utils/string_utils.hpp"
 
 #if ENABLE_NLS
 #  ifdef __APPLE__
@@ -31,15 +32,17 @@
 #    include <libintl.h>
 #  endif
 
-#  define _(String)            (translations->w_gettext(String))
-#  define gettext_noop(String) (String)
-#  define N_(String)           (gettext_noop (String))
+#  define _(String, args...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##args)))
+#  define _LTR(String, args...) (StringUtils::insertValues(translations->w_gettext(String), ##args))
+#  define gettext_noop(String)  (String)
+#  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
 #  if defined(WIN32) && !defined(__CYGWIN__)
 #    undef fprintf
 #  endif
 #else   // No NLS
 #  define _(String)            (translations->w_gettext(String))
+#  define _LTR(String)         (translations->w_gettext(String))
 #  define gettext_noop(String) (String)
 #  define N_(String)           (String)
 #endif
@@ -49,11 +52,14 @@ class Translations
 private:
     irr::core::stringw m_converted_string;
     bool m_rtl;
+    
 public:
                        Translations();
     const wchar_t     *w_gettext(const char* original);
     bool               isRTLLanguage() const;
-    
+    const wchar_t*     fribidize(const wchar_t* in_ptr);
+    const wchar_t*     fribidize(const irr::core::stringw str) { return fribidize(str.c_str()); }
+
     const std::vector<std::string>* getLanguageList() const;
 };   // Translations
 

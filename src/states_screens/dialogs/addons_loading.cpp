@@ -62,16 +62,13 @@ AddonsLoading::AddonsLoading(const float w, const float h,
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
     }
     
-    core::stringw name = StringUtils::insertValues(_("Name: %i"),
-                                                   m_addon.getName().c_str() );
+    core::stringw name = _("Name: %i", m_addon.getName().c_str() );
     getWidget<LabelWidget>("name")->setText(name);
 
-    core::stringw desc = StringUtils::insertValues(_("Description: %i"),
-                                             m_addon.getDescription().c_str());
+    core::stringw desc = _("Description: %i", m_addon.getDescription().c_str());
     getWidget<LabelWidget>("description")->setText(desc);
 
-    core::stringw version = StringUtils::insertValues(_("Version: %d"),
-                                            m_addon.getVersion());
+    core::stringw version = _("Version: %d", m_addon.getVersion());
     getWidget<LabelWidget>("version")->setText(version);
 
 }   // AddonsLoading

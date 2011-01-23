@@ -256,44 +256,13 @@ public:
         target_w = m_w;
         target_h = m_h;
         
-        /*
-        // ---- Player ID label
-        if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
-        {
-            deviceName += _("keyboard");
-        }
-        else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
-        {
-            deviceName += _("gamepad");
-        }
-        
-        m_player_ID_label = new LabelWidget(false, true);
-        
-        m_player_ID_label->setText(
-            //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-            StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str())
-                                   );
-        
-        m_player_ID_label->m_properties[PROP_TEXT_ALIGN] = "center";
-        m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
-        m_player_ID_label->m_x = player_id_x;
-        m_player_ID_label->m_y = player_id_y;
-        m_player_ID_label->m_w = player_id_w;
-        m_player_ID_label->m_h = player_id_h;
-        
-        //playerID->setParent(this);
-        m_children.push_back(m_player_ID_label);
-        */
-        
         // ---- Player identity spinner
         m_player_ident_spinner = new PlayerNameSpinner(parent, m_playerID);
         m_player_ident_spinner->m_x = player_name_x;
         m_player_ident_spinner->m_y = player_name_y;
         m_player_ident_spinner->m_w = player_name_w;
         m_player_ident_spinner->m_h = player_name_h;
-        //m_player_ident_spinner->m_event_handler = this;
-        
-        
+
         if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
         {
             m_player_ident_spinner->setBadge(KEYBOARD_BADGE);
@@ -432,11 +401,6 @@ public:
         
         // restore previous focus, but with new player ID
         if (focus != NULL) focus->setFocusForPlayer(m_playerID);
-
-        //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-        //irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
-        //m_player_ID_label->setText( newLabel ); 
-        //m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
         
         if (m_player_ident_spinner != NULL) m_player_ident_spinner->setID(m_playerID);
     }   // setPlayerID
@@ -536,11 +500,9 @@ public:
                                                m_player_ident_spinner->m_y),
                             core::dimension2di(m_player_ident_spinner->m_w,
                                                m_player_ident_spinner->m_h));
-        GUIEngine::getGUIEnv()->addStaticText(StringUtils::insertValues( _("%s is ready"), playerNameString ).c_str(),
+        GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString),
                                               rect)->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
-        
-        //m_player_ID_label->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
-        
+                
         m_children.remove(m_player_ident_spinner);
         m_player_ident_spinner->getIrrlichtElement()->remove();
         m_player_ident_spinner->elementRemoved();

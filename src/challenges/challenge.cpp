@@ -42,14 +42,12 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
             
-            return StringUtils::insertValues(_("New track '%s' now available"), 
-                                             track->getName().c_str() );
+            return _("New track '%s' now available", track->getName());
             break;
         }
         case UNLOCK_MODE:
         {
-            return StringUtils::insertValues(_("New game mode '%s' now available"), 
-                                             user_name.c_str());
+            return _("New game mode '%s' now available", user_name);
         }
         case UNLOCK_GP:
         {
@@ -59,13 +57,11 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
             if (gp == NULL) return irr::core::stringw( L"????" );
             
             const irr::core::stringw& gp_user_name = gp->getName();
-            return StringUtils::insertValues(_("New Grand Prix '%s' now available"),
-                                                gp_user_name.c_str());
+            return _("New Grand Prix '%s' now available", gp_user_name);
         }
         case UNLOCK_DIFFICULTY:
         {
-            return StringUtils::insertValues(_("New difficulty '%s' now available"), 
-                                             user_name.c_str());
+            return _("New difficulty '%s' now available", user_name);
         }
         case UNLOCK_KART:
         {
@@ -74,8 +70,7 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
             
-            return StringUtils::insertValues( _("New kart '%s' now available"),
-                                              kp->getName().c_str());
+            return _("New kart '%s' now available", kp->getName());
         }
         default:
             assert(false);

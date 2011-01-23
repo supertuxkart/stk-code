@@ -308,7 +308,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     }
     else if (kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
     {
-        m_race_gui->addMessage(StringUtils::insertValues(_("Lap %i"), kart_info.m_race_lap+1),
+        m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
                                m_karts[kart_index], 3.0f, 40, video::SColor(255, 210, 100, 50), true);
     }
 
@@ -366,7 +366,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
             irr::core::stringw m_fastest_lap_message;
             //I18N: as in "fastest lap: 60 seconds by Wilber"
-            m_fastest_lap_message += StringUtils::insertValues(_("%s by %s"), s.c_str(), kart->getName().c_str()).c_str();
+            m_fastest_lap_message += _("%s by %s", s.c_str(), kart->getName().c_str());
 
             m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                    2.0f, 40, video::SColor(255, 100, 210, 100));

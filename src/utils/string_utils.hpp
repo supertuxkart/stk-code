@@ -107,6 +107,10 @@ namespace StringUtils
      */
     std::string insertValues(const std::string &s, std::vector<std::string>& all_vals);
     
+    /** This no-op is useful when using variadic arguments, so that we may support the case with 0 variadic arguments */
+    template <class T1>
+    T1 insertValues(const T1& s) { return s; }
+    
     // ------------------------------------------------------------------------
     /** Same as above but for wide-strings */
     irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals);

@@ -516,8 +516,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
                         abs(value)>gp->m_deadzone)
                     {
                         //I18N: message shown when an input device is used but is not associated to any player
-                        GUIEngine::showMessage(StringUtils::insertValues(_("Ignoring '%s', you needed to join earlier to play!"),
-                                                                         irr::core::stringw(gp->m_name.c_str()).c_str() ).c_str());
+                        GUIEngine::showMessage(_("Ignoring '%s', you needed to join earlier to play!",
+                                                 irr::core::stringw(gp->m_name.c_str()).c_str()));
                     }
                 }
                 return;

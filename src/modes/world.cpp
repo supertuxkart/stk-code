@@ -739,9 +739,8 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
             }
             else
             {
-                m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has been eliminated."),
-                                                                 kart->getName().c_str()),
-                                                                 *i, 2.0f, 60);
+                m_race_gui->addMessage(_("'%s' has been eliminated.", kart->getName().c_str()),
+                                       *i, 2.0f, 60);
             }
         }   // for i in kart
     }

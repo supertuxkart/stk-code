@@ -147,7 +147,82 @@ Translations::Translations()
 #endif
 
 }   // Translations
+
 // ----------------------------------------------------------------------------
+
+const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
+{
+#if ENABLE_BIDI
+    if(this->isRTLLanguage())
+    {
+        const int FRIBIDI_BUFFER_SIZE = 512;
+        FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
+        int len = 0;
+        int n = 0;
+        //std::cout << "fribidi input : ";
+        for (n = 0; ; n++)
+        {
+            fribidiInput[n] = in_ptr[n];
+            //std::cout << (int)fribidiInput[n] << " ";
+            len++;
+            
+            if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
+            {
+                std::cerr << "WARNING : translated string too long, truncating!\n";
+                fribidiInput[n] = 0;
+                break;
+            }
+            if (fribidiInput[n] == 0) break; // stop on '\0'
+        }
+        //std::cout << " (len=" << len << ")\n";
+        
+        // Assume right to left as start direction.
+#if FRIBIDI_MINOR_VERSION==10
+        // While the doc for older fribidi versions is somewhat sparse,
+        // using the RIGHT-TO-LEFT EMBEDDING character here appears to
+        // work correct.
+        FriBidiCharType pbase_dir = L'\u202B';
+#else
+        FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
+#endif
+        
+        static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
+        for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
+        fribidi_boolean result = fribidi_log2vis(fribidiInput,
+                                                 len-1,
+                                                 &pbase_dir,
+                                                 fribidiOutput,
+                                                 /* gint        *position_L_to_V_list */ NULL,
+                                                 /* gint        *position_V_to_L_list */ NULL,
+                                                 /* gint8       *embedding_level_list */ NULL
+                                                 );
+        
+        if (!result)
+        {
+            std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
+            m_converted_string = core::stringw(in_ptr);
+            return m_converted_string.c_str();
+        }
+        
+#ifdef WIN32
+        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+        // So we simply copy the characters over here (note that this
+        // is technically incorrect, all characters we use/support fit
+        // in 16 bits, which is what irrlicht supports atm).
+        static wchar_t out[FRIBIDI_BUFFER_SIZE];
+        for(int i=0; i<len; i++)
+            out[i]=fribidiOutput[i];
+        out[len]=0;
+        return out;
+#else
+        return (const wchar_t*)fribidiOutput;
+#endif //WIND32
+    }
+    
+#endif // ENABLE_BIDI
+    return in_ptr;
+}
+
 const wchar_t* Translations::w_gettext(const char* original)
 {
     if (original[0] == '\0') return L"";
@@ -204,77 +279,7 @@ const wchar_t* Translations::w_gettext(const char* original)
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
-
-#if ENABLE_BIDI
-    if(this->isRTLLanguage())
-    {
-        const int FRIBIDI_BUFFER_SIZE = 512;
-        FriBidiChar fribidiInput[FRIBIDI_BUFFER_SIZE];
-        int len = 0;
-        int n = 0;
-        //std::cout << "fribidi input : ";
-        for (n = 0; ; n++)
-        {
-            fribidiInput[n] = out_ptr[n];
-            //std::cout << (int)fribidiInput[n] << " ";
-            len++;
-
-            if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
-            {
-                std::cerr << "WARNING : translated string too long, truncating!\n";
-                fribidiInput[n] = 0;
-                break;
-            }
-            if (fribidiInput[n] == 0) break; // stop on '\0'
-        }
-        //std::cout << " (len=" << len << ")\n";
-
-        // Assume right to left as start direction.
-#if FRIBIDI_MINOR_VERSION==10
-        // While the doc for older fribidi versions is somewhat sparse,
-        // using the RIGHT-TO-LEFT EMBEDDING character here appears to
-        // work correct.
-        FriBidiCharType pbase_dir = L'\u202B';
-#else
-        FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
-#endif
-
-        static FriBidiChar fribidiOutput[FRIBIDI_BUFFER_SIZE];
-        for (n = 0; n < 512 ; n++)  { fribidiOutput[n] = 0; }
-        fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                                 len-1,
-                                                 &pbase_dir,
-                                                 fribidiOutput,
-                                                 /* gint        *position_L_to_V_list */ NULL,
-                                                 /* gint        *position_V_to_L_list */ NULL,
-                                                 /* gint8       *embedding_level_list */ NULL
-                                                 );
-
-        if (!result)
-        {
-            std::cerr << "Fribidi failed in 'fribidi_log2vis' =(\n";
-            m_converted_string = core::stringw(original);
-            return m_converted_string.c_str();
-        }
-
-#ifdef WIN32
-        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
-        // So we simply copy the characters over here (note that this
-        // is technically incorrect, all characters we use/support fit
-        // in 16 bits, which is what irrlicht supports atm).
-        static wchar_t out[FRIBIDI_BUFFER_SIZE];
-        for(int i=0; i<len; i++)
-            out[i]=fribidiOutput[i];
-        out[len]=0;
-        return out;
-#else
-        return (const wchar_t*)fribidiOutput;
-#endif
-    }
-
-#endif
     return out_ptr;
-
 }
 
 bool Translations::isRTLLanguage() const

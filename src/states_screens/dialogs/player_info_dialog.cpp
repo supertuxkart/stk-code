@@ -136,7 +136,7 @@ void PlayerInfoDialog::showConfirmDialog()
     
     irr::core::stringw message = 
         //I18N: In the player info dialog (when deleting)
-        StringUtils::insertValues( _("Do you really want to delete player '%s' ?"), m_player->getName());
+        _("Do you really want to delete player '%s' ?", m_player->getName());
     
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
     

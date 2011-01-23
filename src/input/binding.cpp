@@ -249,30 +249,23 @@ irr::core::stringw Binding::getAsString() const
             break;
         case Input::IT_STICKMOTION:
             //I18N: to appear in input configuration screen, for gamepad axes
-            s = StringUtils::insertValues( _("Axis %d %s"), m_id, 
-                                          (m_dir == Input::AD_NEGATIVE)
-                                          ? L"-" 
-                                          : L"+");
+            s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
             break;
         case Input::IT_STICKBUTTON:
             //I18N: to appear in input configuration screen, for gamepad buttons
-            s = StringUtils::insertValues( _("Gamepad button %d"), 
-                                          (m_id+1));
+            s = ( _("Gamepad button %d", m_id+1));
             break;
         case Input::IT_STICKHAT:
             //I18N: to appear in input configuration screen, for gamepad hats
-            s = StringUtils::insertValues( _("Gamepad hat %d"), (m_id+1));
+            s = _("Gamepad hat %d", (m_id+1));
             break;
         case Input::IT_MOUSEBUTTON:
             //I18N: to appear in input configuration screen, for mouse (might not be used at all)
-            s = StringUtils::insertValues( _("Mouse button %d"), (m_id+1));
+            s = _("Mouse button %d", (m_id+1));
             break;
         case Input::IT_MOUSEMOTION: // FIXME : I don't reckon this is used at all
             //I18N: to appear in input configuration screen, for mouse (might not be used at all)
-            s = StringUtils::insertValues( _("Mouse axis %d %s"),
-                                           (m_id+1), 
-                                           (m_dir == Input::AD_NEGATIVE) 
-                                           ? '-': '+'                        );
+            s = _("Mouse axis %d %s", (m_id+1), (m_dir == Input::AD_NEGATIVE) ? '-': '+');
             break;
         default:
             s = "?";

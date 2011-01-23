@@ -166,10 +166,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             //I18N: In results of battle mode; %i is where the rank is inserted;
             //I18N: the first %s is where the kart name is inserted;
             //I18N: the second %s is where the time is inserted
-            kart_results_line = StringUtils::insertValues( _("%i. %s : survived for %s"),
-                                                          current_kart->getPosition(),
-                                                          kart_name.c_str(), 
-                                                          time_string.c_str());
+            kart_results_line = _("%i. %s : survived for %s",
+                                  current_kart->getPosition(),
+                                  kart_name.c_str(), 
+                                  time_string.c_str());
         }
         else
         {

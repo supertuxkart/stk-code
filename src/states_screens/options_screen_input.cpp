@@ -91,7 +91,7 @@ void OptionsScreenInput::buildDeviceList()
         
         //FIXME: I18N: since irrLicht's list widget has the nasty tendency to put the 
         //             icons very close to the text, I'm adding spaces to compensate...
-        devices->addItem(internal_name, StringUtils::insertValues(_("   Keyboard %i"), i), 0 /* icon */);
+        devices->addItem(internal_name, _("   Keyboard %i", i), 0 /* icon */);
     }
     
     const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();

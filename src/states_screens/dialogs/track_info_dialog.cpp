@@ -73,7 +73,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-    stringw text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
+    stringw text = _("Track by %s", track->getDesigner().c_str());
 
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
                                                creator_info_area, false , true , // border, word warp
