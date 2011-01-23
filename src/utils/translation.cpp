@@ -231,9 +231,9 @@ const wchar_t* Translations::w_gettext(const char* original)
 
         // Assume right to left as start direction.
 #if FRIBIDI_MINOR_VERSION==10
-	// While the doc for older fribidi versions is somewhat sparse,
-	// using the RIGHT-TO-LEFT EMBEDDING character here appears to
-	// work correct.
+        // While the doc for older fribidi versions is somewhat sparse,
+        // using the RIGHT-TO-LEFT EMBEDDING character here appears to
+        // work correct.
         FriBidiCharType pbase_dir = L'\u202B';
 #else
         FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
@@ -257,39 +257,6 @@ const wchar_t* Translations::w_gettext(const char* original)
             return m_converted_string.c_str();
         }
 
-        // Special format sequences like '%i' and '%2$s' will be reversed
-        // by fribidi (since wrapping them in 'embeded ltr' unicode sequences
-        // is not supported by some editors; see bug 3159482 for details)
-        // so we have to reverse 'i%' and 's$2%' back:
-        FriBidiChar *c=fribidiOutput;
-        if(*c)
-            while(*(c+1))
-            {
-                if( (*c!='i' && *c!='s') ) 
-                {
-                    c++;
-                    continue;
-                }
-                if (*(c+1)=='%')
-                {
-                    *(c+1) = *c;
-                    *c     = '%';
-                    c++;  // Skip the reversed character
-                }
-                // Check for %1$s or %2$i, which will have been
-                // reversed to s$1% and i$2%
-                else if( *(c+1)=='$'  &&
-                         *(c+2) && (*(c+2)>='0' && *(c+2)<='9') &&
-                         *(c+3) && (*(c+3)=='%')                     )
-                {
-                    *(c+3) = *c;
-                    *(c+1) = *(c+2);
-                    *(c+2) = '$';
-                    *c     = '%';
-                    c+=3;  // skip the reversed characters
-                }
-                c++;
-            }
 #ifdef WIN32
         // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
         // So we simply copy the characters over here (note that this
