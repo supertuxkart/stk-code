@@ -114,6 +114,10 @@ RaceGUI::RaceGUI()
     gui::ScalableFont* font = GUIEngine::getFont(); 
     m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
     
+    m_timer_width = font->getDimension(L"99:99:99").Width;
+
+    font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
+    
     int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
@@ -130,9 +134,6 @@ RaceGUI::RaceGUI()
     if(m_rank_lap_width < w) m_rank_lap_width = w;
     w = font->getDimension(m_string_rank.c_str()).Width;
     if(m_rank_lap_width < w) m_rank_lap_width = w;
-
-
-    m_timer_width = font->getDimension(L"99:99:99").Width;
     
 }   // RaceGUI
 
@@ -929,9 +930,10 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart,
         pos.UpperLeftCorner.Y   += 40;
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X 
-                            - m_rank_lap_width-10;
+                            - m_rank_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
-    gui::ScalableFont* font = GUIEngine::getFont(); 
+
+    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
     int font_height         = (int)(font->getDimension(L"X").Height);
     static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
@@ -1032,6 +1034,14 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     // First line of text somewhat under the top of the viewport.
     y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
 
+    gui::ScalableFont* font = GUIEngine::getFont();
+    int font_height = m_max_font_height;
+    if (race_manager->getNumLocalPlayers() > 2)
+    {
+        font = GUIEngine::getSmallFont();
+        font_height = m_small_font_max_height;
+    }
+    
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
@@ -1046,11 +1056,13 @@ void RaceGUI::drawAllMessages(const Kart* kart,
         // Display only messages for all karts, or messages for this kart
         if (msg.m_kart && msg.m_kart!=kart) continue;
 
-        core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-        GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                                   pos, msg.m_color, true /* hcenter */, 
-                                   true /* vcenter */);
-        y += m_max_font_height;        
+        core::rect<s32> pos(x - w/2, y, x + w/2, y + font_height);
+        
+        font->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                   pos, msg.m_color, true /* hcenter */, 
+                   true /* vcenter */);
+        
+        y += font_height;
     }   // for i in all messages
 }   // drawAllMessages
 
