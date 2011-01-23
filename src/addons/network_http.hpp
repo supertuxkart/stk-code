@@ -64,6 +64,9 @@ private:
      *  this value only becomes 1.0f, if the download is completed.*/
     Synchronised<float>  m_progress;
 
+    /** Signal an abort in case that a download is still happening. */
+    Synchronised<bool>   m_abort;
+
     /** Thread id of the thread running in this object. */
     pthread_t     m_thread_id;
 
@@ -91,7 +94,7 @@ public:
     const std::string 
                   getNewsMessage() const;
     float         getProgress() const;
-
+    void          cancelDownload();
 };   // NetworkHttp
 
 extern NetworkHttp *network_http;

@@ -104,7 +104,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
                 if(file_manager->fileExists(full_path))
                 {
                     if(UserConfigParams::m_verbosity>=3)
-                        printf("Removing cached icon '%s'.\n", 
+                        printf("[addons] Removing cached icon '%s'.\n", 
                                addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
                 }
@@ -124,9 +124,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
         else
         {
             fprintf(stderr, 
-                    "Found invalid node '%s' while downloading addons.\n",
+                    "[addons] Found invalid node '%s' while downloading addons.\n",
                     node->getName().c_str());
-            fprintf(stderr, "Ignored.\n");
+            fprintf(stderr, "[addons] Ignored.\n");
         }
     }   // for i<xml->getNumNodes
     delete xml;
@@ -205,7 +205,7 @@ void *AddonsManager::downloadIcons(void *obj)
     for(unsigned int i=0; i<me->m_addons_list.getData().size(); i++)
     {
         if(!me->m_addons_list.getData()[i].iconReady())
-            printf("No icon for '%s'.\n", 
+            printf("[addons] No icon for '%s'.\n", 
                     me->m_addons_list.getData()[i].getId().c_str());
     }
     me->saveInstalled();
@@ -230,7 +230,7 @@ bool AddonsManager::onlineReady()
 void AddonsManager::loadInstalledAddons()
 {
     /* checking for installed addons */
-    std::cout << "[Addons] Loading an xml file for installed addons: ";
+    std::cout << "[addons] Loading an xml file for installed addons: ";
     std::cout << m_file_installed << std::endl;
     const XMLNode *xml = file_manager->createXMLTree(m_file_installed);
     if(!xml)

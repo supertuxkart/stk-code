@@ -64,13 +64,11 @@ void AddonsScreen::init()
     Screen::init();
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
-    std::cout << "[Addons] Using directory <" + file_manager->getAddonsDir() 
+    std::cout << "[addons] Using directory <" + file_manager->getAddonsDir() 
               << ">\n";
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setIcons(m_icon_bank);
-    //w_list->clear();
-    std::cout << "icon bank" << std::endl;
 
     getWidget<GUIEngine::LabelWidget>("update_status")
         ->setText(_("Updating the list..."));

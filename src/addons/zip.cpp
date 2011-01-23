@@ -75,7 +75,7 @@ bool extract_zip(const std::string &from, const std::string &to)
     for(unsigned int i=0; i<zip_file_list->getFileCount(); i++)
     {
         const std::string current_file=zip_file_list->getFileName(i).c_str();
-        std::cout << current_file << std::endl;
+        printf("[addons] Unzipping file '%s'.\n", current_file.c_str());
         if(zip_file_list->isDirectory(i)) continue;
         if(current_file[0]=='.') continue;
         const std::string base = StringUtils::getBasename(current_file);
@@ -84,8 +84,8 @@ bool extract_zip(const std::string &from, const std::string &to)
             file_system->createAndOpenFile(current_file.c_str());
         if(!src_file)
         {
-            printf("Can't read file '%s'.\n", current_file.c_str());
-            printf("This is ignored, but the addon might not work.\n");
+            printf("[addons] Can't read file '%s'.\n", current_file.c_str());
+            printf("[addons] This is ignored, but the addon might not work.\n");
             error = true;
             continue;
         }
@@ -94,19 +94,19 @@ bool extract_zip(const std::string &from, const std::string &to)
             file_system->createAndWriteFile((to+"/"+base).c_str());
         if(dst_file == NULL)
         {
-            printf("Couldn't create the file '%s'.\n",
+            printf("[addons] Couldn't create the file '%s'.\n",
                     (to+"/"+current_file).c_str());
-            printf("The directory might not exist.\n");
-            printf("This is ignored, but the addon might not work.\n");
+            printf("[addons] The directory might not exist.\n");
+            printf("[addons] This is ignored, but the addon might not work.\n");
             error = true;
             continue;
         }
 
         if (IFileSystem_copyFileToFile(dst_file, src_file) < 0)
         {
-            printf("Could not copy '%s' from archive '%s'.\n",
+            printf("[addons] Could not copy '%s' from archive '%s'.\n",
                    current_file.c_str(), from.c_str());
-            printf("This is ignored, but the addon might not work.\n");
+            printf("[addons] This is ignored, but the addon might not work.\n");
             error = true;
         }
         dst_file->drop();

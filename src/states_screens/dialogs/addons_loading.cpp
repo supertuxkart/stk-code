@@ -83,6 +83,7 @@ GUIEngine::EventPropagation
 {
     if(event_source == "cancel")
     {
+        network_http->cancelDownload();
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }

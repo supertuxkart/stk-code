@@ -54,7 +54,7 @@ NetworkHttp *network_http;
  *  This separate thread is running in NetworkHttp::mainLoop, and is being 
  *  waken up if a command is issued (e.g. using downloadFileAsynchronous).
  */
-NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f)
+NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f), m_abort(false)
 {
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
@@ -133,15 +133,24 @@ void *NetworkHttp::mainLoop(void *obj)
  */
 NetworkHttp::~NetworkHttp()
 {
+    // if a download should be active (which means it was cancelled by the
+    // user, in which case it will still be ongoing in the background)
+    // we can't get the mutex, and would have to wait for a timeout,
+    // and we couldn't finish STK. This way we request an abort of
+    // a download, which mean we can get the mutex and ask the service
+    // thread here to cancel properly.
+    cancelDownload();
     pthread_mutex_lock(&m_mutex_command);
     {
         m_command=HC_QUIT;
         pthread_cond_signal(&m_cond_command);
     }
     pthread_mutex_unlock(&m_mutex_command);
+    printf("[addons] Mutex unlocked.\n");
 
     void *result;
     pthread_join(m_thread_id, &result);
+    printf("[addons] Network thread joined.\n");
 
     pthread_mutex_destroy(&m_mutex_command);
     pthread_cond_destroy(&m_cond_command);
@@ -213,6 +222,7 @@ size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char,
 
 std::string NetworkHttp::downloadToStrInternal(std::string url)
 {
+    m_abort.set(false);
 	CURL *session = curl_easy_init();
 
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
@@ -244,7 +254,7 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
                                        bool is_asynchron)
 {
     if(UserConfigParams::m_verbosity>=3)
-        printf("Downloading %s\n", file.c_str());
+        printf("[addons] Downloading %s\n", file.c_str());
 	CURL *session = curl_easy_init();
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;
@@ -278,6 +288,18 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
 }   // downloadFileInternal
 
 // ----------------------------------------------------------------------------
+/** Signals to the progress function to request any ongoing download to be 
+ *  cancelled. This function can also be called if there is actually no 
+ *  download atm. The function progressDownload checks m_abort and will 
+ *  return a non-zero value which causes libcurl to abort. */
+void NetworkHttp::cancelDownload() 
+{ 
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Requesting cancellation of download.\n");
+    m_abort.set(true); 
+}   // cancelDownload
+
+// ----------------------------------------------------------------------------
 /** External interface to download a file synchronously, i.e. it will only 
  *  return once the download is complete. 
  *  \param file The file from the server to download.
@@ -288,6 +310,9 @@ bool NetworkHttp::downloadFileSynchron(const std::string &file,
                                        const std::string &save)
 {
     const std::string &save_filename = (save!="") ? save : file;
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Download synchron '%s' as '%s'.\n",
+               file.c_str(), save_filename.c_str());
 
     return downloadFileInternal(file, save_filename,
                                 /*is_asynchron*/false);
@@ -308,6 +333,9 @@ void NetworkHttp::downloadFileAsynchron(const std::string &file,
     m_file          = file;
     m_save_filename = (save!="") ? save : file;
 
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Download asynchron '%s' as '%s'.\n", 
+               file.c_str(), m_save_filename.c_str());
     // Wake up the network http thread
     pthread_mutex_lock(&m_mutex_command);
     {
@@ -329,6 +357,14 @@ int NetworkHttp::progressDownload(void *clientp,
                                   double download_total, double download_now, 
                                   double upload_total,   double upload_now)
 {
+    // Check if we are asked to abort the download. If so, signal this
+    // back to libcurl by returning a non-zero status.
+    if(network_http->m_abort.get())
+    {
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Aborting download in progress.\n");
+        return 1;
+    }
     float f;
     if(download_now < download_total)
     {
