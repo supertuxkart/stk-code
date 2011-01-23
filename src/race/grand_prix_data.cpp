@@ -52,7 +52,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
             delete root;
             throw std::logic_error("File contents are incomplete or corrupt");
         }
-        m_name = _(temp_name.c_str());
+        m_name = _LTR(temp_name.c_str());
         foundName = true;                
     }
     else

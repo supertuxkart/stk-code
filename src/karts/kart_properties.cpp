@@ -222,7 +222,7 @@ void KartProperties::getAllData(const XMLNode * root)
     
     std::string temp_name;
     root->get("name",              &temp_name          );
-    m_name = _(temp_name.c_str());
+    m_name = _LTR(temp_name.c_str());
     
     root->get("icon-file",         &m_icon_file        );
     

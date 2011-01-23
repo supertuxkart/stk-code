@@ -194,7 +194,7 @@ void Track::loadTrackInfo()
     }
     std::string temp_name;
     root->get("name",                  &temp_name);
-    m_name = _(temp_name.c_str());
+    m_name = _LTR(temp_name.c_str());
     
     //root->get("description",           &m_description);
     root->get("designer",              &m_designer);

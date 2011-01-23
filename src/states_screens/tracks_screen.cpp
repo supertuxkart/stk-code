@@ -116,7 +116,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
+                                        translations->fribidize(clickedTrack->getName().c_str()),
                                         screenshot, 0.8f, 0.7f);
                 }
                 
@@ -135,7 +136,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
+                                        translations->fribidize(clickedTrack->getName().c_str()),
                                         screenshot, 0.8f, 0.7f);
                 }
             }
@@ -213,14 +215,14 @@ void TracksScreen::init()
         
         if (unlock_manager->isLocked(gp->getId()))
         {
-            gps_widget->addAnimatedItem( _("Locked!"),
-                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
-                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            gps_widget->addAnimatedItem(_("Locked!"),
+                                        "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
+                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
         else
         {
-            gps_widget->addAnimatedItem( gp->getName(), gp->getId(), sshot_files, 1.5f, TROPHY_BADGE,
-                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(), sshot_files, 1.5f,
+                                        TROPHY_BADGE, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
     gps_widget->updateItemDisplay();
@@ -264,8 +266,8 @@ void TracksScreen::buildTrackList()
             }
             else
             {
-                tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
-                                       0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
+                                       curr->getScreenshotFile(), 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }
         
@@ -288,8 +290,9 @@ void TracksScreen::buildTrackList()
             }
             else
             {
-                tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
-                                       0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
+                                       curr->getScreenshotFile(), 0 /* no badge */,
+                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }
     }
