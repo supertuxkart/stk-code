@@ -80,6 +80,17 @@ class GamePadDevice : public InputDevice
 
 public:
     Input::AxisDirection *m_prevAxisDirections;
+    
+    /** used to determine if an axis is valid; an axis is considered valid when at least 2 different
+      * values are read from this axis (if an axis keeps on sending the exact same value continuously,
+      * chances are that it's not meant by the user - for instance some gamepads have hats or analog
+      * switches that get reported as axis, we even had a report that on linux some hard disks may be
+      * reported as gamepads with uninteresting axis values)
+      */
+    int                  *m_prevAxisValue;
+    /** \see m_prevAxisValue */
+    bool                 *m_axis_ok;
+    
     int                   m_deadzone;
     int                   m_index;
     int                   m_axis_count;

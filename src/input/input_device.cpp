@@ -69,7 +69,8 @@ bool KeyboardDevice::processAndMapInput(const int id, InputManager::InputDriverM
 #endif
 
 
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount, GamepadConfig *configuration)
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count,
+                             const int btnAmount, GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
     m_deadzone              = DEADZONE_JOYSTICK;
@@ -77,12 +78,18 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
     m_configuration         = configuration;
     m_axis_count            = axis_count;
     m_prevAxisDirections    = new Input::AxisDirection[axis_count];
+    m_prevAxisValue         = new int[axis_count];
+    m_axis_ok               = new bool[axis_count];
     m_button_count          = btnAmount;
-    m_index                 = irrIndex;    
+    m_index                 = irrIndex;
     m_name                  = name;
     
     for (int i = 0; i < axis_count; i++)
+    {
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
+        m_prevAxisValue[i] = -1;
+        m_axis_ok[i] = false;
+    }
 
     for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
         m_buttonPressed[n] = false;
@@ -94,6 +101,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
 GamePadDevice::~GamePadDevice()
 {
     delete[] m_prevAxisDirections;
+    delete[] m_prevAxisValue;
 
     // FIXME - any need to close devices?
 }   // ~GamePadDevice
@@ -169,9 +177,23 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
             }
         }
 
-        if(value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
+        if     (value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
+        if (!m_axis_ok[id])
+        {
+            if (m_prevAxisValue[id] == -1)
+            {
+                // first value we get from this axis
+                m_prevAxisValue[id] = value;
+            }
+            else if (m_prevAxisValue[id] != value)
+            {
+                // second different value we get from this axis, consider it OK
+                m_axis_ok[id] = true;
+            }
+        }
+        
         // check if within deadzone
         if(value > -m_deadzone && value < m_deadzone && player != NULL)
         {
@@ -199,6 +221,9 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
         }
     }
 
+    // If axis did not send proper values yet, ignore it.
+    if (!m_axis_ok[id]) return false;
+    
     if (m_configuration != NULL)
     {
         if (mode == InputManager::INGAME)
