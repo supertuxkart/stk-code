@@ -298,7 +298,15 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
     else if (selection == "new")
     {
-        StateManager::get()->pushScreen( KartSelectionScreen::getInstance() );
+        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        s->setMultiplayer(false);
+        StateManager::get()->pushScreen( s );
+    }
+    else if (selection == "multiplayer")
+    {
+        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        s->setMultiplayer(true);
+        StateManager::get()->pushScreen( s );
     }
     else if (selection == "options")
     {

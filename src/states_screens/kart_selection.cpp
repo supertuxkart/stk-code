@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
@@ -843,6 +844,7 @@ public:
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
     m_removed_widget = NULL;
+    m_multiplayer_message = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -852,6 +854,7 @@ void KartSelectionScreen::loadedFromFile()
     g_dispatcher = new FocusDispatcher(this);
     m_first_widget = g_dispatcher;
     m_player_confirmed = false;
+    m_multiplayer_message = NULL;
     
     // Dynamically add tabs
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
@@ -983,6 +986,13 @@ void KartSelectionScreen::tearDown()
         m_removed_widget = NULL;
     }
     
+    if (m_multiplayer_message != NULL)
+    {
+        manualRemoveWidget(m_multiplayer_message);
+        delete m_multiplayer_message;
+        m_multiplayer_message = NULL;
+    }
+    
     Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
 }   // tearDown
@@ -1000,7 +1010,8 @@ void KartSelectionScreen::unloaded()
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
     if (UserConfigParams::m_verbosity>=5) std::cout << "[KartSelectionScreen]  playerJoin() invoked\n";
-
+    if (!m_multiplayer && !firstPlayer) return false;
+    
     assert (g_dispatcher != NULL);
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
@@ -1045,6 +1056,17 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                 break;
             }
         }
+        
+        
+        // Remove multiplayer message
+        if (m_multiplayer_message != NULL)
+        {
+            manualRemoveWidget(m_multiplayer_message);
+            m_multiplayer_message->getIrrlichtElement()->remove();
+            m_multiplayer_message->elementRemoved();
+            delete m_multiplayer_message;
+            m_multiplayer_message = NULL;
+        }
     }
     
     const int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
@@ -1061,11 +1083,33 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
     Widget* fullarea = getWidget("playerskarts");
-    const int splitWidth = fullarea->m_w / amount;
     
-    for (int n=0; n<amount; n++)
+    // in this special case, leave room for a message on the right
+    if (m_multiplayer && firstPlayer)
     {
-        m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y, splitWidth, fullarea->m_h );
+        const int splitWidth = fullarea->m_w / 2;
+
+        m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth, fullarea->m_h );
+        
+        m_multiplayer_message = new BubbleWidget();
+        m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
+        m_multiplayer_message->setText( _("Everyone:\nPress 'Fire' now to join the game!") );
+        m_multiplayer_message->m_x = fullarea->m_x + splitWidth + splitWidth*0.2f;
+        m_multiplayer_message->m_y = fullarea->m_y + fullarea->m_h*0.3f;
+        m_multiplayer_message->m_w = splitWidth*0.6f;
+        m_multiplayer_message->m_h = fullarea->m_h*0.6f;
+        m_multiplayer_message->setFocusable(false);
+        m_multiplayer_message->add();
+        manualAddWidget(m_multiplayer_message);
+    }
+    else
+    {
+        const int splitWidth = fullarea->m_w / amount;
+
+        for (int n=0; n<amount; n++)
+        {
+            m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y, splitWidth, fullarea->m_h );
+        }
     }
     
     
@@ -1368,6 +1412,13 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         validateIdentChoices();
         validateKartChoices();
     }
+}
+
+// -----------------------------------------------------------------------------
+
+void KartSelectionScreen::setMultiplayer(bool multiplayer)
+{
+    m_multiplayer = multiplayer;
 }
 
 // -----------------------------------------------------------------------------

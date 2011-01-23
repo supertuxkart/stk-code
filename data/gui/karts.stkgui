@@ -6,14 +6,6 @@
            I18N="In the kart selection (player setup) screen"
            text="Choose a Kart"
            align="center" text_align="center" />
-    
-    <!-- FIXME: don't hardcode height -->
-    <box height="30" width="100%" layout="vertical-row">
-        <label width="100%" proportion="1"
-               I18N="In the kart selection (player setup) screen"
-               text="(more players can join by pressing 'fire' now)"
-               align="center" text_align="center" />
-    </box>
       
     <placeholder id="playerskarts" width="100%" proportion="4">
         <!-- Contents is added programatically -->

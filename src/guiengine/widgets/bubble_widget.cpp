@@ -49,7 +49,7 @@ void BubbleWidget::add()
     
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
-                                                      false, true /* word wrap */, m_parent, getNewID());
+                                                      false, true /* word wrap */, m_parent, (m_focusable ? getNewID() : getNewNoFocusID()));
         
     // find expanded bubble size
     int text_height = irrwidget->getTextHeight();

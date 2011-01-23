@@ -404,6 +404,8 @@ namespace GUIEngine
         /** Get whether this object is allowed to receive focus */
         bool isFocusable() const { return m_focusable; }
         
+        void setFocusable(bool f) { m_focusable = f; }
+        
         /**
           * \}
           */

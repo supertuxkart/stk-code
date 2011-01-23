@@ -33,7 +33,7 @@
             <spacer width="25" height="25"/>
             <bubble proportion="1" height="100%"
                     I18N="In the help menu"
-                    text="When input devices are configured, you are ready to play. Simply start a new race by selecting the race icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
+                    text="When input devices are configured, you are ready to play. Select the 'multiplayer race' icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
         </div>
         <spacer width="50" height="25" /> 
     </box>

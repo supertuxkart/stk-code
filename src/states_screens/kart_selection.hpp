@@ -24,6 +24,7 @@
 namespace GUIEngine
 {
     class Widget;
+    class BubbleWidget;
 }
 class InputDevice;
 class PlayerKartWidget;
@@ -47,6 +48,8 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     friend class PlayerKartWidget;
     
+    bool m_multiplayer;
+    
     KartSelectionScreen();
     
     /** Stores whether any player confirmed their choice; then, some things are "frozen", for instance
@@ -55,6 +58,9 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     bool m_player_confirmed;
     
     PlayerKartWidget* m_removed_widget;
+    
+    /** Message shown in multiplayer mode */
+    GUIEngine::BubbleWidget* m_multiplayer_message;
     
     /** Called when all players selected their kart */
     void allPlayersDone();
@@ -81,6 +87,8 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
+    
+    void setMultiplayer(bool multiplayer);
     
     /** \brief Called when a player hits 'fire'/'select' on his device to join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
