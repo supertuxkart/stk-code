@@ -182,6 +182,11 @@ public:
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+#if 0
+#pragma mark -
+#pragma mark PlayerKartWidget
+#endif
+
 /** A widget representing the kart selection for a player (i.e. the player's number, name, the kart view, the kart's name) */
 class PlayerKartWidget : public Widget, public SpinnerWidget::ISpinnerConfirmListener
 {        
@@ -215,14 +220,13 @@ class PlayerKartWidget : public Widget, public SpinnerWidget::ISpinnerConfirmLis
     
 public:
     /** Sub-widgets created by this widget */
-    LabelWidget* m_player_ID_label;
+    //LabelWidget* m_player_ID_label;
     PlayerNameSpinner* m_player_ident_spinner;
     ModelViewWidget* m_model_view;
     LabelWidget* m_kart_name;
     
     
-
-    LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
+    //LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
     core::stringw deviceName;
     std::string m_kartInternalName;
     
@@ -252,6 +256,7 @@ public:
         target_w = m_w;
         target_h = m_h;
         
+        /*
         // ---- Player ID label
         if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
         {
@@ -278,6 +283,7 @@ public:
         
         //playerID->setParent(this);
         m_children.push_back(m_player_ID_label);
+        */
         
         // ---- Player identity spinner
         m_player_ident_spinner = new PlayerNameSpinner(parent, m_playerID);
@@ -286,6 +292,16 @@ public:
         m_player_ident_spinner->m_w = player_name_w;
         m_player_ident_spinner->m_h = player_name_h;
         //m_player_ident_spinner->m_event_handler = this;
+        
+        
+        if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+        {
+            m_player_ident_spinner->setBadge(KEYBOARD_BADGE);
+        }
+        else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
+        {
+            m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
+        }
         
         if (irrlichtWidgetID == -1)
         {
@@ -371,8 +387,8 @@ public:
             GUIEngine::focusNothingForPlayer(m_playerID);
         }
 
-        if (m_player_ID_label->getIrrlichtElement() != NULL)
-            m_player_ID_label->getIrrlichtElement()->remove();
+        //if (m_player_ID_label->getIrrlichtElement() != NULL)
+        //    m_player_ID_label->getIrrlichtElement()->remove();
         
         if (m_player_ident_spinner != NULL && m_player_ident_spinner->getIrrlichtElement() != NULL)
         {
@@ -418,9 +434,9 @@ public:
         if (focus != NULL) focus->setFocusForPlayer(m_playerID);
 
         //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-        irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
-        m_player_ID_label->setText( newLabel ); 
-        m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
+        //irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
+        //m_player_ID_label->setText( newLabel ); 
+        //m_player_ID_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
         
         if (m_player_ident_spinner != NULL) m_player_ident_spinner->setID(m_playerID);
     }   // setPlayerID
@@ -453,7 +469,7 @@ public:
         }
         assert(mineInList);
         
-        m_player_ID_label->add();
+        //m_player_ID_label->add();
         
         // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
         if (m_irrlicht_widget_ID != -1) m_player_ident_spinner->m_reserved_id = m_irrlicht_widget_ID;
@@ -516,7 +532,14 @@ public:
         m_ready = true;
         
         stringw playerNameString = m_player_ident_spinner->getStringValue();
-        m_player_ID_label->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
+        core::rect<s32> rect(core::position2di(m_player_ident_spinner->m_x,
+                                               m_player_ident_spinner->m_y),
+                            core::dimension2di(m_player_ident_spinner->m_w,
+                                               m_player_ident_spinner->m_h));
+        GUIEngine::getGUIEnv()->addStaticText(StringUtils::insertValues( _("%s is ready"), playerNameString ).c_str(),
+                                              rect)->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
+        
+        //m_player_ID_label->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
         
         m_children.remove(m_player_ident_spinner);
         m_player_ident_spinner->getIrrlichtElement()->remove();
@@ -599,10 +622,10 @@ public:
         
         setSize(m_x, m_y, m_w, m_h);
         
-        m_player_ID_label->move(player_id_x,
-                            player_id_y,
-                            player_id_w,
-                            player_id_h);
+        //m_player_ID_label->move(player_id_x,
+        //                    player_id_y,
+        //                    player_id_w,
+        //                    player_id_h);
         
         if (m_player_ident_spinner != NULL)
         {

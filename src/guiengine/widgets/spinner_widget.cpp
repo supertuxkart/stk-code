@@ -123,6 +123,8 @@ void SpinnerWidget::add()
     m_children[0].m_properties[PROP_ID] = "left";
     m_children[0].m_id = m_children[0].m_element->getID();
     
+    m_badge_x_shift = subsize_left_arrow.getWidth();
+    
     // label
     if (m_graphical)
     {

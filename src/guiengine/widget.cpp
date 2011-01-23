@@ -67,6 +67,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_w  = -1;
     m_h  = -1;
     m_id = -1;
+    m_badge_x_shift         = 0;
     m_element               = NULL;
     m_title_font            = false;
     m_type                  = type;

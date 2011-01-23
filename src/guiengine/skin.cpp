@@ -1485,7 +1485,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         
     if (widget->m_badges != 0)
     {
-        drawBadgeOn(widget, rect);
+        drawBadgeOn(widget, rect + position2d<s32>(widget->m_badge_x_shift, 0));
     }
 }
 
@@ -1540,6 +1540,18 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(file_manager->getTextureFile("cup_bronze.png"));
         doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & KEYBOARD_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getGUIDir() + "keyboard.png");
+        doDrawBadge(texture, rect, max_icon_size, true);
+    }
+    if (widget->m_badges & GAMEPAD_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getGUIDir() + "gamepad.png");
+        doDrawBadge(texture, rect, max_icon_size, true);
     }
 }
 // -----------------------------------------------------------------------------
