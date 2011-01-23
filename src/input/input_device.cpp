@@ -219,10 +219,10 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
 
             return false;
         }
+        
+        // If axis did not send proper values yet, ignore it.
+        if (!m_axis_ok[id]) return false;
     }
-
-    // If axis did not send proper values yet, ignore it.
-    if (!m_axis_ok[id]) return false;
     
     if (m_configuration != NULL)
     {
