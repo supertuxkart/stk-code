@@ -1007,21 +1007,25 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
     const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
     
-    // draw less important first, at the very top of the screen
-    for (AllMessageType::const_iterator i = m_messages.begin(); 
-         i != m_messages.end(); ++i)
+    // draw less important first, at the very bottom of the screen
+    // unimportant messages are skipped in multiplayer, they take too much screen space
+    if (race_manager->getNumLocalPlayers() < 2)
     {
-        TimedMessage const &msg = *i;
-        if (!msg.m_important)
+        for (AllMessageType::const_iterator i = m_messages.begin(); 
+             i != m_messages.end(); ++i)
         {
-            // Display only messages for all karts, or messages for this kart
-            if (msg.m_kart && msg.m_kart!=kart) continue;
-            
-            core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-            GUIEngine::getSmallFont()->draw(
-                core::stringw(msg.m_message.c_str()).c_str(),
-                pos, msg.m_color, true /* hcenter */, true /* vcenter */);
-            y -= m_small_font_max_height;                    
+            TimedMessage const &msg = *i;
+            if (!msg.m_important)
+            {
+                // Display only messages for all karts, or messages for this kart
+                if (msg.m_kart && msg.m_kart!=kart) continue;
+                
+                core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
+                GUIEngine::getSmallFont()->draw(
+                    core::stringw(msg.m_message.c_str()).c_str(),
+                    pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+                y -= m_small_font_max_height;                    
+            }
         }
     }
     
