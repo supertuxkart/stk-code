@@ -234,6 +234,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         return;
     }
     
+    // When the lang popup is shown, ignore all other widgets
+    // FIXME: for some reasons, irrlicht widgets appear to be click-through, this is why
+    //        this hack is needed
+    if (m_lang_popup != NULL)
+    {
+        return;
+    }
+    
     // ---- A ribbon icon was clicked
     
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
