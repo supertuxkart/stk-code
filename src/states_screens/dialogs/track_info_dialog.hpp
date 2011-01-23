@@ -33,6 +33,7 @@ namespace irr { namespace gui { class IGUIImage; class IGUIStaticText; } }
 class TrackInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_track_ident;
+    std::string m_ribbon_item;
     
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
@@ -45,10 +46,16 @@ class TrackInfoDialog : public GUIEngine::ModalDialog
     
 public:
     /**
-     * Creates a modal dialog with given percentage of screen width and height
+     * \brief Creates a track info modal dialog with given percentage of screen width and height
+     * \param ribbonItem identifier name of the ribbon item that was clicked in the track selection
+     *        screen to get there (often will be 'trackIdent' but may also be the random item)
+     * \param trackIdent identifier name of the track to show information about
+     * \param trackName  human-readable, possibly translated, name of the track to show information about
+     * \param screenshot screenshot of the track to show information about
      */
-    TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
-                    irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);
+    TrackInfoDialog(const std::string& ribbonItem, const std::string& trackIdent,
+                    const irr::core::stringw& trackName, irr::video::ITexture* screenshot,
+                    const float percentWidth, const float percentHeight);
     virtual ~TrackInfoDialog();
     
     void onEnterPressedInternal();

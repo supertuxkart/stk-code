@@ -116,7 +116,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                    new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
                                         screenshot, 0.8f, 0.7f);
                 }
                 
@@ -135,8 +135,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
-                                         screenshot, 0.8f, 0.7f);
+                    new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                                        screenshot, 0.8f, 0.7f);
                 }
             }
         }

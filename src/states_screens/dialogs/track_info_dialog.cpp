@@ -43,8 +43,9 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
-                                 ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
+TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::string& trackIdent,
+                                 const irr::core::stringw& trackName, ITexture* screenshot,
+                                 const float w, const float h) : ModalDialog(w, h)
 {
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
@@ -54,6 +55,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     const int y3 = m_area.getHeight()*6/7;
     
     m_track_ident = trackIdent;
+    m_ribbon_item = ribbonItem;
 
     // ---- Track title
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
@@ -172,7 +174,7 @@ TrackInfoDialog::~TrackInfoDialog()
     Screen* curr_screen = GUIEngine::getCurrentScreen();
     if (curr_screen->getName() == "tracks.stkgui")
     {
-        ((TracksScreen*)curr_screen)->setFocusOnTrack(m_track_ident);
+        ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);
     }
     
 }
