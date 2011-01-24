@@ -59,6 +59,9 @@ NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f), m_abort(false)
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
 
+    // Since there are no threads at this stage, just init
+    // m_command without mutex.
+    m_command = HC_SLEEP;
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -101,9 +104,17 @@ void *NetworkHttp::mainLoop(void *obj)
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     // Wait in the main loop till a command is received
-    // (atm only QUIT is used).
     pthread_mutex_lock(&me->m_mutex_command);
-    me->m_command = HC_SLEEP;
+
+    // Handle the case that STK is cancelled before the while loop
+    // is entered. If this would happen, this thread hangs in 
+    // pthread_cond_wait (since cond_signal was done before the wait),
+    // and stk hangs since the thread can't join.
+    if(me->m_command==HC_QUIT)
+    {
+        return NULL;
+    }
+
     while(1)
     {
         pthread_cond_wait(&me->m_cond_command, &me->m_mutex_command);
@@ -113,7 +124,7 @@ void *NetworkHttp::mainLoop(void *obj)
             pthread_exit(NULL);
             break;
         case HC_SLEEP: 
-	case HC_INIT:
+        case HC_INIT:
             break;
         case HC_NEWS:
             assert(false);
@@ -223,25 +234,25 @@ size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char,
 std::string NetworkHttp::downloadToStrInternal(std::string url)
 {
     m_abort.set(false);
-	CURL *session = curl_easy_init();
+    CURL *session = curl_easy_init();
 
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + url;
-	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-	
-	std::string fout;
-	
-	//from and out
-	curl_easy_setopt(session, CURLOPT_WRITEDATA,     &fout                 );
-	curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
-	
-	int success = curl_easy_perform(session);
-	
-	//stop curl
-	curl_easy_cleanup(session);
-	
-	if (success == 0) return fout;
-	else             return "";
+    curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
+        
+    std::string fout;
+        
+    //from and out
+    curl_easy_setopt(session, CURLOPT_WRITEDATA,     &fout                 );
+    curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
+        
+    int success = curl_easy_perform(session);
+    
+    //stop curl
+    curl_easy_cleanup(session);
+    
+    if (success == 0) return fout;
+    else             return "";
 }   // downloadToStrInternal
 
 // ----------------------------------------------------------------------------
@@ -255,17 +266,17 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
 {
     if(UserConfigParams::m_verbosity>=3)
         printf("[addons] Downloading %s\n", file.c_str());
-	CURL *session = curl_easy_init();
+    CURL *session = curl_easy_init();
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;
-	curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
+    curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
     FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
                          "wb");
-	
-	//from and out
-	curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
-	curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-	    
+        
+    //from and out
+    curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
+    curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
+            
     if(is_asynchron)
     {
         curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
@@ -273,14 +284,14 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
         // Necessary, oyherwise the progress function doesn't work
         curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
     }
-		
-	int success = curl_easy_perform(session);
-	
-	//close the file where we downloaded the content
-	fclose(fout);
-	
-	//stop curl
-	curl_easy_cleanup(session);
+                
+    int success = curl_easy_perform(session);
+        
+    //close the file where we downloaded the content
+    fclose(fout);
+    
+    //stop curl
+    curl_easy_cleanup(session);
 
     if(is_asynchron)
         m_progress.set( (success==CURLE_OK) ? 1.0f : -1.0f );
