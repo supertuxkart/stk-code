@@ -263,13 +263,16 @@ public:
         m_player_ident_spinner->m_w = player_name_w;
         m_player_ident_spinner->m_h = player_name_h;
 
-        if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+        if (parent->m_multiplayer)
         {
-            m_player_ident_spinner->setBadge(KEYBOARD_BADGE);
-        }
-        else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
-        {
-            m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
+            if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+            {
+                m_player_ident_spinner->setBadge(KEYBOARD_BADGE);
+            }
+            else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
+            {
+                m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
+            }
         }
         
         if (irrlichtWidgetID == -1)
