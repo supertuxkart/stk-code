@@ -3,7 +3,7 @@ import sys
 
 f = open('./data/po/gui_strings.h', 'w')
 
-def traverse(file, node, isChallenge, isGP, isKart, level=0):
+def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -15,9 +15,9 @@ def traverse(file, node, isChallenge, isGP, isKart, level=0):
         if e.hasAttribute("I18N"):
            comment = e.getAttribute("I18N")
          
-        if isChallenge or isGP or isKart:
+        if isChallenge or isGP or isKart or isTrack:
            if e.hasAttribute("name"):
-               # print "Label=", e.getAttribute("name"), " Comment=", comment
+               #print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
                if comment == None:
                    line += "//I18N: " + file + "\n_(\"" + e.getAttribute("name") + "\")\n\n"
@@ -49,7 +49,7 @@ def traverse(file, node, isChallenge, isGP, isKart, level=0):
 
         # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
         if not isKart:
-            traverse(file, e, isChallenge, isGP, isKart, level+1)
+            traverse(file, e, isChallenge, isGP, isKart, isTrack, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
@@ -58,6 +58,7 @@ for file in filenames:
     isChallenge = False
     isGP = False
     isKart = False
+    isTrack = False
     
     if file.endswith(".challenge"):
         isChallenge = True
@@ -65,6 +66,8 @@ for file in filenames:
         isGP = True 
     if file.endswith("kart.xml"):
         isKart = True
+    if file.endswith("track.xml"):
+        isTrack = True
         
     try:
         doc = xml.dom.minidom.parse(file)
@@ -73,5 +76,5 @@ for file in filenames:
         print "/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")"
         print "============================================"
 
-    traverse(file, doc, isChallenge, isGP, isKart)
+    traverse(file, doc, isChallenge, isGP, isKart, isTrack)
     

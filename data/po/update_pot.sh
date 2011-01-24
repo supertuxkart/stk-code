@@ -18,7 +18,7 @@ echo $XML_FILE_LIST
 echo $OTHER_XML_FILES
 
 # XML Files
-python ./data/po/extract_strings_from_XML.py $OTHER_XML_FILES
+python ./data/po/extract_strings_from_XML.py $XML_FILE_LIST $OTHER_XML_FILES
 
 
 
@@ -26,7 +26,7 @@ echo "---------------------------"
 echo "    Generating .pot file..."
 
 # C++ Files
-xgettext    -d supertuxkart -s --keyword=_ --keyboard=_LTR --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST --package-name=supertuxkart
+xgettext    -d supertuxkart -s --keyword=_ --keyword=_LTR --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST --package-name=supertuxkart
 
 # Lisp files
 xgettext -j -L lisp -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $XML_FILE_LIST --package-name=supertuxkart
