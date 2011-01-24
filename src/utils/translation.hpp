@@ -58,7 +58,7 @@ public:
     const wchar_t     *w_gettext(const char* original);
     bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
-    const wchar_t*     fribidize(const irr::core::stringw str) { return fribidize(str.c_str()); }
+    const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     const std::vector<std::string>* getLanguageList() const;
 };   // Translations
