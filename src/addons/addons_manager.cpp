@@ -83,8 +83,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
             int   testing=-1;
             node->get("testing", &testing);
 
-            bool wrong_version=false;
 #ifdef WHILE_WEBPAGE_IS_NOT_UPDATED_YET
+            bool wrong_version=false;
+
             if(addon.getType()=="kart")
                 wrong_version = stk_version <stk_config->m_min_kart_version ||
                                 stk_version >stk_config->m_max_kart_version   ;
