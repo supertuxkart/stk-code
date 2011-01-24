@@ -32,13 +32,8 @@
 #    include <libintl.h>
 #  endif
 
-#ifdef WIN32
 #  define _(String, ...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
 #  define _LTR(String, ...) (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
-#else
-#  define _(String, args...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##args)))
-#  define _LTR(String, args...) (StringUtils::insertValues(translations->w_gettext(String), ##args))
-#endif
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
