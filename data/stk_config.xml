@@ -99,18 +99,6 @@
        ============================ -->
   <general-kart-defaults>
   
-    <!-- Kart's center point:
-        gravity-shift is the shift of the chassis with regards to the center of
-                      mass. E.g. with the the value commented out below the 
-                      chassis will be 30 cm higher than the  center of mass - 
-                      or the center of mass will be 30 cm lower than the  
-                      middle of the chassis. So this effectively lowers the 
-                      center of mass, making the kart more stable and less 
-                      likely to topple over. Default (if nothing is defined 
-                      here) is that the center of the mass is at the very bottom
-                      of the chassis.  -->
-    <center  gravity-shift="0 0.3 0"/>
-
     <!-- Camera: Distance between kart and camera. 
          forward-up-angle: Angle between camera and plane of kart (pitch) 
                  when the camera is pointing forward
