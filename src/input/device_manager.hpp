@@ -76,6 +76,9 @@ private:
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
 
+    /** Will be non-null in single-player mode */
+    StateManager::ActivePlayer* m_single_player;
+    
     /**
      * Helper method, only used internally. Takes care of analyzing keyboard input.
      *
@@ -147,6 +150,11 @@ public:
 
 	void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
+    
+    StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
+    void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
+
+    
     bool initialize();
     void serialize();
 };

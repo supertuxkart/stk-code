@@ -80,6 +80,7 @@ void MainMenuScreen::init()
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
+    input_manager->getDeviceList()->setSinglePlayer( NULL );
     input_manager->setMasterPlayerOnly(false);
 	
 	// Avoid incorrect behaviour in certain race circumstances:

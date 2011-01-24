@@ -1107,6 +1107,11 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         newPlayerWidget->m_player_ident_spinner->setFocusForPlayer(new_player_id);
     }
     
+    if (!m_multiplayer)
+    {
+        input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+    }
+    
     return true;
 }
 
@@ -1501,6 +1506,15 @@ void KartSelectionScreen::allPlayersDone()
     
     // ---- Switch to assign mode
     input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    
+    if (!m_multiplayer)
+    {
+        input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+    }
+    else
+    {
+        input_manager->getDeviceList()->setSinglePlayer( NULL );
+    }
     
     StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
 }

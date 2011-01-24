@@ -39,6 +39,7 @@ DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
+    m_single_player = NULL;
 }   // DeviceManager
 
 // -----------------------------------------------------------------------------
@@ -269,7 +270,12 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriv
         if (keyboard->processAndMapInput(btnID, mode, action))
         {
             //std::cout << "   binding found in keyboard #"  << (n+1) << "; action is " << KartActionStrings[*action] << "\n";
-            if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+            if (m_single_player != NULL)
+            {
+                //printf("Single player\n");
+                *player = m_single_player;
+            }
+            else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
                 *player = NULL;
             }
@@ -301,7 +307,11 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
     {
         if (gPad->processAndMapInput(type, btnID, value, mode, gPad->getPlayer(), action))
         {
-            if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+            if (m_single_player != NULL)
+            {
+                *player = m_single_player;
+            }
+            else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
                 *player = NULL;
             }
