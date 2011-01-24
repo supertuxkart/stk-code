@@ -60,7 +60,6 @@ void LinearWorld::init()
         KartInfo info;
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
-        info.m_last_valid_race_lap  = -1;
         info.m_lap_start_time       = 0;
         m_track->getQuadGraph().findRoadSector(m_karts[n]->getXYZ(),
                                                &info.m_track_sector);
@@ -202,7 +201,6 @@ void LinearWorld::update(float dt)
         if(kart_info.m_on_road)
         {
             kart_info.m_last_valid_sector   = kart_info.m_track_sector;
-            kart_info.m_last_valid_race_lap = kart_info.m_race_lap;
         }
         else
         {
@@ -241,7 +239,7 @@ void LinearWorld::update(float dt)
     }
     
 #ifdef DEBUG
-    // FIXME: Debug output in case that the double position error occurs again.
+    // Debug output in case that the double position error occurs again.
     std::vector<int> pos_used;
     pos_used.resize(kart_amount+1, -99);
     for(unsigned int i=0; i<kart_amount; i++)
@@ -560,10 +558,10 @@ void LinearWorld::moveKartAfterRescue(Kart* kart)
     {
         info.m_track_sector = info.m_last_valid_sector;
     }
-    info.m_race_lap =  info.m_last_valid_race_lap;
-    // FIXME - removing 1 here makes it less likely to fall in a rescue loop since the kart
-    // moves back on each attempt. This is still a weak hack. Also some other code depends
-    // on 1 being substracted, like 'forceRescue'
+
+    // Removing 1 here makes it less likely to fall in a rescue loop since the
+    // kart moves back on each attempt. This is still a weak hack. Also some 
+    // other code depends on 1 being substracted, like 'forceRescue'
     if ( info.m_track_sector > 0 ) info.m_track_sector-- ;
     info.m_last_valid_sector = info.m_track_sector;
     if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;

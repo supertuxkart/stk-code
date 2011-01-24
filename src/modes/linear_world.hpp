@@ -55,7 +55,6 @@ private:
                                             * e.g. UNKNOWN_SECTOR can be negative!*/
 
         int         m_last_valid_sector;    /* used when rescusing, e.g. for invalid shortcuts */
-        int         m_last_valid_race_lap;  /* when a kart is rescued, we need to give it back the number of lap it had */
 
         Vec3        m_curr_track_coords;
         /** True if the kart is on top of the road path drawn by the drivelines */
