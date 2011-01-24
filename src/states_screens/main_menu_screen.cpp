@@ -106,10 +106,10 @@ void MainMenuScreen::init()
 
 }
 
-#ifdef ADDONS_MANAGER
 // ------------------------------------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+#ifdef ADDONS_MANAGER
     IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -122,6 +122,8 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const std::string &news_text = network_http->getNewsMessage();
     w->setText(news_text.c_str());
+    
+#endif
     
     IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
     if (lang_combo != NULL)
@@ -150,7 +152,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         }
     }
 }
-#endif
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)

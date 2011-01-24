@@ -38,10 +38,7 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
     
 public:
     
-#ifdef ADDONS_MANAGER
-
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver);
-#endif
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
