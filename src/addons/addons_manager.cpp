@@ -45,9 +45,9 @@ AddonsManager* addons_manager = 0;
  *  the list of already installed addons). The online component is initialised
  *  later from a separate thread in network_http (once network_http is setup).
  */
-AddonsManager::AddonsManager() : m_state(STATE_INIT),
+AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_icon_queue(std::vector<std::string>() ),
-                                 m_addons_list(std::vector<Addon>() )
+                                 m_state(STATE_INIT)
 {
     m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
 
