@@ -54,21 +54,21 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
 // ------------------------------------------------------------------------------------------------------
-#ifdef ADDONS_MANAGER
-MainMenuScreen::MainMenuScreen() : Screen("mainaddons.stkgui")
-{
-}
-#else
+
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
 }
-#endif
 
 // ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
 {
     m_lang_popup = NULL;
+    
+#ifndef ADDONS_MANAGER
+    RibbonWidget* r = this->getWidget<RibbonWidget>("menu_toprow");
+    if (r != NULL) r->deleteChild("addons");
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -110,12 +110,14 @@ void MainMenuScreen::init()
 // ------------------------------------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    IconButtonWidget* icon = this->getWidget<IconButtonWidget>("addons");
-    if(!addons_manager->onlineReady())
-        icon->setDeactivated();
-    else
-        icon->setActivated();
-
+    IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
+    if (addons_icon != NULL)
+    {
+        if(!addons_manager->onlineReady())
+            addons_icon->setDeactivated();
+        else
+            addons_icon->setActivated();
+    }
 
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const std::string &news_text = network_http->getNewsMessage();
