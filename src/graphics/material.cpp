@@ -87,6 +87,9 @@ Material::Material(const XMLNode *node, int index)
         else if (s != "none")     fprintf(stderr, "[Material] WARNING: Unknown compositing mode '%s'\n", s.c_str());
     }
     
+    // Compatibility to track version 3, which stored zipper data
+    // as attributes. Can be removed if track version 3 is not
+    // supported anymore
     node->get("zipper",                    &m_zipper                   );
     node->get("zipper-duration",           &m_zipper_duration          );
     node->get("zipper-fade-out-time",      &m_zipper_fade_out_time     );
@@ -107,6 +110,15 @@ Material::Material(const XMLNode *node, int index)
         else if (child_node->getName() == "particles")
         {
             initParticlesEffect(child_node);
+        }
+        else if (child_node->getName() == "zipper")
+        {
+            // Track version 4 uses a separate node:
+            m_zipper = true;
+            child_node->get("duration",          &m_zipper_duration          );
+            child_node->get("fade-out-time",     &m_zipper_fade_out_time     );
+            child_node->get("max-speed-increase",&m_zipper_max_speed_increase);
+            child_node->get("speed-gain",        &m_zipper_speed_gain        );
         }
         else
         {
