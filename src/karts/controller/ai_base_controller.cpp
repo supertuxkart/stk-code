@@ -53,11 +53,9 @@ AIBaseController::AIBaseController(Kart *kart,
             // race. Long term statistics might be gathered to determine the
             // best way, potentially depending on race position etc.
             int r = rand();
-            int indx = (int)(
-                             r / ((float)(RAND_MAX)+1.0f) * next.size()
-                             );
-            // In case of rounding errors
-            if(indx>(int)next.size()) indx--;
+            int indx = (int)( r / ((float)(RAND_MAX)+1.0f) * next.size() );
+            // In case of rounding errors0
+            if(indx>=(int)next.size()) indx--;
             m_successor_index.push_back(indx);
             assert(indx <(int)next.size() && indx>=0);
             m_next_node_index.push_back(next[indx]);
