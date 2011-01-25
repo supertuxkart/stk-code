@@ -225,6 +225,7 @@ public:
     ModelViewWidget* m_model_view;
     LabelWidget* m_kart_name;
     
+    gui::IGUIStaticText* m_ready_text;
     
     //LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
     core::stringw deviceName;
@@ -237,6 +238,7 @@ public:
         assert(associatedPlayer->ok());
         m_magic_number = 0x33445566;
 #endif
+        m_ready_text = NULL;
         
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;
@@ -503,8 +505,8 @@ public:
                                                m_player_ident_spinner->m_y),
                             core::dimension2di(m_player_ident_spinner->m_w,
                                                m_player_ident_spinner->m_h));
-        GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString),
-                                              rect)->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
+        m_ready_text = GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString), rect);
+        m_ready_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
                 
         m_children.remove(m_player_ident_spinner);
         m_player_ident_spinner->getIrrlichtElement()->remove();
@@ -599,6 +601,12 @@ public:
                              player_name_w,
                              player_name_h );
         }
+        if (m_ready_text != NULL)
+        {
+            m_ready_text->setRelativePosition(core::recti(core::position2di(player_name_x, player_name_y),
+                                                          core::dimension2di(player_name_w, player_name_h)) );
+        }
+        
         m_model_view->move(model_x,
                         model_y,
                         model_w,
