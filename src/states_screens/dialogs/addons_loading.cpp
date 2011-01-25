@@ -115,7 +115,7 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
-            m_state->setText(_("Donwload failed.\n"));
+            m_state->setText(_("Download failed.\n"));
             m_back_button->setText(_("Back"));
             return;
         }
