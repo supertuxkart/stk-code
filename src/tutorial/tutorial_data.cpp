@@ -48,7 +48,6 @@ TutorialData::TutorialData(const std::string& filename)
     
     std::string s_property;
     int         i_property;
-    float       f_property;
 
     XMLNode     *root = new XMLNode( filename );
 
