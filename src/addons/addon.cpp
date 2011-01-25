@@ -80,7 +80,8 @@ void Addon::writeXML(std::ofstream *out_stream)
     (*out_stream) << "  <"                     << m_type 
                   << " name=\""                << m_name 
                   << "\" id=\""                << m_id 
-                  << "\" installed=\""         << m_installed
+                  << "\" installed=\""         
+                  << (m_installed ? "true" : "false" )
                   << "\" installed-version=\"" << m_installed_version 
                   <<"\" icon-version=\""       << m_icon_version 
                   << "\"/>\n";
