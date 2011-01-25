@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-23 19:22-0500\n"
-"PO-Revision-Date: 2011-01-24 17:54+0200\n"
+"PO-Revision-Date: 2011-01-25 08:25+0200\n"
 "Last-Translator: Jorge Mariano <jmariano@ymail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -667,7 +667,7 @@ msgstr "אנרגיה"
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
 #: src/states_screens/main_menu_screen.cpp:129
 msgid "English"
-msgstr "אנגלית"
+msgstr "עברית"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -1089,7 +1089,7 @@ msgstr "רב-משתתפים"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:500
 msgid "Multiplayer Race"
-msgstr "רב-משתתפים מרוץ"
+msgstr "רב-משתתפים"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
