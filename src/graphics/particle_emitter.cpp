@@ -47,6 +47,8 @@ public:
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
         const core::vector3df& cam_pos = curr_cam->getPosition();
         
+        // printf("Affect called with now=%u, camera=%s\n", now, curr_cam->getName());
+        
         for (unsigned int n=0; n<count; n++)
         {
             scene::SParticle& curr = particlearray[n];

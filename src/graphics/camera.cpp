@@ -43,6 +43,11 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
     m_camera   = irr_driver->addCameraSceneNode();
+    
+#ifdef DEBUG
+    m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
+#endif
+    
     setupCamera();
     m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
@@ -166,7 +171,6 @@ void Camera::setupCamera()
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
-    
     }   // setupCamera
 
 // ----------------------------------------------------------------------------
