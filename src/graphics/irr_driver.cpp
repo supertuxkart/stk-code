@@ -786,7 +786,7 @@ void IrrDriver::displayFPS()
 {
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
-    const int NO_TRUST_COUNT = 25;
+    const int NO_TRUST_COUNT = 200;
     static int no_trust = NO_TRUST_COUNT;
 
     if (no_trust)
