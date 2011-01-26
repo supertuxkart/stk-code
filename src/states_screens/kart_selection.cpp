@@ -457,7 +457,7 @@ public:
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
         {
-            m_player_ident_spinner->addLabel( UserConfigParams::m_all_players[n].getName() );
+            m_player_ident_spinner->addLabel( translations->fribidize(UserConfigParams::m_all_players[n].getName()) );
         }
         
         // select the right player profile in the spinner
