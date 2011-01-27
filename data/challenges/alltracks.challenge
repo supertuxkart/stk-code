@@ -5,7 +5,7 @@
     name="Win the At World's End Grand Prix"
     description="Come first in the At World's End Grand Prix with 3 Expert AI karts."
     unlock-gp="alltracks"
-    depend-on="islandfollow"
+    depend-on="islandfollow fortmagma"
     major="grandprix"
     minor="quickrace"
     gp="atworldsend"
