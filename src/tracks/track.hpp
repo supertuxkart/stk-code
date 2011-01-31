@@ -27,11 +27,14 @@
 using namespace irr;
 
 #include "LinearMath/btTransform.h"
+
 #include "audio/music_information.hpp"
 #include "graphics/material.hpp"
+#include "graphics/particle_emitter.hpp"
 #include "items/item.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/vec3.hpp"
+#include "utils/ptr_vector.hpp"
 
 class AnimationManager;
 class BezierCurve;
@@ -69,6 +72,7 @@ private:
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
+    ptr_vector<ParticleEmitter>     m_all_emitters;
     scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     /** Minimum coordinates of this track. */

@@ -132,6 +132,8 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
+    
+    m_all_emitters.clearAndDeleteAll();
 
     if (m_sky_particles_emitter) delete m_sky_particles_emitter;
     m_sky_particles_emitter = NULL;
@@ -831,41 +833,21 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if (name=="particle-emitter")
         {
-            // based on http://irrlicht.sourceforge.net/tut008.html
             std::string path;
-            std::vector<float> emitter_origin;
-            scene::ISceneManager* smgr = irr_driver->getSceneManager();
-            node->get("texture", &path);
+            irr::core::vector3df emitter_origin;
+            node->get("kind", &path);
             node->get("origin", &emitter_origin);
-            video::ITexture* particle_texture_load;
-            particle_texture_load = irr_driver->getTexture(path);
 
-            scene::IParticleSystemSceneNode* ps = smgr->addParticleSystemSceneNode(false);
-
-            scene::IParticleEmitter* em = ps->createBoxEmitter(
-                    core::aabbox3d<f32>(-2,0,-2,2,1,2),    // emitter size
-                    core::vector3df(0.0f,0.06f,0.0f),      // initial direction
-                    2,3,                                   // emit rate
-                    video::SColor(0,255,255,255),          // darkest color
-                    video::SColor(0,255,255,255),          // brightest color
-                    800,2000,0,                            // min and max age, angle
-                    core::dimension2df(1.f,1.f),           // min size
-                    core::dimension2df(2.f,2.f));          // max size
-
-            ps->setEmitter(em);
-            em->drop();
-
-            scene::IParticleAffector* paf = ps->createFadeOutParticleAffector();
-
-            ps->addAffector(paf);
-            paf->drop();
-
-            ps->setPosition(core::vector3df(emitter_origin[0],  emitter_origin[2], emitter_origin[1] ));
-            ps->setScale(core::vector3df(1,1,1));
-            ps->setMaterialFlag(video::EMF_LIGHTING, false);
-            ps->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
-            ps->setMaterialTexture(0, particle_texture_load);
-            ps->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+            try
+            {
+                ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
+                ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
+                m_all_emitters.push_back(emitter);
+            }
+            catch (std::runtime_error& e)
+            {
+                fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+            }
         }
         else if(name=="sun")
         {
