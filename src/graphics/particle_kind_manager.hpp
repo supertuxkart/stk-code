@@ -33,6 +33,8 @@ class ParticleKindManager : public NoCopy
 {
 private:
     
+    std::map<std::string, ParticleKind*> m_per_track_kinds;
+
     std::map<std::string, ParticleKind*> m_kinds;
     static ParticleKindManager* singleton;
     
@@ -43,6 +45,8 @@ public:
     virtual   ~ParticleKindManager();
 
     ParticleKind* getParticles(const char* name);
+    
+    void   cleanUpTrackSpecificGfx();
     
     static ParticleKindManager* get();
 };

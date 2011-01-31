@@ -120,6 +120,8 @@ void Track::cleanup()
         m_quad_graph = NULL;
     }
 
+    ParticleKindManager::get()->cleanUpTrackSpecificGfx();
+    
     item_manager->cleanup();
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {

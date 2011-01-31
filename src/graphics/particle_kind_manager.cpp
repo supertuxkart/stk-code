@@ -19,6 +19,8 @@
 
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include <stdexcept>
 
 // ----------------------------------------------------------------------------
@@ -41,14 +43,54 @@ ParticleKindManager::ParticleKindManager()
 
 ParticleKindManager::~ParticleKindManager()
 {
-    // TODO: free items in map
+    cleanUpTrackSpecificGfx();
+    
+    std::map<std::string, ParticleKind*>::iterator it;
+    for (it = m_kinds.begin(); it != m_kinds.end(); it++)
+    {
+        delete it->second;
+    }
+    m_kinds.clear();
+}
+
+// ----------------------------------------------------------------------------
+
+void ParticleKindManager::cleanUpTrackSpecificGfx()
+{
+    std::map<std::string, ParticleKind*>::iterator it;
+    for (it = m_per_track_kinds.begin(); it != m_per_track_kinds.end(); it++)
+    {
+        delete it->second;
+    }
+    m_per_track_kinds.clear();
 }
 
 // ----------------------------------------------------------------------------
 
 ParticleKind* ParticleKindManager::getParticles(const char* name)
 {
-    std::map<std::string, ParticleKind*>::iterator i = m_kinds.find(name);
+    Track* t = track_manager->getTrack(race_manager->getTrackName());
+    std::map<std::string, ParticleKind*>::iterator i;
+    i = m_per_track_kinds.find(name);
+    if (i != m_per_track_kinds.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        try
+        {
+            ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
+            m_per_track_kinds[name] = newkind;
+            return newkind;
+        }
+        catch (std::runtime_error& e)
+        {
+            // not found in track directory, let's try globally...
+        }
+    }
+    
+    i = m_kinds.find(name);
     if (i == m_kinds.end())
     {
         try
