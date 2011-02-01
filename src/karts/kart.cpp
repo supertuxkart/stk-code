@@ -1474,7 +1474,7 @@ void Kart::loadData(bool animatedModel)
         }
         catch (std::runtime_error& e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << "[Kart::loadData] " << e.what() << std::endl;
         }
     }
     //m_water_splash_system = new WaterSplash(this);
@@ -1647,6 +1647,10 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                     m_terrain_particles->setCreationRate(0);
                 }
             }
+        }
+        else
+        {
+            m_terrain_particles->setCreationRate(0);
         }
     }
     
