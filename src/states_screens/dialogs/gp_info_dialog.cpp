@@ -62,7 +62,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
-    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( gp->getName().c_str(),
+    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(gp->getName()),
                                                                area_top, false, true, // border, word warp
                                                                m_irrlicht_window);
     title->setTabStop(false);
