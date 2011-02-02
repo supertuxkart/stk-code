@@ -1176,11 +1176,9 @@ void Kart::updatePhysics(float dt)
         }
 
         // dampen any roll while flying, makes the kart hard to control
-        btVector3 velocity = m_body->getAngularVelocity();
-        const float z = velocity.z();
-        if (z > 0.1f)        velocity.setZ(z - 0.1f);
-        else if (z < -0.1f)  velocity.setZ(z + 0.1f);
-        else                 velocity.setZ(0);
+        btVector3 velocity = m_body->getAngularVelocity();  
+        velocity.setX(0);
+        velocity.setZ(0);
         m_body->setAngularVelocity(velocity);
     }
     
