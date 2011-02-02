@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -20,7 +20,7 @@ subject to the following restrictions:
 #include "btStridingMeshInterface.h"
 
 
-///Concave triangle mesh interface. Don't use this class directly, use btBvhTriangleMeshShape instead.
+///The btTriangleMeshShape is an internal concave triangle mesh interface. Don't use this class directly, use btBvhTriangleMeshShape instead.
 class btTriangleMeshShape : public btConcaveShape
 {
 protected:
@@ -40,7 +40,7 @@ public:
 
 	virtual btVector3	localGetSupportingVertexWithoutMargin(const btVector3& vec)const
 	{
-		assert(0);
+		btAssert(0);
 		return localGetSupportingVertex(vec);
 	}
 
@@ -65,11 +65,25 @@ public:
 		return m_meshInterface;
 	}
 
+	const btVector3& getLocalAabbMin() const
+	{
+		return m_localAabbMin;
+	}
+	const btVector3& getLocalAabbMax() const
+	{
+		return m_localAabbMax;
+	}
+
+
 
 	//debugging
 	virtual const char*	getName()const {return "TRIANGLEMESH";}
 
+	
 
 };
+
+
+
 
 #endif //TRIANGLE_MESH_SHAPE_H

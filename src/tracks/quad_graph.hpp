@@ -25,6 +25,7 @@
 
 #include "tracks/graph_node.hpp"
 #include "tracks/quad_set.hpp"
+#include "utils/aligned_array.hpp"
 
 class CheckLine;
 
@@ -81,7 +82,7 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
-    void         setDefaultStartPositions(std::vector<btTransform> 
+    void         setDefaultStartPositions(AlignedArray<btTransform> 
                                                        *start_transforms,
                                          unsigned int karts_per_row,
                                          float forwards_distance=1.5f,

@@ -27,12 +27,14 @@
 #include <string>
 #include <vector>
 
+#include "irrlicht.h"
+using namespace irr;
+
+#include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
-#include "irrlicht.h"
-using namespace irr;
 
 class Camera;
 class Kart;
@@ -204,8 +206,8 @@ public:
           * \precondition           The 3 vectors have the same size.
           */
         void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
-                           std::vector<Vec3>& mesh_location,
-                           std::vector<Vec3>& mesh_scale,
+                           AlignedArray<Vec3>& mesh_location,
+                           AlignedArray<Vec3>& mesh_scale,
                            const std::vector<int>& model_frames);
         
         /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */

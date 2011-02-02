@@ -34,9 +34,7 @@ int gNumManifold = 0;
 
 
 btCollisionDispatcher::btCollisionDispatcher (btCollisionConfiguration* collisionConfiguration): 
-	m_count(0),
-	m_useIslands(true),
-	m_staticWarningReported(false),
+m_dispatcherFlags(btCollisionDispatcher::CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD),
 	m_collisionConfiguration(collisionConfiguration)
 {
 	int i;
@@ -52,12 +50,12 @@ btCollisionDispatcher::btCollisionDispatcher (btCollisionConfiguration* collisio
 		for (int j=0;j<MAX_BROADPHASE_COLLISION_TYPES;j++)
 		{
 			m_doubleDispatch[i][j] = m_collisionConfiguration->getCollisionAlgorithmCreateFunc(i,j);
-			assert(m_doubleDispatch[i][j]);
+			btAssert(m_doubleDispatch[i][j]);
 		}
 	}
 	
 	
-};
+}
 
 
 void btCollisionDispatcher::registerCollisionCreateFunc(int proxyType0, int proxyType1, btCollisionAlgorithmCreateFunc *createFunc)
@@ -78,7 +76,15 @@ btPersistentManifold*	btCollisionDispatcher::getNewManifold(void* b0,void* b1)
 
 	btCollisionObject* body0 = (btCollisionObject*)b0;
 	btCollisionObject* body1 = (btCollisionObject*)b1;
+
+	//optional relative contact breaking threshold, turned on by default (use setDispatcherFlags to switch off feature for improved performance)
 	
+	btScalar contactBreakingThreshold =  (m_dispatcherFlags & btCollisionDispatcher::CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD) ? 
+		btMin(body0->getCollisionShape()->getContactBreakingThreshold(gContactBreakingThreshold) , body1->getCollisionShape()->getContactBreakingThreshold(gContactBreakingThreshold))
+		: gContactBreakingThreshold ;
+
+	btScalar contactProcessingThreshold = btMin(body0->getContactProcessingThreshold(),body1->getContactProcessingThreshold());
+		
 	void* mem = 0;
 	
 	if (m_persistentManifoldPoolAllocator->getFreeCount())
@@ -89,7 +95,7 @@ btPersistentManifold*	btCollisionDispatcher::getNewManifold(void* b0,void* b1)
 		mem = btAlignedAlloc(sizeof(btPersistentManifold),16);
 
 	}
-	btPersistentManifold* manifold = new(mem) btPersistentManifold (body0,body1,0);
+	btPersistentManifold* manifold = new(mem) btPersistentManifold (body0,body1,0,contactBreakingThreshold,contactProcessingThreshold);
 	manifold->m_index1a = m_manifoldsPtr.size();
 	m_manifoldsPtr.push_back(manifold);
 
@@ -144,7 +150,6 @@ btCollisionAlgorithm* btCollisionDispatcher::findAlgorithm(btCollisionObject* bo
 
 
 
-
 bool	btCollisionDispatcher::needsResponse(btCollisionObject* body0,btCollisionObject* body1)
 {
 	//here you can do filtering
@@ -158,19 +163,19 @@ bool	btCollisionDispatcher::needsResponse(btCollisionObject* body0,btCollisionOb
 
 bool	btCollisionDispatcher::needsCollision(btCollisionObject* body0,btCollisionObject* body1)
 {
-	assert(body0);
-	assert(body1);
+	btAssert(body0);
+	btAssert(body1);
 
 	bool needsCollision = true;
 
 #ifdef BT_DEBUG
-	if (!m_staticWarningReported)
+	if (!(m_dispatcherFlags & btCollisionDispatcher::CD_STATIC_STATIC_REPORTED))
 	{
 		//broadphase filtering already deals with this
 		if ((body0->isStaticObject() || body0->isKinematicObject()) &&
 			(body1->isStaticObject() || body1->isKinematicObject()))
 		{
-			m_staticWarningReported = true;
+			m_dispatcherFlags |= btCollisionDispatcher::CD_STATIC_STATIC_REPORTED;
 			printf("warning btCollisionDispatcher::needsCollision: static-static collision!\n");
 		}
 	}
@@ -191,23 +196,25 @@ bool	btCollisionDispatcher::needsCollision(btCollisionObject* body0,btCollisionO
 ///this is useful for the collision dispatcher.
 class btCollisionPairCallback : public btOverlapCallback
 {
-	btDispatcherInfo& m_dispatchInfo;
+	const btDispatcherInfo& m_dispatchInfo;
 	btCollisionDispatcher*	m_dispatcher;
 
 public:
 
-	btCollisionPairCallback(btDispatcherInfo& dispatchInfo,btCollisionDispatcher*	dispatcher)
+	btCollisionPairCallback(const btDispatcherInfo& dispatchInfo,btCollisionDispatcher*	dispatcher)
 	:m_dispatchInfo(dispatchInfo),
 	m_dispatcher(dispatcher)
 	{
 	}
 
-	btCollisionPairCallback& operator=(btCollisionPairCallback& other)
+	/*btCollisionPairCallback& operator=(btCollisionPairCallback& other)
 	{
 		m_dispatchInfo = other.m_dispatchInfo;
 		m_dispatcher = other.m_dispatcher;
 		return *this;
 	}
+	*/
+
 
 	virtual ~btCollisionPairCallback() {}
 
@@ -221,7 +228,8 @@ public:
 };
 
 
-void	btCollisionDispatcher::dispatchAllCollisionPairs(btOverlappingPairCache* pairCache,btDispatcherInfo& dispatchInfo,btDispatcher* dispatcher)
+
+void	btCollisionDispatcher::dispatchAllCollisionPairs(btOverlappingPairCache* pairCache,const btDispatcherInfo& dispatchInfo,btDispatcher* dispatcher) 
 {
 	//m_blockedForChanges = true;
 
@@ -237,7 +245,7 @@ void	btCollisionDispatcher::dispatchAllCollisionPairs(btOverlappingPairCache* pa
 
 
 //by default, Bullet will use this near callback
-void btCollisionDispatcher::defaultNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, btDispatcherInfo& dispatchInfo)
+void btCollisionDispatcher::defaultNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo& dispatchInfo)
 {
 		btCollisionObject* colObj0 = (btCollisionObject*)collisionPair.m_pProxy0->m_clientObject;
 		btCollisionObject* colObj1 = (btCollisionObject*)collisionPair.m_pProxy1->m_clientObject;
@@ -280,7 +288,7 @@ void* btCollisionDispatcher::allocateCollisionAlgorithm(int size)
 	}
 	
 	//warn user for overflow?
-	return	btAlignedAlloc(size,16);
+	return	btAlignedAlloc(static_cast<size_t>(size), 16);
 }
 
 void btCollisionDispatcher::freeCollisionAlgorithm(void* ptr)

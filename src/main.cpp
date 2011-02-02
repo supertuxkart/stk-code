@@ -28,6 +28,7 @@
 #  ifdef _MSC_VER
 #    include <io.h>
 #    include <direct.h>
+#    include <time.h>
 #  endif
 #else
 #  include <unistd.h>
@@ -724,7 +725,11 @@ void initUserConfig(char *argv[])
     {
         char buffer[1024];
         snprintf(buffer, 1024, "LANGUAGE=%s", UserConfigParams::m_language.c_str());
+#ifdef WIN32
+        _putenv( buffer );
+#else
         putenv( buffer );
+#endif
     }
     
     translations            = new Translations();   // needs file_manager

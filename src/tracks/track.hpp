@@ -33,6 +33,7 @@ using namespace irr;
 #include "graphics/particle_emitter.hpp"
 #include "items/item.hpp"
 #include "tracks/quad_graph.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -60,7 +61,7 @@ private:
 
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
-    std::vector<btTransform> m_start_transforms;
+    AlignedArray<btTransform> m_start_transforms;
 
     std::string              m_item_style;
     std::string              m_description;

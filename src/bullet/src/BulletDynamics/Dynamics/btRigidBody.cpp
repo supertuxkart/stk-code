@@ -19,6 +19,7 @@ subject to the following restrictions:
 #include "LinearMath/btTransformUtil.h"
 #include "LinearMath/btMotionState.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
+#include "LinearMath/btSerializer.h"
 
 //'temporarily' global variables
 btScalar	gDeactivationTime = btScalar(2.);
@@ -44,8 +45,10 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 
 	m_linearVelocity.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_angularVelocity.setValue(btScalar(0.),btScalar(0.),btScalar(0.));
-	m_angularFactor = btScalar(1.);
+	m_angularFactor.setValue(1,1,1);
+	m_linearFactor.setValue(1,1,1);
 	m_gravity.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
+	m_gravity_acceleration.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalForce.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalTorque.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0)),
 	m_linearDamping = btScalar(0.);
@@ -77,12 +80,23 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 	m_friction = constructionInfo.m_friction;
 	m_restitution = constructionInfo.m_restitution;
 
-	m_collisionShape = constructionInfo.m_collisionShape;
+	setCollisionShape( constructionInfo.m_collisionShape );
 	m_debugBodyId = uniqueId++;
 	
 	setMassProps(constructionInfo.m_mass, constructionInfo.m_localInertia);
     setDamping(constructionInfo.m_linearDamping, constructionInfo.m_angularDamping);
 	updateInertiaTensor();
+
+	m_rigidbodyFlags = 0;
+
+
+	m_deltaLinearVelocity.setZero();
+	m_deltaAngularVelocity.setZero();
+	m_invMass = m_inverseMass*m_linearFactor;
+	m_pushVelocity.setZero();
+	m_turnVelocity.setZero();
+
+	
 
 }
 
@@ -124,6 +138,7 @@ void btRigidBody::setGravity(const btVector3& acceleration)
 	{
 		m_gravity = acceleration * (btScalar(1.0) / m_inverseMass);
 	}
+	m_gravity_acceleration = acceleration;
 }
 
 
@@ -133,8 +148,8 @@ void btRigidBody::setGravity(const btVector3& acceleration)
 
 void btRigidBody::setDamping(btScalar lin_damping, btScalar ang_damping)
 {
-	m_linearDamping = GEN_clamped(lin_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
-	m_angularDamping = GEN_clamped(ang_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+	m_linearDamping = btClamped(lin_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+	m_angularDamping = btClamped(ang_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
 }
 
 
@@ -143,8 +158,17 @@ void btRigidBody::setDamping(btScalar lin_damping, btScalar ang_damping)
 ///applyDamping damps the velocity, using the given m_linearDamping and m_angularDamping
 void			btRigidBody::applyDamping(btScalar timeStep)
 {
+	//On new damping: see discussion/issue report here: http://code.google.com/p/bullet/issues/detail?id=74
+	//todo: do some performance comparisons (but other parts of the engine are probably bottleneck anyway
+
+//#define USE_OLD_DAMPING_METHOD 1
+#ifdef USE_OLD_DAMPING_METHOD
 	m_linearVelocity *= GEN_clamped((btScalar(1.) - timeStep * m_linearDamping), (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
 	m_angularVelocity *= GEN_clamped((btScalar(1.) - timeStep * m_angularDamping), (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+#else
+	m_linearVelocity *= btPow(btScalar(1)-m_linearDamping, timeStep);
+	m_angularVelocity *= btPow(btScalar(1)-m_angularDamping, timeStep);
+#endif
 
 	if (m_additionalDamping)
 	{
@@ -215,11 +239,15 @@ void btRigidBody::setMassProps(btScalar mass, const btVector3& inertia)
 		m_collisionFlags &= (~btCollisionObject::CF_STATIC_OBJECT);
 		m_inverseMass = btScalar(1.0) / mass;
 	}
+
+	//Fg = m * a
+	m_gravity = mass * m_gravity_acceleration;
 	
 	m_invInertiaLocal.setValue(inertia.x() != btScalar(0.0) ? btScalar(1.0) / inertia.x(): btScalar(0.0),
 				   inertia.y() != btScalar(0.0) ? btScalar(1.0) / inertia.y(): btScalar(0.0),
 				   inertia.z() != btScalar(0.0) ? btScalar(1.0) / inertia.z(): btScalar(0.0));
 
+	m_invMass = m_linearFactor*m_inverseMass;
 }
 
 	
@@ -289,6 +317,28 @@ bool btRigidBody::checkCollideWithOverride(btCollisionObject* co)
 	return true;
 }
 
+void	btRigidBody::internalWritebackVelocity(btScalar timeStep)
+{
+    (void) timeStep;
+	if (m_inverseMass)
+	{
+		setLinearVelocity(getLinearVelocity()+ m_deltaLinearVelocity);
+		setAngularVelocity(getAngularVelocity()+m_deltaAngularVelocity);
+		
+		//correct the position/orientation based on push/turn recovery
+		btTransform newTransform;
+		btTransformUtil::integrateTransform(getWorldTransform(),m_pushVelocity,m_turnVelocity,timeStep,newTransform);
+		setWorldTransform(newTransform);
+		//m_originalBody->setCompanionId(-1);
+	}
+//	m_deltaLinearVelocity.setZero();
+//	m_deltaAngularVelocity .setZero();
+//	m_pushVelocity.setZero();
+//	m_turnVelocity.setZero();
+}
+
+
+
 void btRigidBody::addConstraintRef(btTypedConstraint* c)
 {
 	int index = m_constraintRefs.findLinearSearch(c);
@@ -303,3 +353,51 @@ void btRigidBody::removeConstraintRef(btTypedConstraint* c)
 	m_constraintRefs.remove(c);
 	m_checkCollideWith = m_constraintRefs.size() > 0;
 }
+
+int	btRigidBody::calculateSerializeBufferSize()	const
+{
+	int sz = sizeof(btRigidBodyData);
+	return sz;
+}
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+const char*	btRigidBody::serialize(void* dataBuffer, class btSerializer* serializer) const
+{
+	btRigidBodyData* rbd = (btRigidBodyData*) dataBuffer;
+
+	btCollisionObject::serialize(&rbd->m_collisionObjectData, serializer);
+
+	m_invInertiaTensorWorld.serialize(rbd->m_invInertiaTensorWorld);
+	m_linearVelocity.serialize(rbd->m_linearVelocity);
+	m_angularVelocity.serialize(rbd->m_angularVelocity);
+	rbd->m_inverseMass = m_inverseMass;
+	m_angularFactor.serialize(rbd->m_angularFactor);
+	m_linearFactor.serialize(rbd->m_linearFactor);
+	m_gravity.serialize(rbd->m_gravity);
+	m_gravity_acceleration.serialize(rbd->m_gravity_acceleration);
+	m_invInertiaLocal.serialize(rbd->m_invInertiaLocal);
+	m_totalForce.serialize(rbd->m_totalForce);
+	m_totalTorque.serialize(rbd->m_totalTorque);
+	rbd->m_linearDamping = m_linearDamping;
+	rbd->m_angularDamping = m_angularDamping;
+	rbd->m_additionalDamping = m_additionalDamping;
+	rbd->m_additionalDampingFactor = m_additionalDampingFactor;
+	rbd->m_additionalLinearDampingThresholdSqr = m_additionalLinearDampingThresholdSqr;
+	rbd->m_additionalAngularDampingThresholdSqr = m_additionalAngularDampingThresholdSqr;
+	rbd->m_additionalAngularDampingFactor = m_additionalAngularDampingFactor;
+	rbd->m_linearSleepingThreshold=m_linearSleepingThreshold;
+	rbd->m_angularSleepingThreshold = m_angularSleepingThreshold;
+
+	return btRigidBodyDataName;
+}
+
+
+
+void btRigidBody::serializeSingleObject(class btSerializer* serializer) const
+{
+	btChunk* chunk = serializer->allocate(calculateSerializeBufferSize(),1);
+	const char* structType = serialize(chunk->m_oldPtr, serializer);
+	serializer->finalizeChunk(chunk,structType,BT_RIGIDBODY_CODE,(void*)this);
+}
+
+

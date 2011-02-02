@@ -24,6 +24,27 @@ subject to the following restrictions:
 #include "btBulletDynamicsCommon.h"
 #include "LinearMath/btAlignedAllocator.h"
 
+
+
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btScalar.h"	
+#include "LinearMath/btMatrix3x3.h"
+#include "LinearMath/btTransform.h"
+#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
+#include "BulletCollision/CollisionShapes/btTriangleShape.h"
+
+#include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
+#include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
+#include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
+#include "BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h"
+#include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
+#include "BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
+#include "BulletCollision/CollisionShapes/btMinkowskiSumShape.h"
+#include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
+#include "BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h"
+#include "BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.h"
+
+
 /*
 	Create and Delete a Physics SDK	
 */
@@ -89,16 +110,16 @@ void           plDeleteDynamicsWorld(plDynamicsWorldHandle world)
 void	plStepSimulation(plDynamicsWorldHandle world,	plReal	timeStep)
 {
 	btDynamicsWorld* dynamicsWorld = reinterpret_cast< btDynamicsWorld* >(world);
-	assert(dynamicsWorld);
+	btAssert(dynamicsWorld);
 	dynamicsWorld->stepSimulation(timeStep);
 }
 
 void plAddRigidBody(plDynamicsWorldHandle world, plRigidBodyHandle object)
 {
 	btDynamicsWorld* dynamicsWorld = reinterpret_cast< btDynamicsWorld* >(world);
-	assert(dynamicsWorld);
+	btAssert(dynamicsWorld);
 	btRigidBody* body = reinterpret_cast< btRigidBody* >(object);
-	assert(body);
+	btAssert(body);
 
 	dynamicsWorld->addRigidBody(body);
 }
@@ -106,9 +127,9 @@ void plAddRigidBody(plDynamicsWorldHandle world, plRigidBodyHandle object)
 void plRemoveRigidBody(plDynamicsWorldHandle world, plRigidBodyHandle object)
 {
 	btDynamicsWorld* dynamicsWorld = reinterpret_cast< btDynamicsWorld* >(world);
-	assert(dynamicsWorld);
+	btAssert(dynamicsWorld);
 	btRigidBody* body = reinterpret_cast< btRigidBody* >(object);
-	assert(body);
+	btAssert(body);
 
 	dynamicsWorld->removeRigidBody(body);
 }
@@ -121,7 +142,7 @@ plRigidBodyHandle plCreateRigidBody(	void* user_data,  float mass, plCollisionSh
 	trans.setIdentity();
 	btVector3 localInertia(0,0,0);
 	btCollisionShape* shape = reinterpret_cast<btCollisionShape*>( cshape);
-	assert(shape);
+	btAssert(shape);
 	if (mass)
 	{
 		shape->calculateLocalInertia(mass,localInertia);
@@ -137,7 +158,7 @@ plRigidBodyHandle plCreateRigidBody(	void* user_data,  float mass, plCollisionSh
 void plDeleteRigidBody(plRigidBodyHandle cbody)
 {
 	btRigidBody* body = reinterpret_cast< btRigidBody* >(cbody);
-	assert(body);
+	btAssert(body);
 	btAlignedFree( body);
 }
 
@@ -160,12 +181,12 @@ plCollisionShapeHandle plNewBoxShape(plReal x, plReal y, plReal z)
 plCollisionShapeHandle plNewCapsuleShape(plReal radius, plReal height)
 {
 	//capsule is convex hull of 2 spheres, so use btMultiSphereShape
-	btVector3 inertiaHalfExtents(radius,height,radius);
+	
 	const int numSpheres = 2;
 	btVector3 positions[numSpheres] = {btVector3(0,height,0),btVector3(0,-height,0)};
 	btScalar radi[numSpheres] = {radius,radius};
 	void* mem = btAlignedAlloc(sizeof(btMultiSphereShape),16);
-	return (plCollisionShapeHandle) new (mem)btMultiSphereShape(inertiaHalfExtents,positions,radi,numSpheres);
+	return (plCollisionShapeHandle) new (mem)btMultiSphereShape(positions,radi,numSpheres);
 }
 plCollisionShapeHandle plNewConeShape(plReal radius, plReal height)
 {
@@ -231,22 +252,23 @@ void plSetEuler(plReal yaw,plReal pitch,plReal roll, plQuaternion orient)
 void		plAddVertex(plCollisionShapeHandle cshape, plReal x,plReal y,plReal z)
 {
 	btCollisionShape* colShape = reinterpret_cast<btCollisionShape*>( cshape);
+	(void)colShape;
 	btAssert(colShape->getShapeType()==CONVEX_HULL_SHAPE_PROXYTYPE);
 	btConvexHullShape* convexHullShape = reinterpret_cast<btConvexHullShape*>( cshape);
-	convexHullShape->addPoint(btPoint3(x,y,z));
+	convexHullShape->addPoint(btVector3(x,y,z));
 
 }
 
 void plDeleteShape(plCollisionShapeHandle cshape)
 {
 	btCollisionShape* shape = reinterpret_cast<btCollisionShape*>( cshape);
-	assert(shape);
+	btAssert(shape);
 	btAlignedFree(shape);
 }
 void plSetScaling(plCollisionShapeHandle cshape, plVector3 cscaling)
 {
 	btCollisionShape* shape = reinterpret_cast<btCollisionShape*>( cshape);
-	assert(shape);
+	btAssert(shape);
 	btVector3 scaling(cscaling[0],cscaling[1],cscaling[2]);
 	shape->setLocalScaling(scaling);	
 }
@@ -271,6 +293,14 @@ void plSetOrientation(plRigidBodyHandle object, const plQuaternion orientation)
 	btTransform worldTrans = body->getWorldTransform();
 	worldTrans.setRotation(orn);
 	body->setWorldTransform(worldTrans);
+}
+
+void	plSetOpenGLMatrix(plRigidBodyHandle object, plReal* matrix)
+{
+	btRigidBody* body = reinterpret_cast< btRigidBody* >(object);
+	btAssert(body);
+	btTransform& worldTrans = body->getWorldTransform();
+	worldTrans.setFromOpenGLMatrix(matrix);
 }
 
 void	plGetOpenGLMatrix(plRigidBodyHandle object, plReal* matrix)
@@ -307,3 +337,69 @@ void plGetOrientation(plRigidBodyHandle object,plQuaternion orientation)
 //plRigidBodyHandle plRayCast(plDynamicsWorldHandle world, const plVector3 rayStart, const plVector3 rayEnd, plVector3 hitpoint, plVector3 normal);
 
 //	extern  plRigidBodyHandle plObjectCast(plDynamicsWorldHandle world, const plVector3 rayStart, const plVector3 rayEnd, plVector3 hitpoint, plVector3 normal);
+
+double plNearestPoints(float p1[3], float p2[3], float p3[3], float q1[3], float q2[3], float q3[3], float *pa, float *pb, float normal[3])
+{
+	btVector3 vp(p1[0], p1[1], p1[2]);
+	btTriangleShape trishapeA(vp, 
+				  btVector3(p2[0], p2[1], p2[2]), 
+				  btVector3(p3[0], p3[1], p3[2]));
+	trishapeA.setMargin(0.000001f);
+	btVector3 vq(q1[0], q1[1], q1[2]);
+	btTriangleShape trishapeB(vq, 
+				  btVector3(q2[0], q2[1], q2[2]), 
+				  btVector3(q3[0], q3[1], q3[2]));
+	trishapeB.setMargin(0.000001f);
+	
+	// btVoronoiSimplexSolver sGjkSimplexSolver;
+	// btGjkEpaPenetrationDepthSolver penSolverPtr;	
+	
+	static btSimplexSolverInterface sGjkSimplexSolver;
+	sGjkSimplexSolver.reset();
+	
+	static btGjkEpaPenetrationDepthSolver Solver0;
+	static btMinkowskiPenetrationDepthSolver Solver1;
+		
+	btConvexPenetrationDepthSolver* Solver = NULL;
+	
+	Solver = &Solver1;	
+		
+	btGjkPairDetector convexConvex(&trishapeA ,&trishapeB,&sGjkSimplexSolver,Solver);
+	
+	convexConvex.m_catchDegeneracies = 1;
+	
+	// btGjkPairDetector convexConvex(&trishapeA ,&trishapeB,&sGjkSimplexSolver,0);
+	
+	btPointCollector gjkOutput;
+	btGjkPairDetector::ClosestPointInput input;
+	
+		
+	btTransform tr;
+	tr.setIdentity();
+	
+	input.m_transformA = tr;
+	input.m_transformB = tr;
+	
+	convexConvex.getClosestPoints(input, gjkOutput, 0);
+	
+	
+	if (gjkOutput.m_hasResult)
+	{
+		
+		pb[0] = pa[0] = gjkOutput.m_pointInWorld[0];
+		pb[1] = pa[1] = gjkOutput.m_pointInWorld[1];
+		pb[2] = pa[2] = gjkOutput.m_pointInWorld[2];
+
+		pb[0]+= gjkOutput.m_normalOnBInWorld[0] * gjkOutput.m_distance;
+		pb[1]+= gjkOutput.m_normalOnBInWorld[1] * gjkOutput.m_distance;
+		pb[2]+= gjkOutput.m_normalOnBInWorld[2] * gjkOutput.m_distance;
+		
+		normal[0] = gjkOutput.m_normalOnBInWorld[0];
+		normal[1] = gjkOutput.m_normalOnBInWorld[1];
+		normal[2] = gjkOutput.m_normalOnBInWorld[2];
+
+		return gjkOutput.m_distance;
+	}
+	return -1.0f;	
+}
+

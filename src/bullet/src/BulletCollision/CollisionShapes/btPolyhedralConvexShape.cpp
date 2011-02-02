@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -15,23 +15,20 @@ subject to the following restrictions:
 
 #include "BulletCollision/CollisionShapes/btPolyhedralConvexShape.h"
 
-btPolyhedralConvexShape::btPolyhedralConvexShape()
-:m_localAabbMin(1,1,1),
-m_localAabbMax(-1,-1,-1),
-m_isLocalAabbValid(false),
-m_optionalHull(0)
+btPolyhedralConvexShape::btPolyhedralConvexShape() :btConvexInternalShape()
 {
 
 }
 
 
-
 btVector3	btPolyhedralConvexShape::localGetSupportingVertexWithoutMargin(const btVector3& vec0)const
 {
-	int i;
-	btVector3 supVec(0,0,0);
 
-	btScalar maxDot(btScalar(-1e30));
+
+	btVector3 supVec(0,0,0);
+#ifndef __SPU__
+	int i;
+	btScalar maxDot(btScalar(-BT_LARGE_FLOAT));
 
 	btVector3 vec = vec0;
 	btScalar lenSqr = vec.length2();
@@ -58,12 +55,16 @@ btVector3	btPolyhedralConvexShape::localGetSupportingVertexWithoutMargin(const b
 		}
 	}
 
+	
+#endif //__SPU__
 	return supVec;
-
 }
+
+
 
 void	btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const
 {
+#ifndef __SPU__
 	int i;
 
 	btVector3 vtx;
@@ -71,7 +72,7 @@ void	btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 
 	for (i=0;i<numVectors;i++)
 	{
-		supportVerticesOut[i][3] = btScalar(-1e30);
+		supportVerticesOut[i][3] = btScalar(-BT_LARGE_FLOAT);
 	}
 
 	for (int j=0;j<numVectors;j++)
@@ -91,12 +92,14 @@ void	btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 			}
 		}
 	}
+#endif //__SPU__
 }
 
 
 
 void	btPolyhedralConvexShape::calculateLocalInertia(btScalar mass,btVector3& inertia) const
 {
+#ifndef __SPU__
 	//not yet, return box inertia
 
 	btScalar margin = getMargin();
@@ -116,22 +119,64 @@ void	btPolyhedralConvexShape::calculateLocalInertia(btScalar mass,btVector3& ine
 	const btScalar scaledmass = mass * btScalar(0.08333333);
 
 	inertia = scaledmass * (btVector3(y2+z2,x2+z2,x2+y2));
-
+#endif //__SPU__
 }
 
 
 
-void btPolyhedralConvexShape::getAabb(const btTransform& trans,btVector3& aabbMin,btVector3& aabbMax) const
+void	btPolyhedralConvexAabbCachingShape::setLocalScaling(const btVector3& scaling)
+{
+	btConvexInternalShape::setLocalScaling(scaling);
+	recalcLocalAabb();
+}
+
+btPolyhedralConvexAabbCachingShape::btPolyhedralConvexAabbCachingShape()
+:btPolyhedralConvexShape(),
+m_localAabbMin(1,1,1),
+m_localAabbMax(-1,-1,-1),
+m_isLocalAabbValid(false)
+{
+}
+
+void btPolyhedralConvexAabbCachingShape::getAabb(const btTransform& trans,btVector3& aabbMin,btVector3& aabbMax) const
 {
 	getNonvirtualAabb(trans,aabbMin,aabbMax,getMargin());
 }
 
-
-
-
-void	btPolyhedralConvexShape::recalcLocalAabb()
+void	btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 {
 	m_isLocalAabbValid = true;
+	
+	#if 1
+	static const btVector3 _directions[] =
+	{
+		btVector3( 1.,  0.,  0.),
+		btVector3( 0.,  1.,  0.),
+		btVector3( 0.,  0.,  1.),
+		btVector3( -1., 0.,  0.),
+		btVector3( 0., -1.,  0.),
+		btVector3( 0.,  0., -1.)
+	};
+	
+	btVector3 _supporting[] =
+	{
+		btVector3( 0., 0., 0.),
+		btVector3( 0., 0., 0.),
+		btVector3( 0., 0., 0.),
+		btVector3( 0., 0., 0.),
+		btVector3( 0., 0., 0.),
+		btVector3( 0., 0., 0.)
+	};
+	
+	batchedUnitVectorGetSupportingVertexWithoutMargin(_directions, _supporting, 6);
+	
+	for ( int i = 0; i < 3; ++i )
+	{
+		m_localAabbMax[i] = _supporting[i][i] + m_collisionMargin;
+		m_localAabbMin[i] = _supporting[i + 3][i] - m_collisionMargin;
+	}
+	
+	#else
 
 	for (int i=0;i<3;i++)
 	{
@@ -143,6 +188,6 @@ void	btPolyhedralConvexShape::recalcLocalAabb()
 		tmp = localGetSupportingVertex(vec);
 		m_localAabbMin[i] = tmp[i]-m_collisionMargin;
 	}
+	#endif
 }
-
 

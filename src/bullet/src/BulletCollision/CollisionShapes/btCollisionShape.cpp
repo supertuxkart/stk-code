@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -12,16 +12,20 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
-
+#include "LinearMath/btSerializer.h"
 
 /*
   Make sure this dummy function never changes so that it
   can be used by probes that are checking whether the
   library is actually installed.
 */
-extern "C" void btBulletCollisionProbe () {}
+extern "C" 
+{
+void btBulletCollisionProbe ();
+
+void btBulletCollisionProbe () {}
+}
 
 
 
@@ -37,8 +41,15 @@ void	btCollisionShape::getBoundingSphere(btVector3& center,btScalar& radius) con
 	center = (aabbMin+aabbMax)*btScalar(0.5);
 }
 
+
+btScalar	btCollisionShape::getContactBreakingThreshold(btScalar defaultContactThreshold) const
+{
+	return getAngularMotionDisc() * defaultContactThreshold;
+}
+
 btScalar	btCollisionShape::getAngularMotionDisc() const
 {
+	///@todo cache this value, to improve performance
 	btVector3	center;
 	btScalar disc;
 	getBoundingSphere(center,disc);
@@ -60,7 +71,7 @@ void btCollisionShape::calculateTemporalAabb(const btTransform& curTrans,const b
 
 	// add linear motion
 	btVector3 linMotion = linvel*timeStep;
-	//todo: simd would have a vector max/min operation, instead of per-element access
+	///@todo: simd would have a vector max/min operation, instead of per-element access
 	if (linMotion.x() > btScalar(0.))
 		temporalAabbMaxx += linMotion.x(); 
 	else
@@ -82,4 +93,27 @@ void btCollisionShape::calculateTemporalAabb(const btTransform& curTrans,const b
 
 	temporalAabbMin -= angularMotion3d;
 	temporalAabbMax += angularMotion3d;
+}
+
+///fills the dataBuffer and returns the struct name (and 0 on failure)
+const char*	btCollisionShape::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+	btCollisionShapeData* shapeData = (btCollisionShapeData*) dataBuffer;
+	char* name = (char*) serializer->findNameForPointer(this);
+	shapeData->m_name = (char*)serializer->getUniquePointer(name);
+	if (shapeData->m_name)
+	{
+		serializer->serializeName(name);
+	}
+	shapeData->m_shapeType = m_shapeType;
+	//shapeData->m_padding//??
+	return "btCollisionShapeData";
+}
+
+void	btCollisionShape::serializeSingleShape(btSerializer* serializer) const
+{
+	int len = calculateSerializeBufferSize();
+	btChunk* chunk = serializer->allocate(len,1);
+	const char* structType = serialize(chunk->m_oldPtr, serializer);
+	serializer->finalizeChunk(chunk,structType,BT_SHAPE_CODE,(void*)this);
 }

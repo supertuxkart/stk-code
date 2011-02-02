@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -12,14 +12,13 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
 #ifndef SPHERE_MINKOWSKI_H
 #define SPHERE_MINKOWSKI_H
 
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
-///btSphereShape implements an implicit (getSupportingVertex) Sphere
+///The btSphereShape implements an implicit sphere, centered around a local origin with radius.
 ATTRIBUTE_ALIGNED16(class) btSphereShape : public btConvexInternalShape
 
 {
@@ -27,8 +26,12 @@ ATTRIBUTE_ALIGNED16(class) btSphereShape : public btConvexInternalShape
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-	btSphereShape (btScalar radius);
-	
+	btSphereShape (btScalar radius) : btConvexInternalShape ()
+	{
+		m_shapeType = SPHERE_SHAPE_PROXYTYPE;
+		m_implicitShapeDimensions.setX(radius);
+		m_collisionMargin = radius;
+	}
 	
 	virtual btVector3	localGetSupportingVertex(const btVector3& vec)const;
 	virtual btVector3	localGetSupportingVertexWithoutMargin(const btVector3& vec)const;
@@ -40,9 +43,14 @@ public:
 
 	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 
-	virtual int	getShapeType() const { return SPHERE_SHAPE_PROXYTYPE; }
 
 	btScalar	getRadius() const { return m_implicitShapeDimensions.getX() * m_localScaling.getX();}
+
+	void	setUnscaledRadius(btScalar	radius)
+	{
+		m_implicitShapeDimensions.setX(radius);
+		btConvexInternalShape::setMargin(radius);
+	}
 
 	//debugging
 	virtual const char*	getName()const {return "SPHERE";}

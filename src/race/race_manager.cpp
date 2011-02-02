@@ -330,68 +330,52 @@ void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
     const unsigned int NUM_KARTS = getNumberOfKarts();
-    int *scores                  = new int[NUM_KARTS];
-    int *position                = new int[NUM_KARTS];
-    double *race_time            = new double[NUM_KARTS];
+    class SortData
+    {
+    public:
+        int m_score;
+        int m_position;
+        float m_race_time;
+        bool operator<(const SortData &a)
+        {
+            return ( m_score > a.m_score || 
+                     m_score == m_score && m_race_time < a.m_race_time);
+        }
+
+    };   // SortData
+    ptr_vector<SortData> sort_data;
+
     // Ignore the first kart if it's a follow-the-leader race.
     int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
-    for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
-    {
-        position[kart_id]  = kart_id;
-        scores[kart_id]    = race_manager->getKartScore(kart_id);
-        race_time[kart_id] = race_manager->getOverallTime(kart_id);
-    }
-    
-    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+    if (start)
     {
         // fill values for leader
-        position[0]  = -1;
-        scores[0]    = -1;
-        race_time[0] = -1; 
+        SortData *sd = new SortData;
+
+        sd->m_position  = -1;
+        sd->m_score     = -1;
+        sd->m_race_time = -1;
+        sort_data.push_back(sd);
         m_kart_status[0].m_gp_rank = -1;
     }
-    
-    //Bubblesort
-    bool sorted;
-    do
+    for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
     {
-        sorted = true;
-        for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
-        {
-            if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
-                                            && race_time[i] > race_time[i+1]))
-            {
-                int tmp_score[2];
-                double tmp_time;
-                
-                tmp_score[0] = position[i];
-                tmp_score[1] = scores[i];
-                tmp_time = race_time[i];
-                
-                position[i] = position[i+1];
-                scores[i] = scores[i+1];
-                race_time[i] = race_time[i+1];
-                
-                position[i+1] = tmp_score[0];
-                scores[i+1] = tmp_score[1];
-                race_time[i+1] = tmp_time;
-                
-                sorted = false;
-            }
-        }
-    } while(!sorted);
+        SortData *sd = new SortData;
+        sd->m_position  = kart_id;
+        sd->m_score     = race_manager->getKartScore(kart_id);
+        sd->m_race_time = race_manager->getOverallTime(kart_id);
+        sort_data.push_back(sd);
+    }
     
+    sort_data.insertionSort(start);
     for (unsigned int i=start; i < NUM_KARTS; ++i)
     {
         //printf("setting kart %s to rank %i\n", 
         //    m_kart_status[position[i]].m_ident.c_str(), i-start);
-        m_kart_status[position[i]].m_gp_rank = i - start;
+        m_kart_status[sort_data[i].m_position].m_gp_rank = i - start;
     }
     // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_rank);
-    delete []scores;
-    delete []position;
-    delete []race_time;    
-}
+}   // computeGPRanks
 
 //-----------------------------------------------------------------------------
 

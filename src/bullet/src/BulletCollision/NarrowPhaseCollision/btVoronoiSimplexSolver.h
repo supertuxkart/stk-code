@@ -24,6 +24,11 @@ subject to the following restrictions:
 
 #define VORONOI_SIMPLEX_MAX_VERTS 5
 
+///disable next define, or use defaultCollisionConfiguration->getSimplexSolver()->setEqualVertexThreshold(0.f) to disable/configure
+#define BT_USE_EQUAL_VERTEX_THRESHOLD
+#define VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD 0.0001f
+
+
 struct btUsageBitfield{
 	btUsageBitfield()
 	{
@@ -50,7 +55,7 @@ struct btUsageBitfield{
 
 struct	btSubSimplexClosestResult
 {
-	btPoint3	m_closestPointOnSimplex;
+	btVector3	m_closestPointOnSimplex;
 	//MASK for m_usedVertices
 	//stores the simplex vertex-usage, using the MASK, 
 	// if m_usedVertices & MASK then the related vertex is used
@@ -97,16 +102,19 @@ public:
 	int	m_numVertices;
 
 	btVector3	m_simplexVectorW[VORONOI_SIMPLEX_MAX_VERTS];
-	btPoint3	m_simplexPointsP[VORONOI_SIMPLEX_MAX_VERTS];
-	btPoint3	m_simplexPointsQ[VORONOI_SIMPLEX_MAX_VERTS];
+	btVector3	m_simplexPointsP[VORONOI_SIMPLEX_MAX_VERTS];
+	btVector3	m_simplexPointsQ[VORONOI_SIMPLEX_MAX_VERTS];
 
 	
 
-	btPoint3	m_cachedP1;
-	btPoint3	m_cachedP2;
+	btVector3	m_cachedP1;
+	btVector3	m_cachedP2;
 	btVector3	m_cachedV;
 	btVector3	m_lastW;
+	
+	btScalar	m_equalVertexThreshold;
 	bool		m_cachedValidClosest;
+
 
 	btSubSimplexClosestResult m_cachedBC;
 
@@ -116,16 +124,29 @@ public:
 	void	reduceVertices (const btUsageBitfield& usedVerts);
 	bool	updateClosestVectorAndPoints();
 
-	bool	closestPtPointTetrahedron(const btPoint3& p, const btPoint3& a, const btPoint3& b, const btPoint3& c, const btPoint3& d, btSubSimplexClosestResult& finalResult);
-	int		pointOutsideOfPlane(const btPoint3& p, const btPoint3& a, const btPoint3& b, const btPoint3& c, const btPoint3& d);
-	bool	closestPtPointTriangle(const btPoint3& p, const btPoint3& a, const btPoint3& b, const btPoint3& c,btSubSimplexClosestResult& result);
+	bool	closestPtPointTetrahedron(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d, btSubSimplexClosestResult& finalResult);
+	int		pointOutsideOfPlane(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d);
+	bool	closestPtPointTriangle(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c,btSubSimplexClosestResult& result);
 
 public:
 
+	btVoronoiSimplexSolver()
+		:  m_equalVertexThreshold(VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD)
+	{
+	}
 	 void reset();
 
-	 void addVertex(const btVector3& w, const btPoint3& p, const btPoint3& q);
+	 void addVertex(const btVector3& w, const btVector3& p, const btVector3& q);
 
+	 void	setEqualVertexThreshold(btScalar threshold)
+	 {
+		 m_equalVertexThreshold = threshold;
+	 }
+
+	 btScalar	getEqualVertexThreshold() const
+	 {
+		 return m_equalVertexThreshold;
+	 }
 
 	 bool closest(btVector3& v);
 
@@ -136,7 +157,7 @@ public:
 		 return (m_numVertices == 4);
 	 }
 
-	 int getSimplex(btPoint3 *pBuf, btPoint3 *qBuf, btVector3 *yBuf) const;
+	 int getSimplex(btVector3 *pBuf, btVector3 *qBuf, btVector3 *yBuf) const;
 
 	 bool inSimplex(const btVector3& w);
 	
@@ -144,7 +165,7 @@ public:
 
 	 bool emptySimplex() const ;
 
-	 void compute_points(btPoint3& p1, btPoint3& p2) ;
+	 void compute_points(btVector3& p1, btVector3& p2) ;
 
 	 int numVertices() const 
 	 {

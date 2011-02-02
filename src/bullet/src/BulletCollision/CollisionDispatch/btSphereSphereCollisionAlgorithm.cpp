@@ -19,7 +19,7 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
 btSphereSphereCollisionAlgorithm::btSphereSphereCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* col0,btCollisionObject* col1)
-: btCollisionAlgorithm(ci),
+: btActivatingCollisionAlgorithm(ci,col0,col1),
 m_ownManifold(false),
 m_manifoldPtr(mf)
 {
@@ -56,11 +56,16 @@ void btSphereSphereCollisionAlgorithm::processCollision (btCollisionObject* col0
 	btScalar radius0 = sphere0->getRadius();
 	btScalar radius1 = sphere1->getRadius();
 
-	m_manifoldPtr->clearManifold();
+#ifdef CLEAR_MANIFOLD
+	m_manifoldPtr->clearManifold(); //don't do this, it disables warmstarting
+#endif
 
 	///iff distance positive, don't generate a new contact
 	if ( len > (radius0+radius1))
 	{
+#ifndef CLEAR_MANIFOLD
+		resultOut->refreshContactPoints();
+#endif //CLEAR_MANIFOLD
 		return;
 	}
 	///distance (negative means penetration)
@@ -73,7 +78,7 @@ void btSphereSphereCollisionAlgorithm::processCollision (btCollisionObject* col0
 	}
 
 	///point on A (worldspace)
-	btVector3 pos0 = col0->getWorldTransform().getOrigin() - radius0 * normalOnSurfaceB;
+	///btVector3 pos0 = col0->getWorldTransform().getOrigin() - radius0 * normalOnSurfaceB;
 	///point on B (worldspace)
 	btVector3 pos1 = col1->getWorldTransform().getOrigin() + radius1* normalOnSurfaceB;
 
@@ -82,7 +87,9 @@ void btSphereSphereCollisionAlgorithm::processCollision (btCollisionObject* col0
 	
 	resultOut->addContactPoint(normalOnSurfaceB,pos1,dist);
 
-	//no resultOut->refreshContactPoints(); needed, because of clearManifold (all points are new)
+#ifndef CLEAR_MANIFOLD
+	resultOut->refreshContactPoints();
+#endif //CLEAR_MANIFOLD
 
 }
 

@@ -39,8 +39,8 @@ subject to the following restrictions:
 #endif //BT_USE_PLACEMENT_NEW
 
 
-///btAlignedObjectArray uses a subset of the stl::vector interface for its methods
-///It is developed to replace stl::vector to avoid STL alignment issues to add SIMD/SSE data
+///The btAlignedObjectArray template class uses a subset of the stl::vector interface for its methods
+///It is developed to replace stl::vector to avoid portability issues, including STL alignment issues to add SIMD/SSE data
 template <typename T> 
 //template <class T> 
 class btAlignedObjectArray
@@ -58,7 +58,7 @@ class btAlignedObjectArray
 		{
 			return (size ? size*2 : 1);
 		}
-		SIMD_FORCE_INLINE	void	copy(int start,int end, T* dest)
+		SIMD_FORCE_INLINE	void	copy(int start,int end, T* dest) const
 		{
 			int i;
 			for (i=start;i<end;++i)
@@ -120,16 +120,34 @@ class btAlignedObjectArray
 			clear();
 		}
 
-		SIMD_FORCE_INLINE	int capacity() const
-		{	// return current length of allocated storage
-			return m_capacity;
+		///Generally it is best to avoid using the copy constructor of an btAlignedObjectArray, and use a (const) reference to the array instead.
+		btAlignedObjectArray(const btAlignedObjectArray& otherArray)
+		{
+			init();
+
+			int otherSize = otherArray.size();
+			resize (otherSize);
+			otherArray.copy(0, otherSize, m_data);
 		}
+
 		
+		
+		/// return the number of elements in the array
 		SIMD_FORCE_INLINE	int size() const
-		{	// return length of sequence
+		{	
 			return m_size;
 		}
 		
+		SIMD_FORCE_INLINE const T& at(int n) const
+		{
+			return m_data[n];
+		}
+
+		SIMD_FORCE_INLINE T& at(int n)
+		{
+			return m_data[n];
+		}
+
 		SIMD_FORCE_INLINE const T& operator[](int n) const
 		{
 			return m_data[n];
@@ -141,6 +159,7 @@ class btAlignedObjectArray
 		}
 		
 
+		///clear the array, deallocated memory. Generally it is better to use array.resize(0), to reduce performance overhead of run-time memory (de)allocations.
 		SIMD_FORCE_INLINE	void	clear()
 		{
 			destroy(0,size());
@@ -156,13 +175,15 @@ class btAlignedObjectArray
 			m_data[m_size].~T();
 		}
 
+		///resize changes the number of elements in the array. If the new size is larger, the new elements will be constructed using the optional second argument.
+		///when the new number of elements is smaller, the destructor will be called, but memory will not be freed, to reduce performance overhead of run-time memory (de)allocations.
 		SIMD_FORCE_INLINE	void	resize(int newsize, const T& fillData=T())
 		{
 			int curSize = size();
 
-			if (newsize < size())
+			if (newsize < curSize)
 			{
-				for(int i = curSize; i < newsize; i++)
+				for(int i = newsize; i < curSize; i++)
 				{
 					m_data[i].~T();
 				}
@@ -184,6 +205,18 @@ class btAlignedObjectArray
 			m_size = newsize;
 		}
 	
+		SIMD_FORCE_INLINE	T&  expandNonInitializing( )
+		{	
+			int sz = size();
+			if( sz == capacity() )
+			{
+				reserve( allocSize(size()) );
+			}
+			m_size++;
+
+			return m_data[sz];		
+		}
+
 
 		SIMD_FORCE_INLINE	T&  expand( const T& fillValue=T())
 		{	
@@ -219,6 +252,11 @@ class btAlignedObjectArray
 		}
 
 	
+		/// return the pre-allocated (reserved) elements, this is at least as large as the total number of elements,see size() and reserve()
+		SIMD_FORCE_INLINE	int capacity() const
+		{	
+			return m_capacity;
+		}
 		
 		SIMD_FORCE_INLINE	void reserve(int _Count)
 		{	// determine new minimum length of allocated storage
@@ -419,6 +457,13 @@ class btAlignedObjectArray
 		m_data = (T*)buffer;
 		m_size = size;
 		m_capacity = capacity;
+	}
+
+	void copyFromArray(const btAlignedObjectArray& otherArray)
+	{
+		int otherSize = otherArray.size();
+		resize (otherSize);
+		otherArray.copy(0, otherSize, m_data);
 	}
 
 };

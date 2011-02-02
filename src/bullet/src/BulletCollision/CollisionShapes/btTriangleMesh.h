@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -13,7 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #ifndef TRIANGLE_MESH_H
 #define TRIANGLE_MESH_H
 
@@ -21,22 +20,24 @@ subject to the following restrictions:
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
 
-///btTriangleMesh provides storage for a concave triangle mesh. It can be used as data for the btTriangleMeshShape.
+///The btTriangleMesh class is a convenience class derived from btTriangleIndexVertexArray, that provides storage for a concave triangle mesh. It can be used as data for the btBvhTriangleMeshShape.
 ///It allows either 32bit or 16bit indices, and 4 (x-y-z-w) or 3 (x-y-z) component vertices.
-///btTriangleMesh will duplicate/keep all mesh data. 
-///If you prefer, you can avoid using btTriangleMesh and directly use btTriangleIndexVertexArray or derive your own class from btStridingMeshInterface. This allows to share render and collision meshes.
+///If you want to share triangle/index data between graphics mesh and collision mesh (btBvhTriangleMeshShape), you can directly use btTriangleIndexVertexArray or derive your own class from btStridingMeshInterface.
+///Performance of btTriangleMesh and btTriangleIndexVertexArray used in a btBvhTriangleMeshShape is the same.
 class btTriangleMesh : public btTriangleIndexVertexArray
 {
 	btAlignedObjectArray<btVector3>	m_4componentVertices;
 	btAlignedObjectArray<float>		m_3componentVertices;
 
-	btAlignedObjectArray<int>		m_32bitIndices;
-	btAlignedObjectArray<short int>		m_16bitIndices;
+	btAlignedObjectArray<unsigned int>		m_32bitIndices;
+	btAlignedObjectArray<unsigned short int>		m_16bitIndices;
 	bool	m_use32bitIndices;
 	bool	m_use4componentVertices;
-
+	
 
 	public:
+		btScalar	m_weldingThreshold;
+
 		btTriangleMesh (bool use32bitIndices=true,bool use4componentVertices=true);
 
 		bool	getUse32bitIndices() const
@@ -48,14 +49,19 @@ class btTriangleMesh : public btTriangleIndexVertexArray
 		{
 			return m_use4componentVertices;
 		}
-		
-		void	addTriangle(const btVector3& vertex0,const btVector3& vertex1,const btVector3& vertex2);
+		///By default addTriangle won't search for duplicate vertices, because the search is very slow for large triangle meshes.
+		///In general it is better to directly use btTriangleIndexVertexArray instead.
+		void	addTriangle(const btVector3& vertex0,const btVector3& vertex1,const btVector3& vertex2, bool removeDuplicateVertices=false);
 		
 		int getNumTriangles() const;
 
 		virtual void	preallocateVertices(int numverts){(void) numverts;}
 		virtual void	preallocateIndices(int numindices){(void) numindices;}
 
+		///findOrAddVertex is an internal method, use addTriangle instead
+		int		findOrAddVertex(const btVector3& vertex, bool removeDuplicateVertices);
+		///addIndex is an internal method, use addTriangle instead
+		void	addIndex(int index);
 		
 };
 

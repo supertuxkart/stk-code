@@ -34,9 +34,10 @@
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
 
-std::vector<Camera::EndCameraInformation> Camera::m_end_cameras;
+AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 
 Camera::Camera(int camera_index, const Kart* kart)
 {
@@ -483,7 +484,7 @@ void Camera::handleEndCamera(float dt)
                 );
         m_camera->setFOV(m_fov);
         m_next_end_camera++;
-        if(m_next_end_camera>=m_end_cameras.size()) m_next_end_camera = 0;
+        if(m_next_end_camera>=(unsigned)m_end_cameras.size()) m_next_end_camera = 0;
     }
 }   // handleEndCamera
 

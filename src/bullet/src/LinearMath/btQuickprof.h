@@ -7,224 +7,53 @@
 **
 ***************************************************************************************************/
 
-// Credits: The TimedRace class was inspired by the Timer classes in 
+// Credits: The Clock class was inspired by the Timer classes in 
 // Ogre (www.ogre3d.org).
+
+
 
 #ifndef QUICK_PROF_H
 #define QUICK_PROF_H
 
-#include "btScalar.h"
-
 //To disable built-in profiling, please comment out next line
 //#define BT_NO_PROFILE 1
+#ifndef BT_NO_PROFILE
+#include <stdio.h>//@todo remove this, backwards compatibility
+#include "btScalar.h"
+#include "btAlignedAllocator.h"
+#include <new>
 
 
-//if you don't need btClock, you can comment next line
+
+
+
 #define USE_BT_CLOCK 1
 
 #ifdef USE_BT_CLOCK
-#ifdef __CELLOS_LV2__
-#include <sys/sys_time.h>
-#include <sys/time_util.h>
-#include <stdio.h>
-typedef uint64_t __int64;
-#endif
 
-#if defined (SUNOS) || defined (__SUNOS__) 
-#include <stdio.h> 
-#endif
-
-#if defined(WIN32) || defined(_WIN32)
-
-#define USE_WINDOWS_TIMERS 
-#define WIN32_LEAN_AND_MEAN 
-#define NOWINRES 
-#define NOMCX 
-#define NOIME 
-#ifdef _XBOX
-#include <Xtl.h>
-#else
-#include <windows.h>
-#endif
-#include <time.h>
-
-#else
-#include <sys/time.h>
-#endif
-
-#define mymin(a,b) (a > b ? a : b)
-
-/// basic clock
+///The btClock is a portable basic clock that measures accurate time in seconds, use for profiling.
 class btClock
 {
 public:
-	btClock()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		QueryPerformanceFrequency(&mClockFrequency);
-#endif
-		reset();
-	}
+	btClock();
 
-	~btClock()
-	{
-	}
+	btClock(const btClock& other);
+	btClock& operator=(const btClock& other);
+
+	~btClock();
 
 	/// Resets the initial reference time.
-	void reset()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		QueryPerformanceCounter(&mStartTime);
-		mStartTick = GetTickCount();
-		mPrevElapsedTime = 0;
-#else
-#ifdef __CELLOS_LV2__
-
-		typedef uint64_t __int64;
-		typedef __int64  ClockSize;
-		ClockSize newTime;
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-		SYS_TIMEBASE_GET( newTime );
-		mStartTime = newTime;
-#else
-		gettimeofday(&mStartTime, 0);
-#endif
-
-#endif
-	}
+	void reset();
 
 	/// Returns the time in ms since the last call to reset or since 
 	/// the btClock was created.
-	unsigned long int getTimeMilliseconds()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		LARGE_INTEGER currentTime;
-		QueryPerformanceCounter(&currentTime);
-		LONGLONG elapsedTime = currentTime.QuadPart - 
-			mStartTime.QuadPart;
-
-		// Compute the number of millisecond ticks elapsed.
-		unsigned long msecTicks = (unsigned long)(1000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		// Check for unexpected leaps in the Win32 performance counter.  
-		// (This is caused by unexpected data across the PCI to ISA 
-		// bridge, aka south bridge.  See Microsoft KB274323.)
-		unsigned long elapsedTicks = GetTickCount() - mStartTick;
-		signed long msecOff = (signed long)(msecTicks - elapsedTicks);
-		if (msecOff < -100 || msecOff > 100)
-		{
-			// Adjust the starting time forwards.
-			LONGLONG msecAdjustment = mymin(msecOff * 
-				mClockFrequency.QuadPart / 1000, elapsedTime - 
-				mPrevElapsedTime);
-			mStartTime.QuadPart += msecAdjustment;
-			elapsedTime -= msecAdjustment;
-
-			// Recompute the number of millisecond ticks elapsed.
-			msecTicks = (unsigned long)(1000 * elapsedTime / 
-				mClockFrequency.QuadPart);
-		}
-
-		// Store the current elapsed time for adjustments next time.
-		mPrevElapsedTime = elapsedTime;
-
-		return msecTicks;
-#else
-
-#ifdef __CELLOS_LV2__
-		__int64 freq=sys_time_get_timebase_frequency();
-		double dFreq=((double) freq) / 1000.0;
-		typedef uint64_t __int64;
-		typedef __int64  ClockSize;
-		ClockSize newTime;
-		SYS_TIMEBASE_GET( newTime );
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-
-		return (newTime-mStartTime) / dFreq;
-#else
-
-		struct timeval currentTime;
-		gettimeofday(&currentTime, 0);
-		return (currentTime.tv_sec - mStartTime.tv_sec) * 1000 + 
-			(currentTime.tv_usec - mStartTime.tv_usec) / 1000;
-#endif //__CELLOS_LV2__
-#endif
-	}
+	unsigned long int getTimeMilliseconds();
 
 	/// Returns the time in us since the last call to reset or since 
-	/// the TimedRace was created.
-	unsigned long int getTimeMicroseconds()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		LARGE_INTEGER currentTime;
-		QueryPerformanceCounter(&currentTime);
-		LONGLONG elapsedTime = currentTime.QuadPart - 
-			mStartTime.QuadPart;
-
-		// Compute the number of millisecond ticks elapsed.
-		unsigned long msecTicks = (unsigned long)(1000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		// Check for unexpected leaps in the Win32 performance counter.  
-		// (This is caused by unexpected data across the PCI to ISA 
-		// bridge, aka south bridge.  See Microsoft KB274323.)
-		unsigned long elapsedTicks = GetTickCount() - mStartTick;
-		signed long msecOff = (signed long)(msecTicks - elapsedTicks);
-		if (msecOff < -100 || msecOff > 100)
-		{
-			// Adjust the starting time forwards.
-			LONGLONG msecAdjustment = mymin(msecOff * 
-				mClockFrequency.QuadPart / 1000, elapsedTime - 
-				mPrevElapsedTime);
-			mStartTime.QuadPart += msecAdjustment;
-			elapsedTime -= msecAdjustment;
-		}
-
-		// Store the current elapsed time for adjustments next time.
-		mPrevElapsedTime = elapsedTime;
-
-		// Convert to microseconds.
-		unsigned long usecTicks = (unsigned long)(1000000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		return usecTicks;
-#else
-
-#ifdef __CELLOS_LV2__
-		__int64 freq=sys_time_get_timebase_frequency();
-		double dFreq=((double) freq)/ 1000000.0;
-		typedef uint64_t __int64;
-		typedef __int64  ClockSize;
-		ClockSize newTime;
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-		SYS_TIMEBASE_GET( newTime );
-
-		return (newTime-mStartTime) / dFreq;
-#else
-
-		struct timeval currentTime;
-		gettimeofday(&currentTime, 0);
-		return (currentTime.tv_sec - mStartTime.tv_sec) * 1000000 + 
-			(currentTime.tv_usec - mStartTime.tv_usec);
-#endif//__CELLOS_LV2__
-#endif 
-	}
-
+	/// the Clock was created.
+	unsigned long int getTimeMicroseconds();
 private:
-#ifdef USE_WINDOWS_TIMERS
-	LARGE_INTEGER mClockFrequency;
-	DWORD mStartTick;
-	LONGLONG mPrevElapsedTime;
-	LARGE_INTEGER mStartTime;
-#else
-#ifdef __CELLOS_LV2__
-	uint64_t	mStartTime;
-#else
-	struct timeval mStartTime;
-#endif
-#endif //__CELLOS_LV2__
-
+	struct btClockData* m_data;
 };
 
 #endif //USE_BT_CLOCK
@@ -232,9 +61,7 @@ private:
 
 
 
-/*
-** A node in the Profile Hierarchy Tree
-*/
+///A node in the Profile Hierarchy Tree
 class	CProfileNode {
 
 public:
@@ -247,6 +74,7 @@ public:
 	CProfileNode * Get_Sibling( void )		{ return Sibling; }
 	CProfileNode * Get_Child( void )			{ return Child; }
 
+	void				CleanupMemory();
 	void				Reset( void );
 	void				Call( void );
 	bool				Return( void );
@@ -268,9 +96,7 @@ protected:
 	CProfileNode *	Sibling;
 };
 
-/*
-** An iterator to navigate through the tree
-*/
+///An iterator to navigate through the tree
 class CProfileIterator
 {
 public:
@@ -304,21 +130,32 @@ protected:
 };
 
 
-/*
-** The Manager for the Profile system
-*/
+///The Manager for the Profile system
 class	CProfileManager {
 public:
 	static	void						Start_Profile( const char * name );
 	static	void						Stop_Profile( void );
+
+	static	void						CleanupMemory(void)
+	{
+		Root.CleanupMemory();
+	}
 
 	static	void						Reset( void );
 	static	void						Increment_Frame_Counter( void );
 	static	int						Get_Frame_Count_Since_Reset( void )		{ return FrameCounter; }
 	static	float						Get_Time_Since_Reset( void );
 
-	static	CProfileIterator *	Get_Iterator( void )	{ return new CProfileIterator( &Root ); }
-	static	void						Release_Iterator( CProfileIterator * iterator ) { delete iterator; }
+	static	CProfileIterator *	Get_Iterator( void )	
+	{ 
+		
+		return new CProfileIterator( &Root ); 
+	}
+	static	void						Release_Iterator( CProfileIterator * iterator ) { delete ( iterator); }
+
+	static void	dumpRecursive(CProfileIterator* profileIterator, int spacing);
+
+	static void	dumpAll();
 
 private:
 	static	CProfileNode			Root;
@@ -328,10 +165,8 @@ private:
 };
 
 
-/*
-** ProfileSampleClass is a simple way to profile a function's scope
-** Use the BT_PROFILE macro at the start of scope to time
-*/
+///ProfileSampleClass is a simple way to profile a function's scope
+///Use the BT_PROFILE macro at the start of scope to time
 class	CProfileSample {
 public:
 	CProfileSample( const char * name )
@@ -345,12 +180,14 @@ public:
 	}
 };
 
-#if !defined(BT_NO_PROFILE)
-#define	BT_PROFILE( name )			CProfileSample __profile( name )
-#else
-#define	BT_PROFILE( name )
-#endif
 
+#define	BT_PROFILE( name )			CProfileSample __profile( name )
+
+#else
+
+#define	BT_PROFILE( name )
+
+#endif //#ifndef BT_NO_PROFILE
 
 
 

@@ -16,7 +16,7 @@ subject to the following restrictions:
 
 #include "btPersistentManifold.h"
 #include "LinearMath/btTransform.h"
-#include <assert.h>
+
 
 btScalar					gContactBreakingThreshold = btScalar(0.02);
 ContactDestroyedCallback	gContactDestroyedCallback = 0;
@@ -25,7 +25,8 @@ ContactProcessedCallback	gContactProcessedCallback = 0;
 
 
 btPersistentManifold::btPersistentManifold()
-:m_body0(0),
+:btTypedObject(BT_PERSISTENT_MANIFOLD_TYPE),
+m_body0(0),
 m_body1(0),
 m_cachedPoints (0),
 m_index1a(0)
@@ -66,7 +67,7 @@ void btPersistentManifold::clearUserCache(btManifoldPoint& pt)
 					printf("error in clearUserCache\n");
 			}
 		}
-		assert(occurance<=0);
+		btAssert(occurance<=0);
 #endif //DEBUG_PERSISTENCY
 
 		if (pt.m_userPersistentData && gContactDestroyedCallback)
@@ -162,9 +163,9 @@ int btPersistentManifold::getCacheEntry(const btManifoldPoint& newPoint) const
 	return nearestPoint;
 }
 
-void btPersistentManifold::AddManifoldPoint(const btManifoldPoint& newPoint)
+int btPersistentManifold::addManifoldPoint(const btManifoldPoint& newPoint)
 {
-	assert(validContactDistance(newPoint));
+	btAssert(validContactDistance(newPoint));
 
 	int insertIndex = getNumContacts();
 	if (insertIndex == MANIFOLD_CACHE_SIZE)
@@ -175,7 +176,7 @@ void btPersistentManifold::AddManifoldPoint(const btManifoldPoint& newPoint)
 #else
 		insertIndex = 0;
 #endif
-
+		clearUserCache(m_pointCache[insertIndex]);
 		
 	} else
 	{
@@ -183,12 +184,17 @@ void btPersistentManifold::AddManifoldPoint(const btManifoldPoint& newPoint)
 
 		
 	}
-	replaceContactPoint(newPoint,insertIndex);
+	if (insertIndex<0)
+		insertIndex=0;
+
+	btAssert(m_pointCache[insertIndex].m_userPersistentData==0);
+	m_pointCache[insertIndex] = newPoint;
+	return insertIndex;
 }
 
 btScalar	btPersistentManifold::getContactBreakingThreshold() const
 {
-	return gContactBreakingThreshold;
+	return m_contactBreakingThreshold;
 }
 
 

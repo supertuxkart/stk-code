@@ -20,7 +20,6 @@ subject to the following restrictions:
 #define GJK_PAIR_DETECTOR_H
 
 #include "btDiscreteCollisionDetectorInterface.h"
-#include "LinearMath/btPoint3.h"
 #include "BulletCollision/CollisionShapes/btCollisionMargin.h"
 
 class btConvexShape;
@@ -37,7 +36,13 @@ class btGjkPairDetector : public btDiscreteCollisionDetectorInterface
 	btSimplexSolverInterface* m_simplexSolver;
 	const btConvexShape* m_minkowskiA;
 	const btConvexShape* m_minkowskiB;
+	int	m_shapeTypeA;
+	int m_shapeTypeB;
+	btScalar	m_marginA;
+	btScalar	m_marginB;
+
 	bool		m_ignoreMargin;
+	btScalar	m_cachedSeparatingDistance;
 	
 
 public:
@@ -50,9 +55,13 @@ public:
 
 
 	btGjkPairDetector(const btConvexShape* objectA,const btConvexShape* objectB,btSimplexSolverInterface* simplexSolver,btConvexPenetrationDepthSolver*	penetrationDepthSolver);
+	btGjkPairDetector(const btConvexShape* objectA,const btConvexShape* objectB,int shapeTypeA,int shapeTypeB,btScalar marginA, btScalar marginB, btSimplexSolverInterface* simplexSolver,btConvexPenetrationDepthSolver*	penetrationDepthSolver);
 	virtual ~btGjkPairDetector() {};
 
-	virtual void	getClosestPoints(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw);
+	virtual void	getClosestPoints(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw,bool swapResults=false);
+
+	void	getClosestPointsNonVirtual(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw);
+	
 
 	void setMinkowskiA(btConvexShape* minkA)
 	{
@@ -66,6 +75,15 @@ public:
 	void setCachedSeperatingAxis(const btVector3& seperatingAxis)
 	{
 		m_cachedSeparatingAxis = seperatingAxis;
+	}
+
+	const btVector3& getCachedSeparatingAxis() const
+	{
+		return m_cachedSeparatingAxis;
+	}
+	btScalar	getCachedSeparatingDistance() const
+	{
+		return m_cachedSeparatingDistance;
 	}
 
 	void	setPenetrationDepthSolver(btConvexPenetrationDepthSolver*	penetrationDepthSolver)

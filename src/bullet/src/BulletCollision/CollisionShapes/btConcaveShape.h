@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -20,9 +20,19 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 #include "btTriangleCallback.h"
 
+/// PHY_ScalarType enumerates possible scalar types.
+/// See the btStridingMeshInterface or btHeightfieldTerrainShape for its use
+typedef enum PHY_ScalarType {
+	PHY_FLOAT,
+	PHY_DOUBLE,
+	PHY_INTEGER,
+	PHY_SHORT,
+	PHY_FIXEDPOINT88,
+	PHY_UCHAR
+} PHY_ScalarType;
 
-///Concave shape proves an interface concave shapes that can produce triangles that overlapping a given AABB.
-///Static triangle mesh, infinite plane, height field/landscapes are example that implement this interface.
+///The btConcaveShape class provides an interface for non-moving (static) concave shapes.
+///It has been implemented by the btStaticPlaneShape, btBvhTriangleMeshShape and btHeightfieldTerrainShape.
 class btConcaveShape : public btCollisionShape
 {
 protected:

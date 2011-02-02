@@ -198,7 +198,7 @@ void QuadGraph::setDefaultSuccessors()
  *  \param sidewards_distance Distance in sidewards (X) direction between 
  *               karts.
  */
-void QuadGraph::setDefaultStartPositions(std::vector<btTransform> 
+void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform> 
                                                        *start_transforms,
                                          unsigned int karts_per_row,
                                          float forwards_distance,
@@ -215,7 +215,7 @@ void QuadGraph::setDefaultStartPositions(std::vector<btTransform>
     float x_pos               = -max_x_dist + sidewards_distance*0.5f;
     unsigned int row_number   = 0;
 
-    for(unsigned int i=0; i<start_transforms->size(); i++)
+    for(unsigned int i=0; i<(unsigned int)start_transforms->size(); i++)
     {
         // First find on which segment we have to start
         while(distance_from_start > getNode(current_node).getNodeLength())

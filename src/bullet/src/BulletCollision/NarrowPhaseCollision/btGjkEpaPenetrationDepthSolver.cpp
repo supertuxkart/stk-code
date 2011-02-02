@@ -17,12 +17,14 @@ subject to the following restrictions:
 
 #include "BulletCollision/CollisionShapes/btConvexShape.h"
 #include "btGjkEpaPenetrationDepthSolver.h"
-#include "BulletCollision/NarrowPhaseCollision/btGjkEpa.h"
+
+
+#include "BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
 
 bool btGjkEpaPenetrationDepthSolver::calcPenDepth( btSimplexSolverInterface& simplexSolver,
 											  const btConvexShape* pConvexA, const btConvexShape* pConvexB,
 											  const btTransform& transformA, const btTransform& transformB,
-											  btVector3& v, btPoint3& wWitnessOnA, btPoint3& wWitnessOnB,
+											  btVector3& v, btVector3& wWitnessOnA, btVector3& wWitnessOnB,
 											  class btIDebugDraw* debugDraw, btStackAlloc* stackAlloc )
 {
 
@@ -30,19 +32,33 @@ bool btGjkEpaPenetrationDepthSolver::calcPenDepth( btSimplexSolverInterface& sim
 	(void)v;
 	(void)simplexSolver;
 
-	const btScalar				radialmargin(btScalar(0.));
+//	const btScalar				radialmargin(btScalar(0.));
 	
-	btGjkEpaSolver::sResults	results;
-	if(btGjkEpaSolver::Collide(	pConvexA,transformA,
+	btVector3	guessVector(transformA.getOrigin()-transformB.getOrigin());
+	btGjkEpaSolver2::sResults	results;
+	
+
+	if(btGjkEpaSolver2::Penetration(pConvexA,transformA,
 								pConvexB,transformB,
-								radialmargin,stackAlloc,results))
+								guessVector,results))
+	
 		{
 	//	debugDraw->drawLine(results.witnesses[1],results.witnesses[1]+results.normal,btVector3(255,0,0));
 		//resultOut->addContactPoint(results.normal,results.witnesses[1],-results.depth);
 		wWitnessOnA = results.witnesses[0];
 		wWitnessOnB = results.witnesses[1];
+		v = results.normal;
 		return true;		
+		} else
+	{
+		if(btGjkEpaSolver2::Distance(pConvexA,transformA,pConvexB,transformB,guessVector,results))
+		{
+			wWitnessOnA = results.witnesses[0];
+			wWitnessOnB = results.witnesses[1];
+			v = results.normal;
+			return false;
 		}
+	}
 
 	return false;
 }

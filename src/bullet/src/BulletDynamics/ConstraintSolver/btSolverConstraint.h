@@ -1,5 +1,3 @@
-
-
 /*
 Bullet Continuous Collision Detection and Physics Library
 Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
@@ -21,38 +19,66 @@ subject to the following restrictions:
 class	btRigidBody;
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
+#include "btJacobianEntry.h"
 
 //#define NO_FRICTION_TANGENTIALS 1
+#include "btSolverBody.h"
+
 
 ///1D constraint along a normal axis between bodyA and bodyB. It can be combined to solve contact and friction constraints.
-ATTRIBUTE_ALIGNED16 (struct)	btSolverConstraint
+ATTRIBUTE_ALIGNED64 (struct)	btSolverConstraint
 {
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-	btVector3	m_relpos1CrossNormal;
-	btVector3	m_contactNormal;
+	btVector3		m_relpos1CrossNormal;
+	btVector3		m_contactNormal;
 
-	btVector3	m_relpos2CrossNormal;
-	btVector3	m_angularComponentA;
+	btVector3		m_relpos2CrossNormal;
+	//btVector3		m_contactNormal2;//usually m_contactNormal2 == -m_contactNormal
 
-	btVector3	m_angularComponentB;
-	mutable btScalar	m_appliedVelocityImpulse;
-	mutable btScalar	m_appliedImpulse;
-	int			m_solverBodyIdA;
-	int			m_solverBodyIdB;
+	btVector3		m_angularComponentA;
+	btVector3		m_angularComponentB;
+	
+	mutable btSimdScalar	m_appliedPushImpulse;
+	mutable btSimdScalar	m_appliedImpulse;
+	
 	
 	btScalar	m_friction;
-	btScalar	m_restitution;
 	btScalar	m_jacDiagABInv;
-	btScalar	m_penetration;
-	
+	union
+	{
+		int	m_numConsecutiveRowsPerKernel;
+		btScalar	m_unusedPadding0;
+	};
 
+	union
+	{
+		int			m_frictionIndex;
+		btScalar	m_unusedPadding1;
+	};
+	union
+	{
+		btRigidBody*	m_solverBodyA;
+		int				m_companionIdA;
+	};
+	union
+	{
+		btRigidBody*	m_solverBodyB;
+		int				m_companionIdB;
+	};
 	
-	int			m_constraintType;
-	int			m_frictionIndex;
-	void*		m_originalContactPoint;
-	int			m_unusedPadding[1];
+	union
+	{
+		void*		m_originalContactPoint;
+		btScalar	m_unusedPadding4;
+	};
 
+	btScalar		m_rhs;
+	btScalar		m_cfm;
+	btScalar		m_lowerLimit;
+	btScalar		m_upperLimit;
+
+	btScalar		m_rhsPenetration;
 
 	enum		btSolverConstraintType
 	{
@@ -61,11 +87,10 @@ ATTRIBUTE_ALIGNED16 (struct)	btSolverConstraint
 	};
 };
 
-
-
-
+typedef btAlignedObjectArray<btSolverConstraint>	btConstraintArray;
 
 
 #endif //BT_SOLVER_CONSTRAINT_H
+
 
 

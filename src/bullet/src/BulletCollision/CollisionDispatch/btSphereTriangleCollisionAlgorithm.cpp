@@ -22,7 +22,7 @@ subject to the following restrictions:
 
 
 btSphereTriangleCollisionAlgorithm::btSphereTriangleCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* col0,btCollisionObject* col1,bool swapped)
-: btCollisionAlgorithm(ci),
+: btActivatingCollisionAlgorithm(ci,col0,col1),
 m_ownManifold(false),
 m_manifoldPtr(mf),
 m_swapped(swapped)
@@ -56,14 +56,16 @@ void btSphereTriangleCollisionAlgorithm::processCollision (btCollisionObject* co
 	
 	/// report a contact. internally this will be kept persistent, and contact reduction is done
 	resultOut->setPersistentManifold(m_manifoldPtr);
-	SphereTriangleDetector detector(sphere,triangle);
+	SphereTriangleDetector detector(sphere,triangle, m_manifoldPtr->getContactBreakingThreshold());
 	
 	btDiscreteCollisionDetectorInterface::ClosestPointInput input;
-	input.m_maximumDistanceSquared = btScalar(1e30);//todo: tighter bounds
-	input.m_transformA = col0->getWorldTransform();
-	input.m_transformB = col1->getWorldTransform();
+	input.m_maximumDistanceSquared = btScalar(BT_LARGE_FLOAT);///@todo: tighter bounds
+	input.m_transformA = sphereObj->getWorldTransform();
+	input.m_transformB = triObj->getWorldTransform();
 
-	detector.getClosestPoints(input,*resultOut,dispatchInfo.m_debugDraw);
+	bool swapResults = m_swapped;
+
+	detector.getClosestPoints(input,*resultOut,dispatchInfo.m_debugDraw,swapResults);
 
 	if (m_ownManifold)
 		resultOut->refreshContactPoints();

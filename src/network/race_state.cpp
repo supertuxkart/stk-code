@@ -83,7 +83,7 @@ void RaceState::serialise()
     // 3. Projectiles
     // --------------
     addShort(m_flyable_info.size());
-    for(unsigned int i=0; i<m_flyable_info.size(); i++)
+    for(unsigned int i=0; i<(unsigned int)m_flyable_info.size(); i++)
     {
         m_flyable_info[i].serialise(this);
     }

@@ -392,6 +392,7 @@ supertuxkart_SOURCES = \
  tutorial/tutorial_data.hpp \
  tutorial/tutorial_manager.hpp \
  tutorial/tutorial_manager.cpp \
+ utils/aligned_array.hpp \
  utils/constants.hpp \
  utils/constants.cpp \
  utils/no_copy.hpp \

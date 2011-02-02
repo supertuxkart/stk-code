@@ -31,6 +31,8 @@
 #if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
 #  include <sys/types.h>
+// For RemoveDirectory
+#  include <Windows.h>
 #else
 #  include <direct.h>
 #endif
@@ -749,7 +751,8 @@ bool FileManager::removeDirectory(const std::string &name) const
         }
     }
 #ifdef WIN32
-    return ::RemoveDirectory(name.c_str())==TRUE;
+//FIXME    return RemoveDirectory(name.c_str());
+        return false;
 #else
     return remove(name.c_str())==0;
 #endif

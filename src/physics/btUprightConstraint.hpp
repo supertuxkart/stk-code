@@ -100,8 +100,13 @@ public:
     void setLimitSoftness( btScalar softness ) { m_limitSoftness = softness; }
     void setDamping( btScalar damping )        { m_damping = damping;        }
     void setDisableTime( btScalar t )          { m_disable_time = t;         }
-    virtual void  buildJacobian();
-    virtual void  solveConstraint(btScalar  timeStep);
+    virtual void buildJacobian();
+    virtual void solveConstraintObsolete(btRigidBody& /*bodyA*/,btRigidBody& /*bodyB*/, btScalar  timeStep);
+    virtual void getInfo1 (btConstraintInfo1* info);
+    virtual void getInfo2 (btConstraintInfo2* info);
+    virtual	void setParam(int num, btScalar value, int axis = -1);
+    virtual btScalar getParam(int num, int axis) const;
+
 };
 
  

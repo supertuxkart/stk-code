@@ -217,6 +217,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             
             delete translations;
             
+#ifdef WIN32
+            // Avoid depreciation warnings in windows.
+#  define putenv(a)  _putenv(a)
+#endif
             if (selection == "system")
             {
                 putenv( "LANGUAGE=" );

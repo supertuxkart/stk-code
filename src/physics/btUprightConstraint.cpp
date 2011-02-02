@@ -133,7 +133,7 @@ void btUprightConstraint::buildJacobian()
 //!
 //!
 
-void btUprightConstraint::solveConstraint(btScalar timeStep)
+void btUprightConstraint::solveConstraintObsolete(btRigidBody& /*bodyA*/,btRigidBody& /*bodyB*/,btScalar timeStep)
 {
     m_timeStep = timeStep;
 
@@ -148,3 +148,19 @@ void btUprightConstraint::solveConstraint(btScalar timeStep)
     solveAngularLimit( &m_limit[ 1 ], m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
 }   // solveConstraint
 
+void btUprightConstraint::getInfo1(btConstraintInfo1* info) {
+                info->m_numConstraintRows = 0;
+                info->nub = 0;
+}
+
+void btUprightConstraint::getInfo2(btConstraintInfo2* info) {
+}
+
+btScalar btUprightConstraint::getParam(int num, int axis) const
+{
+    return 0;
+}
+
+void btUprightConstraint::setParam(int num, btScalar value, int axis)
+{
+}

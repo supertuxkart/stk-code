@@ -30,11 +30,12 @@ subject to the following restrictions:
 #include "BulletDynamics/ConstraintSolver/btConeTwistConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btUniversalConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btHinge2Constraint.h"
 
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
-///Optional ODE quickstep constraint solver, redistributed under ZLib license
-#include "BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.h"
-#include "BulletDynamics/ConstraintSolver/btOdeTypedJoint.h"
+
 
 ///Vehicle simulation, with wheel contact simulated by raycasts
 #include "BulletDynamics/Vehicle/btRaycastVehicle.h"

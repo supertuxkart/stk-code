@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -19,7 +19,7 @@ subject to the following restrictions:
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
-/// btMinkowskiSumShape represents implicit (getSupportingVertex) based minkowski sum of two convex implicit shapes.
+/// The btMinkowskiSumShape is only for advanced users. This shape represents implicit based minkowski sum of two convex implicit shapes.
 class btMinkowskiSumShape : public btConvexInternalShape
 {
 
@@ -45,8 +45,6 @@ public:
 	const btTransform& getTransformA()const  { return m_transA;}
 	const btTransform& GetTransformB()const  { return m_transB;}
 
-
-	virtual int	getShapeType() const { return MINKOWSKI_SUM_SHAPE_PROXYTYPE; }
 
 	virtual btScalar	getMargin() const;
 

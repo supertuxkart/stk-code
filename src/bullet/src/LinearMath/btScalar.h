@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bullet.googlecode.com
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -17,13 +17,20 @@ subject to the following restrictions:
 #ifndef SIMD___SCALAR_H
 #define SIMD___SCALAR_H
 
-#include <math.h>
+#ifdef BT_MANAGED_CODE
+//Aligned data types not supported in managed code
+#pragma unmanaged
+#endif
 
+
+#include <math.h>
+#include <stdlib.h>//size_t for MSVC 6.0
 #include <cstdlib>
 #include <cfloat>
 #include <float.h>
 
-#define BT_BULLET_VERSION 268
+/* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
+#define BT_BULLET_VERSION 277
 
 inline int	btGetVersion()
 {
@@ -35,21 +42,32 @@ inline int	btGetVersion()
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
 
 		#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
 
 			#define SIMD_FORCE_INLINE inline
 			#define ATTRIBUTE_ALIGNED16(a) a
+			#define ATTRIBUTE_ALIGNED64(a) a
 			#define ATTRIBUTE_ALIGNED128(a) a
 		#else
-			#define BT_HAS_ALIGNED_ALLOCATOR
-			#pragma warning(disable:4530)
-			#pragma warning(disable:4996)
-			#pragma warning(disable:4786)
+			//#define BT_HAS_ALIGNED_ALLOCATOR
+			#pragma warning(disable : 4324) // disable padding warning
+//			#pragma warning(disable:4530) // Disable the exception disable but used in MSCV Stl warning.
+//			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
+//			#pragma warning(disable:4786) // Disable the "debug name too long" warning
+#ifdef ENABLE_SSE
 			#define SIMD_FORCE_INLINE __forceinline
 			#define ATTRIBUTE_ALIGNED16(a) __declspec(align(16)) a
+			#define ATTRIBUTE_ALIGNED64(a) __declspec(align(64)) a
 			#define ATTRIBUTE_ALIGNED128(a) __declspec (align(128)) a
+#else
+            #define SIMD_FORCE_INLINE inline
+            #define ATTRIBUTE_ALIGNED16(a) a
+            #define ATTRIBUTE_ALIGNED64(a) a
+            #define ATTRIBUTE_ALIGNED128(a) a
+#endif
+
 		#ifdef _XBOX
 			#define BT_USE_VMX128
 
@@ -57,12 +75,22 @@ inline int	btGetVersion()
  			#define BT_HAVE_NATIVE_FSEL
  			#define btFsel(a,b,c) __fsel((a),(b),(c))
 		#else
+
+#if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION)) && defined (ENABLE_SSE)
 			#define BT_USE_SSE
-		#endif
+			#include <emmintrin.h>
+#endif
+
+		#endif//_XBOX
+
 		#endif //__MINGW32__
 
 		#include <assert.h>
+#ifdef BT_DEBUG
 		#define btAssert assert
+#else
+		#define btAssert(x)
+#endif
 		//btFullAssert is optional, slows down a lot
 		#define btFullAssert(x)
 
@@ -72,13 +100,25 @@ inline int	btGetVersion()
 #else
 	
 #if defined	(__CELLOS_LV2__)
-		#define SIMD_FORCE_INLINE inline
+		#define SIMD_FORCE_INLINE inline __attribute__((always_inline))
 		#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
+		#define ATTRIBUTE_ALIGNED64(a) a __attribute__ ((aligned (64)))
 		#define ATTRIBUTE_ALIGNED128(a) a __attribute__ ((aligned (128)))
 		#ifndef assert
 		#include <assert.h>
 		#endif
-		#define btAssert assert
+#ifdef BT_DEBUG
+#ifdef __SPU__
+#include <spu_printf.h>
+#define printf spu_printf
+	#define btAssert(x) {if(!(x)){printf("Assert "__FILE__ ":%u ("#x")\n", __LINE__);spu_hcmpeq(0,0);}}
+#else
+	#define btAssert assert
+#endif
+	
+#else
+		#define btAssert(x)
+#endif
 		//btFullAssert is optional, slows down a lot
 		#define btFullAssert(x)
 
@@ -91,11 +131,16 @@ inline int	btGetVersion()
 
 		#define SIMD_FORCE_INLINE __inline
 		#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
+		#define ATTRIBUTE_ALIGNED64(a) a __attribute__ ((aligned (64)))
 		#define ATTRIBUTE_ALIGNED128(a) a __attribute__ ((aligned (128)))
 		#ifndef assert
 		#include <assert.h>
 		#endif
+#ifdef BT_DEBUG
 		#define btAssert assert
+#else
+		#define btAssert(x)
+#endif
 		//btFullAssert is optional, slows down a lot
 		#define btFullAssert(x)
 
@@ -107,45 +152,84 @@ inline int	btGetVersion()
 #else
 	//non-windows systems
 
+#if (defined (__APPLE__) && defined (__i386__) && (!defined (BT_USE_DOUBLE_PRECISION)))
+	#define BT_USE_SSE
+	#include <emmintrin.h>
+
+	#define SIMD_FORCE_INLINE inline
+///@todo: check out alignment methods for other platforms/compilers
+	#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
+	#define ATTRIBUTE_ALIGNED64(a) a __attribute__ ((aligned (64)))
+	#define ATTRIBUTE_ALIGNED128(a) a __attribute__ ((aligned (128)))
+	#ifndef assert
+	#include <assert.h>
+	#endif
+
+	#if defined(DEBUG) || defined (_DEBUG)
+		#define btAssert assert
+	#else
+		#define btAssert(x)
+	#endif
+
+	//btFullAssert is optional, slows down a lot
+	#define btFullAssert(x)
+	#define btLikely(_c)  _c
+	#define btUnlikely(_c) _c
+
+#else
+
 		#define SIMD_FORCE_INLINE inline
+		///@todo: check out alignment methods for other platforms/compilers
+		///#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
+		///#define ATTRIBUTE_ALIGNED64(a) a __attribute__ ((aligned (64)))
+		///#define ATTRIBUTE_ALIGNED128(a) a __attribute__ ((aligned (128)))
 		#define ATTRIBUTE_ALIGNED16(a) a
+		#define ATTRIBUTE_ALIGNED64(a) a
 		#define ATTRIBUTE_ALIGNED128(a) a
 		#ifndef assert
 		#include <assert.h>
 		#endif
+
+#if defined(DEBUG) || defined (_DEBUG)
 		#define btAssert assert
+#else
+		#define btAssert(x)
+#endif
+
 		//btFullAssert is optional, slows down a lot
 		#define btFullAssert(x)
 		#define btLikely(_c)  _c
 		#define btUnlikely(_c) _c
-
+#endif //__APPLE__ 
 
 #endif // LIBSPE2
 
 #endif	//__CELLOS_LV2__
 #endif
 
-/// older compilers (gcc 3.x) and Sun needs double version of sqrt etc.
-/// exclude Apple Intel (i's assumed to be a Macbook or new Intel Dual Core Processor)
-#if defined (__sun) || defined (__sun__) || defined (__sparc) || (defined (__APPLE__) && ! defined (__i386__))
-//use slow double float precision operation on those platforms
-#ifndef BT_USE_DOUBLE_PRECISION
-#define BT_FORCE_DOUBLE_FUNCTIONS
-#endif
-#endif
 
+///The btScalar type abstracts floating point numbers, to easily switch between double and single floating point precision.
 #if defined(BT_USE_DOUBLE_PRECISION)
 typedef double btScalar;
+//this number could be bigger in double precision
+#define BT_LARGE_FLOAT 1e30
 #else
 typedef float btScalar;
+//keep BT_LARGE_FLOAT*BT_LARGE_FLOAT < FLT_MAX
+#define BT_LARGE_FLOAT 1e18f
 #endif
+
 
 
 #define BT_DECLARE_ALIGNED_ALLOCATOR() \
-	SIMD_FORCE_INLINE void* operator new(size_t sizeInBytes)	{ return btAlignedAlloc(sizeInBytes,16); }	\
-	SIMD_FORCE_INLINE void  operator delete(void* ptr)			{ btAlignedFree(ptr); }	\
-	SIMD_FORCE_INLINE void* operator new(size_t, void* ptr)	{ return ptr; }	\
-	SIMD_FORCE_INLINE void  operator delete(void*, void*)		{ }	\
+   SIMD_FORCE_INLINE void* operator new(size_t sizeInBytes)   { return btAlignedAlloc(sizeInBytes,16); }   \
+   SIMD_FORCE_INLINE void  operator delete(void* ptr)         { btAlignedFree(ptr); }   \
+   SIMD_FORCE_INLINE void* operator new(size_t, void* ptr)   { return ptr; }   \
+   SIMD_FORCE_INLINE void  operator delete(void*, void*)      { }   \
+   SIMD_FORCE_INLINE void* operator new[](size_t sizeInBytes)   { return btAlignedAlloc(sizeInBytes,16); }   \
+   SIMD_FORCE_INLINE void  operator delete[](void* ptr)         { btAlignedFree(ptr); }   \
+   SIMD_FORCE_INLINE void* operator new[](size_t, void* ptr)   { return ptr; }   \
+   SIMD_FORCE_INLINE void  operator delete[](void*, void*)      { }   \
 
 
 
@@ -156,13 +240,14 @@ SIMD_FORCE_INLINE btScalar btFabs(btScalar x) { return fabs(x); }
 SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return cos(x); }
 SIMD_FORCE_INLINE btScalar btSin(btScalar x) { return sin(x); }
 SIMD_FORCE_INLINE btScalar btTan(btScalar x) { return tan(x); }
-SIMD_FORCE_INLINE btScalar btAcos(btScalar x) { return acos(x); }
-SIMD_FORCE_INLINE btScalar btAsin(btScalar x) { return asin(x); }
+SIMD_FORCE_INLINE btScalar btAcos(btScalar x) { if (x<btScalar(-1))	x=btScalar(-1); if (x>btScalar(1))	x=btScalar(1); return acos(x); }
+SIMD_FORCE_INLINE btScalar btAsin(btScalar x) { if (x<btScalar(-1))	x=btScalar(-1); if (x>btScalar(1))	x=btScalar(1); return asin(x); }
 SIMD_FORCE_INLINE btScalar btAtan(btScalar x) { return atan(x); }
 SIMD_FORCE_INLINE btScalar btAtan2(btScalar x, btScalar y) { return atan2(x, y); }
 SIMD_FORCE_INLINE btScalar btExp(btScalar x) { return exp(x); }
 SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return log(x); }
 SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return pow(x,y); }
+SIMD_FORCE_INLINE btScalar btFmod(btScalar x,btScalar y) { return fmod(x,y); }
 
 #else
 		
@@ -175,7 +260,7 @@ SIMD_FORCE_INLINE btScalar btSqrt(btScalar y)
 	tempf = y;
 	*tfptr = (0xbfcdd90a - *tfptr)>>1; /* estimate of 1/sqrt(y) */
 	x =  tempf;
-	z =  y*btScalar(0.5);                        /* hoist out the “/2”    */
+	z =  y*btScalar(0.5);
 	x = (btScalar(1.5)*x)-(x*x)*(x*z);         /* iteration formula     */
 	x = (btScalar(1.5)*x)-(x*x)*(x*z);
 	x = (btScalar(1.5)*x)-(x*x)*(x*z);
@@ -191,15 +276,25 @@ SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return cosf(x); }
 SIMD_FORCE_INLINE btScalar btSin(btScalar x) { return sinf(x); }
 SIMD_FORCE_INLINE btScalar btTan(btScalar x) { return tanf(x); }
 SIMD_FORCE_INLINE btScalar btAcos(btScalar x) { 
-	btAssert(x <= btScalar(1.));
+	if (x<btScalar(-1))	
+		x=btScalar(-1); 
+	if (x>btScalar(1))	
+		x=btScalar(1);
 	return acosf(x); 
 }
-SIMD_FORCE_INLINE btScalar btAsin(btScalar x) { return asinf(x); }
+SIMD_FORCE_INLINE btScalar btAsin(btScalar x) { 
+	if (x<btScalar(-1))	
+		x=btScalar(-1); 
+	if (x>btScalar(1))	
+		x=btScalar(1);
+	return asinf(x); 
+}
 SIMD_FORCE_INLINE btScalar btAtan(btScalar x) { return atanf(x); }
 SIMD_FORCE_INLINE btScalar btAtan2(btScalar x, btScalar y) { return atan2f(x, y); }
 SIMD_FORCE_INLINE btScalar btExp(btScalar x) { return expf(x); }
 SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return logf(x); }
 SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return powf(x,y); }
+SIMD_FORCE_INLINE btScalar btFmod(btScalar x,btScalar y) { return fmodf(x,y); }
 	
 #endif
 
@@ -208,6 +303,10 @@ SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return powf(x,y); }
 #define SIMD_HALF_PI      (SIMD_2_PI * btScalar(0.25))
 #define SIMD_RADS_PER_DEG (SIMD_2_PI / btScalar(360.0))
 #define SIMD_DEGS_PER_RAD  (btScalar(360.0) / SIMD_2_PI)
+#define SIMDSQRT12 btScalar(0.7071067811865475244008443621048490)
+
+#define btRecipSqrt(x) ((btScalar)(btScalar(1.0)/btSqrt(btScalar(x))))		/* reciprocal square root */
+
 
 #ifdef BT_USE_DOUBLE_PRECISION
 #define SIMD_EPSILON      DBL_EPSILON
@@ -289,7 +388,7 @@ SIMD_FORCE_INLINE int btSelect(unsigned condition, int valueIfConditionNonZero, 
 {
     unsigned testNz = (unsigned)(((int)condition | -(int)condition) >> 31);
     unsigned testEqz = ~testNz; 
-    return ((valueIfConditionNonZero & testNz) | (valueIfConditionZero & testEqz));
+    return static_cast<int>((valueIfConditionNonZero & testNz) | (valueIfConditionZero & testEqz));
 }
 SIMD_FORCE_INLINE float btSelect(unsigned condition, float valueIfConditionNonZero, float valueIfConditionZero)
 {
@@ -316,7 +415,7 @@ SIMD_FORCE_INLINE unsigned btSwapEndian(unsigned val)
 
 SIMD_FORCE_INLINE unsigned short btSwapEndian(unsigned short val)
 {
-	return (((val & 0xff00) >> 8) | ((val & 0x00ff) << 8));
+	return static_cast<unsigned short>(((val & 0xff00) >> 8) | ((val & 0x00ff) << 8));
 }
 
 SIMD_FORCE_INLINE unsigned btSwapEndian(int val)
@@ -337,7 +436,7 @@ SIMD_FORCE_INLINE unsigned short btSwapEndian(short val)
 ///so instead of returning a float/double, we return integer/long long integer
 SIMD_FORCE_INLINE unsigned int  btSwapEndianFloat(float d)
 {
-    unsigned int a;
+    unsigned int a = 0;
     unsigned char *dst = (unsigned char *)&a;
     unsigned char *src = (unsigned char *)&d;
 
@@ -351,7 +450,7 @@ SIMD_FORCE_INLINE unsigned int  btSwapEndianFloat(float d)
 // unswap using char pointers
 SIMD_FORCE_INLINE float btUnswapEndianFloat(unsigned int a) 
 {
-    float d;
+    float d = 0.0f;
     unsigned char *src = (unsigned char *)&a;
     unsigned char *dst = (unsigned char *)&d;
 
@@ -383,7 +482,7 @@ SIMD_FORCE_INLINE void  btSwapEndianDouble(double d, unsigned char* dst)
 // unswap using char pointers
 SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src) 
 {
-    double d;
+    double d = 0.0;
     unsigned char *dst = (unsigned char *)&d;
 
     dst[0] = src[7];
@@ -398,5 +497,35 @@ SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src)
 	return d;
 }
 
+// returns normalized value in range [-SIMD_PI, SIMD_PI]
+SIMD_FORCE_INLINE btScalar btNormalizeAngle(btScalar angleInRadians) 
+{
+	angleInRadians = btFmod(angleInRadians, SIMD_2_PI);
+	if(angleInRadians < -SIMD_PI)
+	{
+		return angleInRadians + SIMD_2_PI;
+	}
+	else if(angleInRadians > SIMD_PI)
+	{
+		return angleInRadians - SIMD_2_PI;
+	}
+	else
+	{
+		return angleInRadians;
+	}
+}
 
+///rudimentary class to provide type info
+struct btTypedObject
+{
+	btTypedObject(int objectType)
+		:m_objectType(objectType)
+	{
+	}
+	int	m_objectType;
+	inline int getObjectType() const
+	{
+		return m_objectType;
+	}
+};
 #endif //SIMD___SCALAR_H

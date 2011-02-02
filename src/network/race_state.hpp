@@ -30,6 +30,7 @@
 #include "network/flyable_info.hpp"
 #include "network/item_info.hpp"
 #include "network/message.hpp"
+#include "utils/aligned_array.hpp"
 
 /** This class stores the state information of a (single) race, e.g. the 
     position and orientation of karts, collisions that have happened etc.
@@ -43,7 +44,7 @@ private:
     /** Updates about collected items. */
     std::vector<ItemInfo> m_item_info;
     /** Updates about existing flyables. */
-    std::vector<FlyableInfo> m_flyable_info;
+    AlignedArray<FlyableInfo> m_flyable_info;
     /** Stores the controls of each kart at the beginning of its update(). */
     std::vector<KartControl> m_kart_controls;
     /** Collision information. This vector stores information about which

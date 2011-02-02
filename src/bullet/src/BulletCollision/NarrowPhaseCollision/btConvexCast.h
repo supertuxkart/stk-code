@@ -41,21 +41,22 @@ public:
 		virtual void	drawCoordSystem(const btTransform& trans) {(void)trans;}
 
 		CastResult()
-			:m_fraction(btScalar(1e30)),
-			m_debugDrawer(0)
+			:m_fraction(btScalar(BT_LARGE_FLOAT)),
+			m_debugDrawer(0),
+			m_allowedPenetration(btScalar(0))
 		{
 		}
 
 
 		virtual ~CastResult() {};
 
-		btVector3	m_normal;
-		btVector3   m_hitPoint;
-		btScalar	m_fraction;
 		btTransform	m_hitTransformA;
 		btTransform	m_hitTransformB;
-
+		btVector3	m_normal;
+		btVector3   m_hitPoint;
+		btScalar	m_fraction; //input and output
 		btIDebugDraw* m_debugDrawer;
+		btScalar	m_allowedPenetration;
 
 	};
 

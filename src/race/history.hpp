@@ -25,6 +25,7 @@
 #include "LinearMath/btQuaternion.h"
 
 #include "karts/controller/kart_control.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;
@@ -47,14 +48,14 @@ public:
                              HISTORY_PHYSICS  = 2 };
 private:
     // maximum number of history events to store
-    HistoryReplayMode         m_replay_mode;
-    int                       m_current;
-    bool                      m_wrapped;
-    int                       m_size;
-    std::vector<float>        m_all_deltas;
-    std::vector<KartControl>  m_all_controls;
-    std::vector<Vec3>         m_all_xyz;
-    std::vector<btQuaternion> m_all_rotations;
+    HistoryReplayMode          m_replay_mode;
+    int                        m_current;
+    bool                       m_wrapped;
+    int                        m_size;
+    std::vector<float>         m_all_deltas;
+    std::vector<KartControl>   m_all_controls;
+    AlignedArray<Vec3>         m_all_xyz;
+    AlignedArray<btQuaternion> m_all_rotations;
 
     /** The identities of the karts to use. */
     std::vector<std::string>  m_kart_ident;

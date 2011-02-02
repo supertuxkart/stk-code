@@ -41,9 +41,9 @@ void Vec3::setHPR(const btQuaternion& q)
 // ----------------------------------------------------------------------------
 void Vec3::degreeToRad()
 {
-    m_x=DEGREE_TO_RAD*m_x;
-    m_y=DEGREE_TO_RAD*m_y;      
-    m_z=DEGREE_TO_RAD*m_z;
+    m_floats[0]=DEGREE_TO_RAD*m_floats[0];
+    m_floats[1]=DEGREE_TO_RAD*m_floats[1];      
+    m_floats[2]=DEGREE_TO_RAD*m_floats[2];
 }   // degreeToRad
 
 // ----------------------------------------------------------------------------
@@ -92,6 +92,6 @@ const core::vector3df& Vec3::toIrrVector() const
 /** Returns the X and Y component as an irrlicht 2d vector. */
 const core::vector2df Vec3::toIrrVector2d() const
 {
-    core::vector2df v(m_x, m_z);
+    core::vector2df v(m_floats[0], m_floats[2]);
     return v;
 }   // toIrrVector2d

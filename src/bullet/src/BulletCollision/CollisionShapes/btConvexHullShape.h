@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -20,13 +20,12 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 #include "LinearMath/btAlignedObjectArray.h"
 
-///ConvexHullShape implements an implicit (getSupportingVertex) Convex Hull of a Point Cloud (vertices)
-///No connectivity is needed. localGetSupportingVertex iterates linearly though all vertices.
-///on modern hardware, due to cache coherency this isn't that bad. Complex algorithms tend to trash the cash.
-///(memory is much slower then the cpu)
-ATTRIBUTE_ALIGNED16(class) btConvexHullShape : public btPolyhedralConvexShape
+
+///The btConvexHullShape implements an implicit convex hull of an array of vertices.
+///Bullet provides a general and fast collision detector for convex shapes based on GJK and EPA using localGetSupportingVertex.
+ATTRIBUTE_ALIGNED16(class) btConvexHullShape : public btPolyhedralConvexAabbCachingShape
 {
-	btAlignedObjectArray<btPoint3>	m_points;
+	btAlignedObjectArray<btVector3>	m_unscaledPoints;
 
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
@@ -35,23 +34,38 @@ public:
 	///this constructor optionally takes in a pointer to points. Each point is assumed to be 3 consecutive btScalar (x,y,z), the striding defines the number of bytes between each point, in memory.
 	///It is easier to not pass any points in the constructor, and just add one point at a time, using addPoint.
 	///btConvexHullShape make an internal copy of the points.
-	btConvexHullShape(const btScalar* points=0,int numPoints=0, int stride=sizeof(btPoint3));
+	btConvexHullShape(const btScalar* points=0,int numPoints=0, int stride=sizeof(btVector3));
 
-	void addPoint(const btPoint3& point);
+	void addPoint(const btVector3& point);
 
-	btPoint3* getPoints()
+	
+	btVector3* getUnscaledPoints()
 	{
-		return &m_points[0];
+		return &m_unscaledPoints[0];
 	}
 
-	const btPoint3* getPoints() const
+	const btVector3* getUnscaledPoints() const
 	{
-		return &m_points[0];
+		return &m_unscaledPoints[0];
 	}
 
-	int getNumPoints() const 
+	///getPoints is obsolete, please use getUnscaledPoints
+	const btVector3* getPoints() const
 	{
-		return m_points.size();
+		return getUnscaledPoints();
+	}
+
+	
+
+
+	SIMD_FORCE_INLINE	btVector3 getScaledPoint(int i) const
+	{
+		return m_unscaledPoints[i] * m_localScaling;
+	}
+
+	SIMD_FORCE_INLINE	int getNumPoints() const 
+	{
+		return m_unscaledPoints.size();
 	}
 
 	virtual btVector3	localGetSupportingVertex(const btVector3& vec)const;
@@ -59,7 +73,6 @@ public:
 	virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const;
 	
 
-	virtual int	getShapeType()const { return CONVEX_HULL_SHAPE_PROXYTYPE; }
 
 	//debugging
 	virtual const char*	getName()const {return "Convex";}
@@ -67,15 +80,40 @@ public:
 	
 	virtual int	getNumVertices() const;
 	virtual int getNumEdges() const;
-	virtual void getEdge(int i,btPoint3& pa,btPoint3& pb) const;
-	virtual void getVertex(int i,btPoint3& vtx) const;
+	virtual void getEdge(int i,btVector3& pa,btVector3& pb) const;
+	virtual void getVertex(int i,btVector3& vtx) const;
 	virtual int	getNumPlanes() const;
-	virtual void getPlane(btVector3& planeNormal,btPoint3& planeSupport,int i ) const;
-	virtual	bool isInside(const btPoint3& pt,btScalar tolerance) const;
+	virtual void getPlane(btVector3& planeNormal,btVector3& planeSupport,int i ) const;
+	virtual	bool isInside(const btVector3& pt,btScalar tolerance) const;
 
+	///in case we receive negative scaling
+	virtual void	setLocalScaling(const btVector3& scaling);
 
+	virtual	int	calculateSerializeBufferSize() const;
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
 
 };
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btConvexHullShapeData
+{
+	btConvexInternalShapeData	m_convexInternalShapeData;
+
+	btVector3FloatData	*m_unscaledPointsFloatPtr;
+	btVector3DoubleData	*m_unscaledPointsDoublePtr;
+
+	int		m_numUnscaledPoints;
+	char m_padding3[4];
+
+};
+
+
+SIMD_FORCE_INLINE	int	btConvexHullShape::calculateSerializeBufferSize() const
+{
+	return sizeof(btConvexHullShapeData);
+}
 
 
 #endif //CONVEX_HULL_SHAPE_H

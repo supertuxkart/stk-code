@@ -818,7 +818,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             // It is possible that there are more start positions defined
             // than there are karts (and therefore that there are values
             // allocated in m_start_transforms. Ignore those:
-            if(position <m_start_transforms.size())
+            if(position <(unsigned int)m_start_transforms.size())
             {
                 m_start_transforms[position].setOrigin(xyz);
                 m_start_transforms[position].setRotation(
@@ -1116,9 +1116,9 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
     {
     public:
         const Material* m_material;
-        MaterialCollision(btVector3 p1, btVector3 p2) : 
+        MaterialCollision(const btVector3 &p1, const btVector3 &p2) : 
             btCollisionWorld::ClosestRayResultCallback(p1,p2) {m_material=NULL;}
-        virtual btScalar AddSingleResult(btCollisionWorld::LocalRayResult& rayResult,
+        virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
                                          bool normalInWorldSpace) {
              if(rayResult.m_localShapeInfo && rayResult.m_localShapeInfo->m_shapePart>=0 )
              {
@@ -1134,14 +1134,14 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
                  // just ignore this callback and don't add it.
                  return 1.0f;
              }
-             return btCollisionWorld::ClosestRayResultCallback::AddSingleResult(rayResult, 
+             return btCollisionWorld::ClosestRayResultCallback::addSingleResult(rayResult, 
                                                                                 normalInWorldSpace);
         }   // AddSingleResult
     };   // myCollision
     MaterialCollision rayCallback(pos, to_pos);
     World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
 
-    if(!rayCallback.HasHit()) 
+    if(!rayCallback.hasHit()) 
     {
         *hot      = NOHIT;
         *material = NULL;

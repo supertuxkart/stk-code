@@ -1349,6 +1349,10 @@
 				Name="utils"
 				>
 				<File
+					RelativePath="..\..\utils\aligned_array.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\constants.hpp"
 					>
 				</File>

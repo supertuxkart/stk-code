@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -19,7 +19,7 @@ subject to the following restrictions:
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
-///btConeShape implements a Cone shape, around the Y axis
+///The btConeShape implements a cone shape primitive, centered around the origin and aligned with the Y axis. The btConeShapeX is aligned around the X axis and btConeShapeZ around the Z axis.
 class btConeShape : public btConvexInternalShape
 
 {
@@ -68,9 +68,6 @@ public:
 //		inertia.z() = scaledmass * (x2+y2);
 	}
 
-
-
-		virtual int	getShapeType() const { return CONE_SHAPE_PROXYTYPE; }
 
 		virtual const char*	getName()const 
 		{

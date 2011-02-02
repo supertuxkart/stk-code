@@ -51,10 +51,18 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 	btTransformUtil::calculateVelocity(fromA,toA,btScalar(1.),linVelA,angVelA);
 	btTransformUtil::calculateVelocity(fromB,toB,btScalar(1.),linVelB,angVelB);
 
+
 	btScalar boundingRadiusA = m_convexA->getAngularMotionDisc();
 	btScalar boundingRadiusB = m_convexB->getAngularMotionDisc();
 
 	btScalar maxAngularProjectedVelocity = angVelA.length() * boundingRadiusA + angVelB.length() * boundingRadiusB;
+	btVector3 relLinVel = (linVelB-linVelA);
+
+	btScalar relLinVelocLength = (linVelB-linVelA).length();
+	
+	if ((relLinVelocLength+maxAngularProjectedVelocity) == 0.f)
+		return false;
+
 
 	btScalar radius = btScalar(0.001);
 
@@ -88,7 +96,7 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 
 	{
 		
-		btGjkPairDetector gjk(m_convexA,m_convexB,m_simplexSolver,m_penetrationDepthSolver);		
+		btGjkPairDetector gjk(m_convexA,m_convexB,m_convexA->getShapeType(),m_convexB->getShapeType(),m_convexA->getMargin(),m_convexB->getMargin(),m_simplexSolver,m_penetrationDepthSolver);		
 		btGjkPairDetector::ClosestPointInput input;
 	
 		//we don't use margins during CCD
@@ -108,11 +116,15 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 		dist = pointCollector1.m_distance;
 		n = pointCollector1.m_normalOnBInWorld;
 
-	
-
+		btScalar projectedLinearVelocity = relLinVel.dot(n);
+		
 		//not close enough
 		while (dist > radius)
 		{
+			if (result.m_debugDrawer)
+			{
+				result.m_debugDrawer->drawSphere(c,0.2f,btVector3(1,1,1));
+			}
 			numIter++;
 			if (numIter > maxIter)
 			{
@@ -120,16 +132,21 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 			}
 			btScalar dLambda = btScalar(0.);
 
-				btScalar projectedLinearVelocity = (linVelB-linVelA).dot(n);
+			projectedLinearVelocity = relLinVel.dot(n);
 
 			//calculate safe moving fraction from distance / (linear+rotational velocity)
 			
 			//btScalar clippedDist  = GEN_min(angularConservativeRadius,dist);
 			//btScalar clippedDist  = dist;
 			
+			//don't report time of impact for motion away from the contact normal (or causes minor penetration)
+			if ((projectedLinearVelocity+ maxAngularProjectedVelocity)<=SIMD_EPSILON)
+				return false;
 			
 			dLambda = dist / (projectedLinearVelocity+ maxAngularProjectedVelocity);
 
+			
+			
 			lambda = lambda + dLambda;
 
 			if (lambda > btScalar(1.))
@@ -156,6 +173,11 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 			btTransformUtil::integrateTransform(fromA,linVelA,angVelA,lambda,interpolatedTransA);
 			btTransformUtil::integrateTransform(fromB,linVelB,angVelB,lambda,interpolatedTransB);
 			relativeTrans = interpolatedTransB.inverseTimes(interpolatedTransA);
+
+			if (result.m_debugDrawer)
+			{
+				result.m_debugDrawer->drawSphere(interpolatedTransA.getOrigin(),0.2f,btVector3(1,0,0));
+			}
 
 			result.DebugDraw( lambda );
 
@@ -184,9 +206,13 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 				//??
 				return false;
 			}
+			
 
 		}
-
+	
+		if ((projectedLinearVelocity+ maxAngularProjectedVelocity)<=result.m_allowedPenetration)//SIMD_EPSILON)
+			return false;
+			
 		result.m_fraction = lambda;
 		result.m_normal = n;
 		result.m_hitPoint = c;
@@ -208,4 +234,3 @@ bool	btContinuousConvexCollision::calcTimeOfImpact(
 */
 
 }
-

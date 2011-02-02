@@ -22,7 +22,7 @@ subject to the following restrictions:
 #define USE_PERSISTENT_CONTACTS 1
 
 btBoxBoxCollisionAlgorithm::btBoxBoxCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* obj0,btCollisionObject* obj1)
-: btCollisionAlgorithm(ci),
+: btActivatingCollisionAlgorithm(ci,obj0,obj1),
 m_ownManifold(false),
 m_manifoldPtr(mf)
 {
@@ -61,7 +61,7 @@ void btBoxBoxCollisionAlgorithm::processCollision (btCollisionObject* body0,btCo
 #endif //USE_PERSISTENT_CONTACTS
 
 	btDiscreteCollisionDetectorInterface::ClosestPointInput input;
-	input.m_maximumDistanceSquared = 1e30f;
+	input.m_maximumDistanceSquared = BT_LARGE_FLOAT;
 	input.m_transformA = body0->getWorldTransform();
 	input.m_transformB = body1->getWorldTransform();
 
@@ -78,7 +78,7 @@ void btBoxBoxCollisionAlgorithm::processCollision (btCollisionObject* body0,btCo
 
 }
 
-btScalar btBoxBoxCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut)
+btScalar btBoxBoxCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* /*body0*/,btCollisionObject* /*body1*/,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)
 {
 	//not yet
 	return 1.f;

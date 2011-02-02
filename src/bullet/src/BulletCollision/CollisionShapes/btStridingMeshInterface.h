@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -18,18 +18,14 @@ subject to the following restrictions:
 
 #include "LinearMath/btVector3.h"
 #include "btTriangleCallback.h"
+#include "btConcaveShape.h"
 
-/// PHY_ScalarType enumerates possible scalar types.
-/// See the btStridingMeshInterface for its use
-typedef enum PHY_ScalarType {
-	PHY_FLOAT,
-	PHY_DOUBLE,
-	PHY_INTEGER,
-	PHY_SHORT,
-	PHY_FIXEDPOINT88
-} PHY_ScalarType;
 
-///	btStridingMeshInterface is the interface class for high performance access to triangle meshes
+
+
+
+///	The btStridingMeshInterface is the interface class for high performance generic access to triangle meshes, used in combination with btBvhTriangleMeshShape and some other collision shapes.
+/// Using index striding of 3*sizeof(integer) it can use triangle arrays, using index striding of 1*sizeof(integer) it can handle triangle strips.
 /// It allows for sharing graphics and collision meshes. Also it provides locking/unlocking of graphics meshes that are in gpu memory.
 class  btStridingMeshInterface
 {
@@ -47,7 +43,7 @@ class  btStridingMeshInterface
 
 
 
-		void	InternalProcessAllTriangles(btInternalTriangleIndexCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
+		virtual void	InternalProcessAllTriangles(btInternalTriangleIndexCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
 
 		///brute force method to calculate aabb
 		void	calculateAabbBruteForce(btVector3& aabbMin,btVector3& aabbMax);
@@ -75,6 +71,18 @@ class  btStridingMeshInterface
 		virtual void	preallocateVertices(int numverts)=0;
 		virtual void	preallocateIndices(int numindices)=0;
 
+		virtual bool	hasPremadeAabb() const { return false; }
+		virtual void	setPremadeAabb(const btVector3& aabbMin, const btVector3& aabbMax ) const
+                {
+                        (void) aabbMin;
+                        (void) aabbMax;
+                }
+		virtual void	getPremadeAabb(btVector3* aabbMin, btVector3* aabbMax ) const
+        {
+            (void) aabbMin;
+            (void) aabbMax;
+        }
+
 		const btVector3&	getScaling() const {
 			return m_scaling;
 		}
@@ -83,8 +91,64 @@ class  btStridingMeshInterface
 			m_scaling = scaling;
 		}
 
-	
+		virtual	int	calculateSerializeBufferSize() const;
+
+		///fills the dataBuffer and returns the struct name (and 0 on failure)
+		virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+
 
 };
+
+struct	btIntIndexData
+{
+	int	m_value;
+};
+
+struct	btShortIntIndexData
+{
+	short m_value;
+	char m_pad[2];
+};
+
+struct	btShortIntIndexTripletData
+{
+	short	m_values[3];
+	char	m_pad[2];
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btMeshPartData
+{
+	btVector3FloatData			*m_vertices3f;
+	btVector3DoubleData			*m_vertices3d;
+
+	btIntIndexData				*m_indices32;
+	btShortIntIndexTripletData	*m_3indices16;
+
+	btShortIntIndexData			*m_indices16;//backwards compatibility
+
+	int                     m_numTriangles;//length of m_indices = m_numTriangles
+	int                     m_numVertices;
+};
+
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btStridingMeshInterfaceData
+{
+	btMeshPartData	*m_meshPartsPtr;
+	btVector3FloatData	m_scaling;
+	int	m_numMeshParts;
+	char m_padding[4];
+};
+
+
+
+
+SIMD_FORCE_INLINE	int	btStridingMeshInterface::calculateSerializeBufferSize() const
+{
+	return sizeof(btStridingMeshInterfaceData);
+}
+
+
 
 #endif //STRIDING_MESHINTERFACE_H

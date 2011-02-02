@@ -1,4 +1,8 @@
 //  $Id$
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2011 Joerg Henrichs
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -40,7 +44,7 @@ public:
      *  axis as well (so a vector3df can be stored in and restored from
      *  a vec3).
      */
-    inline Vec3(const core::vector3df &v)  :  btVector3(v.X, v.Y, v.Z)   {}
+    inline Vec3(const core::vector3df &v)  : btVector3(v.X, v.Y, v.Z)    {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     inline Vec3()                          : btVector3()                 {}
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
@@ -54,13 +58,13 @@ public:
          setPitchRoll(normal);}
 
     void                   setHPR(const btQuaternion& q);
-    inline const float     operator[](int n) const  { return *(&m_x+n); }
-    inline const float     getHeading() const       { return m_y;       }
-    inline const float     getPitch() const         { return m_x;       }
-    inline const float     getRoll() const          { return m_z;       }
-    inline const void      setHeading(float f)      { m_y = f;          }
-    inline const void      setPitch(float f)        { m_x = f;          }
-    inline const void      setRoll(float f)         { m_z = f;          }
+    inline const float     operator[](int n) const  { return *(&m_floats[0]+n); }
+    inline const float     getHeading() const       { return m_floats[1];       }
+    inline const float     getPitch() const         { return m_floats[0];       }
+    inline const float     getRoll() const          { return m_floats[2];       }
+    inline const void      setHeading(float f)      { m_floats[1] = f;          }
+    inline const void      setPitch(float f)        { m_floats[0] = f;          }
+    inline const void      setRoll(float f)         { m_floats[2] = f;          }
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
     const core::vector3df& toIrrVector()   const;
     const core::vector3df  toIrrHPR()      const;
@@ -71,20 +75,20 @@ public:
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
-    float          length2_2d() const              {return m_x*m_x + m_z*m_z;}
+    float          length2_2d() const              {return m_floats[0]*m_floats[0] + m_floats[2]*m_floats[2];}
     /** Returns the length of this vector in the plane, i.e. the vector is 
      *  used as a 2d vector. */
-    float          length_2d()  const              {return sqrt(m_x*m_x + m_z*m_z);}
+    float          length_2d()  const              {return sqrt(m_floats[0]*m_floats[0] + m_floats[2]*m_floats[2]);}
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */
-    void           max(const Vec3& a)              {if(a.getX()>m_x) m_x=a.getX();
-                                                    if(a.getY()>m_y) m_y=a.getY();
-                                                    if(a.getZ()>m_z) m_z=a.getZ();}
+    void           max(const Vec3& a)              {if(a.getX()>m_floats[0]) m_floats[0]=a.getX();
+                                                    if(a.getY()>m_floats[1]) m_floats[1]=a.getY();
+                                                    if(a.getZ()>m_floats[2]) m_floats[2]=a.getZ();}
     /** Sets this = min(this, a) componentwise.
      *  \param a Vector to compare with. */
-    void           min(const Vec3& a)              {if(a.getX()<m_x) m_x=a.getX();
-                                                    if(a.getY()<m_y) m_y=a.getY();
-                                                    if(a.getZ()<m_z) m_z=a.getZ();}
+    void           min(const Vec3& a)              {if(a.getX()<m_floats[0]) m_floats[0]=a.getX();
+                                                    if(a.getY()<m_floats[1]) m_floats[1]=a.getY();
+                                                    if(a.getZ()<m_floats[2]) m_floats[2]=a.getZ();}
 };    // Vec3
 
 

@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -12,6 +12,7 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
+
 #include "btConvexTriangleMeshShape.h"
 #include "BulletCollision/CollisionShapes/btCollisionMargin.h"
 
@@ -19,10 +20,12 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionShapes/btStridingMeshInterface.h"
 
 
-btConvexTriangleMeshShape ::btConvexTriangleMeshShape (btStridingMeshInterface* meshInterface)
-:m_stridingMesh(meshInterface)
+btConvexTriangleMeshShape ::btConvexTriangleMeshShape (btStridingMeshInterface* meshInterface, bool calcAabb)
+: btPolyhedralConvexAabbCachingShape(), m_stridingMesh(meshInterface)
 {
-	recalcLocalAabb();
+	m_shapeType = CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE;
+	if ( calcAabb )
+		recalcLocalAabb();
 }
 
 
@@ -41,7 +44,7 @@ public:
 
 	LocalSupportVertexCallback(const btVector3& supportVecLocal)
 		: m_supportVertexLocal(btScalar(0.),btScalar(0.),btScalar(0.)),
-		m_maxDot(btScalar(-1e30)),
+		m_maxDot(btScalar(-BT_LARGE_FLOAT)),
                 m_supportVecLocal(supportVecLocal)
 	{
 	}
@@ -89,7 +92,7 @@ btVector3	btConvexTriangleMeshShape::localGetSupportingVertexWithoutMargin(const
 	}
 
 	LocalSupportVertexCallback	supportCallback(vec);
-	btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+	btVector3 aabbMax(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
 	m_stridingMesh->InternalProcessAllTriangles(&supportCallback,-aabbMax,aabbMax);
 	supVec = supportCallback.GetSupportVertexLocal();
 
@@ -102,18 +105,18 @@ void	btConvexTriangleMeshShape::batchedUnitVectorGetSupportingVertexWithoutMargi
 	{
 		for (int i=0;i<numVectors;i++)
 		{
-			supportVerticesOut[i][3] = btScalar(-1e30);
+			supportVerticesOut[i][3] = btScalar(-BT_LARGE_FLOAT);
 		}
 	}
 	
-	//todo: could do the batch inside the callback!
+	///@todo: could do the batch inside the callback!
 
 
 	for (int j=0;j<numVectors;j++)
 	{
 		const btVector3& vec = vectors[j];
 		LocalSupportVertexCallback	supportCallback(vec);
-		btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+		btVector3 aabbMax(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
 		m_stridingMesh->InternalProcessAllTriangles(&supportCallback,-aabbMax,aabbMax);
 		supportVerticesOut[j] = supportCallback.GetSupportVertexLocal();
 	}
@@ -161,12 +164,12 @@ int btConvexTriangleMeshShape::getNumEdges() const
 	return 0;
 }
 
-void btConvexTriangleMeshShape::getEdge(int ,btPoint3& ,btPoint3& ) const
+void btConvexTriangleMeshShape::getEdge(int ,btVector3& ,btVector3& ) const
 {
 	btAssert(0);	
 }
 
-void btConvexTriangleMeshShape::getVertex(int ,btPoint3& ) const
+void btConvexTriangleMeshShape::getVertex(int ,btVector3& ) const
 {
 	btAssert(0);
 }
@@ -176,13 +179,13 @@ int	btConvexTriangleMeshShape::getNumPlanes() const
 	return 0;
 }
 
-void btConvexTriangleMeshShape::getPlane(btVector3& ,btPoint3& ,int  ) const
+void btConvexTriangleMeshShape::getPlane(btVector3& ,btVector3& ,int  ) const
 {
 	btAssert(0);
 }
 
 //not yet
-bool btConvexTriangleMeshShape::isInside(const btPoint3& ,btScalar ) const
+bool btConvexTriangleMeshShape::isInside(const btVector3& ,btScalar ) const
 {
 	btAssert(0);
 	return false;
@@ -203,3 +206,110 @@ const btVector3& btConvexTriangleMeshShape::getLocalScaling() const
 {
 	return m_stridingMesh->getScaling();
 }
+
+void btConvexTriangleMeshShape::calculatePrincipalAxisTransform(btTransform& principal, btVector3& inertia, btScalar& volume) const
+{
+   class CenterCallback: public btInternalTriangleIndexCallback
+   {
+      bool first;
+      btVector3 ref;
+      btVector3 sum;
+      btScalar volume;
+
+   public:
+
+      CenterCallback() : first(true), ref(0, 0, 0), sum(0, 0, 0), volume(0)
+      {
+      }
+
+      virtual void internalProcessTriangleIndex(btVector3* triangle, int partId, int triangleIndex)
+      {
+         (void) triangleIndex;
+         (void) partId;
+         if (first)
+         {
+            ref = triangle[0];
+            first = false;
+         }
+         else
+         {
+            btScalar vol = btFabs((triangle[0] - ref).triple(triangle[1] - ref, triangle[2] - ref));
+            sum += (btScalar(0.25) * vol) * ((triangle[0] + triangle[1] + triangle[2] + ref));
+            volume += vol;
+         }
+      }
+      
+      btVector3 getCenter()
+      {
+         return (volume > 0) ? sum / volume : ref;
+      }
+
+      btScalar getVolume()
+      {
+         return volume * btScalar(1. / 6);
+      }
+
+   };
+
+   class InertiaCallback: public btInternalTriangleIndexCallback
+   {
+      btMatrix3x3 sum;
+      btVector3 center;
+
+   public:
+
+      InertiaCallback(btVector3& center) : sum(0, 0, 0, 0, 0, 0, 0, 0, 0), center(center)
+      {
+      }
+
+      virtual void internalProcessTriangleIndex(btVector3* triangle, int partId, int triangleIndex)
+      {
+         (void) triangleIndex;
+         (void) partId;
+         btMatrix3x3 i;
+         btVector3 a = triangle[0] - center;
+         btVector3 b = triangle[1] - center;
+         btVector3 c = triangle[2] - center;
+         btScalar volNeg = -btFabs(a.triple(b, c)) * btScalar(1. / 6);
+         for (int j = 0; j < 3; j++)
+         {
+            for (int k = 0; k <= j; k++)
+            {
+               i[j][k] = i[k][j] = volNeg * (btScalar(0.1) * (a[j] * a[k] + b[j] * b[k] + c[j] * c[k])
+                  + btScalar(0.05) * (a[j] * b[k] + a[k] * b[j] + a[j] * c[k] + a[k] * c[j] + b[j] * c[k] + b[k] * c[j]));
+            }
+         }
+         btScalar i00 = -i[0][0];
+         btScalar i11 = -i[1][1];
+         btScalar i22 = -i[2][2];
+         i[0][0] = i11 + i22; 
+         i[1][1] = i22 + i00; 
+         i[2][2] = i00 + i11;
+         sum[0] += i[0];
+         sum[1] += i[1];
+         sum[2] += i[2];
+      }
+      
+      btMatrix3x3& getInertia()
+      {
+         return sum;
+      }
+
+   };
+
+   CenterCallback centerCallback;
+   btVector3 aabbMax(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
+   m_stridingMesh->InternalProcessAllTriangles(&centerCallback, -aabbMax, aabbMax);
+   btVector3 center = centerCallback.getCenter();
+   principal.setOrigin(center);
+   volume = centerCallback.getVolume();
+
+   InertiaCallback inertiaCallback(center);
+   m_stridingMesh->InternalProcessAllTriangles(&inertiaCallback, -aabbMax, aabbMax);
+
+   btMatrix3x3& i = inertiaCallback.getInertia();
+   i.diagonalize(principal.getBasis(), btScalar(0.00001), 20);
+   inertia.setValue(i[0][0], i[1][1], i[2][2]);
+   inertia /= volume;
+}
+

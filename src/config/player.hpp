@@ -115,9 +115,7 @@ public:
         #endif
 		return m_is_guest_account;
     }
-    
-    //int getLastKartId(){ return m_last_kart_id; }
-    //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
+ 
 };
 
 #endif

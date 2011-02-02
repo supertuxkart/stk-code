@@ -7,14 +7,15 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btMinMax.h	 		LinearMath/btScalar.h		 \
 	LinearMath/btAlignedObjectArray.h	LinearMath/btMotionState.h	 \
 	LinearMath/btPoolAllocator.h		LinearMath/btDefaultMotionState.h\
-	LinearMath/btPoint3.h	 		LinearMath/btStackAlloc.h	 \
+		 		LinearMath/btStackAlloc.h	 \
 	LinearMath/btGeometryUtil.cpp		LinearMath/btQuadWord.h		 \
 	LinearMath/btTransform.h 		LinearMath/btGeometryUtil.h	 \
 	LinearMath/btQuaternion.h		LinearMath/btTransformUtil.h	 \
 	LinearMath/btIDebugDraw.h		LinearMath/btQuickprof.cpp  	 \
-	LinearMath/btTypedUserInfo.h		LinearMath/btTypedUserInfo.h	 \
 	LinearMath/btVector3.h			LinearMath/btHashMap.h		 \
-	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h
+	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h        \
+        LinearMath/btSerializer.cpp             LinearMath/btSerializer.h
+
 
 # Certain g++ versions causes stk to crash if btVoronoiSimplexSolver.cpp is
 # compiled with optimisations. Since it's rather difficult to specify certain
@@ -33,6 +34,10 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/BroadphaseCollision/btBroadphaseProxy.h			 \
 	BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp		 \
 	BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h		 \
+        BulletCollision/BroadphaseCollision/btDbvt.cpp                           \
+        BulletCollision/BroadphaseCollision/btDbvt.h                             \
+        BulletCollision/BroadphaseCollision/btDbvtBroadphase.cpp                 \
+        BulletCollision/BroadphaseCollision/btDbvtBroadphase.h                   \
 	BulletCollision/BroadphaseCollision/btDispatcher.cpp			 \
 	BulletCollision/BroadphaseCollision/btDispatcher.h			 \
 	BulletCollision/BroadphaseCollision/btMultiSapBroadphase.cpp		 \
@@ -40,12 +45,14 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/BroadphaseCollision/btOverlappingPairCache.cpp		 \
 	BulletCollision/BroadphaseCollision/btOverlappingPairCache.h		 \
 	BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h		 \
+        BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp                   \
+        BulletCollision/BroadphaseCollision/btQuantizedBvh.h                     \
 	BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp		 \
 	BulletCollision/BroadphaseCollision/btSimpleBroadphase.h		 \
-	BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h		 \
-	BulletCollision/CollisionDispatch/btBoxBoxDetector.h			 \
 	BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp	 \
+	BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h		 \
 	BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp			 \
+	BulletCollision/CollisionDispatch/btBoxBoxDetector.h			 \
 	BulletCollision/CollisionDispatch/btCollisionConfiguration.h		 \
 	BulletCollision/CollisionDispatch/btCollisionCreateFunc.h		 \
 	BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp		 \
@@ -56,12 +63,12 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/CollisionDispatch/btCollisionWorld.h			 \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h	 \
-	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp	 \
-	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp		 \
 	BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h		 \
+	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp	 \
+	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp	 \
 	BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h	 \
 	BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.cpp		 \
@@ -78,6 +85,16 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btUnionFind.cpp			 \
 	BulletCollision/CollisionDispatch/btUnionFind.h				 \
+        BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.cpp     \
+        BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h       \
+        BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.cpp     \
+        BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.h       \
+        BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.cpp        \
+        BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.h          \
+        BulletCollision/CollisionDispatch/btGhostObject.cpp                      \
+        BulletCollision/CollisionDispatch/btGhostObject.h                        \
+        BulletCollision/CollisionDispatch/btInternalEdgeUtility.cpp              \
+        BulletCollision/CollisionDispatch/btInternalEdgeUtility.h                \
 	BulletCollision/CollisionDispatch/SphereTriangleDetector.cpp		 \
 	BulletCollision/CollisionDispatch/SphereTriangleDetector.h		 \
 	BulletCollision/CollisionShapes/btBoxShape.cpp				 \
@@ -140,6 +157,58 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/CollisionShapes/btTriangleShape.h			 \
 	BulletCollision/CollisionShapes/btUniformScalingShape.cpp		 \
 	BulletCollision/CollisionShapes/btUniformScalingShape.h			 \
+        BulletCollision/CollisionShapes/btBox2dShape.cpp                         \
+        BulletCollision/CollisionShapes/btBox2dShape.h                           \
+        BulletCollision/CollisionShapes/btConvex2dShape.cpp                      \
+        BulletCollision/CollisionShapes/btConvex2dShape.h                        \
+        BulletCollision/CollisionShapes/btConvexPointCloudShape.cpp              \
+        BulletCollision/CollisionShapes/btConvexPointCloudShape.h                \
+        BulletCollision/CollisionShapes/btMaterial.h                             \
+        BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.cpp     \
+        BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.h       \
+        BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.cpp         \
+        BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h           \
+        BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.cpp   \
+        BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.h     \
+        BulletCollision/CollisionShapes/btTriangleInfoMap.h                      \
+        BulletCollision/Gimpact/btBoxCollision.h                                 \
+        BulletCollision/Gimpact/btClipPolygon.h                                  \
+        BulletCollision/Gimpact/btContactProcessing.cpp                          \
+        BulletCollision/Gimpact/btContactProcessing.h                            \
+        BulletCollision/Gimpact/btGImpactBvh.cpp                                 \
+        BulletCollision/Gimpact/btGImpactBvh.h                                   \
+        BulletCollision/Gimpact/btGImpactCollisionAlgorithm.cpp                  \
+        BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h                    \
+        BulletCollision/Gimpact/btGImpactMassUtil.h                              \
+        BulletCollision/Gimpact/btGImpactQuantizedBvh.cpp                        \
+        BulletCollision/Gimpact/btGImpactQuantizedBvh.h                          \
+        BulletCollision/Gimpact/btGImpactShape.cpp                               \
+        BulletCollision/Gimpact/btGImpactShape.h                                 \
+        BulletCollision/Gimpact/btGenericPoolAllocator.cpp                       \
+        BulletCollision/Gimpact/btGenericPoolAllocator.h                         \
+        BulletCollision/Gimpact/btGeometryOperations.h                           \
+        BulletCollision/Gimpact/btQuantization.h                                 \
+        BulletCollision/Gimpact/btTriangleShapeEx.cpp                            \
+        BulletCollision/Gimpact/btTriangleShapeEx.h                              \
+        BulletCollision/Gimpact/gim_array.h                                      \
+        BulletCollision/Gimpact/gim_basic_geometry_operations.h                  \
+        BulletCollision/Gimpact/gim_bitset.h                                     \
+        BulletCollision/Gimpact/gim_box_collision.h                              \
+        BulletCollision/Gimpact/gim_box_set.cpp                                  \
+        BulletCollision/Gimpact/gim_box_set.h                                    \
+        BulletCollision/Gimpact/gim_clip_polygon.h                               \
+        BulletCollision/Gimpact/gim_contact.cpp                                  \
+        BulletCollision/Gimpact/gim_contact.h                                    \
+        BulletCollision/Gimpact/gim_geom_types.h                                 \
+        BulletCollision/Gimpact/gim_geometry.h                                   \
+        BulletCollision/Gimpact/gim_hash_table.h                                 \
+        BulletCollision/Gimpact/gim_linear_math.h                                \
+        BulletCollision/Gimpact/gim_math.h                                       \
+        BulletCollision/Gimpact/gim_memory.cpp                                   \
+        BulletCollision/Gimpact/gim_memory.h                                     \
+        BulletCollision/Gimpact/gim_radixsort.h                                  \
+        BulletCollision/Gimpact/gim_tri_collision.cpp                            \
+        BulletCollision/Gimpact/gim_tri_collision.h                              \
 	BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp	 \
 	BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.h	 \
 	BulletCollision/NarrowPhaseCollision/btConvexCast.cpp			 \
@@ -150,8 +219,6 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h			 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp			 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpa2.h			 \
-	BulletCollision/NarrowPhaseCollision/btGjkEpa.cpp			 \
-	BulletCollision/NarrowPhaseCollision/btGjkEpa.h				 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp	 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h	 \
 	BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp		 \
@@ -173,6 +240,9 @@ libbulletcollision_a_SOURCES = \
 libbulletdynamics_a_SOURCES	= \
 	Bullet-C-Api.h					 			 \
 	btBulletDynamicsCommon.h			 			 \
+        BulletDynamics/Character/btCharacterControllerInterface.h                \
+        BulletDynamics/Character/btKinematicCharacterController.cpp              \
+        BulletDynamics/Character/btKinematicCharacterController.h                \
 	BulletDynamics/ConstraintSolver/btConeTwistConstraint.cpp		 \
 	BulletDynamics/ConstraintSolver/btConeTwistConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btConstraintSolver.h			 \
@@ -184,30 +254,25 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btHingeConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btHingeConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btJacobianEntry.h			 \
-	BulletDynamics/ConstraintSolver/btOdeJoint.cpp				 \
-	BulletDynamics/ConstraintSolver/btOdeTypedJoint.cpp			 \
-	BulletDynamics/ConstraintSolver/btOdeMacros.h				 \
-	BulletDynamics/ConstraintSolver/btOdeSolverBody.h			 \
-	BulletDynamics/ConstraintSolver/btOdeContactJoint.cpp			 \
-	BulletDynamics/ConstraintSolver/btOdeContactJoint.h			 \
-	BulletDynamics/ConstraintSolver/btSliderConstraint.cpp			 \
-	BulletDynamics/ConstraintSolver/btSliderConstraint.h			 \
-	BulletDynamics/ConstraintSolver/btSorLcp.cpp				 \
-	BulletDynamics/ConstraintSolver/btSorLcp.h				 \
-	BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.h	 \
-	BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.cpp	 \
-	BulletDynamics/ConstraintSolver/btOdeJoint.h				 \
-	BulletDynamics/ConstraintSolver/btOdeTypedJoint.h			 \
 	BulletDynamics/ConstraintSolver/btPoint2PointConstraint.cpp		 \
 	BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h		 \
 	BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp	 \
 	BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h	 \
+	BulletDynamics/ConstraintSolver/btSliderConstraint.cpp			 \
+	BulletDynamics/ConstraintSolver/btSliderConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.cpp		 \
 	BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h		 \
 	BulletDynamics/ConstraintSolver/btSolverBody.h				 \
 	BulletDynamics/ConstraintSolver/btSolverConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.h			 \
+        BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.cpp        \
+        BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h          \
+        BulletDynamics/ConstraintSolver/btHinge2Constraint.cpp                   \
+        BulletDynamics/ConstraintSolver/btHinge2Constraint.h                     \
+        BulletDynamics/ConstraintSolver/btUniversalConstraint.cpp                \
+        BulletDynamics/ConstraintSolver/btUniversalConstraint.h                  \
+        BulletDynamics/Dynamics/btActionInterface.h                              \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp			 \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.h			 \
 	BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp			 \

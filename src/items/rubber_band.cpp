@@ -215,7 +215,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
     if(m_owner->getBody()->getBroadphaseHandle())
         m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
-    if(ray_callback.HasHit())
+    if(ray_callback.hasHit())
     {
         Vec3 pos(ray_callback.m_hitPointWorld);
         UserPointer *up = (UserPointer*)ray_callback.m_collisionObject->getUserPointer();

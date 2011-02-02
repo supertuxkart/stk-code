@@ -236,7 +236,7 @@
          impact of roll. -->
     <stability roll-influence="0.03"
                chassis-linear-damping="0.2"
-               chassis-angular-damping="30.2"/>
+               chassis-angular-damping="0"/>
 
     <!-- Parameters for the upright constraint, which keeps karts upright. -->
     <upright tolerance="0.2" max-force="30"/>

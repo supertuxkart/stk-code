@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modes/world_with_rank.hpp"
+#include "utils/aligned_array.hpp"
 
 class SFXBase;
 
@@ -69,7 +70,7 @@ protected:
       * This member is not strictly private but try not to use it directly outside
       * tightly related classes (e.g. AI)
       */
-    std::vector<KartInfo> m_kart_info;
+    AlignedArray<KartInfo> m_kart_info;
 
     
     /** Linear races can trigger rescues for one additional reason : shortcuts.

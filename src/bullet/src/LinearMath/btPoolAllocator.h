@@ -19,6 +19,7 @@ subject to the following restrictions:
 #include "btScalar.h"
 #include "btAlignedAllocator.h"
 
+///The btPoolAllocator class allows to efficiently allocate a large pool of objects, instead of dynamically allocating them separately.
 class btPoolAllocator
 {
 	int				m_elemSize;
@@ -33,7 +34,7 @@ public:
 		:m_elemSize(elemSize),
 		m_maxElements(maxElements)
 	{
-		m_pool = (unsigned char*) btAlignedAlloc(m_elemSize*m_maxElements,16);
+		m_pool = (unsigned char*) btAlignedAlloc( static_cast<unsigned int>(m_elemSize*m_maxElements),16);
 
 		unsigned char* p = m_pool;
         m_firstFree = p;
@@ -56,8 +57,15 @@ public:
 		return m_freeCount;
 	}
 
+	int getUsedCount() const
+	{
+		return m_maxElements - m_freeCount;
+	}
+
 	void*	allocate(int size)
 	{
+		// release mode fix
+		(void)size;
 		btAssert(!size || size<=m_elemSize);
 		btAssert(m_freeCount>0);
         void* result = m_firstFree;
@@ -88,6 +96,20 @@ public:
         }
 	}
 
+	int	getElementSize() const
+	{
+		return m_elemSize;
+	}
+
+	unsigned char*	getPoolAddress()
+	{
+		return m_pool;
+	}
+
+	const unsigned char*	getPoolAddress() const
+	{
+		return m_pool;
+	}
 
 };
 

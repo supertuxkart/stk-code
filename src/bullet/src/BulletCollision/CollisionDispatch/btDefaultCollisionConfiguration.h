@@ -18,14 +18,41 @@ subject to the following restrictions:
 
 #include "btCollisionConfiguration.h"
 class btVoronoiSimplexSolver;
-class btGjkEpaPenetrationDepthSolver;
+class btConvexPenetrationDepthSolver;
+
+struct	btDefaultCollisionConstructionInfo
+{
+	btStackAlloc*		m_stackAlloc;
+	btPoolAllocator*	m_persistentManifoldPool;
+	btPoolAllocator*	m_collisionAlgorithmPool;
+	int					m_defaultMaxPersistentManifoldPoolSize;
+	int					m_defaultMaxCollisionAlgorithmPoolSize;
+	int					m_customCollisionAlgorithmMaxElementSize;
+	int					m_defaultStackAllocatorSize;
+	int					m_useEpaPenetrationAlgorithm;
+
+	btDefaultCollisionConstructionInfo()
+		:m_stackAlloc(0),
+		m_persistentManifoldPool(0),
+		m_collisionAlgorithmPool(0),
+		m_defaultMaxPersistentManifoldPoolSize(4096),
+		m_defaultMaxCollisionAlgorithmPoolSize(4096),
+		m_customCollisionAlgorithmMaxElementSize(0),
+		m_defaultStackAllocatorSize(0),
+		m_useEpaPenetrationAlgorithm(true)
+	{
+	}
+};
+
 
 
 ///btCollisionConfiguration allows to configure Bullet collision detection
 ///stack allocator, pool memory allocators
-///todo: describe the meaning
+///@todo: describe the meaning
 class	btDefaultCollisionConfiguration : public btCollisionConfiguration
 {
+
+protected:
 
 	int	m_persistentManifoldPoolSize;
 	
@@ -35,12 +62,13 @@ class	btDefaultCollisionConfiguration : public btCollisionConfiguration
 	btPoolAllocator*	m_persistentManifoldPool;
 	bool	m_ownsPersistentManifoldPool;
 
+
 	btPoolAllocator*	m_collisionAlgorithmPool;
 	bool	m_ownsCollisionAlgorithmPool;
 
 	//default simplex/penetration depth solvers
 	btVoronoiSimplexSolver*	m_simplexSolver;
-	btGjkEpaPenetrationDepthSolver*	m_pdSolver;
+	btConvexPenetrationDepthSolver*	m_pdSolver;
 	
 	//default CreationFunctions, filling the m_doubleDispatch table
 	btCollisionAlgorithmCreateFunc*	m_convexConvexCreateFunc;
@@ -50,8 +78,11 @@ class	btDefaultCollisionConfiguration : public btCollisionConfiguration
 	btCollisionAlgorithmCreateFunc*	m_swappedCompoundCreateFunc;
 	btCollisionAlgorithmCreateFunc* m_emptyCreateFunc;
 	btCollisionAlgorithmCreateFunc* m_sphereSphereCF;
+#ifdef USE_BUGGY_SPHERE_BOX_ALGORITHM
 	btCollisionAlgorithmCreateFunc* m_sphereBoxCF;
 	btCollisionAlgorithmCreateFunc* m_boxSphereCF;
+#endif //USE_BUGGY_SPHERE_BOX_ALGORITHM
+
 	btCollisionAlgorithmCreateFunc* m_boxBoxCF;
 	btCollisionAlgorithmCreateFunc*	m_sphereTriangleCF;
 	btCollisionAlgorithmCreateFunc*	m_triangleSphereCF;
@@ -60,7 +91,8 @@ class	btDefaultCollisionConfiguration : public btCollisionConfiguration
 	
 public:
 
-	btDefaultCollisionConfiguration(btStackAlloc*	stackAlloc=0,btPoolAllocator*	persistentManifoldPool=0,btPoolAllocator*	collisionAlgorithmPool=0);
+
+	btDefaultCollisionConfiguration(const btDefaultCollisionConstructionInfo& constructionInfo = btDefaultCollisionConstructionInfo());
 
 	virtual ~btDefaultCollisionConfiguration();
 
@@ -80,9 +112,22 @@ public:
 		return m_stackAlloc;
 	}
 
+	virtual	btVoronoiSimplexSolver*	getSimplexSolver()
+	{
+		return m_simplexSolver;
+	}
+
 
 	virtual btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc(int proxyType0,int proxyType1);
 
+	///Use this method to allow to generate multiple contact points between at once, between two objects using the generic convex-convex algorithm.
+	///By default, this feature is disabled for best performance.
+	///@param numPerturbationIterations controls the number of collision queries. Set it to zero to disable the feature.
+	///@param minimumPointsPerturbationThreshold is the minimum number of points in the contact cache, above which the feature is disabled
+	///3 is a good value for both params, if you want to enable the feature. This is because the default contact cache contains a maximum of 4 points, and one collision query at the unperturbed orientation is performed first.
+	///See Bullet/Demos/CollisionDemo for an example how this feature gathers multiple points.
+	///@todo we could add a per-object setting of those parameters, for level-of-detail collision detection.
+	void	setConvexConvexMultipointIterations(int numPerturbationIterations=3, int minimumPointsPerturbationThreshold = 3);
 
 };
 

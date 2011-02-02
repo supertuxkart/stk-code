@@ -24,6 +24,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -44,8 +45,8 @@ namespace GUIEngine
         float m_rotation_target;
         
         ptr_vector<scene::IMesh, REF> m_models;
-        std::vector<Vec3> m_model_location;
-        std::vector<Vec3> m_model_scale;
+        AlignedArray<Vec3> m_model_location;
+        AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
         
         video::ITexture* m_texture;

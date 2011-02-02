@@ -1007,8 +1007,8 @@ IrrDriver::RTTProvider::~RTTProvider()
  * the location of the first mesh.
  */
 void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
-                                           std::vector<Vec3>& mesh_location,
-                                           std::vector<Vec3>& mesh_scale,
+                                           AlignedArray<Vec3>& mesh_location,
+                                           AlignedArray<Vec3>& mesh_scale,
                                            const std::vector<int>& model_frames)
 {         
     if (model_frames[0] == -1)

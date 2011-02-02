@@ -29,6 +29,7 @@ using namespace irr;
 
 #include "io/xml_node.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;
@@ -154,7 +155,7 @@ private:
 
     /** List of all end camera information. This information is shared 
      *  between all cameras, so it's static. */
-    static std::vector<EndCameraInformation> m_end_cameras;
+    static AlignedArray<EndCameraInformation> m_end_cameras;
 
     /** Index of the current end camera. */
     unsigned int m_current_end_camera;

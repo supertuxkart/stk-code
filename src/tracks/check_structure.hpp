@@ -22,6 +22,7 @@
 
 #include <vector>
 
+#include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 
 class XMLNode;
@@ -65,7 +66,7 @@ protected:
     /** Stores the previous position of all karts. This is needed to detect
      *  when e.g. a check point is reached the first time, or a checkline is
      *  crossed. */
-    std::vector<Vec3> m_previous_position;
+    AlignedArray<Vec3> m_previous_position;
     /** Stores if this check structure is active (for a given kart). */
     std::vector<bool> m_is_active;
 

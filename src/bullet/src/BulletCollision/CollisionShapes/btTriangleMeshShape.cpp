@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -22,9 +22,17 @@ subject to the following restrictions:
 
 
 btTriangleMeshShape::btTriangleMeshShape(btStridingMeshInterface* meshInterface)
-: m_meshInterface(meshInterface)
+: btConcaveShape (), m_meshInterface(meshInterface)
 {
-	recalcLocalAabb();
+	m_shapeType = TRIANGLE_MESH_SHAPE_PROXYTYPE;
+	if(meshInterface->hasPremadeAabb())
+	{
+		meshInterface->getPremadeAabb(&m_localAabbMin, &m_localAabbMax);
+	}
+	else
+	{
+		recalcLocalAabb();
+	}
 }
 
 
@@ -40,21 +48,20 @@ void btTriangleMeshShape::getAabb(const btTransform& trans,btVector3& aabbMin,bt
 {
 
 	btVector3 localHalfExtents = btScalar(0.5)*(m_localAabbMax-m_localAabbMin);
+	localHalfExtents += btVector3(getMargin(),getMargin(),getMargin());
 	btVector3 localCenter = btScalar(0.5)*(m_localAabbMax+m_localAabbMin);
 	
 	btMatrix3x3 abs_b = trans.getBasis().absolute();  
 
-	btPoint3 center = trans(localCenter);
+	btVector3 center = trans(localCenter);
 
 	btVector3 extent = btVector3(abs_b[0].dot(localHalfExtents),
 		   abs_b[1].dot(localHalfExtents),
 		  abs_b[2].dot(localHalfExtents));
-	extent += btVector3(getMargin(),getMargin(),getMargin());
-
 	aabbMin = center - extent;
 	aabbMax = center + extent;
 
-	
+
 }
 
 void	btTriangleMeshShape::recalcLocalAabb()
@@ -84,7 +91,7 @@ public:
 	btVector3 m_supportVecLocal;
 
 	SupportVertexCallback(const btVector3& supportVecWorld,const btTransform& trans)
-		: m_supportVertexLocal(btScalar(0.),btScalar(0.),btScalar(0.)), m_worldTrans(trans) ,m_maxDot(btScalar(-1e30))
+		: m_supportVertexLocal(btScalar(0.),btScalar(0.),btScalar(0.)), m_worldTrans(trans) ,m_maxDot(btScalar(-BT_LARGE_FLOAT))
 		
 	{
 		m_supportVecLocal = supportVecWorld * m_worldTrans.getBasis();
@@ -192,7 +199,7 @@ btVector3 btTriangleMeshShape::localGetSupportingVertex(const btVector3& vec) co
 
 	SupportVertexCallback supportCallback(vec,ident);
 
-	btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+	btVector3 aabbMax(btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT),btScalar(BT_LARGE_FLOAT));
 	
 	processAllTriangles(&supportCallback,-aabbMax,aabbMax);
 		
@@ -200,3 +207,5 @@ btVector3 btTriangleMeshShape::localGetSupportingVertex(const btVector3& vec) co
 
 	return supportVertex;
 }
+
+

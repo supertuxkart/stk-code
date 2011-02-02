@@ -26,6 +26,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include "utils/aligned_array.hpp"
+
 enum VECTOR_TYPE
 {
     REF,
@@ -37,7 +39,7 @@ class ptr_vector
 {
 
 public:
-    std::vector<TYPE*> contentsVector;
+    AlignedArray<TYPE*> contentsVector;
 
 ptr_vector()
 {
@@ -76,7 +78,7 @@ TYPE* get(const int ID)
 {
 
     assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
 
     return contentsVector[ID];
 }
@@ -85,7 +87,7 @@ const TYPE* getConst(const int ID) const
 {
     
     assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
     
     return contentsVector[ID];
 }
@@ -98,26 +100,43 @@ int size() const
 void erase(const int ID)
 {
     assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
 
     delete ( TYPE *) contentsVector[ID];
-
+#ifdef USE_ALIGNED
+    const unsigned int amount = (unsigned int)contentsVector.size();
+    for(unsigned int i=ID; i<amount-1; i++)
+    {
+        contentsVector[i]=contentsVector[i+1];
+    }
+    contentsVector.pop_back();
+#else
     contentsVector.erase(contentsVector.begin()+ID);
+#endif
 }
 
 TYPE* remove(const int ID)
 {
     assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
 
     TYPE* out = contentsVector[ID];
+#ifdef USE_ALIGNED
+    const unsigned int amount = (unsigned int)contentsVector.size();
+    for(unsigned int i=ID; i<amount-1; i++)
+    {
+        contentsVector[i]=contentsVector[i+1];
+    }
+    contentsVector.pop_back();
+#else
     contentsVector.erase(contentsVector.begin()+ID);
+#endif
     return out;
 }
 
 bool contains( const TYPE* instance ) const
 {
-    const unsigned int amount = contentsVector.size();
+    const unsigned int amount = (unsigned int)contentsVector.size();
     for (unsigned int n=0; n<amount; n++)
     {
         const TYPE * pointer = contentsVector[n];
@@ -129,7 +148,7 @@ bool contains( const TYPE* instance ) const
 
 void clearAndDeleteAll()
 {
-    for (unsigned int n=0; n<contentsVector.size(); n++)
+    for (unsigned int n=0; n<(unsigned int)contentsVector.size(); n++)
     {
         TYPE * pointer = contentsVector[n];
         delete pointer;
@@ -144,13 +163,13 @@ void clearAndDeleteAll()
 
 TYPE& operator[](const unsigned int ID)
 {
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
 
     return *(contentsVector[ID]);
 }
 const TYPE& operator[](const unsigned int ID) const
 {
-    assert((unsigned int)ID < contentsVector.size());
+    assert((unsigned int)ID < (unsigned int)contentsVector.size());
 
     return *(contentsVector[ID]);
 }
@@ -165,13 +184,22 @@ void clearWithoutDeleting()
   */
 void remove(TYPE* obj)
 {
-    for(unsigned int n=0; n<contentsVector.size(); n++)
+    for(unsigned int n=0; n<(unsigned int)contentsVector.size(); n++)
     {
 
         TYPE * pointer = contentsVector[n];
         if(pointer == obj)
         {
+#ifdef USE_ALIGNED
+            const unsigned int amount = (unsigned int)contentsVector.size();
+            for(unsigned int i=n; i<amount-1; i++)
+            {
+                contentsVector[i]=contentsVector[i+1];
+            }
+            contentsVector.pop_back();
+#else
             contentsVector.erase(contentsVector.begin()+n);
+#endif
             return;
         }
     }
@@ -184,18 +212,46 @@ void remove(TYPE* obj)
   */
 bool erase(void* obj)
 {
-    for(unsigned int n=0; n<contentsVector.size(); n++)
+    for(unsigned int n=0; n<(unsigned int)contentsVector.size(); n++)
     {
         TYPE * pointer = contentsVector[n];
         if((void*)pointer == obj)
         {
+#ifdef USE_ALIGNED
+             const unsigned int amount = (unsigned int)contentsVector.size();
+             for(unsigned int i=n; i<amount-1; i++)
+             {
+                 contentsVector[i]=contentsVector[i+1];
+             }
+             contentsVector.pop_back();
+#else
             contentsVector.erase(contentsVector.begin()+n);
+#endif
             delete pointer;
             return true;
         }
     }
     return false;
 }
+
+    void insertionSort(unsigned int start=0)
+    {
+        for(unsigned int j=start; j<(unsigned)contentsVector.size()-1; j++)
+        {
+            if(*(contentsVector[j])<*(contentsVector[j+1])) continue;
+            // Now search the proper place for contentsVector[j+1] 
+            // in the sorted section contentsVectot[start:j]
+            TYPE* t=contentsVector[j+1];
+            unsigned int i = j+1;
+            do
+            {
+                contentsVector[i] = contentsVector[i-1];
+                i--;
+            } while (i>0 && *t<*(contentsVector[i-1]));
+            contentsVector[i]=t;
+        }
+    }   // insertionSort
+
 
 };
 

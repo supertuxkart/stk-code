@@ -1,6 +1,6 @@
 /*
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2007 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -16,9 +16,10 @@ subject to the following restrictions:
 #include "btUniformScalingShape.h"
 
 btUniformScalingShape::btUniformScalingShape(	btConvexShape* convexChildShape,btScalar uniformScalingFactor):
-m_childConvexShape(convexChildShape),
+btConvexShape (), m_childConvexShape(convexChildShape),
 m_uniformScalingFactor(uniformScalingFactor)
 {
+	m_shapeType = UNIFORM_SCALING_SHAPE_PROXYTYPE;
 }
 	
 btUniformScalingShape::~btUniformScalingShape()

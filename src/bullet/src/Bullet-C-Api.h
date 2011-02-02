@@ -38,37 +38,37 @@ typedef plReal	plQuaternion[4];
 extern "C" { 
 #endif
 
-/*	Particular physics SDK */
+/**	Particular physics SDK (C-API) */
 	PL_DECLARE_HANDLE(plPhysicsSdkHandle);
 
-/* 	Dynamics world, belonging to some physics SDK */
+/** 	Dynamics world, belonging to some physics SDK (C-API)*/
 	PL_DECLARE_HANDLE(plDynamicsWorldHandle);
 
-/* Rigid Body that can be part of a Dynamics World */	
+/** Rigid Body that can be part of a Dynamics World (C-API)*/	
 	PL_DECLARE_HANDLE(plRigidBodyHandle);
 
-/* 	Collision Shape/Geometry, property of a Rigid Body */
+/** 	Collision Shape/Geometry, property of a Rigid Body (C-API)*/
 	PL_DECLARE_HANDLE(plCollisionShapeHandle);
 
-/* Constraint for Rigid Bodies */
+/** Constraint for Rigid Bodies (C-API)*/
 	PL_DECLARE_HANDLE(plConstraintHandle);
 
-/* Triangle Mesh interface */
+/** Triangle Mesh interface (C-API)*/
 	PL_DECLARE_HANDLE(plMeshInterfaceHandle);
 
-/* Broadphase Scene/Proxy Handles */
+/** Broadphase Scene/Proxy Handles (C-API)*/
 	PL_DECLARE_HANDLE(plCollisionBroadphaseHandle);
 	PL_DECLARE_HANDLE(plBroadphaseProxyHandle);
 	PL_DECLARE_HANDLE(plCollisionWorldHandle);
 
-/*
+/**
 	Create and Delete a Physics SDK	
 */
 
 	extern	plPhysicsSdkHandle	plNewBulletSdk(); //this could be also another sdk, like ODE, PhysX etc.
 	extern	void		plDeletePhysicsSdk(plPhysicsSdkHandle	physicsSdk);
 
-/* Collision World, not strictly necessary, you can also just create a Dynamics World with Rigid Bodies which internally manages the Collision World with Collision Objects */
+/** Collision World, not strictly necessary, you can also just create a Dynamics World with Rigid Bodies which internally manages the Collision World with Collision Objects */
 
 	typedef void(*btBroadphaseCallback)(void* clientData, void* object1,void* object2);
 
@@ -147,6 +147,7 @@ extern "C" {
 	extern  void plSetPosition(plRigidBodyHandle object, const plVector3 position);
 	extern  void plSetOrientation(plRigidBodyHandle object, const plQuaternion orientation);
 	extern	void plSetEuler(plReal yaw,plReal pitch,plReal roll, plQuaternion orient);
+	extern	void plSetOpenGLMatrix(plRigidBodyHandle object, plReal* matrix);
 
 	typedef struct plRayCastResult {
 		plRigidBodyHandle		m_body;  
@@ -162,10 +163,14 @@ extern "C" {
 	/* extern  plRigidBodyHandle plObjectCast(plDynamicsWorldHandle world, const plVector3 rayStart, const plVector3 rayEnd, plVector3 hitpoint, plVector3 normal); */
 
 	/* Continuous Collision Detection API */
+	
+	// needed for source/blender/blenkernel/intern/collision.c
+	double plNearestPoints(float p1[3], float p2[3], float p3[3], float q1[3], float q2[3], float q3[3], float *pa, float *pb, float normal[3]);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif //BULLET_C_API_H
 
