@@ -86,6 +86,7 @@ ParticleKind* ParticleKindManager::getParticles(const char* name)
         }
         catch (std::runtime_error& e)
         {
+            (void)e;   // remove compiler warning
             // not found in track directory, let's try globally...
         }
     }
