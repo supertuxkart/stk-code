@@ -81,7 +81,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     
     for (int t=0; t<trackAmount; t++)
     {
-        const int from_y      = y1 + height_of_one_line*(t+1);
+        const int from_y = y1 + height_of_one_line*(t+1);
         
         Track* track = track_manager->getTrack(tracks[t]);
         stringw lineText;
@@ -97,7 +97,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         }
                 
         LabelWidget* widget = new LabelWidget();
-        widget->setText(lineText);
+        widget->setText(translations->fribidize(lineText));
         widget->m_x = 20;
         widget->m_y = from_y;
         widget->m_w = m_area.getWidth()/2 - 20;
