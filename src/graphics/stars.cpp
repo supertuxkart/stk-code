@@ -29,7 +29,7 @@ const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;
 const float STAR_SIZE = 0.4f;
 
-Stars::Stars(scene::ISceneNode* parentKart)
+Stars::Stars(scene::ISceneNode* parentKart, core::vector3df center)
 {
     m_parent_kart_node = parentKart;
     m_enabled = false;
@@ -37,7 +37,7 @@ Stars::Stars(scene::ISceneNode* parentKart)
     video::ITexture* texture = irr_driver->getTexture("starparticle.png");
     Material* star_material = material_manager->getMaterial("starparticle.png");
     
-    m_center = core::vector3df(0.0f, 0.6f, 0.0f);
+    m_center = center;
     
     for (int n=0; n<STAR_AMOUNT; n++)
     {

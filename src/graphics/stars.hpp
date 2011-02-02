@@ -48,7 +48,7 @@ private:
     float m_remaining_time;
     
  public:
-           Stars  (scene::ISceneNode* parentKart);
+           Stars  (scene::ISceneNode* parentKart, core::vector3df center);
           ~Stars  ();
     void   showFor(float time);
     void   reset();

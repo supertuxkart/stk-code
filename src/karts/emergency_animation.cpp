@@ -59,7 +59,8 @@ void EmergencyAnimation::reset()
 
     // Create the stars effect in the first reset
     if(!m_stars_effect)
-        m_stars_effect = new Stars(m_kart->getNode());
+        m_stars_effect = new Stars(m_kart->getNode(),
+                                   core::vector3df(0.0f, m_kart->getKartModel()->getModel()->getBoundingBox().MaxEdge.Y, 0.0f));
 
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
