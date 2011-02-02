@@ -32,7 +32,6 @@
 #  include <sys/stat.h>
 #  include <sys/types.h>
 // For RemoveDirectory
-#  include <Windows.h>
 #else
 #  include <direct.h>
 #endif
