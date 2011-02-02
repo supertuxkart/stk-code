@@ -40,6 +40,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/ptr_vector.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -326,31 +327,40 @@ void RaceManager::next()
 
 //-----------------------------------------------------------------------------
 
+/** This class is only used in computeGPRanks, but the C++ standard
+ *  forbids the usage of local data type in templates, so we have to
+ *  declare it outside of the function. This class is used to store
+ *  and compare data for determining the GP rank.
+ */
+namespace computeGPRanksData
+{
+class SortData
+{
+public:
+    int m_score;
+    int m_position;
+    float m_race_time;
+    bool operator<(const SortData &a)
+    {
+        return ( (m_score > a.m_score) || 
+               (m_score == m_score && m_race_time < a.m_race_time) );
+    }
+
+};   // SortData
+}   // namespace
+
 void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
     const unsigned int NUM_KARTS = getNumberOfKarts();
-    class SortData
-    {
-    public:
-        int m_score;
-        int m_position;
-        float m_race_time;
-        bool operator<(const SortData &a)
-        {
-            return ( m_score > a.m_score || 
-                     m_score == m_score && m_race_time < a.m_race_time);
-        }
-
-    };   // SortData
-    ptr_vector<SortData> sort_data;
+    ptr_vector<computeGPRanksData::SortData> sort_data;
 
     // Ignore the first kart if it's a follow-the-leader race.
     int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
     if (start)
     {
         // fill values for leader
-        SortData *sd = new SortData;
+        computeGPRanksData::SortData *sd = new computeGPRanksData::SortData();
 
         sd->m_position  = -1;
         sd->m_score     = -1;
@@ -360,7 +370,7 @@ void RaceManager::computeGPRanks()
     }
     for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
     {
-        SortData *sd = new SortData;
+        computeGPRanksData::SortData *sd = new computeGPRanksData::SortData();
         sd->m_position  = kart_id;
         sd->m_score     = race_manager->getKartScore(kart_id);
         sd->m_race_time = race_manager->getOverallTime(kart_id);
