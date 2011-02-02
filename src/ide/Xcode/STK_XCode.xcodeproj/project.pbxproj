@@ -158,11 +158,6 @@
 		95557AAE12FA14AA00CC458E /* Changelog in Resources */ = {isa = PBXBuildFile; fileRef = 9555791212FA14A900CC458E /* Changelog */; };
 		95557AAF12FA14AA00CC458E /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9555791312FA14A900CC458E /* ChangeLog.txt */; };
 		95557AB012FA14AA00CC458E /* copy_bullet_files in Resources */ = {isa = PBXBuildFile; fileRef = 9555791412FA14A900CC458E /* copy_bullet_files */; };
-		95557AB112FA14AA00CC458E /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 9555791512FA14A900CC458E /* LICENSE */; };
-		95557AB212FA14AA00CC458E /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 9555791612FA14A900CC458E /* Makefile */; };
-		95557AB312FA14AA00CC458E /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 9555791712FA14A900CC458E /* Makefile.am */; };
-		95557AB412FA14AA00CC458E /* Makefile.in in Resources */ = {isa = PBXBuildFile; fileRef = 9555791812FA14A900CC458E /* Makefile.in */; };
-		95557AB512FA14AA00CC458E /* README in Resources */ = {isa = PBXBuildFile; fileRef = 9555791912FA14A900CC458E /* README */; };
 		95557AB612FA14AA00CC458E /* btAlignedAllocator.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791C12FA14A900CC458E /* btAlignedAllocator.Po */; };
 		95557AB712FA14AA00CC458E /* btAxisSweep3.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791D12FA14A900CC458E /* btAxisSweep3.Po */; };
 		95557AB812FA14AA00CC458E /* btBoxBoxCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791E12FA14A900CC458E /* btBoxBoxCollisionAlgorithm.Po */; };
@@ -370,9 +365,6 @@
 		95557B8512FA14AA00CC458E /* btGeometryUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557A9312FA14A900CC458E /* btGeometryUtil.cpp */; };
 		95557B8612FA14AA00CC458E /* btQuickprof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557A9E12FA14A900CC458E /* btQuickprof.cpp */; };
 		95557B8712FA14AA00CC458E /* btSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557AA212FA14A900CC458E /* btSerializer.cpp */; };
-		95557B8812FA14AA00CC458E /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 95557AA812FA14A900CC458E /* Makefile */; };
-		95557B8912FA14AA00CC458E /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 95557AA912FA14A900CC458E /* Makefile.am */; };
-		95557B8A12FA14AA00CC458E /* Makefile.in in Resources */ = {isa = PBXBuildFile; fileRef = 95557AAA12FA14A900CC458E /* Makefile.in */; };
 		95557B8B12FA14AA00CC458E /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 95557AAB12FA14A900CC458E /* VERSION */; };
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
@@ -608,11 +600,6 @@
 		9555791212FA14A900CC458E /* Changelog */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Changelog; path = ../../bullet/Changelog; sourceTree = SOURCE_ROOT; };
 		9555791312FA14A900CC458E /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChangeLog.txt; path = ../../bullet/ChangeLog.txt; sourceTree = SOURCE_ROOT; };
 		9555791412FA14A900CC458E /* copy_bullet_files */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = copy_bullet_files; path = ../../bullet/copy_bullet_files; sourceTree = SOURCE_ROOT; };
-		9555791512FA14A900CC458E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../../bullet/LICENSE; sourceTree = SOURCE_ROOT; };
-		9555791612FA14A900CC458E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../bullet/Makefile; sourceTree = SOURCE_ROOT; };
-		9555791712FA14A900CC458E /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = ../../bullet/Makefile.am; sourceTree = SOURCE_ROOT; };
-		9555791812FA14A900CC458E /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.in; path = ../../bullet/Makefile.in; sourceTree = SOURCE_ROOT; };
-		9555791912FA14A900CC458E /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README; path = ../../bullet/README; sourceTree = SOURCE_ROOT; };
 		9555791C12FA14A900CC458E /* btAlignedAllocator.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btAlignedAllocator.Po; path = ../../bullet/src/.deps/btAlignedAllocator.Po; sourceTree = SOURCE_ROOT; };
 		9555791D12FA14A900CC458E /* btAxisSweep3.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btAxisSweep3.Po; path = ../../bullet/src/.deps/btAxisSweep3.Po; sourceTree = SOURCE_ROOT; };
 		9555791E12FA14A900CC458E /* btBoxBoxCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBoxBoxCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btBoxBoxCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
@@ -994,9 +981,6 @@
 		95557AA512FA14A900CC458E /* btTransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTransform.h; path = ../../bullet/src/LinearMath/btTransform.h; sourceTree = SOURCE_ROOT; };
 		95557AA612FA14A900CC458E /* btTransformUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTransformUtil.h; path = ../../bullet/src/LinearMath/btTransformUtil.h; sourceTree = SOURCE_ROOT; };
 		95557AA712FA14A900CC458E /* btVector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btVector3.h; path = ../../bullet/src/LinearMath/btVector3.h; sourceTree = SOURCE_ROOT; };
-		95557AA812FA14A900CC458E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../bullet/src/Makefile; sourceTree = SOURCE_ROOT; };
-		95557AA912FA14A900CC458E /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = ../../bullet/src/Makefile.am; sourceTree = SOURCE_ROOT; };
-		95557AAA12FA14A900CC458E /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.in; path = ../../bullet/src/Makefile.in; sourceTree = SOURCE_ROOT; };
 		95557AAB12FA14A900CC458E /* VERSION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = VERSION; path = ../../bullet/VERSION; sourceTree = SOURCE_ROOT; };
 		9556A87C119EF976009C558F /* options_screen_audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_audio.cpp; path = ../../states_screens/options_screen_audio.cpp; sourceTree = SOURCE_ROOT; };
 		9556A87D119EF976009C558F /* options_screen_audio.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_audio.hpp; path = ../../states_screens/options_screen_audio.hpp; sourceTree = SOURCE_ROOT; };
@@ -1615,11 +1599,6 @@
 				9555791212FA14A900CC458E /* Changelog */,
 				9555791312FA14A900CC458E /* ChangeLog.txt */,
 				9555791412FA14A900CC458E /* copy_bullet_files */,
-				9555791512FA14A900CC458E /* LICENSE */,
-				9555791612FA14A900CC458E /* Makefile */,
-				9555791712FA14A900CC458E /* Makefile.am */,
-				9555791812FA14A900CC458E /* Makefile.in */,
-				9555791912FA14A900CC458E /* README */,
 				9555791A12FA14A900CC458E /* src */,
 				95557AAB12FA14A900CC458E /* VERSION */,
 			);
@@ -1637,9 +1616,6 @@
 				9555797A12FA14A900CC458E /* BulletCollision */,
 				95557A5112FA14A900CC458E /* BulletDynamics */,
 				95557A8B12FA14A900CC458E /* LinearMath */,
-				95557AA812FA14A900CC458E /* Makefile */,
-				95557AA912FA14A900CC458E /* Makefile.am */,
-				95557AAA12FA14A900CC458E /* Makefile.in */,
 			);
 			name = src;
 			path = ../../bullet/src;
@@ -2923,10 +2899,6 @@
 				95557AAE12FA14AA00CC458E /* Changelog in Resources */,
 				95557AAF12FA14AA00CC458E /* ChangeLog.txt in Resources */,
 				95557AB012FA14AA00CC458E /* copy_bullet_files in Resources */,
-				95557AB112FA14AA00CC458E /* LICENSE in Resources */,
-				95557AB312FA14AA00CC458E /* Makefile.am in Resources */,
-				95557AB412FA14AA00CC458E /* Makefile.in in Resources */,
-				95557AB512FA14AA00CC458E /* README in Resources */,
 				95557AB612FA14AA00CC458E /* btAlignedAllocator.Po in Resources */,
 				95557AB712FA14AA00CC458E /* btAxisSweep3.Po in Resources */,
 				95557AB812FA14AA00CC458E /* btBoxBoxCollisionAlgorithm.Po in Resources */,
@@ -3018,8 +2990,6 @@
 				95557B0E12FA14AA00CC458E /* btWheelInfo.Po in Resources */,
 				95557B0F12FA14AA00CC458E /* Bullet-C-API.Po in Resources */,
 				95557B1012FA14AA00CC458E /* SphereTriangleDetector.Po in Resources */,
-				95557B8912FA14AA00CC458E /* Makefile.am in Resources */,
-				95557B8A12FA14AA00CC458E /* Makefile.in in Resources */,
 				95557B8B12FA14AA00CC458E /* VERSION in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3242,7 +3212,6 @@
 				9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */,
 				9542FD4C12D3E0D700C00366 /* particle_kind.cpp in Sources */,
 				9528C71612D69494006E9167 /* particle_kind_manager.cpp in Sources */,
-				95557AB212FA14AA00CC458E /* Makefile in Sources */,
 				95557B1112FA14AA00CC458E /* btAxisSweep3.cpp in Sources */,
 				95557B1212FA14AA00CC458E /* btBroadphaseProxy.cpp in Sources */,
 				95557B1312FA14AA00CC458E /* btCollisionAlgorithm.cpp in Sources */,
@@ -3359,7 +3328,6 @@
 				95557B8512FA14AA00CC458E /* btGeometryUtil.cpp in Sources */,
 				95557B8612FA14AA00CC458E /* btQuickprof.cpp in Sources */,
 				95557B8712FA14AA00CC458E /* btSerializer.cpp in Sources */,
-				95557B8812FA14AA00CC458E /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
