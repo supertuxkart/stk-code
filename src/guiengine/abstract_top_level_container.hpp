@@ -32,7 +32,7 @@ namespace GUIEngine
     {
     protected:
         /** the widgets in this screen */
-        ptr_vector<Widget, HOLD> m_widgets;
+        PtrVector<Widget, HOLD> m_widgets;
         
         /**
          * AbstractTopLevelContainer is generally able to determine its first widget just fine,
@@ -48,7 +48,7 @@ namespace GUIEngine
          */
         Widget* m_last_widget;
         
-        void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        void addWidgetsRecursively(PtrVector<Widget>& widgets, Widget* parent=NULL);
 
     
     public:
@@ -78,11 +78,11 @@ namespace GUIEngine
             return outCasted;
         }
         
-        static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
-        static Widget* getWidget(const int id, ptr_vector<Widget>* within_vector);
+        static Widget* getWidget(const char* name, PtrVector<Widget>* within_vector);
+        static Widget* getWidget(const int id, PtrVector<Widget>* within_vector);
       
-        Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
-        Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
+        Widget* getFirstWidget(PtrVector<Widget>* within_vector=NULL);
+        Widget* getLastWidget(PtrVector<Widget>* within_vector=NULL);
         
         bool isMyChild(Widget* widget) const;
     };

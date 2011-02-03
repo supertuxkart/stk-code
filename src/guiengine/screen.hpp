@@ -114,7 +114,7 @@ namespace GUIEngine
          * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
          * with little analysis or layout performed on them.
          */
-        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to,
+        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& append_to,
                                        irr::gui::IGUIElement* parent = NULL);
         
         
@@ -159,7 +159,7 @@ namespace GUIEngine
           * \brief invoked when irrlicht widgets added to the screen have been deleted
           * so that we can drop any pointer to them we had (they are now dangling pointers)
           */
-        void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
+        void elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
         
         /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
          (useful e.g. on reschange, when sizes have changed and must be re-calculated) */

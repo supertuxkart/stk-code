@@ -52,7 +52,7 @@ namespace GUIEngine
          * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
          * of the remaining children, as well as absolute sizes and locations.
          */
-        static void calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
+        static void calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
                                     Widget* parent=NULL);
         
     };

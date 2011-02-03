@@ -43,7 +43,7 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     /** Contains the custom widget shown for every player. (ref only since we're adding them to a
       * Screen, and the Screen will take ownership of these widgets)
       */
-    ptr_vector<PlayerKartWidget, REF> m_kart_widgets;
+    PtrVector<PlayerKartWidget, REF> m_kart_widgets;
     
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     friend class PlayerKartWidget;

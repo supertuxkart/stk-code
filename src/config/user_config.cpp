@@ -31,7 +31,7 @@
 #include "utils/ptr_vector.hpp"
 
 class UserConfigParam;
-static ptr_vector<UserConfigParam, REF> all_params;
+static PtrVector<UserConfigParam, REF> all_params;
 
 
 // X-macros

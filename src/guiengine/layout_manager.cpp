@@ -239,7 +239,7 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
 
 // ----------------------------------------------------------------------------
 
-void LayoutManager::calculateLayout(ptr_vector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
+void LayoutManager::calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
                                     Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();

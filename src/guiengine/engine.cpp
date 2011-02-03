@@ -588,10 +588,10 @@ namespace GUIEngine
     }
     using namespace Private;
     
-    ptr_vector<Widget, REF> needsUpdate;
+    PtrVector<Widget, REF> needsUpdate;
     
     //FIXME: the contents of this vector are never ever freed
-    ptr_vector<Screen, REF> g_loaded_screens;
+    PtrVector<Screen, REF> g_loaded_screens;
     
     float dt = 0;
     

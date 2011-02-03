@@ -1006,7 +1006,7 @@ IrrDriver::RTTProvider::~RTTProvider()
  *  to be the root, and all following meshes will have their locations relative to
  * the location of the first mesh.
  */
-void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
+void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh, 
                                            AlignedArray<Vec3>& mesh_location,
                                            AlignedArray<Vec3>& mesh_scale,
                                            const std::vector<int>& model_frames)

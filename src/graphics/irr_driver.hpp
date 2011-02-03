@@ -205,7 +205,7 @@ public:
           *                         When frame is not -1, the corresponding IMesh must be an IAnimatedMesh.
           * \precondition           The 3 vectors have the same size.
           */
-        void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
+        void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh, 
                            AlignedArray<Vec3>& mesh_location,
                            AlignedArray<Vec3>& mesh_scale,
                            const std::vector<int>& model_frames);

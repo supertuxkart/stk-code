@@ -353,7 +353,7 @@ void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
     const unsigned int NUM_KARTS = getNumberOfKarts();
-    ptr_vector<computeGPRanksData::SortData> sort_data;
+    PtrVector<computeGPRanksData::SortData> sort_data;
 
     // Ignore the first kart if it's a follow-the-leader race.
     int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);

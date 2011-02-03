@@ -1231,7 +1231,7 @@ void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool
 /** recursive function to render all sections (recursion allows to easily traverse the tree of children
   * and sub-children)
   */
-void Skin::renderSections(ptr_vector<Widget>* within_vector)
+void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
     if (within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
     

@@ -144,7 +144,7 @@ public:
     };
 
 
-    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers() 
+    const PtrVector<ActivePlayer, HOLD>& getActivePlayers() 
                                  { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);
     
@@ -185,7 +185,7 @@ private:
     /**
      * A list of all currently playing players.
      */
-    ptr_vector<ActivePlayer, HOLD> m_active_players;
+    PtrVector<ActivePlayer, HOLD> m_active_players;
 };
 
 #endif

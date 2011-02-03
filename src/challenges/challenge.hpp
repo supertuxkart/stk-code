@@ -59,18 +59,30 @@ private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
-    std::string              m_Id;                    // short, internal name for this challenge
-    irr::core::stringw       m_Name;                  // name used in menu for this challenge
-    irr::core::stringw       m_challenge_description; // Message the user gets when the feature is not yet unlocked
-    std::vector<UnlockableFeature> m_feature;         // Features to unlock
-    std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
+    /** Short, internal name for this challenge. */
+    std::string              m_Id;
+    /** Name used in menu for this challenge. */
+    irr::core::stringw       m_Name; 
+    /** Message the user gets when the feature is not yet unlocked. */
+    irr::core::stringw       m_challenge_description;
+    /** Features to unlock. */
+    std::vector<UnlockableFeature> m_feature;
+    /** What needs to be done before accessing this challenge. */
+    std::vector<std::string> m_prerequisites;
+    /** Version number of the challenge. */
+    int                      m_version;
+
 public:
              Challenge(const std::string &id, const std::string &name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
+    /** Returns the id of the challenge. */
     const std::string &getId() const              { return m_Id;                  }
+    /** Returns the name of the challenge. */
     const irr::core::stringw &getName() const     { return m_Name;                }
+    /** Sets the name of the challenge. */
     void  setName(const irr::core::stringw & s)   { m_Name = s;                   }
+    /** Sets the id of this challenge. */
     void  setId(const std::string& s)             { m_Id = s;                     }
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 

@@ -44,7 +44,7 @@ namespace GUIEngine
         float m_rotation_speed;
         float m_rotation_target;
         
-        ptr_vector<scene::IMesh, REF> m_models;
+        PtrVector<scene::IMesh, REF> m_models;
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;

@@ -284,7 +284,7 @@ namespace GUIEngine
         
         irr::gui::IGUISkin* getFallbackSkin() { return m_fallback_skin; }
 
-        void renderSections(ptr_vector<Widget>* within_vector=NULL);
+        void renderSections(PtrVector<Widget>* within_vector=NULL);
         void drawBgImage();
         void drawBGFadeColor();
         void drawBadgeOn(const Widget* widget, const irr::core::rect<irr::s32>& rect);

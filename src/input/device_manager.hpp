@@ -51,10 +51,10 @@ class DeviceManager: public NoCopy
 {
 private:
 
-    ptr_vector<KeyboardDevice, HOLD>    m_keyboards;
-    ptr_vector<GamePadDevice, HOLD>     m_gamepads;
-    ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
-    ptr_vector<GamepadConfig, HOLD>     m_gamepad_configs;
+    PtrVector<KeyboardDevice, HOLD>    m_keyboards;
+    PtrVector<GamePadDevice, HOLD>     m_gamepads;
+    PtrVector<KeyboardConfig, HOLD>    m_keyboard_configs;
+    PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
     core::array<SJoystickInfo>          m_irrlicht_gamepads;
     InputDevice*                        m_latest_used_device;
     PlayerAssignMode                    m_assign_mode;

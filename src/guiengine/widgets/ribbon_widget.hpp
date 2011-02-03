@@ -75,7 +75,7 @@ namespace GUIEngine
         virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
         virtual EventPropagation focused(const int playerID);
         
-        ptr_vector<irr::gui::IGUIStaticText, REF> m_labels;
+        PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
         IRibbonListener* m_listener;
         

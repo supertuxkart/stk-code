@@ -40,7 +40,7 @@ AbstractTopLevelContainer::AbstractTopLevelContainer()
     m_last_widget = NULL;
 }
 
-void AbstractTopLevelContainer::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
+void AbstractTopLevelContainer::addWidgetsRecursively(PtrVector<Widget>& widgets, Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
     
@@ -77,7 +77,7 @@ void AbstractTopLevelContainer::addWidgetsRecursively(ptr_vector<Widget>& widget
 
 // ----------------------------------------------------------------------------
 
-bool isMyChildHelperFunc(const ptr_vector<Widget>* within, const Widget* widget)
+bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
 {
     if (within->size() == 0) return false;
     
@@ -120,7 +120,7 @@ Widget* AbstractTopLevelContainer::getWidget(const int id)
 // -----------------------------------------------------------------------------
 
 Widget* AbstractTopLevelContainer::getWidget(const char* name, 
-                                             ptr_vector<Widget>* within_vector)
+                                             PtrVector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
     
@@ -143,7 +143,7 @@ Widget* AbstractTopLevelContainer::getWidget(const char* name,
 // -----------------------------------------------------------------------------
 
 Widget* AbstractTopLevelContainer::getWidget(const int id, 
-                                             ptr_vector<Widget>* within_vector)
+                                             PtrVector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
     
@@ -167,7 +167,7 @@ Widget* AbstractTopLevelContainer::getWidget(const int id,
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getFirstWidget(ptr_vector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getFirstWidget(PtrVector<Widget>* within_vector)
 {
     if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
@@ -201,7 +201,7 @@ Widget* AbstractTopLevelContainer::getFirstWidget(ptr_vector<Widget>* within_vec
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getLastWidget(ptr_vector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getLastWidget(PtrVector<Widget>* within_vector)
 {
     if (m_last_widget != NULL) return m_last_widget;
     if (within_vector == NULL) within_vector = &m_widgets;

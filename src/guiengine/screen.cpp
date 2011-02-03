@@ -184,7 +184,7 @@ void Screen::addWidgets()
  * Called when screen is removed. This means all irrlicht widgets this object has pointers
  * to are now gone. Set all references to NULL to avoid problems.
  */
-void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
+void Screen::elementsWereDeleted(PtrVector<Widget>* within_vector)
 {
     assert(m_magic_number == 0xCAFEC001);
     if (within_vector == NULL) within_vector = &m_widgets;

@@ -79,7 +79,10 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
 }
 
 //-----------------------------------------------------------------------------
-
+/** Sets that the given track will be unlocked if this challenge
+ *  is unlocked. 
+ *  \param track_name Name of the track to unlock.
+ */
 void Challenge::addUnlockTrackReward(const std::string &track_name)
 {
     
@@ -169,8 +172,9 @@ void Challenge::load(const XMLNode* challengesNode)
     bool finished=false;    
     node->get("solved", &finished);
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
-    
-    
+    m_version = 0;
+    node->get("version", &m_version);
+
     if(!finished) loadAdditionalInfo(node);
 }   // load
 

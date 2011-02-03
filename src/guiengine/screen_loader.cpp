@@ -34,7 +34,7 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to,
+void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& append_to,
                                 irr::gui::IGUIElement* parent)
 {
     // parse XML file

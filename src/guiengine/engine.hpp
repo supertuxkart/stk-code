@@ -91,7 +91,7 @@ namespace GUIEngine
     }
     
     /** Widgets that need to be notified at every frame can add themselves there (FIXME: unclean) */
-    extern ptr_vector<Widget, REF> needsUpdate;
+    extern PtrVector<Widget, REF> needsUpdate;
     
     /**
       * \brief               Call this method to init the GUI engine.

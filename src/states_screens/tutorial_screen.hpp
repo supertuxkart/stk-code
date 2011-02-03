@@ -20,7 +20,6 @@
 
 #include "irrlicht.h"
 #include "guiengine/screen.hpp"
-#include "utils/ptr_vector.hpp"
 #include "guiengine/CGUISpriteBank.h"
 
 using namespace irr::core;

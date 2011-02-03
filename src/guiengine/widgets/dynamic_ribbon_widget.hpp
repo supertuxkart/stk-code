@@ -70,7 +70,7 @@ namespace GUIEngine
         friend class RibbonWidget;
         
         /** A list of all listeners that registered to be notified on hover/selection */
-        ptr_vector<DynamicRibbonHoverListener> m_hover_listeners;
+        PtrVector<DynamicRibbonHoverListener> m_hover_listeners;
         
         virtual ~DynamicRibbonWidget();
         
@@ -177,7 +177,7 @@ namespace GUIEngine
         
         /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
          ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */
-        ptr_vector<RibbonWidget, REF> m_rows;
+        PtrVector<RibbonWidget, REF> m_rows;
         
         /** Dynamically add an item to the ribbon's list of items (will not be visible until you
           * call 'updateItemDisplay' or 'add').

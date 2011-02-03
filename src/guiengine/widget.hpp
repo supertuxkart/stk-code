@@ -214,7 +214,7 @@ namespace GUIEngine
          * be created automatically for logical widgets built with more than
          * one irrlicht widgets (e.g. Spinner)
          */
-        ptr_vector<Widget> m_children;
+        PtrVector<Widget> m_children;
         
         /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
         int m_badges;
@@ -488,7 +488,7 @@ namespace GUIEngine
         /**
           * \return a read-only view of the childrens of this widget, if any
           */
-        const ptr_vector<Widget>& getChildren() const { return m_children; }
+        const PtrVector<Widget>& getChildren() const { return m_children; }
         
         /**
           * \brief removes and deletes the child with the given PROP_ID

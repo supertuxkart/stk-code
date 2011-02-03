@@ -73,7 +73,7 @@ private:
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
-    ptr_vector<ParticleEmitter>     m_all_emitters;
+    PtrVector<ParticleEmitter>     m_all_emitters;
     scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     /** Minimum coordinates of this track. */

@@ -1437,7 +1437,7 @@ void KartSelectionScreen::allPlayersDone()
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     
-    const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
+    const PtrVector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
     
     // ---- Print selection (for debugging purposes)
     if(UserConfigParams::m_verbosity>=4)

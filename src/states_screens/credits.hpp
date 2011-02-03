@@ -34,7 +34,7 @@ class CreditsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 {
     float m_time_element;
     
-    ptr_vector<CreditsSection, HOLD> m_sections;
+    PtrVector<CreditsSection, HOLD> m_sections;
     CreditsSection* getCurrentSection();
     
     int x, y, w, h;
