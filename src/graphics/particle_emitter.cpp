@@ -185,8 +185,10 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         m_node->removeAll();
         m_node->removeAllAffectors();
     }
-    
-    m_node = irr_driver->addParticleNode();
+    else
+    {
+        m_node = irr_driver->addParticleNode();
+    }
     
     if (m_parent != NULL)
     {
