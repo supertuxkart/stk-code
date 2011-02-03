@@ -838,7 +838,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             std::string path;
             irr::core::vector3df emitter_origin;
             node->get("kind", &path);
-            node->get("origin", &emitter_origin);
+            node->getXYZ(&emitter_origin);
 
             try
             {
