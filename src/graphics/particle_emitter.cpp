@@ -86,10 +86,13 @@ public:
 ParticleEmitter::ParticleEmitter(const ParticleKind* type, core::vector3df position,
                                  scene::ISceneNode* parent) : m_position(position)
 {
+    assert(type != NULL);
+    m_magic_number = 0x58781325;
     m_node = NULL;
     m_particle_type = NULL;
     m_parent = parent;
     setParticleType(type);
+    assert(m_node != NULL);
     
 }   // KartParticleSystem
 
@@ -98,12 +101,18 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type, core::vector3df posit
  */
 ParticleEmitter::~ParticleEmitter()
 {
+    assert(m_magic_number == 0x58781325);
+    assert(m_node != NULL);
     irr_driver->removeNode(m_node);
+    
+    m_magic_number = 0xDEADBEEF;
 }   // ~ParticleEmitter
 
 //-----------------------------------------------------------------------------
 void ParticleEmitter::update()
 {
+    assert(m_magic_number == 0x58781325);
+    
     // No particles to emit, nothing to do
     if (m_emitter->getMinParticlesPerSecond() == 0) return;
     
@@ -164,6 +173,7 @@ void ParticleEmitter::setPosition(core::vector3df pos)
 
 void ParticleEmitter::setParticleType(const ParticleKind* type)
 {    
+    assert(m_magic_number == 0x58781325);
     if (m_particle_type == type) return; // already the right type
     
     if (m_node != NULL)
@@ -171,15 +181,14 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         m_node->removeAll();
         m_node->removeAllAffectors();
     }
-    else
+    
+    m_node = irr_driver->addParticleNode();
+    
+    if (m_parent != NULL)
     {
-        m_node = irr_driver->addParticleNode();
-        
-        if (m_parent != NULL)
-        {
-            m_node->setParent(m_parent);
-        }
+        m_node->setParent(m_parent);
     }
+    
     
     m_particle_type = type;
     
@@ -223,6 +232,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                    lifeTimeMin, lifeTimeMax,
                                                    m_particle_type->getAngleSpread() /* angle */
                                                    );
+            
+            irr_driver->getSceneManager()->addCubeSceneNode(0.1f, m_parent, -1, m_position);
+
             break;
         }
             

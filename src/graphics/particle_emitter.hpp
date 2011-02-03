@@ -49,6 +49,8 @@ private:
 
     const ParticleKind              *m_particle_type;
     
+    unsigned int m_magic_number;
+    
 public:
     
     ParticleEmitter             (const ParticleKind* type, core::vector3df position,
