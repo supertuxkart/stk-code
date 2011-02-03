@@ -19,6 +19,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -68,13 +69,17 @@ void OptionsScreenInput2::init()
     ButtonWidget* deleteBtn = this->getWidget<ButtonWidget>("delete");
     if (m_config->getType() != DEVICE_CONFIG_TYPE_KEYBOARD)
     {
-        //I18N: button to disable a gamepad configuration
-        if (m_config->isEnabled())  deleteBtn->setLabel(_("Disable Device"));
-        //I18N: button to enable a gamepad configuration
-        else                        deleteBtn->setLabel(_("Enable Device"));
-            
-            
-        //deleteBtn->setDeactivated();
+        core::stringw label = (m_config->isEnabled() ? //I18N: button to disable a gamepad configuration
+                                                      _("Disable Device")
+                                                     : //I18N: button to enable a gamepad configuration
+                                                      _("Enable Device"));
+        
+        // Make sure button is wide enough as the text is being changed away from the original value
+        core::dimension2d<u32> size = GUIEngine::getFont()->getDimension(label.c_str());
+        const int needed = size.Width + deleteBtn->getWidthNeededAroundLabel();
+        if (deleteBtn->m_w < needed) deleteBtn->m_w = needed;
+        
+        deleteBtn->setLabel(label);
     }
     else
     {
@@ -90,6 +95,14 @@ void OptionsScreenInput2::init()
             deleteBtn->setActivated();
         }
     }
+    
+    // Make the two buttons the same length, not strictly needed but will look nicer...
+    ButtonWidget* backBtn = this->getWidget<ButtonWidget>("back_to_device_list");
+    if (backBtn->m_w < deleteBtn->m_w) backBtn->m_w   = deleteBtn->m_w;
+    else                               deleteBtn->m_w = backBtn->m_w;
+    
+    backBtn->moveIrrlichtElement();
+    deleteBtn->moveIrrlichtElement();
     
     LabelWidget* label = this->getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str() );

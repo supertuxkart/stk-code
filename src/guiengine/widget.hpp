@@ -204,16 +204,7 @@ namespace GUIEngine
 
         /** Whether to reserve an ID in 'm_reserved_id' when widget is added */
         bool m_reserve_id;
-               
-        /** When inferring widget size from its label length, this method will be called to
-          * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getWidthNeededAroundLabel()  const { return 0; }
-        
-        /** When inferring widget size from its label length, this method will be called to
-         * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getHeightNeededAroundLabel() const { return 0; }
-        
-        
+
         /** Type of this widget */
         WidgetType m_type;
         
@@ -368,6 +359,15 @@ namespace GUIEngine
          * Get the underlying irrLicht GUI element
          */
         irr::gui::IGUIElement* getIrrlichtElement() { return m_element; }
+        
+        void moveIrrlichtElement()
+        {
+            if (m_element != NULL)
+            {
+                m_element->setRelativePosition( irr::core::recti(irr::core::position2di(m_x, m_y),
+                                                                 irr::core::dimension2di(m_w, m_h) ) );
+            }
+        }
         
         bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
 
@@ -534,6 +534,14 @@ namespace GUIEngine
         
         bool searchInsideMe() const { return m_check_inside_me; }
 
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getWidthNeededAroundLabel()  const { return 0; }
+        
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getHeightNeededAroundLabel() const { return 0; }
+        
         /**
           * \}
           */
