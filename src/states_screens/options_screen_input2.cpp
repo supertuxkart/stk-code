@@ -76,16 +76,20 @@ void OptionsScreenInput2::init()
             
         //deleteBtn->setDeactivated();
     }
-    else if (input_manager->getDeviceList()->getKeyboardAmount() < 2)
-    {
-        // don't allow deleting the last config
-        deleteBtn->setDeactivated();
-    }
     else
     {
-        deleteBtn->setActivated();
+        deleteBtn->setLabel(_("Delete Configuration"));
+        
+        if (input_manager->getDeviceList()->getKeyboardAmount() < 2)
+        {
+            // don't allow deleting the last config
+            deleteBtn->setDeactivated();
+        }
+        else
+        {
+            deleteBtn->setActivated();
+        }
     }
-
     
     LabelWidget* label = this->getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str() );
