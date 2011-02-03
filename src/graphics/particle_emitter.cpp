@@ -233,7 +233,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                    m_particle_type->getAngleSpread() /* angle */
                                                    );
             
-            irr_driver->getSceneManager()->addCubeSceneNode(0.1f, m_parent, -1, m_position);
+            //irr_driver->getSceneManager()->addCubeSceneNode(0.1f, m_parent, -1, m_position);
 
             break;
         }
