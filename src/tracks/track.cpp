@@ -843,6 +843,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             try
             {
                 ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
+                if (kind == NULL)
+                {
+                    throw std::runtime_error(path + " could not be loaded");
+                }
                 ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
                 m_all_emitters.push_back(emitter);
             }
