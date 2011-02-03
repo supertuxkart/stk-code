@@ -40,11 +40,12 @@ public:
         m_start_fading = start;
         m_end_fading = end;
         assert(m_end_fading >= m_start_fading);
-    }
-    
+    }   // FadeAwayAffector
+    // ------------------------------------------------------------------------
     virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
     {
-        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+        scene::ICameraSceneNode* curr_cam = 
+            irr_driver->getSceneManager()->getActiveCamera();
         const core::vector3df& cam_pos = curr_cam->getPosition();
         
         // printf("Affect called with now=%u, camera=%s\n", now, curr_cam->getName());
@@ -71,20 +72,23 @@ public:
                 curr.color.setAlpha((int)((distance_squared - m_start_fading) 
                                         / (m_end_fading - m_start_fading)));
             }
-        }
-    }
-    
+        }   // for n<count
+    }   // affect
+
+    // ------------------------------------------------------------------------
     virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
     {
         // FIXME: this method seems to make sense only for built-in affectors
         return scene::EPAT_FADE_OUT;
     }
     
-};
+};   // FadeAwayAffector
 
-
-ParticleEmitter::ParticleEmitter(const ParticleKind* type, core::vector3df position,
-                                 scene::ISceneNode* parent) : m_position(position)
+// ============================================================================
+ParticleEmitter::ParticleEmitter(const ParticleKind* type, 
+                                 const core::vector3df &position,
+                                 scene::ISceneNode* parent) 
+               : m_position(position)
 {
     assert(type != NULL);
     m_magic_number = 0x58781325;
@@ -164,7 +168,7 @@ void ParticleEmitter::setCreationRate(float f)
 
 //-----------------------------------------------------------------------------
 
-void ParticleEmitter::setPosition(core::vector3df pos)
+void ParticleEmitter::setPosition(const core::vector3df &pos)
 {
     m_node->setPosition(pos);
 }
@@ -295,4 +299,4 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         m_node->addAffector(faa);
         faa->drop();
     }
-}
+}   // setParticleType

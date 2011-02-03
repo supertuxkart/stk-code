@@ -53,13 +53,14 @@ private:
     
 public:
     
-    ParticleEmitter             (const ParticleKind* type, core::vector3df position,
+    ParticleEmitter             (const ParticleKind* type, 
+                                 const core::vector3df &position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
     virtual void update         ();
     void         setCreationRate(float f);
     
-    void         setPosition(core::vector3df pos);
+    void         setPosition(const core::vector3df &pos);
     
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
     
