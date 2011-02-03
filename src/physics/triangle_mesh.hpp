@@ -24,6 +24,7 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "physics/user_pointer.hpp"
+#include "utils/aligned_array.hpp"
 
 class Material;
 
@@ -40,15 +41,46 @@ private:
     btTriangleMesh               m_mesh;
     btDefaultMotionState        *m_motion_state;
     btCollisionShape            *m_collision_shape;
+    /** The three normals for each triangle. */
+    AlignedArray<btVector3>      m_normals;
 public:
          TriangleMesh();
         ~TriangleMesh();
     void addTriangle(const btVector3 &t1, const btVector3 &t2, 
-                     const btVector3 &t3, const Material* m);
+                     const btVector3 &t3, const btVector3 &n1,
+                     const btVector3 &n2, const btVector3 &n3,
+                     const Material* m);
     void createBody(btCollisionObject::CollisionFlags flags=
                          (btCollisionObject::CollisionFlags)0);
     void removeBody();
-    const Material* getMaterial(int n) const {return m_triangleIndex2Material[n];}
+    btVector3 getInterpolatedNormal(unsigned int index,
+                                    const btVector3 &position) const;
+    // ------------------------------------------------------------------------
+    const Material* getMaterial(int n) const 
+                                          {return m_triangleIndex2Material[n];}
+    // ------------------------------------------------------------------------
+    void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
+                     btVector3 *p3) const
+    {
+        const IndexedMeshArray &m = m_mesh.getIndexedMeshArray();
+        btVector3 *p = &(((btVector3*)(m[0].m_vertexBase))[3*indx]);
+        *p1 = p[0];
+        *p2 = p[1];
+        *p3 = p[2];
+    }   // getTriangle
+    // ------------------------------------------------------------------------
+    /** Returns the normals of the triangle with the given index.
+     *  \param indx Index of the triangle to get the three normals of.
+     *  \result n1,n2,n3 The three normals. */
+    void getNormals(unsigned int indx, btVector3 *n1, btVector3 *n2,
+                    btVector3 *n3) const
+    {
+        assert(indx < m_triangleIndex2Material.size());
+        unsigned int n = indx*3;
+        *n1 = m_normals[n  ];
+        *n2 = m_normals[n+1];
+        *n3 = m_normals[n+2];
+    }   // getNormals
 };
 #endif
 /* EOF */

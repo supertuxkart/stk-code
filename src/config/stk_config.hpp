@@ -83,6 +83,8 @@ public:
                                          or reverse point order.             */
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
+    bool  m_smooth_normals;          /**< If normals for raycasts for wheels
+                                         should be interpolated.             */
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near

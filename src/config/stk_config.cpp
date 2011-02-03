@@ -158,6 +158,7 @@ void STKConfig::init_defaults()
     m_max_track_version        = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
+    m_smooth_normals           = false;
     m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -220,6 +221,11 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         leader_node->get("intervals",     &m_leader_intervals    );
         leader_node->get("time-per-kart", &m_leader_time_per_kart);
+    }
+
+    if (const XMLNode *physics_node= root->getNode("physics"))
+    {
+        physics_node->get("smooth-normals", &m_smooth_normals );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))

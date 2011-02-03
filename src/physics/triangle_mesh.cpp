@@ -46,10 +46,22 @@ TriangleMesh::~TriangleMesh()
 }   // ~TriangleMesh
 
 // -----------------------------------------------------------------------------
+/** Adds a triangle to the bullet mesh. It also stores the material used for
+ *  this triangle, and the three normals.
+ *  \param t1,t2,t3 Points of the triangle.
+ *  \param n1,n2,n3 Normals at the corresponding points.
+ *  \param m Material used for this triangle
+ */
 void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2, 
-                               const btVector3 &t3, const Material* m)
+                               const btVector3 &t3, 
+                               const btVector3 &n1, const btVector3 &n2,
+                               const btVector3 &n3, 
+                               const Material* m)
 {
     m_triangleIndex2Material.push_back(m);
+    m_normals.push_back(n1);
+    m_normals.push_back(n2);
+    m_normals.push_back(n3);
     m_mesh.addTriangle(t1, t2, t3);
 }   // addTriangle
 
@@ -106,3 +118,51 @@ void TriangleMesh::removeBody()
 }   // removeBody
 
 // -----------------------------------------------------------------------------
+/** Interpolates the normal at the given position for the triangle with
+ *  a given index. The position must be inside of the given triangle.
+ *  \param index Index of the triangle to use.
+ *  \param position The position for which to interpolate the normal.
+ */
+btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
+                                              const btVector3 &position) const
+{
+    btVector3 p1, p2, p3;
+    getTriangle(index, &p1, &p2, &p3);
+    btVector3 n1, n2, n3;
+    getNormals(index, &n1, &n2, &n3);
+
+    // Compute the Barycentric coordinates of position inside  triangle 
+    // p1, p2, p3.
+    btVector3 edge1 = p2 - p1;
+    btVector3 edge2 = p3 - p1;
+
+    // Area of triangle ABC
+    btScalar p1p2p3 = edge1.cross(edge2).length2();
+
+    // Area of BCP
+    btScalar p2p3p = (p3 - p2).cross(position - p2).length2();
+
+    // Area of CAP
+    btScalar p3p1p = edge2.cross(position - p3).length2();
+    btScalar s = btSqrt(p2p3p / p1p2p3);
+    btScalar t = btSqrt(p3p1p / p1p2p3);
+    btScalar w = 1.0f - s - t;
+
+#ifdef NORMAL_DEBUGGING
+    btVector3 regen_position = s * p1 + t * p2 + w * p3;
+
+    if((regen_position - position).length2() >= 0.0001f)
+    {
+        printf("bary:\n");
+        printf("new: %f %f %f\n", regen_position.getX(),regen_position.getY(),regen_position.getZ());
+        printf("old: %f %f %f\n", position.getX(), position.getY(),position.getZ());
+        printf("stw: %f %f %f\n", s, t, w);
+        printf("p1:  %f %f %f\n", p1.getX(),p1.getY(),p1.getZ());
+        printf("p2:  %f %f %f\n", p2.getX(),p2.getY(),p2.getZ());
+        printf("p3:  %f %f %f\n", p3.getX(),p3.getY(),p3.getZ());
+        printf("pos: %f %f %f\n", position.getX(),position.getY(),position.getZ());
+    }
+#endif
+
+    return s*n1 + t*n2 + w*n3;
+}   // getInterpolatedNormal

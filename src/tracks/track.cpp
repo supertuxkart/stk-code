@@ -439,6 +439,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
         u16 *mbIndices = mb->getIndices();
         Vec3 vertices[3];
+        Vec3 normals[3];
         irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
         for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
             for(unsigned int k=0; k<3; k++) {
@@ -446,9 +447,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                 core::vector3df v = mbVertices[indx].Pos;
                 mat.transformVect(v);
                 vertices[k]=v;
+                normals[k]=mbVertices[indx].Normal;
             }   // for k
             if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
-                                         vertices[2], material     );
+                                         vertices[2], normals[0],
+                                         normals[1],  normals[2],
+                                         material                 );
         }   // for j
     }   // for i<getMeshBufferCount
 

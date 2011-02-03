@@ -46,6 +46,7 @@
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
+#include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -231,7 +232,7 @@ void Kart::createPhysics()
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster =
-        new btDefaultVehicleRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
+        new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btKart::btVehicleTuning();
     m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
     m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster,

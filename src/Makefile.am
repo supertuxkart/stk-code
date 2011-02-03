@@ -250,6 +250,8 @@ supertuxkart_SOURCES = \
  network/world_loaded_message.hpp \
  physics/btKart.cpp \
  physics/btKart.hpp \
+ physics/btKartRaycast.cpp \
+ phsycis/btKartRaycast.hpp \
  physics/btUprightConstraint.cpp \
  physics/btUprightConstraint.hpp \
  physics/irr_debug_drawer.cpp \

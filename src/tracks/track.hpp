@@ -217,19 +217,6 @@ public:
     /** Starts the music for this track. */
     void               startMusic        () const;
 
-    /** Returns the filename of this track. */
-    const std::string& getFilename       () const {return m_filename;           }
-
-    const std::string& getDesigner       () const {return m_designer;           }
-    
-    /** Returns an absolute path to the screenshot file of this track */
-    const std::string& getScreenshotFile () const {return m_screenshot;         }
-
-    /** Returns the start coordinates for a kart with a given index.
-     *  \param index Index of kart ranging from 0 to kart_num-1. */
-    btTransform        getStartTransform (unsigned int index) const     
-                                              {return m_start_transforms[index];}
-
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
@@ -237,13 +224,33 @@ public:
     void               update(float dt);
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
-    void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+    /** Sets the current ambient color for a kart with index k. */
+    void               setAmbientColor(const video::SColor &color,
+                                       unsigned int k);
+    void               handleExplosion(const Vec3 &pos, 
+                                       const PhysicalObject *mp) const;
+    // ------------------------------------------------------------------------
+    /** Returns the filename of this track. */
+    const std::string& getFilename       () const {return m_filename;           }
+    // ------------------------------------------------------------------------
+    /** Returns the name of the designer. */
+    const std::string& getDesigner       () const {return m_designer;           }
+    // ------------------------------------------------------------------------
+    /** Returns an absolute path to the screenshot file of this track */
+    const std::string& getScreenshotFile () const {return m_screenshot;         }
+    // ------------------------------------------------------------------------
+    /** Returns the start coordinates for a kart with a given index.
+     *  \param index Index of kart ranging from 0 to kart_num-1. */
+    btTransform        getStartTransform (unsigned int index) const     
+                                            {return m_start_transforms[index];}
+    // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const
                        { *min = &m_aabb_min; *max = &m_aabb_max; }
+    // ------------------------------------------------------------------------
     /** Returns the graph of quads, mainly for the AI. */
     QuadGraph&         getQuadGraph() const { return *m_quad_graph; }
-
+    // ------------------------------------------------------------------------
     /** Returns 'a' angle for quad n. This angle is used to position a kart
      *  after a rescue, and to detect wrong directions. This function will
      *  always return the angle towards the first successor, i.e. the angle
@@ -251,7 +258,8 @@ public:
      *  \param n Number of the quad for which the angle is asked. 
      */
     float              getAngle(int n) const 
-                                { return m_quad_graph->getAngleToNext(n, 0);    }
+                                { return m_quad_graph->getAngleToNext(n, 0);  }
+    // ------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map 
      *  texture.
      *  \param xyz Coordinates of the point to map.
@@ -260,23 +268,29 @@ public:
      */
     void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
                                 { m_quad_graph->mapPoint2MiniMap(xyz, draw_at); }
+    // ------------------------------------------------------------------------
     /** Returns the full path of a given file inside this track directory. */
     std::string        getTrackFile(const std::string &s) const 
                                 { return m_root+"/"+s; }
+    // ------------------------------------------------------------------------
     /** Returns the number of modes available for this track. */
     unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    // ------------------------------------------------------------------------
     /** Returns the name of the i-th. mode. */
     const std::string &getModeName(unsigned int i) const 
                                                 { return m_all_modes[i].m_name;}
+    // ------------------------------------------------------------------------
     /** Returns the default ambient color. */
     const video::SColor &getDefaultAmbientColor() const
                                                 { return m_default_ambient_color;}
-    /** Sets the current ambient color for a kart with index k. */
-    void   setAmbientColor(const video::SColor &color,
-                           unsigned int k);
+    // ------------------------------------------------------------------------
     /** Returns the far value for cameras. */
     float  getCameraFar() const { return m_camera_far; }
 
+    // ------------------------------------------------------------------------
+    /** Returns the triangle mesh for this track. */
+    const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
+    // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
                                            { return m_start_transforms.size(); }    
