@@ -833,7 +833,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         {
             m_check_manager = new CheckManager(*node, this);
         }
-        else if (name=="particle-emitter")
+        else if (name=="particle-emitter"  && UserConfigParams::m_graphical_effects)
         {
             std::string path;
             irr::core::vector3df emitter_origin;
