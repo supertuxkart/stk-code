@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\challenges\challenge.cpp" />
     <ClCompile Include="..\..\challenges\challenge_data.cpp" />
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
+    <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
@@ -406,6 +407,7 @@
     <ClInclude Include="..\..\network\race_state.hpp" />
     <ClInclude Include="..\..\network\remote_kart_info.hpp" />
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
+    <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />

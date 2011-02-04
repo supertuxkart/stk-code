@@ -714,6 +714,9 @@
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\physics\btKartRaycast.cpp">
+      <Filter>Quelldateien\physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1336,6 +1339,9 @@
     </ClInclude>
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp">
       <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\physics\btKartRaycast.hpp">
+      <Filter>Headerdateien\physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
