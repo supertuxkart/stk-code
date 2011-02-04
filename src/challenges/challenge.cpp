@@ -172,8 +172,6 @@ void Challenge::load(const XMLNode* challengesNode)
     bool finished=false;    
     node->get("solved", &finished);
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
-    m_version = 0;
-    node->get("version", &m_version);
 
     if(!finished) loadAdditionalInfo(node);
 }   // load
@@ -181,7 +179,8 @@ void Challenge::load(const XMLNode* challengesNode)
 //-----------------------------------------------------------------------------
 void Challenge::save(std::ofstream& writer)
 {
-    writer << "        <" << getId() << " solved=\"" << (isSolved() ? "true" : "false") << "\"";
+    writer << "        <" << getId() << " solved=\"" 
+           << (isSolved() ? "true" : "false") << "\"";
     if(!isSolved()) saveAdditionalInfo(writer);
     writer << " />\n";
 }   // save

@@ -106,10 +106,10 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
             if (f)
             {
                 fclose(f);
-                ChallengeData* newChallenge = NULL;
+                ChallengeData* new_challenge = NULL;
                 try
                 {
-                    newChallenge = new ChallengeData(filename);
+                    new_challenge = new ChallengeData(filename);
                 }
                 catch (std::runtime_error& ex)
                 {
@@ -117,7 +117,7 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
                               << ex.what() << " : challenge will be ignored.\n\n"; 
                     continue;
                 }
-                addChallenge(newChallenge);
+                addOrFreeChallenge(new_challenge);
             }   // if file
             
         }   // for file in files
@@ -125,37 +125,52 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
 }
 
 //-----------------------------------------------------------------------------
-void UnlockManager::addChallenge(Challenge *c)
+/** If a challenge is supported by this binary (i.e. has an appropriate 
+ *  challenge version number), add this challenge to the set of all challenges,
+ *  otherwise free the memory for this challenge.
+ *  \param c The challenge that is either stored or freed.
+ */
+void UnlockManager::addOrFreeChallenge(ChallengeData *c)
 {
-    m_all_challenges[c->getId()]=c;
-}   // addChallenge
+    if(isSupportedVersion(*c))
+        m_all_challenges[c->getId()]=c;
+    else
+    {
+        printf("[challenge] Challenge '%s' is not supported - ignored.\n",
+               c->getId().c_str());
+        delete c;
+    }
+}   // addOrFreeChallenge
 
 //-----------------------------------------------------------------------------
-
+/** Reads a challenge from the given filename. The challenge will then either
+ *  be stored, or (if the challenge version is not supported anymore
+ *  \param filename Name of the challenge file to read.
+ */
 void UnlockManager::addChallenge(const std::string& filename)
 {
-    ChallengeData* newChallenge = NULL;
+    ChallengeData* new_challenge = NULL;
     try
     {
-        newChallenge = new ChallengeData(filename);
-        newChallenge->check();
+        new_challenge = new ChallengeData(filename);
+        new_challenge->check();
     }
     catch (std::runtime_error& ex)
     {
         std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
                   << ex.what() << " : challenge will be ignored.\n\n"; 
-        if (newChallenge != NULL) delete newChallenge;
+        if (new_challenge != NULL) delete new_challenge;
         return;
     }
-    addChallenge(newChallenge);
+    addOrFreeChallenge(new_challenge);
     
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
-std::vector<const Challenge*> UnlockManager::getActiveChallenges()
+std::vector<const ChallengeData*> UnlockManager::getActiveChallenges()
 {
     computeActive();
-    std::vector<const Challenge*> all_active;
+    std::vector<const ChallengeData*> all_active;
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
     {
@@ -165,7 +180,7 @@ std::vector<const Challenge*> UnlockManager::getActiveChallenges()
 }   // getActiveChallenges
 
 //-----------------------------------------------------------------------------
-const Challenge* UnlockManager::getChallenge(const std::string& id)
+const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 {
     if(m_all_challenges.find(id)==m_all_challenges.end()) return NULL;
     return m_all_challenges[id];
@@ -224,10 +239,22 @@ void UnlockManager::save()
     challenge_file.close();
 }   // save
 
+//-----------------------------------------------------------------------------
 void UnlockManager::playLockSound() const
 {
     m_locked_sound->play();
-}
+}   // playLockSound
+
+//-----------------------------------------------------------------------------
+/** Test if the given challenge is supported by this binary.
+ *  \param challenge The challenge to test.
+ */
+bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
+{
+    // Test if challenge version number is in between minimum
+    // and maximum supported version.
+    return (challenge.getVersion()>=1 && challenge.getVersion()<=1);
+}   // isSupportedVersion
 
 //-----------------------------------------------------------------------------
 void UnlockManager::computeActive()
@@ -255,7 +282,7 @@ void UnlockManager::computeActive()
         for(std::vector<std::string>::iterator pre =pre_req.begin();
                                                pre!=pre_req.end(); pre++)
         {
-            const Challenge*p = getChallenge(*pre);
+            const ChallengeData *p = getChallenge(*pre);
             if(!p)
             {
                 fprintf(stderr,"Challenge prerequisite '%s' of '%s' not found - ignored\n",
@@ -310,7 +337,7 @@ void UnlockManager::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-void UnlockManager::lockFeature(Challenge* challenge)
+void UnlockManager::lockFeature(const ChallengeData *challenge)
 {
     const unsigned int amount = (unsigned int)challenge->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
@@ -319,7 +346,7 @@ void UnlockManager::lockFeature(Challenge* challenge)
 
 //-----------------------------------------------------------------------------
 
-void UnlockManager::unlockFeature(Challenge* c, bool do_save)
+void UnlockManager::unlockFeature(ChallengeData* c, bool do_save)
 {
     const unsigned int amount = (unsigned int)c->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
@@ -349,9 +376,9 @@ bool UnlockManager::isLocked(const std::string& feature)
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
 //-----------------------------------------------------------------------------
-const std::vector<const Challenge*>   UnlockManager::getUnlockedFeatures()
+const std::vector<const ChallengeData*>   UnlockManager::getUnlockedFeatures()
 {    
-    std::vector<const Challenge*>  out;
+    std::vector<const ChallengeData*>  out;
     
     for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
         i!=m_all_challenges.end();  i++)
@@ -362,9 +389,9 @@ const std::vector<const Challenge*>   UnlockManager::getUnlockedFeatures()
     return out;
 }
 //-----------------------------------------------------------------------------
-const std::vector<const Challenge*>   UnlockManager::getLockedChallenges()
+const std::vector<const ChallengeData*>   UnlockManager::getLockedChallenges()
 {    
-    std::vector<const Challenge*>  out;
+    std::vector<const ChallengeData*>  out;
     
     for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
         i!=m_all_challenges.end();  i++)

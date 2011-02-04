@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="tollway"
     name="Win a race on Tux Tollway"
     description="Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."

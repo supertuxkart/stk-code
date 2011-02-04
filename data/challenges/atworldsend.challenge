@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="islandfollow"
     name="Follow the Leader on a Desert Island"
     description="Win a Follow the Leader race with 3 AI karts on a Desert Island."

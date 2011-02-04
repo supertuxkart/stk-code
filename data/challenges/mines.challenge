@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="energyxr591"
     name="Collect fuel for your rocket"
     description="Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 minutes."

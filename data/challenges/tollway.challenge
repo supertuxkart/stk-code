@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="lighthousetime"
     name="Finish Lighthouse in 1:30"
     description="Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."

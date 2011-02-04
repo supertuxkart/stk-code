@@ -21,7 +21,7 @@
 
 #include <SColor.h>
 
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_data.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -484,7 +484,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challenge*> unlocked)
+void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const ChallengeData*> unlocked)
 {
     for (unsigned int n=0; n<unlocked.size(); n++)
     {

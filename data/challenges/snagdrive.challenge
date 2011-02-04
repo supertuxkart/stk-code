@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="tothemoonandbackgp"
     name="Win To the Moon and Back Grand Prix"
     description="Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."

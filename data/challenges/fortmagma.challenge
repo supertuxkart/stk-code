@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="minestime"
     name="Finish Mines in 3:00"
     description="Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."

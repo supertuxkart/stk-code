@@ -476,10 +476,12 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
     }
     else if (eventSource == "seeunlocked")
     {
-        std::vector<const Challenge*> unlocked = unlock_manager->getRecentlyUnlockedFeatures();
+        std::vector<const ChallengeData*> unlocked = 
+            unlock_manager->getRecentlyUnlockedFeatures();
         unlock_manager->clearUnlocked();
         
-        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        FeatureUnlockedCutScene* scene = 
+            FeatureUnlockedCutScene::getInstance();
         
         /*
         scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),

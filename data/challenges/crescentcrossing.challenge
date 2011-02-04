@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="energymathclass"
     name="Collect Nitro in Math Class"
     description="Finish with at least 10 points of nitro on three laps of Oliver's Math Class in under 55 seconds."

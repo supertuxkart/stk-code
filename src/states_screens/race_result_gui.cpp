@@ -130,7 +130,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         if(name=="top")
         {
-            std::vector<const Challenge*> unlocked = 
+            std::vector<const ChallengeData*> unlocked = 
                 unlock_manager->getRecentlyUnlockedFeatures();
             unlock_manager->clearUnlocked();
             FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();

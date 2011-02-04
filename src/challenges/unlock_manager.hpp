@@ -22,7 +22,7 @@
 
 #include <map>
 
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_data.hpp"
 #include "utils/no_copy.hpp"
 
 #include <fstream>
@@ -38,45 +38,46 @@ class UnlockManager : public NoCopy
 {
 private:
     SFXBase    *m_locked_sound;
-    typedef std::map<std::string, Challenge*> AllChallengesType;
+    typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
     std::map<std::string, bool>   m_locked_features;
-    std::vector<const Challenge*> m_unlocked_features;
+    std::vector<const ChallengeData*> m_unlocked_features;
     void       computeActive     ();
     void       load              ();
     
-    void       unlockFeature     (Challenge* c, bool do_save=true);
+    void       unlockFeature     (ChallengeData* c, bool do_save=true);
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
     
 public:
                UnlockManager     ();
               ~UnlockManager     ();
-    void       addChallenge      (Challenge *c);
+    void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
     void       save              ();
-    std::vector<const Challenge*> 
+    std::vector<const ChallengeData*> 
                getActiveChallenges();
     
     /** Returns the list of recently unlocked features (e.g. call at the end of a
         race to know if any features were unlocked) */
-    const std::vector<const Challenge*> 
+    const std::vector<const ChallengeData*> 
                getRecentlyUnlockedFeatures() {return m_unlocked_features;}
 
     /** Clear the list of recently unlocked challenges */
     void       clearUnlocked     () {m_unlocked_features.clear(); }
     
     /** Returns a complete list of all solved challenges */
-    const std::vector<const Challenge*>   getUnlockedFeatures();
+    const std::vector<const ChallengeData*>   getUnlockedFeatures();
 
     /** Returns the list of currently inaccessible (locked) challenges */
-    const std::vector<const Challenge*>   getLockedChallenges();
+    const std::vector<const ChallengeData*>   getLockedChallenges();
     
-    const Challenge *getChallenge      (const std::string& id);
+    const ChallengeData *getChallenge      (const std::string& id);
 
     void       raceFinished      ();
     void       grandPrixFinished ();
-    void       lockFeature       (Challenge* challenge);
+    void       lockFeature       (const ChallengeData *challenge);
     bool       isLocked          (const std::string& feature);
+    bool       isSupportedVersion(const ChallengeData &challenge);
 
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;

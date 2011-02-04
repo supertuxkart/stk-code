@@ -69,8 +69,6 @@ private:
     std::vector<UnlockableFeature> m_feature;
     /** What needs to be done before accessing this challenge. */
     std::vector<std::string> m_prerequisites;
-    /** Version number of the challenge. */
-    int                      m_version;
 
 public:
              Challenge(const std::string &id, const std::string &name);

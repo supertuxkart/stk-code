@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="worldsend"
     name="Win the At World's End Grand Prix"
     description="Come first in the At World's End Grand Prix with 3 Expert AI karts."

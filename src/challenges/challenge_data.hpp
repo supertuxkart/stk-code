@@ -45,6 +45,8 @@ private:
     std::string                    m_track_name;
     int                            m_energy;
     std::string                    m_filename;
+    /** Version number of the challenge. */
+    int                            m_version;
 
     void getUnlocks(const XMLNode *root, const std:: string type, REWARD_TYPE reward);
     void error(const char *id) const;
@@ -62,6 +64,8 @@ public:
     virtual void check() const;
     virtual bool raceFinished();
     virtual bool grandPrixFinished();
+    /** Returns the version number of this challenge. */
+    int          getVersion() const { return m_version; }
 };   // ChallengeData
 
 #endif   // HEADER_CHALLENGE_DATA_HPP

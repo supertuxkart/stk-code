@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="starfollow"
     name="Follow the Leader around the Solar System"
     description="Win a Follow the Leader race with 5 AI karts on Star track"

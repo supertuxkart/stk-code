@@ -394,10 +394,12 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
         
         if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
         {
-            std::vector<const Challenge*> unlocked = unlock_manager->getRecentlyUnlockedFeatures();
+            std::vector<const ChallengeData*> unlocked = 
+                unlock_manager->getRecentlyUnlockedFeatures();
             unlock_manager->clearUnlocked();
             
-            FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+            FeatureUnlockedCutScene* scene = 
+                FeatureUnlockedCutScene::getInstance();
             
             assert(unlocked.size() > 0);
             scene->addUnlockedThings(unlocked);

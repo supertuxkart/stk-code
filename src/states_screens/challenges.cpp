@@ -72,9 +72,9 @@ void ChallengesScreen::init()
     // Re-build track list everytime (accounts for locking changes, etc.)
     w->clearItems();
     
-    const std::vector<const Challenge*>& activeChallenges = unlock_manager->getActiveChallenges();
-    const std::vector<const Challenge*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
-    const std::vector<const Challenge*>& lockedChallenges = unlock_manager->getLockedChallenges();
+    const std::vector<const ChallengeData*>& activeChallenges = unlock_manager->getActiveChallenges();
+    const std::vector<const ChallengeData*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
+    const std::vector<const ChallengeData*>& lockedChallenges = unlock_manager->getLockedChallenges();
     
     const int activeChallengeAmount = activeChallenges.size();
     const int solvedChallengeAmount = solvedChallenges.size();

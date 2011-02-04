@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="penguinplaygroundgp"
     name="Win Penguin Playground Grand Prix"
     description="Win Penguin Playground Grand Prix with 3 Expert Level AI karts."

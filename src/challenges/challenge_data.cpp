@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "challenges/unlock_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
@@ -47,15 +48,28 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_track_name  = "";
     m_gp_id       = "";
     m_energy      = -1;
+    m_version     = 0;
 
     XMLNode *root = new XMLNode( filename );
-//    if(!root || root->getName()!="challenges")
     if(!root || root->getName()!="challenge")
     {
         delete root;
         std::ostringstream msg;
         msg << "Couldn't load challenge '" << filename << "': no challenge node.";
         throw std::runtime_error(msg.str());
+    }
+
+    std::string s;
+    if(!root->get("id", &s) ) error("id");
+    setId(s);
+
+    root->get("version", &m_version);
+    // No need to get the rest of the data if this challenge 
+    // is not supported anyway (id is needed for warning message)
+    if(!unlock_manager->isSupportedVersion(*this))
+    {
+        delete root;
+        return;
     }
 
     std::string mode;
@@ -78,13 +92,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     else
         error("minor");
 
-    std::string s;
     if(!root->get("name", &s) ) error("name");
     //std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
     setName( _(s.c_str()) );
-
-    if(!root->get("id", &s) ) error("id");
-    setId(s);
 
     if(!root->get("description", &s) ) error("description");
     setChallengeDescription( _(s.c_str()) );

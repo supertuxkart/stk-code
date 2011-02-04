@@ -26,7 +26,7 @@
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
-class Challenge;
+class ChallengeData;
 
 /**
   * \brief Screen shown when a feature has been unlocked
@@ -146,7 +146,7 @@ public:
     
     /** Call before showing up the screen to make whatever the passed challenges unlocked
       * come out of the chest */
-    void addUnlockedThings(const std::vector<const Challenge*> unlocked);
+    void addUnlockedThings(const std::vector<const ChallengeData*> unlocked);
     
     
     /** override from base class to handle escape press */

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <challenge
+    version="1"
     id="canyon"
     name="Win a race on Canyon"
     description="Win a 3 lap race on Canyon against 4 Expert level AI karts."
