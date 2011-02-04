@@ -217,19 +217,13 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             
             delete translations;
             
-#ifdef WIN32
-            // Avoid depreciation warnings in windows.
-#  define putenv(a)  _putenv(a)
-#endif
             if (selection == "system")
             {
-                putenv( "LANGUAGE=" );
+	      setenv( "LANGUAGE=", "", 1);
             }
             else
             {
-                char buffer[1024];
-                snprintf(buffer, 1024, "LANGUAGE=%s", selection.c_str());
-                putenv( buffer );
+		setenv("LANGUAGE", selection.c_str(), 1);
             }
             
             translations = new Translations();
