@@ -47,10 +47,10 @@ protected:
     unsigned int m_magic_number;
 #endif
     
-public:
-    
     IntUserConfigParam    m_use_frequency;
 
+public:
+    
     /**
       * Constructor to create a new player that didn't exist before
       */
@@ -114,6 +114,19 @@ public:
 		assert(m_magic_number == 0xABCD1234); 
         #endif
 		return m_is_guest_account;
+    }
+    
+    int getUseFrequency() const
+    {
+        if (m_is_guest_account) return -1;
+        else return m_use_frequency;
+    }
+    
+    
+    void incrementUseFrequency()
+    {
+        if (m_is_guest_account) m_use_frequency = -1;
+        else m_use_frequency++;
     }
  
 };

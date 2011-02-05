@@ -442,7 +442,7 @@ void UserConfig::addDefaultPlayer()
  */
 bool operator<(const PlayerProfile &a, const PlayerProfile &b)
 {
-    return a.m_use_frequency > b.m_use_frequency;
+    return a.getUseFrequency() > b.getUseFrequency();
 }   // operator<
 
 // -----------------------------------------------------------------------------

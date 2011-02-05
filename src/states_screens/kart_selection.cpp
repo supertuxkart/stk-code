@@ -1452,7 +1452,7 @@ void KartSelectionScreen::allPlayersDone()
     
     for (int n=0; n<players.size(); n++)
     {
-        StateManager::get()->getActivePlayer(n)->getProfile()->m_use_frequency++;
+        StateManager::get()->getActivePlayer(n)->getProfile()->incrementUseFrequency();
     }
     // ---- Give player info to race manager
     race_manager->setNumLocalPlayers( players.size() );
