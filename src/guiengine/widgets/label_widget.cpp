@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
+#include "utils/translation.hpp"
 
 #include <assert.h>
 
@@ -61,6 +62,10 @@ void LabelWidget::add()
     IGUIStaticText* irrwidget;    
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                       false, word_wrap, m_parent, -1);
+    
+#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
+    irrwidget->setRightToLeft( translations->isRTLLanguage() );
+#endif
     
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
