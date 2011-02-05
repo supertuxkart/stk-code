@@ -67,7 +67,7 @@ void ParticleKindManager::cleanUpTrackSpecificGfx()
 
 // ----------------------------------------------------------------------------
 
-ParticleKind* ParticleKindManager::getParticles(const char* name)
+ParticleKind* ParticleKindManager::getParticles(const std::string &name)
 {
     Track* t = track_manager->getTrack(race_manager->getTrackName());
     std::map<std::string, ParticleKind*>::iterator i;

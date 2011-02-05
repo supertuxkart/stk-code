@@ -880,6 +880,19 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         {
             Camera::readEndCamera(*node);
         }
+        else if(name=="weather")
+        {
+            std::string sky_particles;
+            node->get("particles", &sky_particles);
+            if (sky_particles.size() ==0)
+            {
+                fprintf(stderr, 
+                    "Warning: no weather particles found - ignored.\n");
+                continue;
+            }
+            m_sky_particles = 
+                ParticleKindManager::get()->getParticles(sky_particles);
+        }
         else
         {
             fprintf(stderr, "Warning: while loading track '%s', element '%s' was met but is unknown.\n",
@@ -1037,14 +1050,6 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         xml_node.get("texture-percent", &m_sky_texture_percent);
         xml_node.get("speed-x", &m_sky_dx );
         xml_node.get("speed-y", &m_sky_dy);
-        
-        std::string sky_particles;
-        xml_node.get("particles", &sky_particles);
-        if (sky_particles.size() > 0)
-        {
-            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
-        }
-
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")
     {
@@ -1062,25 +1067,11 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         {
             m_sky_type = SKY_BOX;
         }
-        
-        std::string sky_particles;
-        xml_node.get("particles", &sky_particles);
-        if (sky_particles.size() > 0)
-        {
-            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
-        }
     }
     else if (xml_node.getName() == "sky-color")
     {
         m_sky_type = SKY_COLOR;
         xml_node.get("rgb", &m_sky_color);
-        
-        std::string sky_particles;
-        xml_node.get("particles", &sky_particles);
-        if (sky_particles.size() > 0)
-        {
-            m_sky_particles = ParticleKindManager::get()->getParticles(sky_particles.c_str());
-        }
     }   // if sky-box
 }   // handleSky
 
