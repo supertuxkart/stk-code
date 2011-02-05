@@ -59,6 +59,11 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
     
     m_init_pos.setIdentity();
+    Vec3 hpr(m_init_hpr);
+    hpr.degreeToRad();
+    btQuaternion q;
+    q.setEuler(hpr.getX(), hpr.getY(), hpr.getZ());
+    m_init_pos.setRotation(q);
     Vec3 init_xyz(m_init_xyz);
     m_init_pos.setOrigin(init_xyz);
 
