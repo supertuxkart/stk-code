@@ -7,7 +7,7 @@
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="3" max="4"/>
+  <track-version min="3" max="5"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -37,7 +37,7 @@
   <startup penalty="1" />
 
   <!-- If the normals (for wheel raycasts) should be smoothened -->
-  <physics smooth-normals="false"/>
+  <physics smooth-normals="true"/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
