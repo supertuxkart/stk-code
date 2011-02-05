@@ -38,7 +38,8 @@ class PhysicalObject : public TrackObject
 public:
     /** The supported collision shapes. */
     enum bodyTypes {MP_NONE, 
-                    MP_CONE, MP_CONE_X, MP_CONE_Z,
+                    MP_CONE_Y, MP_CONE_X, MP_CONE_Z,
+                    MP_CYLINDER_Y, MP_CYLINDER_X, MP_CYLINDER_Z,
                     MP_BOX, MP_SPHERE};
 
 protected:

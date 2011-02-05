@@ -51,9 +51,15 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     xml_node.get("shape",  &shape   );
 
     m_body_type = MP_NONE;
-    if     (shape=="cone"||shape=="coneY") m_body_type = MP_CONE;
-    else if(shape=="coneX"  ) m_body_type = MP_CONE_X;
-    else if(shape=="coneZ"  ) m_body_type = MP_CONE_Z;
+    if     (shape=="cone"  ||
+            shape=="coneY"    ) m_body_type = MP_CONE_Y;
+    else if(shape=="coneX"    ) m_body_type = MP_CONE_X;
+    else if(shape=="coneZ"    ) m_body_type = MP_CONE_Z;
+    else if(shape=="cylinder"||
+            shape=="cylinderY") m_body_type = MP_CYLINDER_Y;
+    else if(shape=="cylinderX") m_body_type = MP_CYLINDER_X;
+    else if(shape=="cylinderZ") m_body_type = MP_CYLINDER_Z;
+
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
     else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
@@ -96,7 +102,7 @@ void PhysicalObject::init()
     Vec3 offset_from_center = -0.5f*(max+min);
     switch (m_body_type)
     {
-    case MP_CONE:   {
+    case MP_CONE_Y: {
                     if(m_radius<0) m_radius = 0.5f*extend.length_2d();
                     m_shape = new btConeShape(m_radius, extend.getY());
                     break;
@@ -113,6 +119,25 @@ void PhysicalObject::init()
                         m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
                                              extend.getY()*extend.getY());
                     m_shape = new btConeShapeZ(m_radius, extend.getY());
+                    break;
+                    }
+    case MP_CYLINDER_Y: {
+                    if(m_radius<0) m_radius = 0.5f*extend.length_2d();
+                    m_shape = new btCylinderShape(0.5f*extend);
+                    break;
+                    }
+    case MP_CYLINDER_X: {
+                    if(m_radius<0) 
+                        m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
+                                             extend.getZ()*extend.getZ());
+                    m_shape = new btCylinderShapeX(0.5f*extend);
+                    break;
+                    }
+    case MP_CYLINDER_Z: {
+                    if(m_radius<0)
+                        m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
+                                             extend.getY()*extend.getY());
+                    m_shape = new btCylinderShapeZ(0.5f*extend);
                     break;
                     }
     case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
