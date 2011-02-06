@@ -83,7 +83,7 @@ private:
 
     // Display and gui
     // ---------------
-    irr::core::stringw m_name;        /**< The human readable Name of the kart
+    std::string m_name;        /**< The human readable Name of the kart
                                        *   driver. */
     std::string m_ident;              /**< The computer readable-name of the
                                        *   kart driver. */
@@ -304,8 +304,10 @@ public:
      *  should not be modified, not attachModel be called on it. */
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
 
-    /** Returns the name of this kart. */
-    const irr::core::stringw& getName() const {return m_name;                 }
+    /** Returns the name of this kart. 
+        \note Pass it through fridibi as needed, this is the LTR name
+      */
+    const wchar_t* getName() const {return translations->w_gettext(m_name.c_str()); }
 
     /** Returns the internal identifier of this kart. */
     const std::string& getIdent      () const {return m_ident;                }

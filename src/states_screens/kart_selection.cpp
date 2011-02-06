@@ -1713,7 +1713,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             }
             else
             {
-                w->addItem(translations->fribidize(prop->getName().c_str()), prop->getIdent(), 
+                w->addItem(translations->fribidize(prop->getName()), prop->getIdent(), 
                            prop->getAbsoluteIconFile(), 0, 
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
                 usableKartCount++;
@@ -1740,7 +1740,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
             }
             else
             {
-                w->addItem(translations->fribidize(prop->getName().c_str()), prop->getIdent(), 
+                w->addItem(translations->fribidize(prop->getName()), prop->getIdent(), 
                            icon_path, 0, 
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
                 usableKartCount++;

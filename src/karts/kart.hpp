@@ -375,8 +375,8 @@ public:
     void           setSlipstreamEffect(float f);
     // ------------------------------------------------------------------------
     /** Returns a name to be displayed for this kart. */
-    virtual const irr::core::stringw& getName() const 
-                                       { return m_kart_properties->getName(); }
+    virtual const wchar_t* getName() const 
+                                        { return m_kart_properties->getName(); }
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
      *  kart was loaded from). */

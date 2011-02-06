@@ -583,7 +583,7 @@ int handleCmdLine(int argc, char **argv)
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
                 const KartProperties* KP= kart_properties_manager->getKartById(i);
-                fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName().c_str());
+                fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName());
             }
             fprintf ( stdout, "\n" );
         }

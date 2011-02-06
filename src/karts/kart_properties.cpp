@@ -220,9 +220,7 @@ void KartProperties::getAllData(const XMLNode * root)
 {
     root->get("version", &m_version);
     
-    std::string temp_name;
-    root->get("name",              &temp_name          );
-    m_name = _LTR(temp_name.c_str());
+    root->get("name",              &m_name             );
     
     root->get("icon-file",         &m_icon_file        );
     
@@ -458,7 +456,7 @@ void KartProperties::getAllData(const XMLNode * root)
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
-            std::cerr << "[KartProperties::getAllData()] WARNING : Kart " << temp_name
+            std::cerr << "[KartProperties::getAllData()] WARNING : Kart " << m_name.c_str()
                       << " has invalid engine : " << s << "\n";
             m_engine_sfx_type = "engine_small";
         }

@@ -43,9 +43,9 @@ const wchar_t* getAnchorString()
     switch (id)
     {
         //I18N: shown when anchor applied. %s is the victim.
-        case 0: return _("Arrr, the %s dropped anchor, Captain!");
-        case 1: return _("%s pays the next round of grog!");
-        case 2: return _("%s is a mighty pirate!");
+        case 0: return _LTR("Arrr, the %s dropped anchor, Captain!");
+        case 1: return _LTR("%s pays the next round of grog!");
+        case 2: return _LTR("%s is a mighty pirate!");
         default: assert(false); return L"";   // avoid compiler warning.
     }
 }   // getAnchorString
@@ -278,8 +278,8 @@ void Powerup::use()
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(getAnchorString(), kart->getName().c_str()).c_str();
-                gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+                anchor_message += StringUtils::insertValues(getAnchorString(), kart->getName()).c_str();
+                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }

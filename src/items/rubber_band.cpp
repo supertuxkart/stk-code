@@ -40,11 +40,11 @@ const wchar_t* getPlungerString()
     switch (id)
     {
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 0: return _("%0 bites %1's bait");
+        case 0: return _LTR("%0 bites %1's bait");
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 1: return _("%1 latches onto %0 for a free ride");
+        case 1: return _LTR("%1 latches onto %0 for a free ride");
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 2: return _("%1 tests a tractor beam on %0");
+        case 2: return _LTR("%1 tests a tractor beam on %0");
         default: assert(false); return L"";  // avoid warning about no return value
     }
 }
@@ -249,10 +249,10 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
         RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
         hit_message += StringUtils::insertValues(getPlungerString(),
-                                                 kart_hit->getName().c_str(),
-                                                 m_owner->getName().c_str()
+                                                 kart_hit->getName(),
+                                                 m_owner->getName()
                                                 ).c_str();
-        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         return;
     }
 

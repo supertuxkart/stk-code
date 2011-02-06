@@ -47,11 +47,11 @@ const wchar_t* getCakeString()
     switch (id)
     {
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 0: return _("%0 eats too much of %1's cake");
+        case 0: return _LTR("%0 eats too much of %1's cake");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 1: return _("%0 is dubious of %1's cooking skills");
+        case 1: return _LTR("%0 is dubious of %1's cooking skills");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 2: return _("%0 should not play with %1's lunch");
+        case 2: return _LTR("%0 should not play with %1's lunch");
         default: assert(false); return L"";   // avoid compiler warning
     }
 }
@@ -67,11 +67,11 @@ const wchar_t* getBowlingString()
     switch (id)
     {
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 0 : return _("%0 will not go bowling with %1 again");
+        case 0 : return _LTR("%0 will not go bowling with %1 again");
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 1 : return _("%1 strikes %0");
+        case 1 : return _LTR("%1 strikes %0");
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 2 : return _("%0 is bowled over by %1");
+        case 2 : return _LTR("%0 is bowled over by %1");
         default: assert(false); return L"";  //  avoid compiler warning
     }
 }
@@ -87,11 +87,11 @@ const wchar_t* getSelfBowlingString()
     switch (id)
     {
         //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 0 : return _("%s is practicing with a blue, big, spheric yo-yo");
+        case 0 : return _LTR("%s is practicing with a blue, big, spheric yo-yo");
         //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 1 : return _("%s is the world master of the boomerang ball");
+        case 1 : return _LTR("%s is the world master of the boomerang ball");
         //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 2 : return _("%s should play (rubber) darts instead of bowling");
+        case 2 : return _LTR("%s should play (rubber) darts instead of bowling");
         default: assert(false); return L"";  //  avoid compiler warning
     }
 }
@@ -439,8 +439,8 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             case PowerupManager::POWERUP_CAKE:
             {
                 hit_message += StringUtils::insertValues(getCakeString(),
-                                                         kart_hit->getName().c_str(),
-                                                         m_owner->getName().c_str()
+                                                         kart_hit->getName(),
+                                                         m_owner->getName()
                                                         ).c_str();
             }
             break;
@@ -452,14 +452,14 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                 if (kart_hit == m_owner)
                 {
                     hit_message += StringUtils::insertValues(getSelfBowlingString(),
-                                                             m_owner->getName().c_str()
+                                                             m_owner->getName()
                                                             ).c_str();
                 }
                 else
                 {
                     hit_message += StringUtils::insertValues(getBowlingString(),
-                                                             kart_hit->getName().c_str(),
-                                                             m_owner->getName().c_str()
+                                                             kart_hit->getName(),
+                                                             m_owner->getName()
                                                             ).c_str();
                 }
             }
@@ -468,7 +468,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                 printf("Failed message for %i\n", m_type);
                 assert(false);
         }
-        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
     }
 
     m_has_hit_something=true;

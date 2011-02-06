@@ -191,7 +191,7 @@ void ProfileWorld::enterRaceOverState()
         else
             av_t += m_karts[i]->getFinishTime();
         printf("%ls  start %d  end %d time %f\n",
-            m_karts[i]->getName().c_str(),1+(int)i,
+            m_karts[i]->getName(), 1 + (int)i,
             m_karts[i]->getPosition(),
             m_karts[i]->getFinishTime());
     }

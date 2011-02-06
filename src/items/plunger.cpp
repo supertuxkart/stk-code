@@ -44,9 +44,9 @@ const wchar_t* getPlungerInFaceString()
     switch (id)
     {
         //I18N: shown when a player receives a plunger in his face
-        case 0: return _("%0 gets a fancy mask from %1");
+        case 0: return _LTR("%0 gets a fancy mask from %1");
         //I18N: shown when a player receives a plunger in his face
-        case 1: return _("%1 merges %0's face with a plunger");
+        case 1: return _LTR("%1 merges %0's face with a plunger");
         default:assert(false); return L"";   // avoid compiler warning
     }
 }
@@ -178,10 +178,10 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             kart->blockViewWithPlunger();
 
             hit_message += StringUtils::insertValues(getPlungerInFaceString(),
-                                                     kart->getName().c_str(),
-                                                     m_owner->getName().c_str()
+                                                     kart->getName(),
+                                                     m_owner->getName()
                                                     ).c_str();
-            gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         }
 
         m_keep_alive = 0;
