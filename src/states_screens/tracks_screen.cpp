@@ -90,7 +90,7 @@ void TracksScreen::loadedFromFile()
 
 void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    // -- track seelction screen
+    // -- track selection screen
     if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
