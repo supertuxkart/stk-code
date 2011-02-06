@@ -147,7 +147,8 @@ private:
     std::vector<TrackMode> m_all_modes;
 
     /** Name of the track to display. */
-    irr::core::stringw  m_name;
+    std::string         m_name;
+    
     bool                m_use_fog;
     float               m_fog_density;
     float               m_fog_start;
@@ -207,8 +208,10 @@ public:
     /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;              }
 
-    /** Returns the name of the track, which is e.g. displayed on the screen. */
-    const irr::core::stringw& getName           () const {return m_name;        }
+    /** Returns the name of the track, which is e.g. displayed on the screen.
+        \note this is the LTR name, invoke fribidi as needed
+      */
+    const wchar_t* getName               () const {return translations->w_gettext(m_name.c_str()); }
 
     /** Returns all groups this track belongs to. */
     const std::vector<std::string>

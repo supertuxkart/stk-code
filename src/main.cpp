@@ -571,7 +571,7 @@ int handleCmdLine(int argc, char **argv)
                 {
                     fprintf ( stdout, "\t%10s: %ls\n",
                               track->getIdent().c_str(),
-                              track->getName().c_str());
+                              track->getName());
                 }
             }
 

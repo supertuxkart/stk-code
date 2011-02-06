@@ -128,7 +128,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                 
-                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName(),
                                     screenshot, 0.8f, 0.7f);
             }
             
@@ -147,7 +147,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
 
-                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName(),
                                     screenshot, 0.8f, 0.7f);
             }   // clickedTrack !=  NULL
         }   // if random_track

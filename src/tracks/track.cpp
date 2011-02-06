@@ -196,9 +196,7 @@ void Track::loadTrackInfo()
         o<<"Can't load track '"<<m_filename<<"', no track element.";
         throw std::runtime_error(o.str());
     }
-    std::string temp_name;
-    root->get("name",                  &temp_name);
-    m_name = _LTR(temp_name.c_str());
+    root->get("name",                  &m_name);
     
     //root->get("description",           &m_description);
     root->get("designer",              &m_designer);
