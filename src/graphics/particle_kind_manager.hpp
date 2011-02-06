@@ -47,6 +47,7 @@ public:
     ParticleKind* getParticles(const std::string &name);
     
     void   cleanUpTrackSpecificGfx();
+    void   cleanup();
     
     static ParticleKindManager* get();
 };

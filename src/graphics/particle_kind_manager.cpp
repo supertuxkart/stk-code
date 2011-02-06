@@ -43,6 +43,13 @@ ParticleKindManager::ParticleKindManager()
 
 ParticleKindManager::~ParticleKindManager()
 {
+    cleanup();
+}
+
+// ----------------------------------------------------------------------------
+
+void ParticleKindManager::cleanup()
+{
     cleanUpTrackSpecificGfx();
     
     std::map<std::string, ParticleKind*>::iterator it;

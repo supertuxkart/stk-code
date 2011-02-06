@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -339,21 +340,19 @@ void IrrDriver::applyResolutionSettings()
                                                                 UserConfigParams::m_prev_height) );
     m_device->getVideoDriver()->endScene();
 
-    // startScreen             -> removeTextures();
     attachment_manager      -> removeTextures();
     projectile_manager      -> removeTextures();
     item_manager            -> removeTextures();
     kart_properties_manager -> unloadAllKarts();
     powerup_manager         -> unloadPowerups();
+    ParticleKindManager::get()->cleanup();
     delete input_manager;
     GUIEngine::clear();
     GUIEngine::cleanUp();
     
-    //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
     m_device->closeDevice();
     m_device->clearSystemMessages();
     m_device->run(); 
-    //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
 
     // Clear the pointer stored in the file manager
     file_manager->dropFileSystem();
