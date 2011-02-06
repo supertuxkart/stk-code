@@ -249,8 +249,8 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
         RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
         hit_message += StringUtils::insertValues(getPlungerString(),
-                                                 kart_hit->getName(),
-                                                 m_owner->getName()
+                                                 core::stringw(kart_hit->getName()),
+                                                 core::stringw(m_owner->getName())
                                                 ).c_str();
         gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         return;

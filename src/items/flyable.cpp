@@ -439,8 +439,8 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             case PowerupManager::POWERUP_CAKE:
             {
                 hit_message += StringUtils::insertValues(getCakeString(),
-                                                         kart_hit->getName(),
-                                                         m_owner->getName()
+                                                         core::stringw(kart_hit->getName()),
+                                                         core::stringw(m_owner->getName())
                                                         ).c_str();
             }
             break;
@@ -452,14 +452,14 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                 if (kart_hit == m_owner)
                 {
                     hit_message += StringUtils::insertValues(getSelfBowlingString(),
-                                                             m_owner->getName()
+                                                             core::stringw(m_owner->getName())
                                                             ).c_str();
                 }
                 else
                 {
                     hit_message += StringUtils::insertValues(getBowlingString(),
-                                                             kart_hit->getName(),
-                                                             m_owner->getName()
+                                                             core::stringw(kart_hit->getName()),
+                                                             core::stringw(m_owner->getName())
                                                             ).c_str();
                 }
             }

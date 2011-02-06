@@ -364,7 +364,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
             irr::core::stringw m_fastest_lap_message;
             //I18N: as in "fastest lap: 60 seconds by Wilber"
-            m_fastest_lap_message += _("%s by %s", s.c_str(), kart->getName());
+            m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
 
             m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                    2.0f, 40, video::SColor(255, 100, 210, 100));

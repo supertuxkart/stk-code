@@ -178,8 +178,8 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             kart->blockViewWithPlunger();
 
             hit_message += StringUtils::insertValues(getPlungerInFaceString(),
-                                                     kart->getName(),
-                                                     m_owner->getName()
+                                                     core::stringw(kart->getName()),
+                                                     core::stringw(m_owner->getName())
                                                     ).c_str();
             gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         }
