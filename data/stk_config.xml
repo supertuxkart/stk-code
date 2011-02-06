@@ -37,7 +37,7 @@
   <startup penalty="1" />
 
   <!-- If the normals (for wheel raycasts) should be smoothened -->
-  <physics smooth-normals="true"/>
+  <physics smooth-normals="false"/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
