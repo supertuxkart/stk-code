@@ -237,6 +237,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             translations = new Translations();
             GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
             
+            GUIEngine::getFont()->updateRTL();
+            GUIEngine::getTitleFont()->updateRTL();
+            GUIEngine::getSmallFont()->updateRTL();
+            
             UserConfigParams::m_language = selection.c_str();
             user_config->saveConfig();
         }

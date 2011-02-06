@@ -134,6 +134,8 @@ public:
     void setScale(const float scale);
     float getScale() const { return m_scale; }
     
+    void updateRTL();
+    
 private:
 
     struct SFontArea

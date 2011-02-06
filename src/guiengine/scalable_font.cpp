@@ -71,6 +71,11 @@ ScalableFont::~ScalableFont()
         if (SpriteBank) SpriteBank->drop();
     }
 }
+
+void ScalableFont::updateRTL()
+{
+    m_rtl = translations->isRTLLanguage();
+}
     
 void ScalableFont::setShadow(irr::video::SColor col)
 {
