@@ -20,7 +20,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
-#include "graphics/rain.h"
+#include "graphics/rain.hpp"
 
 const float RAIN_RADIUS[RAIN_RING_COUNT] = { 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
