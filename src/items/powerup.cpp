@@ -278,7 +278,7 @@ void Powerup::use()
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(getAnchorString(), kart->getName()).c_str();
+                anchor_message += StringUtils::insertValues(getAnchorString(), core::stringw(kart->getName()));
                 gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
                 break;
             }
