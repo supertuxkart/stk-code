@@ -33,7 +33,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/rain.h"
+#include "graphics/rain.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
