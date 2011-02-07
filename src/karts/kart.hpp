@@ -49,6 +49,7 @@ class SkidMarks;
 class SlipStream;
 class WaterSplash;
 class ParticleEmitter;
+class Rain;
 
 /** The main kart class. All type of karts are of this object, but with 
  *  different controllers. The controllers are what turn a kart into a 
@@ -146,6 +147,8 @@ private:
 
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
+    
+    Rain            *m_rain;
 
     float           m_wheel_rotation;
     
@@ -188,12 +191,12 @@ protected:
     KartModel*            m_kart_model;
     
 public:
-                   Kart(const std::string& ident, int position, 
+                   Kart(const std::string& ident, Track* track, int position, 
                         const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
-    void           loadData(bool animatedModel);
+    void           loadData(RaceManager::KartType type, Track* track, bool animatedModel);
     virtual void   updateGraphics(const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     void           createPhysics    ();

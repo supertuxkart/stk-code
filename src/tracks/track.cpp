@@ -80,6 +80,7 @@ Track::Track(std::string filename)
     m_sky_particles_emitter = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
+    m_weather_type          = WEATHER_NONE;
     loadTrackInfo();
 }   // Track
 
@@ -880,16 +881,26 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if(name=="weather")
         {
-            std::string sky_particles;
-            node->get("particles", &sky_particles);
-            if (sky_particles.size() ==0)
+            std::string weather_particles;
+            std::string weather_type;
+            node->get("particles", &weather_particles);
+            node->get("type", &weather_type);
+
+            if (weather_particles.size() > 0)
+            {
+                m_sky_particles = 
+                    ParticleKindManager::get()->getParticles(weather_particles);
+            }
+            else if (weather_type.size() > 0)
+            {
+                m_weather_type = WEATHER_RAIN;
+            }
+            else
             {
                 fprintf(stderr, 
-                    "Warning: no weather particles found - ignored.\n");
+                        "Warning: bas weather node found - ignored.\n");
                 continue;
             }
-            m_sky_particles = 
-                ParticleKindManager::get()->getParticles(sky_particles);
         }
         else
         {

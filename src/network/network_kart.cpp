@@ -24,10 +24,10 @@
 /** A network kart. On the server, it receives its control information (steering etc)
     from the network manager.
     */
-NetworkKart::NetworkKart(const std::string &kart_name, int position, 
+NetworkKart::NetworkKart(const std::string &kart_name, Track* track, int position, 
                          const btTransform &init_transform, int global_player_id,
                          RaceManager::KartType type)
-                         : Kart(kart_name, position, init_transform, type)
+                         : Kart(kart_name, track, position, init_transform, type)
 {
     m_global_player_id = global_player_id;
 }   // NetworkKart

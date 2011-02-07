@@ -370,6 +370,7 @@
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
 		955764E612FB67EF005CE479 /* btKartRaycast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955764E412FB67EF005CE479 /* btKartRaycast.cpp */; };
 		95591C4412A5E91E00FB1E95 /* fribidi.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
+		9559DE7F12FF777600350DE8 /* rain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9559DE7E12FF777600350DE8 /* rain.cpp */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		9560368C12187EFB00EB96C4 /* layout_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9560368A12187EFB00EB96C4 /* layout_manager.cpp */; };
@@ -989,6 +990,8 @@
 		9556A87F119EF976009C558F /* options_screen_video.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_video.hpp; path = ../../states_screens/options_screen_video.hpp; sourceTree = SOURCE_ROOT; };
 		955764E412FB67EF005CE479 /* btKartRaycast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btKartRaycast.cpp; path = ../../physics/btKartRaycast.cpp; sourceTree = SOURCE_ROOT; };
 		955764E512FB67EF005CE479 /* btKartRaycast.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = btKartRaycast.hpp; path = ../../physics/btKartRaycast.hpp; sourceTree = SOURCE_ROOT; };
+		9559DE7D12FF777600350DE8 /* rain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rain.h; path = games/supertuxkart/src/graphics/rain.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9559DE7E12FF777600350DE8 /* rain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rain.cpp; path = games/supertuxkart/src/graphics/rain.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		955DE88110042701006A4F3C /* check_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_manager.cpp; path = ../../tracks/check_manager.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88210042701006A4F3C /* check_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_manager.hpp; path = ../../tracks/check_manager.hpp; sourceTree = SOURCE_ROOT; };
 		955DE8871004273B006A4F3C /* check_structure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_structure.cpp; path = ../../tracks/check_structure.cpp; sourceTree = SOURCE_ROOT; };
@@ -1547,6 +1550,8 @@
 				9542FD4B12D3E0D700C00366 /* particle_kind.hpp */,
 				9528C71412D69494006E9167 /* particle_kind_manager.cpp */,
 				9528C71512D69494006E9167 /* particle_kind_manager.hpp */,
+				9559DE7E12FF777600350DE8 /* rain.cpp */,
+				9559DE7D12FF777600350DE8 /* rain.h */,
 				952A153D103F66D600B1895D /* shadow.cpp */,
 				952A153E103F66D600B1895D /* shadow.hpp */,
 				952A153F103F66D600B1895D /* skid_marks.cpp */,
@@ -3334,6 +3339,7 @@
 				95557B8612FA14AA00CC458E /* btQuickprof.cpp in Sources */,
 				95557B8712FA14AA00CC458E /* btSerializer.cpp in Sources */,
 				955764E612FB67EF005CE479 /* btKartRaycast.cpp in Sources */,
+				9559DE7F12FF777600350DE8 /* rain.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

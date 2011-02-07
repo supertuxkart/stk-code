@@ -48,6 +48,12 @@ class TriangleMesh;
 class World;
 class XMLNode;
 
+enum WeatherType
+{
+    WEATHER_NONE,
+    WEATHER_RAIN
+};
+
 /**
   * \ingroup tracks
   */
@@ -125,8 +131,11 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
-    /** Particles emitted from the sky (e.g. rain or snow) */
+    /** Particles emitted from the sky (wheather) */
     ParticleKind*            m_sky_particles;
+    
+    /** Use a special built-in wheather */
+    WeatherType              m_weather_type;
     
     ParticleEmitter*         m_sky_particles_emitter;
     
@@ -297,6 +306,9 @@ public:
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
                                            { return m_start_transforms.size(); }    
+    
+    WeatherType  getWeatherType           () const { return m_weather_type; }
+    
 };   // class Track
 
 #endif

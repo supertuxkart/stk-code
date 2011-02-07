@@ -33,6 +33,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/rain.h"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -64,7 +65,7 @@
  *         number of karts). This is used to determine the start position.
  *  \param init_transform  The initial position and rotation for this kart.
  */
-Kart::Kart (const std::string& ident, int position,
+Kart::Kart (const std::string& ident, Track* track, int position,
             const btTransform& init_transform, RaceManager::KartType type)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
@@ -92,7 +93,7 @@ Kart::Kart (const std::string& ident, int position,
     m_finish_time          = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
-    m_terrain_particles         = NULL;
+    m_terrain_particles    = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_slipstream           = NULL;
@@ -101,6 +102,7 @@ Kart::Kart (const std::string& ident, int position,
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_flying               = false;
+    m_rain                 = NULL;
     
     m_view_blocked_by_plunger = 0;
 
@@ -151,7 +153,7 @@ Kart::Kart (const std::string& ident, int position,
         animations = false;
     }
     
-    loadData(animations);
+    loadData(type, track, animations);
 
     reset();
 }   // Kart
@@ -746,10 +748,15 @@ void Kart::update(float dt)
     m_attachment->update(dt);
 
     //smoke drawing control point
-    if (UserConfigParams::m_graphical_effects && m_terrain_particles)
+    if (UserConfigParams::m_graphical_effects)
     {
-        m_terrain_particles->update();
-        m_water_splash_system->update();
+        if (m_terrain_particles)   m_terrain_particles->update();
+        if (m_water_splash_system) m_water_splash_system->update();
+        if (m_rain)
+        {
+            m_rain->setPosition( getCamera()->getCameraSceneNode()->getPosition() );
+            m_rain->update(dt);
+        }
     }  // UserConfigParams::m_graphical_effects
 
     m_nitro->update();
@@ -1449,7 +1456,7 @@ void Kart::updatePhysics(float dt)
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
  */
-void Kart::loadData(bool animatedModel)
+void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel)
 {
     m_kart_model->attachModel(&m_node, animatedModel);
     // Attachment must be created after attachModel, since only then the
@@ -1477,6 +1484,12 @@ void Kart::loadData(bool animatedModel)
             std::cerr << "[Kart::loadData] " << e.what() << std::endl;
         }
     }
+    
+    if (UserConfigParams::m_weather_effects && track->getWeatherType() == WEATHER_RAIN && type == RaceManager::KT_PLAYER)
+    {
+        m_rain = new Rain(NULL);
+    }
+    
     //m_water_splash_system = new WaterSplash(this);
     
     m_water_splash_system = new ParticleEmitter(ParticleKindManager::get()->getParticles("splash.xml"),

@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,22 +17,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NETWORK_KART_HPP
-#define HEADER_NETWORK_KART_HPP
+#ifndef HEADER_RAIN_HPP
+#define HEADER_RAIN_HPP
 
-#include "karts/kart.hpp"
+#include <irrlicht.h>
+const int RAIN_RING_COUNT = 3;
 
-class Track;
-
-class NetworkKart : public Kart
+class Rain
 {
-private:
-    int m_global_player_id;     // to identify this kart to the network manager
+    irr::scene::ISceneNode* m_node[RAIN_RING_COUNT];
+    std::vector<irr::video::SMaterial*> m_materials;
+    
+    float m_y;
+    
 public:
-         NetworkKart(const std::string& kart_name, Track* track, int position,
-                     const btTransform& init_transform,
-                     int global_player_id, RaceManager::KartType type);
-    void setControl(const KartControl& kc);
-    virtual bool isNetworkKart() const { return true; }
-};   // NetworkKart
+    Rain(irr::scene::ISceneNode* parent);
+    void update(float dt);
+    void setPosition(const irr::core::vector3df& position);
+};
+
 #endif
