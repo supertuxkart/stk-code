@@ -71,7 +71,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
                    kart /* search in front of this kart */, m_reverse_mode);
 
-    btTransform kart_transform = kart->getKartTransform();
+    btTransform kart_transform = kart->getAlignedTransform();
     btMatrix3x3 kart_rotation = kart_transform.getBasis();
     // The current forward vector is rotation*(0,0,1), or:
     btVector3 forward(kart_rotation.getColumn(2));

@@ -304,7 +304,7 @@ public:
     /** Returns a bullet transform object located at the kart's position
         and oriented in the direction the kart is going. Can be useful
         e.g. to calculate the starting point and direction of projectiles. */
-    btTransform     getKartTransform(const float customPitch=-1);
+    btTransform     getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
     const video::SColor &getColor() const 

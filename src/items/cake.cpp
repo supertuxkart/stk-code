@@ -99,7 +99,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
         m_target = NULL;
         // kart is too far to be hit. so throw the projectile in a generic way,
         // straight ahead, without trying to hit anything in particular
-        trans = kart->getKartTransform(pitch);
+        trans = kart->getAlignedTransform(pitch);
         
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
