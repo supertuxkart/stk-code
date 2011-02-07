@@ -21,7 +21,7 @@
 #define HEADER_RAIN_HPP
 
 #include <irrlicht.h>
-const int RAIN_RING_COUNT = 3;
+const int RAIN_RING_COUNT = 5;
 
 class Rain
 {
