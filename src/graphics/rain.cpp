@@ -44,6 +44,7 @@ Rain::Rain(irr::scene::ISceneNode* parent)
         
         buffer->Material.setTexture(0, m->getTexture());
         m->setMaterialProperties(&buffer->Material);
+        buffer->Material.ZWriteEnable = false;
         buffer->Material.BackfaceCulling = false;
         
         m_materials.push_back(&buffer->Material);
