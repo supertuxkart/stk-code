@@ -185,7 +185,7 @@ btTransform Kart::getKartTransform(const float customPitch)
     float pitch = (customPitch == -1 ? getTerrainPitch(getHeading()) : customPitch);
 
     btMatrix3x3 m;
-    m.setEulerYPR(-getHeading(), pitch, 0.0f);
+    m.setEulerZYX(pitch, getHeading(), 0.0f);
     trans.setBasis(m);
 
     return trans;
