@@ -21,6 +21,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/rain.hpp"
+#include "utils/constants.hpp"
 
 const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
@@ -96,8 +97,9 @@ Rain::Rain(irr::scene::ISceneNode* parent)
         
         buffer->drop();
     }
-}
+}   // Rain
 
+// ----------------------------------------------------------------------------
 void Rain::update(float dt)
 {
     m_y = m_y + dt*RAIN_DY;
@@ -107,16 +109,17 @@ void Rain::update(float dt)
     for (int m=0; m<RAIN_RING_COUNT; m++)
     {
         core::matrix4& matrix = m_node[m]->getMaterial(0).getTextureMatrix(0);
-        
+
         matrix.setTextureTranslate(0, m_y);
     }
-}
+}   // update
 
+// ----------------------------------------------------------------------------
 void Rain::setPosition(const core::vector3df& position)
 {
     for (int m=0; m<RAIN_RING_COUNT; m++)
     {
         m_node[m]->setPosition(position);
     }
-}
+}   // setPosition
 
