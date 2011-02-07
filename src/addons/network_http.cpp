@@ -276,7 +276,12 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
     //from and out
     curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
     curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-            
+    
+    // FIXME: if a network problem prevent the first 'list' download
+    // to finish, the thread can not be cancelled. 
+    // If we disable this test it works as expected, but I am not sure
+    // if there are any side effects if synchron downloads use the
+    // progress bar as well.
     if(is_asynchron)
     {
         curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
