@@ -1019,6 +1019,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\minimal_race_gui.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\options_screen_audio.cpp"
 					>
 				</File>
@@ -1950,6 +1954,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\main_menu_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\minimal_race_gui.hpp"
 					>
 				</File>
 				<File
