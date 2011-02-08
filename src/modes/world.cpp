@@ -47,6 +47,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui.hpp"
+#include "states_screens/minimal_race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -107,7 +108,10 @@ void World::init()
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
     // do any rendering on texture.
-    m_race_gui = new RaceGUI();
+	if(UserConfigParams::m_minimal_race_gui)
+		m_race_gui = new MinimalRaceGUI();
+	else
+		m_race_gui = new RaceGUI();
 
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());

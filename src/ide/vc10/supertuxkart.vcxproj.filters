@@ -717,6 +717,12 @@
     <ClCompile Include="..\..\physics\btKartRaycast.cpp">
       <Filter>Quelldateien\physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp">
+      <Filter>Quelldateien\states_screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\graphics\rain.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1342,6 +1348,12 @@
     </ClInclude>
     <ClInclude Include="..\..\physics\btKartRaycast.hpp">
       <Filter>Headerdateien\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp">
+      <Filter>Headerdateien\states_screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\rain.hpp">
+      <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

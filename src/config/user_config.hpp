@@ -344,6 +344,8 @@ namespace UserConfigParams
     
 
     // ---- Misc
+    PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_log_errors

@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
+    <ClCompile Include="..\..\graphics\rain.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\..\challenges\challenge_data.cpp" />
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
+    <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
@@ -361,6 +363,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
+    <ClInclude Include="..\..\graphics\rain.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp" />
@@ -408,6 +411,7 @@
     <ClInclude Include="..\..\network\remote_kart_info.hpp" />
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
+    <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />
