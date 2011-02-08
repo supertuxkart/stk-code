@@ -28,6 +28,11 @@ TriangleMesh::TriangleMesh() : m_mesh()
 {
     m_body            = NULL;
     m_motion_state    = NULL;
+    // FIXME: on VS in release mode this statement actually overwrites
+    // part of the data of m_mesh, causing a crash later. Debugging 
+    // shows that apparently m_collision_shape is at the same address
+    // as m_mesh->m_use32bitIndices and m_use4componentVertices
+    // (and m_mesh->m_weldingThreshold at m_normals
     m_collision_shape = NULL;
 }   // TriangleMesh
 
