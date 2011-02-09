@@ -756,7 +756,65 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
  */
 video::ITexture *IrrDriver::getTexture(const std::string &filename)
 {
+#undef PREMULPNGS
+#ifndef PREMULPNGS
     video::ITexture* out = m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
+#else
+    video::IImage* img = m_scene_manager->getVideoDriver()->createImageFromFile(filename.c_str());
+    // PNGs are non premul, but some are used for premul tasks, so convert
+    // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
+    if(StringUtils::hasSuffix(filename.c_str(), ".png")) // FIXME check param, not name
+    {
+        if ((img->getColorFormat() == irr::video::ECF_A8R8G8B8) && img->lock())
+        {
+            core::dimension2d<u32> dim = img->getDimension();
+            for(uint x = 0; x < dim.Width; x++)
+            {
+                for(uint y = 0; y < dim.Height; y++)
+                {
+                    video::SColor col = img->getPixel(x, y);
+                    uint alpha = col.getAlpha();
+                    uint red   = alpha * col.getRed()   / 255;
+                    uint blue  = alpha * col.getBlue()  / 255;
+                    uint green = alpha * col.getGreen() / 255;
+                    col.set(alpha, red, green, blue);
+                    img->setPixel(x, y, col, false);
+                }
+            }
+            img->unlock();
+        }
+    }
+    /*
+    // Other formats can be premul, but the tasks can be non premul
+    // So divide to get the separate RGBA (only possible if alpha!=0)
+    else if() // FIXME, use param "DE-PREMUL requested" to match above
+    {
+        if ((img->getColorFormat() == irr::video::ECF_A8R8G8B8) && img->lock())
+        {
+            core::dimension2d<u32> dim = img->getDimension();
+            for(uint x = 0; x < dim.Width; x++)
+            {
+                for(uint y = 0; y < dim.Height; y++)
+                {
+                    video::SColor col = img->getPixel(x, y);
+                    uint alpha = col.getAlpha();
+                    // Avoid divide by zero
+                    if (alpha) {
+                        uint red   = 255 * col.getRed() / alpha ;
+                        uint blue  = 255 * col.getBlue() / alpha;
+                        uint green = 255 * col.getGreen() / alpha;
+                        col.set(alpha, red, green, blue);
+                        img->setPixel(x, y, col, false);
+                    }
+                }
+            }
+            img->unlock();
+        }
+    }
+     */
+    video::ITexture* out = m_scene_manager->getVideoDriver()->addTexture(filename.c_str(),
+                                                                         img, NULL);
+#endif
     
 #ifndef NDEBUG
     if (out == NULL)
