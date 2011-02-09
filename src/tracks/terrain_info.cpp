@@ -22,44 +22,85 @@
 #include <math.h>
 
 #include "modes/world.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-TerrainInfo::TerrainInfo(int frequency)
+/** Constructor to initialise terrain data.
+ */
+TerrainInfo::TerrainInfo()
 {
-    m_HoT_frequency = frequency;
-    m_HoT_counter   = frequency;
     m_last_material = NULL;
-}
+}   // TerrainInfo
 
 //-----------------------------------------------------------------------------
-TerrainInfo::TerrainInfo(const Vec3 &pos, int frequency)
+/** Constructor to initialise terrain data at a given position
+ *  \param pos The position to get the data from.
+ */
+TerrainInfo::TerrainInfo(const Vec3 &pos)
 {
-    m_HoT_frequency = frequency;
-    m_HoT_counter   = frequency;
     // initialise HoT
     update(pos);
-}
+}   // TerrainInfo
 //-----------------------------------------------------------------------------
+/** Update the terrain information based on the latest position.
+ *  \param Position from which to start the rayast from. 
+ */
 void TerrainInfo::update(const Vec3& pos)
 {
-    m_HoT_counter++;
-    if(m_HoT_counter>=m_HoT_frequency)
-    {
-        m_last_material = m_material;
-        World::getWorld()->getTrack()->getTerrainInfo(pos, &m_HoT,
-                                                      &m_normal, &m_material);
-        m_normal.normalize();
-        m_HoT_counter = 0;
-    }
+    m_last_material = m_material;
+    World::getWorld()->getTrack()->getTerrainInfo(pos, &m_hit_point,
+        &m_normal, &m_material);
+    m_normal.normalize();
 }   // update
+
+// -----------------------------------------------------------------------------
+/** If the raycast indicated that the kart is 'under something' (i.e. a 
+ *  specially marked terrain), to another raycast up to detect under whic
+ *  mesh the kart is. This is using the special gfx effect mesh only.
+ *  This is used e.g. to detect if a kart is under water, and then to 
+ *  get the proper position for water effects. Note that the TerrainInfo
+ *  objects keeps track of the previous raycast position.
+ */
+bool TerrainInfo::getSurfacePosition(Vec3 *position)
+{
+    if(m_material && m_material->isBelowSurface())
+    {
+        btTransform from;
+        from.setIdentity();
+        from.setOrigin(m_hit_point+btVector3(0,5,0));
+        btTransform to;
+        to.setIdentity();
+        to.setOrigin(m_hit_point+btVector3(0, 10000.0f, 0));
+        btTransform world_trans;
+        world_trans.setIdentity();
+
+        btCollisionWorld::ClosestRayResultCallback 
+                           result(from.getOrigin(), to.getOrigin());
+
+        const btCollisionShape &shape = 
+            World::getWorld()->getTrack()->getGFXEffectMesh().getCollisionShape();
+        btCollisionObject col_obj;
+        btTransform bt;
+        bt.setIdentity();
+        col_obj.setWorldTransform(bt);
+        btCollisionWorld::rayTestSingle(from, to, &col_obj, &shape, 
+                                        world_trans, result);
+        if(result.hasHit())
+        {
+            *position = result.m_hitPointWorld;
+        }
+        return result.hasHit();
+    }
+    return false;
+}   // getSurfacePosition
 
 // -----------------------------------------------------------------------------
 /** Returns the pitch of the terrain depending on the heading
 */
 float TerrainInfo::getTerrainPitch(float heading) const {
-    if(m_HoT==Track::NOHIT) return 0.0f;
+    if(!m_material) return 0.0f;
 
     const float X = sin(heading);
     const float Z = cos(heading);

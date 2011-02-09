@@ -60,6 +60,8 @@ Material::Material(const XMLNode *node, int index)
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
     node->get("friction",         &m_friction          );
+    node->get("below-surface",    &m_below_surface     );
+    node->get("surface",          &m_surface           );
     node->get("ignore",           &m_ignore            );
     node->get("reset",            &m_resetter          );
     node->get("additive",         &m_add               );
@@ -159,6 +161,8 @@ void Material::init(unsigned int index)
     m_backface_culling          = true;
     m_sphere_map                = false;
     m_friction                  = 1.0f;
+    m_below_surface             = false;
+    m_surface                   = false;
     m_ignore                    = false;
     m_resetter                  = false;
     m_add                       = false;

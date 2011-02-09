@@ -441,8 +441,8 @@ void World::resetAllKarts()
         {
             if(!(*i)->isInRest())
             {
-                float           hot;
                 Vec3            normal;
+                Vec3            hit_point;
                 const Material *material;
                 // We can't use (*i)->getXYZ(), since this is only defined
                 // after update() was called. Instead we have to get the
@@ -451,7 +451,8 @@ void World::resetAllKarts()
                 (*i)->getBody()->getMotionState()->getWorldTransform(t);
                 // This test can not be done only once before the loop, since
                 // it can happen that the kart falls through the track later!
-                m_track->getTerrainInfo(t.getOrigin(), &hot, &normal, &material);
+                m_track->getTerrainInfo(t.getOrigin(), &hit_point, &normal,
+                                        &material);
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",

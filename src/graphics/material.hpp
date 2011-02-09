@@ -55,8 +55,23 @@ private:
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
     GraphicalEffect  m_graphical_effect;
+    /** Set if being on this surface means being under some other mesh.
+     *  This is used to simulate that a kart is in water: the ground under
+     *  the water is marked as 'm_below_surface', which will then trigger a raycast
+     *  up to find the position of the actual water surface. */
+    bool             m_below_surface;
+    /** A material that is a surface only, i.e. the karts can fall through
+     *  but the information is still needed (for GFX mostly). An example is
+     *  a water surface: karts can drive while partly in water (so the water
+     *  surface is not a physical object), but the location of the water
+     *  effect is on the surface. */
+    bool             m_surface;
+    /** If the material is a zipper, i.e. gives a speed boost. */
     bool             m_zipper;
+    /** If a kart is rescued when touching this surface. */
     bool             m_resetter;
+    /** If the property should be ignored in the physics. Example would be
+     *  plants that a kart can just drive through. */
     bool             m_ignore;
     bool             m_add;
     
@@ -150,6 +165,17 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this material should have smoke effect. */
     //bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
+    // ------------------------------------------------------------------------
+    /** Returns true if this material is under some other mesh and therefore
+     *  requires another raycast to find the surface it is under (used for
+     *  gfx, e.g. driving under water to find where the water splash should
+     *  be shown at. */
+    bool isBelowSurface      () const { return m_below_surface; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this material is a surface, i.e. it is going to be
+     *  ignored for the physics, but the information is needed e.g. for 
+     *  gfx. See m_below_surface for more details. */
+    bool isSurface          () const { return m_surface; }
     // ------------------------------------------------------------------------
     /** Returns true if this material should have water splashes. */
     bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}

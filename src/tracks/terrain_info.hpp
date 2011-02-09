@@ -30,32 +30,45 @@
 class TerrainInfo
 {
 private:
-    int               m_HoT_frequency;      // how often hight of terrain is computed
-    int               m_HoT_counter;        // compute HAT only every N timesteps
-    Vec3              m_normal;             // normal of the triangle under the object
-    const Material   *m_material;           // material of the triangle under the object
-    const Material   *m_last_material;      // the previous material a kart was on
-    float             m_HoT;                // height of terrain
+    /** Normal of the triangle under the object. */
+    Vec3              m_normal;
+    /** Material of the triangle under the object. */
+    const Material   *m_material;
+    /** The previous material a kart was on. */
+    const Material   *m_last_material;
+    /** The point that was hit. */
+    Vec3              m_hit_point;
+    /** Position of last raycast. */
+    Vec3              m_last_pos;
 
 public:
-    TerrainInfo(int frequency=1);
-    TerrainInfo(const Vec3 &pos, int frequency=1);
+             TerrainInfo();
+             TerrainInfo(const Vec3 &pos);
     virtual ~TerrainInfo() {};
 
     virtual void update(const Vec3 &pos);
+    bool     getSurfacePosition(Vec3 *position);
 
+    // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
-    float getHoT()                       const {return m_HoT;          }
-    
+    float getHoT()                       const {return m_hit_point.getY(); }    
+    // ------------------------------------------------------------------------
     /** Returns the current material the kart is on. */
     const Material *getMaterial()        const {return m_material;     }
+    // ------------------------------------------------------------------------
     /** Returns the previous material the kart was one (which might be
      *  the same as getMaterial() ). */
     const Material *getLastMaterial()    const {return m_last_material;}
+    // ------------------------------------------------------------------------
     /** Returns the normal of the terrain the kart is on. */
     const Vec3 &getNormal()              const {return m_normal;       }
+    // ------------------------------------------------------------------------
     /** Returns the pitch of the terrain depending on the heading. */
     float getTerrainPitch(float heading) const;
+    // ------------------------------------------------------------------------
+    /** Returns the hit point of the raycast. */
+    const btVector3& getHitPoint() const { return m_hit_point; }
+
 };  // TerrainInfo
 
 #endif // HEADER_TERRAIN_INFO_HPP

@@ -69,6 +69,7 @@ Track::Track(std::string filename)
     m_screenshot            = "";
     m_version               = 0;
     m_track_mesh            = new TriangleMesh();
+    m_gfx_effect_mesh       = new TriangleMesh();
     m_all_nodes.clear();
     m_all_meshes.clear();
     m_is_arena              = false;
@@ -93,6 +94,7 @@ Track::~Track()
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
     if(m_sky_particles_emitter) delete m_sky_particles_emitter;
     delete m_track_mesh;
+    delete m_gfx_effect_mesh;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -163,6 +165,9 @@ void Track::cleanup()
 
     delete m_track_mesh;
     m_track_mesh = new TriangleMesh();
+
+    delete m_gfx_effect_mesh;
+    m_gfx_effect_mesh = new TriangleMesh();
 
     // remove temporary materials loaded by the material manager
     material_manager->popTempMaterial();
@@ -352,8 +357,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-    m_track_mesh->createBody();
-    
+    m_track_mesh->createPhysicalBody();
+    m_gfx_effect_mesh->createCollisionShape();
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
@@ -432,8 +437,11 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         {
             std::string image = std::string(core::stringc(t->getName()).c_str());
             material=material_manager->getMaterial(StringUtils::getBasename(image));
-            // Materials to be ignored are not converted into bullet meshes.
-            if(material->isIgnore()) continue;
+            // Special gfx meshes will not be stored as a normal physics body,
+            // but converted to a collision body only, so that ray tests
+            // against them can be done.
+            if(material->isSurface())
+                tmesh = m_gfx_effect_mesh;
         } 
 
         u16 *mbIndices = mb->getIndices();
@@ -567,8 +575,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         exit(-1);
     }
     
-    m_track_mesh->createBody();
-
+    m_track_mesh->createPhysicalBody();
+    m_gfx_effect_mesh->createCollisionShape();
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
     scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
 
@@ -1115,7 +1123,16 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
-void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 
+/** Does a ray cast straight down from the given position, and returns
+ *  the hit point, material, and normal at the given location (or material
+ *  ==NULL if no triangle was hit).
+ *  \param pos Positions from which to cast the ray.
+ *  \param hit_point On return: the position which was hit.
+ *  \param normal On return the normal of the triangle at that point.
+ *  \param material The material at the hit point (or NULL if no material
+ *         was found.
+ */
+void  Track::getTerrainInfo(const Vec3 &pos, Vec3 *hit_point, Vec3 *normal, 
                             const Material **material) const
 {
     btVector3 to_pos(pos);
@@ -1152,14 +1169,13 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
 
     if(!rayCallback.hasHit()) 
     {
-        *hot      = NOHIT;
         *material = NULL;
         return;
     }
 
-    *hot      = rayCallback.m_hitPointWorld.getY();
-    *normal   = rayCallback.m_hitNormalWorld;
-    *material = rayCallback.m_material;
+    *hit_point = rayCallback.m_hitPointWorld;
+    *normal    = rayCallback.m_hitNormalWorld;
+    *material  = rayCallback.m_material;
     // Note: material might be NULL. This happens if the ray cast does not
     // hit the track, but another rigid body (kart, moving_physics) - e.g.
     // assume two karts falling down, one over the other. Bullet does not
@@ -1174,9 +1190,9 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
  */
 float Track::getTerrainHeight(const Vec3 &pos) const
 {
-    float hot;
+    Vec3  hit_point;
     Vec3  normal;
     const Material *m;
-    getTerrainInfo(pos, &hot, &normal, &m);
-    return hot;
+    getTerrainInfo(pos, &hit_point, &normal, &m);
+    return hit_point.getY();
 }   // getTerrainHeight

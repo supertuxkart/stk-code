@@ -79,9 +79,16 @@ private:
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
-    PtrVector<ParticleEmitter>     m_all_emitters;
+    PtrVector<ParticleEmitter>      m_all_emitters;
     scene::ILightSceneNode  *m_sun;
+    /** Used to collect the triangles for the bullet mesh. */
     TriangleMesh*            m_track_mesh;
+    /** Used to collect the triangles which do not have a physical
+     *  representation, but are needed for some raycast effects. An
+     *  example is a water surface: the karts ignore this (i.e. 
+     *  allowing the kart to drive in/partly under water), but the
+     *  actual surface position is needed for the water splash effect. */
+    TriangleMesh*            m_gfx_effect_mesh;
     /** Minimum coordinates of this track. */
     Vec3                     m_aabb_min;
     /** Maximum coordinates of this track. */
@@ -229,7 +236,8 @@ public:
     /** Starts the music for this track. */
     void               startMusic        () const;
 
-    void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
+    void               getTerrainInfo(const Vec3 &pos, Vec3 *hit_point, 
+                                      Vec3* normal,
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
@@ -302,6 +310,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the triangle mesh for this track. */
     const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
+    // ------------------------------------------------------------------------
+    /** Returns the graphical effect mesh for this track. */
+    const TriangleMesh& getGFXEffectMesh() const {return *m_gfx_effect_mesh;}
     // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 

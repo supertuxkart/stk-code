@@ -39,6 +39,7 @@ private:
     std::vector<const Material*> m_triangleIndex2Material;
     btRigidBody                 *m_body;
     btTriangleMesh               m_mesh;
+    btVector3 dummy1, dummy2;
     btDefaultMotionState        *m_motion_state;
     btCollisionShape            *m_collision_shape;
     /** The three normals for each triangle. */
@@ -50,8 +51,9 @@ public:
                      const btVector3 &t3, const btVector3 &n1,
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
-    void createBody(btCollisionObject::CollisionFlags flags=
-                         (btCollisionObject::CollisionFlags)0);
+    void createCollisionShape();
+    void createPhysicalBody(btCollisionObject::CollisionFlags flags=
+                               (btCollisionObject::CollisionFlags)0);
     void removeBody();
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
@@ -59,6 +61,12 @@ public:
     const Material* getMaterial(int n) const 
                                           {return m_triangleIndex2Material[n];}
     // ------------------------------------------------------------------------
+    const btCollisionShape &getCollisionShape() const 
+                                          {return *m_collision_shape;}
+    // ------------------------------------------------------------------------
+    /** Returns the points of the 'indx' triangle.
+     *  \param indx Index of the triangle to get. 
+     *  \param p1,p2,p3 On return the three points of the triangle. */
     void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
                      btVector3 *p3) const
     {
