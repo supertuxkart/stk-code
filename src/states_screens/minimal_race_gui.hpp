@@ -76,8 +76,6 @@ private:
     };   // TimedMessage
     // ---------------------------------------------------------
 
-    Material        *m_speed_meter_icon;
-    Material        *m_speed_bar_icon;
     Material        *m_plunger_face;
     typedef          std::vector<TimedMessage> AllMessageType;
     AllMessageType   m_messages;

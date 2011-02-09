@@ -80,8 +80,6 @@ MinimalRaceGUI::MinimalRaceGUI()
         m_map_left = UserConfigParams::m_width - m_map_width;
     }
 
-    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
     m_music_icon       = material_manager->getMaterial("notes.png");
     createMarkerTexture();
@@ -638,29 +636,7 @@ void MinimalRaceGUI::drawAllMessages(const Kart* kart,
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
           
     const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
-    
-    // draw less important first, at the very bottom of the screen
-    // unimportant messages are skipped in multiplayer, they take too much screen space
-    if (race_manager->getNumLocalPlayers() < 2)
-    {
-        for (AllMessageType::const_iterator i = m_messages.begin(); 
-             i != m_messages.end(); ++i)
-        {
-            TimedMessage const &msg = *i;
-            if (!msg.m_important)
-            {
-                // Display only messages for all karts, or messages for this kart
-                if (msg.m_kart && msg.m_kart!=kart) continue;
-                
-                core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-                GUIEngine::getSmallFont()->draw(
-                    core::stringw(msg.m_message.c_str()).c_str(),
-                    pos, msg.m_color, true /* hcenter */, true /* vcenter */);
-                y -= m_small_font_max_height;                    
-            }
-        }
-    }
+    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);    
     
     // First line of text somewhat under the top of the viewport.
     y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
@@ -681,7 +657,7 @@ void MinimalRaceGUI::drawAllMessages(const Kart* kart,
     {
         TimedMessage const &msg = *i;
 
-         // less important messages were already displayed
+         // less important messages are not displayed in minimal mode
         if (!msg.m_important) continue;
         
         // Display only messages for all karts, or messages for this kart
