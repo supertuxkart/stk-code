@@ -100,6 +100,17 @@ Rain::Rain(irr::scene::ISceneNode* parent)
 }   // Rain
 
 // ----------------------------------------------------------------------------
+
+Rain::~Rain()
+{
+    for (int r=0; r<RAIN_RING_COUNT; r++)
+    {
+        m_node[r]->remove();
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void Rain::update(float dt)
 {
     m_y = m_y + dt*RAIN_DY;
@@ -115,6 +126,7 @@ void Rain::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+
 void Rain::setPosition(const core::vector3df& position)
 {
     for (int m=0; m<RAIN_RING_COUNT; m++)

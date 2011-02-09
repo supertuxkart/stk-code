@@ -335,10 +335,11 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_beep_sound   );
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-    if(m_terrain_particles)        delete m_terrain_particles;
+    if(m_terrain_particles)   delete m_terrain_particles;
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
     if(m_slipstream)          delete m_slipstream;
+    if(m_rain)                delete m_rain;
 
     delete m_shadow;
 
