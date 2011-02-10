@@ -62,7 +62,7 @@ private:
 
     void setDefaultSuccessors();
     void load         (const std::string &filename);
-    void createMesh(bool show_invisible=true);
+    void createMesh(bool show_invisible=true, bool draw_lap_line=false);
     int  getPredecessor(unsigned int target_node) const;
 public:
     static const int UNKNOWN_SECTOR;

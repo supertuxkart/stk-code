@@ -259,7 +259,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 /** Creates a mesh for this graph. The mesh is not added to a scene node and 
  *  is stored in m_mesh.
  */
-void QuadGraph::createMesh(bool show_invisible)
+void QuadGraph::createMesh(bool show_invisible, bool draw_lap_line)
 {
     // The debug track will not be lighted or culled.
     video::SMaterial m;
@@ -278,10 +278,10 @@ void QuadGraph::createMesh(bool show_invisible)
     }
 
     // Four vertices for each of the n-1 remaining quads
-    video::S3DVertex *new_v = new video::S3DVertex[n*4];
+    video::S3DVertex *new_v = new video::S3DVertex[4*n];
     // Each quad consists of 2 triangles with 3 elements, so 
     // we need 2*3 indices for each quad.
-    irr::u16         *ind   = new irr::u16[n*6];
+    irr::u16         *ind   = new irr::u16[6*n];
     video::SColor     c(255, 255, 0, 0);    
 
     // Now add all quads
@@ -310,6 +310,50 @@ void QuadGraph::createMesh(bool show_invisible)
     }   // for i=1; i<m_all_quads
     
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
+
+    if(draw_lap_line)
+    {
+        video::S3DVertex lap_v[4];
+        irr::u16         lap_ind[6];
+        video::SColor     c(128, 128, 128, 128);
+        m_all_nodes[0]->getQuad().getVertices(lap_v, c);
+
+        // Now scale the length (distance between vertix 0 and 3
+        // and between 1 and 2) to be 'length':
+        Vec3 bb_min, bb_max;
+        m_all_quads->getBoundingBox(&bb_min, &bb_max);
+        const float length=(bb_max.getZ()-bb_min.getZ())/20.0f;
+
+        core::vector3df dl = lap_v[3].Pos-lap_v[0].Pos;
+        float ll2 = dl.getLengthSQ();
+        if(ll2<0.001)
+            lap_v[3].Pos = lap_v[0].Pos+core::vector3df(0, 0, 1);
+        else
+            lap_v[3].Pos = lap_v[0].Pos+dl*length/sqrt(ll2);
+
+        core::vector3df dr = lap_v[2].Pos-lap_v[1].Pos;
+        float lr2 = dr.getLengthSQ();
+        if(lr2<0.001)
+            lap_v[2].Pos = lap_v[1].Pos+core::vector3df(0, 0, 1);
+        else
+            lap_v[2].Pos = lap_v[1].Pos+dr*length/sqrt(lr2);
+lap_v[3].Pos.Y += 1.0f;
+        lap_ind[0] = 0;
+        lap_ind[1] = 1;
+        lap_ind[2] = 2;
+        lap_ind[3] = 0;
+        lap_ind[4] = 3;
+        lap_ind[5] = 2;
+        lap_v[0].TCoords = core::vector2df(0,0);
+        lap_v[1].TCoords = core::vector2df(3,0);
+        lap_v[2].TCoords = core::vector2df(3,1);
+        lap_v[3].TCoords = core::vector2df(0,1);
+        m_mesh_buffer->append(lap_v, 4, lap_ind, 6);
+        video::SMaterial &m = m_mesh_buffer->getMaterial();
+        video::ITexture *t = irr_driver->getTexture("chess.png");
+        m.setTexture(0, t);
+    }
+
     // Instead of setting the bounding boxes, we could just disable culling,
     // since the debug track should always be drawn.
     //m_node->setAutomaticCulling(scene::EAC_OFF);
@@ -558,13 +602,17 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                         const video::SColor &fill_color)
 {
     IrrDriver::RTTProvider rttProvider(dimension, name);
-    createMesh(/*show_invisible part of the track*/false);
+    createMesh(/*show_invisible part of the track*/ false,
+               /*createLapLine*/                    true  );
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
+    // The last 4 vertices are for the lap counting line, which 
+    // is textured, so don't change the colour there.
+    for(unsigned int i=0; i<m_mesh_buffer->getVertexCount()-4; i++)
     {
         v[i].Color = fill_color;
     }
 
+    
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
 #ifdef DEBUG
     m_node->setName("minimap-mesh");

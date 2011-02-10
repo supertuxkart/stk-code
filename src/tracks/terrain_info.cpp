@@ -69,7 +69,7 @@ bool TerrainInfo::getSurfacePosition(Vec3 *position)
     {
         btTransform from;
         from.setIdentity();
-        from.setOrigin(m_hit_point+btVector3(0,5,0));
+        from.setOrigin(m_hit_point);
         btTransform to;
         to.setIdentity();
         to.setOrigin(m_hit_point+btVector3(0, 10000.0f, 0));
