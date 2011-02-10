@@ -424,6 +424,7 @@
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
+		95E1FCDF130369EB004D83CC /* per_camera_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E1FCDD130369EB004D83CC /* per_camera_node.cpp */; };
 		95E246BE111A2959000C965D /* confirm_resolution_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */; };
 		95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E6A0BE11DCF37800AE088A /* addons_loading.cpp */; };
 		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
@@ -991,7 +992,6 @@
 		9556A87F119EF976009C558F /* options_screen_video.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_video.hpp; path = ../../states_screens/options_screen_video.hpp; sourceTree = SOURCE_ROOT; };
 		955764E412FB67EF005CE479 /* btKartRaycast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btKartRaycast.cpp; path = ../../physics/btKartRaycast.cpp; sourceTree = SOURCE_ROOT; };
 		955764E512FB67EF005CE479 /* btKartRaycast.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = btKartRaycast.hpp; path = ../../physics/btKartRaycast.hpp; sourceTree = SOURCE_ROOT; };
-		9559DE7D12FF777600350DE8 /* rain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rain.h; path = games/supertuxkart/src/graphics/rain.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9559DE7E12FF777600350DE8 /* rain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rain.cpp; path = games/supertuxkart/src/graphics/rain.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		955DE88110042701006A4F3C /* check_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_manager.cpp; path = ../../tracks/check_manager.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88210042701006A4F3C /* check_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_manager.hpp; path = ../../tracks/check_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1412,6 +1412,9 @@
 		95D950D10FE473CA002E10AD /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../config/user_config.hpp; sourceTree = SOURCE_ROOT; };
 		95DFC5001106933B00A043A9 /* slip_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = slip_stream.cpp; path = ../../graphics/slip_stream.cpp; sourceTree = SOURCE_ROOT; };
 		95DFC5011106933B00A043A9 /* slip_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = slip_stream.hpp; path = ../../graphics/slip_stream.hpp; sourceTree = SOURCE_ROOT; };
+		95E1FCDD130369EB004D83CC /* per_camera_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = per_camera_node.cpp; path = ../../graphics/per_camera_node.cpp; sourceTree = SOURCE_ROOT; };
+		95E1FCDE130369EB004D83CC /* per_camera_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = per_camera_node.hpp; path = ../../graphics/per_camera_node.hpp; sourceTree = SOURCE_ROOT; };
+		95E1FCE0130369F4004D83CC /* rain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rain.hpp; path = ../../graphics/rain.hpp; sourceTree = SOURCE_ROOT; };
 		95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = confirm_resolution_dialog.cpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = confirm_resolution_dialog.hpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		95E6A0BE11DCF37800AE088A /* addons_loading.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_loading.cpp; path = ../../states_screens/dialogs/addons_loading.cpp; sourceTree = SOURCE_ROOT; };
@@ -1553,8 +1556,10 @@
 				9542FD4B12D3E0D700C00366 /* particle_kind.hpp */,
 				9528C71412D69494006E9167 /* particle_kind_manager.cpp */,
 				9528C71512D69494006E9167 /* particle_kind_manager.hpp */,
+				95E1FCDD130369EB004D83CC /* per_camera_node.cpp */,
+				95E1FCDE130369EB004D83CC /* per_camera_node.hpp */,
 				9559DE7E12FF777600350DE8 /* rain.cpp */,
-				9559DE7D12FF777600350DE8 /* rain.h */,
+				95E1FCE0130369F4004D83CC /* rain.hpp */,
 				952A153D103F66D600B1895D /* shadow.cpp */,
 				952A153E103F66D600B1895D /* shadow.hpp */,
 				952A153F103F66D600B1895D /* skid_marks.cpp */,
@@ -3346,6 +3351,7 @@
 				955764E612FB67EF005CE479 /* btKartRaycast.cpp in Sources */,
 				9559DE7F12FF777600350DE8 /* rain.cpp in Sources */,
 				9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */,
+				95E1FCDF130369EB004D83CC /* per_camera_node.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

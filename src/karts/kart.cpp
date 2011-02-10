@@ -922,6 +922,22 @@ void Kart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+
+void Kart::setCamera(Camera *camera)
+{
+    m_camera = camera;
+    
+#ifdef DEBUG
+    m_camera->getCameraSceneNode()->setName((m_kart_properties->getIdent() + "'s camera").c_str());
+#endif
+    
+    if (m_rain)
+    {
+        m_rain->setCamera( camera->getCameraSceneNode() );
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be 
  *  used with a specific material, in which case the zipper parmaters are
  *  taken from this material (parameters that are <0 will be using the
@@ -1488,7 +1504,7 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
     
     if (UserConfigParams::m_weather_effects && track->getWeatherType() == WEATHER_RAIN && type == RaceManager::KT_PLAYER)
     {
-        m_rain = new Rain(NULL);
+        m_rain = new Rain((m_camera != NULL ? m_camera->getCameraSceneNode() : NULL), NULL);
     }
     
     //m_water_splash_system = new WaterSplash(this);

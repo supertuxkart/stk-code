@@ -38,6 +38,7 @@ using namespace irr;
 
 class Camera;
 class Kart;
+class PerCameraNode;
 
 struct VideoMode
 {
@@ -120,6 +121,7 @@ public:
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
+    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh, scene::ICameraSceneNode* node, scene::ISceneNode *parent = NULL);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent=NULL);
 
     scene::IParticleSystemSceneNode

@@ -20,22 +20,27 @@
 #ifndef HEADER_RAIN_HPP
 #define HEADER_RAIN_HPP
 
+class PerCameraNode;
+
 #include <irrlicht.h>
 const int RAIN_RING_COUNT = 5;
 
 class Rain
 {
-    irr::scene::ISceneNode* m_node[RAIN_RING_COUNT];
+    PerCameraNode* m_node[RAIN_RING_COUNT];
+
     std::vector<irr::video::SMaterial*> m_materials;
     
     float m_y;
     
 public:
-    Rain(irr::scene::ISceneNode* parent);
+    Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent);
     ~Rain();
     
     void update(float dt);
     void setPosition(const irr::core::vector3df& position);
+    
+    void setCamera(scene::ICameraSceneNode* camera);
 };
 
 #endif

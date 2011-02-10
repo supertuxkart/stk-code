@@ -23,6 +23,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/per_camera_node.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -540,6 +541,15 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 {
     return m_scene_manager->addMeshSceneNode(mesh, parent);
 }   // addMesh
+
+// ----------------------------------------------------------------------------
+
+PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh, scene::ICameraSceneNode* camera,
+                                           scene::ISceneNode *parent)
+{
+    return new PerCameraNode((parent != NULL ? parent : m_scene_manager->getRootSceneNode()), m_scene_manager, -1, camera, mesh);
+}   // addMesh
+
 
 // ----------------------------------------------------------------------------
 /** Adds a billboard node to scene.

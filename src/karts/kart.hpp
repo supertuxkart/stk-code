@@ -265,7 +265,7 @@ public:
     const Camera*  getCamera         () const {return m_camera;}
     // ------------------------------------------------------------------------
     /** Sets the camera for this kart. Takes ownership of the camera and will delete it. */
-    void           setCamera(Camera *camera) {m_camera=camera; }
+    void           setCamera(Camera *camera);
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     const Powerup *getPowerup          () const { return &m_powerup;         }

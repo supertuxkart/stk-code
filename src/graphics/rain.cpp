@@ -20,6 +20,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
+#include "graphics/per_camera_node.hpp"
 #include "graphics/rain.hpp"
 #include "utils/constants.hpp"
 
@@ -32,7 +33,7 @@ const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
 const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 
 
-Rain::Rain(irr::scene::ISceneNode* parent)
+Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
 {
     m_y = 0.0f;
     
@@ -90,8 +91,9 @@ Rain::Rain(irr::scene::ISceneNode* parent)
         scene::SMesh* mesh = new scene::SMesh();
         mesh->addMeshBuffer(buffer);
         mesh->recalculateBoundingBox();
-
-        m_node[r] = irr_driver->addMesh(mesh);
+        
+        m_node[r] = irr_driver->addPerCameraMesh(mesh, camera);
+        
         if (parent != NULL) m_node[r]->setParent(parent);
         mesh->drop();
         
@@ -119,7 +121,7 @@ void Rain::update(float dt)
     //const int count = m_materials.size();
     for (int m=0; m<RAIN_RING_COUNT; m++)
     {
-        core::matrix4& matrix = m_node[m]->getMaterial(0).getTextureMatrix(0);
+        core::matrix4& matrix = m_node[m]->getChild()->getMaterial(0).getTextureMatrix(0);
 
         matrix.setTextureTranslate(0, m_y);
     }
@@ -131,7 +133,13 @@ void Rain::setPosition(const core::vector3df& position)
 {
     for (int m=0; m<RAIN_RING_COUNT; m++)
     {
-        m_node[m]->setPosition(position);
+        m_node[m]->getChild()->setPosition(position);
     }
 }   // setPosition
 
+// ----------------------------------------------------------------------------
+
+void Rain::setCamera(scene::ICameraSceneNode* camera)
+{
+    for (int n=0; n<RAIN_RING_COUNT; n++) m_node[n]->setCamera(camera);
+}
