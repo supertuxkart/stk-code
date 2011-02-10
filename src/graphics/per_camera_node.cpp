@@ -30,8 +30,10 @@ PerCameraNode::PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mg
 #endif
     
     m_camera = camera;
-    //m_child = mgr->addMeshSceneNode(mesh, this);
-    m_child = mgr->addCubeSceneNode(0.5f, this, -1);
+    m_child = mgr->addMeshSceneNode(mesh, this);
+    //m_child = mgr->addCubeSceneNode(0.5f, this, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(3.0f,0.2f,3.0f));
+    //RelativeTransformationMatrix.setTranslation( core::vector3df(-0.5,-1,3) );
+    
     setAutomaticCulling(scene::EAC_OFF);
     
     parent->addChild(this);
@@ -41,22 +43,28 @@ PerCameraNode::~PerCameraNode()
 {
 }
 
+// How to show/hide a child node is not as easy as one might think.
+// setVisible(false) is effective starting from the NEXT render so we
+// can't easily use it; deciding which nodes go into the render list
+// from OnRegisterSceneNode doesn't work either, presumably because
+// this method is called before the active camera is set or for some
+// other obscure reason (?). So my solution is to add no children
+// nodes from OnRegisterSceneNode, but register the PerCameraNode to
+// be "rendered" in the camera phase (which is very early in the render
+// pipe). then, in the render callback, I can decide whether I add
+// the children nodes to the render list.
+
 void PerCameraNode::render()
 {
-    if (irr_driver->getSceneManager()->getSceneNodeRenderPass() != scene::ESNRP_SKY_BOX)
-    {
-        return;
-    }
-    
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-    //printf("cam %s <--> %s\n", curr_cam->getName(), m_camera->getName());
-    m_child->setVisible(curr_cam == m_camera);
+
+    // Only register children nodes if the right camera is in use
+    if (curr_cam == m_camera) ISceneNode::OnRegisterSceneNode();
 }
 
 void PerCameraNode::OnRegisterSceneNode()
 {
-    irr_driver->getSceneManager()->registerNodeForRendering(this, scene::ESNRP_SKY_BOX);
-    ISceneNode::OnRegisterSceneNode();
+    irr_driver->getSceneManager()->registerNodeForRendering(this, scene::ESNRP_CAMERA);
 }
 
 void PerCameraNode::setCamera(scene::ICameraSceneNode* camera)
@@ -65,6 +73,6 @@ void PerCameraNode::setCamera(scene::ICameraSceneNode* camera)
     
 #ifdef DEBUG
     if (camera)
-        setDebugName(camera->getDebugName());
+        setName(camera->getName());
 #endif
 }

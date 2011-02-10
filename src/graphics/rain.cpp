@@ -92,9 +92,7 @@ Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
         mesh->addMeshBuffer(buffer);
         mesh->recalculateBoundingBox();
         
-        m_node[r] = irr_driver->addPerCameraMesh(mesh, camera);
-        
-        if (parent != NULL) m_node[r]->setParent(parent);
+        m_node[r] = irr_driver->addPerCameraMesh(mesh, camera, parent);
         mesh->drop();
         
         buffer->drop();
