@@ -711,6 +711,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\per_camera_node.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\rain.cpp"
 					>
 				</File>
@@ -1674,6 +1678,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\particle_kind_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\per_camera_node.hpp"
 					>
 				</File>
 				<File
