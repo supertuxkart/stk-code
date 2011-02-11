@@ -798,7 +798,7 @@
 		9556A87F119EF976009C558F /* options_screen_video.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_video.hpp; path = ../../states_screens/options_screen_video.hpp; sourceTree = SOURCE_ROOT; };
 		955764E412FB67EF005CE479 /* btKartRaycast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btKartRaycast.cpp; path = ../../physics/btKartRaycast.cpp; sourceTree = SOURCE_ROOT; };
 		955764E512FB67EF005CE479 /* btKartRaycast.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = btKartRaycast.hpp; path = ../../physics/btKartRaycast.hpp; sourceTree = SOURCE_ROOT; };
-		9559DE7E12FF777600350DE8 /* rain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rain.cpp; path = games/supertuxkart/src/graphics/rain.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9559DE7E12FF777600350DE8 /* rain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rain.cpp; path = ../../graphics/rain.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88110042701006A4F3C /* check_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_manager.cpp; path = ../../tracks/check_manager.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88210042701006A4F3C /* check_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_manager.hpp; path = ../../tracks/check_manager.hpp; sourceTree = SOURCE_ROOT; };
 		955DE8871004273B006A4F3C /* check_structure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_structure.cpp; path = ../../tracks/check_structure.cpp; sourceTree = SOURCE_ROOT; };
@@ -1045,7 +1045,6 @@
 		95CB476B0FF30EF400413BAE /* bezier_curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bezier_curve.cpp; path = ../../tracks/bezier_curve.cpp; sourceTree = SOURCE_ROOT; };
 		95D2343D1078227A00625256 /* feature_unlocked.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = feature_unlocked.hpp; path = ../../states_screens/feature_unlocked.hpp; sourceTree = SOURCE_ROOT; };
 		95D2343E1078227A00625256 /* feature_unlocked.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = feature_unlocked.cpp; path = ../../states_screens/feature_unlocked.cpp; sourceTree = SOURCE_ROOT; };
-		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
 		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = /usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = "<absolute>"; };
@@ -1277,7 +1276,6 @@
 			isa = PBXGroup;
 			children = (
 				9551C9F80FC1B87600DB481B /* Config.xcconfig */,
-				95D464880FA37B1B00F50CA2 /* libIrrlicht.a */,
 				95D538830F69D61C00B4062E /* irrlicht */,
 				9555790F12FA14A900CC458E /* bullet */,
 				95C2ABA60F29653F000D3E5D /* src */,
