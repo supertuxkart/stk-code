@@ -153,102 +153,6 @@
 		9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9552C1F91231249000347B6C /* world_with_rank.cpp */; };
 		9553823A10FD4FEC00737979 /* constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9553823910FD4FEC00737979 /* constants.cpp */; };
 		9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9554C4A411F1188000906416 /* race_result_gui.cpp */; };
-		95557AAC12FA14AA00CC458E /* AUTHORS in Resources */ = {isa = PBXBuildFile; fileRef = 9555791012FA14A900CC458E /* AUTHORS */; };
-		95557AAD12FA14AA00CC458E /* BulletLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9555791112FA14A900CC458E /* BulletLicense.txt */; };
-		95557AAE12FA14AA00CC458E /* Changelog in Resources */ = {isa = PBXBuildFile; fileRef = 9555791212FA14A900CC458E /* Changelog */; };
-		95557AAF12FA14AA00CC458E /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9555791312FA14A900CC458E /* ChangeLog.txt */; };
-		95557AB012FA14AA00CC458E /* copy_bullet_files in Resources */ = {isa = PBXBuildFile; fileRef = 9555791412FA14A900CC458E /* copy_bullet_files */; };
-		95557AB612FA14AA00CC458E /* btAlignedAllocator.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791C12FA14A900CC458E /* btAlignedAllocator.Po */; };
-		95557AB712FA14AA00CC458E /* btAxisSweep3.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791D12FA14A900CC458E /* btAxisSweep3.Po */; };
-		95557AB812FA14AA00CC458E /* btBoxBoxCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791E12FA14A900CC458E /* btBoxBoxCollisionAlgorithm.Po */; };
-		95557AB912FA14AA00CC458E /* btBoxBoxDetector.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555791F12FA14A900CC458E /* btBoxBoxDetector.Po */; };
-		95557ABA12FA14AA00CC458E /* btBoxShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792012FA14A900CC458E /* btBoxShape.Po */; };
-		95557ABB12FA14AA00CC458E /* btBroadphaseProxy.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792112FA14A900CC458E /* btBroadphaseProxy.Po */; };
-		95557ABC12FA14AA00CC458E /* btBvhTriangleMeshShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792212FA14A900CC458E /* btBvhTriangleMeshShape.Po */; };
-		95557ABD12FA14AA00CC458E /* btCapsuleShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792312FA14A900CC458E /* btCapsuleShape.Po */; };
-		95557ABE12FA14AA00CC458E /* btCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792412FA14A900CC458E /* btCollisionAlgorithm.Po */; };
-		95557ABF12FA14AA00CC458E /* btCollisionDispatcher.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792512FA14A900CC458E /* btCollisionDispatcher.Po */; };
-		95557AC012FA14AA00CC458E /* btCollisionObject.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792612FA14A900CC458E /* btCollisionObject.Po */; };
-		95557AC112FA14AA00CC458E /* btCollisionShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792712FA14A900CC458E /* btCollisionShape.Po */; };
-		95557AC212FA14AA00CC458E /* btCollisionWorld.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792812FA14A900CC458E /* btCollisionWorld.Po */; };
-		95557AC312FA14AA00CC458E /* btCompoundCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792912FA14A900CC458E /* btCompoundCollisionAlgorithm.Po */; };
-		95557AC412FA14AA00CC458E /* btCompoundShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792A12FA14A900CC458E /* btCompoundShape.Po */; };
-		95557AC512FA14AA00CC458E /* btConcaveShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792B12FA14A900CC458E /* btConcaveShape.Po */; };
-		95557AC612FA14AA00CC458E /* btConeShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792C12FA14A900CC458E /* btConeShape.Po */; };
-		95557AC712FA14AA00CC458E /* btConeTwistConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792D12FA14A900CC458E /* btConeTwistConstraint.Po */; };
-		95557AC812FA14AA00CC458E /* btContactConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792E12FA14A900CC458E /* btContactConstraint.Po */; };
-		95557AC912FA14AA00CC458E /* btContinuousConvexCollision.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555792F12FA14A900CC458E /* btContinuousConvexCollision.Po */; };
-		95557ACA12FA14AA00CC458E /* btContinuousDynamicsWorld.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793012FA14A900CC458E /* btContinuousDynamicsWorld.Po */; };
-		95557ACB12FA14AA00CC458E /* btConvexCast.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793112FA14A900CC458E /* btConvexCast.Po */; };
-		95557ACC12FA14AA00CC458E /* btConvexConcaveCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793212FA14A900CC458E /* btConvexConcaveCollisionAlgorithm.Po */; };
-		95557ACD12FA14AA00CC458E /* btConvexConvexAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793312FA14A900CC458E /* btConvexConvexAlgorithm.Po */; };
-		95557ACE12FA14AA00CC458E /* btConvexHull.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793412FA14A900CC458E /* btConvexHull.Po */; };
-		95557ACF12FA14AA00CC458E /* btConvexHullShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793512FA14A900CC458E /* btConvexHullShape.Po */; };
-		95557AD012FA14AA00CC458E /* btConvexInternalShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793612FA14A900CC458E /* btConvexInternalShape.Po */; };
-		95557AD112FA14AA00CC458E /* btConvexPlaneCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793712FA14A900CC458E /* btConvexPlaneCollisionAlgorithm.Po */; };
-		95557AD212FA14AA00CC458E /* btConvexShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793812FA14A900CC458E /* btConvexShape.Po */; };
-		95557AD312FA14AA00CC458E /* btConvexTriangleMeshShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793912FA14A900CC458E /* btConvexTriangleMeshShape.Po */; };
-		95557AD412FA14AA00CC458E /* btCylinderShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793A12FA14A900CC458E /* btCylinderShape.Po */; };
-		95557AD512FA14AA00CC458E /* btDefaultCollisionConfiguration.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793B12FA14A900CC458E /* btDefaultCollisionConfiguration.Po */; };
-		95557AD612FA14AA00CC458E /* btDiscreteDynamicsWorld.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793C12FA14A900CC458E /* btDiscreteDynamicsWorld.Po */; };
-		95557AD712FA14AA00CC458E /* btDispatcher.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793D12FA14A900CC458E /* btDispatcher.Po */; };
-		95557AD812FA14AA00CC458E /* btEmptyCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793E12FA14A900CC458E /* btEmptyCollisionAlgorithm.Po */; };
-		95557AD912FA14AA00CC458E /* btEmptyShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555793F12FA14A900CC458E /* btEmptyShape.Po */; };
-		95557ADA12FA14AA00CC458E /* btGeneric6DofConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794012FA14A900CC458E /* btGeneric6DofConstraint.Po */; };
-		95557ADB12FA14AA00CC458E /* btGeometryUtil.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794112FA14A900CC458E /* btGeometryUtil.Po */; };
-		95557ADC12FA14AA00CC458E /* btGjkConvexCast.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794212FA14A900CC458E /* btGjkConvexCast.Po */; };
-		95557ADD12FA14AA00CC458E /* btGjkEpa.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794312FA14A900CC458E /* btGjkEpa.Po */; };
-		95557ADE12FA14AA00CC458E /* btGjkEpa2.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794412FA14A900CC458E /* btGjkEpa2.Po */; };
-		95557ADF12FA14AA00CC458E /* btGjkEpaPenetrationDepthSolver.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794512FA14A900CC458E /* btGjkEpaPenetrationDepthSolver.Po */; };
-		95557AE012FA14AA00CC458E /* btGjkPairDetector.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794612FA14A900CC458E /* btGjkPairDetector.Po */; };
-		95557AE112FA14AA00CC458E /* btHeightfieldTerrainShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794712FA14A900CC458E /* btHeightfieldTerrainShape.Po */; };
-		95557AE212FA14AA00CC458E /* btHingeConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794812FA14A900CC458E /* btHingeConstraint.Po */; };
-		95557AE312FA14AA00CC458E /* btManifoldResult.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794912FA14A900CC458E /* btManifoldResult.Po */; };
-		95557AE412FA14AA00CC458E /* btMinkowskiPenetrationDepthSolver.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794A12FA14A900CC458E /* btMinkowskiPenetrationDepthSolver.Po */; };
-		95557AE512FA14AA00CC458E /* btMinkowskiSumShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794B12FA14A900CC458E /* btMinkowskiSumShape.Po */; };
-		95557AE612FA14AA00CC458E /* btMultiSapBroadphase.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794C12FA14A900CC458E /* btMultiSapBroadphase.Po */; };
-		95557AE712FA14AA00CC458E /* btMultiSphereShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794D12FA14A900CC458E /* btMultiSphereShape.Po */; };
-		95557AE812FA14AA00CC458E /* btOdeContactJoint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794E12FA14A900CC458E /* btOdeContactJoint.Po */; };
-		95557AE912FA14AA00CC458E /* btOdeJoint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555794F12FA14A900CC458E /* btOdeJoint.Po */; };
-		95557AEA12FA14AA00CC458E /* btOdeQuickstepConstraintSolver.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795012FA14A900CC458E /* btOdeQuickstepConstraintSolver.Po */; };
-		95557AEB12FA14AA00CC458E /* btOdeTypedJoint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795112FA14A900CC458E /* btOdeTypedJoint.Po */; };
-		95557AEC12FA14AA00CC458E /* btOptimizedBvh.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795212FA14A900CC458E /* btOptimizedBvh.Po */; };
-		95557AED12FA14AA00CC458E /* btOverlappingPairCache.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795312FA14A900CC458E /* btOverlappingPairCache.Po */; };
-		95557AEE12FA14AA00CC458E /* btPersistentManifold.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795412FA14A900CC458E /* btPersistentManifold.Po */; };
-		95557AEF12FA14AA00CC458E /* btPoint2PointConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795512FA14A900CC458E /* btPoint2PointConstraint.Po */; };
-		95557AF012FA14AA00CC458E /* btPolyhedralConvexShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795612FA14A900CC458E /* btPolyhedralConvexShape.Po */; };
-		95557AF112FA14AA00CC458E /* btQuickprof.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795712FA14A900CC458E /* btQuickprof.Po */; };
-		95557AF212FA14AA00CC458E /* btRaycastCallback.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795812FA14A900CC458E /* btRaycastCallback.Po */; };
-		95557AF312FA14AA00CC458E /* btRaycastVehicle.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795912FA14A900CC458E /* btRaycastVehicle.Po */; };
-		95557AF412FA14AA00CC458E /* btRigidBody.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795A12FA14A900CC458E /* btRigidBody.Po */; };
-		95557AF512FA14AA00CC458E /* btSequentialImpulseConstraintSolver.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795B12FA14A900CC458E /* btSequentialImpulseConstraintSolver.Po */; };
-		95557AF612FA14AA00CC458E /* btShapeHull.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795C12FA14A900CC458E /* btShapeHull.Po */; };
-		95557AF712FA14AA00CC458E /* btSimpleBroadphase.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795D12FA14A900CC458E /* btSimpleBroadphase.Po */; };
-		95557AF812FA14AA00CC458E /* btSimpleDynamicsWorld.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795E12FA14A900CC458E /* btSimpleDynamicsWorld.Po */; };
-		95557AF912FA14AA00CC458E /* btSimulationIslandManager.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555795F12FA14A900CC458E /* btSimulationIslandManager.Po */; };
-		95557AFA12FA14AA00CC458E /* btSliderConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796012FA14A900CC458E /* btSliderConstraint.Po */; };
-		95557AFB12FA14AA00CC458E /* btSolve2LinearConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796112FA14A900CC458E /* btSolve2LinearConstraint.Po */; };
-		95557AFC12FA14AA00CC458E /* btSorLcp.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796212FA14A900CC458E /* btSorLcp.Po */; };
-		95557AFD12FA14AA00CC458E /* btSphereBoxCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796312FA14A900CC458E /* btSphereBoxCollisionAlgorithm.Po */; };
-		95557AFE12FA14AA00CC458E /* btSphereShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796412FA14A900CC458E /* btSphereShape.Po */; };
-		95557AFF12FA14AA00CC458E /* btSphereSphereCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796512FA14A900CC458E /* btSphereSphereCollisionAlgorithm.Po */; };
-		95557B0012FA14AA00CC458E /* btSphereTriangleCollisionAlgorithm.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796612FA14A900CC458E /* btSphereTriangleCollisionAlgorithm.Po */; };
-		95557B0112FA14AA00CC458E /* btStaticPlaneShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796712FA14A900CC458E /* btStaticPlaneShape.Po */; };
-		95557B0212FA14AA00CC458E /* btStridingMeshInterface.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796812FA14A900CC458E /* btStridingMeshInterface.Po */; };
-		95557B0312FA14AA00CC458E /* btSubSimplexConvexCast.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796912FA14A900CC458E /* btSubSimplexConvexCast.Po */; };
-		95557B0412FA14AA00CC458E /* btTetrahedronShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796A12FA14A900CC458E /* btTetrahedronShape.Po */; };
-		95557B0512FA14AA00CC458E /* btTriangleBuffer.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796B12FA14A900CC458E /* btTriangleBuffer.Po */; };
-		95557B0612FA14AA00CC458E /* btTriangleCallback.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796C12FA14A900CC458E /* btTriangleCallback.Po */; };
-		95557B0712FA14AA00CC458E /* btTriangleIndexVertexArray.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796D12FA14A900CC458E /* btTriangleIndexVertexArray.Po */; };
-		95557B0812FA14AA00CC458E /* btTriangleMesh.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796E12FA14A900CC458E /* btTriangleMesh.Po */; };
-		95557B0912FA14AA00CC458E /* btTriangleMeshShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555796F12FA14A900CC458E /* btTriangleMeshShape.Po */; };
-		95557B0A12FA14AA00CC458E /* btTypedConstraint.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797012FA14A900CC458E /* btTypedConstraint.Po */; };
-		95557B0B12FA14AA00CC458E /* btUniformScalingShape.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797112FA14A900CC458E /* btUniformScalingShape.Po */; };
-		95557B0C12FA14AA00CC458E /* btUnionFind.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797212FA14A900CC458E /* btUnionFind.Po */; };
-		95557B0D12FA14AA00CC458E /* btVoronoiSimplexSolver.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797312FA14A900CC458E /* btVoronoiSimplexSolver.Po */; };
-		95557B0E12FA14AA00CC458E /* btWheelInfo.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797412FA14A900CC458E /* btWheelInfo.Po */; };
-		95557B0F12FA14AA00CC458E /* Bullet-C-API.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797512FA14A900CC458E /* Bullet-C-API.Po */; };
-		95557B1012FA14AA00CC458E /* SphereTriangleDetector.Po in Resources */ = {isa = PBXBuildFile; fileRef = 9555797612FA14A900CC458E /* SphereTriangleDetector.Po */; };
 		95557B1112FA14AA00CC458E /* btAxisSweep3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9555797C12FA14A900CC458E /* btAxisSweep3.cpp */; };
 		95557B1212FA14AA00CC458E /* btBroadphaseProxy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9555797F12FA14A900CC458E /* btBroadphaseProxy.cpp */; };
 		95557B1312FA14AA00CC458E /* btCollisionAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9555798112FA14A900CC458E /* btCollisionAlgorithm.cpp */; };
@@ -365,7 +269,6 @@
 		95557B8512FA14AA00CC458E /* btGeometryUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557A9312FA14A900CC458E /* btGeometryUtil.cpp */; };
 		95557B8612FA14AA00CC458E /* btQuickprof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557A9E12FA14A900CC458E /* btQuickprof.cpp */; };
 		95557B8712FA14AA00CC458E /* btSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95557AA212FA14A900CC458E /* btSerializer.cpp */; };
-		95557B8B12FA14AA00CC458E /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 95557AAB12FA14A900CC458E /* VERSION */; };
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
 		955764E612FB67EF005CE479 /* btKartRaycast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955764E412FB67EF005CE479 /* btKartRaycast.cpp */; };
@@ -599,102 +502,6 @@
 		9553823910FD4FEC00737979 /* constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = constants.cpp; path = ../../utils/constants.cpp; sourceTree = SOURCE_ROOT; };
 		9554C4A411F1188000906416 /* race_result_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_result_gui.cpp; path = ../../states_screens/race_result_gui.cpp; sourceTree = SOURCE_ROOT; };
 		9554C4A511F1188000906416 /* race_result_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_result_gui.hpp; path = ../../states_screens/race_result_gui.hpp; sourceTree = SOURCE_ROOT; };
-		9555791012FA14A900CC458E /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = AUTHORS; path = ../../bullet/AUTHORS; sourceTree = SOURCE_ROOT; };
-		9555791112FA14A900CC458E /* BulletLicense.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = BulletLicense.txt; path = ../../bullet/BulletLicense.txt; sourceTree = SOURCE_ROOT; };
-		9555791212FA14A900CC458E /* Changelog */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Changelog; path = ../../bullet/Changelog; sourceTree = SOURCE_ROOT; };
-		9555791312FA14A900CC458E /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChangeLog.txt; path = ../../bullet/ChangeLog.txt; sourceTree = SOURCE_ROOT; };
-		9555791412FA14A900CC458E /* copy_bullet_files */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = copy_bullet_files; path = ../../bullet/copy_bullet_files; sourceTree = SOURCE_ROOT; };
-		9555791C12FA14A900CC458E /* btAlignedAllocator.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btAlignedAllocator.Po; path = ../../bullet/src/.deps/btAlignedAllocator.Po; sourceTree = SOURCE_ROOT; };
-		9555791D12FA14A900CC458E /* btAxisSweep3.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btAxisSweep3.Po; path = ../../bullet/src/.deps/btAxisSweep3.Po; sourceTree = SOURCE_ROOT; };
-		9555791E12FA14A900CC458E /* btBoxBoxCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBoxBoxCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btBoxBoxCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555791F12FA14A900CC458E /* btBoxBoxDetector.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBoxBoxDetector.Po; path = ../../bullet/src/.deps/btBoxBoxDetector.Po; sourceTree = SOURCE_ROOT; };
-		9555792012FA14A900CC458E /* btBoxShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBoxShape.Po; path = ../../bullet/src/.deps/btBoxShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792112FA14A900CC458E /* btBroadphaseProxy.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBroadphaseProxy.Po; path = ../../bullet/src/.deps/btBroadphaseProxy.Po; sourceTree = SOURCE_ROOT; };
-		9555792212FA14A900CC458E /* btBvhTriangleMeshShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btBvhTriangleMeshShape.Po; path = ../../bullet/src/.deps/btBvhTriangleMeshShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792312FA14A900CC458E /* btCapsuleShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCapsuleShape.Po; path = ../../bullet/src/.deps/btCapsuleShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792412FA14A900CC458E /* btCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555792512FA14A900CC458E /* btCollisionDispatcher.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCollisionDispatcher.Po; path = ../../bullet/src/.deps/btCollisionDispatcher.Po; sourceTree = SOURCE_ROOT; };
-		9555792612FA14A900CC458E /* btCollisionObject.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCollisionObject.Po; path = ../../bullet/src/.deps/btCollisionObject.Po; sourceTree = SOURCE_ROOT; };
-		9555792712FA14A900CC458E /* btCollisionShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCollisionShape.Po; path = ../../bullet/src/.deps/btCollisionShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792812FA14A900CC458E /* btCollisionWorld.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCollisionWorld.Po; path = ../../bullet/src/.deps/btCollisionWorld.Po; sourceTree = SOURCE_ROOT; };
-		9555792912FA14A900CC458E /* btCompoundCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCompoundCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btCompoundCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555792A12FA14A900CC458E /* btCompoundShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCompoundShape.Po; path = ../../bullet/src/.deps/btCompoundShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792B12FA14A900CC458E /* btConcaveShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConcaveShape.Po; path = ../../bullet/src/.deps/btConcaveShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792C12FA14A900CC458E /* btConeShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConeShape.Po; path = ../../bullet/src/.deps/btConeShape.Po; sourceTree = SOURCE_ROOT; };
-		9555792D12FA14A900CC458E /* btConeTwistConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConeTwistConstraint.Po; path = ../../bullet/src/.deps/btConeTwistConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555792E12FA14A900CC458E /* btContactConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btContactConstraint.Po; path = ../../bullet/src/.deps/btContactConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555792F12FA14A900CC458E /* btContinuousConvexCollision.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btContinuousConvexCollision.Po; path = ../../bullet/src/.deps/btContinuousConvexCollision.Po; sourceTree = SOURCE_ROOT; };
-		9555793012FA14A900CC458E /* btContinuousDynamicsWorld.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btContinuousDynamicsWorld.Po; path = ../../bullet/src/.deps/btContinuousDynamicsWorld.Po; sourceTree = SOURCE_ROOT; };
-		9555793112FA14A900CC458E /* btConvexCast.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexCast.Po; path = ../../bullet/src/.deps/btConvexCast.Po; sourceTree = SOURCE_ROOT; };
-		9555793212FA14A900CC458E /* btConvexConcaveCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexConcaveCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btConvexConcaveCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555793312FA14A900CC458E /* btConvexConvexAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexConvexAlgorithm.Po; path = ../../bullet/src/.deps/btConvexConvexAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555793412FA14A900CC458E /* btConvexHull.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexHull.Po; path = ../../bullet/src/.deps/btConvexHull.Po; sourceTree = SOURCE_ROOT; };
-		9555793512FA14A900CC458E /* btConvexHullShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexHullShape.Po; path = ../../bullet/src/.deps/btConvexHullShape.Po; sourceTree = SOURCE_ROOT; };
-		9555793612FA14A900CC458E /* btConvexInternalShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexInternalShape.Po; path = ../../bullet/src/.deps/btConvexInternalShape.Po; sourceTree = SOURCE_ROOT; };
-		9555793712FA14A900CC458E /* btConvexPlaneCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexPlaneCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btConvexPlaneCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555793812FA14A900CC458E /* btConvexShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexShape.Po; path = ../../bullet/src/.deps/btConvexShape.Po; sourceTree = SOURCE_ROOT; };
-		9555793912FA14A900CC458E /* btConvexTriangleMeshShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btConvexTriangleMeshShape.Po; path = ../../bullet/src/.deps/btConvexTriangleMeshShape.Po; sourceTree = SOURCE_ROOT; };
-		9555793A12FA14A900CC458E /* btCylinderShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btCylinderShape.Po; path = ../../bullet/src/.deps/btCylinderShape.Po; sourceTree = SOURCE_ROOT; };
-		9555793B12FA14A900CC458E /* btDefaultCollisionConfiguration.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btDefaultCollisionConfiguration.Po; path = ../../bullet/src/.deps/btDefaultCollisionConfiguration.Po; sourceTree = SOURCE_ROOT; };
-		9555793C12FA14A900CC458E /* btDiscreteDynamicsWorld.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btDiscreteDynamicsWorld.Po; path = ../../bullet/src/.deps/btDiscreteDynamicsWorld.Po; sourceTree = SOURCE_ROOT; };
-		9555793D12FA14A900CC458E /* btDispatcher.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btDispatcher.Po; path = ../../bullet/src/.deps/btDispatcher.Po; sourceTree = SOURCE_ROOT; };
-		9555793E12FA14A900CC458E /* btEmptyCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btEmptyCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btEmptyCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555793F12FA14A900CC458E /* btEmptyShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btEmptyShape.Po; path = ../../bullet/src/.deps/btEmptyShape.Po; sourceTree = SOURCE_ROOT; };
-		9555794012FA14A900CC458E /* btGeneric6DofConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGeneric6DofConstraint.Po; path = ../../bullet/src/.deps/btGeneric6DofConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555794112FA14A900CC458E /* btGeometryUtil.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGeometryUtil.Po; path = ../../bullet/src/.deps/btGeometryUtil.Po; sourceTree = SOURCE_ROOT; };
-		9555794212FA14A900CC458E /* btGjkConvexCast.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGjkConvexCast.Po; path = ../../bullet/src/.deps/btGjkConvexCast.Po; sourceTree = SOURCE_ROOT; };
-		9555794312FA14A900CC458E /* btGjkEpa.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGjkEpa.Po; path = ../../bullet/src/.deps/btGjkEpa.Po; sourceTree = SOURCE_ROOT; };
-		9555794412FA14A900CC458E /* btGjkEpa2.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGjkEpa2.Po; path = ../../bullet/src/.deps/btGjkEpa2.Po; sourceTree = SOURCE_ROOT; };
-		9555794512FA14A900CC458E /* btGjkEpaPenetrationDepthSolver.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGjkEpaPenetrationDepthSolver.Po; path = ../../bullet/src/.deps/btGjkEpaPenetrationDepthSolver.Po; sourceTree = SOURCE_ROOT; };
-		9555794612FA14A900CC458E /* btGjkPairDetector.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btGjkPairDetector.Po; path = ../../bullet/src/.deps/btGjkPairDetector.Po; sourceTree = SOURCE_ROOT; };
-		9555794712FA14A900CC458E /* btHeightfieldTerrainShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btHeightfieldTerrainShape.Po; path = ../../bullet/src/.deps/btHeightfieldTerrainShape.Po; sourceTree = SOURCE_ROOT; };
-		9555794812FA14A900CC458E /* btHingeConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btHingeConstraint.Po; path = ../../bullet/src/.deps/btHingeConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555794912FA14A900CC458E /* btManifoldResult.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btManifoldResult.Po; path = ../../bullet/src/.deps/btManifoldResult.Po; sourceTree = SOURCE_ROOT; };
-		9555794A12FA14A900CC458E /* btMinkowskiPenetrationDepthSolver.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btMinkowskiPenetrationDepthSolver.Po; path = ../../bullet/src/.deps/btMinkowskiPenetrationDepthSolver.Po; sourceTree = SOURCE_ROOT; };
-		9555794B12FA14A900CC458E /* btMinkowskiSumShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btMinkowskiSumShape.Po; path = ../../bullet/src/.deps/btMinkowskiSumShape.Po; sourceTree = SOURCE_ROOT; };
-		9555794C12FA14A900CC458E /* btMultiSapBroadphase.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btMultiSapBroadphase.Po; path = ../../bullet/src/.deps/btMultiSapBroadphase.Po; sourceTree = SOURCE_ROOT; };
-		9555794D12FA14A900CC458E /* btMultiSphereShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btMultiSphereShape.Po; path = ../../bullet/src/.deps/btMultiSphereShape.Po; sourceTree = SOURCE_ROOT; };
-		9555794E12FA14A900CC458E /* btOdeContactJoint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOdeContactJoint.Po; path = ../../bullet/src/.deps/btOdeContactJoint.Po; sourceTree = SOURCE_ROOT; };
-		9555794F12FA14A900CC458E /* btOdeJoint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOdeJoint.Po; path = ../../bullet/src/.deps/btOdeJoint.Po; sourceTree = SOURCE_ROOT; };
-		9555795012FA14A900CC458E /* btOdeQuickstepConstraintSolver.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOdeQuickstepConstraintSolver.Po; path = ../../bullet/src/.deps/btOdeQuickstepConstraintSolver.Po; sourceTree = SOURCE_ROOT; };
-		9555795112FA14A900CC458E /* btOdeTypedJoint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOdeTypedJoint.Po; path = ../../bullet/src/.deps/btOdeTypedJoint.Po; sourceTree = SOURCE_ROOT; };
-		9555795212FA14A900CC458E /* btOptimizedBvh.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOptimizedBvh.Po; path = ../../bullet/src/.deps/btOptimizedBvh.Po; sourceTree = SOURCE_ROOT; };
-		9555795312FA14A900CC458E /* btOverlappingPairCache.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btOverlappingPairCache.Po; path = ../../bullet/src/.deps/btOverlappingPairCache.Po; sourceTree = SOURCE_ROOT; };
-		9555795412FA14A900CC458E /* btPersistentManifold.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btPersistentManifold.Po; path = ../../bullet/src/.deps/btPersistentManifold.Po; sourceTree = SOURCE_ROOT; };
-		9555795512FA14A900CC458E /* btPoint2PointConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btPoint2PointConstraint.Po; path = ../../bullet/src/.deps/btPoint2PointConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555795612FA14A900CC458E /* btPolyhedralConvexShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btPolyhedralConvexShape.Po; path = ../../bullet/src/.deps/btPolyhedralConvexShape.Po; sourceTree = SOURCE_ROOT; };
-		9555795712FA14A900CC458E /* btQuickprof.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btQuickprof.Po; path = ../../bullet/src/.deps/btQuickprof.Po; sourceTree = SOURCE_ROOT; };
-		9555795812FA14A900CC458E /* btRaycastCallback.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btRaycastCallback.Po; path = ../../bullet/src/.deps/btRaycastCallback.Po; sourceTree = SOURCE_ROOT; };
-		9555795912FA14A900CC458E /* btRaycastVehicle.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btRaycastVehicle.Po; path = ../../bullet/src/.deps/btRaycastVehicle.Po; sourceTree = SOURCE_ROOT; };
-		9555795A12FA14A900CC458E /* btRigidBody.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btRigidBody.Po; path = ../../bullet/src/.deps/btRigidBody.Po; sourceTree = SOURCE_ROOT; };
-		9555795B12FA14A900CC458E /* btSequentialImpulseConstraintSolver.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSequentialImpulseConstraintSolver.Po; path = ../../bullet/src/.deps/btSequentialImpulseConstraintSolver.Po; sourceTree = SOURCE_ROOT; };
-		9555795C12FA14A900CC458E /* btShapeHull.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btShapeHull.Po; path = ../../bullet/src/.deps/btShapeHull.Po; sourceTree = SOURCE_ROOT; };
-		9555795D12FA14A900CC458E /* btSimpleBroadphase.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSimpleBroadphase.Po; path = ../../bullet/src/.deps/btSimpleBroadphase.Po; sourceTree = SOURCE_ROOT; };
-		9555795E12FA14A900CC458E /* btSimpleDynamicsWorld.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSimpleDynamicsWorld.Po; path = ../../bullet/src/.deps/btSimpleDynamicsWorld.Po; sourceTree = SOURCE_ROOT; };
-		9555795F12FA14A900CC458E /* btSimulationIslandManager.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSimulationIslandManager.Po; path = ../../bullet/src/.deps/btSimulationIslandManager.Po; sourceTree = SOURCE_ROOT; };
-		9555796012FA14A900CC458E /* btSliderConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSliderConstraint.Po; path = ../../bullet/src/.deps/btSliderConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555796112FA14A900CC458E /* btSolve2LinearConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSolve2LinearConstraint.Po; path = ../../bullet/src/.deps/btSolve2LinearConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555796212FA14A900CC458E /* btSorLcp.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSorLcp.Po; path = ../../bullet/src/.deps/btSorLcp.Po; sourceTree = SOURCE_ROOT; };
-		9555796312FA14A900CC458E /* btSphereBoxCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSphereBoxCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btSphereBoxCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555796412FA14A900CC458E /* btSphereShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSphereShape.Po; path = ../../bullet/src/.deps/btSphereShape.Po; sourceTree = SOURCE_ROOT; };
-		9555796512FA14A900CC458E /* btSphereSphereCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSphereSphereCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btSphereSphereCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555796612FA14A900CC458E /* btSphereTriangleCollisionAlgorithm.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSphereTriangleCollisionAlgorithm.Po; path = ../../bullet/src/.deps/btSphereTriangleCollisionAlgorithm.Po; sourceTree = SOURCE_ROOT; };
-		9555796712FA14A900CC458E /* btStaticPlaneShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btStaticPlaneShape.Po; path = ../../bullet/src/.deps/btStaticPlaneShape.Po; sourceTree = SOURCE_ROOT; };
-		9555796812FA14A900CC458E /* btStridingMeshInterface.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btStridingMeshInterface.Po; path = ../../bullet/src/.deps/btStridingMeshInterface.Po; sourceTree = SOURCE_ROOT; };
-		9555796912FA14A900CC458E /* btSubSimplexConvexCast.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btSubSimplexConvexCast.Po; path = ../../bullet/src/.deps/btSubSimplexConvexCast.Po; sourceTree = SOURCE_ROOT; };
-		9555796A12FA14A900CC458E /* btTetrahedronShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTetrahedronShape.Po; path = ../../bullet/src/.deps/btTetrahedronShape.Po; sourceTree = SOURCE_ROOT; };
-		9555796B12FA14A900CC458E /* btTriangleBuffer.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTriangleBuffer.Po; path = ../../bullet/src/.deps/btTriangleBuffer.Po; sourceTree = SOURCE_ROOT; };
-		9555796C12FA14A900CC458E /* btTriangleCallback.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTriangleCallback.Po; path = ../../bullet/src/.deps/btTriangleCallback.Po; sourceTree = SOURCE_ROOT; };
-		9555796D12FA14A900CC458E /* btTriangleIndexVertexArray.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTriangleIndexVertexArray.Po; path = ../../bullet/src/.deps/btTriangleIndexVertexArray.Po; sourceTree = SOURCE_ROOT; };
-		9555796E12FA14A900CC458E /* btTriangleMesh.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTriangleMesh.Po; path = ../../bullet/src/.deps/btTriangleMesh.Po; sourceTree = SOURCE_ROOT; };
-		9555796F12FA14A900CC458E /* btTriangleMeshShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTriangleMeshShape.Po; path = ../../bullet/src/.deps/btTriangleMeshShape.Po; sourceTree = SOURCE_ROOT; };
-		9555797012FA14A900CC458E /* btTypedConstraint.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btTypedConstraint.Po; path = ../../bullet/src/.deps/btTypedConstraint.Po; sourceTree = SOURCE_ROOT; };
-		9555797112FA14A900CC458E /* btUniformScalingShape.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btUniformScalingShape.Po; path = ../../bullet/src/.deps/btUniformScalingShape.Po; sourceTree = SOURCE_ROOT; };
-		9555797212FA14A900CC458E /* btUnionFind.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btUnionFind.Po; path = ../../bullet/src/.deps/btUnionFind.Po; sourceTree = SOURCE_ROOT; };
-		9555797312FA14A900CC458E /* btVoronoiSimplexSolver.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btVoronoiSimplexSolver.Po; path = ../../bullet/src/.deps/btVoronoiSimplexSolver.Po; sourceTree = SOURCE_ROOT; };
-		9555797412FA14A900CC458E /* btWheelInfo.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = btWheelInfo.Po; path = ../../bullet/src/.deps/btWheelInfo.Po; sourceTree = SOURCE_ROOT; };
-		9555797512FA14A900CC458E /* Bullet-C-API.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Bullet-C-API.Po"; path = "../../bullet/src/.deps/Bullet-C-API.Po"; sourceTree = SOURCE_ROOT; };
-		9555797612FA14A900CC458E /* SphereTriangleDetector.Po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SphereTriangleDetector.Po; path = ../../bullet/src/.deps/SphereTriangleDetector.Po; sourceTree = SOURCE_ROOT; };
 		9555797712FA14A900CC458E /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		9555797812FA14A900CC458E /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		9555797912FA14A900CC458E /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -985,7 +792,6 @@
 		95557AA512FA14A900CC458E /* btTransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTransform.h; path = ../../bullet/src/LinearMath/btTransform.h; sourceTree = SOURCE_ROOT; };
 		95557AA612FA14A900CC458E /* btTransformUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTransformUtil.h; path = ../../bullet/src/LinearMath/btTransformUtil.h; sourceTree = SOURCE_ROOT; };
 		95557AA712FA14A900CC458E /* btVector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btVector3.h; path = ../../bullet/src/LinearMath/btVector3.h; sourceTree = SOURCE_ROOT; };
-		95557AAB12FA14A900CC458E /* VERSION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = VERSION; path = ../../bullet/VERSION; sourceTree = SOURCE_ROOT; };
 		9556A87C119EF976009C558F /* options_screen_audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_audio.cpp; path = ../../states_screens/options_screen_audio.cpp; sourceTree = SOURCE_ROOT; };
 		9556A87D119EF976009C558F /* options_screen_audio.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_audio.hpp; path = ../../states_screens/options_screen_audio.hpp; sourceTree = SOURCE_ROOT; };
 		9556A87E119EF976009C558F /* options_screen_video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_video.cpp; path = ../../states_screens/options_screen_video.cpp; sourceTree = SOURCE_ROOT; };
@@ -1610,13 +1416,7 @@
 		9555790F12FA14A900CC458E /* bullet */ = {
 			isa = PBXGroup;
 			children = (
-				9555791012FA14A900CC458E /* AUTHORS */,
-				9555791112FA14A900CC458E /* BulletLicense.txt */,
-				9555791212FA14A900CC458E /* Changelog */,
-				9555791312FA14A900CC458E /* ChangeLog.txt */,
-				9555791412FA14A900CC458E /* copy_bullet_files */,
 				9555791A12FA14A900CC458E /* src */,
-				95557AAB12FA14A900CC458E /* VERSION */,
 			);
 			name = bullet;
 			path = ../../bullet;
@@ -1640,97 +1440,6 @@
 		9555791B12FA14A900CC458E /* .deps */ = {
 			isa = PBXGroup;
 			children = (
-				9555791C12FA14A900CC458E /* btAlignedAllocator.Po */,
-				9555791D12FA14A900CC458E /* btAxisSweep3.Po */,
-				9555791E12FA14A900CC458E /* btBoxBoxCollisionAlgorithm.Po */,
-				9555791F12FA14A900CC458E /* btBoxBoxDetector.Po */,
-				9555792012FA14A900CC458E /* btBoxShape.Po */,
-				9555792112FA14A900CC458E /* btBroadphaseProxy.Po */,
-				9555792212FA14A900CC458E /* btBvhTriangleMeshShape.Po */,
-				9555792312FA14A900CC458E /* btCapsuleShape.Po */,
-				9555792412FA14A900CC458E /* btCollisionAlgorithm.Po */,
-				9555792512FA14A900CC458E /* btCollisionDispatcher.Po */,
-				9555792612FA14A900CC458E /* btCollisionObject.Po */,
-				9555792712FA14A900CC458E /* btCollisionShape.Po */,
-				9555792812FA14A900CC458E /* btCollisionWorld.Po */,
-				9555792912FA14A900CC458E /* btCompoundCollisionAlgorithm.Po */,
-				9555792A12FA14A900CC458E /* btCompoundShape.Po */,
-				9555792B12FA14A900CC458E /* btConcaveShape.Po */,
-				9555792C12FA14A900CC458E /* btConeShape.Po */,
-				9555792D12FA14A900CC458E /* btConeTwistConstraint.Po */,
-				9555792E12FA14A900CC458E /* btContactConstraint.Po */,
-				9555792F12FA14A900CC458E /* btContinuousConvexCollision.Po */,
-				9555793012FA14A900CC458E /* btContinuousDynamicsWorld.Po */,
-				9555793112FA14A900CC458E /* btConvexCast.Po */,
-				9555793212FA14A900CC458E /* btConvexConcaveCollisionAlgorithm.Po */,
-				9555793312FA14A900CC458E /* btConvexConvexAlgorithm.Po */,
-				9555793412FA14A900CC458E /* btConvexHull.Po */,
-				9555793512FA14A900CC458E /* btConvexHullShape.Po */,
-				9555793612FA14A900CC458E /* btConvexInternalShape.Po */,
-				9555793712FA14A900CC458E /* btConvexPlaneCollisionAlgorithm.Po */,
-				9555793812FA14A900CC458E /* btConvexShape.Po */,
-				9555793912FA14A900CC458E /* btConvexTriangleMeshShape.Po */,
-				9555793A12FA14A900CC458E /* btCylinderShape.Po */,
-				9555793B12FA14A900CC458E /* btDefaultCollisionConfiguration.Po */,
-				9555793C12FA14A900CC458E /* btDiscreteDynamicsWorld.Po */,
-				9555793D12FA14A900CC458E /* btDispatcher.Po */,
-				9555793E12FA14A900CC458E /* btEmptyCollisionAlgorithm.Po */,
-				9555793F12FA14A900CC458E /* btEmptyShape.Po */,
-				9555794012FA14A900CC458E /* btGeneric6DofConstraint.Po */,
-				9555794112FA14A900CC458E /* btGeometryUtil.Po */,
-				9555794212FA14A900CC458E /* btGjkConvexCast.Po */,
-				9555794312FA14A900CC458E /* btGjkEpa.Po */,
-				9555794412FA14A900CC458E /* btGjkEpa2.Po */,
-				9555794512FA14A900CC458E /* btGjkEpaPenetrationDepthSolver.Po */,
-				9555794612FA14A900CC458E /* btGjkPairDetector.Po */,
-				9555794712FA14A900CC458E /* btHeightfieldTerrainShape.Po */,
-				9555794812FA14A900CC458E /* btHingeConstraint.Po */,
-				9555794912FA14A900CC458E /* btManifoldResult.Po */,
-				9555794A12FA14A900CC458E /* btMinkowskiPenetrationDepthSolver.Po */,
-				9555794B12FA14A900CC458E /* btMinkowskiSumShape.Po */,
-				9555794C12FA14A900CC458E /* btMultiSapBroadphase.Po */,
-				9555794D12FA14A900CC458E /* btMultiSphereShape.Po */,
-				9555794E12FA14A900CC458E /* btOdeContactJoint.Po */,
-				9555794F12FA14A900CC458E /* btOdeJoint.Po */,
-				9555795012FA14A900CC458E /* btOdeQuickstepConstraintSolver.Po */,
-				9555795112FA14A900CC458E /* btOdeTypedJoint.Po */,
-				9555795212FA14A900CC458E /* btOptimizedBvh.Po */,
-				9555795312FA14A900CC458E /* btOverlappingPairCache.Po */,
-				9555795412FA14A900CC458E /* btPersistentManifold.Po */,
-				9555795512FA14A900CC458E /* btPoint2PointConstraint.Po */,
-				9555795612FA14A900CC458E /* btPolyhedralConvexShape.Po */,
-				9555795712FA14A900CC458E /* btQuickprof.Po */,
-				9555795812FA14A900CC458E /* btRaycastCallback.Po */,
-				9555795912FA14A900CC458E /* btRaycastVehicle.Po */,
-				9555795A12FA14A900CC458E /* btRigidBody.Po */,
-				9555795B12FA14A900CC458E /* btSequentialImpulseConstraintSolver.Po */,
-				9555795C12FA14A900CC458E /* btShapeHull.Po */,
-				9555795D12FA14A900CC458E /* btSimpleBroadphase.Po */,
-				9555795E12FA14A900CC458E /* btSimpleDynamicsWorld.Po */,
-				9555795F12FA14A900CC458E /* btSimulationIslandManager.Po */,
-				9555796012FA14A900CC458E /* btSliderConstraint.Po */,
-				9555796112FA14A900CC458E /* btSolve2LinearConstraint.Po */,
-				9555796212FA14A900CC458E /* btSorLcp.Po */,
-				9555796312FA14A900CC458E /* btSphereBoxCollisionAlgorithm.Po */,
-				9555796412FA14A900CC458E /* btSphereShape.Po */,
-				9555796512FA14A900CC458E /* btSphereSphereCollisionAlgorithm.Po */,
-				9555796612FA14A900CC458E /* btSphereTriangleCollisionAlgorithm.Po */,
-				9555796712FA14A900CC458E /* btStaticPlaneShape.Po */,
-				9555796812FA14A900CC458E /* btStridingMeshInterface.Po */,
-				9555796912FA14A900CC458E /* btSubSimplexConvexCast.Po */,
-				9555796A12FA14A900CC458E /* btTetrahedronShape.Po */,
-				9555796B12FA14A900CC458E /* btTriangleBuffer.Po */,
-				9555796C12FA14A900CC458E /* btTriangleCallback.Po */,
-				9555796D12FA14A900CC458E /* btTriangleIndexVertexArray.Po */,
-				9555796E12FA14A900CC458E /* btTriangleMesh.Po */,
-				9555796F12FA14A900CC458E /* btTriangleMeshShape.Po */,
-				9555797012FA14A900CC458E /* btTypedConstraint.Po */,
-				9555797112FA14A900CC458E /* btUniformScalingShape.Po */,
-				9555797212FA14A900CC458E /* btUnionFind.Po */,
-				9555797312FA14A900CC458E /* btVoronoiSimplexSolver.Po */,
-				9555797412FA14A900CC458E /* btWheelInfo.Po */,
-				9555797512FA14A900CC458E /* Bullet-C-API.Po */,
-				9555797612FA14A900CC458E /* SphereTriangleDetector.Po */,
 			);
 			name = .deps;
 			path = ../../bullet/src/.deps;
@@ -2914,103 +2623,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9507E9B70FC1CCE900BD2B92 /* stk.icns in Resources */,
-				95557AAC12FA14AA00CC458E /* AUTHORS in Resources */,
-				95557AAD12FA14AA00CC458E /* BulletLicense.txt in Resources */,
-				95557AAE12FA14AA00CC458E /* Changelog in Resources */,
-				95557AAF12FA14AA00CC458E /* ChangeLog.txt in Resources */,
-				95557AB012FA14AA00CC458E /* copy_bullet_files in Resources */,
-				95557AB612FA14AA00CC458E /* btAlignedAllocator.Po in Resources */,
-				95557AB712FA14AA00CC458E /* btAxisSweep3.Po in Resources */,
-				95557AB812FA14AA00CC458E /* btBoxBoxCollisionAlgorithm.Po in Resources */,
-				95557AB912FA14AA00CC458E /* btBoxBoxDetector.Po in Resources */,
-				95557ABA12FA14AA00CC458E /* btBoxShape.Po in Resources */,
-				95557ABB12FA14AA00CC458E /* btBroadphaseProxy.Po in Resources */,
-				95557ABC12FA14AA00CC458E /* btBvhTriangleMeshShape.Po in Resources */,
-				95557ABD12FA14AA00CC458E /* btCapsuleShape.Po in Resources */,
-				95557ABE12FA14AA00CC458E /* btCollisionAlgorithm.Po in Resources */,
-				95557ABF12FA14AA00CC458E /* btCollisionDispatcher.Po in Resources */,
-				95557AC012FA14AA00CC458E /* btCollisionObject.Po in Resources */,
-				95557AC112FA14AA00CC458E /* btCollisionShape.Po in Resources */,
-				95557AC212FA14AA00CC458E /* btCollisionWorld.Po in Resources */,
-				95557AC312FA14AA00CC458E /* btCompoundCollisionAlgorithm.Po in Resources */,
-				95557AC412FA14AA00CC458E /* btCompoundShape.Po in Resources */,
-				95557AC512FA14AA00CC458E /* btConcaveShape.Po in Resources */,
-				95557AC612FA14AA00CC458E /* btConeShape.Po in Resources */,
-				95557AC712FA14AA00CC458E /* btConeTwistConstraint.Po in Resources */,
-				95557AC812FA14AA00CC458E /* btContactConstraint.Po in Resources */,
-				95557AC912FA14AA00CC458E /* btContinuousConvexCollision.Po in Resources */,
-				95557ACA12FA14AA00CC458E /* btContinuousDynamicsWorld.Po in Resources */,
-				95557ACB12FA14AA00CC458E /* btConvexCast.Po in Resources */,
-				95557ACC12FA14AA00CC458E /* btConvexConcaveCollisionAlgorithm.Po in Resources */,
-				95557ACD12FA14AA00CC458E /* btConvexConvexAlgorithm.Po in Resources */,
-				95557ACE12FA14AA00CC458E /* btConvexHull.Po in Resources */,
-				95557ACF12FA14AA00CC458E /* btConvexHullShape.Po in Resources */,
-				95557AD012FA14AA00CC458E /* btConvexInternalShape.Po in Resources */,
-				95557AD112FA14AA00CC458E /* btConvexPlaneCollisionAlgorithm.Po in Resources */,
-				95557AD212FA14AA00CC458E /* btConvexShape.Po in Resources */,
-				95557AD312FA14AA00CC458E /* btConvexTriangleMeshShape.Po in Resources */,
-				95557AD412FA14AA00CC458E /* btCylinderShape.Po in Resources */,
-				95557AD512FA14AA00CC458E /* btDefaultCollisionConfiguration.Po in Resources */,
-				95557AD612FA14AA00CC458E /* btDiscreteDynamicsWorld.Po in Resources */,
-				95557AD712FA14AA00CC458E /* btDispatcher.Po in Resources */,
-				95557AD812FA14AA00CC458E /* btEmptyCollisionAlgorithm.Po in Resources */,
-				95557AD912FA14AA00CC458E /* btEmptyShape.Po in Resources */,
-				95557ADA12FA14AA00CC458E /* btGeneric6DofConstraint.Po in Resources */,
-				95557ADB12FA14AA00CC458E /* btGeometryUtil.Po in Resources */,
-				95557ADC12FA14AA00CC458E /* btGjkConvexCast.Po in Resources */,
-				95557ADD12FA14AA00CC458E /* btGjkEpa.Po in Resources */,
-				95557ADE12FA14AA00CC458E /* btGjkEpa2.Po in Resources */,
-				95557ADF12FA14AA00CC458E /* btGjkEpaPenetrationDepthSolver.Po in Resources */,
-				95557AE012FA14AA00CC458E /* btGjkPairDetector.Po in Resources */,
-				95557AE112FA14AA00CC458E /* btHeightfieldTerrainShape.Po in Resources */,
-				95557AE212FA14AA00CC458E /* btHingeConstraint.Po in Resources */,
-				95557AE312FA14AA00CC458E /* btManifoldResult.Po in Resources */,
-				95557AE412FA14AA00CC458E /* btMinkowskiPenetrationDepthSolver.Po in Resources */,
-				95557AE512FA14AA00CC458E /* btMinkowskiSumShape.Po in Resources */,
-				95557AE612FA14AA00CC458E /* btMultiSapBroadphase.Po in Resources */,
-				95557AE712FA14AA00CC458E /* btMultiSphereShape.Po in Resources */,
-				95557AE812FA14AA00CC458E /* btOdeContactJoint.Po in Resources */,
-				95557AE912FA14AA00CC458E /* btOdeJoint.Po in Resources */,
-				95557AEA12FA14AA00CC458E /* btOdeQuickstepConstraintSolver.Po in Resources */,
-				95557AEB12FA14AA00CC458E /* btOdeTypedJoint.Po in Resources */,
-				95557AEC12FA14AA00CC458E /* btOptimizedBvh.Po in Resources */,
-				95557AED12FA14AA00CC458E /* btOverlappingPairCache.Po in Resources */,
-				95557AEE12FA14AA00CC458E /* btPersistentManifold.Po in Resources */,
-				95557AEF12FA14AA00CC458E /* btPoint2PointConstraint.Po in Resources */,
-				95557AF012FA14AA00CC458E /* btPolyhedralConvexShape.Po in Resources */,
-				95557AF112FA14AA00CC458E /* btQuickprof.Po in Resources */,
-				95557AF212FA14AA00CC458E /* btRaycastCallback.Po in Resources */,
-				95557AF312FA14AA00CC458E /* btRaycastVehicle.Po in Resources */,
-				95557AF412FA14AA00CC458E /* btRigidBody.Po in Resources */,
-				95557AF512FA14AA00CC458E /* btSequentialImpulseConstraintSolver.Po in Resources */,
-				95557AF612FA14AA00CC458E /* btShapeHull.Po in Resources */,
-				95557AF712FA14AA00CC458E /* btSimpleBroadphase.Po in Resources */,
-				95557AF812FA14AA00CC458E /* btSimpleDynamicsWorld.Po in Resources */,
-				95557AF912FA14AA00CC458E /* btSimulationIslandManager.Po in Resources */,
-				95557AFA12FA14AA00CC458E /* btSliderConstraint.Po in Resources */,
-				95557AFB12FA14AA00CC458E /* btSolve2LinearConstraint.Po in Resources */,
-				95557AFC12FA14AA00CC458E /* btSorLcp.Po in Resources */,
-				95557AFD12FA14AA00CC458E /* btSphereBoxCollisionAlgorithm.Po in Resources */,
-				95557AFE12FA14AA00CC458E /* btSphereShape.Po in Resources */,
-				95557AFF12FA14AA00CC458E /* btSphereSphereCollisionAlgorithm.Po in Resources */,
-				95557B0012FA14AA00CC458E /* btSphereTriangleCollisionAlgorithm.Po in Resources */,
-				95557B0112FA14AA00CC458E /* btStaticPlaneShape.Po in Resources */,
-				95557B0212FA14AA00CC458E /* btStridingMeshInterface.Po in Resources */,
-				95557B0312FA14AA00CC458E /* btSubSimplexConvexCast.Po in Resources */,
-				95557B0412FA14AA00CC458E /* btTetrahedronShape.Po in Resources */,
-				95557B0512FA14AA00CC458E /* btTriangleBuffer.Po in Resources */,
-				95557B0612FA14AA00CC458E /* btTriangleCallback.Po in Resources */,
-				95557B0712FA14AA00CC458E /* btTriangleIndexVertexArray.Po in Resources */,
-				95557B0812FA14AA00CC458E /* btTriangleMesh.Po in Resources */,
-				95557B0912FA14AA00CC458E /* btTriangleMeshShape.Po in Resources */,
-				95557B0A12FA14AA00CC458E /* btTypedConstraint.Po in Resources */,
-				95557B0B12FA14AA00CC458E /* btUniformScalingShape.Po in Resources */,
-				95557B0C12FA14AA00CC458E /* btUnionFind.Po in Resources */,
-				95557B0D12FA14AA00CC458E /* btVoronoiSimplexSolver.Po in Resources */,
-				95557B0E12FA14AA00CC458E /* btWheelInfo.Po in Resources */,
-				95557B0F12FA14AA00CC458E /* Bullet-C-API.Po in Resources */,
-				95557B1012FA14AA00CC458E /* SphereTriangleDetector.Po in Resources */,
-				95557B8B12FA14AA00CC458E /* VERSION in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
