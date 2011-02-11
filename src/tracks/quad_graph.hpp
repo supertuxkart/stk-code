@@ -62,7 +62,9 @@ private:
 
     void setDefaultSuccessors();
     void load         (const std::string &filename);
-    void createMesh(bool show_invisible=true, bool draw_lap_line=false);
+    void createMesh(bool show_invisible=true, 
+                    const video::SColor *track_color=NULL,
+                    const video::SColor *lap_color=NULL);
     int  getPredecessor(unsigned int target_node) const;
 public:
     static const int UNKNOWN_SECTOR;
