@@ -22,7 +22,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#define AI_DEBUG
+#undef AI_DEBUG
 
 #include "karts/controller/default_ai_controller.hpp"
 
