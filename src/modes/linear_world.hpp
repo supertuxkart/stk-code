@@ -95,7 +95,6 @@ public:
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
-    void          setTimeAtLapForKart(float t, const int kart_id);
     float         getTimeAtLapForKart(const int kart_id) const;
 
     virtual  RaceGUIBase::KartIconDisplayInfo* 

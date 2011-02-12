@@ -40,49 +40,7 @@ AIBaseController::AIBaseController(Kart *kart,
         m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
         m_track       = m_world->getTrack();
         m_quad_graph  = &m_track->getQuadGraph();
-
-        m_next_node_index.reserve(m_quad_graph->getNumNodes());
-        m_successor_index.reserve(m_quad_graph->getNumNodes());
-        std::vector<unsigned int> next;
-        
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
-        {
-            next.clear();
-            m_quad_graph->getSuccessors(i, next);
-            // For now pick one part on random, which is not adjusted during the 
-            // race. Long term statistics might be gathered to determine the
-            // best way, potentially depending on race position etc.
-            int r = rand();
-            int indx = (int)( r / ((float)(RAND_MAX)+1.0f) * next.size() );
-            // In case of rounding errors0
-            if(indx>=(int)next.size()) indx--;
-            m_successor_index.push_back(indx);
-            assert(indx <(int)next.size() && indx>=0);
-            m_next_node_index.push_back(next[indx]);
-
-        }
-        
-        const unsigned int look_ahead=10;
-        // Now compute for each node in the graph the list of the next 'look_ahead'
-        // graph nodes. This is the list of node that is tested in checkCrashes.
-        // If the look_ahead is too big, the AI can skip loops (see 
-        // QuadGraph::findRoadSector for details), if it's too short the AI won't
-        // find too good a driveline. Note that in general this list should
-        // be computed recursively, but since the AI for now is using only 
-        // (randomly picked) path this is fine
-        m_all_look_aheads.reserve(m_quad_graph->getNumNodes());
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
-        {
-            std::vector<int> l;
-            int current = i;
-            for(unsigned int j=0; j<look_ahead; j++)
-            {
-                assert(current < (int)m_next_node_index.size());
-                l.push_back(m_next_node_index[current]);
-                current = m_next_node_index[current];
-            }   // for j<look_ahead
-            m_all_look_aheads.push_back(l);
-        }
+        computePath();
     }
     else
     {
@@ -98,6 +56,65 @@ AIBaseController::AIBaseController(Kart *kart,
 
 }   // AIBaseController
 
+//-----------------------------------------------------------------------------
+/** Triggers a recomputation of the path to use, so that the AI does not
+ *  always use the same way.
+ */
+void  AIBaseController::newLap(int lap)
+{
+    if(lap>0)
+    {
+        computePath();
+    }
+}   // newLap
+
+//-----------------------------------------------------------------------------
+/** Computes a path for the AI to follow.
+ */
+void AIBaseController::computePath()
+{
+
+    m_next_node_index.resize(m_quad_graph->getNumNodes());
+    m_successor_index.resize(m_quad_graph->getNumNodes());
+    std::vector<unsigned int> next;
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        next.clear();
+        m_quad_graph->getSuccessors(i, next);
+        // For now pick one part on random, which is not adjusted during the 
+        // race. Long term statistics might be gathered to determine the
+        // best way, potentially depending on race position etc.
+        int r = rand();
+        int indx = (int)( r / ((float)(RAND_MAX)+1.0f) * next.size() );
+        // In case of rounding errors0
+        if(indx>=(int)next.size()) indx--;
+        m_successor_index[i] = indx;
+        assert(indx <(int)next.size() && indx>=0);
+        m_next_node_index[i] = next[indx];
+    }
+
+    const unsigned int look_ahead=10;
+    // Now compute for each node in the graph the list of the next 'look_ahead'
+    // graph nodes. This is the list of node that is tested in checkCrashes.
+    // If the look_ahead is too big, the AI can skip loops (see 
+    // QuadGraph::findRoadSector for details), if it's too short the AI won't
+    // find too good a driveline. Note that in general this list should
+    // be computed recursively, but since the AI for now is using only 
+    // (randomly picked) path this is fine
+    m_all_look_aheads.resize(m_quad_graph->getNumNodes());
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        std::vector<int> l;
+        int current = i;
+        for(unsigned int j=0; j<look_ahead; j++)
+        {
+            assert(current < (int)m_next_node_index.size());
+            l.push_back(m_next_node_index[current]);
+            current = m_next_node_index[current];
+        }   // for j<look_ahead
+        m_all_look_aheads[i] = l;
+    }
+}   // computePath
 //-----------------------------------------------------------------------------
 void AIBaseController::update(float dt)
 {

@@ -22,7 +22,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#undef AI_DEBUG
+#define AI_DEBUG
 
 #include "karts/controller/default_ai_controller.hpp"
 
@@ -410,9 +410,6 @@ void DefaultAIController::handleSteering(float dt)
         m_debug_sphere->setPosition(straight_point.toIrrVector());
 #endif
         steer_angle = steerToPoint(straight_point);
-#ifdef AI_DEBUG
-        std::cout << "- Fallback."  << std::endl;
-#endif
     }
 
     setSteering(steer_angle, dt);

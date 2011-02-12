@@ -65,6 +65,9 @@ public:
     virtual bool  isNetworkController() const {return false;}
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void  action             (PlayerAction action, int value) {}
+    /** Callback whenever a new lap is triggered. Used by the AI
+     *  to trigger a recomputation of the way to use.            */
+    virtual void  newLap             (int lap) {}
     virtual const irr::core::stringw& getNamePostfix() const;
 
 };   // Controller

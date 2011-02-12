@@ -283,13 +283,13 @@ void LinearWorld::newLap(unsigned int kart_index)
     if(kart_info.m_race_lap+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
-        setTimeAtLapForKart(getTime(), kart_index );
+        kart_info.m_time_at_last_lap=getTime();
         kart_info.m_race_lap++ ;
     }
     // Last lap message (kart_index's assert in previous block already)
     if(kart_info.m_race_lap+1 == lap_count)
     {
-        m_race_gui->addMessage(_("Final lap!"), m_karts[kart_index],
+        m_race_gui->addMessage(_("Final lap!"), kart,
                                3.0f, 40, video::SColor(255, 210, 100, 50), true);
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
@@ -307,7 +307,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     else if (kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
-                               m_karts[kart_index], 3.0f, 40, video::SColor(255, 210, 100, 50), true);
+                               kart, 3.0f, 40, video::SColor(255, 210, 100, 50), true);
     }
 
     // The race positions must be updated here: consider the situation where 
@@ -334,7 +334,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
-        // A client wait does not detect race finished by itself, it will
+        // A client does not detect race finished by itself, it will
         // receive a message from the server. So a client does not do
         // anything here.
         if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
@@ -342,35 +342,35 @@ void LinearWorld::newLap(unsigned int kart_index)
             kart->finishedRace(getTime());
         }
     }
+    float time_per_lap;
+    if (kart_info.m_race_lap == 1) // just completed first lap
     {
-        float time_per_lap;
-        if (kart_info.m_race_lap == 1) // just completed first lap
-        {
-            time_per_lap=getTime();
-        }
-        else //completing subsequent laps
-        {
-            time_per_lap=getTime() - kart_info.m_lap_start_time;
-        }
-
-        // if new fastest lap
-        if(time_per_lap < getFastestLapTime() && raceHasLaps() &&
-            kart_info.m_race_lap>0)
-        {
-            setFastestLap(kart, time_per_lap);
-            m_race_gui->addMessage(_("New fastest lap"), NULL,
-                                   2.0f, 40, video::SColor(255, 100, 210, 100), true);
-            std::string s = StringUtils::timeToString(time_per_lap);
-
-            irr::core::stringw m_fastest_lap_message;
-            //I18N: as in "fastest lap: 60 seconds by Wilber"
-            m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
-
-            m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                                   2.0f, 40, video::SColor(255, 100, 210, 100));
-        } // end if new fastest lap
+        time_per_lap=getTime();
     }
+    else //completing subsequent laps
+    {
+        time_per_lap=getTime() - kart_info.m_lap_start_time;
+    }
+
+    // if new fastest lap
+    if(time_per_lap < getFastestLapTime() && raceHasLaps() &&
+        kart_info.m_race_lap>0)
+    {
+        setFastestLap(kart, time_per_lap);
+        m_race_gui->addMessage(_("New fastest lap"), NULL,
+            2.0f, 40, video::SColor(255, 100, 210, 100), true);
+        std::string s = StringUtils::timeToString(time_per_lap);
+
+        irr::core::stringw m_fastest_lap_message;
+        //I18N: as in "fastest lap: 60 seconds by Wilber"
+        m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
+
+        m_race_gui->addMessage(m_fastest_lap_message, NULL,
+            2.0f, 40, video::SColor(255, 100, 210, 100));
+    } // end if new fastest lap
+
     kart_info.m_lap_start_time = getTime();
+    kart->getController()->newLap(kart_info.m_race_lap);
 }   // newLap
 
 //-----------------------------------------------------------------------------
@@ -404,12 +404,6 @@ int LinearWorld::getLapForKart(const int kart_id) const
 {
     return  m_kart_info[kart_id].m_race_lap;
 }   // getLapForKart
-
-//-----------------------------------------------------------------------------
-void LinearWorld::setTimeAtLapForKart(float t, const int kart_id)
-{
-    m_kart_info[kart_id].m_time_at_last_lap=t;
-}   // setTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
 /** Returns the estimated finishing time. Only valid during the last lap!

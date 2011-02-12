@@ -74,12 +74,15 @@ protected:
     std::vector<std::vector<int> > m_all_look_aheads;
 
     virtual void update      (float delta) ;
+    virtual unsigned int getNextSector(unsigned int index);
+    virtual void  newLap             (int lap);
     float    steerToAngle  (const unsigned int sector, const float angle);
     float    steerToPoint  (const Vec3 &point);
     float    normalizeAngle(float angle);
     void     setSteering   (float angle, float dt);
     void     setSkiddingFraction(float f);
-    virtual unsigned int getNextSector(unsigned int index);
+    void     computePath();
+
 public:
              AIBaseController(Kart *kart,
                               StateManager::ActivePlayer *player=NULL);
