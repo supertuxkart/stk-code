@@ -557,7 +557,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                     
                     if (kart == NULL)
                     {
-                        fprintf(stderr, "[KartSelectionScreen] WANRING: could not find a kart named '%s'\n",
+                        fprintf(stderr, "[KartSelectionScreen] WARNING: could not find a kart named '%s'\n",
                                 unlockedFeatures[i].name.c_str());
                         
                         video::ITexture* tex = irr_driver->getTexture(file_manager->getGUIDir() + "/main_help.png");

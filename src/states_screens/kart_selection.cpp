@@ -310,11 +310,9 @@ public:
         const std::string default_kart = UserConfigParams::m_default_kart;
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
         if(!props)
-        {
-            fprintf(stderr, "[KartSelectionScreen] WARNING: could not find a kart named '%s'\n", default_kart.c_str());
-            
+        {            
             // If the default kart can't be found (e.g. previously a addon 
-            // kart was used, but the addon package was removed, use the
+            // kart was used, but the addon package was removed), use the
             // first kart as a default. This way we don't have to hardcode
             // any kart names.
             props = kart_properties_manager->getKartById(0);
