@@ -50,9 +50,11 @@ TerrainInfo::TerrainInfo(const Vec3 &pos)
 void TerrainInfo::update(const Vec3& pos)
 {
     m_last_material = m_material;
-    World::getWorld()->getTrack()->getTerrainInfo(pos, &m_hit_point,
-        &m_normal, &m_material);
-    m_normal.normalize();
+    btVector3 to(pos);
+    to.setY(-100000.f);
+
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    tm.castRay(pos, to, &m_hit_point, &m_material, &m_normal);
 }   // update
 
 // -----------------------------------------------------------------------------

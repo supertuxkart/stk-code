@@ -38,6 +38,7 @@ private:
     UserPointer                  m_user_pointer;
     std::vector<const Material*> m_triangleIndex2Material;
     btRigidBody                 *m_body;
+    btCollisionObject           *m_collision_object;
     btTriangleMesh               m_mesh;
     btVector3 dummy1, dummy2;
     btDefaultMotionState        *m_motion_state;
@@ -51,7 +52,7 @@ public:
                      const btVector3 &t3, const btVector3 &n1,
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
-    void createCollisionShape();
+    void createCollisionShape(bool create_collision_object=true);
     void createPhysicalBody(btCollisionObject::CollisionFlags flags=
                                (btCollisionObject::CollisionFlags)0);
     void removeBody();
@@ -63,6 +64,10 @@ public:
     // ------------------------------------------------------------------------
     const btCollisionShape &getCollisionShape() const 
                                           {return *m_collision_shape;}
+    // ------------------------------------------------------------------------
+    bool castRay(const btVector3 &from, const btVector3 &to,
+                 btVector3 *xyz, const Material **material, 
+                 btVector3 *normal=NULL) const;
     // ------------------------------------------------------------------------
     /** Returns the points of the 'indx' triangle.
      *  \param indx Index of the triangle to get. 

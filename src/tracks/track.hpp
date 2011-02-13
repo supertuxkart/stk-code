@@ -235,10 +235,6 @@ public:
 
     /** Starts the music for this track. */
     void               startMusic        () const;
-
-    void               getTerrainInfo(const Vec3 &pos, Vec3 *hit_point, 
-                                      Vec3* normal,
-                                      const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);

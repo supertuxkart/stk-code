@@ -41,6 +41,7 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
@@ -451,8 +452,10 @@ void World::resetAllKarts()
                 (*i)->getBody()->getMotionState()->getWorldTransform(t);
                 // This test can not be done only once before the loop, since
                 // it can happen that the kart falls through the track later!
-                m_track->getTerrainInfo(t.getOrigin(), &hit_point, &normal,
-                                        &material);
+                Vec3 to = t.getOrigin()+Vec3(0, -10000, 0);
+                m_track->getTriangleMesh().castRay(t.getOrigin(), to, 
+                                                   &hit_point, &material,
+                                                   &normal);
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",

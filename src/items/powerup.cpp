@@ -29,6 +29,7 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -235,9 +236,10 @@ void Powerup::use()
         Vec3 hit_point;
         Vec3 normal;
         const Material* material_hit;
-        btVector3 pos = m_owner->getXYZ();
-        world->getTrack()->getTerrainInfo(pos, &hit_point, &normal, 
-                                          &material_hit);
+        Vec3 pos = m_owner->getXYZ();
+        Vec3 to=pos+Vec3(0, -10000, 0);
+        world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
+                                                     &material_hit, &normal);
         // This can happen if the kart is 'over nothing' when dropping
         // the bubble gum
         if(!material_hit)

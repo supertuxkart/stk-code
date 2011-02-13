@@ -1123,66 +1123,6 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
-/** Does a ray cast straight down from the given position, and returns
- *  the hit point, material, and normal at the given location (or material
- *  ==NULL if no triangle was hit).
- *  \param pos Positions from which to cast the ray.
- *  \param hit_point On return: the position which was hit.
- *  \param normal On return the normal of the triangle at that point.
- *  \param material The material at the hit point (or NULL if no material
- *         was found.
- */
-void  Track::getTerrainInfo(const Vec3 &pos, Vec3 *hit_point, Vec3 *normal, 
-                            const Material **material) const
-{
-    btVector3 to_pos(pos);
-    to_pos.setY(-100000.f);
-
-    class MaterialCollision : public btCollisionWorld::ClosestRayResultCallback
-    {
-    public:
-        const Material* m_material;
-        MaterialCollision(const btVector3 &p1, const btVector3 &p2) : 
-            btCollisionWorld::ClosestRayResultCallback(p1,p2) {m_material=NULL;}
-        virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
-                                         bool normalInWorldSpace) {
-             if(rayResult.m_localShapeInfo && rayResult.m_localShapeInfo->m_shapePart>=0 )
-             {
-                 m_material = ((TriangleMesh*)rayResult.m_collisionObject->getUserPointer())->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
-             }
-             else
-             {
-                 // This can happen if the raycast hits a kart. This should 
-                 // actually be impossible (since the kart is removed from
-                 // the collision group), but now and again the karts don't
-                 // have the broadphase handle set (kart::update() for 
-                 // details), and it might still happen. So in this case
-                 // just ignore this callback and don't add it.
-                 return 1.0f;
-             }
-             return btCollisionWorld::ClosestRayResultCallback::addSingleResult(rayResult, 
-                                                                                normalInWorldSpace);
-        }   // AddSingleResult
-    };   // myCollision
-    MaterialCollision rayCallback(pos, to_pos);
-    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
-
-    if(!rayCallback.hasHit()) 
-    {
-        *material = NULL;
-        return;
-    }
-
-    *hit_point = rayCallback.m_hitPointWorld;
-    *normal    = rayCallback.m_hitNormalWorld;
-    *material  = rayCallback.m_material;
-    // Note: material might be NULL. This happens if the ray cast does not
-    // hit the track, but another rigid body (kart, moving_physics) - e.g.
-    // assume two karts falling down, one over the other. Bullet does not
-    // have any triangle/material information in this case!
-}   // getTerrainInfo
-
-// ----------------------------------------------------------------------------
 /** Simplified version to determine only the height of the terrain.
  *  \param pos Position at which to determine the height (x,y coordinates
  *             are only used).
@@ -1193,6 +1133,7 @@ float Track::getTerrainHeight(const Vec3 &pos) const
     Vec3  hit_point;
     Vec3  normal;
     const Material *m;
-    getTerrainInfo(pos, &hit_point, &normal, &m);
+    Vec3 to=pos+Vec3(0,-10000,0);
+    m_track_mesh->castRay(pos, to, &hit_point, &m, &normal);
     return hit_point.getY();
 }   // getTerrainHeight

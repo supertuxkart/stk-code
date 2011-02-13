@@ -19,6 +19,8 @@
 
 #include "physics/triangle_mesh.hpp"
 
+#include "btBulletDynamicsCommon.h"
+
 #include "modes/world.hpp"
 
 // -----------------------------------------------------------------------------
@@ -26,14 +28,15 @@
  */
 TriangleMesh::TriangleMesh() : m_mesh()
 {
-    m_body            = NULL;
-    m_motion_state    = NULL;
+    m_body             = NULL;
+    m_motion_state     = NULL;
     // FIXME: on VS in release mode this statement actually overwrites
     // part of the data of m_mesh, causing a crash later. Debugging 
     // shows that apparently m_collision_shape is at the same address
     // as m_mesh->m_use32bitIndices and m_use4componentVertices
     // (and m_mesh->m_weldingThreshold at m_normals
-    m_collision_shape = NULL;
+    m_collision_shape  = NULL;
+    m_collision_object = NULL;
     m_user_pointer.set(this);
 }   // TriangleMesh
 
@@ -49,6 +52,8 @@ TriangleMesh::~TriangleMesh()
         delete m_motion_state;
         delete m_collision_shape;
     }
+    if(m_collision_object)
+        delete m_collision_object;
 }   // ~TriangleMesh
 
 // -----------------------------------------------------------------------------
@@ -75,18 +80,26 @@ void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
 /** Creates a collision body only, which can be used for raycasting, but
  *  has no physical properties.
  */
-void TriangleMesh::createCollisionShape()
+void TriangleMesh::createCollisionShape(bool create_collision_object)
 {
     if(m_triangleIndex2Material.size()==0)
     {
-        m_collision_shape = NULL;
-        m_motion_state    = NULL;
-        m_body            = NULL;
+        m_collision_shape  = NULL;
+        m_motion_state     = NULL;
+        m_body             = NULL;
+        m_collision_object = NULL;
         return;
     }
     // Now convert the triangle mesh into a static rigid body
     m_collision_shape = new btBvhTriangleMeshShape(&m_mesh, true);
     m_collision_shape->setUserPointer(&m_user_pointer);
+    if(create_collision_object)
+    {
+        m_collision_object = new btCollisionObject();
+        btTransform bt;
+        bt.setIdentity();
+        m_collision_object->setWorldTransform(bt);
+    }
 }   // createCollisionShape
 
 // -----------------------------------------------------------------------------
@@ -101,14 +114,15 @@ void TriangleMesh::createCollisionShape()
  */
 void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags)
 {
-    createCollisionShape();
+    // We need the collision shape, but not the collision object (since
+    // this will be creates when the dynamics body is anyway).
+    createCollisionShape(/*create_collision_object*/false);
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state, 
                                                   m_collision_shape);
     m_body=new btRigidBody(info);
-
     World::getWorld()->getPhysics()->addBody(m_body);
 
     m_body->setUserPointer(&m_user_pointer);
@@ -183,3 +197,81 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
 
     return s*n1 + t*n2 + w*n3;
 }   // getInterpolatedNormal
+
+// ----------------------------------------------------------------------------
+/** Casts a ray from 'from' to 'to'. If a triangle of this mesh was hit,
+ *  xyz and material will be set.
+ *  \param from/to The from and to position for the raycast/
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ */
+bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
+                           btVector3 *xyz, const Material **material, 
+                           btVector3 *normal) const
+{
+    btTransform trans_from;
+    trans_from.setIdentity();
+    trans_from.setOrigin(from);
+
+    btTransform trans_to;
+    trans_to.setIdentity();
+    trans_to.setOrigin(to);
+
+    btTransform world_trans;
+    world_trans.setIdentity();
+
+    btCollisionWorld::ClosestRayResultCallback result(from, to);
+
+
+    class MaterialRayResult : public btCollisionWorld::ClosestRayResultCallback
+    {
+    public:
+        const Material* m_material;
+        const TriangleMesh *m_this;
+        // --------------------------------------------------------------------
+        MaterialRayResult(const btVector3 &p1, const btVector3 &p2, 
+                          const TriangleMesh *me)
+                        : btCollisionWorld::ClosestRayResultCallback(p1,p2)
+        {
+            m_material = NULL;
+            m_this     = me;
+        }   // MaterialRayResult
+        // --------------------------------------------------------------------
+        virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
+                                         bool normalInWorldSpace) 
+        {
+            m_material = 
+                m_this->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
+            return btCollisionWorld::ClosestRayResultCallback
+                    ::addSingleResult(rayResult, normalInWorldSpace);
+        }   // AddSingleResult
+        // --------------------------------------------------------------------
+    };   // myCollision
+
+    MaterialRayResult ray_callback(from, to, this);
+
+    // If this is a rigid body, m_collision_object is NULL, and the
+    // rigid body is the actual collision object.
+    btCollisionWorld::rayTestSingle(trans_from, trans_to, 
+                                    m_collision_object ? m_collision_object 
+                                                       : m_body,
+                                    m_collision_shape, world_trans, 
+                                    ray_callback);
+    if(ray_callback.hasHit())
+    {
+        *xyz      = ray_callback.m_hitPointWorld;
+        *material = ray_callback.m_material;
+        *normal   = ray_callback.m_hitNormalWorld;
+        normal->normalize();
+    }
+    else
+    {
+        *material = NULL;
+        normal->setValue(0, 1, 0);
+    }
+    return ray_callback.hasHit();
+
+}   // castRay
