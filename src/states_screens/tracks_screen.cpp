@@ -109,7 +109,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 const std::vector<int>& curr_group = track_manager->getTracksInGroup( tabs->getSelectionIDString(0) );
                 
                 RandomGenerator random;
-                const int randomID = random.get(curr_group.size());
+               
+                int attempts = 0; // just to avoid an infinite loop, in case all tracks are locked...
+                int randomID;
+                do
+                {
+                    randomID = random.get(curr_group.size());
+                    attempts++;
+                    if (attempts > 100) return;
+                }
+                while (unlock_manager->isLocked( track_manager->getTrack(curr_group[randomID])->getIdent()));
                 
                 Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
                 if (clickedTrack != NULL)
