@@ -399,8 +399,22 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
     
+#ifdef DEBUG
+    if(UserConfigParams::m_rendering_debug)
+    {
+        m->Shininess = 100.0f;
+        m->DiffuseColor  = video::SColor(200, 255, 0, 0);
+        m->AmbientColor  = video::SColor(200, 0, 0, 255);
+        m->SpecularColor = video::SColor(200, 0, 255, 0);
+    }
+#endif
+
     // anisotropic
+#ifdef DEBUG
+    if (UserConfigParams::m_rendering_debug || (m_anisotropic && UserConfigParams::m_anisotropic))
+#else
     if (m_anisotropic && UserConfigParams::m_anisotropic)
+#endif
     {
         m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
     }
@@ -439,5 +453,12 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->setFlag(video::EMF_BACK_FACE_CULLING, false);
 
     m->ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+
+#ifdef DEBUG
+    if (UserConfigParams::m_rendering_debug)
+    {
+        m->ColorMaterial = video::ECM_NONE; // Override one above
+    }
+#endif
     
 }   // setMaterialProperties

@@ -322,7 +322,12 @@ namespace UserConfigParams
      *  must always be printed. */
     PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
 
-    PARAM_PREFIX bool                       m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
+    PARAM_PREFIX bool                       m_no_start_screen   PARAM_DEFAULT( false );
+
+    /** True to test funky ambient/diffuse/specularity in RGB & all anisotropic */
+    PARAM_PREFIX bool                       m_rendering_debug   PARAM_DEFAULT( false );
+
+    // not saved to file
 
     // ---- Networking
     PARAM_PREFIX StringUserConfigParam      m_server_address

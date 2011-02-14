@@ -441,6 +441,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_slipstream_debug=true;
         }
+        else if(!strcmp(argv[i], "--rendering-debug"))
+        {
+            UserConfigParams::m_rendering_debug=true;
+        }
         else if(sscanf(argv[i], "--server=%d",&n)==1)
         {
             network_manager->setMode(NetworkManager::NW_SERVER);
