@@ -28,6 +28,7 @@ const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
 const float RAIN_Y_FROM = -10.0f;
 const float RAIN_DY = 2.5f;
+const float RAIN_DX = 0.2f;
 
 const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
 const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
@@ -113,7 +114,9 @@ Rain::~Rain()
 
 void Rain::update(float dt)
 {
+    m_x = m_x + dt*RAIN_DX;
     m_y = m_y + dt*RAIN_DY;
+    if (m_x > 1.0f) m_x = fmod(m_x, 1.0f);
     if (m_y > 1.0f) m_y = fmod(m_y, 1.0f);
 
     //const int count = m_materials.size();
@@ -121,7 +124,7 @@ void Rain::update(float dt)
     {
         core::matrix4& matrix = m_node[m]->getChild()->getMaterial(0).getTextureMatrix(0);
 
-        matrix.setTextureTranslate(0, m_y);
+        matrix.setTextureTranslate(m_x, m_y);
     }
 }   // update
 

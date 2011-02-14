@@ -31,6 +31,7 @@ class Rain
 
     std::vector<irr::video::SMaterial*> m_materials;
     
+    float m_x;
     float m_y;
     
 public:
