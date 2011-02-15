@@ -1112,7 +1112,19 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // if only 2d coordinates are given, let the item fall from very high
     if(drop)
     {
-        loc.setY(getTerrainHeight(loc));
+        // If raycast is used, increase the start position slightly
+        // in case that the point is too close to the actual surface
+        // (e.g. floating point errors can cause a problem here).
+        loc += Vec3(0,0.1f,0);
+        bool drop_success = setTerrainHeight(&loc);
+#ifdef DEBUG
+        if(!drop_success)
+        {
+            printf("Item at position (%f,%f,%f) can not be dropped\n",
+                loc.getX(), loc.getY(), loc.getZ());
+            printf("onto terrain - position unchanged.\n");
+        }
+#endif
     }
 
     // Don't tilt the items, since otherwise the rotation will look odd,
@@ -1124,17 +1136,25 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
-/** Simplified version to determine only the height of the terrain.
- *  \param pos Position at which to determine the height (x,y coordinates
- *             are only used).
- *  \return The height at the x,y coordinates.
+/** Does a raycast from the given position, and if terrain was found
+ *  adjust the Y position of the given vector to the actual terrain
+ *  height. If no terrain is found, false is returned and the
+ *  y position is not modified.
+ *  \param pos Pointer to the position at which to determine the 
+ *         height. If terrain is found, its Y position will be
+ *         set to the actual height.
+ *  \return True if terrain was found and the height was adjusted.
  */
-float Track::getTerrainHeight(const Vec3 &pos) const
+bool Track::setTerrainHeight(Vec3 *pos) const
 {
     Vec3  hit_point;
     Vec3  normal;
     const Material *m;
-    Vec3 to=pos+Vec3(0,-10000,0);
-    m_track_mesh->castRay(pos, to, &hit_point, &m, &normal);
-    return hit_point.getY();
-}   // getTerrainHeight
+    Vec3 to=*pos+Vec3(0,-10000,0);
+    if(m_track_mesh->castRay(*pos, to, &hit_point, &m, &normal))
+    {
+        pos->setY(hit_point.getY());
+        return true;
+    }
+    return false;
+}   // setTerrainHeight

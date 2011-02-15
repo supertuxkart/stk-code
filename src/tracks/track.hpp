@@ -235,7 +235,7 @@ public:
 
     /** Starts the music for this track. */
     void               startMusic        () const;
-    float              getTerrainHeight(const Vec3 &pos) const;
+    bool               setTerrainHeight(Vec3 *pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
