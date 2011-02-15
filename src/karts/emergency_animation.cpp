@@ -209,7 +209,8 @@ void EmergencyAnimation::update(float dt)
         // here, and again in reset (e.g. when restarting the race) if
         // m_eliminated is still true.
         m_eliminated = false;
-        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+        if(m_kart->getCamera())
+            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
         return;
     }
 
