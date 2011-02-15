@@ -137,10 +137,7 @@ private:
     bool             m_shadow_enabled;
     
     /** Particle emitter used for terrain-specific effects (including but not limited too skidding). */
-    ParticleEmitter *m_terrain_particles;
-    
-    /** Water splash when driving in water. */
-    ParticleEmitter *m_water_splash_system;
+    ParticleEmitter *m_terrain_particles;    
 
     /** Graphical effect when using a nitro. */
     ParticleEmitter *m_nitro;
@@ -182,6 +179,8 @@ private:
     float         m_time_last_crash;
 
     void          updatePhysics(float dt);
+    void          handleMaterialSFX(const Material *material);
+    void          handleMaterialGFX();
 
 protected:
     const KartProperties *m_kart_properties;

@@ -20,10 +20,11 @@
 #ifndef HEADER_SMOKE_HPP
 #define HEADER_SMOKE_HPP
 
-#include "utils/no_copy.hpp"
-
 #include "irrlicht.h"
 using namespace irr;
+
+#include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 class Material;
 class ParticleKind;
@@ -39,7 +40,7 @@ private:
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node;
     
-    core::vector3df                  m_position;
+    Vec3                             m_position;
     
     scene::ISceneNode*               m_parent;
     
@@ -54,13 +55,13 @@ private:
 public:
     
     ParticleEmitter             (const ParticleKind* type, 
-                                 const core::vector3df &position,
+                                 const Vec3 &position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
     virtual void update         ();
     void         setCreationRate(float f);
     
-    void         setPosition(const core::vector3df &pos);
+    void         setPosition(const Vec3 &pos);
     
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
     

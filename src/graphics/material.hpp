@@ -60,6 +60,10 @@ private:
      *  the water is marked as 'm_below_surface', which will then trigger a raycast
      *  up to find the position of the actual water surface. */
     bool             m_below_surface;
+
+    /** If a kart is falling over a material with this flag set, it
+     *  will trigger the special camera fall effect. */
+    bool             m_falling_effect;
     /** A material that is a surface only, i.e. the karts can fall through
      *  but the information is still needed (for GFX mostly). An example is
      *  a water surface: karts can drive while partly in water (so the water
@@ -191,6 +195,10 @@ public:
       */
     const ParticleKind* getParticlesWhen(ParticleConditions cond) const { return m_particles_effects[cond]; }
     
+    // ------------------------------------------------------------------------
+    /** Returns true if a kart falling over this kind of material triggers
+     *  the special falling camera. */
+    bool hasFallingEffect() const {return m_falling_effect; }
     // ------------------------------------------------------------------------
     /** Returns the zipper parametersfor the current material. */
     void getZipperParameter(float *zipper_max_speed_increase,

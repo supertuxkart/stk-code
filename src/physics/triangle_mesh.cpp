@@ -212,6 +212,12 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
                            btVector3 *xyz, const Material **material, 
                            btVector3 *normal) const
 {
+    if(!m_collision_shape)
+    {
+        *material=NULL;
+        return false;
+    }
+
     btTransform trans_from;
     trans_from.setIdentity();
     trans_from.setOrigin(from);
@@ -264,13 +270,17 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
     {
         *xyz      = ray_callback.m_hitPointWorld;
         *material = ray_callback.m_material;
-        *normal   = ray_callback.m_hitNormalWorld;
-        normal->normalize();
+        if(normal)
+        {
+            *normal   = ray_callback.m_hitNormalWorld;
+            normal->normalize();
+        }
     }
     else
     {
         *material = NULL;
-        normal->setValue(0, 1, 0);
+        if(normal)
+            normal->setValue(0, 1, 0);
     }
     return ray_callback.hasHit();
 

@@ -502,9 +502,3 @@ void Camera::activate()
 }   // activate
 
 // ----------------------------------------------------------------------------
-
-void Camera::setFallMode(bool mode)
-{
-    if (mode) m_mode = CM_FALLING;
-    else      m_mode = CM_NORMAL;
-}

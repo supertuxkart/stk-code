@@ -38,8 +38,6 @@ private:
     const Material   *m_last_material;
     /** The point that was hit. */
     Vec3              m_hit_point;
-    /** Position of last raycast. */
-    Vec3              m_last_pos;
 
 public:
              TerrainInfo();
@@ -47,7 +45,8 @@ public:
     virtual ~TerrainInfo() {};
 
     virtual void update(const Vec3 &pos);
-    bool     getSurfacePosition(Vec3 *position);
+    bool     getSurfaceInfo(const Vec3 &from, Vec3 *position, 
+                            const Material **m);
 
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */

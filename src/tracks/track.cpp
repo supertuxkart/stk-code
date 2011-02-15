@@ -437,12 +437,16 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         {
             std::string image = std::string(core::stringc(t->getName()).c_str());
             material=material_manager->getMaterial(StringUtils::getBasename(image));
-            if(material->isIgnore()) continue;
             // Special gfx meshes will not be stored as a normal physics body,
             // but converted to a collision body only, so that ray tests
             // against them can be done.
             if(material->isSurface())
                 tmesh = m_gfx_effect_mesh;
+            // A material which is a surface must be converted,
+            // even if it's marked as ignore. So only ignore
+            // non-surface materials.
+            else if(material->isIgnore()) 
+                continue;
         } 
 
         u16 *mbIndices = mb->getIndices();

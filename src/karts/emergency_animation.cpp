@@ -19,6 +19,7 @@
 
 #include "karts/emergency_animation.hpp"
 
+#include "graphics/camera.hpp"
 #include "graphics/stars.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
@@ -123,6 +124,9 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
         world->kartHit(m_kart->getWorldKartId());
     }
 
+    // Reset camera in case that it was in falling mode before.
+    if(m_kart->getCamera())
+        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
 }   // forceRescue
 
 //-----------------------------------------------------------------------------
@@ -205,6 +209,7 @@ void EmergencyAnimation::update(float dt)
         // here, and again in reset (e.g. when restarting the race) if
         // m_eliminated is still true.
         m_eliminated = false;
+        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
         return;
     }
 

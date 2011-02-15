@@ -195,10 +195,6 @@ public:
 
     /** Returns the scaling in x/y direction for this camera. */
     const core::vector2df& getScaling() const {return m_scaling; }
-
-    /** In "fall mode", the camera stays up and looks down at the falling kart
-        (mainly to avoid following the kart underwater) */
-    void setFallMode(bool fallMode);
     
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() 

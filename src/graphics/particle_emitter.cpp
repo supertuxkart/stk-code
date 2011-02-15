@@ -86,7 +86,7 @@ public:
 
 // ============================================================================
 ParticleEmitter::ParticleEmitter(const ParticleKind* type, 
-                                 const core::vector3df &position,
+                                 const Vec3 &position,
                                  scene::ISceneNode* parent) 
                : m_position(position)
 {
@@ -167,11 +167,13 @@ void ParticleEmitter::setCreationRate(float f)
 }   // setCreationRate
 
 //-----------------------------------------------------------------------------
-
-void ParticleEmitter::setPosition(const core::vector3df &pos)
+/** Sets the position of the particle emitter.
+ *  \param pos The position for the particle emitter.
+ */
+void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-    m_node->setPosition(pos);
-}
+    m_node->setPosition(pos.toIrrVector());
+}   // setPosition
 
 //-----------------------------------------------------------------------------
 
@@ -220,7 +222,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     
     video::SMaterial& mat0 = m_node->getMaterial(0);
     
-    m_node->setPosition(m_position);
+    m_node->setPosition(m_position.toIrrVector());
     material->setMaterialProperties(&mat0);
     m_node->setMaterialTexture(0, material->getTexture());
     
@@ -238,9 +240,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                    lifeTimeMin, lifeTimeMax,
                                                    m_particle_type->getAngleSpread() /* angle */
                                                    );
-            
-            //irr_driver->getSceneManager()->addCubeSceneNode(0.1f, m_parent, -1, m_position);
-
             break;
         }
             
@@ -258,11 +257,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
                                                  m_particle_type->getAngleSpread() /* angle */
-                                                 );
-            
-            //irr_driver->getSceneManager()->addCubeSceneNode(2.0f, m_parent, -1, m_position, core::vector3df(0, 0, 0) /* rotation */,
-            //                                                core::vector3df(box_size_x*2, box_size_y*2, box_size_z*2));
-            
+                                                 );            
             break;
         }
             

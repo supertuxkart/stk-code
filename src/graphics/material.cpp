@@ -60,10 +60,17 @@ Material::Material(const XMLNode *node, int index)
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
     node->get("friction",         &m_friction          );
+    node->get("reset",            &m_resetter          );
     node->get("below-surface",    &m_below_surface     );
+    node->get("falling-effect",   &m_falling_effect    );
+    // A terrain with falling effect has to force a reset
+    // since. So to make it easier for artists, force
+    // the reset flag in this case.
+    if(m_falling_effect)
+        m_resetter=true;
     node->get("surface",          &m_surface           );
     node->get("ignore",           &m_ignore            );
-    node->get("reset",            &m_resetter          );
+
     node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
@@ -162,6 +169,7 @@ void Material::init(unsigned int index)
     m_sphere_map                = false;
     m_friction                  = 1.0f;
     m_below_surface             = false;
+    m_falling_effect            = false;
     m_surface                   = false;
     m_ignore                    = false;
     m_resetter                  = false;

@@ -58,45 +58,21 @@ void TerrainInfo::update(const Vec3& pos)
 }   // update
 
 // -----------------------------------------------------------------------------
-/** If the raycast indicated that the kart is 'under something' (i.e. a 
+/** Does a raycast upwards from the given position
+If the raycast indicated that the kart is 'under something' (i.e. a 
  *  specially marked terrain), to another raycast up to detect under whic
  *  mesh the kart is. This is using the special gfx effect mesh only.
  *  This is used e.g. to detect if a kart is under water, and then to 
  *  get the proper position for water effects. Note that the TerrainInfo
  *  objects keeps track of the previous raycast position.
  */
-bool TerrainInfo::getSurfacePosition(Vec3 *position)
+bool TerrainInfo::getSurfaceInfo(const Vec3 &from, Vec3 *position, 
+                                 const Material **material)
 {
-    if(m_material && m_material->isBelowSurface())
-    {
-        btTransform from;
-        from.setIdentity();
-        from.setOrigin(m_hit_point);
-        btTransform to;
-        to.setIdentity();
-        to.setOrigin(m_hit_point+btVector3(0, 10000.0f, 0));
-        btTransform world_trans;
-        world_trans.setIdentity();
-
-        btCollisionWorld::ClosestRayResultCallback 
-                           result(from.getOrigin(), to.getOrigin());
-
-        const btCollisionShape &shape = 
-            World::getWorld()->getTrack()->getGFXEffectMesh().getCollisionShape();
-        btCollisionObject col_obj;
-        btTransform bt;
-        bt.setIdentity();
-        col_obj.setWorldTransform(bt);
-        btCollisionWorld::rayTestSingle(from, to, &col_obj, &shape, 
-                                        world_trans, result);
-        if(result.hasHit())
-        {
-            *position = result.m_hitPointWorld;
-        }
-        return result.hasHit();
-    }
-    return false;
-}   // getSurfacePosition
+    Vec3 to=from+Vec3(0, 10000, 0);
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getGFXEffectMesh();
+    return tm.castRay(from, to, position, material);
+}   // getSurfaceInfo
 
 // -----------------------------------------------------------------------------
 /** Returns the pitch of the terrain depending on the heading

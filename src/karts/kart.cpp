@@ -94,7 +94,6 @@ Kart::Kart (const std::string& ident, Track* track, int position,
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_terrain_particles    = NULL;
-    m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
@@ -336,7 +335,6 @@ Kart::~Kart()
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_terrain_particles)   delete m_terrain_particles;
-    if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
     if(m_slipstream)          delete m_slipstream;
     if(m_rain)                delete m_rain;
@@ -752,7 +750,6 @@ void Kart::update(float dt)
     if (UserConfigParams::m_graphical_effects)
     {
         if (m_terrain_particles)   m_terrain_particles->update();
-        if (m_water_splash_system) m_water_splash_system->update();
         if (m_rain)
         {
             m_rain->setPosition( getCamera()->getCameraSceneNode()->getPosition() );
@@ -805,8 +802,9 @@ void Kart::update(float dt)
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
+    handleMaterialGFX();
     const Material* material=TerrainInfo::getMaterial();
-    if (getHoT()==Track::NOHIT)   // kart falling off the track
+    if (!material)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
@@ -814,61 +812,9 @@ void Kart::update(float dt)
         if(min->getY() - getXYZ().getY() > 17)
             forceRescue();
     }
-
-    // Sometimes the material can be 0. This can happen if a kart is above
-    // another kart (e.g. mass collision, or one kart falling on another
-    // kart). Bullet does not have any triangle information in this case,
-    // and so material can not be set. In this case it is simply ignored
-    // since it can't hurt (material is only used for friction, zipper and
-    // rescue, so those things are not triggered till the kart is on the
-    // track again)
-    else if(material)
+    else
     {
-        // If a terrain specific sfx is already being played, when a new
-        // terrain is entered, an old sfx should be finished (once, not
-        // looped anymore of course). The m_terrain_sound is then copied
-        // to a m_previous_terrain_sound, for which looping is disabled.
-        // In case that three sfx needed to be played (i.e. a previous is
-        // playing, a current is playing, and a new terrain with sfx is
-        // entered), the oldest (previous) sfx is stopped and deleted.
-        if(getLastMaterial()!=material)
-        {
-            // First stop any previously playing terrain sound
-            // and remove it, sp that m_previous_terrain_sound
-            // can be used again.
-            if(m_previous_terrain_sound)
-            {
-                sfx_manager->deleteSFX(m_previous_terrain_sound);
-            }
-            m_previous_terrain_sound = m_terrain_sound;
-            if(m_previous_terrain_sound)
-                m_previous_terrain_sound->setLoop(false);
-
-            const std::string s = material->getSFXName();
-            if(s!="")
-            {
-                m_terrain_sound = sfx_manager->createSoundSource(s);
-                m_terrain_sound->play();
-                m_terrain_sound->setLoop(true);
-            }
-            else
-                m_terrain_sound = NULL;
-        }
-        if(m_previous_terrain_sound && 
-            m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
-        {
-            // We don't modify the position of m_previous_terrain_sound 
-            // anymore, so that it keeps on playing at the place where the 
-            // kart left the material.
-            sfx_manager->deleteSFX(m_previous_terrain_sound);
-            m_previous_terrain_sound = NULL;
-        }
-        if(m_terrain_sound) 
-        {
-            m_terrain_sound->position(getXYZ());
-            material->setSFXSpeed(m_terrain_sound, m_speed);
-        }
-
+        handleMaterialSFX(material);
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper(material);
         else
@@ -920,6 +866,164 @@ void Kart::update(float dt)
         m_shadow_enabled = true;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Plays any terrain specific sound effect.
+ */
+void Kart::handleMaterialSFX(const Material *material)
+{
+    // If a terrain specific sfx is already being played, when a new
+    // terrain is entered, an old sfx should be finished (once, not
+    // looped anymore of course). The m_terrain_sound is then copied
+    // to a m_previous_terrain_sound, for which looping is disabled.
+    // In case that three sfx needed to be played (i.e. a previous is
+    // playing, a current is playing, and a new terrain with sfx is
+    // entered), the oldest (previous) sfx is stopped and deleted.
+    if(getLastMaterial()!=material)
+    {
+        // First stop any previously playing terrain sound
+        // and remove it, sp that m_previous_terrain_sound
+        // can be used again.
+        if(m_previous_terrain_sound)
+        {
+            sfx_manager->deleteSFX(m_previous_terrain_sound);
+        }
+        m_previous_terrain_sound = m_terrain_sound;
+        if(m_previous_terrain_sound)
+            m_previous_terrain_sound->setLoop(false);
+
+        const std::string s = material->getSFXName();
+        if(s!="")
+        {
+            m_terrain_sound = sfx_manager->createSoundSource(s);
+            m_terrain_sound->play();
+            m_terrain_sound->setLoop(true);
+        }
+        else
+            m_terrain_sound = NULL;
+    }
+    if(m_previous_terrain_sound && 
+        m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
+    {
+        // We don't modify the position of m_previous_terrain_sound 
+        // anymore, so that it keeps on playing at the place where the 
+        // kart left the material.
+        sfx_manager->deleteSFX(m_previous_terrain_sound);
+        m_previous_terrain_sound = NULL;
+    }
+    if(m_terrain_sound) 
+    {
+        m_terrain_sound->position(getXYZ());
+        material->setSFXSpeed(m_terrain_sound, m_speed);
+    }
+
+}   // handleMaterialSFX
+
+//-----------------------------------------------------------------------------
+/** Handles material specific sfx, mostly particle effects. Particle 
+ *  effects can be triggered by two different situations: either
+ *  because a kart drives on top of a terrain with a special effect,
+ *  or because the kart is driving or falling under a surface (e.g.
+ *  water), and the terrain effect is coming from that surface. Those
+ *  effects are exclusive - you either get the effect from the terrain
+ *  you are driving on, or the effect from a surface the kart is 
+ *  (partially) under. The surface effect is triggered, if either the
+ *  kart is falling, or if the surface the kart is driving on has
+ *  the 'isBelowSurface' property set.
+ */
+void Kart::handleMaterialGFX()
+{
+    // Nothing to do if there are no particles.
+    if (!m_terrain_particles) return;
+
+    const Material *material = getMaterial();
+    
+    // First test: give the terrain effect, if the kart is
+    // on top of a surface (i.e. not falling), actually touching
+    // something with the wheels, and the material has not the
+    // below surface property set.
+    if(material && isOnGround() && !material->isBelowSurface())
+    {
+        Vec3 xyz;
+        m_wheel_toggle = 1 - m_wheel_toggle;
+        const btWheelInfo &wi = 
+            getVehicle()->getWheelInfo(2 + m_wheel_toggle);
+        xyz = wi.m_raycastInfo.m_contactPointWS;
+        // FIXME: the X position is not yet always accurate.
+        xyz += Vec3(0.06f * (m_wheel_toggle ? +1 : -1),
+                    0,
+                    0.06f);
+        // Get the appropriate particle data depending on
+        // wether the kart is skidding or driving.
+        const ParticleKind* pk = 
+            material->getParticlesWhen(m_skidding > 1.0f
+                                       ? Material::EMIT_ON_SKID
+                                       : Material::EMIT_ON_DRIVE);
+        if(!pk) 
+        {
+            // Disable potentially running particle effects
+            m_terrain_particles->setCreationRate(0);
+            return;  // no particle effect, return
+        }
+
+        // Now compute the particle creation rate:
+        float rate = 0;
+        if(m_skidding > 1.0f)
+        {
+            rate = fabsf(m_controls.m_steer) > 0.8 ? m_skidding - 1 : 0;
+        }
+        else
+        {
+            const float speed = fabsf(getSpeed());
+            rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
+                                 : 0;
+        }
+
+        float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
+        m_terrain_particles->setParticleType(pk);
+        m_terrain_particles->setCreationRate(create);
+        return;
+    }
+
+    // Now the kart is either falling, or driving on a terrain which
+    // has the 'below surface' flag set. Detect if there is a surface 
+    // on top of the kart.
+    if(material->hasFallingEffect() && m_camera)
+    {
+        m_camera->setMode(Camera::CM_FALLING);
+    }
+
+    // Use the middle of the contact points of the two rear wheels
+    // as the point from which to cast the ray upwards
+    const btWheelInfo::RaycastInfo &ri2 = 
+            getVehicle()->getWheelInfo(2).m_raycastInfo;
+    const btWheelInfo::RaycastInfo &ri3 = 
+            getVehicle()->getWheelInfo(3).m_raycastInfo;
+    Vec3 from = (ri2.m_contactPointWS + ri3.m_contactPointWS)*0.5f;
+    Vec3 xyz;
+    const Material *surface_material;
+    if(!getSurfaceInfo(from, &xyz, &surface_material))
+    {
+        m_terrain_particles->setCreationRate(0);
+        return;
+    }
+    const ParticleKind *pk = 
+        surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
+    if(pk && !m_flying)
+    {
+        m_terrain_particles->setParticleType(pk);
+        m_terrain_particles->setPosition(xyz.toIrrVector());
+        const float speed = fabsf(getSpeed());
+        float rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
+                                   : 0;
+
+        float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
+        m_terrain_particles->setCreationRate(create);
+    }
+    //if (m_camera != NULL) m_camera->setFallMode(true);
+    //m_camera->setFallMode(false);
+
+}   // handleMaterialGFX
 
 //-----------------------------------------------------------------------------
 
@@ -1365,18 +1469,6 @@ void Kart::updatePhysics(float dt)
     
     m_vehicle->enableSliding(enable_skidding);
 
-    
-    /*
-    // debug prints
-    static float f = 0.0f;
-    f += dt;
-    if (f > 0.5f)
-    {
-        f -= 0.5f;
-        printf("[%s] %f %f --> friction = %f\n", m_kart_properties->getIdent().c_str(), getPitch(), getRoll(), friction);
-    }
-    */
-
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
     m_vehicle->setSteeringValue(steering, 0);
@@ -1492,7 +1584,7 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
             // gives the position of the wheels on the ground in world coordinates.
             // So it's easier not to move the particle system with the kart, and set 
             // the position directly from the wheel coordinates.
-            core::vector3df position(-getKartWidth()*0.35f, 0.06f, -getKartLength()*0.5f);
+            Vec3 position(-getKartWidth()*0.35f, 0.06f, -getKartLength()*0.5f);
             m_terrain_particles = new ParticleEmitter(ParticleKindManager::get()->getParticles("smoke.xml"),
                                                       position);
         }
@@ -1506,14 +1598,8 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
     {
         m_rain = new Rain((m_camera != NULL ? m_camera->getCameraSceneNode() : NULL), NULL);
     }
-    
-    //m_water_splash_system = new WaterSplash(this);
-    
-    m_water_splash_system = new ParticleEmitter(ParticleKindManager::get()->getParticles("splash.xml"),
-                                                core::vector3df(0.0f, 0.0f, 0.0f), getNode());
-    m_water_splash_system->setCreationRate(0);
-    
-    core::vector3df position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
+        
+    Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
     
     try
     {
@@ -1606,136 +1692,6 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
                -m_kart_model->getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
     
-    if (m_terrain_particles)
-    {
-        const Material* material = getMaterial();
-        
-        if (material != NULL)
-        {
-            if (m_skidding > 1.0f)
-            {
-                const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_SKID);
-                if (pk != NULL && isOnGround())
-                {
-                    m_terrain_particles->setParticleType(pk);
-                    
-                    if (fabsf(m_controls.m_steer) > 0.8 && isOnGround())
-                    {
-                        float rate = m_skidding - 1;
-                        m_terrain_particles->setCreationRate(pk->getMinRate() + rate*(pk->getMaxRate() - pk->getMinRate()));
-                        
-                        m_wheel_toggle = 1 - m_wheel_toggle;
-                        const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
-                        Vec3 c = wi.m_raycastInfo.m_contactPointWS;
-                        
-                        // FIXME: the X position is not yet always accurate.
-                        m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
-                                                                         c.getY(),
-                                                                         c.getZ() + 0.06f));
-                    }
-                    else
-                    {
-                        m_terrain_particles->setCreationRate(0.0f);
-                    }
-                }
-                else
-                {
-                    m_terrain_particles->setCreationRate(0);
-                }
-            }
-            else // not skidding
-            {
-                const ParticleKind* pk = material->getParticlesWhen(Material::EMIT_ON_DRIVE);
-                if (pk != NULL && isOnGround())
-                {
-                    //printf("Setting DRIVING particles\n");
-                    m_terrain_particles->setParticleType(pk);
-                    
-                    m_wheel_toggle = 1 - m_wheel_toggle;
-                    const btWheelInfo &wi = getVehicle()->getWheelInfo(2 + m_wheel_toggle);
-                    Vec3 c = wi.m_raycastInfo.m_contactPointWS;
-                    
-                    // FIXME: the X position is not yet always accurate.
-                    m_terrain_particles->setPosition(core::vector3df(c.getX() + 0.06f * (m_wheel_toggle ? +1 : -1),
-                                                                     c.getY(),
-                                                                     c.getZ() + 0.06f));
-                    
-                    const float speed = fabsf(getSpeed());
-                    if (speed < 0.5f)
-                    {
-                        m_terrain_particles->setCreationRate(0);
-                    }
-                    else
-                    {
-                        float rate = (speed/m_kart_properties->getMaxSpeed());
-                        m_terrain_particles->setCreationRate(pk->getMinRate() + rate*(pk->getMaxRate() - pk->getMinRate()));
-                    }
-                }
-                else
-                {
-                    //printf("No DRIVING particles\n");
-                    m_terrain_particles->setCreationRate(0);
-                }
-            }
-        }
-        else
-        {
-            m_terrain_particles->setCreationRate(0);
-        }
-    }
-    
-    if(m_water_splash_system)
-    {
-        const Material* m = getMaterial();
-        if (m != NULL)
-        {
-            const float hot = getHoT();
-
-            if (m->hasWaterSplash() && hot != Track::NOHIT && !m_flying)
-            {
-                const float hat = getXYZ().getY() - hot;
-#ifdef NOT_TESTED_YET
-                if(m->isBelowSurface())
-                {
-                    Vec3 pos;
-                    if(getSurfacePosition(&pos))
-                    {
-                        m_water_splash_system->setPosition(pos.toIrrVector());
-                        m_water_splash_system->setCreationRate(
-                            (float)m_water_splash_system->getParticlesInfo()->getMaxRate()
-                        );
-                    }
-                }   // m->isBelowSurface
-#endif
-                // TODO: don't hardcode height, get from exporter
-                if (hat < 4.0f && hat > 2.0f)
-                {
-                    m_water_splash_system->setCreationRate(
-                        (float)m_water_splash_system->getParticlesInfo()->getMaxRate()
-                        );
-                }
-                else
-                {
-                    if (m_camera != NULL) m_camera->setFallMode(true);
-                    m_water_splash_system->setCreationRate(0);
-                }
-            }
-            else
-            {
-                if (m_camera != NULL && m_camera->getMode() == Camera::CM_FALLING)
-                {
-                    m_camera->setFallMode(false);
-                }
-                
-                m_water_splash_system->setCreationRate(0);
-            }
-        }
-        
-        //float f = getMaterial() && getMaterial()->hasWaterSplash() && isOnGround()
-        //        ? sqrt(getSpeed())*40.0f
-        //        : 0.0f;
-        //m_water_splash_system->setCreationRate(f);
-    }
     if (m_nitro)
     {
         // fabs(speed) is important, otherwise the negative number will
