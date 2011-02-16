@@ -953,6 +953,7 @@ void Kart::handleMaterialGFX()
         xyz += Vec3(0.06f * (m_wheel_toggle ? +1 : -1),
                     0,
                     0.06f);
+        m_terrain_particles->setPosition(xyz.toIrrVector());
         // Get the appropriate particle data depending on
         // wether the kart is skidding or driving.
         const ParticleKind* pk = 
