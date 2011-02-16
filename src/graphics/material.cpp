@@ -56,6 +56,17 @@ Material::Material(const XMLNode *node, int index)
     node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP;
     node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
+    std::string s;
+    node->get("adjust-image",     &s                   );
+    if(s=="premultiply")
+        m_adjust_image = ADJ_PREMUL;
+    else if (s=="divide")
+        m_adjust_image = ADJ_DIV;
+    else if (s=="" || s=="none")
+        m_adjust_image = ADJ_NONE;
+    else
+        printf("Incorrect adjust-image specification: '%s' - ignored.\n",
+               s.c_str());
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
@@ -77,7 +88,8 @@ Material::Material(const XMLNode *node, int index)
     node->get("anisotropic",      &m_anisotropic       );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
-    std::string s("");
+
+    s="";
     node->get("graphical-effect", &s                   );
     if(s=="water")
         m_graphical_effect = GE_WATER;
@@ -162,6 +174,7 @@ void Material::init(unsigned int index)
     m_clamp_tex                 = 0;
     m_alpha_testing             = false;
     m_lightmap                  = false;
+    m_adjust_image              = ADJ_NONE;
     m_alpha_blending            = false;
     m_lighting                  = true;
     m_anisotropic               = false;
@@ -201,7 +214,8 @@ void Material::install(bool is_full_path)
     const std::string &full_path = is_full_path 
                                  ? m_texname
                                  : file_manager->getTextureFile(m_texname);
-    m_texture = irr_driver->getTexture(full_path);
+    m_texture = irr_driver->getTexture(full_path,
+                                       isPreMul(), isPreDiv());
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);

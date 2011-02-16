@@ -763,69 +763,77 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
 // ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object.
  *  \param filename File name of the texture to load.
+ *  \param is_premul If the alpha values needd to be multiplied for
+ *         all pixels.
+ *  \param is_prediv If the alpha value needs to be divided into
+ *         each pixel.
  */
-video::ITexture *IrrDriver::getTexture(const std::string &filename)
+video::ITexture *IrrDriver::getTexture(const std::string &filename,
+                                       bool is_premul,
+                                       bool is_prediv)
 {
-#undef PREMULPNGS
-#ifndef PREMULPNGS
-    video::ITexture* out = m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
-#else
-    video::IImage* img = m_scene_manager->getVideoDriver()->createImageFromFile(filename.c_str());
-    // PNGs are non premul, but some are used for premul tasks, so convert
-    // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
-    if(StringUtils::hasSuffix(filename.c_str(), ".png")) // FIXME check param, not name
+    video::ITexture* out;
+    if(!is_premul && !is_prediv)
+        out = m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
+    else
     {
-        if ((img->getColorFormat() == irr::video::ECF_A8R8G8B8) && img->lock())
+        // FIXME: can't we just do this externally, and just use the
+        // modified textures??
+        video::IImage* img = 
+            m_scene_manager->getVideoDriver()->createImageFromFile(filename.c_str());
+        // PNGs are non premul, but some are used for premul tasks, so convert
+        // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
+        // FIXME check param, not name
+        if(is_premul &&
+            StringUtils::hasSuffix(filename.c_str(), ".png") &&
+            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) && 
+            img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
-            for(uint x = 0; x < dim.Width; x++)
+            for(unsigned int x = 0; x < dim.Width; x++)
             {
-                for(uint y = 0; y < dim.Height; y++)
+                for(unsigned int y = 0; y < dim.Height; y++)
                 {
                     video::SColor col = img->getPixel(x, y);
-                    uint alpha = col.getAlpha();
-                    uint red   = alpha * col.getRed()   / 255;
-                    uint blue  = alpha * col.getBlue()  / 255;
-                    uint green = alpha * col.getGreen() / 255;
+                    unsigned int alpha = col.getAlpha();
+                    unsigned int red   = alpha * col.getRed()   / 255;
+                    unsigned int blue  = alpha * col.getBlue()  / 255;
+                    unsigned int green = alpha * col.getGreen() / 255;
                     col.set(alpha, red, green, blue);
                     img->setPixel(x, y, col, false);
-                }
-            }
+                }   // for y
+            }   // for x
             img->unlock();
-        }
-    }
-    /*
-    // Other formats can be premul, but the tasks can be non premul
-    // So divide to get the separate RGBA (only possible if alpha!=0)
-    else if() // FIXME, use param "DE-PREMUL requested" to match above
-    {
-        if ((img->getColorFormat() == irr::video::ECF_A8R8G8B8) && img->lock())
+        }   // if png and ColorFOrmat and lock
+        // Other formats can be premul, but the tasks can be non premul
+        // So divide to get the separate RGBA (only possible if alpha!=0)
+        else if(is_prediv &&
+            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) && 
+            img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
-            for(uint x = 0; x < dim.Width; x++)
+            for(unsigned int  x = 0; x < dim.Width; x++)
             {
-                for(uint y = 0; y < dim.Height; y++)
+                for(unsigned int y = 0; y < dim.Height; y++)
                 {
                     video::SColor col = img->getPixel(x, y);
-                    uint alpha = col.getAlpha();
+                    unsigned int alpha = col.getAlpha();
                     // Avoid divide by zero
                     if (alpha) {
-                        uint red   = 255 * col.getRed() / alpha ;
-                        uint blue  = 255 * col.getBlue() / alpha;
-                        uint green = 255 * col.getGreen() / alpha;
+                        unsigned int red   = 255 * col.getRed() / alpha ;
+                        unsigned int blue  = 255 * col.getBlue() / alpha;
+                        unsigned int green = 255 * col.getGreen() / alpha;
                         col.set(alpha, red, green, blue);
                         img->setPixel(x, y, col, false);
                     }
-                }
-            }
+                }   // for y
+            }   // for x
             img->unlock();
-        }
-    }
-     */
-    video::ITexture* out = m_scene_manager->getVideoDriver()->addTexture(filename.c_str(),
-                                                                         img, NULL);
-#endif
-    
+        }   // if premul && color format && lock
+        out = m_scene_manager->getVideoDriver()->addTexture(filename.c_str(),
+                                                            img, NULL);    
+    }   // if is_premul or is_prediv
+
 #ifndef NDEBUG
     if (out == NULL)
     {

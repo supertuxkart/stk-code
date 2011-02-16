@@ -96,7 +96,11 @@ private:
     
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
-    
+
+    /** Some textures need to be pre-multiplied, some divided to give
+     *  the intended effect. */
+    enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
+                     m_adjust_image;
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
     float            m_friction;
@@ -158,6 +162,12 @@ public:
     
     bool  isTransparent      () const { return m_alpha_testing || m_alpha_blending || m_add; }
     
+    // ------------------------------------------------------------------------
+    /** Returns true if this materials need pre-multiply of alpha. */
+    bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this materials need pre-division of alpha. */
+    bool isPreDiv() const {return m_adjust_image==ADJ_DIV; }
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }

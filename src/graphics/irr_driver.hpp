@@ -112,7 +112,9 @@ public:
     bool                  OnEvent(const irr::SEvent &event);
     
     void                  setAmbientLight(const video::SColor &light);
-    video::ITexture      *getTexture(const std::string &filename);
+    video::ITexture      *getTexture(const std::string &filename,
+                                     bool is_premul=false,
+                                     bool is_prediv=false);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 
                                          bool create_one_quad=false);
     scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h);
