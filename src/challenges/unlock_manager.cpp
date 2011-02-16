@@ -341,7 +341,7 @@ void UnlockManager::lockFeature(const ChallengeData *challenge)
 {
     const unsigned int amount = (unsigned int)challenge->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
-        m_locked_features[challenge->getFeatures()[n].name]=true;
+        m_locked_features[challenge->getFeatures()[n].m_name]=true;
 }   // lockFeature
 
 //-----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ void UnlockManager::unlockFeature(ChallengeData* c, bool do_save)
     const unsigned int amount = (unsigned int)c->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
     {
-        std::string feature = c->getFeatures()[n].name;
+        std::string feature = c->getFeatures()[n].m_name;
         std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
         if(p==m_locked_features.end())
         {

@@ -48,7 +48,8 @@ private:
     /** Version number of the challenge. */
     int                            m_version;
 
-    void getUnlocks(const XMLNode *root, const std:: string type, REWARD_TYPE reward);
+    void getUnlocks(const XMLNode *root, const std::string &type, 
+                    Challenge::REWARD_TYPE reward);
     void error(const char *id) const;
 
 public:

@@ -31,13 +31,13 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
-const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
+const irr::core::stringw Challenge::UnlockableFeature::getUnlockedMessage() const
 {
-    switch (type)
+    switch (m_type)
     {
         case UNLOCK_TRACK:
         {    // {} avoids compiler warning
-            const Track* track = track_manager->getTrack( name );
+            const Track* track = track_manager->getTrack(m_name);
             
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
@@ -47,11 +47,11 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
         }
         case UNLOCK_MODE:
         {
-            return _("New game mode '%s' now available", user_name);
+            return _("New game mode '%s' now available", m_user_name);
         }
         case UNLOCK_GP:
         {
-            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(name);
+            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_name);
             
             // shouldn't happen but let's avoid crashes as much as possible...
             if (gp == NULL) return irr::core::stringw( L"????" );
@@ -61,11 +61,12 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
         }
         case UNLOCK_DIFFICULTY:
         {
-            return _("New difficulty '%s' now available", user_name);
+            return _("New difficulty '%s' now available", m_user_name);
         }
         case UNLOCK_KART:
         {
-            const KartProperties* kp = kart_properties_manager->getKart( name );
+            const KartProperties* kp = 
+                kart_properties_manager->getKart(m_name);
             
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
@@ -76,7 +77,7 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
             assert(false);
             return L"";
     }   // switch
-}
+}   // UnlockableFeature::getUnlockedMessage
 
 //-----------------------------------------------------------------------------
 /** Sets that the given track will be unlocked if this challenge
@@ -92,10 +93,10 @@ void Challenge::addUnlockTrackReward(const std::string &track_name)
     }
     
     UnlockableFeature feature;
-    feature.name = track_name;
-    feature.type = UNLOCK_TRACK;
+    feature.m_name = track_name;
+    feature.m_type = UNLOCK_TRACK;
     m_feature.push_back(feature);
-}
+}   // addUnlockTrackReward
 
 //-----------------------------------------------------------------------------
 
@@ -103,11 +104,11 @@ void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
                                     const irr::core::stringw &user_mode_name)
 {    
     UnlockableFeature feature;
-    feature.name = internal_mode_name;
-    feature.type = UNLOCK_MODE;
-    feature.user_name = user_mode_name;
+    feature.m_name = internal_mode_name;
+    feature.m_type = UNLOCK_MODE;
+    feature.m_user_name = user_mode_name;
     m_feature.push_back(feature);
-}
+}   // addUnlockModeReward
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockGPReward(const std::string &gp_name)
@@ -119,11 +120,11 @@ void Challenge::addUnlockGPReward(const std::string &gp_name)
     
     UnlockableFeature feature;
     
-    feature.name = gp_name.c_str();
+    feature.m_name = gp_name.c_str();
     
-    feature.type = UNLOCK_GP;
+    feature.m_type = UNLOCK_GP;
     m_feature.push_back(feature);
-}
+}   // addUnlockGPReward
 
 //-----------------------------------------------------------------------------
 
@@ -131,11 +132,11 @@ void Challenge::addUnlockDifficultyReward(const std::string &internal_name,
                                           const irr::core::stringw &user_name)
 {
     UnlockableFeature feature;
-    feature.name = internal_name;
-    feature.type = UNLOCK_DIFFICULTY;
-    feature.user_name = user_name;
+    feature.m_name = internal_name;
+    feature.m_type = UNLOCK_DIFFICULTY;
+    feature.m_user_name = user_name;
     m_feature.push_back(feature);
-}
+}   // addUnlockDifficultyReward
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockKartReward(const std::string &internal_name, 
@@ -152,11 +153,11 @@ void Challenge::addUnlockKartReward(const std::string &internal_name,
     }
     
     UnlockableFeature feature;
-    feature.name = internal_name;
-    feature.type = UNLOCK_KART;
-    feature.user_name = user_name;
+    feature.m_name = internal_name;
+    feature.m_type = UNLOCK_KART;
+    feature.m_user_name = user_name;
     m_feature.push_back(feature);
-}
+}   // addUnlockKartReward
 
 //-----------------------------------------------------------------------------
 /** Loads the state for a challenge object (esp. m_state), and calls the

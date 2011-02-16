@@ -148,7 +148,8 @@ void RaceSetupScreen::onGameModeChanged()
     assert( w2 != NULL );
     
     std::string gamemode_str = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    RaceManager::MinorRaceModeType gamemode = RaceManager::getModeIDFromInternalName(gamemode_str.c_str());
+    RaceManager::MinorRaceModeType gamemode = 
+        RaceManager::getModeIDFromInternalName(gamemode_str);
     
     // deactivate the AI karts count widget for modes for which we have no AI
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");

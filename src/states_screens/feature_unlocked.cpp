@@ -488,27 +488,29 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
 {
     for (unsigned int n=0; n<unlocked.size(); n++)
     {
-        const std::vector<UnlockableFeature>& unlockedFeatures = unlocked[n]->getFeatures();
+        const std::vector<Challenge::UnlockableFeature>& 
+                    unlockedFeatures = unlocked[n]->getFeatures();
         assert(unlockedFeatures.size() > 0);
         
         for (unsigned int i=0; i<unlockedFeatures.size(); i++)
-        {
-            
-            switch (unlockedFeatures[i].type)
+        {            
+            switch (unlockedFeatures[i].m_type)
             {
-                case UNLOCK_TRACK:
+                case Challenge::UNLOCK_TRACK:
                 {
-                    Track* track = track_manager->getTrack(unlockedFeatures[i].name);
+                    Track* track = 
+                        track_manager->getTrack(unlockedFeatures[i].m_name);
                     assert(track != NULL);
                     const std::string sshot = track->getScreenshotFile();
                     addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 1.0f, 0.75f,
-                                         unlockedFeatures[i].getUnlockedMessage() );
+                        unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case UNLOCK_GP:
+                case Challenge::UNLOCK_GP:
                 {
                     std::vector<ITexture*> images;
-                    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(unlockedFeatures[i].name);
+                    const GrandPrixData* gp = 
+                        grand_prix_manager->getGrandPrix(unlockedFeatures[i].m_name);
                     if (gp == NULL)
                     {
                         std::cerr << "ERROR: Unlocked GP does not exist???\n";
@@ -519,75 +521,79 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                     {
                         const std::vector<std::string>& gptracks = gp->getTracks();
                         const int trackAmount = gptracks.size();
-                        
+
                         if (trackAmount == 0)
                         {
                             std::cerr << "ERROR: Unlocked GP is empty???\n";
                             video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
                             images.push_back(WTF_image);
                         }
-                        
+
                         for (int t=0; t<trackAmount; t++)
                         {
                             Track* track = track_manager->getTrack(gptracks[t]);
-                            
+
                             ITexture* tex = irr_driver->getTexture(track  != NULL ?
-                                                                   track->getScreenshotFile().c_str() :
-                                                                   file_manager->getDataDir() + "gui/main_help.png");
+                                track->getScreenshotFile().c_str() :
+                            file_manager->getDataDir() + "gui/main_help.png");
                             images.push_back(tex);
                         }
                     }
 
                     addUnlockedPictures(images, 1.0f, 0.75f,
-                                        unlockedFeatures[i].getUnlockedMessage() );
+                        unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case UNLOCK_MODE:
+                case Challenge::UNLOCK_MODE:
                 {
                     const RaceManager::MinorRaceModeType mode =
-                    RaceManager::getModeIDFromInternalName(unlockedFeatures[i].name.c_str());
+                        RaceManager::getModeIDFromInternalName(unlockedFeatures[i].m_name);
                     const std::string icon = file_manager->getDataDir() + "/" + RaceManager::getIconOf(mode);
                     addUnlockedPicture( irr_driver->getTexture(icon.c_str()), 0.8f, 0.8f,
-                                        unlockedFeatures[i].getUnlockedMessage() );
+                        unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case UNLOCK_KART:
+                case Challenge::UNLOCK_KART:
                 {
-                    const KartProperties* kart = kart_properties_manager->getKart(unlockedFeatures[i].name);
-                    
+                    const KartProperties* kart =
+                        kart_properties_manager->getKart(unlockedFeatures[i].m_name);
+
                     if (kart == NULL)
                     {
                         fprintf(stderr, "[KartSelectionScreen] WARNING: could not find a kart named '%s'\n",
-                                unlockedFeatures[i].name.c_str());
-                        
-                        video::ITexture* tex = irr_driver->getTexture(file_manager->getGUIDir() + "/main_help.png");
+                            unlockedFeatures[i].m_name.c_str());
+
+                        video::ITexture* tex = 
+                            irr_driver->getTexture(file_manager->getGUIDir() + 
+                                                   "/main_help.png"            );
                         addUnlockedPicture(tex, 1.0f, 0.75f,
-                                           L"???" );
+                            L"???" );
                     }
                     else
                     {
-                        // the passed kart will not be modified, that's why I allow myself to use const_cast
+                        // the passed kart will not be modified, 
+                        // that's why I allow myself to use const_cast
                         addUnlockedKart(const_cast<KartProperties*>(kart),
                                         unlockedFeatures[i].getUnlockedMessage() );
                     }
-                    
+
                     break;
                 }
-                case UNLOCK_DIFFICULTY:
+                case Challenge::UNLOCK_DIFFICULTY:
                 {
                     //TODO : implement difficulty reward
                     std::cerr << "OK, I see you unlocked a difficulty, but this is not supported yet\n";
 
                     video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
                     addUnlockedPicture( tex, 1.0f, 0.75f,
-                                        unlockedFeatures[i].getUnlockedMessage() );
+                        unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
                 default:
                 {
                     assert(false);
-                }
-            }
+                }   // default
+            }   // switch
             
         } // next feature
     } // next challenge

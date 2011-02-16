@@ -169,12 +169,12 @@ public:
      *  used from challenge_data, which reads the mode from a challenge file.
      *  \param name The name of the minor mode.
      */
-    static const MinorRaceModeType getModeIDFromInternalName(const char* name)
+    static const MinorRaceModeType getModeIDFromInternalName(const std::string &name)
     {
-        if      (strcmp(name, IDENT_STD)     == 0) return MINOR_MODE_NORMAL_RACE;
-        else if (strcmp(name, IDENT_TTRIAL)  == 0) return MINOR_MODE_TIME_TRIAL;
-        else if (strcmp(name, FTL_IDENT)     == 0) return MINOR_MODE_FOLLOW_LEADER;
-        else if (strcmp(name, STRIKES_IDENT) == 0) return MINOR_MODE_3_STRIKES;
+        if      (name==IDENT_STD    ) return MINOR_MODE_NORMAL_RACE;
+        else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
+        else if (name==FTL_IDENT    ) return MINOR_MODE_FOLLOW_LEADER;
+        else if (name==STRIKES_IDENT) return MINOR_MODE_3_STRIKES;
 
         assert(0);
         return MINOR_MODE_NONE;

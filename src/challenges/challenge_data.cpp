@@ -146,11 +146,11 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
     }
 
-    getUnlocks(root, "unlock-track",      UNLOCK_TRACK);
-    getUnlocks(root, "unlock-gp",         UNLOCK_GP   );
-    getUnlocks(root, "unlock-mode",       UNLOCK_MODE );
-    getUnlocks(root, "unlock-difficulty", UNLOCK_DIFFICULTY);
-    getUnlocks(root, "unlock-kart",       UNLOCK_KART);
+    getUnlocks(root, "unlock-track",      Challenge::UNLOCK_TRACK);
+    getUnlocks(root, "unlock-gp",         Challenge::UNLOCK_GP   );
+    getUnlocks(root, "unlock-mode",       Challenge::UNLOCK_MODE );
+    getUnlocks(root, "unlock-difficulty", Challenge::UNLOCK_DIFFICULTY);
+    getUnlocks(root, "unlock-kart",       Challenge::UNLOCK_KART);
 
     if (getFeatures().size() == 0)
     {
@@ -215,7 +215,7 @@ void ChallengeData::check() const
 
 // ----------------------------------------------------------------------------
 
-void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
+void ChallengeData::getUnlocks(const XMLNode *root, const std:: string &type,
                                REWARD_TYPE reward)
 {
     std:: string attrib;
@@ -241,7 +241,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
             
     case UNLOCK_MODE:       {
                             const RaceManager::MinorRaceModeType mode =
-                                RaceManager::getModeIDFromInternalName(attrib.c_str());
+                                RaceManager::getModeIDFromInternalName(attrib);
                             addUnlockModeReward      (attrib, RaceManager::getNameOf(mode));
                             break;
                             }

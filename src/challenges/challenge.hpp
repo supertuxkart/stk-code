@@ -33,21 +33,6 @@
 
 class XMLNode;
 
-enum REWARD_TYPE
-   {UNLOCK_TRACK,
-    UNLOCK_GP,
-    UNLOCK_MODE,
-    UNLOCK_KART,
-    UNLOCK_DIFFICULTY};
-
-struct UnlockableFeature
-{
-    std::string name; // internal name
-    irr::core::stringw user_name; // not all types of feature have one
-    REWARD_TYPE type;
-    
-    const irr::core::stringw getUnlockedMessage() const;
-};
 
 /**
   * \brief A class for all challenges
@@ -55,6 +40,25 @@ struct UnlockableFeature
   */
 class Challenge : public NoCopy
 {
+public:    
+    enum REWARD_TYPE    {UNLOCK_TRACK,
+                         UNLOCK_GP,
+                         UNLOCK_MODE,
+                         UNLOCK_KART,
+                         UNLOCK_DIFFICULTY};
+    // ------------------------------------------------------------------------
+    class UnlockableFeature
+    {
+    public:
+
+        std::string        m_name; // internal name
+        irr::core::stringw m_user_name; // not all types of feature have one
+        REWARD_TYPE        m_type;
+
+        const irr::core::stringw getUnlockedMessage() const;
+    };   // UnlockableFeature
+    // ------------------------------------------------------------------------
+
 private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
@@ -70,6 +74,12 @@ private:
     /** What needs to be done before accessing this challenge. */
     std::vector<std::string> m_prerequisites;
 
+    /** Version of the challenge. This way incorrect challenges 
+     *  (e.g. if a newer version of STK is installed on top of an
+     *  existing installation, and the older challenges refer to 
+     *  a track that does not exist/does not work anymore) can be
+     *  avoided. */
+    unsigned int             m_version;
 public:
              Challenge(const std::string &id, const std::string &name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
