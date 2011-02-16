@@ -27,6 +27,8 @@ using namespace irr;
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
 
+#include "utils/constants.hpp"
+
 /** A wrapper around bullets btVector3 to include conventient conversion
  *  functions (e.g. between btVector3 and the graphics specific 3d vector). */
 class Vec3 : public btVector3
@@ -65,25 +67,56 @@ public:
     inline const void      setHeading(float f)      { m_floats[1] = f;          }
     inline const void      setPitch(float f)        { m_floats[0] = f;          }
     inline const void      setRoll(float f)         { m_floats[2] = f;          }
-    /** Converts a Vec3 to an irrlicht 3d floating point vector. */
-    const core::vector3df& toIrrVector()   const;
-    const core::vector3df  toIrrHPR()      const;
-    const core::vector2df  toIrrVector2d() const;
-    void                   degreeToRad();
+    // ------------------------------------------------------------------------
+    /** Converts a vec3 into an irrlicht vector (which is a simple type cast). */
+    const core::vector3df& toIrrVector() const
+    {
+            return (const core::vector3df&)*this;
+    }   // toIrrVector
+    // ------------------------------------------------------------------------
+    /** Converts a bullet HPR value into an irrlicht HPR value. */
+    const core::vector3df  toIrrHPR() const
+    {
+        return core::vector3df(RAD_TO_DEGREE*(getX()),     // pitch
+                               RAD_TO_DEGREE*(getY()),     // heading
+                               RAD_TO_DEGREE*(getZ()) );   // roll
+    }   // toIrrHPR
+    // ------------------------------------------------------------------------
+    /** Returns the X and Z component as an irrlicht 2d vector. */
+    const core::vector2df  toIrrVector2d() const
+    {
+        return core::vector2df(m_floats[0], m_floats[2]);
+    }   // toIrrVector2d
+    // ------------------------------------------------------------------------
+    /** Converts degree values stored in this vec3 to radians. */
+    void degreeToRad()
+    {
+        m_floats[0]*=DEGREE_TO_RAD;
+        m_floats[1]*=DEGREE_TO_RAD;
+        m_floats[2]*=DEGREE_TO_RAD;
+    }   // degreeToRad
+    // ------------------------------------------------------------------------
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
+    // ------------------------------------------------------------------------
     Vec3&          operator=(const btQuaternion& q){setHPR(q);           return *this;}
+    // ------------------------------------------------------------------------
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
+    // ------------------------------------------------------------------------
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
     float          length2_2d() const              {return m_floats[0]*m_floats[0] + m_floats[2]*m_floats[2];}
+    // ------------------------------------------------------------------------
     /** Returns the length of this vector in the plane, i.e. the vector is 
      *  used as a 2d vector. */
+    // ------------------------------------------------------------------------
     float          length_2d()  const              {return sqrt(m_floats[0]*m_floats[0] + m_floats[2]*m_floats[2]);}
+    // ------------------------------------------------------------------------
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */
     void           max(const Vec3& a)              {if(a.getX()>m_floats[0]) m_floats[0]=a.getX();
                                                     if(a.getY()>m_floats[1]) m_floats[1]=a.getY();
                                                     if(a.getZ()>m_floats[2]) m_floats[2]=a.getZ();}
+    // ------------------------------------------------------------------------
     /** Sets this = min(this, a) componentwise.
      *  \param a Vector to compare with. */
     void           min(const Vec3& a)              {if(a.getX()<m_floats[0]) m_floats[0]=a.getX();

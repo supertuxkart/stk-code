@@ -19,9 +19,6 @@
 
 #include "utils/vec3.hpp"
 
-#include "utils/constants.hpp"
-
-
 void Vec3::setHPR(const btQuaternion& q)
 {
     float W = q.getW();
@@ -37,14 +34,6 @@ void Vec3::setHPR(const btQuaternion& q)
     setY(asinf(-2.0f * (X * Z - Y * W)));
     setZ(atan2f(2.0f * (X * Y + Z * W), XSquared - YSquared - ZSquared + WSquared));
 }   // setHPR(btQuaternion)
-
-// ----------------------------------------------------------------------------
-void Vec3::degreeToRad()
-{
-    m_floats[0]=DEGREE_TO_RAD*m_floats[0];
-    m_floats[1]=DEGREE_TO_RAD*m_floats[1];      
-    m_floats[2]=DEGREE_TO_RAD*m_floats[2];
-}   // degreeToRad
 
 // ----------------------------------------------------------------------------
 /** Sets the pitch and the roll of this vector to follow the normal given. The
@@ -67,31 +56,3 @@ void Vec3::setPitchRoll(const Vec3 &normal)
     setRoll (-acosf(roll)  + NINETY_DEGREE_RAD);
 }   // setPitchRoll
 
-// ----------------------------------------------------------------------------
-/** Converts a bullet HPR value into an irrlicht HPR value.
- *  FIXME: this function should be inlined, but while debugging it's
- *  easier (compile-time wise) to modify it here :)
- */
-const core::vector3df Vec3::toIrrHPR() const
-{
-    core::vector3df r(RAD_TO_DEGREE*(getX()),     // pitch
-                      RAD_TO_DEGREE*(getY()),     // heading
-                      RAD_TO_DEGREE*(getZ()) );   // roll
-    return r;
-
-}  // toIrrHPR
-// ----------------------------------------------------------------------------
-/** Converts a vec3 into an irrlicht vector (which is a simple type cast).
- */
-const core::vector3df& Vec3::toIrrVector() const
-{
-    return (const core::vector3df&)*this;
-}   // toIrrVector
-
-// ----------------------------------------------------------------------------
-/** Returns the X and Y component as an irrlicht 2d vector. */
-const core::vector2df Vec3::toIrrVector2d() const
-{
-    core::vector2df v(m_floats[0], m_floats[2]);
-    return v;
-}   // toIrrVector2d
