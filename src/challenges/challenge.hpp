@@ -64,9 +64,9 @@ private:
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
     /** Short, internal name for this challenge. */
-    std::string              m_Id;
+    std::string              m_id;
     /** Name used in menu for this challenge. */
-    irr::core::stringw       m_Name; 
+    irr::core::stringw       m_name; 
     /** Message the user gets when the feature is not yet unlocked. */
     irr::core::stringw       m_challenge_description;
     /** Features to unlock. */
@@ -74,24 +74,11 @@ private:
     /** What needs to be done before accessing this challenge. */
     std::vector<std::string> m_prerequisites;
 
-    /** Version of the challenge. This way incorrect challenges 
-     *  (e.g. if a newer version of STK is installed on top of an
-     *  existing installation, and the older challenges refer to 
-     *  a track that does not exist/does not work anymore) can be
-     *  avoided. */
-    unsigned int             m_version;
 public:
              Challenge(const std::string &id, const std::string &name);
-             Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
+             Challenge() : m_id(""), m_name(""), m_state(CH_INACTIVE)
+             { }
     virtual ~Challenge() {};
-    /** Returns the id of the challenge. */
-    const std::string &getId() const              { return m_Id;                  }
-    /** Returns the name of the challenge. */
-    const irr::core::stringw &getName() const     { return m_Name;                }
-    /** Sets the name of the challenge. */
-    void  setName(const irr::core::stringw & s)   { m_Name = s;                   }
-    /** Sets the id of this challenge. */
-    void  setId(const std::string& s)             { m_Id = s;                     }
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
                               const irr::core::stringw &user_mode_name);
@@ -100,37 +87,60 @@ public:
                                     const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
-    
-    const std::vector<UnlockableFeature>&
-          getFeatures() const                    { return m_feature;             }
-    void  setChallengeDescription(const irr::core::stringw& d) 
-                                                 {m_challenge_description=d;      }
-    const irr::core::stringw& 
-          getChallengeDescription() const        {return m_challenge_description; }
-    void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
-    bool  isSolved() const                       {return m_state==CH_SOLVED;      }
-    bool  isActive() const                       {return m_state==CH_ACTIVE;      }
-    void  setSolved()                            {m_state = CH_SOLVED;            }
-    void  setActive()                            {m_state = CH_ACTIVE;            }
-    const std::vector<std::string>& 
-          getPrerequisites() const               {return m_prerequisites;         }
     void  load(const XMLNode* config);
     void  save(std::ofstream& writer);
-
     // These functions are meant for customisation, e.g. load/save
     // additional state information specific to the challenge
     virtual void loadAdditionalInfo(const XMLNode* config) {};
     virtual void saveAdditionalInfo(std::ofstream& writer)     {};
-
-    // These functions are called when a race/gp is finished. It allows
-    // the challenge to unlock features (when returning true), otherwise
-    // the feature remains locked.
-    virtual bool raceFinished()                      {return false;}   // end of a race
-    virtual bool grandPrixFinished()                 {return false;}   // end of a GP
-    
-    /** sets the right parameters in RaceManager to try this challenge */
+    // ------------------------------------------------------------------------
+    /** Returns the id of the challenge. */
+    const std::string &getId() const              { return m_id;              }
+    // ------------------------------------------------------------------------
+    /** Returns the name of the challenge. */
+    const irr::core::stringw &getName() const     { return m_name;            }
+    // ------------------------------------------------------------------------
+    /** Sets the name of the challenge. */
+    void  setName(const irr::core::stringw & s)   { m_name = s;               }
+    // ------------------------------------------------------------------------
+    /** Sets the id of this challenge. */
+    void  setId(const std::string& s)             { m_id = s;                 }
+    // ------------------------------------------------------------------------
+    const std::vector<UnlockableFeature>&
+          getFeatures() const                    { return m_feature;          }
+    // ------------------------------------------------------------------------    
+    void  setChallengeDescription(const irr::core::stringw& d) 
+                                                 {m_challenge_description=d;  }
+    // ------------------------------------------------------------------------
+    const irr::core::stringw& 
+          getChallengeDescription() const    {return m_challenge_description; }
+    // ------------------------------------------------------------------------
+    void  addDependency(const std::string id)  {m_prerequisites.push_back(id);}
+    // ------------------------------------------------------------------------
+    bool  isSolved() const                       {return m_state==CH_SOLVED;  }
+    // ------------------------------------------------------------------------
+    bool  isActive() const                       {return m_state==CH_ACTIVE;  }
+    // ------------------------------------------------------------------------
+    void  setSolved()                            {m_state = CH_SOLVED;        }
+    // ------------------------------------------------------------------------
+    void  setActive()                            {m_state = CH_ACTIVE;        }
+    // ------------------------------------------------------------------------
+    const std::vector<std::string>& 
+          getPrerequisites() const               {return m_prerequisites;     }
+    // ------------------------------------------------------------------------
+    /** These functions are called when a race is finished. It allows
+     *  the challenge to unlock features (when returning true), otherwise
+     *  the feature remains locked. */
+    virtual bool raceFinished()                  {return false;               }
+    // ------------------------------------------------------------------------
+    /** These functions are called when a grand prix is finished. It allows
+     *  the challenge to unlock features (when returning true), otherwise
+     *  the feature remains locked. */
+    virtual bool grandPrixFinished()             {return false;               }
+    // ------------------------------------------------------------------------    
+    /** Sets the right parameters in RaceManager to try this challenge */
     virtual void setRace() const = 0;
-    
+    // ------------------------------------------------------------------------
     /** Checks if a challenge is valid. */
     virtual void check() const = 0;
 };
