@@ -850,26 +850,29 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         {
             m_check_manager = new CheckManager(*node, this);
         }
-        else if (name=="particle-emitter"  && UserConfigParams::m_graphical_effects)
+        else if (name=="particle-emitter")
         {
-            std::string path;
-            irr::core::vector3df emitter_origin;
-            node->get("kind", &path);
-            node->getXYZ(&emitter_origin);
+            if (UserConfigParams::m_graphical_effects)
+            {
+                std::string path;
+                irr::core::vector3df emitter_origin;
+                node->get("kind", &path);
+                node->getXYZ(&emitter_origin);
 
-            try
-            {
-                ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
-                if (kind == NULL)
+                try
                 {
-                    throw std::runtime_error(path + " could not be loaded");
+                    ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
+                    if (kind == NULL)
+                    {
+                        throw std::runtime_error(path + " could not be loaded");
+                    }
+                    ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
+                    m_all_emitters.push_back(emitter);
                 }
-                ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
-                m_all_emitters.push_back(emitter);
-            }
-            catch (std::runtime_error& e)
-            {
-                fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+                catch (std::runtime_error& e)
+                {
+                    fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+                }
             }
         }
         else if(name=="sun")
