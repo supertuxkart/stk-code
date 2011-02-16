@@ -76,7 +76,7 @@ private:
 
 public:
              Challenge(const std::string &id, const std::string &name);
-             Challenge() : m_id(""), m_name(""), m_state(CH_INACTIVE)
+             Challenge() : m_state(CH_INACTIVE), m_id(""), m_name("")
              { }
     virtual ~Challenge() {};
     void  addUnlockTrackReward(const std::string &track_name);
