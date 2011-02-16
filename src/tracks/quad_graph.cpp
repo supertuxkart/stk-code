@@ -332,7 +332,7 @@ void QuadGraph::createMesh(bool show_invisible,
         m_all_quads->getBoundingBox(&bb_min, &bb_max);
         // Length of the lap line about 3% of the 'height'
         // of the track.
-        const float length=(bb_max.getZ()-bb_min.getZ())*0.03;
+        const float length=(bb_max.getZ()-bb_min.getZ())*0.03f;
 
         core::vector3df dl = lap_v[3].Pos-lap_v[0].Pos;
         float ll2 = dl.getLengthSQ();
