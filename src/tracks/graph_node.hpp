@@ -134,6 +134,14 @@ public:
     /** Returns the length of the quad of this node. */
     float       getNodeLength() const 
                 {return (m_lower_center-m_upper_center).length();}
+    // ------------------------------------------------------------------------
+    /** Returns true if the index-successor of this node is one that the AI
+     *  is allowed to use.
+     *  \param index Index of the successor. */
+    bool        ignoreSuccessorForAI(unsigned int i) const
+    {
+        return m_all_quads->getQuad(m_vertices[i]).letAIIgnore();
+    };
 };   // GraphNode
 
 #endif

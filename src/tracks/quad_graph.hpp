@@ -75,7 +75,8 @@ public:
     void         createDebugMesh();
     void         cleanupDebugMesh();
     void         getSuccessors(int node_number, 
-                               std::vector<unsigned int>& succ) const;
+                               std::vector<unsigned int>& succ,
+                               bool for_ai=false) const;
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz, 
                                 const int sector)               const;
     void         findRoadSector(const Vec3& XYZ, int *sector,

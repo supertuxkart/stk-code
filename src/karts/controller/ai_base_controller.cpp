@@ -80,7 +80,8 @@ void AIBaseController::computePath()
     for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
     {
         next.clear();
-        m_quad_graph->getSuccessors(i, next);
+        // Get all successors the AI is allowed to take.
+        m_quad_graph->getSuccessors(i, next, /*for_ai*/true);
         // For now pick one part on random, which is not adjusted during the 
         // race. Long term statistics might be gathered to determine the
         // best way, potentially depending on race position etc.

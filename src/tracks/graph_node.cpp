@@ -132,3 +132,5 @@ float GraphNode::getDistance2FromPoint(const Vec3 &xyz)
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
     return (closest-xyz2d).getLengthSQ();
 }   // getDistance2FromPoint
+
+// ----------------------------------------------------------------------------

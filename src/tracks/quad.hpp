@@ -48,10 +48,13 @@ private:
     /** Set to true if this quad should not be shown in the minimap. */
     bool  m_invisible;
 
+    /** Set if this quad should not be used by the AI. */
+    bool  m_ai_ignore;
+
     float sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const;
 public:
          Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-              bool invis=false);
+              bool invis=false, bool ai_ignore=false);
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     bool pointInQuad(const Vec3& p) const;
     void transform(const btTransform &t, Quad *result) const;
@@ -68,5 +71,8 @@ public:
     /** Returns true of this quad is invisible, i.e. not to be shown in 
      *  the minimap. */
     bool        isInvisible() const { return m_invisible; }
+    // ------------------------------------------------------------------------
+    /** True if this quad should be ignored by the AI. */
+    bool        letAIIgnore() const { return m_ai_ignore; }
 };   // class Quad
 #endif

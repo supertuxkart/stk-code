@@ -90,6 +90,11 @@ void QuadSet::load(const std::string &filename)
                    xml_node->getName().c_str(), filename.c_str());
             continue;
         }
+
+        // Note that it's not easy to do the reading of the parameters here
+        // in quad, since the specification in the xml can contain references
+        // to previous points. E.g.:  
+        // <quad p0="40:3" p1="40:2" p2="25.396030 0.770338 64.796539" ...
         Vec3 p0, p1, p2, p3;
         getPoint(xml_node, "p0", &p0);
         getPoint(xml_node, "p1", &p1);
@@ -97,7 +102,9 @@ void QuadSet::load(const std::string &filename)
         getPoint(xml_node, "p3", &p3);
         bool invisible=false;
         xml_node->get("invisible", &invisible);
-        Quad* q=new Quad(p0,p1,p2,p3, invisible);
+        bool ai_ignore=false;
+        xml_node->get("ai-ignore", &ai_ignore);
+        Quad* q=new Quad(p0,p1,p2,p3, invisible, ai_ignore);
         m_all_quads.push_back(q);
         m_max.max(p0);m_max.max(p1);m_max.max(p2);m_max.max(p3);
         m_min.min(p0);m_min.min(p1);m_min.min(p2);m_min.min(p3);

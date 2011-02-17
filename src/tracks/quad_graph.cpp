@@ -425,13 +425,19 @@ void QuadGraph::cleanupDebugMesh()
 /** Returns the list of successors or a node.
  *  \param node_number The number of the node.
  *  \param succ A vector of ints to which the successors are added.
+ *  \param for_ai true if only quads accessible by the AI should be returned.
  */
 void QuadGraph::getSuccessors(int node_number, 
-                              std::vector<unsigned int>& succ) const
+                              std::vector<unsigned int>& succ,
+                              bool for_ai) const
 {
     const GraphNode *gn=m_all_nodes[node_number];
-    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++) {
-        succ.push_back(gn->getSuccessor(i));
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++) 
+    {
+        // If getSuccessor is called for the AI, only add
+        // quads that are meant for the AI to be used.
+        if(!for_ai || !gn->ignoreSuccessorForAI(i))
+            succ.push_back(gn->getSuccessor(i));
     }
 }   // getSuccessors
 

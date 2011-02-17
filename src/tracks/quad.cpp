@@ -25,7 +25,7 @@
 
 /** Constructor, takes 4 points. */
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-           bool invisible)
+           bool invisible, bool ai_ignore)
  {
      if(sideOfLine2D(p0, p2, p1)>0 ||
          sideOfLine2D(p0, p2, p3)<0)
@@ -44,6 +44,7 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
                                std::min(p2.getY(), p3.getY())  );
      m_invisible = invisible;
+     m_ai_ignore = ai_ignore;
 
 }   // Quad
 
