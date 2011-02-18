@@ -26,6 +26,8 @@ using namespace irr;
 
 using namespace GUIEngine;
 
+const int BOTTOM_MARGIN = 10;
+
 // ----------------------------------------------------------------------------
 
 BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
@@ -47,9 +49,12 @@ void BubbleWidget::add()
     
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
     
+    m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
+    
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
-                                                      false, true /* word wrap */, m_parent, (m_focusable ? getNewID() : getNewNoFocusID()));
+                                                      false, true /* word wrap */, m_parent,
+                                                      (m_focusable ? getNewID() : getNewNoFocusID()));
     
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
