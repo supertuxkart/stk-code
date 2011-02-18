@@ -123,10 +123,6 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
         world->kartHit(m_kart->getWorldKartId());
     }
-
-    // Reset camera in case that it was in falling mode before.
-    if(m_kart->getCamera())
-        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
 }   // forceRescue
 
 //-----------------------------------------------------------------------------
