@@ -5,8 +5,10 @@
     <header width="100%" I18N="Section in track selection screen" text="Grand Prix"
             align="center" text_align="center" />
 
-    <scrollable_toolbar id="gps" height="175" width="100%" align="center" label_location="each"
-                        square_items="true" child_width="160" child_height="120" />
+    <box width="100%" height="195">
+        <scrollable_toolbar id="gps" height="175" y="10" x="10" width="100%" align="center" label_location="each"
+                            square_items="true" child_width="160" child_height="120" />
+    </box>
     
     <header width="100%" I18N="Section in track selection screen" text="All Tracks"
             align="center" text_align="center" />
