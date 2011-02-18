@@ -727,12 +727,10 @@ void initUserConfig(char *argv[])
     
     if (UserConfigParams::m_language.toString() != "system")
     {
-        char buffer[1024];
-        snprintf(buffer, 1024, "LANGUAGE=%s", UserConfigParams::m_language.c_str());
 #ifdef WIN32
-        _putenv( buffer );
+        SetEnvironmentVariableA("LANGUAGE", UserConfigParams::m_language.c_str());
 #else
-        putenv( buffer );
+        setenv("LANGUAGE", UserConfigParams::m_language.c_str(), 1);
 #endif
     }
     
