@@ -37,7 +37,7 @@ const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
 {
     m_y = 0.0f;
-    
+    m_x = 0.0f;
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
     
