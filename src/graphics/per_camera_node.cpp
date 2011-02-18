@@ -57,14 +57,17 @@ PerCameraNode::~PerCameraNode()
 void PerCameraNode::render()
 {
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-
+    
     // Only register children nodes if the right camera is in use
     if (curr_cam == m_camera) ISceneNode::OnRegisterSceneNode();
 }
 
 void PerCameraNode::OnRegisterSceneNode()
 {
-    irr_driver->getSceneManager()->registerNodeForRendering(this, scene::ESNRP_CAMERA);
+    if (m_camera == NULL)
+        ISceneNode::OnRegisterSceneNode();
+    else
+        irr_driver->getSceneManager()->registerNodeForRendering(this, scene::ESNRP_CAMERA);
 }
 
 void PerCameraNode::setCamera(scene::ICameraSceneNode* camera)
