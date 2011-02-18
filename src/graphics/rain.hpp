@@ -31,8 +31,8 @@ class Rain
 
     std::vector<irr::video::SMaterial*> m_materials;
     
-    float m_x;
-    float m_y;
+    float m_x[RAIN_RING_COUNT];
+    float m_y[RAIN_RING_COUNT];
     
 public:
     Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent);

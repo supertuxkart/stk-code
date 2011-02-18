@@ -28,7 +28,7 @@ const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
 const float RAIN_Y_FROM = -10.0f;
 const float RAIN_DY = 2.5f;
-const float RAIN_DX = 0.2f;
+const float RAIN_DX = 0.0f;
 
 const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
 const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
@@ -36,13 +36,14 @@ const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 
 Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
 {
-    m_y = 0.0f;
-    m_x = 0.0f;
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
     
     for (int r=0; r<RAIN_RING_COUNT; r++)
     {
+        m_x[r] = r/(float)RAIN_RING_COUNT;
+        m_y[r] = r/(float)RAIN_RING_COUNT;
+        
         scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
         
         buffer->Material.setTexture(0, m->getTexture());
@@ -114,17 +115,17 @@ Rain::~Rain()
 
 void Rain::update(float dt)
 {
-    m_x = m_x + dt*RAIN_DX;
-    m_y = m_y + dt*RAIN_DY;
-    if (m_x > 1.0f) m_x = fmod(m_x, 1.0f);
-    if (m_y > 1.0f) m_y = fmod(m_y, 1.0f);
-
     //const int count = m_materials.size();
     for (int m=0; m<RAIN_RING_COUNT; m++)
     {
+        m_x[m] = m_x[m] + dt*RAIN_DX;
+        m_y[m] = m_y[m] + dt*RAIN_DY;
+        if (m_x[m] > 1.0f) m_x[m] = fmod(m_x[m], 1.0f);
+        if (m_y[m] > 1.0f) m_y[m] = fmod(m_y[m], 1.0f);
+        
         core::matrix4& matrix = m_node[m]->getChild()->getMaterial(0).getTextureMatrix(0);
 
-        matrix.setTextureTranslate(m_x, m_y);
+        matrix.setTextureTranslate(m_x[m], m_y[m]);
     }
 }   // update
 
