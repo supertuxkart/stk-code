@@ -909,12 +909,19 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             }
             else if (weather_type.size() > 0)
             {
-                m_weather_type = WEATHER_RAIN;
+                if (weather_type == "rain")
+                {
+                    m_weather_type = WEATHER_RAIN;
+                }
+                else
+                {
+                    fprintf(stderr, "[Track] ERROR: Unknown weather type : '%s'\n", weather_type.c_str());
+                }
             }
             else
             {
                 fprintf(stderr, 
-                        "Warning: bas weather node found - ignored.\n");
+                        "[Track] ERROR: Warning: bad weather node found - ignored.\n");
                 continue;
             }
         }
