@@ -723,6 +723,9 @@
     <ClCompile Include="..\..\graphics\rain.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\graphics\per_camera_node.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1353,6 +1356,9 @@
       <Filter>Headerdateien\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\rain.hpp">
+      <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\per_camera_node.hpp">
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>

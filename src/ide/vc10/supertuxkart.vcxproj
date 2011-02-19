@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
+    <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
@@ -363,6 +364,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
+    <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
