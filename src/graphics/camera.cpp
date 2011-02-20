@@ -62,6 +62,13 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
+    // TODO: Make this per user too if the one above goes that way.
+    switch(UserConfigParams::m_camera_style)
+    {
+        case 1: m_camera_style = CS_CLASSIC; break;
+        case 0:
+        default: m_camera_style = CS_MODERN; break;
+    }
     reset();
 }   // Camera
 
@@ -339,8 +346,36 @@ void Camera::update(float dt)
     {
     case CM_NORMAL:
         {
-            computeNormalCameraPosition(&wanted_position, &wanted_target);
-            smoothMoveCamera(dt, wanted_position, wanted_target);
+            switch (m_camera_style)
+            {
+            // 0.7 flexible link
+            case CS_MODERN:
+                {
+                   computeNormalCameraPosition(&wanted_position, &wanted_target);
+                   smoothMoveCamera(dt, wanted_position, wanted_target);
+                   break;
+                }
+
+            // More like the 0.6 STK way
+            case CS_CLASSIC:
+                {
+                  // wanted_target.setY(wanted_target.getY()+ 0.75f);
+                  wanted_target.setY(wanted_target.getY()+ 0.30f);
+                  float angle_around = m_kart->getHeading();
+                  float angle_up     = m_kart->getKartProperties()->getCameraBackwardUpAngle()
+                                     - m_kart->getPitch() ;
+                  angle_around += 3.14;   // face forward
+                  wanted_position.setX( sin(angle_around));
+                  wanted_position.setY( sin(angle_up)    );
+                  wanted_position.setZ( cos(angle_around));
+                  wanted_position *= m_distance * 1.5f;
+                  wanted_position += wanted_target;
+                  smoothMoveCamera(dt, wanted_position, wanted_target);
+                  m_camera->setPosition(wanted_position.toIrrVector());
+                  m_camera->setTarget(wanted_target.toIrrVector());
+                  break;
+                }
+            }
             break;
         }
     case CM_FALLING:

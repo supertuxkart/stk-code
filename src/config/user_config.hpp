@@ -360,6 +360,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "reverse_look_threshold", 
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
+    PARAM_PREFIX IntUserConfigParam         m_camera_style
+            PARAM_DEFAULT( IntUserConfigParam(1, "camera_style", "Camera Style") );
+
     
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );

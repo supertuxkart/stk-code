@@ -51,6 +51,11 @@ public:
         CM_FALLING
     };
 
+    enum Style {
+        CS_MODERN,  //!< Flexible link between kart and camera
+        CS_CLASSIC, //!< Fixed position style, like STK v0.6
+    };
+
 private:
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
@@ -97,6 +102,10 @@ private:
 
     /** Velocity of the target of the camera, only used for end camera. */
     core::vector3df m_target_velocity;
+
+    /* Whether we should use the pre-0.7 camera style or the
+     * modern style. Should default to modern. */
+    Style           m_camera_style;
     
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
