@@ -364,7 +364,7 @@ void Camera::update(float dt)
                   float angle_around = m_kart->getHeading();
                   float angle_up     = m_kart->getKartProperties()->getCameraBackwardUpAngle()
                                      - m_kart->getPitch() ;
-                  angle_around += 3.14;   // face forward
+                  angle_around += M_PI;   // face forward
                   wanted_position.setX( sin(angle_around));
                   wanted_position.setY( sin(angle_up)    );
                   wanted_position.setZ( cos(angle_around));
