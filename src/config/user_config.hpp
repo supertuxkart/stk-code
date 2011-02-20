@@ -49,6 +49,7 @@ const int CURRENT_CONFIG_VERSION = 8;
 using irr::core::stringc;
 using irr::core::stringw;
 
+#include "graphics/camera.hpp"
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -361,7 +362,7 @@ namespace UserConfigParams
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
     PARAM_PREFIX IntUserConfigParam         m_camera_style
-            PARAM_DEFAULT( IntUserConfigParam(1, "camera_style", "Camera Style") );
+            PARAM_DEFAULT( IntUserConfigParam(Camera::CS_MODERN, "camera_style", "Camera Style") );
 
     
     PARAM_PREFIX StringUserConfigParam      m_item_style
