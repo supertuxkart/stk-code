@@ -42,7 +42,7 @@ const irr::core::stringw Challenge::UnlockableFeature::getUnlockedMessage() cons
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
             
-            return _("New track '%s' now available", track->getName());
+            return _("New track '%s' now available", core::stringw(track->getName()));
             break;
         }
         case UNLOCK_MODE:
@@ -71,7 +71,7 @@ const irr::core::stringw Challenge::UnlockableFeature::getUnlockedMessage() cons
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
             
-            return _("New kart '%s' now available", kp->getName());
+            return _("New kart '%s' now available", core::stringw(kp->getName()));
         }
         default:
             assert(false);
