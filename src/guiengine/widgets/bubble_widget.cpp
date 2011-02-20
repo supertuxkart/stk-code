@@ -72,11 +72,23 @@ void BubbleWidget::add()
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
         
         // reduce text to fit in the available space if it's too long
-        while (text_height > m_shrinked_size.getHeight())
+        if (translations->isRTLLanguage())
         {
-            message = message.subString(0, message.size() - 10) + "...";
-            irrwidget->setText(message.c_str());
-            text_height = irrwidget->getTextHeight();
+            while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
+            {
+                message = core::stringw(L"...") + message.subString(10, message.size() - 10);
+                irrwidget->setText(message.c_str());
+                text_height = irrwidget->getTextHeight();
+            }
+        }
+        else
+        {
+            while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
+            {
+                message = message.subString(0, message.size() - 10) + "...";
+                irrwidget->setText(message.c_str());
+                text_height = irrwidget->getTextHeight();
+            }
         }
     }
     m_shrinked_text = message;
