@@ -332,6 +332,14 @@ void Camera::update(float dt)
         return;
     }
 
+    // If an explosion or rescue is happening, stop moving the camera,
+    // but keep it target on the kart.
+    if(m_kart->playingEmergencyAnimation())
+    {
+        m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+        return;
+    }
+
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
 
