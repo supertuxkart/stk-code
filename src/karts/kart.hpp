@@ -47,7 +47,6 @@ class Shadow;
 class SFXBase;
 class SkidMarks;
 class SlipStream;
-class WaterSplash;
 class ParticleEmitter;
 class Rain;
 

@@ -46,7 +46,6 @@
 		952A154B103F66D600B1895D /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1539103F66D600B1895D /* moving_texture.cpp */; };
 		952A154D103F66D600B1895D /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153D103F66D600B1895D /* shadow.cpp */; };
 		952A154E103F66D600B1895D /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153F103F66D600B1895D /* skid_marks.cpp */; };
-		952A1550103F66D600B1895D /* water_splash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1543103F66D600B1895D /* water_splash.cpp */; };
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
@@ -440,8 +439,6 @@
 		952A153E103F66D600B1895D /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
 		952A153F103F66D600B1895D /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
 		952A1540103F66D600B1895D /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
-		952A1543103F66D600B1895D /* water_splash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = water_splash.cpp; path = ../../graphics/water_splash.cpp; sourceTree = SOURCE_ROOT; };
-		952A1544103F66D600B1895D /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
 		952A1552103F68D000B1895D /* profile_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profile_world.cpp; path = ../../modes/profile_world.cpp; sourceTree = SOURCE_ROOT; };
 		952A1553103F68D000B1895D /* profile_world.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = profile_world.hpp; path = ../../modes/profile_world.hpp; sourceTree = SOURCE_ROOT; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
@@ -1384,8 +1381,6 @@
 				95DFC5011106933B00A043A9 /* slip_stream.hpp */,
 				95C9C97010E93456005A418D /* stars.cpp */,
 				95C9C97110E93456005A418D /* stars.hpp */,
-				952A1543103F66D600B1895D /* water_splash.cpp */,
-				952A1544103F66D600B1895D /* water_splash.hpp */,
 			);
 			name = graphics;
 			path = ../../graphics;
@@ -2795,7 +2790,6 @@
 				952A154B103F66D600B1895D /* moving_texture.cpp in Sources */,
 				952A154D103F66D600B1895D /* shadow.cpp in Sources */,
 				952A154E103F66D600B1895D /* skid_marks.cpp in Sources */,
-				952A1550103F66D600B1895D /* water_splash.cpp in Sources */,
 				952A1554103F68D000B1895D /* profile_world.cpp in Sources */,
 				9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */,
 				9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */,

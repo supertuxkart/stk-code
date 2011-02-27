@@ -191,9 +191,6 @@ public:
      *  gfx. See m_below_surface for more details. */
     bool isSurface          () const { return m_surface; }
     // ------------------------------------------------------------------------
-    /** Returns true if this material should have water splashes. */
-    bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}
-    // ------------------------------------------------------------------------
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &

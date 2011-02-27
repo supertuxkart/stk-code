@@ -37,7 +37,6 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
-#include "graphics/water_splash.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -1012,13 +1011,26 @@ void Kart::handleMaterialGFX()
         surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
     if(pk && !m_flying)
     {
+        const float distance = xyz.distance2(from);
         m_terrain_particles->setParticleType(pk);
         m_terrain_particles->setPosition(xyz.toIrrVector());
-        const float speed = fabsf(getSpeed());
-        float rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
-                                   : 0;
+        //const float speed = fabsf(getSpeed());
+        //float rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
+        //                           : 0;
 
-        float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
+        float create;
+        if (distance < 2.0f)
+        {
+            create = pk->getMaxRate();
+        }
+        else if (distance < 4.0f)
+        {
+            create = pk->getMinRate() + (pk->getMaxRate() - pk->getMinRate())*(distance - 2.0f)/2.0f;
+        }
+        else
+        {
+            create = 0.0f;
+        }
         m_terrain_particles->setCreationRate(create);
     }
     //if (m_camera != NULL) m_camera->setFallMode(true);

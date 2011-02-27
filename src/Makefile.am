@@ -89,8 +89,6 @@ supertuxkart_SOURCES = \
  graphics/slip_stream.hpp \
  graphics/stars.cpp \
  graphics/stars.hpp \
- graphics/water_splash.hpp \
- graphics/water_splash.cpp \
  guiengine/CGUISpriteBank.cpp \
  guiengine/CGUISpriteBank.h \
  guiengine/abstract_state_manager.cpp \
