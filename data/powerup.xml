@@ -37,8 +37,8 @@
        too often (compared with many items which will only
        affect a karts or two).                                -->
   <!--      bubble  cake  bowl  zipper  plunger  switch  para  anvil -->
-  <first  w="30       0    10     0       0       10       0     0"
-    w-multi=" 0       0     0     0       0        0       0     0"    />
+  <first  w="25       5    15     5      10       10       0     0"
+    w-multi=" 0       0     5     0       0        0       0     0"    />
   <top33  w="30      30    30    30      30       10      30     0"
     w-multi=" 0      10    10     0      10        0       0     0"    />
   <mid33  w="30      30    30    30      30       10      30     0"
@@ -47,8 +47,8 @@
     w-multi=" 0      30    30    30      30        0       0     0"    />
   <last   w=" 0      30    30    60      60        0      60    60"
     w-multi=" 0      30    30    60      60        0       0     0"    />
-  <battle w=" 0      60    30     0       0        0       0     0"
-    w-multi=" 0      20    10     0       0        0       0     0"    />
+  <battle w=" 0      30    60     0       0        0       0     0"
+    w-multi=" 0      10    20     0       0        0       0     0"    />
 
 </powerup>
 
