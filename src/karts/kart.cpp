@@ -305,6 +305,7 @@ void Kart::startEngineSFX()
 {
     if(m_engine_sound)
     {
+        m_engine_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
         m_engine_sound->speed(0.6f);
         m_engine_sound->setLoop(true);
         m_engine_sound->play();
