@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <particles emitter="point">
 
-    <spreading xangle="120"      />
+    <spreading angle="90"        />
     
     <velocity  x="0.003"
                y="0.0047"
