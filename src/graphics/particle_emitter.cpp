@@ -115,14 +115,13 @@ public:
         for (unsigned int n=0; n<count; n++)
         {
             scene::SParticle& curr = particlearray[n];
-            const int i = (curr.pos.X - track_x)/track_x_len*m_height_map.size();
-            const int j = (curr.pos.Z - track_z)/track_z_len*m_height_map.size();
-            assert(i < (int)m_height_map.size());
-            assert(j < (int)m_height_map.size());
-            assert(i >= 0);
-            assert(j >= 0);
-            
+            const int i = (curr.pos.X - track_x)/track_x_len*(HEIGHT_MAP_RESOLUTION);
+            const int j = (curr.pos.Z - track_z)/track_z_len*(HEIGHT_MAP_RESOLUTION);
+            if (i >= HEIGHT_MAP_RESOLUTION || j >= HEIGHT_MAP_RESOLUTION) continue;
+            if (i < 0 || j < 0) continue;
+
             /*
+            // debug draw
             core::vector3df lp = curr.pos;
             core::vector3df lp2 = curr.pos;
             lp2.Y = m_height_map[i][j] + 0.02f;

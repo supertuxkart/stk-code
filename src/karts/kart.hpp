@@ -138,6 +138,8 @@ private:
     /** Particle emitter used for terrain-specific effects (including but not limited too skidding). */
     ParticleEmitter *m_terrain_particles;    
 
+    ParticleEmitter *m_sky_particles_emitter;
+    
     /** Graphical effect when using a nitro. */
     ParticleEmitter *m_nitro;
 

@@ -78,7 +78,6 @@ Track::Track(std::string filename)
     m_check_manager         = NULL;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
-    m_sky_particles_emitter = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
     m_weather_type          = WEATHER_NONE;
@@ -92,7 +91,6 @@ Track::~Track()
     if(m_quad_graph)    delete m_quad_graph;
     if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
-    if(m_sky_particles_emitter) delete m_sky_particles_emitter;
     delete m_track_mesh;
     delete m_gfx_effect_mesh;
 }   // ~Track
@@ -139,9 +137,6 @@ void Track::cleanup()
     m_all_nodes.clear();
     
     m_all_emitters.clearAndDeleteAll();
-
-    if (m_sky_particles_emitter) delete m_sky_particles_emitter;
-    m_sky_particles_emitter = NULL;
     
     // The meshes stored in the scene nodes are dropped now.
     // But to really remove all track meshes from memory
@@ -1022,20 +1017,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
-
-    if (UserConfigParams::m_weather_effects && m_sky_particles != NULL)
-    {
-        const float x = (m_aabb_max.getX() + m_aabb_min.getX())/2.0f;
-        const float z = (m_aabb_max.getZ() + m_aabb_min.getZ())/2.0f;
-        const float size_x = m_aabb_max.getX() - m_aabb_min.getX();
-        const float size_z = m_aabb_max.getZ() - m_aabb_min.getZ();
-        m_sky_particles->setBoxSizeX(size_x*0.5f); // FIXME: don't hardcode size reduction. We need to set the emission area in blender
-        m_sky_particles->setBoxSizeZ(size_z*0.5f);
-        
-        // FIXME: don't hardcode height We need to set the emission area in blender
-        m_sky_particles_emitter = new ParticleEmitter(m_sky_particles, core::vector3df(x, m_aabb_max.getY()*0.75f, z));
-        m_sky_particles_emitter->addHeightMapAffector(this);
-    }
     
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
@@ -1177,9 +1158,7 @@ bool Track::setTerrainHeight(Vec3 *pos) const
 // ----------------------------------------------------------------------------
 
 std::vector< std::vector<float> > Track::buildHeightMap()
-{
-    const int HEIGHT_MAP_RESOLUTION = 128;
-    
+{    
     std::vector< std::vector<float> > out(HEIGHT_MAP_RESOLUTION);
     
     float x = m_aabb_min.getX();

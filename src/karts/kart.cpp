@@ -101,6 +101,7 @@ Kart::Kart (const std::string& ident, Track* track, int position,
     m_saved_controller     = NULL;
     m_flying               = false;
     m_rain                 = NULL;
+    m_sky_particles_emitter= NULL;
     
     m_view_blocked_by_plunger = 0;
 
@@ -334,10 +335,11 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_beep_sound   );
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-    if(m_terrain_particles)   delete m_terrain_particles;
-    if(m_nitro)               delete m_nitro;
-    if(m_slipstream)          delete m_slipstream;
-    if(m_rain)                delete m_rain;
+    if(m_terrain_particles)      delete m_terrain_particles;
+    if(m_nitro)                  delete m_nitro;
+    if(m_slipstream)             delete m_slipstream;
+    if(m_rain)                   delete m_rain;
+    if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
 
     delete m_shadow;
 
@@ -1609,7 +1611,22 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
         }
     }
     
-    if (UserConfigParams::m_weather_effects && track->getWeatherType() == WEATHER_RAIN && type == RaceManager::KT_PLAYER)
+    if (type == RaceManager::KT_PLAYER && UserConfigParams::m_weather_effects &&
+        track->getSkyParticles() != NULL)
+    {
+        track->getSkyParticles()->setBoxSizeX(150.0f);
+        track->getSkyParticles()->setBoxSizeZ(150.0f);
+        
+        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(), core::vector3df(0, 40.0f, 0),
+                                                      getNode());
+        
+        // FIXME: in multiplayer mode, this will result in several instances of the heightmap being calculated
+        //        and kept in memory
+        m_sky_particles_emitter->addHeightMapAffector(track);
+    }
+    
+    if (UserConfigParams::m_weather_effects && track->getWeatherType() == WEATHER_RAIN &&
+        type == RaceManager::KT_PLAYER)
     {
         // camera not yet available at this point
         m_rain = new Rain(NULL, NULL);

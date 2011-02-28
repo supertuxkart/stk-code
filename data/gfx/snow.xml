@@ -12,8 +12,8 @@
     <material  file="snowflake.png"/>
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="900"
-               max="900"           />
+    <rate      min="400"
+               max="500"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="9000"

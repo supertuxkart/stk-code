@@ -48,6 +48,8 @@ class TriangleMesh;
 class World;
 class XMLNode;
 
+const int HEIGHT_MAP_RESOLUTION = 256;
+
 enum WeatherType
 {
     WEATHER_NONE,
@@ -143,9 +145,7 @@ private:
     
     /** Use a special built-in wheather */
     WeatherType              m_weather_type;
-    
-    ParticleEmitter*         m_sky_particles_emitter;
-    
+        
     /** A simple class to keep information about a track mode. */
     class TrackMode
     {
@@ -314,7 +314,8 @@ public:
     unsigned int getNumberOfStartPositions() const 
                                            { return m_start_transforms.size(); }    
     
-    WeatherType  getWeatherType           () const { return m_weather_type; }
+    WeatherType   getWeatherType          () const { return m_weather_type; }
+    ParticleKind* getSkyParticles         () { return m_sky_particles; }
     
     std::vector< std::vector<float> >     buildHeightMap();
     
