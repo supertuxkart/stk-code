@@ -28,6 +28,7 @@ using namespace irr;
 
 class Material;
 class ParticleKind;
+class Track;
 
 /**
  * \brief manages smoke particle effects
@@ -68,6 +69,8 @@ public:
     void         setParticleType(const ParticleKind* p);
     
     scene::IParticleSystemSceneNode* getNode() { return m_node; }
+    
+    void         addHeightMapAffector(Track* t);
 };
 #endif
 

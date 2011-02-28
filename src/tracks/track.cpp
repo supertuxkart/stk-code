@@ -1034,6 +1034,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         
         // FIXME: don't hardcode height We need to set the emission area in blender
         m_sky_particles_emitter = new ParticleEmitter(m_sky_particles, core::vector3df(x, m_aabb_max.getY()*0.75f, z));
+        m_sky_particles_emitter->addHeightMapAffector(this);
     }
     
     // Only print warning if not in battle mode, since battle tracks don't have
@@ -1172,3 +1173,73 @@ bool Track::setTerrainHeight(Vec3 *pos) const
     }
     return false;
 }   // setTerrainHeight
+
+// ----------------------------------------------------------------------------
+
+std::vector< std::vector<float> > Track::buildHeightMap()
+{
+    const int HEIGHT_MAP_RESOLUTION = 128;
+    
+    std::vector< std::vector<float> > out(HEIGHT_MAP_RESOLUTION);
+    
+    float x = m_aabb_min.getX();
+    const float x_len = m_aabb_max.getX() - m_aabb_min.getX();
+    const float z_len = m_aabb_max.getZ() - m_aabb_min.getZ();
+    
+    const float x_step = x_len/HEIGHT_MAP_RESOLUTION;
+    const float z_step = z_len/HEIGHT_MAP_RESOLUTION;
+    
+    btVector3 hitpoint;
+    const Material* material;
+    btVector3 normal;
+    
+    for (int i=0; i<HEIGHT_MAP_RESOLUTION; i++)
+    {
+        out[i].resize(HEIGHT_MAP_RESOLUTION);
+        float z = m_aabb_min.getZ();
+        
+        for (int j=0; j<HEIGHT_MAP_RESOLUTION; j++)
+        {
+            btVector3 pos(x, 100.0f, z);
+            btVector3 to = pos;
+            to.setY(-100000.f);
+            
+            m_track_mesh->castRay(pos, to, &hitpoint, &material, &normal);
+            z += z_step;
+            
+            out[i][j] = hitpoint.getY();
+            
+            /*
+            if (out[i][j] < -50)
+            {
+                printf(" ");
+            }
+            else if (out[i][j] < -25)
+            {
+                printf("`");
+            }
+            else if (out[i][j] < 0)
+            {
+                printf("-");
+            }
+            else if (out[i][j] < 25)
+            {
+                printf(":");
+            }
+            else if (out[i][j] < 50)
+            {
+                printf("!");
+            }
+            else if (out[i][j] < 100)
+            {
+                printf("#");
+            }
+             */
+        }
+        
+        //printf("\n");
+        x += x_step;
+    }
+    
+    return out;
+}

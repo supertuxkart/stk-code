@@ -316,6 +316,8 @@ public:
     
     WeatherType  getWeatherType           () const { return m_weather_type; }
     
+    std::vector< std::vector<float> >     buildHeightMap();
+    
 };   // class Track
 
 #endif

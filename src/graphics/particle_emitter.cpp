@@ -24,6 +24,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
 class FadeAwayAffector : public scene::IParticleAffector
@@ -41,7 +42,9 @@ public:
         m_end_fading = end;
         assert(m_end_fading >= m_start_fading);
     }   // FadeAwayAffector
+    
     // ------------------------------------------------------------------------
+    
     virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
     {
         scene::ICameraSceneNode* curr_cam = 
@@ -76,6 +79,7 @@ public:
     }   // affect
 
     // ------------------------------------------------------------------------
+    
     virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
     {
         // FIXME: this method seems to make sense only for built-in affectors
@@ -84,7 +88,74 @@ public:
     
 };   // FadeAwayAffector
 
+
 // ============================================================================
+
+class HeightMapCollisionAffector : public scene::IParticleAffector
+{
+    std::vector< std::vector<float> > m_height_map;
+    Track* m_track;
+    
+public:
+    HeightMapCollisionAffector(Track* t) : m_height_map(t->buildHeightMap())
+    {
+        m_track = t;
+    }
+    
+    virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
+    {
+        const Vec3* aabb_min;
+        const Vec3* aabb_max;
+        m_track->getAABB(&aabb_min, &aabb_max);
+        float track_x = aabb_min->getX();
+        float track_z = aabb_min->getZ();
+        const float track_x_len = aabb_max->getX() - aabb_min->getX();
+        const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
+        
+        for (unsigned int n=0; n<count; n++)
+        {
+            scene::SParticle& curr = particlearray[n];
+            const int i = (curr.pos.X - track_x)/track_x_len*m_height_map.size();
+            const int j = (curr.pos.Z - track_z)/track_z_len*m_height_map.size();
+            assert(i < (int)m_height_map.size());
+            assert(j < (int)m_height_map.size());
+            assert(i >= 0);
+            assert(j >= 0);
+            
+            /*
+            core::vector3df lp = curr.pos;
+            core::vector3df lp2 = curr.pos;
+            lp2.Y = m_height_map[i][j] + 0.02f;
+            
+            irr_driver->getVideoDriver()->draw3DLine(lp, lp2, video::SColor(255,255,0,0));
+            core::vector3df lp3 = lp2;
+            lp3.X += 0.1f;
+            lp3.Y += 0.02f;
+            lp3.Z += 0.1f;
+            lp2.X -= 0.1f;
+            lp2.Y -= 0.02f;
+            lp2.Z -= 0.1f;
+            irr_driver->getVideoDriver()->draw3DBox(core::aabbox3d< f32 >(lp2, lp3), video::SColor(255,255,0,0));
+            */
+            
+            if (curr.pos.Y < m_height_map[i][j])
+            {
+                //curr.color = video::SColor(255,255,0,0);
+                curr.endTime = curr.startTime; // destroy particle
+            }
+        }
+    }
+    
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        // FIXME: this method seems to make sense only for built-in affectors
+        return scene::EPAT_FADE_OUT;
+    }
+};
+
+
+// ============================================================================
+
 ParticleEmitter::ParticleEmitter(const ParticleKind* type, 
                                  const Vec3 &position,
                                  scene::ISceneNode* parent) 
@@ -297,3 +368,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         faa->drop();
     }
 }   // setParticleType
+
+//-----------------------------------------------------------------------------
+
+void ParticleEmitter::addHeightMapAffector(Track* t)
+{
+    HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
+    m_node->addAffector(hmca);
+    hmca->drop();
+}
