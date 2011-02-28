@@ -178,7 +178,11 @@ private:
     void computeNormalCameraPosition(Vec3 *wanted_position,
                                      Vec3 *wanted_target);
     void handleEndCamera(float dt);
-
+    void getCameraSettings(float *above_kart, float *cam_angle, 
+                           float *side_way, float *distance,
+                           bool *smoothing);
+    void positionCamera(float dt, float above_kart, float cam_angle,
+                        float side_way, float distance, float smoothing);
 public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();

@@ -315,6 +315,94 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
 }   // computeNormalCameraPosition
 
 //-----------------------------------------------------------------------------
+/** Determine the camera settings for the current frame.
+ *  \param above_kart How far above the camera should aim at.
+ *  \param cam_angle  Angle above the kart plane for the camera.
+ *  \param sideway Sideway movement of the camera.
+ *  \param distance Distance from kart.
+ */
+void Camera::getCameraSettings(float *above_kart, float *cam_angle, 
+                               float *sideway, float *distance,
+                               bool *smoothing)
+{
+    const KartProperties *kp = m_kart->getKartProperties();
+
+    if( (m_mode==CM_NORMAL && m_camera_style==CS_MODERN) ||
+        (m_mode==CM_FALLING)                                 )
+    {
+        *above_kart    = 0.75f;
+        float steering = m_kart->getSteerPercent() 
+                       * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+        // quadratically to dampen small variations (but keep sign)
+        float dampened_steer = fabsf(steering) * steering; 
+        *cam_angle     = kp->getCameraForwardUpAngle();
+        *sideway       = -m_rotation_range*dampened_steer*0.5f;
+        *distance      = -m_distance;
+        *smoothing     = true;
+        return;
+    }
+    switch(m_mode)
+    {
+    case CM_NORMAL:
+            assert(m_camera_style==CS_CLASSIC);
+
+            *above_kart = 0.3f;
+            *cam_angle  = kp->getCameraBackwardUpAngle();
+            *sideway    = 0.0f;
+            *distance   = -1.5f*m_distance;
+            *smoothing  = true;
+            break;
+    case CM_FALLING:
+        {
+            *above_kart    = 0.75f;
+            float steering = m_kart->getSteerPercent() 
+                           * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+            // quadratically to dampen small variations (but keep sign)
+            float dampened_steer = fabsf(steering) * steering; 
+            *cam_angle           = kp->getCameraForwardUpAngle();
+            *sideway             = -m_rotation_range*dampened_steer*0.5f;
+            *distance            = m_distance;
+            *smoothing           = true;
+            break;
+        }   // CM_FALLING
+    case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
+        {
+            *above_kart = 0.75f;
+            *cam_angle  = kp->getCameraBackwardUpAngle();
+            *sideway    = 0;
+            *distance   = 2.0f*m_distance;
+            *smoothing  = false;
+            break;
+        }
+    case CM_CLOSEUP: // Lower to the ground and closer to the kart
+        {
+            *above_kart = 0.75f;
+            *cam_angle  = 20.0f*DEGREE_TO_RAD;
+            *sideway    = m_rotation_range 
+                        * m_kart->getSteerPercent()
+                        * m_kart->getSkidding();
+            *distance   = -0.5f*m_distance;
+            *smoothing  = false;
+            break;
+        }
+    case CM_LEADER_MODE:
+        {
+            *above_kart = 0.0f;
+            *cam_angle  = 40*DEGREE_TO_RAD;
+            *sideway    = 0;
+            *distance   = 2.0f*m_distance;
+            *smoothing  = true;
+            break;
+        }
+    case CM_FINAL:
+    case CM_SIMPLE_REPLAY:
+        // TODO: Implement
+        break;
+    }
+
+}   // get CameraPosition
+
+//-----------------------------------------------------------------------------
 /** Called once per time frame to move the camera to the right position.
  *  \param dt Time step.
  */
@@ -332,109 +420,70 @@ void Camera::update(float dt)
         return;
     }
 
+    if(m_mode==CM_FINAL)
+    {
+        handleEndCamera(dt);
+        return;
+    }
+
+    float above_kart, cam_angle, side_way, distance;
+    bool  smoothing;
+    getCameraSettings(&above_kart, &cam_angle, &side_way, &distance,
+                      &smoothing);
+
     // If an explosion or rescue is happening, stop moving the camera,
     // but keep it target on the kart.
     if(m_kart->playingEmergencyAnimation())
     {
-        m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+        // The camera target needs to be 'smooth moved', otherwise
+        // there will be a noticable jump in the first frame
+
+        // Aim at the usual same position of the kart (i.e. slightly
+        // above the kart).
+        core::vector3df wanted_target(m_kart->getXYZ().toIrrVector()
+                                      +core::vector3df(0, above_kart, 0) );
+        core::vector3df current_target   = m_camera->getTarget();
+        // Note: this code is replicated from smoothMoveCamera so that
+        // the camera keeps on pointing to the same spot.
+        current_target += ((wanted_target-current_target)*m_target_speed)*dt;
+
+        m_camera->setTarget(current_target);
         return;
     }
 
+    positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+}   // update
+
+// ----------------------------------------------------------------------------
+/** Actually sets the camera based on the given parameter.
+ *  \param above_kart How far above the camera should aim at.
+ *  \param cam_angle  Angle above the kart plane for the camera.
+ *  \param sideway Sideway movement of the camera.
+ *  \param distance Distance from kart.
+*/
+void Camera::positionCamera(float dt, float above_kart, float cam_angle, 
+                           float side_way, float distance, float smoothing)
+{
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
 
+    wanted_target.setY(wanted_target.getY()+above_kart);
 
-    Vec3 relative_position;
-    const KartProperties *kp = m_kart->getKartProperties();
-    const btTransform &trans = m_kart->getTrans();
-    // Each case should set wanted_position and wanted_target according to 
-    // what is needed for that mode. Yes, there is a lot of duplicate code 
-    // but it is (IMHO) much easier to follow this way.
-    switch(m_mode)
+    float tan_up = tan(cam_angle);
+    Vec3 relative_position(side_way,
+                           fabsf(distance)*tan_up+above_kart,
+                           distance);
+    const btTransform &trans=m_kart->getTrans();
+    wanted_position = trans(relative_position);
+    if(smoothing)
+        smoothMoveCamera(dt, wanted_position, wanted_target);
+    else
     {
-    case CM_NORMAL:
-        {
-            switch (m_camera_style)
-            {
-            // 0.7 flexible link
-            case CS_MODERN:
-                {
-                   computeNormalCameraPosition(&wanted_position, 
-                                               &wanted_target);
-                   smoothMoveCamera(dt, wanted_position, wanted_target);
-                   break;
-                }
-
-            // More like the 0.6 STK way
-            case CS_CLASSIC:
-                {
-                  wanted_target.setY(wanted_target.getY()+ 0.3f);
-                  float tan_up = tan(kp->getCameraBackwardUpAngle());
-                  relative_position.setValue(0, 
-                                              1.5f*m_distance*tan_up+0.3f,
-                                             -1.5f*m_distance       );
-                  wanted_position = trans(relative_position);
-                  smoothMoveCamera(dt, wanted_position, wanted_target);
-                  break;
-                }
-            }
-            break;
-        }
-    case CM_FALLING:
-        {
-            computeNormalCameraPosition(&wanted_position, &wanted_target);            
-            wanted_position = m_camera->getPosition();
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            break;
-        }
-    case CM_FINAL:
-        {
-            handleEndCamera(dt);
-            break;
-        }
-    case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
-        {
-            wanted_target.setY(wanted_target.getY()+0.75f);
-            float tan_up = tan(kp->getCameraBackwardUpAngle());
-            relative_position.setValue(0, 
-                                       2.0f*m_distance*tan_up+0.75f,
-                                       2.0f*m_distance);
-            wanted_position = trans(relative_position);
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            m_camera->setPosition(wanted_position.toIrrVector());
-            m_camera->setTarget(wanted_target.toIrrVector());
-            break;
-        }
-    case CM_CLOSEUP: // Lower to the ground and closer to the kart
-        {
-            wanted_target.setY(wanted_target.getY()+0.75f);
-            float tan_up = tan(20.0f*DEGREE_TO_RAD);
-            relative_position.setX(  m_rotation_range 
-                                   * m_kart->getSteerPercent()
-                                   * m_kart->getSkidding());
-            relative_position.setY(0.5f*m_distance*tan_up+0.75f);
-            relative_position.setZ(0.5f*m_distance);
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            break;
-        }
-    case CM_LEADER_MODE:
-        {
-            World *world  = World::getWorld();
-            Kart *kart    = world->getKart(0);
-            wanted_target = kart->getXYZ().toIrrVector();
-            float tan_up = tan(40.0f*DEGREE_TO_RAD);
-            wanted_position.setValue(0, 
-                                     2.0f*m_distance*tan_up, 
-                                     2.0f*m_distance);
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            break;
-        }
-    case CM_SIMPLE_REPLAY:
-        // TODO: Implement
-        break;
+        m_camera->setPosition(wanted_position.toIrrVector());
+        m_camera->setTarget(wanted_target.toIrrVector());
     }
 
-}   // update
+}   // positionCamera
 
 // ----------------------------------------------------------------------------
 /** This function handles the end camera. It adjusts the camera position
@@ -469,23 +518,12 @@ void Camera::handleEndCamera(float dt)
         }
     case EndCameraInformation::EC_AHEAD_OF_KART:
         {
-            Vec3 wanted_target = m_kart->getXYZ();
-            wanted_target.setY(wanted_target.getY()+ 0.75f);
-            float angle_around = m_kart->getHeading()
-                //+ m_rotation_range * m_kart->getSteerPercent() 
-                //* m_kart->getSkidding()
-                ;
-            float angle_up     = m_kart->getKartProperties()->getCameraBackwardUpAngle()
-                               - m_kart->getPitch() ;
-            Vec3 wanted_position;
-            wanted_position.setX( sin(angle_around));
-            wanted_position.setY( sin(angle_up)    );
-            wanted_position.setZ( cos(angle_around));
-            wanted_position *= m_distance * 2.0f;
-            wanted_position += wanted_target;
-            smoothMoveCamera(dt, wanted_position, wanted_target);
-            m_camera->setPosition(wanted_position.toIrrVector());
-            m_camera->setTarget(wanted_target.toIrrVector());
+            const KartProperties *kp=m_kart->getKartProperties();
+            float cam_angle  = kp->getCameraBackwardUpAngle();
+
+            positionCamera(dt, /*above_kart*/0.75f, 
+                           cam_angle, /*side_way*/0, 
+                           2.0f*m_distance, /*smoothing*/false);
             break;
         }
     default: break;
@@ -506,7 +544,7 @@ void Camera::handleEndCamera(float dt)
         m_next_end_camera++;
         if(m_next_end_camera>=(unsigned)m_end_cameras.size()) m_next_end_camera = 0;
     }
-}   // handleEndCamera
+}   // checkForNextEndCamera
 
 // ----------------------------------------------------------------------------
 /** Sets viewport etc. for this camera. Called from irr_driver just before
