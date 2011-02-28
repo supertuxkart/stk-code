@@ -95,11 +95,13 @@ class HeightMapCollisionAffector : public scene::IParticleAffector
 {
     std::vector< std::vector<float> > m_height_map;
     Track* m_track;
+    bool m_first_time;
     
 public:
     HeightMapCollisionAffector(Track* t) : m_height_map(t->buildHeightMap())
     {
         m_track = t;
+        m_first_time = true;
     }
     
     virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
@@ -137,12 +139,21 @@ public:
             irr_driver->getVideoDriver()->draw3DBox(core::aabbox3d< f32 >(lp2, lp3), video::SColor(255,255,0,0));
             */
             
-            if (curr.pos.Y < m_height_map[i][j])
+            if (m_first_time)
             {
-                //curr.color = video::SColor(255,255,0,0);
-                curr.endTime = curr.startTime; // destroy particle
+                curr.pos.Y = m_height_map[i][j] + (curr.pos.Y - m_height_map[i][j])*((rand()%500)/500.0f);
+            }
+            else
+            {
+                if (curr.pos.Y < m_height_map[i][j])
+                {
+                    //curr.color = video::SColor(255,255,0,0);
+                    curr.endTime = curr.startTime; // destroy particle
+                }
             }
         }
+        
+        if (m_first_time) m_first_time = false;
     }
     
     virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
