@@ -734,10 +734,6 @@
 					RelativePath="..\..\graphics\stars.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\graphics\water_splash.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="network"
@@ -1702,10 +1698,6 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\stars.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\water_splash.hpp"
 					>
 				</File>
 			</Filter>
