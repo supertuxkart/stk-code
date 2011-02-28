@@ -117,8 +117,10 @@ public:
         for (unsigned int n=0; n<count; n++)
         {
             scene::SParticle& curr = particlearray[n];
-            const int i = (curr.pos.X - track_x)/track_x_len*(HEIGHT_MAP_RESOLUTION);
-            const int j = (curr.pos.Z - track_z)/track_z_len*(HEIGHT_MAP_RESOLUTION);
+            const int i = (int)( (curr.pos.X - track_x)
+                                 /track_x_len*(HEIGHT_MAP_RESOLUTION) );
+            const int j = (int)( (curr.pos.Z - track_z)
+                                 /track_z_len*(HEIGHT_MAP_RESOLUTION) );
             if (i >= HEIGHT_MAP_RESOLUTION || j >= HEIGHT_MAP_RESOLUTION) continue;
             if (i < 0 || j < 0) continue;
 
@@ -141,7 +143,9 @@ public:
             
             if (m_first_time)
             {
-                curr.pos.Y = m_height_map[i][j] + (curr.pos.Y - m_height_map[i][j])*((rand()%500)/500.0f);
+                curr.pos.Y = m_height_map[i][j] 
+                           + (curr.pos.Y - m_height_map[i][j])
+                                *((rand()%500)/500.0f);
             }
             else
             {

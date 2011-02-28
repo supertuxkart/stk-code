@@ -1024,7 +1024,7 @@ void Kart::handleMaterialGFX()
         float create;
         if (distance < 2.0f)
         {
-            create = pk->getMaxRate();
+            create = (float)pk->getMaxRate();
         }
         else if (distance < 4.0f)
         {
