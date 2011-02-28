@@ -126,7 +126,8 @@ void WorldStatus::update(const float dt)
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;  
             m_phase = TRACK_INTRO_PHASE;
-            m_track_intro_sound->play();
+            if (UserConfigParams::m_music)
+                m_track_intro_sound->play();
             return;
         case TRACK_INTRO_PHASE:
             if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING)
