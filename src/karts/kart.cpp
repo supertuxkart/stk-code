@@ -1617,7 +1617,7 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
         track->getSkyParticles()->setBoxSizeX(150.0f);
         track->getSkyParticles()->setBoxSizeZ(150.0f);
         
-        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(), core::vector3df(0, 40.0f, 0),
+        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(), core::vector3df(0.0f, 40.0f, 55.0f),
                                                       getNode());
         
         // FIXME: in multiplayer mode, this will result in several instances of the heightmap being calculated
