@@ -497,24 +497,33 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            const KartProperties *prop = kart_properties_manager->getKart(argv[i+1]);
-            if(prop)
+            if (!unlock_manager->isLocked(argv[i+1]))
             {
-                UserConfigParams::m_default_kart = argv[i+1];
-
-                // if a player was added with -N, change its kart. Otherwise, nothing to do,
-                // kart choice will be picked up upon player creation.
-                if (StateManager::get()->activePlayerCount() > 0)
+                const KartProperties *prop = kart_properties_manager->getKart(argv[i+1]);
+                if(prop)
                 {
-                    race_manager->setLocalKartInfo(0, argv[i+1]);
+                    UserConfigParams::m_default_kart = argv[i+1];
+                    
+                    // if a player was added with -N, change its kart. Otherwise, nothing to do,
+                    // kart choice will be picked up upon player creation.
+                    if (StateManager::get()->activePlayerCount() > 0)
+                    {
+                        race_manager->setLocalKartInfo(0, argv[i+1]);
+                    }
+                    fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
+                    i++;
                 }
-                fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
-                i++;
+                else
+                {
+                    fprintf(stdout, "Kart '%s' not found, ignored.\n",
+                            argv[i+1]);
+                }
             }
             else
             {
-                fprintf(stdout, "Kart '%s' not found, ignored.\n",
-                        argv[i+1]);
+                fprintf(stdout, "Kart %s has not been unlocked yet. \n", argv[i+1]);
+                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
+                return 0;
             }
         }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
@@ -544,7 +553,7 @@ int handleCmdLine(int argc, char **argv)
             else
             {
                 fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
-                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
+                fprintf(stdout, "Use --list-karts to list available tracks.\n\n");
                 return 0;
             }
             i++;
@@ -593,7 +602,10 @@ int handleCmdLine(int argc, char **argv)
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
                 const KartProperties* KP= kart_properties_manager->getKartById(i);
-                fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName());
+                if (!unlock_manager->isLocked(KP->getIdent()))
+                {
+                    fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName());
+                }
             }
             fprintf ( stdout, "\n" );
         }
