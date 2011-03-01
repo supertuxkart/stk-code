@@ -435,9 +435,6 @@
     <ClCompile Include="..\..\graphics\stars.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\graphics\water_splash.cpp">
-      <Filter>Quelldateien\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\network\connect_message.cpp">
       <Filter>Quelldateien\network</Filter>
     </ClCompile>
@@ -1083,9 +1080,6 @@
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\stars.hpp">
-      <Filter>Headerdateien\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\graphics\water_splash.hpp">
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\ambient_light_sphere.hpp">

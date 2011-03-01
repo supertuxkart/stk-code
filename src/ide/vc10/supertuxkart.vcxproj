@@ -269,7 +269,6 @@
     <ClCompile Include="..\..\graphics\skid_marks.cpp" />
     <ClCompile Include="..\..\graphics\slip_stream.cpp" />
     <ClCompile Include="..\..\graphics\stars.cpp" />
-    <ClCompile Include="..\..\graphics\water_splash.cpp" />
     <ClCompile Include="..\..\network\connect_message.cpp" />
     <ClCompile Include="..\..\network\kart_control_message.cpp" />
     <ClCompile Include="..\..\network\kart_update_message.cpp" />
@@ -487,7 +486,6 @@
     <ClInclude Include="..\..\graphics\skid_marks.hpp" />
     <ClInclude Include="..\..\graphics\slip_stream.hpp" />
     <ClInclude Include="..\..\graphics\stars.hpp" />
-    <ClInclude Include="..\..\graphics\water_splash.hpp" />
     <ClInclude Include="..\..\tracks\ambient_light_sphere.hpp" />
     <ClInclude Include="..\..\tracks\bezier_curve.hpp" />
     <ClInclude Include="..\..\tracks\check_lap.hpp" />
