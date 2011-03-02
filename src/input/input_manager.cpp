@@ -83,21 +83,20 @@ InputManager::~InputManager()
 //-----------------------------------------------------------------------------
 void InputManager::handleStaticAction(int key, int value)
 {
-
-    static bool control_is_pressed=false;
-    World *world=World::getWorld();
+    static bool control_is_pressed = false;
+    World *world = World::getWorld();
 
     switch (key)
     {
-#ifdef DEBUG
         case KEY_CONTROL:
         case KEY_RCONTROL:
         case KEY_LCONTROL:
             control_is_pressed = value!=0;
             break;
+
         case KEY_KEY_I:
         {
-            if (world == NULL) break;
+            if (world == NULL || !UserConfigParams::m_artist_debug_mode) break;
             
             Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
@@ -107,7 +106,7 @@ void InputManager::handleStaticAction(int key, int value)
         }
         case KEY_KEY_K:
         {
-            if (world == NULL) break;
+            if (world == NULL || !UserConfigParams::m_artist_debug_mode) break;
             
             Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
@@ -116,7 +115,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
         case KEY_F1:
-            if (world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
@@ -128,50 +127,50 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         case KEY_F2:
-            if (world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
         case KEY_F3:
-            if (world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
             }
             break;
         case KEY_F4:
-            if (world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
             }
             break;
         case KEY_F5:
-            if (world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
             }
             break;
         case KEY_F6:
-            if (world && race_manager->getNumPlayers() == 1)
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
             }
             break;
         case KEY_F7:
-            if (world && race_manager->getNumPlayers() == 1)
+            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
-            
+        
         case KEY_F8:
-            if(value)
+            if (UserConfigParams::m_artist_debug_mode && value)
             {
                 if (control_is_pressed)
                 {
@@ -193,12 +192,12 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_F11:
-            if(value && control_is_pressed)
+            if (UserConfigParams::m_artist_debug_mode && value && control_is_pressed)
             {
                 world->getPhysics()->nextDebugMode();
             }
             break;
-#endif
+
         case KEY_F12:
             if(value)
                 UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;

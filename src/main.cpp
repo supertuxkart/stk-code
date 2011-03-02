@@ -415,7 +415,7 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_material_debug = true;
         }
-        else if(!strcmp(argv[i], "--camera-debug"))
+        else if(UserConfigParams::m_artist_debug_mode && !strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
         }
@@ -434,7 +434,7 @@ int handleCmdLine(int argc, char **argv)
                        km->getMasterKartModel().getModel()->getMeshBufferCount());
             }
         }
-        else if(!strcmp(argv[i], "--check-debug"))
+        else if(UserConfigParams::m_artist_debug_mode && !strcmp(argv[i], "--check-debug"))
         {
             UserConfigParams::m_check_debug=true;
         }
@@ -619,37 +619,12 @@ int handleCmdLine(int argc, char **argv)
         //fprintf ( stdout, "Enabling reverse mode.\n" ) ;
         //raceSetup.reverse = 1;
         }
-        else if ( !strcmp(argv[i], "--mirror") )
-        {
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-            fprintf ( stdout, "Enabling mirror mode.\n" ) ;
-            //raceSetup.mirror = 1;
-#else
-            //raceSetup.mirror = 0 ;
-#endif
-
-        }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
             fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
             race_manager->setNumLaps(atoi(argv[i+1]));
             i++;
         }
-        /* TODO: add back --players" switch
-        else if ( !strcmp(argv[i], "--players") && i+1<argc ) {
-          raceSetup.numPlayers = atoi(argv[i+1]);
-
-          if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4) {
-        fprintf ( stderr,
-        "You choose an invalid number of players: %d.\n",
-        raceSetup.numPlayers );
-        cmdLineHelp(argv[0]);
-        return 0;
-          }
-          fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
-          i++;
-        }
-        */
         else if( !strcmp(argv[i], "--log=terminal"))
         {
             UserConfigParams::m_log_errors=false;

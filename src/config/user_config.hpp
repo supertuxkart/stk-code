@@ -381,9 +381,11 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_server_addons
             PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
 
-    PARAM_PREFIX StringUserConfigParam         m_language
+    PARAM_PREFIX StringUserConfigParam     m_language
             PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );
     
+    PARAM_PREFIX BoolUserConfigParam       m_artist_debug_mode
+            PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode", "Whether to enable track debugging features") );
     
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

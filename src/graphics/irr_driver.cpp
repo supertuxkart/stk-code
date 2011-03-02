@@ -972,9 +972,8 @@ void IrrDriver::update(float dt)
                     // the bullet debug view, since otherwise the camera
                     // is not set up properly. This is only used for 
                     // the bullet debug view.
-#ifdef DEBUG
-                    World::getWorld()->getPhysics()->draw();
-#endif
+                    if (UserConfigParams::m_artist_debug_mode)
+                        World::getWorld()->getPhysics()->draw();
                 }   // if kart->Camera
             }   // for i<world->getNumKarts()
             // To draw the race gui we set the viewport back to the full
