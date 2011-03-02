@@ -200,6 +200,7 @@ void UnlockManager::load()
         save();
         
         if (root) delete root;
+        computeActive();
         return;
     }
     
