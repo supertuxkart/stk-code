@@ -153,7 +153,8 @@ void OptionsScreenVideo::init()
             {
                 found_config_res = true;
             }
-            else if (w == 800 && h == 600)
+            
+            if (w == 800 && h == 600)
             {
                 found_800_600 = true;
             }
@@ -186,6 +187,19 @@ void OptionsScreenVideo::init()
             const int w = UserConfigParams::m_width;
             const int h = UserConfigParams::m_height;
             const float ratio = (float)w / h;
+            
+            if (w == 800 && h == 600)
+            {
+                found_800_600 = true;
+            }
+            else if (w == 1024 && h == 640)
+            {
+                found_1024_640 = true;
+            }
+            else if (w == 1024 && h == 768)
+            {
+                found_1024_768 = true;
+            }
             
             char name[32];
             sprintf( name, "%ix%i", w, h );
