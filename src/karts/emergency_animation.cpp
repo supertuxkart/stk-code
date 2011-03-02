@@ -157,7 +157,10 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     m_up_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
     World::getWorld()->getPhysics()->removeKart(m_kart);
     
-    m_curr_rotation.setHPR(m_kart->getRotation());
+    m_curr_rotation.setHeading(m_kart->getHeading());
+    m_curr_rotation.setPitch(m_kart->getPitch());
+    m_curr_rotation.setRoll(m_kart->getRoll());
+
     const int max_rotation = direct_hit ? 2 : 1;
     // To get rotations in both directions for each axis we determine a random
     // number between -(max_rotation-1) and +(max_rotation-1)
