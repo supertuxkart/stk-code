@@ -101,6 +101,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 std::cout << "Clicked on track " << selection.c_str() 
                           << std::endl;
             
+            UserConfigParams::m_last_track = selection;
+            
             if (selection == "random_track")
             {
                 RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
@@ -239,7 +241,12 @@ void TracksScreen::init()
     buildTrackList();
        
     // select something for the game master
-    tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
+    // FIXME: 'setSelection' will not scroll up to the passed track, so if given track is not visible
+    //         with current scrolling this fails
+    if (!tracks_widget->setSelection(UserConfigParams::m_last_track, PLAYER_ID_GAME_MASTER, true))
+    {
+        tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
+    }
 }
 
 // -----------------------------------------------------------------------------------------------
