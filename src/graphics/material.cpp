@@ -91,15 +91,25 @@ Material::Material(const XMLNode *node, int index)
 
     s="";
     node->get("graphical-effect", &s                   );
-    if(s=="water")
+    
+    if (s == "water")
+    {
         m_graphical_effect = GE_WATER;
-    else if (s!="")
+    }
+    else if (s == "none")
+    {
+    }
+    else if (s != "")
+    {
         fprintf(stderr, 
-            "Invalid graphical effect specification: '%s' - ignored.\n", 
-            s.c_str());
+                "Invalid graphical effect specification: '%s' - ignored.\n", 
+                s.c_str());
+    }
     else
+    {
         m_graphical_effect = GE_NONE;
-
+    }
+    
     if (node->get("compositing", &s))
     {
         if      (s == "blend")    m_alpha_blending = true;
