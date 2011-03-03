@@ -522,7 +522,7 @@ int handleCmdLine(int argc, char **argv)
             else
             {
                 fprintf(stdout, "Kart %s has not been unlocked yet. \n", argv[i+1]);
-                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
+                fprintf(stdout, "Use --list-karts to list available karts.\n\n");
                 return 0;
             }
         }
@@ -553,7 +553,7 @@ int handleCmdLine(int argc, char **argv)
             else
             {
                 fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
-                fprintf(stdout, "Use --list-karts to list available tracks.\n\n");
+                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
                 return 0;
             }
             i++;
