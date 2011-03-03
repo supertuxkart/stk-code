@@ -39,7 +39,7 @@ private:
     Kart              *m_kart;
 
     /** The scene node. */
-    scene::ISceneNode *m_node;
+    scene::IMeshSceneNode *m_node;
 
     /** The actual mesh. */
     scene::IMesh      *m_mesh;

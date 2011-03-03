@@ -252,6 +252,25 @@ void SlipStream::setIntensity(float f, const Kart *kart)
     // For real testing in game: this needs some tuning!
     m_node->setVisible(f!=0);
     MovingTexture::setSpeed(f, 0);
+    
+
+    int c = f*255;
+    if (c > 255) c = 255;
+        
+    const unsigned int bcount = m_node->getMesh()->getMeshBufferCount();
+    for (unsigned int b=0; b<bcount; b++)
+    {
+        scene::IMeshBuffer* mb = m_node->getMesh()->getMeshBuffer(b);
+        irr::video::S3DVertex* vertices = (video::S3DVertex*)mb->getVertices();
+        for (unsigned int i=0; i<mb->getVertexCount(); i++)
+        {
+            const int color = c*(vertices[i].Color.getAlpha()/255.0f);
+            vertices[i].Color.setRed( color );
+            vertices[i].Color.setGreen( color );
+            vertices[i].Color.setBlue( color );
+        }
+    }
+
     return;
     // For debugging: make the slip stream effect visible all the time
     m_node->setVisible(true);
