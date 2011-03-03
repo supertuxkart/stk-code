@@ -1727,23 +1727,28 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     
     if (m_nitro)
     {
-        // fabs(speed) is important, otherwise the negative number will
-        // become a huge unsigned number in the particle scene node!
-        const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
-        const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
-        const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
-        assert(rate >= 0.0f); // allow for rounding errors...
-        //assert(rate <= 2.0f); // max speed is not always respected it seems...
-        m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && 
-                                 m_collected_energy>0
-                                 ? (min_rate + rate*(max_rate - min_rate)) : 0);
+        // For testing purposes mis-use the nitro graphical effects to show
+        // then the slipstream becomes usable.
+        if(m_slipstream->isSlipstreamReady())
+        {
+            m_nitro->setCreationRate(200.0f);
+        }
+        else
+        {
+            // fabs(speed) is important, otherwise the negative number will
+            // become a huge unsigned number in the particle scene node!
+            const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
+            const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
+            const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
+            assert(rate >= 0.0f); // allow for rounding errors...
+            //assert(rate <= 2.0f); // max speed is not always respected it seems...
+            m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && 
+                                     m_collected_energy>0
+                                     ? (min_rate + rate*(max_rate - min_rate)) : 0);
+        }
     }
 
-    // For testing purposes mis-use the nitro graphical effects to show
-    // then the slipstream becomes usable.
-    if(m_slipstream->inUse())
-        m_nitro->setCreationRate(20.0f);
-
+    
     float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
