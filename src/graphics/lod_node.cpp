@@ -52,17 +52,6 @@ void LODNode::OnRegisterSceneNode()
             return;
         }
     }
-    
-    if (dist >= m_detail[m_nodes.size()-1])
-    {
-        m_nodes[m_nodes.size()-1]->OnRegisterSceneNode();
-    }
-    else
-    {
-        // This probably means the first level of detail is not 0
-        assert(false);
-    }
-    //ISceneNode::OnRegisterSceneNode();
 }
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
