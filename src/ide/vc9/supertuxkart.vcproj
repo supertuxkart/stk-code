@@ -683,6 +683,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\lod_node.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\material.cpp"
 					>
 				</File>
@@ -1646,6 +1650,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\irr_driver.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\lod_node.hpp"
 					>
 				</File>
 				<File
