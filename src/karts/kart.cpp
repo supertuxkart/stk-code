@@ -136,6 +136,15 @@ Kart::Kart (const std::string& ident, Track* track, int position,
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 
+    // In multiplayer mode, sounds are NOT positional
+    if (race_manager->getNumLocalPlayers() > 1)
+    {
+        m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+    }
+    
     if(!m_engine_sound)
     {
         fprintf(stdout, "Error: Could not allocate a sfx object for the kart. Further errors may ensue!\n");
