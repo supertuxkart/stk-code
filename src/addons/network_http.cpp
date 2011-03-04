@@ -82,9 +82,9 @@ void *NetworkHttp::mainLoop(void *obj)
     // Initialise the online portion of the addons manager.
     if(UserConfigParams::m_verbosity>=3)
         printf("[addons] Downloading list.\n");
-    if(me->downloadFileSynchron("list"))
+    if(me->downloadFileSynchron("news.xml"))
     {
-        std::string xml_file = file_manager->getAddonsFile("list");
+        std::string xml_file = file_manager->getAddonsFile("news.xml");
 
         const XMLNode *xml = new XMLNode(xml_file);
         me->checkNewServer(xml);
@@ -198,9 +198,9 @@ void NetworkHttp::updateNews(const XMLNode *xml)
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
-        if(node->getName()!="news") continue;
+        if(node->getName()!="message") continue;
         std::string news;
-        node->get("text", &news);
+        node->get("content", &news);
         m_news.set(news);
         error = false;
     }

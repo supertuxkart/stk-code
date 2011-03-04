@@ -72,7 +72,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
         const XMLNode *node = xml->getNode(i);
         const std::string &name = node->getName();
         // Ignore news/redirect, which is handled by network_http
-        if(name=="news" || name=="redirect") continue;
+        if(name=="include" || name=="message") continue;
         if(node->getName()=="track" || node->getName()=="kart")
         {
             Addon addon(*node);
