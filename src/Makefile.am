@@ -63,6 +63,8 @@ supertuxkart_SOURCES = \
  graphics/explosion.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
+ graphics/lod_node.cpp \
+ graphics/lod_node.hpp \
  graphics/material.cpp \
  graphics/material.hpp \
  graphics/material_manager.cpp \

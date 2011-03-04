@@ -33,6 +33,7 @@ using namespace irr;
 #include "graphics/camera.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
@@ -521,6 +522,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     MeshTools::minMax3D(merged_mesh, &m_aabb_min, &m_aabb_max);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
+    std::map< std::string, std::vector< std::pair<int, scene::ISceneNode*> > > lod_groups;
+    
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
@@ -548,6 +551,12 @@ bool Track::loadMainTrack(const XMLNode &root)
         n->get("hpr", &hpr);
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
+        
+        std::string lodgroup;
+        n->get("lodgroup", &lodgroup);
+        
+        int detail = -1;
+        n->get("detail", &detail);
         
         if (tangent)
         {
@@ -601,9 +610,31 @@ bool Track::loadMainTrack(const XMLNode &root)
 
 
         handleAnimatedTextures(scene_node, *n);
-        m_all_nodes.push_back(scene_node);
+        
+        if (lodgroup.empty())
+        {
+            m_all_nodes.push_back( scene_node );
+        }
+        else
+        {
+            lod_groups[lodgroup].push_back( std::pair<int, scene::ISceneNode*>(detail, scene_node) );
+        }
     }   // for i
 
+    scene::ISceneManager* sm = irr_driver->getSceneManager();
+    scene::ISceneNode* sroot = sm->getRootSceneNode();
+    std::map<std::string, std::vector< std::pair<int, scene::ISceneNode*> > >::iterator it;
+    for (it = lod_groups.begin(); it != lod_groups.end(); it++)
+    {
+        LODNode* node = new LODNode(sroot, sm, -1);
+        std::vector< std::pair<int, scene::ISceneNode*> >& nodes = it->second;
+        for (unsigned int n=0; n<nodes.size(); n++)
+        {
+            node->add( nodes[n].first, nodes[n].second, true );
+        }
+        m_all_nodes.push_back( node );
+    }
+    
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {

@@ -47,6 +47,7 @@
 		952A154D103F66D600B1895D /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153D103F66D600B1895D /* shadow.cpp */; };
 		952A154E103F66D600B1895D /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A153F103F66D600B1895D /* skid_marks.cpp */; };
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
+		95376CAF1320784100C842A4 /* lod_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95376CAD1320784100C842A4 /* lod_node.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
 		9538A56012CD094200CE3220 /* addon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538A55E12CD094200CE3220 /* addon.cpp */; };
@@ -441,6 +442,8 @@
 		952A1540103F66D600B1895D /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
 		952A1552103F68D000B1895D /* profile_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profile_world.cpp; path = ../../modes/profile_world.cpp; sourceTree = SOURCE_ROOT; };
 		952A1553103F68D000B1895D /* profile_world.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = profile_world.hpp; path = ../../modes/profile_world.hpp; sourceTree = SOURCE_ROOT; };
+		95376CAD1320784100C842A4 /* lod_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lod_node.cpp; path = ../../graphics/lod_node.cpp; sourceTree = SOURCE_ROOT; };
+		95376CAE1320784100C842A4 /* lod_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = lod_node.hpp; path = ../../graphics/lod_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
@@ -1355,6 +1358,8 @@
 				952A1530103F66D600B1895D /* explosion.hpp */,
 				952A1531103F66D600B1895D /* irr_driver.cpp */,
 				952A1532103F66D600B1895D /* irr_driver.hpp */,
+				95376CAD1320784100C842A4 /* lod_node.cpp */,
+				95376CAE1320784100C842A4 /* lod_node.hpp */,
 				952A1533103F66D600B1895D /* material.cpp */,
 				952A1534103F66D600B1895D /* material.hpp */,
 				952A1535103F66D600B1895D /* material_manager.cpp */,
@@ -2980,6 +2985,7 @@
 				9559DE7F12FF777600350DE8 /* rain.cpp in Sources */,
 				9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */,
 				95E1FCDF130369EB004D83CC /* per_camera_node.cpp in Sources */,
+				95376CAF1320784100C842A4 /* lod_node.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
