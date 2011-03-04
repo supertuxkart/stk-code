@@ -139,10 +139,20 @@ Kart::Kart (const std::string& ident, Track* track, int position,
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
-        m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-        m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-        m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
-        m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        if (type == RaceManager::KT_PLAYER)
+        {
+            m_goo_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
+            m_skid_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
+            m_crash_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
+            m_beep_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
+        }
+        else
+        {
+            m_goo_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        }
     }
     
     if(!m_engine_sound)
