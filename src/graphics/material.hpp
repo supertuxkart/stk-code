@@ -81,6 +81,10 @@ private:
     
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
     
+    /** For normal maps */
+    bool             m_normal_map;
+    std::string      m_normal_map_tex;
+    
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
     bool             m_lighting;
@@ -219,6 +223,8 @@ public:
         *zipper_fade_out_time      = m_zipper_fade_out_time;
     }   // getZipperParameter
 
+    bool isNormalMap() const { return m_normal_map; }
+    
 } ;
 
 

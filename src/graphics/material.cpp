@@ -89,6 +89,11 @@ Material::Material(const XMLNode *node, int index)
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
 
+    if (node->get("normal-map",  &m_normal_map_tex))
+    {
+        m_normal_map = true;
+    }
+
     s="";
     node->get("graphical-effect", &s                   );
     
@@ -211,6 +216,7 @@ void Material::init(unsigned int index)
     m_zipper_fade_out_time      = -1.0f;
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
+    m_normal_map                = false;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -411,15 +417,22 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
                                                     video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
         modes++;
     }
-    
-    if (m_disable_z_write)
+    if (m_normal_map)
     {
-        m->ZWriteEnable = false;
+        // TODO: allow searching in per-track dir too...
+        m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
+        m->MaterialType = video::EMT_NORMAL_MAP_SOLID ;
+        modes++;
     }
     
     if (modes > 1)
     {
         std::cerr << "[Material::setMaterialProperties] More than one main mode set for " << m_texname.c_str() << "\n";
+    }
+    
+    if (m_disable_z_write)
+    {
+        m->ZWriteEnable = false;
     }
 
     if (!m_lighting)
@@ -455,6 +468,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->setFlag(video::EMF_TRILINEAR_FILTER, true);
     }    
     
+    // UV clamping
     if ( (m_clamp_tex & UCLAMP) != 0)
     {
         //  m->setFlag();
@@ -480,10 +494,11 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         }
     }
 
-
+    // Backface culling
     if(!m_backface_culling)
         m->setFlag(video::EMF_BACK_FACE_CULLING, false);
 
+    // Material color
     m->ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
 
 #ifdef DEBUG
@@ -492,5 +507,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+
     
 }   // setMaterialProperties

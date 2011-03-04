@@ -533,32 +533,72 @@ bool Track::loadMainTrack(const XMLNode &root)
                     n->getName().c_str());
             continue;
         }
+        
+        bool tangent = false;
+        n->get("tangents", &tangent);
+        
+        scene::ISceneNode* scene_node;
         model_name="";
         n->get("model", &model_name);
         full_path = m_root+"/"+model_name;
-        scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
-        if(!a_mesh)
-        {
-            fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                    full_path.c_str());
-            continue;
-        }
-        m_all_meshes.push_back(a_mesh);
-        scene::ISceneNode *scene_node = irr_driver->addAnimatedMesh(a_mesh);
-#ifdef DEBUG
-        std::string debug_name = model_name+" (static track-object)";
-        scene_node->setName(debug_name.c_str());
-#endif
-
+        
         core::vector3df xyz(0,0,0);
         n->get("xyz", &xyz);
-        scene_node->setPosition(xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
-        scene_node->setRotation(hpr);
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
-        scene_node->setScale(scale);
+        
+        if (tangent)
+        {
+            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+            
+            scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
+            
+            // create a node out of this mesh just for bullet; delete it after, normal maps are special
+            // and require tangent meshes
+            scene_node = irr_driver->addMesh(original_mesh);
+            
+            scene_node->setPosition(xyz);
+            scene_node->setRotation(hpr);
+            scene_node->setScale(scale);
+
+            convertTrackToBullet(scene_node);
+            scene_node->remove();
+            
+            scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
+            m_all_meshes.push_back(mesh);
+            scene_node = irr_driver->addMesh(mesh);
+            scene_node->setPosition(xyz);
+            scene_node->setRotation(hpr);
+            scene_node->setScale(scale);
+            
+#ifdef DEBUG
+            std::string debug_name = model_name+" (tangent static track-object)";
+            scene_node->setName(debug_name.c_str());
+#endif
+        }
+        else
+        {
+            scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+            if(!a_mesh)
+            {
+                fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
+                        full_path.c_str());
+                continue;
+            }
+            m_all_meshes.push_back(a_mesh);
+            scene_node = irr_driver->addAnimatedMesh(a_mesh);
+            scene_node->setPosition(xyz);
+            scene_node->setRotation(hpr);
+            scene_node->setScale(scale);
+            
+#ifdef DEBUG
+            std::string debug_name = model_name+" (static track-object)";
+            scene_node->setName(debug_name.c_str());
+#endif
+        }
+
 
         handleAnimatedTextures(scene_node, *n);
         m_all_nodes.push_back(scene_node);
