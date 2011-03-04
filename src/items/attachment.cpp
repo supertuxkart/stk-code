@@ -111,10 +111,13 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 {
     float leftover_time   = 0.0f;
     
+    bool add_a_new_item = true;
+    
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:
         {
+        add_a_new_item = false;
         projectile_manager->newExplosion(m_kart->getXYZ());
         m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
         clear();
@@ -133,11 +136,11 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // if the kart already has an anvil, attach a new anvil, 
         // and increase the overall time 
         new_attachment = 2;
-        leftover_time     = m_time_left;
+        leftover_time  = m_time_left;
         break;
     case ATTACH_PARACHUTE:
-        new_attachment = 2;  // anvil
-        leftover_time     = m_time_left;
+        new_attachment = 2;
+        leftover_time  = m_time_left;
         break;
     default:
         // There is no attachment currently, but there will be one
@@ -157,30 +160,33 @@ void Attachment::hitBanana(Item *item, int new_attachment)
                                   new_attachment);
     }
 
-    switch (new_attachment)
+    if (add_a_new_item)
     {
-    case 0: 
-        set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
-        m_initial_speed = m_kart->getSpeed();
-        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
-        // if ( m_kart == m_kart[0] )
-        //   sound -> playSfx ( SOUND_SHOOMF ) ;
-        break ;
-    case 1:
-        set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
-        // if ( m_kart == m_kart[0] )
-        //   sound -> playSfx ( SOUND_SHOOMF ) ;
-        break ;
-    case 2:
-        set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
-        // if ( m_kart == m_kart[0] )
-        //   sound -> playSfx ( SOUND_SHOOMF ) ;
-        // Reduce speed once (see description above), all other changes are
-        // handled in Kart::updatePhysics
-        m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
-        m_kart->updatedWeight();
-        break ;
-    }   // switch 
+        switch (new_attachment)
+        {
+        case 0: 
+            set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
+            m_initial_speed = m_kart->getSpeed();
+            if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
+            // if ( m_kart == m_kart[0] )
+            //   sound -> playSfx ( SOUND_SHOOMF ) ;
+            break ;
+        case 1:
+            set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
+            // if ( m_kart == m_kart[0] )
+            //   sound -> playSfx ( SOUND_SHOOMF ) ;
+            break ;
+        case 2:
+            set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
+            // if ( m_kart == m_kart[0] )
+            //   sound -> playSfx ( SOUND_SHOOMF ) ;
+            // Reduce speed once (see description above), all other changes are
+            // handled in Kart::updatePhysics
+            m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+            m_kart->updatedWeight();
+            break ;
+        }   // switch
+    }
 }   // hitBanana
 
 //-----------------------------------------------------------------------------
