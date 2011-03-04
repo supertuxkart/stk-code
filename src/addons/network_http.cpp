@@ -239,6 +239,10 @@ std::string NetworkHttp::downloadToStrInternal(std::string url)
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + url;
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
+#ifdef VERSION
+    std::string uagent = (std::string)"SuperTuxKart/" + VERSION;
+    curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
+#endif
         
     std::string fout;
         
@@ -270,6 +274,10 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
+#ifdef VERSION
+    std::string uagent = (std::string)"SuperTuxKart/" + VERSION;
+    curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
+#endif
     FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
                          "wb");
         
