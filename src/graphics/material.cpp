@@ -419,9 +419,8 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     if (m_normal_map)
     {
-        // TODO: allow searching in per-track dir too...
         m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
-        m->MaterialType = video::EMT_NORMAL_MAP_SOLID ;
+        m->MaterialType = video::EMT_NORMAL_MAP_SOLID; // video::EMT_PARALLAX_MAP_SOLID
         modes++;
     }
     
