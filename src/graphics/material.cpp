@@ -93,6 +93,12 @@ Material::Material(const XMLNode *node, int index)
     {
         m_normal_map = true;
     }
+    else if (node->get("parallax-map",  &m_normal_map_tex))
+    {
+        m_parallax_map = true;
+        m_parallax_height = 0.2f;
+        node->get("parallax-height", &m_parallax_height);
+    }
 
     s="";
     node->get("graphical-effect", &s                   );
@@ -217,6 +223,7 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_normal_map                = false;
+    m_parallax_map              = false;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -420,7 +427,14 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     if (m_normal_map)
     {
         m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
-        m->MaterialType = video::EMT_NORMAL_MAP_SOLID; // video::EMT_PARALLAX_MAP_SOLID
+        m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
+        modes++;
+    }
+    if (m_parallax_map)
+    {
+        m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
+        m->MaterialType = video::EMT_PARALLAX_MAP_SOLID;
+        m->MaterialTypeParam = m_parallax_height;
         modes++;
     }
     

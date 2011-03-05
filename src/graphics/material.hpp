@@ -85,6 +85,9 @@ private:
     bool             m_normal_map;
     std::string      m_normal_map_tex;
     
+    bool             m_parallax_map;
+    float            m_parallax_height;
+    
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
     bool             m_lighting;
