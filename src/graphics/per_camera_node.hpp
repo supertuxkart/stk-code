@@ -23,6 +23,14 @@
 using namespace irr;
 
 
+namespace irr
+{
+    namespace scene
+    {
+        const int ESNT_PER_CAMERA_NODE = MAKE_IRR_ID('p','c','a','m');
+    }
+}
+        
 /**
  * \brief manages smoke particle effects
  * \ingroup graphics
@@ -58,7 +66,7 @@ public:
     virtual void OnRegisterSceneNode();
     virtual void render();
     
-    virtual scene::ESCENE_NODE_TYPE getType() const { return scene::ESNT_DUMMY_TRANSFORMATION; }
+    virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_PER_CAMERA_NODE; }
     
     scene::ISceneNode* getChild() { return m_child; }
 };

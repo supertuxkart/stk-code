@@ -364,6 +364,11 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
+    if (node->getType() == scene::ESNT_LOD_NODE)
+    {
+        node = ((LODNode*)node)->getFirstNode();
+    }
+    
     const core::vector3df &pos   = node->getPosition();
     const core::vector3df &hpr   = node->getRotation();
     const core::vector3df &scale = node->getScale();
@@ -374,6 +379,8 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     // water nodes, which only have the material defined in the node,
     // but not in the mesh at all!
     bool is_readonly_material=false;
+    
+    
     switch(node->getType())
     {
         case scene::ESNT_MESH          :
@@ -706,6 +713,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             {
                 full_path = m_root + "/" + group[m].second;
                 
+                // TODO: check whether the mesh contains animations or not, and use a static
+                //       mesh when there are no animations?
                 scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
                 if(!a_mesh)
                 {

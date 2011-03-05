@@ -22,6 +22,13 @@
 #include "irrlicht.h"
 using namespace irr;
 
+namespace irr
+{
+    namespace scene
+    {
+        const int ESNT_LOD_NODE = MAKE_IRR_ID('l','o','d','n');
+    }
+}
 
 /**
  * \brief manages smoke particle effects
@@ -54,10 +61,12 @@ public:
     
     void add(int level, scene::ISceneNode* node, bool reparent);
     
+    scene::ISceneNode* getFirstNode() { return m_nodes[0]; }
+    
     virtual void OnRegisterSceneNode();
     virtual void render();
     
-    virtual scene::ESCENE_NODE_TYPE getType() const { return scene::ESNT_DUMMY_TRANSFORMATION; }
+    virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_LOD_NODE; }
 
 };
 
