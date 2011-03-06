@@ -84,7 +84,7 @@ private:
     /** For normal maps */
     bool             m_normal_map;
     std::string      m_normal_map_tex;
-    
+    bool             m_is_heightmap;
     bool             m_parallax_map;
     float            m_parallax_height;
     

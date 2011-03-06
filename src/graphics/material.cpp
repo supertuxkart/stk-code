@@ -93,8 +93,20 @@ Material::Material(const XMLNode *node, int index)
     {
         m_normal_map = true;
     }
+    else if (node->get("normal-heightmap",  &m_normal_map_tex))
+    {
+        m_is_heightmap = true;
+        m_normal_map = true;
+    }
     else if (node->get("parallax-map",  &m_normal_map_tex))
     {
+        m_parallax_map = true;
+        m_parallax_height = 0.2f;
+        node->get("parallax-height", &m_parallax_height);
+    }
+    else if (node->get("parallax-heightmap",  &m_normal_map_tex))
+    {
+        m_is_heightmap = true;
         m_parallax_map = true;
         m_parallax_height = 0.2f;
         node->get("parallax-height", &m_parallax_height);
@@ -224,6 +236,7 @@ void Material::init(unsigned int index)
     m_zipper_speed_gain         = -1.0f;
     m_normal_map                = false;
     m_parallax_map              = false;
+    m_is_heightmap              = false;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -426,15 +439,26 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     if (m_normal_map)
     {
-        m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
+        video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex) ;
+        if (m_is_heightmap)
+        {
+            irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
+        }
+        m->setTexture(1, tex);
         m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
         modes++;
     }
     if (m_parallax_map)
     {
-        m->setTexture(1, irr_driver->getTexture(m_normal_map_tex));
+        video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
+        if (m_is_heightmap)
+        {
+            irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
+        }
+        m->setTexture(1, tex);
         m->MaterialType = video::EMT_PARALLAX_MAP_SOLID;
         m->MaterialTypeParam = m_parallax_height;
+        m->SpecularColor.set(0,0,0,0);
         modes++;
     }
     
