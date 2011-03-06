@@ -327,7 +327,24 @@ void Kart::startEngineSFX()
     {
         // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
         // so the engine sounds of all AIs is constantly heard. So reduce volume of all sounds.
-        m_engine_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+        if (race_manager->getNumLocalPlayers() > 1)
+        {
+            const int np = race_manager->getNumLocalPlayers();
+            const int nai = race_manager->getNumberOfKarts() - np;
+            
+            // player karts twice as loud as AIs toghether
+            const float players_volume = (np * 2.0f) / (np*2.0f + np);
+            
+            if (m_controller->isPlayerController())
+            {
+                m_engine_sound->volume( players_volume / np );
+            }
+            else
+            {
+                m_engine_sound->volume( (1.0f - players_volume) / nai );
+            }
+        }
+        
         m_engine_sound->speed(0.6f);
         m_engine_sound->setLoop(true);
         m_engine_sound->play();
