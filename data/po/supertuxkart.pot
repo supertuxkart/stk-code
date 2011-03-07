@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-05 18:01-0500\n"
+"POT-Creation-Date: 2011-03-06 19:25-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -625,6 +625,10 @@ msgstr ""
 
 #: src/items/powerup.cpp:66
 msgid "Do you want to fly kites?"
+msgstr ""
+
+#: src/karts/controller/player_controller.cpp:282
+msgid "Don't accelerate before go"
 msgstr ""
 
 #. I18N: Key binding name
@@ -1820,7 +1824,7 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/karts/kart.cpp:568 src/karts/kart.cpp:587
+#: src/karts/kart.cpp:585 src/karts/kart.cpp:604
 msgid "You finished the race!"
 msgstr ""
 
@@ -1833,7 +1837,7 @@ msgstr ""
 msgid "You unlocked a new feature!"
 msgstr ""
 
-#: src/karts/kart.cpp:568 src/karts/kart.cpp:587
+#: src/karts/kart.cpp:585 src/karts/kart.cpp:604
 msgid "You won the race!"
 msgstr ""
 
