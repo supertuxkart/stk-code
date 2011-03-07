@@ -278,7 +278,8 @@ void PlayerController::update(float dt)
                 RaceGUIBase* m=World::getWorld()->getRaceGUI();
                 if(m)
                 {
-                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f, 60);
+                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f, 90, video::SColor(255, 255, 128, 0));
+                    m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f, 60, video::SColor(255, 210, 100, 50));
                 }
                 m_bzzt_sound->play();
             }   // if penalty_time = 0
