@@ -42,7 +42,8 @@ void LODNode::OnRegisterSceneNode()
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
 
     // Assumes all children are at the same location
-    const int dist = m_nodes[0]->getPosition().getDistanceFromSQ( curr_cam->getPosition() );
+    const int dist = 
+        (int)(m_nodes[0]->getPosition().getDistanceFromSQ( curr_cam->getPosition() ));
         
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
