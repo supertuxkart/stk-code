@@ -404,7 +404,7 @@ void MinimalRaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-        // int marker_height = m_marker->getOriginalSize().Height;
+
         core::rect<s32> source(i    *m_marker_rendered_size,
                                0, 
                                (i+1)*m_marker_rendered_size, 
@@ -416,6 +416,23 @@ void MinimalRaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size), 
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
+
+        // Highlight the player icons with some backgorund image.
+        if (kart->getController()->isPlayerController())
+        {
+            video::SColor colors[4];
+            for (unsigned int i=0;i<4;i++)
+            {
+                colors[i]=kart->getKartProperties()->getColor();
+            }
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                m_icons_frame->getTexture()->getOriginalSize());
+            
+            irr_driver->getVideoDriver()->draw2DImage(
+                m_icons_frame->getTexture(), position, rect,
+                NULL, colors, true);
+        }   // if isPlayerController
+
         irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
                                                   NULL, NULL, true);
     }   // for i<getNumKarts
