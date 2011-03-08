@@ -57,7 +57,11 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     else
     {
         std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
-        scene::IAnimatedMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+        scene::IAnimatedMesh *mesh=NULL;
+        if(file_manager->fileExists(full_path))
+        {
+            scene::IAnimatedMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+        }
         if(!mesh)
         {
             // If the model isn't found in the track directory, look 
