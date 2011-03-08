@@ -56,6 +56,10 @@ void LODNode::OnRegisterSceneNode()
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
+    // samuncle suggested to put a slight randomisation in LOD
+    // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
+    level += ((rand()%1000)-500)/500.0f*(level*0.1f);
+    
     // FIXME : this class assumes that 'm_detail' is sorted, this may not always be the case
     node->grab();
     node->remove();
