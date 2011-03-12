@@ -59,8 +59,8 @@ MinimalRaceGUI::MinimalRaceGUI()
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_ai_size        = (int)( 28.0f * scaling);
-    m_marker_player_size    = (int)( 24.0f * scaling);
+    m_marker_ai_size        = (int)( 24.0f * scaling);
+    m_marker_player_size    = (int)( 34.0f * scaling);
     m_map_width             = (int)(200.0f * scaling);
     m_map_height            = (int)(200.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
