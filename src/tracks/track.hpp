@@ -317,6 +317,8 @@ public:
     WeatherType   getWeatherType          () const { return m_weather_type; }
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     
+    bool isFogEnabled() const { return m_use_fog; }
+    
     std::vector< std::vector<float> >     buildHeightMap();
     
 };   // class Track
