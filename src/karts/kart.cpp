@@ -1073,6 +1073,22 @@ void Kart::handleMaterialGFX()
             create = 0.0f;
         }
         m_terrain_particles->setCreationRate(create);
+        
+        
+        const std::string s = surface_material->getSFXName();
+        if (s != "" && (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+        {
+            if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+            m_previous_terrain_sound = m_terrain_sound;
+            if(m_previous_terrain_sound)
+                m_previous_terrain_sound->setLoop(false);
+            
+            m_terrain_sound = sfx_manager->createSoundSource(s);
+            m_terrain_sound->play();
+            m_terrain_sound->setLoop(false);
+        }
+        
+        // handleMaterialSFX(surface_material);
     }
     //if (m_camera != NULL) m_camera->setFallMode(true);
     //m_camera->setFallMode(false);
