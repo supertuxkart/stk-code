@@ -40,7 +40,7 @@ class Stars;
  */
 class EmergencyAnimation: public NoCopy
 {
-private:
+protected:
     /** The coordinates where the kart was hit originally. */
     Vec3 m_xyz;
 

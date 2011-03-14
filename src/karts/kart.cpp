@@ -982,7 +982,7 @@ void Kart::handleMaterialGFX()
     // on top of a surface (i.e. not falling), actually touching
     // something with the wheels, and the material has not the
     // below surface property set.
-    if(material && isOnGround() && !material->isBelowSurface())
+    if(material && isOnGround() && !material->isBelowSurface() && m_kart_mode != EA_RESCUE)
     {
         Vec3 xyz;
         m_wheel_toggle = 1 - m_wheel_toggle;
@@ -1050,7 +1050,7 @@ void Kart::handleMaterialGFX()
     }
     const ParticleKind *pk = 
         surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
-    if(pk && !m_flying)
+    if(pk && !m_flying && m_kart_mode != EA_RESCUE)
     {
         const float distance = xyz.distance2(from);
         m_terrain_particles->setParticleType(pk);
@@ -1076,7 +1076,8 @@ void Kart::handleMaterialGFX()
         
         
         const std::string s = surface_material->getSFXName();
-        if (s != "" && (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+        if (s != "" && m_kart_mode != EA_RESCUE &&
+            (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
         {
             if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
             m_previous_terrain_sound = m_terrain_sound;
