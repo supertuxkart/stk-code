@@ -25,6 +25,8 @@ class PerCameraNode;
 #include <irrlicht.h>
 const int RAIN_RING_COUNT = 5;
 
+class SFXBase;
+
 class Rain
 {
     PerCameraNode* m_node[RAIN_RING_COUNT];
@@ -33,6 +35,9 @@ class Rain
     
     float m_x[RAIN_RING_COUNT];
     float m_y[RAIN_RING_COUNT];
+    
+    float m_next_lightning;
+    SFXBase* m_thunder_sound;
     
 public:
     Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent);

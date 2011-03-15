@@ -23,6 +23,8 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include <algorithm>
+
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -47,6 +49,9 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
  *  created, so only the race manager can be accessed safely.
@@ -65,6 +70,7 @@ RaceGUI::RaceGUI()
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
     m_map_bottom            = (int)( 10.0f * scaling);
+    m_lightning             = 0.0f;
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -267,6 +273,8 @@ void RaceGUI::renderGlobal(float dt)
 {
     cleanupMessages(dt);
     
+    if (m_lightning > 0.0f) m_lightning -= dt;
+    
     // Special case : when 3 players play, use 4th window to display such 
     // stuff (but we must clear it)
     if (race_manager->getNumLocalPlayers() == 3 && 
@@ -315,6 +323,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     if (!m_enabled) return;
     
     const core::recti &viewport    = kart->getCamera()->getViewport();
+    
     core::vector2df scaling = kart->getCamera()->getScaling();
     //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
     
@@ -349,6 +358,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
 
     
     drawAllMessages     (kart, viewport, scaling);
+    
     if(!World::getWorld()->isRacePhase()) return;
 
     RaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
@@ -357,6 +367,30 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     drawSpeedAndEnergy  (kart, viewport, scaling);
     drawRankLap         (info, kart, viewport);
 
+    if (m_lightning > 0.0f)
+    {
+        GLint glviewport[4];
+        glGetIntegerv(GL_VIEWPORT, glviewport);
+
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor4f(m_lightning, m_lightning, std::min(1.0f, m_lightning*1.5f), 1.0f);
+        glEnable(GL_COLOR_MATERIAL);
+        glDisable(GL_CULL_FACE);
+        glBegin(GL_QUADS);
+        
+        glVertex3d(glviewport[0],glviewport[1],0);
+        glVertex3d(glviewport[0],glviewport[3],0);
+        glVertex3d(glviewport[2],glviewport[3],0);
+        glVertex3d(glviewport[2],glviewport[1],0);
+        glEnd();
+        glEnable(GL_BLEND);
+    }
+
+    
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

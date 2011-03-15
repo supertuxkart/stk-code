@@ -17,12 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/per_camera_node.hpp"
 #include "graphics/rain.hpp"
+#include "modes/world.hpp"
+#include "states_screens/race_gui.hpp"
 #include "utils/constants.hpp"
+#include "utils/random_generator.hpp"
 
 const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
@@ -36,8 +41,13 @@ const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 
 Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
 {
+    m_thunder_sound = sfx_manager->createSoundSource("thunder");
+    
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
+    
+    RandomGenerator g;
+    m_next_lightning = g.get(35);
     
     for (int r=0; r<RAIN_RING_COUNT; r++)
     {
@@ -109,6 +119,8 @@ Rain::~Rain()
     {
         m_node[r]->remove();
     }
+    
+    if (m_thunder_sound) sfx_manager->deleteSFX(m_thunder_sound);
 }
 
 // ----------------------------------------------------------------------------
@@ -127,6 +139,23 @@ void Rain::update(float dt)
 
         matrix.setTextureTranslate(m_x[m], m_y[m]);
     }
+    
+    m_next_lightning -= dt;
+    
+    if (m_next_lightning < 0.0f)
+    {
+        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+        RaceGUI* gui = dynamic_cast<RaceGUI*>(gui_base);
+        if (gui != NULL)
+        {
+            gui->lightning();
+            if (m_thunder_sound) m_thunder_sound->play();
+        }
+        
+        RandomGenerator g;
+        m_next_lightning = g.get(35);
+    }
+    
 }   // update
 
 // ----------------------------------------------------------------------------
