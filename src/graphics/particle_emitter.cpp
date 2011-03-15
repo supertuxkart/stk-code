@@ -263,7 +263,7 @@ void ParticleEmitter::setPosition(const Vec3 &pos)
 //-----------------------------------------------------------------------------
 
 void ParticleEmitter::setParticleType(const ParticleKind* type)
-{    
+{   
     assert(m_magic_number == 0x58781325);
     if (m_particle_type == type) return; // already the right type
     
@@ -291,27 +291,38 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     const int lifeTimeMin = type->getMinLifetime();
     const int lifeTimeMax = type->getMaxLifetime();
     
-    assert(material->getTexture() != NULL);
     assert(maxSize >= minSize);
     assert(lifeTimeMax >= lifeTimeMin);
     
 #ifdef DEBUG
-    video::ITexture* tex = material->getTexture();
-    assert(tex != NULL);
-    const io::SNamedPath& name = tex->getName();
-    const io::path& tpath = name.getPath();
-    
-    std::string debug_name = std::string("particles(") + tpath.c_str() + ")";
-    m_node->setName(debug_name.c_str());
+    if (material != NULL)
+    {
+        video::ITexture* tex = material->getTexture();
+        assert(tex != NULL);
+        const io::SNamedPath& name = tex->getName();
+        const io::path& tpath = name.getPath();
+        
+        std::string debug_name = std::string("particles(") + tpath.c_str() + ")";
+        m_node->setName(debug_name.c_str());
+    }
 #endif
     
     video::SMaterial& mat0 = m_node->getMaterial(0);
     
     m_node->setPosition(m_position.toIrrVector());
-    material->setMaterialProperties(&mat0);
-    m_node->setMaterialTexture(0, material->getTexture());
     
-    mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
+    if (material != NULL)
+    {
+        assert(material->getTexture() != NULL);
+        material->setMaterialProperties(&mat0);
+        m_node->setMaterialTexture(0, material->getTexture());
+    
+        mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
+    }
+    else
+    {
+        m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str()));
+    }
     
     switch (type->getShape())
     {
@@ -320,7 +331,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_emitter = m_node->createPointEmitter(core::vector3df(m_particle_type->getVelocityX(),
                                                                    m_particle_type->getVelocityY(),
                                                                    m_particle_type->getVelocityZ()),   // velocity in m/ms
-                                                   type->getMinRate(), type->getMaxRate(),
+                                                   type->getMinRate(),  type->getMaxRate(),
                                                    type->getMinColor(), type->getMaxColor(),
                                                    lifeTimeMin, lifeTimeMax,
                                                    m_particle_type->getAngleSpread() /* angle */
@@ -338,7 +349,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                  core::vector3df(m_particle_type->getVelocityX(),
                                                                  m_particle_type->getVelocityY(),
                                                                  m_particle_type->getVelocityZ()),   // velocity in m/ms
-                                                 type->getMinRate(), type->getMaxRate(),
+                                                 type->getMinRate(),  type->getMaxRate(),
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
                                                  m_particle_type->getAngleSpread() /* angle */

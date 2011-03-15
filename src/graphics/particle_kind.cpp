@@ -28,7 +28,8 @@
 
 #include <stdexcept>
 
-ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255), m_max_start_color(255,255,255,255)
+ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255),
+    m_max_start_color(255,255,255,255), m_name(file)
 {
     // ---- Initial values to prevent readin uninitialized values
     m_max_size       = 0.5f;
@@ -135,7 +136,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     }
     else
     {
-        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of currently known materials, it will be opaque", materialFile.c_str());
+        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of currently known materials\n", materialFile.c_str());
     }
     
     // ------------------------------------------------------------------------

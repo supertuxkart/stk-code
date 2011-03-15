@@ -333,7 +333,7 @@ void Material::initParticlesEffect(const XMLNode *node)
     
     if (count == 0)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles '%s' for material '%s' are declared but not used\n",
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles '%s' for material '%s' are declared but not used (no emission condition set)\n",
                 base.c_str(), m_texname.c_str());
     }
     

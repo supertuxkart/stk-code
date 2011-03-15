@@ -83,6 +83,8 @@ private:
     /** Distance from camera at which particles start fading out, or negative if disabled */
     float m_fade_away_start, m_fade_away_end;
     
+    std::string m_name;
+    
 public:
     
     /**
@@ -134,6 +136,8 @@ public:
     void      setBoxSizeX    (float newVal) { m_box_x = newVal;    }
     void      setBoxSizeY    (float newVal) { m_box_y = newVal;    }
     void      setBoxSizeZ    (float newVal) { m_box_z = newVal;    }
+    
+    std::string getName() const { return m_name; }
 };
 
 #endif
