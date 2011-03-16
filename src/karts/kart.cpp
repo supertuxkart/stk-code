@@ -1034,7 +1034,7 @@ void Kart::handleMaterialGFX()
     // Now the kart is either falling, or driving on a terrain which
     // has the 'below surface' flag set. Detect if there is a surface 
     // on top of the kart.
-    if(m_camera && material && material->hasFallingEffect())
+    if(m_camera && material && material->hasFallingEffect() && !m_flying)
     {
         m_camera->setMode(Camera::CM_FALLING);
     }
