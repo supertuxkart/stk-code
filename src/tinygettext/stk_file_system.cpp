@@ -24,6 +24,8 @@
 #include <dirent.h>
 #include <string.h>
 
+#include "io/file_manager.hpp"
+
 namespace tinygettext {
 
 StkFileSystem::StkFileSystem()
@@ -33,25 +35,15 @@ StkFileSystem::StkFileSystem()
 std::vector<std::string>
 StkFileSystem::open_directory(const std::string& pathname)
 {
-  DIR* dir = opendir(pathname.c_str());
-  if (!dir)
-  {
-    // FIXME: error handling
-    return std::vector<std::string>();
-  }
-  else
-  {
-    std::vector<std::string> files;
+  std::set<std::string> result;
 
-    struct dirent* dp;
-    while((dp = readdir(dir)) != 0)
-    {
-      files.push_back(dp->d_name);
-    }
-    closedir(dir);
-
-    return files;
+  file_manager->listFiles(result, pathname, /*is_full_path*/true);
+  std::vector<std::string> files;
+  for(std::set<std::string>::iterator i=result.begin(); i!=result.end(); i++)
+  {
+    files.push_back(*i);
   }
+  return files;
 }
   
 std::auto_ptr<std::istream>
