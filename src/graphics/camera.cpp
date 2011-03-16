@@ -271,7 +271,8 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     core::vector3df current_target   = m_camera->getTarget();
     current_target   += ((wanted_target.toIrrVector()   - current_target  ) * m_target_speed  ) * dt;
     current_position += ((wanted_position.toIrrVector() - current_position) * m_position_speed) * dt;
-    m_camera->setPosition(current_position);
+    if(m_mode!=CM_FALLING)
+        m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);
 
     assert(!isnan(m_camera->getPosition().X));
@@ -327,31 +328,19 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
-    if( (m_mode==CM_NORMAL && m_camera_style==CS_MODERN) ||
-        (m_mode==CM_FALLING)                                 )
-    {
-        *above_kart    = 0.75f;
-        float steering = m_kart->getSteerPercent() 
-                       * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
-        // quadratically to dampen small variations (but keep sign)
-        float dampened_steer = fabsf(steering) * steering; 
-        *cam_angle     = kp->getCameraForwardUpAngle();
-        *sideway       = -m_rotation_range*dampened_steer*0.5f;
-        *distance      = -m_distance;
-        *smoothing     = true;
-        return;
-    }
     switch(m_mode)
     {
     case CM_NORMAL:
-            assert(m_camera_style==CS_CLASSIC);
-
+        if(m_camera_style==CS_CLASSIC)
+        {
             *above_kart = 0.3f;
             *cam_angle  = kp->getCameraBackwardUpAngle();
             *sideway    = 0.0f;
             *distance   = -1.5f*m_distance;
             *smoothing  = true;
             break;
+        }
+        // Fall through to falling mode.
     case CM_FALLING:
         {
             *above_kart    = 0.75f;
@@ -361,7 +350,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             float dampened_steer = fabsf(steering) * steering; 
             *cam_angle           = kp->getCameraForwardUpAngle();
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *distance            = m_distance;
+            *distance            = -m_distance;
             *smoothing           = true;
             break;
         }   // CM_FALLING
@@ -479,7 +468,8 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         smoothMoveCamera(dt, wanted_position, wanted_target);
     else
     {
-        m_camera->setPosition(wanted_position.toIrrVector());
+        if(m_mode!=CM_FALLING)
+            m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
     }
 
