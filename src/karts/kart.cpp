@@ -1038,6 +1038,8 @@ void Kart::handleMaterialGFX()
     {
         m_camera->setMode(Camera::CM_FALLING);
     }
+    else
+        m_camera->setMode(Camera::CM_NORMAL);
 
     // Use the middle of the contact points of the two rear wheels
     // as the point from which to cast the ray upwards
