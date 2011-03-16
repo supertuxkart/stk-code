@@ -308,6 +308,15 @@
 		95833240101243ED00C5137E /* player_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95833239101243ED00C5137E /* player_info_dialog.cpp */; };
 		95833241101243ED00C5137E /* press_a_key_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323B101243ED00C5137E /* press_a_key_dialog.cpp */; };
 		95833242101243ED00C5137E /* track_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323D101243ED00C5137E /* track_info_dialog.cpp */; };
+		9584449E1330F89100CEA60A /* dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9584448A1330F89100CEA60A /* dictionary.cpp */; };
+		9584449F1330F89100CEA60A /* dictionary_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9584448C1330F89100CEA60A /* dictionary_manager.cpp */; };
+		958444A01330F89100CEA60A /* iconv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9584448F1330F89100CEA60A /* iconv.cpp */; };
+		958444A11330F89100CEA60A /* language.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958444911330F89100CEA60A /* language.cpp */; };
+		958444A21330F89100CEA60A /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958444931330F89100CEA60A /* log.cpp */; };
+		958444A31330F89100CEA60A /* plural_forms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958444961330F89100CEA60A /* plural_forms.cpp */; };
+		958444A41330F89100CEA60A /* po_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958444981330F89100CEA60A /* po_parser.cpp */; };
+		958444A51330F89100CEA60A /* stk_file_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9584449A1330F89100CEA60A /* stk_file_system.cpp */; };
+		958444A61330F89100CEA60A /* tinygettext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9584449C1330F89100CEA60A /* tinygettext.cpp */; };
 		9586318411B1EC9F00B8B4AF /* grand_prix_lose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9586318011B1EC9F00B8B4AF /* grand_prix_lose.cpp */; };
 		9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9586318211B1EC9F00B8B4AF /* grand_prix_win.cpp */; };
 		958BD770117F6AE90095B483 /* music_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958BD76E117F6AE90095B483 /* music_manager.cpp */; };
@@ -1045,6 +1054,26 @@
 		9583323C101243ED00C5137E /* press_a_key_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = press_a_key_dialog.hpp; path = ../../states_screens/dialogs/press_a_key_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		9583323D101243ED00C5137E /* track_info_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info_dialog.cpp; path = ../../states_screens/dialogs/track_info_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		9583323E101243ED00C5137E /* track_info_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info_dialog.hpp; path = ../../states_screens/dialogs/track_info_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		9584448A1330F89100CEA60A /* dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dictionary.cpp; path = ../../tinygettext/dictionary.cpp; sourceTree = SOURCE_ROOT; };
+		9584448B1330F89100CEA60A /* dictionary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dictionary.hpp; path = ../../tinygettext/dictionary.hpp; sourceTree = SOURCE_ROOT; };
+		9584448C1330F89100CEA60A /* dictionary_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dictionary_manager.cpp; path = ../../tinygettext/dictionary_manager.cpp; sourceTree = SOURCE_ROOT; };
+		9584448D1330F89100CEA60A /* dictionary_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dictionary_manager.hpp; path = ../../tinygettext/dictionary_manager.hpp; sourceTree = SOURCE_ROOT; };
+		9584448E1330F89100CEA60A /* file_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = file_system.hpp; path = ../../tinygettext/file_system.hpp; sourceTree = SOURCE_ROOT; };
+		9584448F1330F89100CEA60A /* iconv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iconv.cpp; path = ../../tinygettext/iconv.cpp; sourceTree = SOURCE_ROOT; };
+		958444901330F89100CEA60A /* iconv.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = iconv.hpp; path = ../../tinygettext/iconv.hpp; sourceTree = SOURCE_ROOT; };
+		958444911330F89100CEA60A /* language.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = language.cpp; path = ../../tinygettext/language.cpp; sourceTree = SOURCE_ROOT; };
+		958444921330F89100CEA60A /* language.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = language.hpp; path = ../../tinygettext/language.hpp; sourceTree = SOURCE_ROOT; };
+		958444931330F89100CEA60A /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = ../../tinygettext/log.cpp; sourceTree = SOURCE_ROOT; };
+		958444941330F89100CEA60A /* log.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = log.hpp; path = ../../tinygettext/log.hpp; sourceTree = SOURCE_ROOT; };
+		958444951330F89100CEA60A /* log_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = log_stream.hpp; path = ../../tinygettext/log_stream.hpp; sourceTree = SOURCE_ROOT; };
+		958444961330F89100CEA60A /* plural_forms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plural_forms.cpp; path = ../../tinygettext/plural_forms.cpp; sourceTree = SOURCE_ROOT; };
+		958444971330F89100CEA60A /* plural_forms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = plural_forms.hpp; path = ../../tinygettext/plural_forms.hpp; sourceTree = SOURCE_ROOT; };
+		958444981330F89100CEA60A /* po_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = po_parser.cpp; path = ../../tinygettext/po_parser.cpp; sourceTree = SOURCE_ROOT; };
+		958444991330F89100CEA60A /* po_parser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = po_parser.hpp; path = ../../tinygettext/po_parser.hpp; sourceTree = SOURCE_ROOT; };
+		9584449A1330F89100CEA60A /* stk_file_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_file_system.cpp; path = ../../tinygettext/stk_file_system.cpp; sourceTree = SOURCE_ROOT; };
+		9584449B1330F89100CEA60A /* stk_file_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_file_system.hpp; path = ../../tinygettext/stk_file_system.hpp; sourceTree = SOURCE_ROOT; };
+		9584449C1330F89100CEA60A /* tinygettext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinygettext.cpp; path = ../../tinygettext/tinygettext.cpp; sourceTree = SOURCE_ROOT; };
+		9584449D1330F89100CEA60A /* tinygettext.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tinygettext.hpp; path = ../../tinygettext/tinygettext.hpp; sourceTree = SOURCE_ROOT; };
 		9586318011B1EC9F00B8B4AF /* grand_prix_lose.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_lose.cpp; path = ../../states_screens/grand_prix_lose.cpp; sourceTree = SOURCE_ROOT; };
 		9586318111B1EC9F00B8B4AF /* grand_prix_lose.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_lose.hpp; path = ../../states_screens/grand_prix_lose.hpp; sourceTree = SOURCE_ROOT; };
 		9586318211B1EC9F00B8B4AF /* grand_prix_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_win.cpp; path = ../../states_screens/grand_prix_win.cpp; sourceTree = SOURCE_ROOT; };
@@ -2188,6 +2217,34 @@
 			path = ../../states_screens/dialogs;
 			sourceTree = SOURCE_ROOT;
 		};
+		958444891330F89100CEA60A /* tinygettext */ = {
+			isa = PBXGroup;
+			children = (
+				9584448A1330F89100CEA60A /* dictionary.cpp */,
+				9584448B1330F89100CEA60A /* dictionary.hpp */,
+				9584448C1330F89100CEA60A /* dictionary_manager.cpp */,
+				9584448D1330F89100CEA60A /* dictionary_manager.hpp */,
+				9584448E1330F89100CEA60A /* file_system.hpp */,
+				9584448F1330F89100CEA60A /* iconv.cpp */,
+				958444901330F89100CEA60A /* iconv.hpp */,
+				958444911330F89100CEA60A /* language.cpp */,
+				958444921330F89100CEA60A /* language.hpp */,
+				958444931330F89100CEA60A /* log.cpp */,
+				958444941330F89100CEA60A /* log.hpp */,
+				958444951330F89100CEA60A /* log_stream.hpp */,
+				958444961330F89100CEA60A /* plural_forms.cpp */,
+				958444971330F89100CEA60A /* plural_forms.hpp */,
+				958444981330F89100CEA60A /* po_parser.cpp */,
+				958444991330F89100CEA60A /* po_parser.hpp */,
+				9584449A1330F89100CEA60A /* stk_file_system.cpp */,
+				9584449B1330F89100CEA60A /* stk_file_system.hpp */,
+				9584449C1330F89100CEA60A /* tinygettext.cpp */,
+				9584449D1330F89100CEA60A /* tinygettext.hpp */,
+			);
+			name = tinygettext;
+			path = ../../tinygettext;
+			sourceTree = SOURCE_ROOT;
+		};
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
 			children = (
@@ -2226,6 +2283,7 @@
 				95263DDF0FD7471900CF5F92 /* race */,
 				95C2B19C0F296545000D3E5D /* replay */,
 				958330C110122B4A00C5137E /* states_screens */,
+				958444891330F89100CEA60A /* tinygettext */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
 				9576460212BAD1CF00DB80C7 /* tutorial */,
 				95C2B1DF0F296546000D3E5D /* utils */,
@@ -2986,6 +3044,15 @@
 				9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */,
 				95E1FCDF130369EB004D83CC /* per_camera_node.cpp in Sources */,
 				95376CAF1320784100C842A4 /* lod_node.cpp in Sources */,
+				9584449E1330F89100CEA60A /* dictionary.cpp in Sources */,
+				9584449F1330F89100CEA60A /* dictionary_manager.cpp in Sources */,
+				958444A01330F89100CEA60A /* iconv.cpp in Sources */,
+				958444A11330F89100CEA60A /* language.cpp in Sources */,
+				958444A21330F89100CEA60A /* log.cpp in Sources */,
+				958444A31330F89100CEA60A /* plural_forms.cpp in Sources */,
+				958444A41330F89100CEA60A /* po_parser.cpp in Sources */,
+				958444A51330F89100CEA60A /* stk_file_system.cpp in Sources */,
+				958444A61330F89100CEA60A /* tinygettext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,11 +26,7 @@
 #include "utils/string_utils.hpp"
 
 #if ENABLE_NLS
-#  ifdef __APPLE__
-#    include <libintl/libintl.h>
-#  else
-#    include <libintl.h>
-#  endif
+#  include "tinygettext/tinygettext.hpp"
 
 #  define _(String, ...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
 #  define _LTR(String, ...) (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
@@ -50,6 +46,9 @@
 class Translations
 {
 private:
+    tinygettext::DictionaryManager m_dictionary_manager;
+    tinygettext::Dictionary        m_dictionary;
+    
     irr::core::stringw m_converted_string;
     bool m_rtl;
     

@@ -113,7 +113,7 @@ IConv::convert(const std::string& text)
     char* outbuf = &result[0]; 
   
     // Try to convert the text.
-    size_t ret = tinygettext_iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+    size_t ret = tinygettext_iconv(cd, (const char**)&inbuf, &inbytesleft, &outbuf, &outbytesleft);
     if (ret == static_cast<size_t>(-1))
     {
       if (errno == EILSEQ || errno == EINVAL)
