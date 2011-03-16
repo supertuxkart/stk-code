@@ -865,16 +865,18 @@ void Track::createWater(const XMLNode &node)
         scene_node = irr_driver->addMesh(mesh);
     }
     
-#ifdef DEBUG
-    std::string debug_name = model_name+"(water node)";
-    scene_node->setName(debug_name.c_str());
-#endif
     if(!mesh || !scene_node)
     {
         fprintf(stderr, "Warning: Water model '%s' in '%s' not found, ignored.\n",
                 node.getName().c_str(), model_name.c_str());
         return;
     }
+    
+#ifdef DEBUG
+    std::string debug_name = model_name+"(water node)";
+    scene_node->setName(debug_name.c_str());
+#endif
+    
     mesh->grab();
     m_all_meshes.push_back(mesh);
 
