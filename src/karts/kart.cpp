@@ -1009,15 +1009,20 @@ void Kart::handleMaterialGFX()
 
         // Now compute the particle creation rate:
         float rate = 0;
-        if(m_skidding > 1.0f)
+        const float speed = fabsf(getSpeed());
+
+        if (m_skidding > 1.0f)
         {
             rate = fabsf(m_controls.m_steer) > 0.8 ? m_skidding - 1 : 0;
         }
+        else if (speed >= 0.5f)
+        {
+            rate = speed/m_kart_properties->getMaxSpeed();
+        }
         else
         {
-            const float speed = fabsf(getSpeed());
-            rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
-                                 : 0;
+            m_terrain_particles->setCreationRate(0);
+            return;
         }
 
         float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
