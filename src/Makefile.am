@@ -362,6 +362,26 @@ supertuxkart_SOURCES = \
  states_screens/tracks_screen.hpp \
  states_screens/tutorial_screen.cpp \
  states_screens/tutorial_screen.hpp \
+ tinygettext/dictionary.cpp \
+ tinygettext/dictionary.hpp \
+ tinygettext/dictionary_manager.cpp \
+ tinygettext/dictionary_manager.hpp \
+ tinygettext/file_system.hpp \
+ tinygettext/iconv.cpp \
+ tinygettext/iconv.hpp \
+ tinygettext/language.cpp \
+ tinygettext/language.hpp \
+ tinygettext/log.cpp \
+ tinygettext/log.hpp \
+ tinygettext/log_stream.hpp \
+ tinygettext/plural_forms.cpp \
+ tinygettext/plural_forms.hpp \
+ tinygettext/po_parser.cpp \
+ tinygettext/po_parser.hpp \
+ tinygettext/stk_file_system.cpp \
+ tinygettext/stk_file_system.hpp \
+ tinygettext/tinygettext.cpp \
+ tinygettext/tinygettext.hpp \
  tracks/ambient_light_sphere.cpp \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
@@ -419,4 +439,3 @@ supertuxkart_LDADD = \
         $(irrlicht_LIBS) $(fribidi_LIBS) $(bullet_LIBS) $(enet_LIBS) \
         $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
         $(INTLLIBS) $(LIBCURL_LIBS) $(LIBCURL_CFLAGS)
-

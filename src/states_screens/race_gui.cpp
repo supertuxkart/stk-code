@@ -49,8 +49,12 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#endif
 
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
