@@ -266,19 +266,17 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
     const std::string isRtl = m_dictionary.translate("   Is this a RTL language?");
-    const wchar_t* isRtlW = reinterpret_cast<const wchar_t*>(isRtl.c_str());
     
     m_rtl = false;
     
-    for (int n=0; isRtlW[n] != 0; n++)
+    for (unsigned int n=0; n < isRtl.size() != 0; n++)
     {
-        if (isRtlW[n] == 'Y')
+        if (isRtl[n] == 'Y')
         {
             m_rtl = true;
             break;
         }
     }
-
 #endif
 
 }   // Translations
