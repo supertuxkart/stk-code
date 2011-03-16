@@ -478,7 +478,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *  material_manager.
  *  \param mesh  The mesh to change the settings in.
  */
-void IrrDriver::setAllMaterialFlags(scene::IAnimatedMesh *mesh) const
+void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
 {
     unsigned int n=mesh->getMeshBufferCount();
     for(unsigned int i=0; i<n; i++)
