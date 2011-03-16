@@ -492,11 +492,12 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
 #endif
 
     // anisotropic
-#ifdef DEBUG
-    if (UserConfigParams::m_rendering_debug || (m_anisotropic && UserConfigParams::m_anisotropic))
-#else
-    if (m_anisotropic && UserConfigParams::m_anisotropic)
-#endif
+    //#ifdef DEBUG
+    //if (UserConfigParams::m_rendering_debug || (m_anisotropic && UserConfigParams::m_anisotropic))
+    //#else
+    //if (m_anisotropic && UserConfigParams::m_anisotropic)
+    //#endif
+    if (UserConfigParams::m_anisotropic)
     {
         m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
     }
