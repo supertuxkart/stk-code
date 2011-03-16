@@ -79,10 +79,10 @@ Dictionary::translate_plural(const Entries& dict, const std::string& msgid, cons
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
-    log_info << "Candidates: " << std::endl;
-    for (i = dict.begin(); i != dict.end(); ++i)
-      log_info << "'" << i->first << "'" << std::endl;
+    //log_info << "Couldn't translate: " << msgid << std::endl;
+    //log_info << "Candidates: " << std::endl;
+    //for (i = dict.begin(); i != dict.end(); ++i)
+    //  log_info << "'" << i->first << "'" << std::endl;
 
     if (count == 1) // default to english rules
       return msgid;
@@ -107,7 +107,7 @@ Dictionary::translate(const Entries& dict, const std::string& msgid)
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
+    //log_info << "Couldn't translate: " << msgid << std::endl;
     return msgid;
   } 
 }
@@ -122,7 +122,7 @@ Dictionary::translate_ctxt(const std::string& msgctxt, const std::string& msgid)
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
+    //log_info << "Couldn't translate: " << msgid << std::endl;
     return msgid;
   }
 }
@@ -138,7 +138,7 @@ Dictionary::translate_ctxt_plural(const std::string& msgctxt,
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
+    //log_info << "Couldn't translate: " << msgid << std::endl;
     if (num != 1) // default to english
       return msgidplural;
     else

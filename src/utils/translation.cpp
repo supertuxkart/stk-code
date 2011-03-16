@@ -219,6 +219,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     */
     
     m_dictionary_manager.add_directory( file_manager->getTranslationDir().c_str() );
+    
+    /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();
     std::cout << "Number of languages: " << languages.size() << std::endl;
     for (std::set<Language>::const_iterator i = languages.begin(); i != languages.end(); ++i)
@@ -231,8 +233,25 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                   << "Modifier:  " << language.get_modifier()  << std::endl
                   << std::endl;
     }
+    */
 
-    m_dictionary = m_dictionary_manager.get_dictionary(Language::from_spec("fr", "FR"));
+    const char* lang = getenv("LANG");
+    const char* language = getenv("LANGUAGE");
+
+    if (language != NULL && strlen(language) > 0)
+    {
+        printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, Language::from_env(language).get_name().c_str());
+        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(language));
+    }
+    else if (lang != NULL && strlen(lang) > 0)
+    {
+        printf("Env var LANG = '%s'\n", lang);
+        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(lang));
+    }
+    else
+    {
+        m_dictionary = m_dictionary_manager.get_dictionary();
+    }
     
     // This is a silly but working hack I added to determine whether the current language is RTL or
     // not, since gettext doesn't seem to provide this information
