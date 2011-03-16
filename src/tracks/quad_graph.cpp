@@ -629,7 +629,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     createMesh(/*show_invisible part of the track*/ false,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
-    video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
+    //video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
 #ifdef DEBUG

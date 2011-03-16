@@ -60,7 +60,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         scene::IAnimatedMesh *mesh=NULL;
         if(file_manager->fileExists(full_path))
         {
-            scene::IAnimatedMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+            mesh = irr_driver->getAnimatedMesh(full_path);
         }
         if(!mesh)
         {
