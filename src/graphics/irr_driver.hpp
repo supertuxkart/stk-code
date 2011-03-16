@@ -71,7 +71,7 @@ private:
     enum {RES_CHANGE_NONE, RES_CHANGE_YES, 
           RES_CHANGE_CANCEL}                m_resolution_changing;
     
-    void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
+    void setAllMaterialFlags(scene::IMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
     void                  setupViewports();
