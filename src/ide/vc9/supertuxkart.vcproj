@@ -233,7 +233,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurld_imp.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurld_imp.lib"
 				OutputFile="./../../../$(ProjectName)_curl_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../../dependencies/lib"
@@ -1155,6 +1155,46 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="tinygettext"
+				>
+				<File
+					RelativePath="..\..\tinygettext\dictionary.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\dictionary_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\iconv.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\language.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\log.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\plural_forms.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\po_parser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\stk_file_system.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\tinygettext.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1397,9 +1437,29 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\utf8.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\vec3.hpp"
 					>
 				</File>
+				<Filter
+					Name="utf8"
+					>
+					<File
+						RelativePath="..\..\utils\utf8\checked.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\utils\utf8\core.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\utils\utf8\unchecked.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="audio"
@@ -2098,6 +2158,54 @@
 				</File>
 				<File
 					RelativePath="..\..\tutorial\tutorial_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tinygettext"
+				>
+				<File
+					RelativePath="..\..\tinygettext\dictionary.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\dictionary_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\file_system.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\iconv.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\language.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\log.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\log_stream.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\plural_forms.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\po_parser.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\stk_file_system.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\tinygettext.hpp"
 					>
 				</File>
 			</Filter>

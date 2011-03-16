@@ -46,7 +46,7 @@ unsigned int plural4_ar(int n) { return static_cast<unsigned int>( n==1 ? 0 : n=
 PluralForms
 PluralForms::from_string(const std::string& str)
 {
-  static std::map<std::string, struct PluralForms> plural_forms;
+  static std::map<std::string, class PluralForms> plural_forms;
     
   if (plural_forms.empty())
   {
@@ -73,7 +73,7 @@ PluralForms::from_string(const std::string& str)
     if (!isspace(str[i]))
       space_less_str += str[i];
   
-  std::map<std::string, struct PluralForms>::const_iterator it= plural_forms.find(space_less_str);
+  std::map<std::string, class PluralForms>::const_iterator it= plural_forms.find(space_less_str);
   if (it != plural_forms.end())
   {
     return it->second;

@@ -50,7 +50,7 @@ public:
   bool operator!=(const PluralForms& other) { return !(*this == other); }
 
   operator bool() const {
-    return plural;
+    return plural!=NULL;
   }
 };
 
