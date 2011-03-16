@@ -842,8 +842,8 @@ void Track::createWater(const XMLNode &node)
     node.get("model", &model_name);
     std::string full_path = m_root+"/"+model_name;
 
-    scene::IAnimatedMesh *mesh = irr_driver->getAnimatedMesh(full_path.c_str());
-    
+    scene::IMesh *mesh = irr_driver->getMesh(full_path);
+
     float wave_height  = 2.0f;
     float wave_speed   = 300.0f;
     float wave_length  = 10.0f;
