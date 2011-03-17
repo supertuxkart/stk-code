@@ -45,7 +45,7 @@ private:
         
 public:
     
-    LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id);
+    LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
     virtual     ~LODNode();
     
     //! returns the axis aligned bounding box of this node

@@ -1651,7 +1651,7 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel)
 {
-    m_kart_model->attachModel(&m_node, animatedModel);
+    m_node = m_kart_model->attachModel(animatedModel);
     // Attachment must be created after attachModel, since only then the
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which

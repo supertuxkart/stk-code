@@ -185,16 +185,18 @@ KartModel* KartModel::makeCopy()
 
 // ----------------------------------------------------------------------------
 /** Attach the kart model and wheels to the scene node.
- *  \param node Node to attach the models to.
+ *  \return the node with the model attached
  */
-void KartModel::attachModel(scene::ISceneNode **node, bool animatedModels)
+scene::ISceneNode* KartModel::attachModel(bool animatedModels)
 {
     assert(!m_is_master);
     
+    scene::ISceneNode* node;
+    
     if (animatedModels)
     {
-        *node = irr_driver->addAnimatedMesh(m_mesh);
-        m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
+        node = irr_driver->addAnimatedMesh(m_mesh);
+        m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
     }
@@ -209,19 +211,18 @@ void KartModel::attachModel(scene::ISceneNode **node, bool animatedModels)
         scene::IMesh* main_frame = m_mesh->getMesh(straight_frame);
         main_frame->setHardwareMappingHint(scene::EHM_STATIC);
         
-        *node = irr_driver->addMesh(main_frame);
+        node = irr_driver->addMesh(main_frame);
     }
     
 #ifdef DEBUG
     std::string debug_name = m_model_filename+" (kart-model)";
-    (*node)->setName(debug_name.c_str());
+    node->setName(debug_name.c_str());
 #endif
 
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_wheel_model[i]) continue;
-        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i],
-                                              *node);
+        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
         m_wheel_node[i]->grab();
 #ifdef DEBUG
         std::string debug_name = m_wheel_filename[i]+" (wheel)";
@@ -229,6 +230,8 @@ void KartModel::attachModel(scene::ISceneNode **node, bool animatedModels)
 #endif
         m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
     }
+    
+    return node;
 }   // attachModel
 
 // ----------------------------------------------------------------------------

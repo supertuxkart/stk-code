@@ -708,7 +708,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             node->get("scale", &scale);
             
-            LODNode* lod_node = new LODNode(sroot, sm, -1);
+            LODNode* lod_node = new LODNode(sroot, sm);
             for (unsigned int m=0; m<group.size(); m++)
             {
                 full_path = m_root + "/" + group[m].second;
