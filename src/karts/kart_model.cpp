@@ -215,8 +215,16 @@ scene::ISceneNode* KartModel::attachModel(bool animatedModels)
     }
     
 #ifdef DEBUG
-    std::string debug_name = m_model_filename+" (kart-model)";
-    node->setName(debug_name.c_str());
+    if (animatedModels)
+    {
+        std::string debug_name = m_model_filename+" (animated-kart-model)";
+        node->setName(debug_name.c_str());
+    }
+    else
+    {
+        std::string debug_name = m_model_filename+" (kart-model)";
+        node->setName(debug_name.c_str());
+    }
 #endif
 
     for(unsigned int i=0; i<4; i++)

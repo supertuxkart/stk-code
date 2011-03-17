@@ -22,6 +22,8 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include <set>
+
 namespace irr
 {
     namespace scene
@@ -34,7 +36,7 @@ namespace irr
  * \brief manages smoke particle effects
  * \ingroup graphics
  */
-class LODNode : public scene::IDummyTransformationSceneNode
+class LODNode : public scene::ISceneNode // scene::IDummyTransformationSceneNode
 {
 private:
     core::matrix4 RelativeTransformationMatrix;
@@ -42,7 +44,9 @@ private:
 
     std::vector<int> m_detail;
     std::vector<scene::ISceneNode*> m_nodes;
-        
+    
+    std::set<scene::ISceneNode*> m_nodes_set;
+    
 public:
     
     LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
@@ -51,6 +55,7 @@ public:
     //! returns the axis aligned bounding box of this node
     virtual const core::aabbox3d<f32>& getBoundingBox() const { return Box; }
     
+    /*
     //! Returns a reference to the current relative transformation matrix.
     //! This is the matrix, this scene node uses instead of scale, translation
     //! and rotation.
@@ -58,9 +63,18 @@ public:
     
     //! Returns the relative transformation of the scene node.
     virtual core::matrix4 getRelativeTransformation() const { return RelativeTransformationMatrix; }
+    */
     
+    /**
+      * Adds a node associated with a level of detail.
+      * \note The LOD levels must be added in ascending order.
+      * \param level Distance (number of units) from which this level of detail kicks in
+      * \param node  The node to show at this level
+      * \param reparent If true, node will be removed from its current parent first
+      */
     void add(int level, scene::ISceneNode* node, bool reparent);
     
+    /** Get the highest level of detail node */
     scene::ISceneNode* getFirstNode() { return m_nodes[0]; }
     
     virtual void OnRegisterSceneNode();

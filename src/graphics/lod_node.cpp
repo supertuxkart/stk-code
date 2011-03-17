@@ -21,8 +21,10 @@
 
 
 LODNode::LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id)
-    : IDummyTransformationSceneNode(parent, mgr, id)
+: ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)
 {
+    assert(mgr != NULL);
+    assert(parent != NULL);
     parent->addChild(this);
 }
 
@@ -43,14 +45,26 @@ void LODNode::OnRegisterSceneNode()
 
     // Assumes all children are at the same location
     const int dist = 
-        (int)(m_nodes[0]->getPosition().getDistanceFromSQ( curr_cam->getPosition() ));
+        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
         
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
         {
             m_nodes[n]->OnRegisterSceneNode();
-            return;
+            break;
+        }
+    }
+    
+    // If this node has children other than the LOD nodes, draw them
+    core::list<ISceneNode*>::Iterator it;
+    
+    for (it = Children.begin(); it != Children.end(); it++)
+    {
+        if (m_nodes_set.find(*it) == m_nodes_set.end())
+        {
+            assert(*it != NULL);
+            (*it)->OnRegisterSceneNode();
         }
     }
 }
@@ -61,11 +75,13 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
     level += (int)(((rand()%1000)-500)/500.0f*(level*0.1f));
     
-    // FIXME : this class assumes that 'm_detail' is sorted, this may not always be the case
+    assert(node != NULL);
+    
     node->grab();
     node->remove();
     m_detail.push_back(level*level);
     m_nodes.push_back(node);
+    m_nodes_set.insert(node);
     node->setParent(this);
     node->drop();
 }
