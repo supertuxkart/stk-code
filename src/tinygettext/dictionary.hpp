@@ -43,6 +43,9 @@ private:
   std::string translate(const Entries& dict, const std::string& msgid);
   std::string translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgidplural, int num);
 
+  bool m_has_fallback;
+  Dictionary* m_fallback;
+    
 public:
   /** Constructs a dictionary converting to the specified \a charset (default UTF-8) */
   Dictionary(const std::string& charset = "UTF-8");
@@ -100,6 +103,12 @@ public:
     return func;
   }
 
+  void addFallback(Dictionary* fallback)
+  {
+      m_has_fallback = true;
+      m_fallback = fallback;
+  }
+    
   /** Iterate over all messages with a context, Func is of type:
       void func(const std::string& ctxt, const std::string& msgid, const std::vector<std::string>& msgstrs) */
   template<class Func>

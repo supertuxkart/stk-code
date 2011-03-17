@@ -27,6 +27,7 @@ Dictionary::Dictionary(const std::string& charset_) :
   charset(charset_),
   plural_forms()
 {
+    m_has_fallback = false;
 }
 
 Dictionary::~Dictionary()
@@ -108,7 +109,9 @@ Dictionary::translate(const Entries& dict, const std::string& msgid)
   else
   {
     //log_info << "Couldn't translate: " << msgid << std::endl;
-    return msgid;
+        
+    if (m_has_fallback) return m_fallback->translate(msgid);
+    else return msgid;
   } 
 }
 
