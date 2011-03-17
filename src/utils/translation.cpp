@@ -40,12 +40,17 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
+//#include "tinygettext/iconv.hpp"
+#include "utils/utf8.h"
+
 #if ENABLE_BIDI
 #include <fribidi/fribidi.h>
 #endif
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
+
+using namespace tinygettext;
 
 Translations* translations = NULL;
 const bool REMOVE_BOM = false;
@@ -65,8 +70,98 @@ const std::vector<std::string>* Translations::getLanguageList() const
     return &g_language_list;
 }
 
+
+wchar_t* utf8_to_wide(const char* input)
+{
+    static std::vector<wchar_t> utf16line;
+    utf16line.clear();
+    
+    utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
+    utf16line.push_back(0);
+    
+    return &utf16line[0];
+    
+    /*
+    static tinygettext_iconv_t cd = 0;
+    
+    if (cd == 0) cd = tinygettext_iconv_open("UTF-16", "UTF-8");
+    if (cd == reinterpret_cast<tinygettext_iconv_t>(-1))
+    {
+        fprintf(stderr, "[utf8_to_wide] ERROR: failed to init libiconv\n");
+        return L"?";
+    }
+    
+    size_t inbytesleft  = strlen(input);
+    size_t outbytesleft = 4*inbytesleft; // Worst case scenario: ASCII -> UTF-32?
+    
+    const unsigned int BUFF_SIZE = 512*4;
+    
+    if (outbytesleft > BUFF_SIZE)
+    {
+        fprintf(stderr, "[utf8_to_wide] ERROR: stirng too long : '%s'\n", input);
+    }
+    
+    static char temp_buffer[BUFF_SIZE];
+    
+    // Try to convert the text.
+    size_t ret = tinygettext_iconv(cd, &input, &inbytesleft, (char**)&temp_buffer, &outbytesleft);
+    if (ret == static_cast<size_t>(-1))
+    {
+        if (errno == EILSEQ || errno == EINVAL)
+        { // invalid multibyte sequence
+            tinygettext_iconv(cd, NULL, NULL, NULL, NULL); // reset state
+            
+            // FIXME: Could try to skip the invalid byte and continue
+            fprintf(stderr, "[Translation] ERROR: invalid multibyte sequence in '%s'\n", input);
+        }
+        else if (errno == E2BIG)
+        { // output buffer to small
+            fprintf(stderr, "[Translation] ERROR: E2BIG: This should never be reached\n");
+        }
+        else if (errno == EBADF)
+        {
+            fprintf(stderr, "[Translation] ERROR: EBADF: This should never be reached\n");
+        }
+        else
+        {
+            fprintf(stderr, "[Translation] ERROR: <unknown>: This should never be reached\n");
+        }
+        return L"?";
+    }
+    else
+    {
+        if (sizeof(wchar_t) == 2)
+        {
+            return (wchar_t*)temp_buffer;
+        }
+        else if (sizeof(wchar_t) == 4)
+        {
+            static wchar_t out_buffer[512];
+
+            // FIXME: endianness?
+            int i = 0;
+            for (char* ptr = temp_buffer; ; ptr += 2)
+            {
+                out_buffer[i] = (*ptr << 8) | *(ptr + 1);
+                
+                if (*ptr == 0 && *(ptr + 1) == 0) break;
+                
+                i++;
+            }
+            
+            return out_buffer;
+        }
+        else
+        {
+            fprintf(stderr, "Unknown wchar_t size : %lui\n", sizeof(wchar_t));
+            return L"?";
+        }
+    }
+     */
+}
+
 // ----------------------------------------------------------------------------
-Translations::Translations()
+Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
 #ifdef ENABLE_NLS
 
@@ -102,6 +197,7 @@ Translations::Translations()
 #endif
 
 
+    /*
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
 
     if (sizeof(wchar_t) == 4)
@@ -120,30 +216,67 @@ Translations::Translations()
     }
 
     textdomain (PACKAGE);
+    */
+    
+    m_dictionary_manager.add_directory( file_manager->getTranslationDir().c_str() );
+    
+    /*
+    const std::set<Language>& languages = m_dictionary_manager.get_languages();
+    std::cout << "Number of languages: " << languages.size() << std::endl;
+    for (std::set<Language>::const_iterator i = languages.begin(); i != languages.end(); ++i)
+    {
+        const Language& language = *i;
+        std::cout << "Env:       " << language.str()           << std::endl
+                  << "Name:      " << language.get_name()      << std::endl
+                  << "Language:  " << language.get_language()  << std::endl
+                  << "Country:   " << language.get_country()   << std::endl
+                  << "Modifier:  " << language.get_modifier()  << std::endl
+                  << std::endl;
+    }
+    */
 
+    const char* lang = getenv("LANG");
+    const char* language = getenv("LANGUAGE");
+
+    if (language != NULL && strlen(language) > 0)
+    {
+        printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, Language::from_env(language).get_name().c_str());
+        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(language));
+    }
+    else if (lang != NULL && strlen(lang) > 0)
+    {
+        printf("Env var LANG = '%s'\n", lang);
+        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(lang));
+    }
+    else
+    {
+        m_dictionary = m_dictionary_manager.get_dictionary();
+    }
+    
     // This is a silly but working hack I added to determine whether the current language is RTL or
     // not, since gettext doesn't seem to provide this information
 
+    //std::string test = m_dictionary.translate("Loading");
+    //printf("'%s'\n", test.c_str());
+    
     // This one is just for the xgettext parser to pick up
 #define ignore(X)
 
     ignore(_("   Is this a RTL language?"));
 
     //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
-    const char* isRtl = gettext("   Is this a RTL language?");
-    const wchar_t* isRtlW = reinterpret_cast<const wchar_t*>(isRtl);
+    const std::string isRtl = m_dictionary.translate("   Is this a RTL language?");
     
     m_rtl = false;
     
-    for (int n=0; isRtlW[n] != 0; n++)
+    for (unsigned int n=0; n < isRtl.size() != 0; n++)
     {
-        if (isRtlW[n] == 'Y')
+        if (isRtl[n] == 'Y')
         {
             m_rtl = true;
             break;
         }
     }
-
 #endif
 
 }   // Translations
@@ -236,7 +369,7 @@ const wchar_t* Translations::w_gettext(const char* original)
 #endif
 
 #if ENABLE_NLS
-    const char* original_t = gettext(original);
+    const std::string& original_t = m_dictionary.translate(original);
 #else
     m_converted_string = core::stringw(original);
     return m_converted_string.c_str();
@@ -259,7 +392,7 @@ const wchar_t* Translations::w_gettext(const char* original)
         }
     }*/
 
-    if(original_t==original)
+    if (original_t == original)
     {
         m_converted_string = core::stringw(original);
 
@@ -272,7 +405,9 @@ const wchar_t* Translations::w_gettext(const char* original)
     // print
     //for (int n=0;; n+=4)
 
-    wchar_t* out_ptr = (wchar_t*)original_t;
+    wchar_t* original_tw = utf8_to_wide(original_t.c_str());
+
+    wchar_t* out_ptr = original_tw;
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE

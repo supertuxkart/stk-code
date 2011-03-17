@@ -220,7 +220,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             if (selection == "system")
             {
 #ifdef WIN32
-                SetEnvironmentVariableA("LANGUAGE", "");
+                SetEnvironmentVariable("LANGUAGE", "");
+                _putenv("LANGUAGE=");
 #else
                 setenv( "LANGUAGE", "", 1);
 #endif
@@ -228,7 +229,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             else
             {
 #ifdef WIN32
-                SetEnvironmentVariableA("LANGUAGE", selection.c_str());
+                std::string s=std::string("LANGUAGE=")+selection.c_str();
+                _putenv(s.c_str());
 #else
                 setenv("LANGUAGE", selection.c_str(), 1);
 #endif
