@@ -1034,13 +1034,18 @@ void Kart::handleMaterialGFX()
     // Now the kart is either falling, or driving on a terrain which
     // has the 'below surface' flag set. Detect if there is a surface 
     // on top of the kart.
-    if(m_camera && material && material->hasFallingEffect() && !m_flying)
+    if (m_camera)
     {
-        m_camera->setMode(Camera::CM_FALLING);
+        if (material && material->hasFallingEffect() && !m_flying)
+        {
+            m_camera->setMode(Camera::CM_FALLING);
+        }
+        else
+        {
+            m_camera->setMode(Camera::CM_NORMAL);
+        }
     }
-    else
-        m_camera->setMode(Camera::CM_NORMAL);
-
+    
     // Use the middle of the contact points of the two rear wheels
     // as the point from which to cast the ray upwards
     const btWheelInfo::RaycastInfo &ri2 = 
