@@ -54,9 +54,6 @@ using namespace irr;
 #else
 #include <GL/gl.h>
 #endif
-#else
-#include <GL/gl.h>
-#endif
 
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
