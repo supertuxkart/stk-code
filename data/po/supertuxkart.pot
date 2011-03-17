@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-06 19:25-0500\n"
+"POT-Creation-Date: 2011-03-17 14:19-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
-#: src/utils/translation.cpp:130 src/utils/translation.cpp:133
+#: src/utils/translation.cpp:265
 msgid "   Is this a RTL language?"
 msgstr ""
 
@@ -860,7 +859,7 @@ msgid "Gnu"
 msgstr ""
 
 #: src/states_screens/minimal_race_gui.cpp:102
-#: src/states_screens/race_gui.cpp:104
+#: src/states_screens/race_gui.cpp:113
 msgid "Go!"
 msgstr ""
 
@@ -979,7 +978,7 @@ msgstr ""
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/minimal_race_gui.cpp:94
-#: src/states_screens/race_gui.cpp:96
+#: src/states_screens/race_gui.cpp:105
 msgid "Lap"
 msgstr ""
 
@@ -1320,13 +1319,13 @@ msgid "Random Track"
 msgstr ""
 
 #: src/states_screens/minimal_race_gui.cpp:95
-#: src/states_screens/race_gui.cpp:97
+#: src/states_screens/race_gui.cpp:106
 msgid "Rank"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/minimal_race_gui.cpp:100
-#: src/states_screens/race_gui.cpp:102
+#: src/states_screens/race_gui.cpp:111
 msgid "Ready!"
 msgstr ""
 
@@ -1404,7 +1403,7 @@ msgid "Select a game mode"
 msgstr ""
 
 #: src/states_screens/minimal_race_gui.cpp:101
-#: src/states_screens/race_gui.cpp:103
+#: src/states_screens/race_gui.cpp:112
 msgid "Set!"
 msgstr ""
 
@@ -1610,7 +1609,7 @@ msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/minimal_race_gui.cpp:98
-#: src/states_screens/race_gui.cpp:100
+#: src/states_screens/race_gui.cpp:109
 #, c-format
 msgid "Top %i"
 msgstr ""
@@ -1863,8 +1862,8 @@ msgid "[none]"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:740
-#: src/states_screens/race_gui.cpp:1133
+#: src/states_screens/minimal_race_gui.cpp:757
+#: src/states_screens/race_gui.cpp:1194
 msgid "by"
 msgstr ""
 
