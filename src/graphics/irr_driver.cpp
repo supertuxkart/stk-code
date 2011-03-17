@@ -150,6 +150,7 @@ void IrrDriver::initDevice()
         for (int bits=32; bits>15; bits -=8)
         {
             std::cout << "[IrrDriver] Trying to create device with " << bits << " bits\n";
+            /*
             m_device = createDevice(type,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
@@ -159,6 +160,21 @@ void IrrDriver::initDevice()
                                     false,  // vsync
                                     this    // event receiver
                                     );
+             */
+            
+            SIrrlichtCreationParameters params;
+            params.DriverType = type;
+            params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
+                                                       UserConfigParams::m_height);
+            params.Bits = bits;
+            params.EventReceiver = this;
+            params.Fullscreen = UserConfigParams::m_fullscreen;
+            
+            if (UserConfigParams::m_fullscreen_antialiasing)
+                params.AntiAlias = 8;
+            
+            m_device = createDeviceEx(params);
+            
             if(m_device) break;
         }   // for bits=32, 24, 16
         if(m_device) break;

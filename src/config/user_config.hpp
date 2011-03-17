@@ -347,7 +347,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
         PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
                                            "Whether trilinear filtering is allowed to be used (true or false)") );
-    
+    PARAM_PREFIX BoolUserConfigParam         m_fullscreen_antialiasing
+        PARAM_DEFAULT( BoolUserConfigParam(false, "fullscreen_antialiasing", &m_graphics_quality,
+                                       "Whether fullscreen antialiasing is enabled") );
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui

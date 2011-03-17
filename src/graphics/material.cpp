@@ -545,6 +545,9 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+    
+    if (UserConfigParams::m_fullscreen_antialiasing)
+        m->AntiAliasing = video::EAAM_LINE_SMOOTH;
 
     
 }   // setMaterialProperties
