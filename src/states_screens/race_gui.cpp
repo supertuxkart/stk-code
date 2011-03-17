@@ -390,7 +390,8 @@ void RaceGUI::renderPlayerView(const Kart *kart)
         glVertex3d(glviewport[2],glviewport[3],0);
         glVertex3d(glviewport[2],glviewport[1],0);
         glEnd();
-        glEnable(GL_BLEND);
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 #if 0 // Rainy look, off, TODO: needs to be settable per track
     else
