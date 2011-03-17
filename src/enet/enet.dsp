@@ -101,6 +101,10 @@ SOURCE=.\callbacks.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\compress.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\packet.c
 # End Source File
 # Begin Source File

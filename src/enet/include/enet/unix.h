@@ -6,8 +6,10 @@
 #define __ENET_UNIX_H__
 
 #include <stdlib.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 typedef int ENetSocket;
 
@@ -32,5 +34,12 @@ typedef struct
 
 #define ENET_API extern
 
+typedef fd_set ENetSocketSet;
+
+#define ENET_SOCKETSET_EMPTY(sockset)          FD_ZERO (& (sockset))
+#define ENET_SOCKETSET_ADD(sockset, socket)    FD_SET (socket, & (sockset))
+#define ENET_SOCKETSET_REMOVE(sockset, socket) FD_CLEAR (socket, & (sockset))
+#define ENET_SOCKETSET_CHECK(sockset, socket)  FD_ISSET (socket, & (sockset))
+    
 #endif /* __ENET_UNIX_H__ */
 

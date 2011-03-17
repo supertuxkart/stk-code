@@ -6,7 +6,7 @@ is:
 
 # Generate the build system.
 
-aclocal && automake -a -c --foreign && autoconf
+autoreconf -vfi
 
 # Compile and install the library.
 

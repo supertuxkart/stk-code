@@ -16,7 +16,7 @@ If you obtained the package from CVS, you must have automake and autoconf
 available to generate the build system first by doing the following command
 before using the above mentioned build procedure:
 
-aclocal && automake -a -c --foreign && autoconf
+autoreconf -vfi
 
 
 @subsection SolarisBSD Solaris and BSD
@@ -32,7 +32,7 @@ build a suitable library file. Alternatively, you may simply drag all
 the ENet source files into your main project.
 
 You will have to link to the Winsock2 libraries, so make sure to add
-ws2_32.lib to your library list (Project Settings | Link |
+ws2_32.lib and winmm.lib to your library list (Project Settings | Link |
 Object/library modules).
 
 @subsection enet.dsp Building with the included enet.dsp
@@ -46,8 +46,8 @@ selected to build. By default, it should produce "Debug/enet.lib".
 
 You may then copy the resulting "enet.lib" file and the header files
 found in the "include/" directory to your other projects and add it to 
-their library lists. Make sure to also link against "ws2_32.lib" as 
-described above.
+their library lists. Make sure to also link against "ws2_32.lib" and
+"winmm.lib" as described above.
 
 @subsection DLL DLL
 

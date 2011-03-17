@@ -24,6 +24,7 @@ extern void enet_list_clear (ENetList *);
 
 extern ENetListIterator enet_list_insert (ENetListIterator, void *);
 extern void * enet_list_remove (ENetListIterator);
+extern ENetListIterator enet_list_move (ENetListIterator, void *, void *);
 
 extern size_t enet_list_size (ENetList *);
 

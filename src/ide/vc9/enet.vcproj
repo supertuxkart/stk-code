@@ -220,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\enet\compress.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\enet\host.c"
 				>
 			</File>
