@@ -380,7 +380,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
         glDisable(GL_BLEND);
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-        glColor4f(m_lightning, m_lightning, std::min(1.0f, m_lightning*1.5f), 1.0f);
+        glColor4f(0.7f*m_lightning, 0.7f*m_lightning, 0.7f*std::min(1.0f, m_lightning*1.5f), 1.0f);
         glEnable(GL_COLOR_MATERIAL);
         glDisable(GL_CULL_FACE);
         glBegin(GL_QUADS);
@@ -392,7 +392,31 @@ void RaceGUI::renderPlayerView(const Kart *kart)
         glEnd();
         glEnable(GL_BLEND);
     }
+#if 0 // Rainy look, off, TODO: needs to be settable per track
+    else
+    {
+        GLint glviewport[4];
+        glGetIntegerv(GL_VIEWPORT, glviewport);
 
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+
+        glEnable(GL_COLOR_MATERIAL);
+        glDisable(GL_CULL_FACE);
+        glBegin(GL_QUADS);
+        
+        glVertex3d(glviewport[0],glviewport[1],0);
+        glVertex3d(glviewport[0],glviewport[3],0);
+        glVertex3d(glviewport[2],glviewport[3],0);
+        glVertex3d(glviewport[2],glviewport[1],0);
+        glEnd();
+        glEnable(GL_BLEND);
+    }
+#endif
     
 }   // renderPlayerView
 
