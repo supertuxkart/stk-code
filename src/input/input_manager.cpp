@@ -194,7 +194,10 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F11:
             if (UserConfigParams::m_artist_debug_mode && value && control_is_pressed)
             {
-                world->getPhysics()->nextDebugMode();
+                if (world != NULL)
+                {
+                    world->getPhysics()->nextDebugMode();
+                }
             }
             break;
 
