@@ -1654,10 +1654,10 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
 {
     if (animatedModel)
     {
-        scene::ISceneNode* staticModel   = m_kart_model->attachModel(false);
-        scene::ISceneNode* animatedModel = m_kart_model->attachModel(animatedModel);
+        scene::ISceneNode* staticModel       = m_kart_model->attachModel(false);
+        scene::ISceneNode* animatedModelNode = m_kart_model->attachModel(animatedModel);
         LODNode* node = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager());
-        node->add(100, animatedModel, true);
+        node->add(100, animatedModelNode, true);
         node->add(500, staticModel, true);
         m_node = node;
     }
