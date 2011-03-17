@@ -269,7 +269,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     
     m_rtl = false;
     
-    for (unsigned int n=0; n < isRtl.size() != 0; n++)
+    for (unsigned int n=0; n < isRtl.size(); n++)
     {
         if (isRtl[n] == 'Y')
         {
