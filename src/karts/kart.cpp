@@ -1666,7 +1666,7 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
         m_node = m_kart_model->attachModel(animatedModel);
     }
     
-#if DEBUG
+#ifdef DEBUG
     m_node->setName( (m_kart_properties->getIdent()+"(lod-node)").c_str() );
 #endif
     
