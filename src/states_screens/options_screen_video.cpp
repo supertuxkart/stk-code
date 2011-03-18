@@ -33,6 +33,7 @@
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -116,7 +117,7 @@ void OptionsScreenVideo::init()
 
     GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-    
+        
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
     assert( res != NULL );
@@ -298,7 +299,36 @@ void OptionsScreenVideo::init()
             break;
         }
     }
+    
+    updateTooltip();
 }   // init
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenVideo::updateTooltip()
+{
+    GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    assert( gfx != NULL );
+    
+    core::stringw tooltip;
+    
+    //I18N: in the graphical options tooltip; indicates a graphical feature is enabled
+    core::stringw enabled = _("Enabled");
+    //I18N: in the graphical options tooltip; indicates a graphical feature is disabled
+    core::stringw disabled = _("Disabled");
+    //I18N: if all kart animations are enabled
+    core::stringw all = _("All");
+    //I18N: if some kart animations are enabled
+    core::stringw me = _("Me Only");
+    //I18N: if no kart animations are enabled
+    core::stringw none = _("None");
+    
+    tooltip = _("Graphical Effects : %s", UserConfigParams::m_graphical_effects ? enabled : disabled);
+    tooltip = tooltip + L"\n" + _("Weather Effects : %s", UserConfigParams::m_weather_effects ? enabled : disabled);
+    tooltip = tooltip + L"\n" + _("Animated Characters : %s", UserConfigParams::m_show_steering_animations == 2 ? all :
+                                  (UserConfigParams::m_show_steering_animations == 1 ? me : none));
+    gfx->setTooltip(tooltip);
+}
 
 // -----------------------------------------------------------------------------
 
@@ -358,6 +388,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
+        
+        updateTooltip();
     }
 
     

@@ -163,7 +163,7 @@ wchar_t* utf8_to_wide(const char* input)
 // ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
-#ifdef ENABLE_NLS
+//#ifdef ENABLE_NLS
 
     if (g_language_list.size() == 0)
     {
@@ -277,7 +277,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             break;
         }
     }
-#endif
+//#endif
 
 }   // Translations
 
@@ -368,12 +368,12 @@ const wchar_t* Translations::w_gettext(const char* original)
     #endif
 #endif
 
-#if ENABLE_NLS
+//#if ENABLE_NLS
     const std::string& original_t = m_dictionary.translate(original);
-#else
-    m_converted_string = core::stringw(original);
-    return m_converted_string.c_str();
-#endif
+//#else
+//    m_converted_string = core::stringw(original);
+//    return m_converted_string.c_str();
+//#endif
 
     /*
     std::cout << "--> original_t==original ? " << (original_t==original) << std::endl;

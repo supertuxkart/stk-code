@@ -39,6 +39,8 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
     
     std::vector<std::string> m_skins;
 
+    void updateTooltip();
+    
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
     

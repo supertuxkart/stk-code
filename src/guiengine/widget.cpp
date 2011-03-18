@@ -79,6 +79,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_show_bounding_box     = false;
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
+    m_has_tooltip           = false;
     
     m_tab_down_root = -1;
     m_tab_up_root = -1;

@@ -230,6 +230,9 @@ namespace GUIEngine
         /** If a badge wouldn't look too pretty on the very side of the widget */
         int m_badge_x_shift;
         
+        bool m_has_tooltip;
+        irr::core::stringw m_tooltip_text;
+        
     public:
         
         /**
@@ -593,6 +596,23 @@ namespace GUIEngine
          * \}
          */
         
+        /**
+         * \{
+         * \name Tooltip support
+         *
+         */
+        
+        
+        bool hasTooltip() const { return m_has_tooltip; }
+        
+        /** Only call if hasTooltip() returned true */
+        irr::core::stringw getTooltipText() const { return m_tooltip_text; }
+        
+        void setTooltip(irr::core::stringw s) { m_tooltip_text = s; m_has_tooltip = true; }
+        
+        /**
+         * \}
+         */
     };
 
     

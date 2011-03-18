@@ -268,6 +268,8 @@ namespace GUIEngine
         void drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect);
         void drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool bottomArrow);
 
+        void drawTooltip(Widget* widget);
+        
     public:
         
         // dirty way to have dialogs that zoom in
