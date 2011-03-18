@@ -877,6 +877,8 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
  */
 void IrrDriver::displayFPS()
 {
+    gui::IGUIFont* font = GUIEngine::getFont();
+
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -885,11 +887,14 @@ void IrrDriver::displayFPS()
     if (no_trust)
     {
         no_trust--;
+        
+        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor, false );
+        
         return;
     }
 
     // Ask for current frames per second and last number of triangles processed (trimed to thousands)
-    gui::IGUIFont* font = GUIEngine::getFont();
     const int fps       = m_device->getVideoDriver()->getFPS();
     const int kilotris  = (int)(m_device->getVideoDriver()->getPrimitiveCountDrawn(0)
                                 * (1.f / 1000.f)                                     );
