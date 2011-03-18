@@ -173,6 +173,8 @@ void IrrDriver::initDevice()
             if (UserConfigParams::m_fullscreen_antialiasing)
                 params.AntiAlias = 8;
             
+            params.Vsync = UserConfigParams::m_vsync;
+            
             m_device = createDeviceEx(params);
             
             if(m_device) break;

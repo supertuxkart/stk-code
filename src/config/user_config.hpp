@@ -337,7 +337,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", "Information about last server used") );
     
     // ---- Graphic Quality
-    // FIXME: those are probably not needed...
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
     
@@ -350,7 +349,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_fullscreen_antialiasing
         PARAM_DEFAULT( BoolUserConfigParam(false, "fullscreen_antialiasing", &m_graphics_quality,
                                        "Whether fullscreen antialiasing is enabled") );
-
+    PARAM_PREFIX BoolUserConfigParam         m_vsync
+        PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", &m_graphics_quality,
+                                       "Whether vertical sync is enabled") );
+    
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
