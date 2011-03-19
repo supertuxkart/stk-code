@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-17 14:19-0400\n"
+"POT-Creation-Date: 2011-03-19 14:19-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,10 +244,13 @@ msgstr ""
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
+#. I18N: if all kart animations are enabled
+#. I18N: name of the tab that will show tracks from all groups
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: src/states_screens/arenas_screen.cpp:83
 #: src/states_screens/kart_selection.cpp:888
+#: src/states_screens/options_screen_video.cpp:320
 #: src/states_screens/tracks_screen.cpp:85 data/po/gui_strings.h:230
 msgid "All"
 msgstr ""
@@ -275,6 +278,16 @@ msgstr ""
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:369
 msgid "Anchor - slows down greatly the kart in the first position"
+msgstr ""
+
+#: src/states_screens/options_screen_video.cpp:328
+#, c-format
+msgid "Animated Characters : %s"
+msgstr ""
+
+#: src/states_screens/options_screen_video.cpp:326
+#, c-format
+msgid "Animated Scenery : %s"
 msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
@@ -616,6 +629,11 @@ msgstr ""
 msgid "Disable Device"
 msgstr ""
 
+#. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
+#: src/states_screens/options_screen_video.cpp:318
+msgid "Disabled"
+msgstr ""
+
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
 #, c-format
@@ -650,9 +668,11 @@ msgstr ""
 msgid "Enable Device"
 msgstr ""
 
+#. I18N: in the graphical options tooltip; indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
-#: data/po/gui_strings.h:526 data/po/gui_strings.h:538
+#: src/states_screens/options_screen_video.cpp:316 data/po/gui_strings.h:526
+#: data/po/gui_strings.h:538
 msgid "Enabled"
 msgstr ""
 
@@ -937,7 +957,7 @@ msgid ""
 msgstr ""
 
 #. I18N: message shown when an input device is used but is not associated to any player
-#: src/input/input_manager.cpp:524
+#: src/input/input_manager.cpp:527
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr ""
@@ -1037,6 +1057,11 @@ msgstr ""
 msgid "Make your rivals bite dust!"
 msgstr ""
 
+#. I18N: if some kart animations are enabled
+#: src/states_screens/options_screen_video.cpp:322
+msgid "Me Only"
+msgstr ""
+
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:130
 msgid "Menu Keys"
@@ -1133,6 +1158,11 @@ msgstr ""
 msgid "Nolok"
 msgstr ""
 
+#. I18N: if no kart animations are enabled
+#: src/states_screens/options_screen_video.cpp:324
+msgid "None"
+msgstr ""
+
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
 msgid "Normal Race"
@@ -1171,7 +1201,7 @@ msgstr ""
 
 #. I18N: message shown when a player that isn't game master tries to modify options that
 #. I18N: only the game master is allowed to
-#: src/input/input_manager.cpp:549
+#: src/input/input_manager.cpp:552
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -1705,6 +1735,11 @@ msgstr ""
 msgid "Weapons"
 msgstr ""
 
+#: src/states_screens/options_screen_video.cpp:327
+#, c-format
+msgid "Weather Effects : %s"
+msgstr ""
+
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:455
@@ -1823,7 +1858,7 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/karts/kart.cpp:585 src/karts/kart.cpp:604
+#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
 msgid "You finished the race!"
 msgstr ""
 
@@ -1836,7 +1871,7 @@ msgstr ""
 msgid "You unlocked a new feature!"
 msgstr ""
 
-#: src/karts/kart.cpp:585 src/karts/kart.cpp:604
+#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
 msgid "You won the race!"
 msgstr ""
 
@@ -1863,7 +1898,7 @@ msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
 #: src/states_screens/minimal_race_gui.cpp:757
-#: src/states_screens/race_gui.cpp:1194
+#: src/states_screens/race_gui.cpp:1195
 msgid "by"
 msgstr ""
 
