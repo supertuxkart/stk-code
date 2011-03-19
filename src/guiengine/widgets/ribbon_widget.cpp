@@ -320,7 +320,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     }
     updateSelection();
     
-    if (m_ribbon_type == RIBBON_COMBO)
+    if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
         if (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER)
@@ -396,7 +396,7 @@ EventPropagation RibbonWidget::focused(const int playerID)
     
     if (m_children.size() < 1) return EVENT_LET; // empty ribbon
     
-    if (m_ribbon_type == RIBBON_COMBO)
+    if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
         if (m_mouse_focus == NULL && m_selection[playerID] != -1  &&
@@ -419,7 +419,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayer
     //std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
     const int subbuttons_amount = m_children.size();
     
-    if (m_ribbon_type == RIBBON_COMBO)
+    if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
         //std::cout << "SETTING m_mouse_focus\n";
         m_mouse_focus = child;

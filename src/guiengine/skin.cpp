@@ -726,6 +726,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["tab::focused"];
+        else if (parentRibbon->m_mouse_focus == widget)
+            params = &SkinConfig::m_render_params["tab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["tab::down"];
         else

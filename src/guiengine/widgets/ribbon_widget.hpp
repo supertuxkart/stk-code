@@ -89,7 +89,7 @@ namespace GUIEngine
         static const char* NO_ITEM_ID;
         
         /** Contains which element within the ribbon is currently focused by player 0 (used by the skin to
-            show mouse hovers over items that are not selected). Only used for COMBO ribbons. */
+            show mouse hovers over items that are not selected). Only used for COMBO and TAB ribbons. */
         Widget* m_mouse_focus;
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
