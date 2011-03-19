@@ -1375,7 +1375,7 @@ void Skin::drawTooltip(Widget* widget)
     irr::gui::ScalableFont* font = GUIEngine::getSmallFont();
     core::dimension2d<u32> size = font->getDimension(widget->getTooltipText().c_str());
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
-    core::rect<s32> r(pos, size + core::dimension2d<u32>(0,15));
+    core::rect<s32> r(pos, size);
     GUIEngine::getDriver()->draw2DRectangle( video::SColor(255, 200, 200, 200), r );
     font->draw(widget->getTooltipText(), r, video::SColor(255, 0, 0, 0), false, false);
 }
