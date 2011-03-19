@@ -323,7 +323,7 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if no kart animations are enabled
     core::stringw none = _("None");
     
-    tooltip = _("Graphical Effects : %s", UserConfigParams::m_graphical_effects ? enabled : disabled);
+    tooltip = _("Animated Scenery : %s", UserConfigParams::m_graphical_effects ? enabled : disabled);
     tooltip = tooltip + L"\n" + _("Weather Effects : %s", UserConfigParams::m_weather_effects ? enabled : disabled);
     tooltip = tooltip + L"\n" + _("Animated Characters : %s", UserConfigParams::m_show_steering_animations == 2 ? all :
                                   (UserConfigParams::m_show_steering_animations == 1 ? me : none));
