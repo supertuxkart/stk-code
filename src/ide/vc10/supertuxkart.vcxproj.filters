@@ -151,6 +151,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Headerdateien\tinygettext">
+      <UniqueIdentifier>{8da5c73a-5884-4e8d-818a-20521a66e611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\utils\utf8">
+      <UniqueIdentifier>{b231fec4-a731-46b5-a8cf-1ef8fa0bf7be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\tinygettext">
+      <UniqueIdentifier>{5faa19dc-78e6-438e-a2a0-6a489961f098}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main.cpp">
@@ -721,6 +730,36 @@
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\per_camera_node.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\dictionary.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\iconv.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\language.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\log.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\plural_forms.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\po_parser.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\stk_file_system.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\tinygettext.cpp">
+      <Filter>Quelldateien\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\graphics\lod_node.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1353,6 +1392,54 @@
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\per_camera_node.hpp">
+      <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\dictionary.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\file_system.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\iconv.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\language.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\log.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\log_stream.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\plural_forms.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\po_parser.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\stk_file_system.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\tinygettext.hpp">
+      <Filter>Headerdateien\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\utf8\unchecked.h">
+      <Filter>Headerdateien\utils\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\utf8\checked.h">
+      <Filter>Headerdateien\utils\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\utf8\core.h">
+      <Filter>Headerdateien\utils\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\utf8.h">
+      <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\lod_node.hpp">
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>

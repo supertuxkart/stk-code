@@ -102,6 +102,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\enet\callbacks.c" />
+    <ClCompile Include="..\..\enet\compress.c" />
     <ClCompile Include="..\..\enet\host.c" />
     <ClCompile Include="..\..\enet\list.c" />
     <ClCompile Include="..\..\enet\packet.c" />

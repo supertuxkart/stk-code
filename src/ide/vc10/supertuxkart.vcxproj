@@ -163,6 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\graphics\lod_node.cpp" />
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
@@ -204,6 +205,15 @@
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
+    <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
+    <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
+    <ClCompile Include="..\..\tinygettext\iconv.cpp" />
+    <ClCompile Include="..\..\tinygettext\language.cpp" />
+    <ClCompile Include="..\..\tinygettext\log.cpp" />
+    <ClCompile Include="..\..\tinygettext\plural_forms.cpp" />
+    <ClCompile Include="..\..\tinygettext\po_parser.cpp" />
+    <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
+    <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
@@ -362,6 +372,7 @@
     <ClCompile Include="..\..\tutorial\tutorial_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\graphics\lod_node.hpp" />
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
@@ -413,6 +424,17 @@
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
+    <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
+    <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />
+    <ClInclude Include="..\..\tinygettext\file_system.hpp" />
+    <ClInclude Include="..\..\tinygettext\iconv.hpp" />
+    <ClInclude Include="..\..\tinygettext\language.hpp" />
+    <ClInclude Include="..\..\tinygettext\log.hpp" />
+    <ClInclude Include="..\..\tinygettext\log_stream.hpp" />
+    <ClInclude Include="..\..\tinygettext\plural_forms.hpp" />
+    <ClInclude Include="..\..\tinygettext\po_parser.hpp" />
+    <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
+    <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />
@@ -420,6 +442,10 @@
     <ClInclude Include="..\..\utils\string_utils.hpp" />
     <ClInclude Include="..\..\utils\synchronised.hpp" />
     <ClInclude Include="..\..\utils\translation.hpp" />
+    <ClInclude Include="..\..\utils\utf8.h" />
+    <ClInclude Include="..\..\utils\utf8\checked.h" />
+    <ClInclude Include="..\..\utils\utf8\core.h" />
+    <ClInclude Include="..\..\utils\utf8\unchecked.h" />
     <ClInclude Include="..\..\utils\vec3.hpp" />
     <ClInclude Include="..\..\audio\music.hpp" />
     <ClInclude Include="..\..\audio\music_information.hpp" />
