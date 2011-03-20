@@ -1050,7 +1050,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     
     if (focused && widget->hasTooltip())
     {
-        drawTooltip(widget);
+        m_tooltips.push_back(widget);
     }
 }
 
@@ -1370,6 +1370,15 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bo
         //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_background::neutral"]);
     }
     
+}
+
+void Skin::drawTooltips()
+{
+    for (unsigned int n=0; n<m_tooltips.size(); n++)
+    {
+        drawTooltip(m_tooltips[n]);
+    }
+    m_tooltips.clear();
 }
 
 void Skin::drawTooltip(Widget* widget)

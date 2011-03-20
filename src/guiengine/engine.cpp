@@ -989,6 +989,12 @@ namespace GUIEngine
                 World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
         }
         
+        
+        if (gamestate == MENU || gamestate == INGAME_MENU)
+        {
+            g_skin->drawTooltips();
+        }
+        
         if (gamestate != GAME && !gui_messages.empty())
         {
             core::dimension2d<u32> screen_size = irr_driver->getFrameSize();

@@ -242,6 +242,9 @@ namespace GUIEngine
 
         irr::video::ITexture* bg_image;
         
+        
+        std::vector<Widget*> m_tooltips;
+        
 #ifdef USE_PER_LINE_BACKGROUND
     public:
 #endif
@@ -318,6 +321,8 @@ namespace GUIEngine
         virtual void    setIcon (irr::gui::EGUI_DEFAULT_ICON icon, irr::u32 index);
         virtual void    setSize (irr::gui::EGUI_DEFAULT_SIZE which, irr::s32 size);
         virtual void    setSpriteBank (irr::gui::IGUISpriteBank *bank);
+        
+        void drawTooltips();
         
         static irr::video::SColor getColor(const std::string name);
 
