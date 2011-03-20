@@ -43,10 +43,11 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
 // Look-up table for GFX levels
-const bool GFX           [] = {false, true,  true,  true,  true};
-const int  GFX_ANIM_KARTS[] = {0,     0,     1,     2,     2   };
-const bool GFX_WEATHER   [] = {false, false, false, false, true};
-const int  GFX_LEVEL_AMOUNT = 5;
+const bool GFX           [] = {false, true,  true,  true,  true,  true};
+const int  GFX_ANIM_KARTS[] = {0,     0,     1,     2,     2,     2   };
+const bool GFX_WEATHER   [] = {false, false, false, false, true,  true};
+const bool GFX_ANTIALIAS [] = {false, false, false, false, false, true};
+const int  GFX_LEVEL_AMOUNT = 6;
 
 // -----------------------------------------------------------------------------
 
@@ -88,7 +89,7 @@ void OptionsScreenVideo::loadedFromFile()
         skinSelector->setDeactivated();
         return;
     }
-        
+    
     const int skinCount = m_skins.size();
     for (int n=0; n<skinCount; n++)
     {
@@ -99,6 +100,9 @@ void OptionsScreenVideo::loadedFromFile()
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
 
+    GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    gfx->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(GFX_LEVEL_AMOUNT);
+    
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -293,7 +297,8 @@ void OptionsScreenVideo::init()
     {
         if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l] &&
             UserConfigParams::m_graphical_effects        == GFX[l] &&
-            UserConfigParams::m_weather_effects          == GFX_WEATHER[l])
+            UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
+            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l])
         {
             gfx->setValue(l+1);
             break;
@@ -323,10 +328,15 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if no kart animations are enabled
     core::stringw none = _("None");
     
+    //I18N: in graphical options
     tooltip = _("Animated Scenery : %s", UserConfigParams::m_graphical_effects ? enabled : disabled);
+    //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Weather Effects : %s", UserConfigParams::m_weather_effects ? enabled : disabled);
+    //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Animated Characters : %s", UserConfigParams::m_show_steering_animations == 2 ? all :
                                   (UserConfigParams::m_show_steering_animations == 1 ? me : none));
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s", UserConfigParams::m_fullscreen_antialiasing ? enabled : disabled);
     gfx->setTooltip(tooltip);
 }
 
@@ -388,6 +398,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
+        UserConfigParams::m_fullscreen_antialiasing  = GFX_ANTIALIAS[level-1];
         
         updateTooltip();
     }

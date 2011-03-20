@@ -273,17 +273,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", &m_video_group,"Previous screen/window height") );
     PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", &m_video_group) );
-    
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx", &m_video_group) );
-    
-    PARAM_PREFIX BoolUserConfigParam        m_weather_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", &m_video_group) );
-    
-    PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, "steering_animations", &m_video_group,
-                                               "Whether to display kart animations (0=disabled for all; "
-                                               "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+
 
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );
@@ -340,18 +330,27 @@ namespace UserConfigParams
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
     
+    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx", &m_graphics_quality, "Scenery animations") );
+    
+    PARAM_PREFIX BoolUserConfigParam        m_weather_effects
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", &m_graphics_quality, "Weather effects") );
+    PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
+            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, "steering_animations", &m_graphics_quality,
+                                               "Whether to display kart animations (0=disabled for all; "
+                                               "1=enabled for humans, disabled for AIs; 2=enabled for all") );
     PARAM_PREFIX BoolUserConfigParam         m_anisotropic
             PARAM_DEFAULT( BoolUserConfigParam(true, "anisotropic", &m_graphics_quality,
                                                "Whether anisotropic filtering is allowed to be used (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
-        PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
-                                           "Whether trilinear filtering is allowed to be used (true or false)") );
+            PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
+                                               "Whether trilinear filtering is allowed to be used (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_fullscreen_antialiasing
-        PARAM_DEFAULT( BoolUserConfigParam(false, "fullscreen_antialiasing", &m_graphics_quality,
-                                       "Whether fullscreen antialiasing is enabled") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, "fullscreen_antialiasing", &m_graphics_quality,
+                                               "Whether fullscreen antialiasing is enabled") );
     PARAM_PREFIX BoolUserConfigParam         m_vsync
-        PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", &m_graphics_quality,
-                                       "Whether vertical sync is enabled") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", &m_graphics_quality,
+                                               "Whether vertical sync is enabled") );
     
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
