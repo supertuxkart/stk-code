@@ -31,6 +31,7 @@
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -62,43 +63,6 @@ void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
     
-    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
-    assert( skinSelector != NULL );
-    
-    skinSelector->m_properties[PROP_WARP_AROUND] = "true";
-    
-    m_skins.clear();
-    skinSelector->clearLabels();
-    
-    std::set<std::string> skinFiles;
-    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "/skins",
-                            true /* is full path */, true /* make full path */ );
-    
-    for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
-    {
-        if ( (*it).find(".stkskin") != std::string::npos )
-        {
-            m_skins.push_back( *it );
-        }
-    }
-    
-    if (m_skins.size() == 0)
-    {
-        std::cerr << "WARNING: could not find a single skin, make sure that "
-                     "the data files are correctly installed\n";
-        skinSelector->setDeactivated();
-        return;
-    }
-    
-    const int skinCount = m_skins.size();
-    for (int n=0; n<skinCount; n++)
-    {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
-        const std::string skinName = StringUtils::removeExtension( skinFileName );
-        skinSelector->addLabel( core::stringw(skinName.c_str()) );
-    }
-    skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
 
     GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     gfx->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(GFX_LEVEL_AMOUNT);
@@ -113,15 +77,16 @@ void OptionsScreenVideo::init()
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
     
-    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
-    assert( skinSelector != NULL );
-    
     GUIEngine::ButtonWidget* applyBtn = this->getWidget<GUIEngine::ButtonWidget>("apply_resolution");
     assert( applyBtn != NULL );
 
     GUIEngine::SpinnerWidget* gfx = this->getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-        
+    
+    GUIEngine::CheckBoxWidget* vsync = this->getWidget<GUIEngine::CheckBoxWidget>("vsync");
+    assert( vsync != NULL );
+    vsync->setState( UserConfigParams::m_vsync );
+    
     // ---- video modes
     DynamicRibbonWidget* res = this->getWidget<DynamicRibbonWidget>("resolutions");
     assert( res != NULL );
@@ -271,27 +236,6 @@ void OptionsScreenVideo::init()
         }
     }  // end for
     
-    // --- select the right skin in the spinner
-    bool currSkinFound = false;
-    const int skinCount = m_skins.size();
-    for (int n=0; n<skinCount; n++)
-    {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
-        
-        if (UserConfigParams::m_skin_file.c_str() == skinFileName)
-        {
-            skinSelector->setValue(n);
-            currSkinFound = true;
-            break;
-        }
-    }
-    if (!currSkinFound)
-    {
-        std::cerr << "WARNING: couldn't find current skin in the list of skins!!\n";
-        skinSelector->setValue(0);
-        GUIEngine::reloadSkin();
-    }
-    
     // --- set gfx settings values
     for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
     {
@@ -352,6 +296,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
         else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        else if (selection == "tab_ui") StateManager::get()->replaceTopMostScreen(OptionsScreenUI::getInstance());
     }
     else if(name == "back")
     {
@@ -378,15 +323,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         
 
         irr_driver->changeResolution(w, h, w2->getState());
-    }
-    else if (name == "skinchoice")
-    {
-        GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
-        assert( skinSelector != NULL );
-        
-        const core::stringw selectedSkin = skinSelector->getStringValue();
-        UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
-        GUIEngine::reloadSkin();
     }
     else if (name == "gfx_level")
     {

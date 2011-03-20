@@ -34,6 +34,7 @@
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
+#include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -374,6 +375,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
         if (selection == "tab_audio")        StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video")   StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+        else if (selection == "tab_ui") StateManager::get()->replaceTopMostScreen(OptionsScreenUI::getInstance());
         else if (selection == "tab_controls") {}
     }
     else if (name == "back_to_device_list")

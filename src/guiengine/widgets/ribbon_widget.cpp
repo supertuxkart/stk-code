@@ -76,6 +76,10 @@ void RibbonWidget::add()
     
     const int subbuttons_amount = m_children.size();
     
+    // For some ribbon types, we can have unequal sizes depending on whether items have labels or not
+    int with_label = 0;
+    int without_label = 0;
+    
     // ---- check how much space each child button will take and fit them within available space
     int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
@@ -96,6 +100,10 @@ void RibbonWidget::add()
             icon->m_tab_stop = false;
         }
         
+        
+        if (m_children[i].m_text.size() > 0) with_label++;
+        else                                 without_label++;
+        
         total_needed_space += m_children[i].m_w;
     }
     
@@ -111,20 +119,40 @@ void RibbonWidget::add()
     
     const int one_button_space = (int)round((float)m_w / (float)subbuttons_amount);
     
+    int widget_x = -1;
+    
     // ---- add children
     for (int i=0; i<subbuttons_amount; i++)
-    {
-        
-        const int widget_x = one_button_space*(i+1) - one_button_space/2;
-        
+    {        
         // ---- tab ribbons
         if (getRibbonType() == RIBBON_TABS)
         {
-            IGUIButton * subbtn = NULL;
-            rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0,
-                                          widget_x + one_button_space/2-2,  m_h);
+            const int large_tab = (with_label + without_label)*one_button_space / (with_label + without_label/2.0f);
+            const int small_tab = large_tab/2;
             
             stringw& message = m_children[i].m_text;
+            
+
+            if (message.size() == 0)
+            {
+                if (widget_x == -1) widget_x = small_tab/2;
+                else widget_x += small_tab/2;
+            }
+            else
+            {
+                if (widget_x == -1) widget_x = large_tab/2;
+                else widget_x += large_tab/2;
+            }
+            
+            IGUIButton * subbtn = NULL;
+            rect<s32> subsize = rect<s32>(widget_x - large_tab/2+2,  0,
+                                          widget_x + large_tab/2-2,  m_h);
+                        
+            if (message.size() == 0)
+            {
+                subsize = rect<s32>(widget_x - small_tab/2+2,  0,
+                                    widget_x + small_tab/2-2,  m_h);
+            }
             
             if (m_children[i].m_type == WTYPE_BUTTON)
             {
@@ -138,6 +166,17 @@ void RibbonWidget::add()
                                                 0,
                                                 subsize.getHeight()+15,
                                                 subsize.getHeight());
+                
+                if (message.size() == 0)
+                {
+                    const int x = subsize.getWidth()/2 - subsize.getHeight()/2;
+                    // no label, only icon, so center the icon
+                    icon_part = rect<s32>(x,
+                                          0,
+                                          x + subsize.getHeight(),
+                                          subsize.getHeight());
+                }
+                
                 // label at the *right* of the icon (for tabs)
                 rect<s32> label_part = rect<s32>(subsize.getHeight()+15,
                                                  0,
@@ -156,7 +195,7 @@ void RibbonWidget::add()
                 icon->setUseAlphaChannel(true);
                 icon->setDrawBorder(false);
                 icon->setTabStop(false);
-                
+
                 IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), label_part,
                                                                               false /* border */,
                                                                               true /* word wrap */,
@@ -168,7 +207,6 @@ void RibbonWidget::add()
                 
                 subbtn->setTabStop(false);
                 subbtn->setTabGroup(false);
-                
             }
             else
             {
@@ -176,10 +214,15 @@ void RibbonWidget::add()
             }
             
             m_children[i].m_element = subbtn;
+            
+            if (message.size() == 0) widget_x += small_tab/2;
+            else                     widget_x += large_tab/2;
         }
         // ---- icon ribbons
         else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
+            if (widget_x == -1) widget_x = one_button_space/2;
+            
             // find how much space to keep for the label under the button.
             // consider font size, whether the label is multiline, etc...
             const bool has_label = m_children[i].m_text.size() > 0;
@@ -233,6 +276,8 @@ void RibbonWidget::add()
             
             // the label itself will be added by the icon widget. since it adds the label outside of the
             // widget area it is assigned to, the label will appear in the area we want at the bottom
+            
+            widget_x += one_button_space;
         }
         else
         {

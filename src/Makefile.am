@@ -345,6 +345,8 @@ supertuxkart_SOURCES = \
  states_screens/options_screen_input2.hpp \
  states_screens/options_screen_players.cpp \
  states_screens/options_screen_players.hpp \
+ states_screens/options_screen_ui.cpp \
+ states_screens/options_screen_u.hpp \
  states_screens/options_screen_video.cpp \
  states_screens/options_screen_video.hpp \
  states_screens/addons_screen.cpp \

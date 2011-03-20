@@ -6,20 +6,19 @@
     <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"
-                I18N="Section in the settings menu" text="Graphics"/>
+        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
         <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"
                 I18N="Section in the settings menu" text="Audio"/>
-        <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"
-                I18N="Section in the settings menu" text="Players"/>
-        <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"
-                I18N="Section in the settings menu" text="Controls"/>
+        <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"/>
+        <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"/>
+        <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
         
         <spacer height="15" width="10"/>
         
+        <!-- ******** Music ******** -->
         <label width="100%" I18N="Section in the audio/video settings submenu" text="Music"/>
         
         <!-- FIXME: don't hardcode height! -->
@@ -31,7 +30,7 @@
                 <checkbox id="music_enabled" width="40" height="40"/>
             </div>
         </div>
-        <div width="75%" height="30" layout="horizontal-row" >
+        <div width="75%" height="40" layout="horizontal-row" >
             <label proportion="1" height="100%" text_align="right" I18N="Music volume in options" text="Volume"/>
             <div proportion="1" height="40" layout="horizontal-row" >
                 <spacer width="40" height="100%" />
@@ -41,6 +40,7 @@
         
         <spacer height="15" width="10"/>
         
+        <!-- ******** SFX ******** -->
         <label width="100%" I18N="Section in audio/video settings submenu" text="Sound Effects"/>
                     
         <div width="75%" height="40" layout="horizontal-row" >
@@ -50,7 +50,7 @@
                 <checkbox id="sfx_enabled" width="40" height="40"/>
             </div>
         </div>
-        <div width="75%" height="30" layout="horizontal-row" >
+        <div width="75%" height="40" layout="horizontal-row" >
             <label proportion="1" height="100%" text_align="right" I18N="Sound volume in options" text="Volume"/>
             <div proportion="1" height="40" layout="horizontal-row" >
                 <spacer width="40" height="100%" />

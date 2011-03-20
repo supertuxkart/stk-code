@@ -55,6 +55,7 @@
 		9538E2BA12C25D6800172896 /* network_http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538E2B712C25D6800172896 /* network_http.cpp */; };
 		9538E2E912C2682B00172896 /* IrrFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9538E2E812C2682B00172896 /* IrrFramework.framework */; };
 		95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95395A75129DFE130079BCE7 /* message_dialog.cpp */; };
+		953A959D13367D6E00D86B4D /* options_screen_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953A959B13367D6E00D86B4D /* options_screen_ui.cpp */; };
 		953C304E12BEF384005BB4CD /* tutorial_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C304C12BEF384005BB4CD /* tutorial_data.cpp */; };
 		953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F8B1F11F7C13C00205E66 /* scalable_font.cpp */; };
 		9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FC7512D3BDB000C00366 /* particle_emitter.cpp */; };
@@ -466,6 +467,8 @@
 		9538E2E812C2682B00172896 /* IrrFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IrrFramework.framework; path = /Library/Frameworks/IrrFramework.framework; sourceTree = "<absolute>"; };
 		95395A75129DFE130079BCE7 /* message_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message_dialog.cpp; path = ../../states_screens/dialogs/message_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		95395A76129DFE130079BCE7 /* message_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = message_dialog.hpp; path = ../../states_screens/dialogs/message_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		953A959B13367D6E00D86B4D /* options_screen_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_ui.cpp; path = ../../states_screens/options_screen_ui.cpp; sourceTree = SOURCE_ROOT; };
+		953A959C13367D6E00D86B4D /* options_screen_ui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen_ui.hpp; path = ../../states_screens/options_screen_ui.hpp; sourceTree = SOURCE_ROOT; };
 		953C304C12BEF384005BB4CD /* tutorial_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_data.cpp; path = ../../tutorial/tutorial_data.cpp; sourceTree = SOURCE_ROOT; };
 		953C304D12BEF384005BB4CD /* tutorial_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_data.hpp; path = ../../tutorial/tutorial_data.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
@@ -2171,6 +2174,8 @@
 				9522F1EC107961560067ECF5 /* options_screen_players.hpp */,
 				9556A87E119EF976009C558F /* options_screen_video.cpp */,
 				9556A87F119EF976009C558F /* options_screen_video.hpp */,
+				953A959B13367D6E00D86B4D /* options_screen_ui.cpp */,
+				953A959C13367D6E00D86B4D /* options_screen_ui.hpp */,
 				957BF97811EA96720018118A /* race_gui_base.hpp */,
 				958330C810122B4A00C5137E /* race_gui.cpp */,
 				958330C910122B4A00C5137E /* race_gui.hpp */,
@@ -3053,6 +3058,7 @@
 				958444A41330F89100CEA60A /* po_parser.cpp in Sources */,
 				958444A51330F89100CEA60A /* stk_file_system.cpp in Sources */,
 				958444A61330F89100CEA60A /* tinygettext.cpp in Sources */,
+				953A959D13367D6E00D86B4D /* options_screen_ui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
