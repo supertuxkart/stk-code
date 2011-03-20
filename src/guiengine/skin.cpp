@@ -722,11 +722,13 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     /* tab-bar ribbons */
     if (type == RIBBON_TABS)
     {
+        const bool mouseIn = rect.isPointInside(irr_driver->getDevice()->getCursorControl()->getPosition());
+        
         BoxRenderParams* params;
         
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["tab::focused"];
-        else if (parentRibbon->m_mouse_focus == widget)
+        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
             params = &SkinConfig::m_render_params["tab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["tab::down"];

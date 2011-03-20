@@ -435,6 +435,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     }
 }
 // -----------------------------------------------------------------------------
+
 EventPropagation RibbonWidget::focused(const int playerID)
 {    
     Widget::focused(playerID);
@@ -456,6 +457,13 @@ EventPropagation RibbonWidget::focused(const int playerID)
     
     return EVENT_LET;
 }
+
+// -----------------------------------------------------------------------------
+
+void RibbonWidget::unfocused(const int playerID)
+{
+}
+
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayerID)
 {

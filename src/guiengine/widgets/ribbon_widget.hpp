@@ -74,6 +74,7 @@ namespace GUIEngine
         virtual EventPropagation mouseHovered(Widget* child, const int playerID);
         virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
         virtual EventPropagation focused(const int playerID);
+        virtual void unfocused(const int playerID);
         
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
