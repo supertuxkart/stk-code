@@ -64,6 +64,11 @@ void OptionsScreenPlayers::init()
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL) tabBar->select( "tab_players", PLAYER_ID_GAME_MASTER );
     
+    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
+    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
+    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
+    tabBar->getRibbonChildren()[4].setTooltip( _("Controls") );
+    
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
     

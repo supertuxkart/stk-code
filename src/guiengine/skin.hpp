@@ -244,6 +244,7 @@ namespace GUIEngine
         
         
         std::vector<Widget*> m_tooltips;
+        std::vector<bool> m_tooltip_at_mouse;
         
 #ifdef USE_PER_LINE_BACKGROUND
     public:
@@ -271,7 +272,7 @@ namespace GUIEngine
         void drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect);
         void drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool bottomArrow);
 
-        void drawTooltip(Widget* widget);
+        void drawTooltip(Widget* widget, bool atMouse);
         
     public:
         

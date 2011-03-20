@@ -77,6 +77,11 @@ void OptionsScreenVideo::init()
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
     
+    ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
+    ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
+    ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
+    ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
+    
     GUIEngine::ButtonWidget* applyBtn = this->getWidget<GUIEngine::ButtonWidget>("apply_resolution");
     assert( applyBtn != NULL );
 

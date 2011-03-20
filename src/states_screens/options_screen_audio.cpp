@@ -60,6 +60,11 @@ void OptionsScreenAudio::init()
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
     
+    ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
+    ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
+    ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
+    ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
+    
     // ---- sfx volume
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
     assert(gauge != NULL);

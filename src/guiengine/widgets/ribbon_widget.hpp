@@ -148,6 +148,8 @@ namespace GUIEngine
           * \brief clear all children of this ribbon (likely because new ones will be added soon after)
           */
         void clearAllChildren();
+        
+        PtrVector<Widget>& getRibbonChildren() { return m_children; }
     };
 
 }

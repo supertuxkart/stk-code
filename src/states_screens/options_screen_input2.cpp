@@ -67,6 +67,12 @@ void OptionsScreenInput2::init()
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
     
+    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
+    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
+    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
+    tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
+    
+    
     ButtonWidget* deleteBtn = this->getWidget<ButtonWidget>("delete");
     if (m_config->getType() != DEVICE_CONFIG_TYPE_KEYBOARD)
     {

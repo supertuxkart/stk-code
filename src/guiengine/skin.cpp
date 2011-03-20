@@ -944,6 +944,15 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
 
     } // end if icon ribbons
     
+
+    if (/*mark_selected && widget->hasTooltip() && (focused || parent_focused) &&*/ parentRibbon->m_mouse_focus == widget)
+    {
+        if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()->getPosition()))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 }
 
 /**
@@ -1050,6 +1059,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     
     if (focused && widget->hasTooltip())
     {
+        m_tooltip_at_mouse.push_back(false);
         m_tooltips.push_back(widget);
     }
 }
@@ -1376,16 +1386,23 @@ void Skin::drawTooltips()
 {
     for (unsigned int n=0; n<m_tooltips.size(); n++)
     {
-        drawTooltip(m_tooltips[n]);
+        drawTooltip(m_tooltips[n], m_tooltip_at_mouse[n]);
     }
     m_tooltips.clear();
+    m_tooltip_at_mouse.clear();
 }
 
-void Skin::drawTooltip(Widget* widget)
+void Skin::drawTooltip(Widget* widget, bool atMouse)
 {
     irr::gui::ScalableFont* font = GUIEngine::getSmallFont();
     core::dimension2d<u32> size = font->getDimension(widget->getTooltipText().c_str());
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
+    
+    if (atMouse)
+    {
+        pos = irr_driver->getDevice()->getCursorControl()->getPosition() + core::position2di(15, 15);
+    }
+    
     core::rect<s32> r(pos, size);
     GUIEngine::getDriver()->draw2DRectangle( video::SColor(255, 200, 200, 200), r );
     font->draw(widget->getTooltipText(), r, video::SColor(255, 0, 0, 0), false, false);
@@ -1606,14 +1623,14 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround,
                              const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{    
+{
     const int id = element->getID();
     Widget* widget = GUIEngine::getWidget(id);
-        
+    
     if (widget == NULL) return;
     
     const WidgetType type = widget->m_type;
-        
+    
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
