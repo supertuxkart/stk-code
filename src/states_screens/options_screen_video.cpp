@@ -338,7 +338,12 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         
         updateTooltip();
     }
-
+    else if (name == "vsync")
+    {
+        GUIEngine::CheckBoxWidget* vsync = this->getWidget<GUIEngine::CheckBoxWidget>("vsync");
+        assert( vsync != NULL );
+        UserConfigParams::m_vsync = vsync->getState();
+    }
     
 }   // eventCallback
 
