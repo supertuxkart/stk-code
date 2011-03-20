@@ -262,15 +262,15 @@ void OptionsScreenVideo::updateTooltip()
     core::stringw tooltip;
     
     //I18N: in the graphical options tooltip; indicates a graphical feature is enabled
-    core::stringw enabled = _("Enabled");
+    core::stringw enabled = _LTR("Enabled");
     //I18N: in the graphical options tooltip; indicates a graphical feature is disabled
-    core::stringw disabled = _("Disabled");
+    core::stringw disabled = _LTR("Disabled");
     //I18N: if all kart animations are enabled
-    core::stringw all = _("All");
+    core::stringw all = _LTR("All");
     //I18N: if some kart animations are enabled
-    core::stringw me = _("Me Only");
+    core::stringw me = _LTR("Me Only");
     //I18N: if no kart animations are enabled
-    core::stringw none = _("None");
+    core::stringw none = _LTR("None");
     
     //I18N: in graphical options
     tooltip = _("Animated Scenery : %s", UserConfigParams::m_graphical_effects ? enabled : disabled);
