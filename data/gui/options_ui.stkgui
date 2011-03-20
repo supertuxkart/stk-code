@@ -19,7 +19,7 @@
         <spacer height="20" width="10"/>
 
         <!-- ************ SKIN CHOICE ************ -->
-        <label width="100%" I18N="In the graphics settings" text="Skin"/>
+        <label I18N="In the graphics settings" text="Skin"/>
         
         <!-- FIXME: don't hardcode size -->
         <spinner id="skinchoice" width="300" height="50" />
@@ -30,7 +30,7 @@
         <div width="75%" height="40" layout="horizontal-row" >
             <checkbox id="showfps" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" I18N="In the ui settings" text="Display FPS"/>
+            <label height="100%" I18N="In the ui settings" text="Display FPS"/>
         </div>
 
         <spacer height="4" width="4"/>

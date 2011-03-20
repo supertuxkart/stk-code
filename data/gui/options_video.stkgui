@@ -32,7 +32,7 @@
         <div width="75%" height="40" layout="horizontal-row" >
             <checkbox id="vsync" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
+            <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
         </div>
         
         <spacer width="20" height="20"/>
@@ -52,7 +52,7 @@
             <spacer width="40" height="100%" />
             <checkbox id="fullscreen" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" I18N="In the video settings" text="Fullscreen"/>
+            <label height="100%" I18N="In the video settings" text="Fullscreen"/>
         </div>
         
         <spacer height="10" width="10"/>
