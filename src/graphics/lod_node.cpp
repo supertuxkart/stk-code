@@ -25,7 +25,11 @@ LODNode::LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id)
 {
     assert(mgr != NULL);
     assert(parent != NULL);
-    parent->addChild(this);
+    // At this stage refcount is two: one because of the object being 
+    // created, and once because it is a child of the parent. Drop once,
+    // so that only the reference from the parent is active, causing this
+    // node to be deleted when it is removed from the parent.
+    drop();
 }
 
 LODNode::~LODNode()
