@@ -262,7 +262,7 @@ public:
             {
                 m_contents_vector[i] = m_contents_vector[i-1];
                 i--;
-            } while (i>0 && *t<*(m_contents_vector[i-1]));
+            } while (i>start && *t<*(m_contents_vector[i-1]));
             m_contents_vector[i]=t;
         }
     }   // insertionSort
