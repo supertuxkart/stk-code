@@ -207,6 +207,11 @@ void RaceManager::startNew()
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1, 
                                            init_gp_rank, KT_AI));
         init_gp_rank ++;
+        if(UserConfigParams::m_ftl_debug)
+        {
+            printf("[ftl] rank %d ai-kart %s\n", init_gp_rank, 
+                   m_ai_kart_list[i].c_str());
+        }
     }
 
     // Then the players, which start behind the AI karts
@@ -220,6 +225,11 @@ void RaceManager::startNew()
                                            m_player_karts[i].getGlobalPlayerId(),
                                            init_gp_rank, kt
                                            ) );
+        if(UserConfigParams::m_ftl_debug)
+        {
+            printf("[ftl] rank %d kart %s\n", init_gp_rank, 
+                m_player_karts[i].getKartName().c_str());
+        }
         init_gp_rank ++;
     }
 
@@ -367,14 +377,26 @@ void RaceManager::computeGPRanks()
         sd->m_race_time = -1;
         sort_data.push_back(sd);
         m_kart_status[0].m_gp_rank = -1;
+        if(UserConfigParams::m_ftl_debug)
+        {
+            printf("[ftl] kart '%s' has position %d.\n",
+                World::getWorld()->getKart(0)->getIdent().c_str(),
+                sd->m_position);
+        }
     }
     for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
     {
         computeGPRanksData::SortData *sd = new computeGPRanksData::SortData();
         sd->m_position  = kart_id;
-        sd->m_score     = race_manager->getKartScore(kart_id);
-        sd->m_race_time = race_manager->getOverallTime(kart_id);
+        sd->m_score     = getKartScore(kart_id);
+        sd->m_race_time = getOverallTime(kart_id);
         sort_data.push_back(sd);
+        if(UserConfigParams::m_ftl_debug)
+        {
+            printf("[ftl] kart '%s' has position %d score %d.\n",
+                World::getWorld()->getKart(kart_id)->getIdent().c_str(),
+                sd->m_position, sd->m_score);
+        }
     }
     
     sort_data.insertionSort(start);
@@ -382,6 +404,18 @@ void RaceManager::computeGPRanks()
     {
         //printf("setting kart %s to rank %i\n", 
         //    m_kart_status[position[i]].m_ident.c_str(), i-start);
+        if(UserConfigParams::m_ftl_debug)
+        {
+            if(sort_data[i].m_position<0 || 
+                sort_data[i].m_position>=getNumberOfKarts())
+                printf("XX");
+            const Kart *kart =
+                World::getWorld()->getKart(sort_data[i].m_position);
+            printf("[ftl] kart '%s' has now position %d.\n",
+                kart->getIdent().c_str(), 
+                i-start);
+        }
+
         m_kart_status[sort_data[i].m_position].m_gp_rank = i - start;
     }
     // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_rank);

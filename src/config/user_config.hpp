@@ -306,6 +306,9 @@ namespace UserConfigParams
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool                       m_slipstream_debug  PARAM_DEFAULT( false );
 
+    /** True if follow-the-leader debug information should be printed. */
+    PARAM_PREFIX bool                       m_ftl_debug    PARAM_DEFAULT( false );
+
     /** True if currently developed tutorial debugging is enabled. */
     PARAM_PREFIX bool                       m_tutorial_debug    PARAM_DEFAULT( false );
 

@@ -631,9 +631,9 @@ Highscores* World::getHighscores() const
 }   // getHighscores
 
 // ----------------------------------------------------------------------------
-/*
- * Usually called at the end of a race. Checks if the current times are worth a new
- * score, if so it notifies the HighscoreManager so the new score is added and saved.
+/** Called at the end of a race. Checks if the current times are worth a new
+ *  score, if so it notifies the HighscoreManager so the new score is added 
+ *  and saved.
  */
 void World::updateHighscores()
 {

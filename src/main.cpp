@@ -415,6 +415,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_material_debug = true;
         }
+        else if(!strcmp(argv[i], "--ftl-debug"))
+        {
+            UserConfigParams::m_ftl_debug = true;
+        }
         else if(UserConfigParams::m_artist_debug_mode && !strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
