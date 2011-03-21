@@ -185,7 +185,12 @@ when the border that intersect at this corner are enabled.
 <element type="window" image="peach/dialog.png"
       left_border="7" right_border="7" top_border="50" bottom_border="50"
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
-          
+
+<!-- Stateless -->
+<element type="tooltip" image="peach/tooltip.png"
+    left_border="10" right_border="10" top_border="10" bottom_border="10"
+    hborder_out_portion="1.0" vborder_out_portion="1.0" />
+    
 <!--                   Colors                  -->
 <color type="text" state="neutral" r="0" g="0" b="0" />
 <color type="brighttext" state="neutral" r="255" g="145" b="0" />
