@@ -1043,6 +1043,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\options_screen_ui.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\options_screen_video.cpp"
 					>
 				</File>
@@ -2042,6 +2046,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\options_screen_players.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_ui.hpp"
 					>
 				</File>
 				<File
