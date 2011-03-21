@@ -505,7 +505,7 @@ void ScalableFont::draw(const core::stringw& text,
             c == L'\n'    )        // Unix breaks
         {
             if(c==L'\r' && text[i+1]==L'\n') c = text[++i];
-            offset.Y += MaxHeight*m_scale;
+            offset.Y += (int)(MaxHeight*m_scale);
             offset.X  = position.UpperLeftCorner.X;
             if (hcenter)
                 offset.X += (position.getWidth() - text_dimension.Width) >> 1;

@@ -127,7 +127,9 @@ void RibbonWidget::add()
         // ---- tab ribbons
         if (getRibbonType() == RIBBON_TABS)
         {
-            const int large_tab = (with_label + without_label)*one_button_space / (with_label + without_label/2.0f);
+            const int large_tab = (int)((with_label + without_label)
+                                        *one_button_space 
+                                        / (with_label + without_label/2.0f));
             const int small_tab = large_tab/2;
             
             stringw& message = m_children[i].m_text;
