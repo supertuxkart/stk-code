@@ -400,10 +400,8 @@ esac
 ENETTREE="src/enet"
 
 # =================
-# Check for gettext
+# Disable/enable addons support
 # =================
-CHECK_GETTEXT(external)
-#disable/enable addons support
 AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
               [This option is used to enable/disable addons support])])
 if test "x$with_addons" == "xyes" ; then
