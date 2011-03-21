@@ -104,6 +104,7 @@ KartProperties::KartProperties(const std::string &filename)
 /** Destructor, dereferences the kart model. */
 KartProperties::~KartProperties()
 {
+    delete m_kart_model;
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
