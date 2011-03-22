@@ -406,9 +406,6 @@ void RaceManager::computeGPRanks()
         //    m_kart_status[position[i]].m_ident.c_str(), i-start);
         if(UserConfigParams::m_ftl_debug)
         {
-            if(sort_data[i].m_position<0 || 
-                sort_data[i].m_position>=getNumberOfKarts())
-                printf("XX");
             const Kart *kart =
                 World::getWorld()->getKart(sort_data[i].m_position);
             printf("[ftl] kart '%s' has now position %d.\n",
