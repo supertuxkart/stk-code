@@ -762,6 +762,9 @@
     <ClCompile Include="..\..\graphics\lod_node.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\states_screens\options_screen_ui.cpp">
+      <Filter>Quelldateien\states_screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1441,6 +1444,9 @@
     </ClInclude>
     <ClInclude Include="..\..\graphics\lod_node.hpp">
       <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\options_screen_ui.hpp">
+      <Filter>Headerdateien\states_screens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

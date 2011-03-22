@@ -205,6 +205,7 @@
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
+    <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
     <ClCompile Include="..\..\tinygettext\iconv.cpp" />
@@ -424,6 +425,7 @@
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
+    <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />
     <ClInclude Include="..\..\tinygettext\file_system.hpp" />
