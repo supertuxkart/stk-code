@@ -25,7 +25,6 @@
 #include <string>
 #include "utils/string_utils.hpp"
 
-//#if ENABLE_NLS
 #  include "tinygettext/tinygettext.hpp"
 
 #  define _(String, ...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
@@ -36,12 +35,6 @@
 #  if defined(WIN32) && !defined(__CYGWIN__)
 #    undef fprintf
 #  endif
-//#else   // No NLS
-//#  define _(String, ...)       (translations->w_gettext(String))
-//#  define _LTR(String, ...)    (translations->w_gettext(String))
-//#  define gettext_noop(String) (String)
-//#  define N_(String)           (String)
-//#endif
 
 class Translations
 {
