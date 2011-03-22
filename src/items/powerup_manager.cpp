@@ -54,8 +54,18 @@ PowerupManager::~PowerupManager()
 {
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
     {
-        if(m_all_meshes[(PowerupType)i])
-            m_all_meshes[(PowerupType)i]->drop();
+        scene::IMesh *mesh = m_all_meshes[(PowerupType)i];
+        if(mesh)
+        {
+            mesh->drop();
+            // If the ref count is 1, the only reference is in
+            // irrlicht's mesh cache, from which the mesh can
+            // then be deleted
+            // Note that this test is necessary, since some meshes
+            // are also used in attachment_manager!!!
+            if(mesh->getReferenceCount()==1)
+                m_all_meshes[(PowerupType)i]->drop();
+        }
     }
 }   // ~PowerupManager
 
@@ -156,8 +166,6 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     node.get("model", &model);
     if(model.size()>0)
     {
-        // FIXME LEAK: not freed (unimportant, since the models have to exist
-        // for the whole game anyway).
         std::string full_path = file_manager->getModelFile(model);
         m_all_meshes[type] = irr_driver->getMesh(full_path);
         if(!m_all_meshes[type])

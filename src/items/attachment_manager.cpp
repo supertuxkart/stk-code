@@ -54,6 +54,23 @@ initAttachmentType iat[]=
 };
 
 //-----------------------------------------------------------------------------
+AttachmentManager::~AttachmentManager()
+{
+    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    {
+        scene::IMesh *mesh = m_attachments[iat[i].attachment];
+        mesh->drop();
+        // If the count is 1, the only reference is in the
+        // irrlicht mesh cache, so the mesh can be removed
+        // from the cache.
+        // Note that this test is necessary, since some meshes
+        // are also used in powerup_manager!!!
+        if(mesh->getReferenceCount()==1)
+            irr_driver->removeMesh(mesh);
+    }
+}   // ~AttachmentManager
+
+//-----------------------------------------------------------------------------
 void AttachmentManager::removeTextures()
 {
     for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
@@ -67,10 +84,9 @@ void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
     {
-        // FIXME LEAK: these models are not removed (unimportant, since they
-        // have to be in memory till the end of the game.
         std::string full_path = file_manager->getModelFile(iat[i].file);
         m_attachments[iat[i].attachment]=irr_driver->getAnimatedMesh(full_path);
+        m_attachments[iat[i].attachment]->grab();
         if(iat[i].icon_file)
         {
             std::string full_icon_path     =
