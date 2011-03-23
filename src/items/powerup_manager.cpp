@@ -64,7 +64,7 @@ PowerupManager::~PowerupManager()
             // Note that this test is necessary, since some meshes
             // are also used in attachment_manager!!!
             if(mesh->getReferenceCount()==1)
-                m_all_meshes[(PowerupType)i]->drop();
+                irr_driver->removeMesh(mesh);
         }
     }
 }   // ~PowerupManager
