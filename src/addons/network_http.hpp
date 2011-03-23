@@ -75,6 +75,8 @@ private:
 
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
+    void          loadAddonsList(const XMLNode *xml,
+                                 const std::string &filename);
     std::string   downloadToStrInternal(std::string url);
     bool          downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,

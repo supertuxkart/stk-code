@@ -56,6 +56,9 @@ NetworkHttp *network_http;
  *  would need an additional handle to get the right data back).
  *  This separate thread is running in NetworkHttp::mainLoop, and is being 
  *  waken up if a command is issued (e.g. using downloadFileAsynchronous).
+ *  While UserConfigParams are modified, they can't (easily) be saved here,
+ *  since the user might trigger another save in the menu (potentially
+ *  ending up with an corrupted file).
  */
 NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f), m_abort(false)
 {
@@ -86,20 +89,21 @@ void *NetworkHttp::mainLoop(void *obj)
     // or if the time of the last update was more than news_frequency ago.
     bool download = UserConfigParams::m_news_last_updated==0  ||
                     UserConfigParams::m_news_last_updated
-                      +UserConfigParams::m_news_frequency
-                    > Time::getTimeSinceEpoch();
+                        +UserConfigParams::m_news_frequency
+                    < Time::getTimeSinceEpoch();
 
     if(!download)
     {
         // If there is no old news message file, force a new download
         std::string xml_file = file_manager->getAddonsFile("news.xml");
-        if(xml_file=="")
+        if(!file_manager->fileExists(xml_file))
             download=true;
     }
 
-        // Initialise the online portion of the addons manager.
+    // Initialise the online portion of the addons manager.
     if(download && UserConfigParams::m_verbosity>=3)
         printf("[addons] Downloading list.\n");
+
     if(!download || me->downloadFileSynchron("news.xml"))
     {
         std::string xml_file = file_manager->getAddonsFile("news.xml");
@@ -107,7 +111,8 @@ void *NetworkHttp::mainLoop(void *obj)
             UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
         me->checkNewServer(xml);
-        me->updateNews(xml);
+        me->updateNews(xml, xml_file);
+        me->loadAddonsList(xml, xml_file);
         addons_manager->initOnline(xml);
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Addons manager list downloaded\n");
@@ -204,16 +209,24 @@ void NetworkHttp::checkNewServer(const XMLNode *xml)
                       << "[Addons] New server: " << new_server << std::endl;
         }
         UserConfigParams::m_server_addons = new_server;
-        user_config->saveConfig();
     }
 }   // checkNewServer
 
 // ----------------------------------------------------------------------------
 /** Updates the 'news' string to be displayed in the main menu.
+ *  \param xml The XML data from the news file.
+ *  \param filename The filename of the news xml file. Only needed
+ *         in case of an error (e.g. the file might be corrupted) 
+ *         - the file will be deleted so that on next start of stk it 
+ *         will be updated again.
  */
-void NetworkHttp::updateNews(const XMLNode *xml)
+void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
 {
     bool error = true;
+    int frequency=0;
+    if(xml->get("frequency", &frequency))
+        UserConfigParams::m_news_frequency = frequency;
+
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
@@ -224,9 +237,52 @@ void NetworkHttp::updateNews(const XMLNode *xml)
         error = false;
     }
     if(error)
+    {
+        // In case of an error (e.g. the file only contains
+        // an error message from the server), delete the file
+        // so that it is not read again (and this will force
+        // a new read on the next start, instead of waiting
+        // for some time).
+        file_manager->removeFile(filename);
         m_news.set("Can't access stkaddons server...");
+    }
     
 }   // updateNews
+
+// ----------------------------------------------------------------------------
+/** Checks the last modified date and if necessary updates the
+ *  list of addons.
+ *  \param xml The news xml file which contains the data about
+ *         the addon list.
+ *  \param filename The filename of the news xml file. Only needed
+ *         in case of an error (e.g. it might contain a corrupted
+ *         url) - the file will be deleted so that on next start
+ *         of stk it will be updated again.
+ */
+void NetworkHttp::loadAddonsList(const XMLNode *xml,
+                                 const std::string &filename)
+{
+    std::string    addon_list_url("");
+    Time::TimeType mtime(0);
+    const XMLNode *include = xml->getNode("include");
+    if(include)
+    {
+        include->get("file",  &addon_list_url);
+        include->get("mtime", &mtime         );
+    }
+    if(addon_list_url.size()==0)
+    {
+        file_manager->removeFile(filename);
+        m_news.set("Can't access stkaddons server...");
+        return;
+    }
+
+    bool download = mtime > UserConfigParams::m_addons_last_updated;
+    if(!download)
+    {
+        std::string filename=file_manager->getAddonsFile("addon_list.xml");
+    }
+}   // loadAddonsList
 
 // ----------------------------------------------------------------------------
 /** Returns the last loaded news message (using mutex to make sure a valid

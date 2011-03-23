@@ -682,7 +682,7 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
 void IrrDriver::removeNode(scene::ISceneNode *node)
 {
     node->remove();
-}   // removeMesh
+}   // removeNode
 
 // ----------------------------------------------------------------------------
 /** Removes a mesh from the mesh cache, freeing the memory.

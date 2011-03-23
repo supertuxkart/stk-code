@@ -423,7 +423,7 @@ namespace UserConfigParams
                                                   "The server used for addon.") );
 
     PARAM_PREFIX TimeUserConfigParam         m_news_last_updated
-            PARAM_DEFAULT(  TimeUserConfigParam(0, "last_updated",
+            PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
                                                 &m_addon_group,
                                                 "Time news was updated last.") );
 
@@ -431,6 +431,12 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "news_frequency", 
                                                &m_addon_group,
                                                "How often news should be updated.") );
+
+    PARAM_PREFIX TimeUserConfigParam         m_addons_last_updated
+            PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
+                                                &m_addon_group,
+                                                "Time addon-list was updated last.") );
+
 
     PARAM_PREFIX StringUserConfigParam     m_language
             PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );
