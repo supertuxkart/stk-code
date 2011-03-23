@@ -170,6 +170,71 @@ void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 
 // ---------------------------------------------------------------------------------------
 
+TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value, 
+                                         const char* param_name, 
+                                         const char* comment)
+{
+    m_value         = default_value;
+    m_default_value = default_value;
+    
+    this->paramName = param_name;
+    all_params.push_back(this);
+    if(comment != NULL) this->comment = comment;
+}
+
+TimeUserConfigParam::TimeUserConfigParam(Time::TimeType defaultValue, 
+                                         const char* paramName,
+                                         GroupUserConfigParam* group, 
+                                         const char* comment)
+{
+    m_value = defaultValue;
+    m_default_value = defaultValue;
+    
+    this->paramName = paramName;
+    group->addChild(this);
+    if(comment != NULL) this->comment = comment;
+}
+
+void TimeUserConfigParam::write(XMLWriter& stream) const
+{
+    if(comment.size() > 0) stream << L"    <!-- " << comment.c_str() << L" -->\n";
+    std::ostringstream o;
+    o<<m_value;
+    stream << L"    <" << paramName.c_str() << L" value=\"" 
+        << core::stringw(o.str().c_str()) << L"\" />\n\n";
+}
+
+irr::core::stringw TimeUserConfigParam::toString() const
+{
+    // irrString does not have a += with a 64-bit int type, so
+    // we can't use an irrlicht's stringw directly. Since it's only a
+    // number, we can use std::string, and convert to stringw
+
+    std::string tmp;
+    std::ostringstream o;
+    o<<m_value;
+    return core::stringw(o.str().c_str());
+}
+
+void TimeUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
+{
+    const XMLNode* child = node->getNode( paramName );
+    if(child == NULL)
+    {
+        //std::cout << "Couldn't find int parameter " << paramName << std::endl;
+        return;
+    }
+
+    child->get( "value", &m_value );
+    //std::cout << "read int " << paramName << ", value=" << value << std::endl;
+}
+void TimeUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
+{
+    node->get( paramName, &m_value );
+}
+
+// ---------------------------------------------------------------------------------------
+
 StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment)
 {
     

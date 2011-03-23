@@ -53,6 +53,7 @@ using irr::core::stringw;
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/time.hpp"
 
 class XMLNode;
 class XMLWriter;
@@ -109,6 +110,32 @@ public:
     int& operator=(const int& v) { m_value = v; return m_value; }
     int& operator=(const IntUserConfigParam& v) { m_value = (int)v; return m_value; }
 };
+
+class TimeUserConfigParam : public UserConfigParam
+{
+    Time::TimeType m_value;
+    Time::TimeType m_default_value;
+    
+public:
+    
+    TimeUserConfigParam(Time::TimeType defaultValue, const char* paramName, 
+                        const char* comment = NULL);
+    TimeUserConfigParam(Time::TimeType defaultValue, const char* paramName, 
+                        GroupUserConfigParam* group, const char* comment=NULL);
+
+    void write(XMLWriter& stream) const;
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
+    
+    irr::core::stringw toString() const;
+    void revertToDefaults()               { m_value = m_default_value;        }
+    operator Time::TimeType() const       { return m_value;                   }
+    Time::TimeType& operator=(const Time::TimeType& v) 
+                                          { m_value = v; return m_value;      }
+    Time::TimeType& operator=(const TimeUserConfigParam& v) 
+                                          { m_value = (int)v; return m_value; }
+};
+
 
 class StringUserConfigParam : public UserConfigParam
 {
@@ -384,8 +411,26 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );
             
+    // ---- Addon server related entries
+    PARAM_PREFIX GroupUserConfigParam        m_addon_group
+        PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews", 
+                                            "Addon and news related settings") );
+
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT(  StringUserConfigParam("http://download.tuxfamily.org/stkaddons/0.7/", "server_addons", "The server used for addon.") );
+            PARAM_DEFAULT(  StringUserConfigParam("http://stkaddons.tuxfamily.org/dl/xml",
+                                                  "server_addons", 
+                                                  &m_addon_group,
+                                                  "The server used for addon.") );
+
+    PARAM_PREFIX TimeUserConfigParam         m_news_last_updated
+            PARAM_DEFAULT(  TimeUserConfigParam(0, "last_updated",
+                                                &m_addon_group,
+                                                "Time news was updated last.") );
+
+    PARAM_PREFIX IntUserConfigParam         m_news_frequency
+            PARAM_DEFAULT(  IntUserConfigParam(0, "news_frequency", 
+                                               &m_addon_group,
+                                               "How often news should be updated.") );
 
     PARAM_PREFIX StringUserConfigParam     m_language
             PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );

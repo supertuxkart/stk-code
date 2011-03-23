@@ -20,13 +20,14 @@
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
-#include "utils/no_copy.hpp"
-
 #include <string>
 #include <map>
 #include <vector>
 #include "irrlicht.h"
 using namespace irr;
+
+#include "utils/no_copy.hpp"
+#include "utils/time.hpp"
 
 class Vec3;
 
@@ -64,6 +65,7 @@ public:
     int get(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, unsigned int *value) const;
+    int get(const std::string &attribute, Time::TimeType *value) const;
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;

@@ -431,6 +431,7 @@ supertuxkart_SOURCES = \
  utils/random_generator.hpp \
  utils/string_utils.cpp \
  utils/string_utils.hpp \
+ utils/time.hpp \
  utils/translation.cpp \
  utils/translation.hpp \
  utils/vec3.cpp \

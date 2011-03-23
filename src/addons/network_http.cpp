@@ -23,8 +23,10 @@
 #include <string>
 
 #if defined(WIN32) && !defined(__CYGWIN__)
+#  include <windows.h>
 #  define isnan _isnan
 #else
+#  include <sys/time.h>
 #  include <math.h>
 #endif
 
@@ -34,6 +36,7 @@
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/time.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 // Use Sleep, which takes time in msecs. It must be defined after the
@@ -79,13 +82,29 @@ void *NetworkHttp::mainLoop(void *obj)
 {
     NetworkHttp *me=(NetworkHttp*)obj;
 
-    // Initialise the online portion of the addons manager.
-    if(UserConfigParams::m_verbosity>=3)
+    // The news message must be updated if either it has never been updated,
+    // or if the time of the last update was more than news_frequency ago.
+    bool download = UserConfigParams::m_news_last_updated==0  ||
+                    UserConfigParams::m_news_last_updated
+                      +UserConfigParams::m_news_frequency
+                    > Time::getTimeSinceEpoch();
+
+    if(!download)
+    {
+        // If there is no old news message file, force a new download
+        std::string xml_file = file_manager->getAddonsFile("news.xml");
+        if(xml_file=="")
+            download=true;
+    }
+
+        // Initialise the online portion of the addons manager.
+    if(download && UserConfigParams::m_verbosity>=3)
         printf("[addons] Downloading list.\n");
-    if(me->downloadFileSynchron("news.xml"))
+    if(!download || me->downloadFileSynchron("news.xml"))
     {
         std::string xml_file = file_manager->getAddonsFile("news.xml");
-
+        if(download)
+            UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
         me->checkNewServer(xml);
         me->updateNews(xml);

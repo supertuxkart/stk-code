@@ -1437,6 +1437,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\time.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\translation.hpp"
 					>
 				</File>
