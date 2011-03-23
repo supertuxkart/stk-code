@@ -443,6 +443,7 @@
     <ClInclude Include="..\..\utils\random_generator.hpp" />
     <ClInclude Include="..\..\utils\string_utils.hpp" />
     <ClInclude Include="..\..\utils\synchronised.hpp" />
+    <ClInclude Include="..\..\utils\time.hpp" />
     <ClInclude Include="..\..\utils\translation.hpp" />
     <ClInclude Include="..\..\utils\utf8.h" />
     <ClInclude Include="..\..\utils\utf8\checked.h" />

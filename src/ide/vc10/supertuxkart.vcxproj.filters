@@ -1448,5 +1448,8 @@
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp">
       <Filter>Headerdateien\states_screens</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\utils\time.hpp">
+      <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
