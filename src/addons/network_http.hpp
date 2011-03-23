@@ -73,7 +73,8 @@ private:
     static void  *mainLoop(void *obj);
     void          checkNewServer(const XMLNode *xml);
 
-    void          updateNews(const XMLNode *xml);
+    void          updateNews(const XMLNode *xml,
+                             const std::string &filename);
     std::string   downloadToStrInternal(std::string url);
     bool          downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
