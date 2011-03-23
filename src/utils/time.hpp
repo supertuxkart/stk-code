@@ -21,10 +21,11 @@
 #define HEADER_TIME_HPP
 
 #ifdef WIN32
-# define _WINSOCKAPI_
-# include <windows.h>
+#  define _WINSOCKAPI_
+#  include <windows.h>
 #else
-# include <stdint.h>
+#  include <stdint.h>
+#  include <sys/time.h>
 #endif
 
 class Time
@@ -67,3 +68,4 @@ public:
 
 };   // class time
 #endif
+
