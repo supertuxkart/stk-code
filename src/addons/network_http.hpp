@@ -66,7 +66,10 @@ private:
             m_message_id    = id;
             m_display_count = 0;
         }   // NewsMessage
+        /** Returns the news message. */
         const core::stringw& getNews() const {return m_news;}
+        /** Increases how often this message was being displayed. */
+        void increaseDisplayCount() {m_display_count++;}
     };   // NewsMessage
 
     mutable Synchronised< std::vector<NewsMessage> > m_news;

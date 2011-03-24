@@ -129,7 +129,7 @@ void LabelWidget::setText(const wchar_t *text)
     // The c_str is important, otherwise it will call
     // LabelWidget::setText(wstring), which will turn
     // this function again.
-    Widget::setText((spaces+text+spaces).c_str());
+    Widget::setText((spaces+text).c_str());
 
 }   // setText
 

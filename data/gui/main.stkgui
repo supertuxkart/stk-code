@@ -38,8 +38,8 @@
             
             <label proportion="3" height="100%" id="info_addons"
                    I18N="In the main screen"
-                   text="Loading news from stkaddons..."
-                   align="center" text_align="center" />
+                   text=""
+                   align="center" text_align="left" />
                
             <placeholder id="empty_for_now" proportion="1">
             </placeholder>

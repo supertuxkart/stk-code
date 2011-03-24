@@ -312,10 +312,16 @@ const core::stringw NetworkHttp::getNextNewsMessage()
     if(m_news.getData().size()==0)
         return "";
 
-    m_current_news_message++;
     core::stringw m("");
     m_news.lock();
     {
+        if(m_current_news_message>-1)
+        {
+            // Now we have a message that was finished being
+            // displayed --> increase display count.
+            m_news.getData()[m_current_news_message].increaseDisplayCount();
+        }
+        m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
             m_current_news_message = 0;            
 
