@@ -56,19 +56,19 @@ namespace GUIEngine
 
         virtual void setText(const wchar_t *text);
         virtual void update(float dt);
+        
         // --------------------------------------------------------------------
         /** Overloaded function which takes a stringw. */
         virtual void setText(const irr::core::stringw &s) 
         {
             setText(s.c_str()); 
         }
+        
         // --------------------------------------------------------------------
+        
         /** Sets horizontal scroll speed. */
-        void    setScrollSpeed(float speed)
-        {
-            m_scroll_offset = 0;
-            m_scroll_speed  = speed;
-        }   // setScrollSpeed
+        void    setScrollSpeed(float speed);
+        
         // --------------------------------------------------------------------
         bool scrolledOff() const;
 

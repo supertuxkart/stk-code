@@ -60,10 +60,18 @@ void LabelWidget::add()
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
     
-    IGUIStaticText* irrwidget;    
-    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
-                                                      false, word_wrap, m_parent, -1);
-    
+    IGUIStaticText* irrwidget;
+    if (m_scroll_offset)
+    {
+        IGUIElement* container = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, -1);
+        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), core::rect<s32>( core::position2di(0,0), widget_size.getSize()),
+                                                          false, word_wrap, /*m_parent*/ container, -1);
+    }
+    else
+    {
+        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
+                                                          false, word_wrap, m_parent, -1);
+    }
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
 #endif
@@ -89,7 +97,18 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
     
-    m_element->setNotClipped(true);
+    if (!m_scroll_offset)
+    {
+        m_element->setNotClipped(true);
+    }
+    
+    if (m_scroll_speed > 0)
+    {
+        IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
+                                      : GUIEngine::getFont();
+        core::dimension2du r = font->getDimension(getText().c_str());
+        m_scroll_offset = r.Width;
+    }
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -106,31 +125,13 @@ void LabelWidget::add()
 void LabelWidget::setText(const wchar_t *text)
 {
     m_scroll_offset = 0;
-    if(m_scroll_speed<=0)
+    
+    if (m_scroll_speed > 0)
     {
-        Widget::setText(text);
-        return;
+        m_scroll_offset = m_element->getAbsolutePosition().getWidth();
     }
-
-    // Now the widget is scrolling. So add enough spaces
-    // to the left and right of the string so that it scrolls
-    // in.
-    IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
-                                  : GUIEngine::getFont();
-    core::dimension2du r = font->getDimension(stringw(" ").c_str());
-    unsigned int n = m_w / r.Width+1;
-
-    stringw spaces="";
-    spaces.reserve(n+1);  // include end 0
-    for(unsigned int i=0; i<n; i++)
-    {
-        spaces.append(' ');
-    }
-    // The c_str is important, otherwise it will call
-    // LabelWidget::setText(wstring), which will turn
-    // this function again.
-    Widget::setText((spaces+text).c_str());
-
+    
+    Widget::setText(text);
 }   // setText
 
 // ----------------------------------------------------------------------------
@@ -139,15 +140,13 @@ void LabelWidget::setText(const wchar_t *text)
  */
 void LabelWidget::update(float dt)
 {
-    m_scroll_offset += dt*m_scroll_speed;
-    while(m_scroll_offset>1)
+    if (m_scroll_speed != 0)
     {
-        const core::stringw &w= getText();
-        // The c_str is important, otherwise it will call
-        // LabelWidget::setText(wstring), which would add
-        // more spaces again.
-        Widget::setText(w.subString(1, w.size()-1).c_str());
-        m_scroll_offset --;
+        m_scroll_offset -= dt*m_scroll_speed*5.0f;
+        
+        //printf("m_scroll_offset = %f; x = %f\n", m_scroll_offset, m_x + m_scroll_offset);
+        
+        m_element->setRelativePosition( core::position2di( /*m_x +*/ m_scroll_offset, /*m_y*/ 0 ) );
     }
 }   // update
 // ----------------------------------------------------------------------------
@@ -156,5 +155,14 @@ void LabelWidget::update(float dt)
  */
 bool LabelWidget::scrolledOff() const
 {
-    return getText().size()==0;
+    return m_scroll_offset <= -m_element->getAbsolutePosition().getWidth();
 }
+
+// ----------------------------------------------------------------------------
+/** Sets horizontal scroll speed. */
+void LabelWidget::setScrollSpeed(float speed)
+{
+    m_scroll_offset = -m_element->getAbsolutePosition().getWidth() - 10; // start scrolled off
+    m_scroll_speed  = speed;
+}   // setScrollSpeed
+
