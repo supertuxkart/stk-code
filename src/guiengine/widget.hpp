@@ -401,7 +401,7 @@ namespace GUIEngine
           *  \note This mehtod uses the virtual setText(wchar_t*) function, so only the latter
           *  needs to be overwritten by other classes.
           */
-        void setText(const irr::core::stringw &s) { setText(s.c_str()); }
+        virtual void setText(const irr::core::stringw &s) { setText(s.c_str()); }
 
         /** Returns the text of a widget. */
         const irr::core::stringw &getText() const {return m_text; }

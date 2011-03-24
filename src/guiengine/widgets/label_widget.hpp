@@ -35,6 +35,10 @@ namespace GUIEngine
         bool               m_has_color;
         irr::video::SColor m_color;
 
+        /** Scroll speed in characters/seconds (0 if no scrolling). */
+        float              m_scroll_speed;
+        /** Current scroll offset. */
+        float              m_scroll_offset;
     public:
                  LabelWidget(bool title=false, bool bright=false);
         virtual ~LabelWidget() {}
@@ -49,6 +53,25 @@ namespace GUIEngine
             m_has_color = true;
         }   // setColor
         
+
+        virtual void setText(const wchar_t *text);
+        virtual void update(float dt);
+        // --------------------------------------------------------------------
+        /** Overloaded function which takes a stringw. */
+        virtual void setText(const irr::core::stringw &s) 
+        {
+            setText(s.c_str()); 
+        }
+        // --------------------------------------------------------------------
+        /** Sets horizontal scroll speed. */
+        void    setScrollSpeed(float speed)
+        {
+            m_scroll_offset = 0;
+            m_scroll_speed  = speed;
+        }   // setScrollSpeed
+        // --------------------------------------------------------------------
+        bool scrolledOff() const;
+
     };
 }
 

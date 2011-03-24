@@ -35,8 +35,9 @@ using namespace irr;
  */
 LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
 {
-    m_title_font = title;
-    m_has_color  = false;
+    m_title_font   = title;
+    m_has_color    = false;
+    m_scroll_speed = 0;
     
     if (bright)
     {
@@ -92,3 +93,68 @@ void LabelWidget::add()
 }   // add
 
 // ----------------------------------------------------------------------------
+/** Sets the text. This is the function used by overloaded functions
+ *  as well. It takes esp. care of horizontal scrolling by adding
+ *  spaces to the left and right of the string, so that it appears
+ *  that the text is appearing from the left and going to the right.
+ *  Then a character is removed on the left, resulting in the text
+ *  appearing to scroll from the left. 
+ *  It is important that the scrolling speed (if any) is set before
+ *  calling this function!
+ *  \param text The string to use as text for this widget.
+ */
+void LabelWidget::setText(const wchar_t *text)
+{
+    m_scroll_offset = 0;
+    if(m_scroll_speed<=0)
+    {
+        Widget::setText(text);
+        return;
+    }
+
+    // Now the widget is scrolling. So add enough spaces
+    // to the left and right of the string so that it scrolls
+    // in.
+    IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
+                                  : GUIEngine::getFont();
+    core::dimension2du r = font->getDimension(stringw(" ").c_str());
+    unsigned int n = m_w / r.Width+1;
+
+    stringw spaces="";
+    spaces.reserve(n+1);  // include end 0
+    for(unsigned int i=0; i<n; i++)
+    {
+        spaces.append(' ');
+    }
+    // The c_str is important, otherwise it will call
+    // LabelWidget::setText(wstring), which will turn
+    // this function again.
+    Widget::setText((spaces+text+spaces).c_str());
+
+}   // setText
+
+// ----------------------------------------------------------------------------
+/** Needs to be called to update scrolling.
+ *  \param dt Time step size.
+ */
+void LabelWidget::update(float dt)
+{
+    m_scroll_offset += dt*m_scroll_speed;
+    while(m_scroll_offset>1)
+    {
+        const core::stringw &w= getText();
+        // The c_str is important, otherwise it will call
+        // LabelWidget::setText(wstring), which would add
+        // more spaces again.
+        Widget::setText(w.subString(1, w.size()-1).c_str());
+        m_scroll_offset --;
+    }
+}   // update
+// ----------------------------------------------------------------------------
+/** Returns true if the text has completely scrolled off. This is detected
+ *  by checking if the remaining text is empty.
+ */
+bool LabelWidget::scrolledOff() const
+{
+    return getText().size()==0;
+}
