@@ -60,8 +60,10 @@ NetworkHttp *network_http;
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : m_news(""), m_progress(-1.0f), m_abort(false)
+NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()), 
+                             m_progress(-1.0f), m_abort(false)
 {
+    m_current_news_message = -1;
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
 
@@ -110,7 +112,7 @@ void *NetworkHttp::mainLoop(void *obj)
         if(download)
             UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
-        me->checkNewServer(xml);
+        me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
         me->loadAddonsList(xml, xml_file);
         addons_manager->initOnline(xml);
@@ -194,8 +196,9 @@ NetworkHttp::~NetworkHttp()
 // ---------------------------------------------------------------------------
 /** Checks if a redirect is received, causing a new server to be used for
  *  downloading addons.
+ *  \param xml XML data structure containing the redirect information.
  */
-void NetworkHttp::checkNewServer(const XMLNode *xml)
+void NetworkHttp::checkRedirect(const XMLNode *xml)
 {
     std::string new_server;
     int result = xml->get("redirect", &new_server);
@@ -210,7 +213,7 @@ void NetworkHttp::checkNewServer(const XMLNode *xml)
         }
         UserConfigParams::m_server_addons = new_server;
     }
-}   // checkNewServer
+}   // checkRedirect
 
 // ----------------------------------------------------------------------------
 /** Updates the 'news' string to be displayed in the main menu.
@@ -233,7 +236,15 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         if(node->getName()!="message") continue;
         std::string news;
         node->get("content", &news);
-        m_news.set(news);
+
+        m_news.lock();
+        {
+            NewsMessage n(core::stringw(news.c_str()),
+                          m_news.getData().size());
+            m_news.getData().push_back(n);
+        }
+        m_news.unlock();
+
         error = false;
     }
     if(error)
@@ -244,7 +255,10 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         // a new read on the next start, instead of waiting
         // for some time).
         file_manager->removeFile(filename);
-        m_news.set("Can't access stkaddons server...");
+        NewsMessage n("Can't access stkaddons server...", -1);
+        m_news.lock();
+        m_news.getData().push_back(n);
+        m_news.unlock();
     }
     
 }   // updateNews
@@ -273,7 +287,10 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
     if(addon_list_url.size()==0)
     {
         file_manager->removeFile(filename);
-        m_news.set("Can't access stkaddons server...");
+        NewsMessage n("Can't access stkaddons server...", -1);
+        m_news.lock();
+        m_news.getData().push_back(n);
+        m_news.unlock();
         return;
     }
 
@@ -285,13 +302,28 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
 }   // loadAddonsList
 
 // ----------------------------------------------------------------------------
-/** Returns the last loaded news message (using mutex to make sure a valid
- *  value is available).
+/** Returns the next loaded news message. It will 'wrap around', i.e.
+ *  if there is only one message it will be returned over and over again.
+ *  To be used by the the main menu to get the next news message after
+ *  one message was scrolled off screen.
  */
-const std::string NetworkHttp::getNewsMessage() const
+const core::stringw NetworkHttp::getNextNewsMessage()
 {
-    return m_news.get();
-}   // getNewsMessage
+    if(m_news.getData().size()==0)
+        return "";
+
+    m_current_news_message++;
+    core::stringw m("");
+    m_news.lock();
+    {
+        if(m_current_news_message >= (int)m_news.getData().size())
+            m_current_news_message = 0;            
+
+        m = m_news.getData()[m_current_news_message].getNews();
+    }
+    m_news.unlock();
+    return m;
+}   // getNextNewsMessage
 
 // ----------------------------------------------------------------------------
 

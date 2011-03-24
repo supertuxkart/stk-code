@@ -102,6 +102,8 @@ void MainMenuScreen::init()
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
     }
+    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    w->setScrollSpeed(15);
 #endif
 
 }
@@ -120,8 +122,12 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     }
 
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-    const std::string &news_text = network_http->getNewsMessage();
-    w->setText(news_text.c_str());
+    w->update(delta);
+    if(w->scrolledOff())
+    {
+        const core::stringw &news_text = network_http->getNextNewsMessage();
+        w->setText(news_text);
+    }
     
 #endif
     

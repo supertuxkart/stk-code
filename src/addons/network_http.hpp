@@ -22,8 +22,13 @@
 
 #include <pthread.h>
 #include <string>
+#include <vector>
+
+#include "irrlicht.h"
+using namespace irr;
 
 #include "utils/synchronised.hpp"
+
 
 class XMLNode;
 
@@ -43,14 +48,39 @@ public:
                        HC_DOWNLOAD_FILE,
                        HC_NEWS    } ;
 private:
+    // A wrapper class to store news message together with
+    // a message id and a display count.
+    class NewsMessage
+    {
+        // The actual news message
+        core::stringw m_news;
+        // A message id used to store some information in the
+        // user config file.
+        int           m_message_id;
+        // Counts how often a message has been displayed.
+        int           m_display_count;
+    public:
+        NewsMessage(const core::stringw &m, int id)
+        {
+            m_news          = m;
+            m_message_id    = id;
+            m_display_count = 0;
+        }   // NewsMessage
+        const core::stringw& getNews() const {return m_news;}
+    };   // NewsMessage
 
-    Synchronised<std::string> m_news;
+    mutable Synchronised< std::vector<NewsMessage> > m_news;
+
+    /** Index of the current news message that is being displayed. */
+    int             m_current_news_message;
 
     /** Which command to execute next. Access to this variable is guarded
      *  by m_mutex_command and m_cond_command. */
     HttpCommands    m_command;
+
     /** A mutex for accessing m_commands. */
     pthread_mutex_t m_mutex_command;
+
     /** A conditional variable to wake up the main loop. */
     pthread_cond_t  m_cond_command;
 
@@ -71,7 +101,7 @@ private:
     pthread_t     m_thread_id;
 
     static void  *mainLoop(void *obj);
-    void          checkNewServer(const XMLNode *xml);
+    void          checkRedirect(const XMLNode *xml);
 
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
@@ -94,8 +124,8 @@ public:
     bool          downloadFileSynchron(const std::string &file, 
                                        const std::string &save = "");
 
-    const std::string 
-                  getNewsMessage() const;
+    const core::stringw
+                  getNextNewsMessage();
     float         getProgress() const;
     void          cancelDownload();
 };   // NetworkHttp
