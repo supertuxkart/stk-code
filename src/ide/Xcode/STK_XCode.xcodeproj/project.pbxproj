@@ -1246,6 +1246,11 @@
 		95C77D65106958A50080838E /* check_line.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_line.cpp; path = ../../tracks/check_line.cpp; sourceTree = SOURCE_ROOT; };
 		95C77D6D106958E10080838E /* check_sphere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_sphere.cpp; path = ../../tracks/check_sphere.cpp; sourceTree = SOURCE_ROOT; };
 		95C77D6E106958E10080838E /* check_sphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_sphere.hpp; path = ../../tracks/check_sphere.hpp; sourceTree = SOURCE_ROOT; };
+		95C87F2D133A34E400D86528 /* time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = time.hpp; path = ../../utils/time.hpp; sourceTree = SOURCE_ROOT; };
+		95C87F2F133A34EE00D86528 /* checked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = checked.h; path = ../../utils/utf8/checked.h; sourceTree = SOURCE_ROOT; };
+		95C87F30133A34EE00D86528 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core.h; path = ../../utils/utf8/core.h; sourceTree = SOURCE_ROOT; };
+		95C87F31133A34EE00D86528 /* unchecked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unchecked.h; path = ../../utils/utf8/unchecked.h; sourceTree = SOURCE_ROOT; };
+		95C87F32133A34EE00D86528 /* utf8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utf8.h; path = ../../utils/utf8.h; sourceTree = SOURCE_ROOT; };
 		95C9C97010E93456005A418D /* stars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stars.cpp; path = ../../graphics/stars.cpp; sourceTree = SOURCE_ROOT; };
 		95C9C97110E93456005A418D /* stars.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stars.hpp; path = ../../graphics/stars.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
@@ -2586,8 +2591,11 @@
 				95C2B1E30F296546000D3E5D /* random_generator.hpp */,
 				95C2B1E60F296546000D3E5D /* string_utils.cpp */,
 				95C2B1E70F296546000D3E5D /* string_utils.hpp */,
+				95C87F2D133A34E400D86528 /* time.hpp */,
 				953EAAB50F30A4650000D57D /* translation.cpp */,
 				953EAAB40F30A4650000D57D /* translation.hpp */,
+				95C87F2E133A34EE00D86528 /* utf8 */,
+				95C87F32133A34EE00D86528 /* utf8.h */,
 				95C2B1E80F296546000D3E5D /* vec3.cpp */,
 				95C2B1E90F296546000D3E5D /* vec3.hpp */,
 			);
@@ -2607,6 +2615,17 @@
 			);
 			name = io;
 			path = ../../io;
+			sourceTree = SOURCE_ROOT;
+		};
+		95C87F2E133A34EE00D86528 /* utf8 */ = {
+			isa = PBXGroup;
+			children = (
+				95C87F2F133A34EE00D86528 /* checked.h */,
+				95C87F30133A34EE00D86528 /* core.h */,
+				95C87F31133A34EE00D86528 /* unchecked.h */,
+			);
+			name = utf8;
+			path = ../../utils/utf8;
 			sourceTree = SOURCE_ROOT;
 		};
 		95D950CC0FE473CA002E10AD /* config */ = {
