@@ -71,11 +71,12 @@ void LabelWidget::add()
     {
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                           false, word_wrap, m_parent, -1);
+#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
+        irrwidget->setTextRestrainedInside(false);
+#endif
     }
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
-    
-    irrwidget->setTextRestrainedInside(false);
 #endif
     
     m_element = irrwidget;
