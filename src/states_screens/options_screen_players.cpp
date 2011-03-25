@@ -85,7 +85,11 @@ void OptionsScreenPlayers::init()
 
 bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
 {
+    // FIXME: Using a truncated ASCII string for internal ID. Let's cross our fingers
+    //        and hope no one enters two player names that, when stripped down to ASCII,
+    //        give the same identifier...
     stringc newNameC( newName );
+    
     ListWidget* players = this->getWidget<ListWidget>("players");
     if (players == NULL) return false;
     
@@ -102,20 +106,18 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         // add new player
         UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
         
-        players->addItem( newNameC.c_str(), newNameC.c_str() );
+        players->addItem( newNameC.c_str(), newName );
     }
     else // ---- Rename existing player
     {
-        player->setName( newNameC.c_str() );
+        player->setName( newName );
         
         // refresh list display
         players->clear();
         const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            // FIXME: encoding issues
-            players->addItem(core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
-                             UserConfigParams::m_all_players[n].getName());
+            players->addItem(newNameC.c_str(), UserConfigParams::m_all_players[n].getName());
         }
         
     }
