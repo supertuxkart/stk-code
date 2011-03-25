@@ -142,6 +142,8 @@ private:
      *  is <0 the kart specific value will be used. */
     float            m_zipper_fade_out_time;
 
+    std::string      m_mask;
+    
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
     void  initCustomSFX(const XMLNode *sfx);

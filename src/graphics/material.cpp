@@ -89,6 +89,8 @@ Material::Material(const XMLNode *node, int index)
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
 
+    node->get("mask",             &m_mask);
+    
     if (node->get("normal-map",  &m_normal_map_tex))
     {
         m_normal_map = true;
@@ -158,7 +160,6 @@ Material::Material(const XMLNode *node, int index)
         
         if (child_node->getName() == "sfx")
         {
-          
             initCustomSFX(child_node);
         }
         else if (child_node->getName() == "particles")
@@ -392,6 +393,12 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
 void  Material::setMaterialProperties(video::SMaterial *m) const
 {
     int modes = 0;
+    
+    if (m_mask.size() > 0)
+    {
+        video::ITexture* newtex = irr_driver->applyMask(m->getTexture(0), m_mask);
+        if (newtex) m->setTexture(0, newtex);
+    }
     
     if (m_alpha_testing)
     {

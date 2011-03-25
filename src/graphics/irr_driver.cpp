@@ -864,6 +864,43 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 }   // getTexture
 
 // ----------------------------------------------------------------------------
+
+ITexture* IrrDriver::applyMask(video::ITexture* texture, const std::string& mask_path)
+{
+    video::IImage* img = 
+        m_scene_manager->getVideoDriver()->createImage(texture, core::position2d<s32>(0,0), texture->getSize());
+
+    video::IImage* mask = 
+        m_scene_manager->getVideoDriver()->createImageFromFile(mask_path.c_str());
+    
+    if (img == NULL || mask == NULL) return NULL;
+    
+    if (img->lock() && mask->lock())
+    {
+        core::dimension2d<u32> dim = img->getDimension();
+        for (unsigned int x = 0; x < dim.Width; x++)
+        {
+            for (unsigned int y = 0; y < dim.Height; y++)
+            {
+                video::SColor col = img->getPixel(x, y);
+                video::SColor alpha = mask->getPixel(x, y);
+                col.setAlpha( alpha.getRed() );
+                img->setPixel(x, y, col, false);
+            }   // for y
+        }   // for x
+        
+        mask->unlock();
+        img->unlock();
+    }
+    else
+    {
+        return NULL;
+    }
+    
+    return m_scene_manager->getVideoDriver()->addTexture(texture->getName().getPath().c_str(), img, NULL);  
+}
+
+// ----------------------------------------------------------------------------
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
  */
