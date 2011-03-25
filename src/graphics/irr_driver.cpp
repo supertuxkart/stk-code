@@ -1047,7 +1047,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
         case irr::EET_LOG_TEXT_EVENT:
         {
             // Ignore 'normal' messages
-            if (event.LogEvent.Level>0)
+            if (event.LogEvent.Level > 1)
             {
                 printf("[IrrDriver Temp Logger] Level %d: %s\n",
                        event.LogEvent.Level,event.LogEvent.Text);
