@@ -70,6 +70,10 @@ private:
         const core::stringw& getNews() const {return m_news;}
         /** Increases how often this message was being displayed. */
         void increaseDisplayCount() {m_display_count++;}
+        /** Returns the news id. */
+        int  getMessageId() const {return m_message_id;}
+        /** Returns the display count. */
+        int getDisplayCount() const {return m_display_count; }
     };   // NewsMessage
 
     mutable Synchronised< std::vector<NewsMessage> > m_news;
@@ -108,6 +112,7 @@ private:
 
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
+    void          updateUserConfigFile() const;
     void          loadAddonsList(const XMLNode *xml,
                                  const std::string &filename);
     std::string   downloadToStrInternal(std::string url);

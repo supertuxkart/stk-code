@@ -107,7 +107,7 @@ void LabelWidget::add()
         IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
                                       : GUIEngine::getFont();
         core::dimension2du r = font->getDimension(getText().c_str());
-        m_scroll_offset = r.Width;
+        m_scroll_offset = (float)r.Width;
     }
 }   // add
 
@@ -128,7 +128,7 @@ void LabelWidget::setText(const wchar_t *text)
     
     if (m_scroll_speed > 0)
     {
-        m_scroll_offset = m_element->getAbsolutePosition().getWidth();
+        m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
     }
     
     Widget::setText(text);
@@ -142,11 +142,9 @@ void LabelWidget::update(float dt)
 {
     if (m_scroll_speed != 0)
     {
-        m_scroll_offset -= dt*m_scroll_speed*5.0f;
-        
-        //printf("m_scroll_offset = %f; x = %f\n", m_scroll_offset, m_x + m_scroll_offset);
-        
-        m_element->setRelativePosition( core::position2di( /*m_x +*/ m_scroll_offset, /*m_y*/ 0 ) );
+        m_scroll_offset -= dt*m_scroll_speed*5.0f;        
+        m_element->setRelativePosition( core::position2di( /*m_x +*/ (int)m_scroll_offset, 
+                                                           /*m_y*/ 0 ) );
     }
 }   // update
 // ----------------------------------------------------------------------------
@@ -162,7 +160,8 @@ bool LabelWidget::scrolledOff() const
 /** Sets horizontal scroll speed. */
 void LabelWidget::setScrollSpeed(float speed)
 {
-    m_scroll_offset = -m_element->getAbsolutePosition().getWidth() - 10; // start scrolled off
+    // start scrolled off
+    m_scroll_offset = (float)(-m_element->getAbsolutePosition().getWidth()-10);
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 

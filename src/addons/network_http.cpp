@@ -320,6 +320,7 @@ const core::stringw NetworkHttp::getNextNewsMessage()
             // Now we have a message that was finished being
             // displayed --> increase display count.
             m_news.getData()[m_current_news_message].increaseDisplayCount();
+            updateUserConfigFile();
         }
         m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
@@ -331,6 +332,23 @@ const core::stringw NetworkHttp::getNextNewsMessage()
     return m;
 }   // getNextNewsMessage
 
+// ----------------------------------------------------------------------------
+/** Saves the information about which message was being displayed how often
+ *  to the user config file.
+ *  Note that this function assumes that m_news is already locked!
+ */
+void NetworkHttp::updateUserConfigFile() const
+{
+    std::ostringstream o;
+    for(unsigned int i=0; i<m_news.getData().size(); i++)
+    {
+        const NewsMessage &n=m_news.getData()[i];
+        o << n.getMessageId()    << ":"
+          << n.getDisplayCount() << " ";
+    }
+
+    UserConfigParams::m_display_count = o.str();
+}   // updateUserConfigFile
 // ----------------------------------------------------------------------------
 
 size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, 

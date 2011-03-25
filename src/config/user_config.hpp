@@ -432,6 +432,11 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "How often news should be updated.") );
 
+    PARAM_PREFIX StringUserConfigParam      m_display_count
+            PARAM_DEFAULT(  StringUserConfigParam("", "news_display_count", 
+                                               &m_addon_group,
+                                               "How often all news messages have been displayed") );
+
     PARAM_PREFIX TimeUserConfigParam         m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
                                                 &m_addon_group,
