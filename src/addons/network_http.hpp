@@ -74,12 +74,18 @@ private:
         int  getMessageId() const {return m_message_id;}
         /** Returns the display count. */
         int getDisplayCount() const {return m_display_count; }
+        /** Sets the display count for this message. */
+        void setDisplayCount(int n) {m_display_count = n; }
     };   // NewsMessage
 
     mutable Synchronised< std::vector<NewsMessage> > m_news;
 
     /** Index of the current news message that is being displayed. */
     int             m_current_news_message;
+
+    /** Stores the news message display count from the user config file. 
+    */
+    std::vector<int> m_saved_display_count;
 
     /** Which command to execute next. Access to this variable is guarded
      *  by m_mutex_command and m_cond_command. */
@@ -116,6 +122,7 @@ private:
     void          loadAddonsList(const XMLNode *xml,
                                  const std::string &filename);
     std::string   downloadToStrInternal(std::string url);
+    void          updateMessageDisplayCount();
     bool          downloadFileInternal(const std::string &file,
                                        const std::string &save_filename,
                                        bool is_asynchron);

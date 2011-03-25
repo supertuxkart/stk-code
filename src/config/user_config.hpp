@@ -412,7 +412,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );
             
     // ---- Addon server related entries
-    PARAM_PREFIX GroupUserConfigParam        m_addon_group
+    PARAM_PREFIX GroupUserConfigParam       m_addon_group
         PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews", 
                                             "Addon and news related settings") );
 
@@ -422,7 +422,7 @@ namespace UserConfigParams
                                                   &m_addon_group,
                                                   "The server used for addon.") );
 
-    PARAM_PREFIX TimeUserConfigParam         m_news_last_updated
+    PARAM_PREFIX TimeUserConfigParam        m_news_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
                                                 &m_addon_group,
                                                 "Time news was updated last.") );
@@ -437,22 +437,31 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "How often all news messages have been displayed") );
 
-    PARAM_PREFIX TimeUserConfigParam         m_addons_last_updated
+    PARAM_PREFIX IntUserConfigParam         m_ignore_message_id
+            PARAM_DEFAULT(  IntUserConfigParam(-1, "ignore_message_id", 
+                                               &m_addon_group,
+                                               "Ignore all messages with this id and lower") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_enable_internet
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "enable_internet",
+                                               &m_addon_group,
+                                               "Enable news and addons server") );
+
+    PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
                                                 &m_addon_group,
                                                 "Time addon-list was updated last.") );
 
-
-    PARAM_PREFIX StringUserConfigParam     m_language
+    PARAM_PREFIX StringUserConfigParam      m_language
             PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );
     
-    PARAM_PREFIX BoolUserConfigParam       m_artist_debug_mode
+    PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode", "Whether to enable track debugging features") );
     
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
-    PARAM_PREFIX PtrVector<PlayerProfile>  m_all_players;
+    PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
 
 }
 #undef PARAM_PREFIX

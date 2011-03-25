@@ -36,6 +36,10 @@
        Penalty: Penalty time if a kart accelerates before GO. -->
   <startup penalty="1" />
 
+  <!-- How often a news message is going to be displayed before
+       it will be ignored. -->
+  <news max-display="10"/>
+
   <!-- If the normals (for wheel raycasts) should be smoothened -->
   <physics smooth-normals="false"/>
 

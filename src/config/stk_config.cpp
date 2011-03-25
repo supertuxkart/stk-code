@@ -127,6 +127,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
+    CHECK_NEG(m_max_display_news,          "max-display-news"           );
 
     m_kart_properties.checkAllSet(filename);
 }   // load
@@ -156,6 +157,7 @@ void STKConfig::init_defaults()
     m_max_kart_version         = -100;
     m_min_track_version        = -100;
     m_max_track_version        = -100;
+    m_max_display_news         = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
     m_smooth_normals           = false;
@@ -231,6 +233,11 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
         startup_node->get("penalty", &m_penalty_time );
+    }
+
+    if (const XMLNode *news_node= root->getNode("news"))
+    {
+        news_node->get("max-display", &m_max_display_news);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

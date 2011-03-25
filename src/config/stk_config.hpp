@@ -95,6 +95,8 @@ public:
           m_max_kart_version;        /**<version supported by this binary.   */
     int   m_min_track_version,       /**<The minimum and maximum .track file */
           m_max_track_version;       /**<version supported by this binary.   */
+    int   m_max_display_news;        /**<How often a news message is displayed
+                                         before it is ignored. */
     bool  m_enable_networking;
 
     std::vector<float>

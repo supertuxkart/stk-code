@@ -236,12 +236,20 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         if(node->getName()!="message") continue;
         std::string news;
         node->get("content", &news);
+        int id=-1;
+        node->get("id", &id);
 
         m_news.lock();
         {
-            NewsMessage n(core::stringw(news.c_str()),
-                          m_news.getData().size());
-            m_news.getData().push_back(n);
+            // While the xml file does not have an id:
+            if(id==-1)
+                id = m_news.getData().size();
+            // Only add the news if it's not supposed to be ignored.
+            if(id>UserConfigParams::m_ignore_message_id)
+            {
+                NewsMessage n(core::stringw(news.c_str()), id);
+                m_news.getData().push_back(n);
+            }
         }
         m_news.unlock();
 
@@ -260,6 +268,8 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         m_news.getData().push_back(n);
         m_news.unlock();
     }
+    else
+        updateMessageDisplayCount();
     
 }   // updateNews
 
@@ -315,12 +325,31 @@ const core::stringw NetworkHttp::getNextNewsMessage()
     core::stringw m("");
     m_news.lock();
     {
+        // Check if we have a message that was finished being
+        // displayed --> increase display count.
         if(m_current_news_message>-1)
         {
-            // Now we have a message that was finished being
-            // displayed --> increase display count.
-            m_news.getData()[m_current_news_message].increaseDisplayCount();
+            NewsMessage &n = m_news.getData()[m_current_news_message];
+            n.increaseDisplayCount();
+
+            // If the message is being displayed often enough,
+            // ignore it from now on.
+            if(n.getDisplayCount()>stk_config->m_max_display_news)
+            {
+                // Messages have sequential numbers, so we only store
+                // the latest message id (which is the current one)
+                UserConfigParams::m_ignore_message_id = n.getMessageId();
+                m_news.getData().erase(m_news.getData().begin()
+                                       +m_current_news_message  );
+
+            }
             updateUserConfigFile();
+            // 
+            if(m_news.getData().size()==0)
+            {
+                m_news.unlock();
+                return "";
+            }
         }
         m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
@@ -334,7 +363,9 @@ const core::stringw NetworkHttp::getNextNewsMessage()
 
 // ----------------------------------------------------------------------------
 /** Saves the information about which message was being displayed how often
- *  to the user config file.
+ *  to the user config file. It dnoes not actually save the user config
+ *  file, this is left to the main program (user config is saved at
+ *  the exit of the program).
  *  Note that this function assumes that m_news is already locked!
  */
 void NetworkHttp::updateUserConfigFile() const
@@ -346,9 +377,38 @@ void NetworkHttp::updateUserConfigFile() const
         o << n.getMessageId()    << ":"
           << n.getDisplayCount() << " ";
     }
-
     UserConfigParams::m_display_count = o.str();
 }   // updateUserConfigFile
+
+// ----------------------------------------------------------------------------
+/** Reads the information about which message was dislpayed how often from
+ *  the user config file.
+ */
+void NetworkHttp::updateMessageDisplayCount()
+{
+    m_news.lock();
+    std::vector<std::string> pairs = 
+        StringUtils::split(UserConfigParams::m_display_count,' ');
+    for(unsigned int i=0; i<pairs.size(); i++)
+    {
+        std::vector<std::string> v = StringUtils::split(pairs[i], ':');
+        int id, count;
+        StringUtils::fromString(v[0], id);
+        StringUtils::fromString(v[1], count);
+        // Search all downloaded messages for this id. 
+        for(unsigned int j=0; j<m_news.getData().size(); j++)
+        {
+            if(m_news.getData()[j].getMessageId()!=id)
+                continue;
+            m_news.getData()[j].setDisplayCount(count);
+            if(count>stk_config->m_max_display_news)
+                m_news.getData().erase(m_news.getData().begin()+j);
+            break;
+        }   // for j <m_news.getData().size()
+    }
+    m_news.unlock();
+}   // updateMessageDisplayCount
+
 // ----------------------------------------------------------------------------
 
 size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, 
