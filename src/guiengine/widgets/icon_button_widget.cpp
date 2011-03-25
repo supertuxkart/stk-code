@@ -20,6 +20,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 using namespace irr::video;
@@ -135,6 +136,11 @@ void IconButtonWidget::add()
         {
             m_label->setOverrideFont( GUIEngine::getSmallFont() );
         }
+        
+#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
+        m_label->setRightToLeft( translations->isRTLLanguage() );
+        m_label->setTextRestrainedInside(false);
+#endif
     }
     
     // ---- IDs

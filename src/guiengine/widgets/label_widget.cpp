@@ -74,6 +74,8 @@ void LabelWidget::add()
     }
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
+    
+    irrwidget->setTextRestrainedInside(false);
 #endif
     
     m_element = irrwidget;
