@@ -88,7 +88,8 @@ void EmergencyAnimation::eliminate()
         World::getWorld()->getPhysics()->removeKart(m_kart);
     }
     m_eliminated = true;
-
+    m_kart_mode = EA_NONE;
+    
     m_kart->getNode()->setVisible(false);
 }   // eliminate
 

@@ -719,6 +719,12 @@ bool Kart::isNearGround() const
  */
 void Kart::update(float dt)
 {
+    if (m_eliminated)
+    {
+        getNode()->setVisible(false);
+        return;
+    }
+    
     // Update the position and other data taken from the physics    
     Moveable::update(dt);
 
