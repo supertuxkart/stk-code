@@ -153,7 +153,7 @@ void Rain::update(float dt)
         }
         
         RandomGenerator g;
-        m_next_lightning = (float)g.get(35);
+        m_next_lightning = 35 + (float)g.get(35);
     }
     
 }   // update
