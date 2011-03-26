@@ -105,7 +105,7 @@ public:
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     
-    video::ITexture* IrrDriver::applyMask(video::ITexture* texture, const std::string& mask_path);
+    video::ITexture      *applyMask(video::ITexture* texture, const std::string& mask_path);
     
     void                  displayFPS();
     /** this is not really used to process events, it's only used to shut down irrLicht's
