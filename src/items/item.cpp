@@ -21,6 +21,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -204,6 +205,11 @@ void Item::collected(const Kart *kart, float t)
         // be automatically set to false again.
         m_time_till_return = t;
         m_node->setVisible(false);
+    }
+    
+    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    {
+        m_time_till_return *= 3;
     }
 }   // isCollected
 

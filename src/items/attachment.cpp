@@ -26,6 +26,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
@@ -113,6 +114,13 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     
     bool add_a_new_item = true;
     
+    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    {
+        World::getWorld()->kartHit(m_kart->getWorldKartId());
+        m_kart->handleExplosion(Vec3(0.0f, 1.0f, 0.0f), true);
+        return;
+    }
+    
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:
@@ -150,7 +158,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
     }   // switch
-
+    
     // Save the information about the attachment in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
