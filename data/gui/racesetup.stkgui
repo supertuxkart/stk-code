@@ -1,8 +1,10 @@
 <stkgui>
 
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
 <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
-    <header width="100%" text="Race Setup" align="center" text_align="center" />
+    <header width="80%" text="Race Setup" align="center" text_align="center" />
     
     <spacer proportion="1" width="25"/>
     
@@ -33,9 +35,7 @@
 
     <scrollable_toolbar id="gamemode" height="135" width="85%" label_location="bottom" align="center"
                         child_width="135" child_height="135" />
-
-    
-    <spacer proportion="2" width="25"/>
+    <spacer proportion="1" width="25" />
 </div>
 
 </stkgui>

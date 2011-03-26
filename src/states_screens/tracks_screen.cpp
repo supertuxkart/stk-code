@@ -179,7 +179,11 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         buildTrackList();
     }
-    
+    else if (name == "back")
+    {
+printf("back in tracks_screen\n");      
+        StateManager::get()->escapePressed();
+    }
 }
 
 // -----------------------------------------------------------------------------------------------

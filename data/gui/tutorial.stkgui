@@ -13,7 +13,9 @@
 
     </div>
         
-    <button id="back" x="20" y="-40" height="35" align="left" text="Back to main menu"/>
+    <icon-button id="back" x="20" y="-40" height="64" width="128" align="left" icon="gui/screenback.png"
+            I18N="In the options menu, to go back to the main menu or game" text="Back to menu"/>
     <button id="play" x="-200" y="-40" height="35" align="right" text="Play all"/>
+
 
 </stkgui>

@@ -157,6 +157,10 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         buildTrackList();
     }
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
     
 }   // eventCallback
 

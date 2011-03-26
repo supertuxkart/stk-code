@@ -1,9 +1,13 @@
 <stkgui>
 
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
 <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
 
-    <header width="100%" I18N="Section in arena tracks selection screen" text="Arenas"
+    <header width="80%" I18N="Section in arena tracks selection screen" text="Arenas"
             align="center" text_align="center" />
+    
+    <spacer width="20" height="5" />
     
     <box proportion="1" width="100%" layout="vertical-row">
         <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true" 
@@ -17,7 +21,7 @@
         <button id="all" I18N="track group" text="All"/>
     </tabs>
 
-    <spacer width="20" height="13" />
+    <spacer width="20" height="3%" />
     
 </div>
 

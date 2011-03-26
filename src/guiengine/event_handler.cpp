@@ -226,6 +226,8 @@ EventHandler* EventHandler::get()
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+const bool NAVIGATION_DEBUG = false;
+
 #if 0
 #pragma mark -
 #pragma mark Private methods
@@ -300,7 +302,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
             
             if (success)
             {
-                //std::cout << "Navigating up to " << closest->getID() << std::endl;
+                if (NAVIGATION_DEBUG) std::cout << "Navigating up to " << closest->getID() << std::endl;
                 Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
                 if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
 
@@ -324,11 +326,24 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     }
     
     if (!found)
-    {        
-        //std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
-        //if (el == NULL) std::cout << "    because el is null\n";
-        //else if (el->getTabGroup() == NULL) std::cout << "    because el's tab group is null\n";
-        //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known previous\n"; 
+    {    
+        if (NAVIGATION_DEBUG)
+        {
+            std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
+            if (el == NULL)
+            {
+                std::cout << "    because el is null\n";
+            }
+            else if (el->getTabGroup() == NULL)
+            {
+                std::cout << "    because el's tab group is null\n";
+            }
+            else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
+            {
+                std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order "
+                          << el->getTabOrder() << ") has no known previous\n"; 
+            }
+        }
         
         // select the last widget
         Widget* lastWidget = NULL;
@@ -412,13 +427,17 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         // if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
         for (int n=0; n<10 && !found; n++)
         {
-            const bool success = el->getTabGroup()->getNextElement(el->getTabOrder()+n,
+            const bool success = el->getTabGroup()->getNextElement(el->getTabOrder() + n,
                                                                    false, false, first, closest, true);
-            
-            if (success)
+            if (success && closest->getID() != -1)
             {
                 Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
                 if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+                
+                if (NAVIGATION_DEBUG)
+                {
+                    std::cout << "Navigating down to " << closestWidget->getID() << "\n";
+                }
                 
                 assert( closestWidget != NULL );
                 closestWidget->setFocusForPlayer(playerID);
@@ -440,6 +459,8 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (!found)
     {
 
+        if (NAVIGATION_DEBUG) std::cout << "Navigating down : warp around\n";
+        
         // select the first widget
         Widget* firstWidget = NULL;
         

@@ -1,8 +1,10 @@
 <stkgui>
 
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-    <header align="center" width="100%" text="SuperTuxKart Help" text_align="center"/>
+    <header align="center" width="80%" text="SuperTuxKart Help" text_align="center"/>
     <spacer height="15" width="10"/>
     
     <tabs id="category" height="10%" max_height="110" width="100%" align="center">
@@ -37,10 +39,6 @@
         </div>
         <spacer width="50" height="25" /> 
     </box>
-    <spacer width="50" height="45" /> 
 </div>
-
-<button id="back" x="20" y="-40" width="250" height="35" align="left"
-        I18N="In the help menu, to return to the previous screen" text="Back"/>
 
 </stkgui>

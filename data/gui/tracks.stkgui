@@ -1,8 +1,10 @@
 <stkgui>
 
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
 <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
 
-    <header width="100%" I18N="Section in track selection screen" text="Grand Prix"
+    <header width="80%" I18N="Section in track selection screen" text="Grand Prix"
             align="center" text_align="center" />
 
     <box width="100%" height="195">
@@ -22,9 +24,8 @@
 
     <!-- Populated dynamically at runtime -->
     <tabs width="100%" height="25" id="trackgroups"> </tabs>
-
-    <spacer width="20" height="13" />
     
+    <spacer width="100%" height="2%" />
 </div>
 
 </stkgui>

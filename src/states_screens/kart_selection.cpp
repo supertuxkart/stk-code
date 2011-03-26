@@ -1398,6 +1398,11 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     {
         playerConfirm(playerID);
     }
+    else if (name == "back")
+    {
+printf("back in kart screen\n");      
+        StateManager::get()->escapePressed();
+    }
     else
     {
         // Transmit to all subwindows, maybe *they* care about this event

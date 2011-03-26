@@ -1,8 +1,10 @@
 <stkgui>
 
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-    <header text_align="center" width="100%" text="SuperTuxKart Options"/>
+    <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
@@ -62,11 +64,6 @@
         <spacer height="20" width="10"/>
         
     </box>
-    
-    <spacer width="50" height="10" /> 
-    <button id="back" x="20" width="250"  align="left"
-        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
-
 </div>
 
 </stkgui>

@@ -1,4 +1,6 @@
 <stkgui>
+    
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
     <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
     
@@ -9,11 +11,7 @@
         <box id="animated_area" width="100%" proportion="10">
         
         </box>
-    
-        <spacer width="50" height="45" /> 
-    
+
     </div>
-    
-    <button id="back" x="20" y="-40" height="35" align="left" text="Back to main menu"/>
 
 </stkgui>
