@@ -76,6 +76,7 @@ void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
                          const float iconAspectRatio,
                          int* visibleItems, int* takenArea, int* itemHeight)
 {
+    assert(height > 0);
     const int row_height = height / rowCount;
 
     float icon_height = (float)row_height;
@@ -190,36 +191,44 @@ void DynamicRibbonWidget::add()
         m_row_amount = -1;
         int max_score_so_far = -1;
 
-        for (int row_count = 1; row_count < 10; row_count++)
+        if (m_h - m_label_height < 0)
         {
-            int visible_items;
-            int taken_area;
-            int item_height;
-            estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
-                                aspect_ratio, &visible_items, &taken_area, &item_height);
-            
-            
-            // FIXME: this system to determine the best number of columns is really complicated!
-            // the score is computed from taken screen area AND visible item count.
-            // A number of rows that allows for the screen space to be used a lot will
-            // get a better score. A number of rows that allows showing very few items
-            // will be penalized. A configuration that makes items much smaller than
-            // requested in the XML file will also be penalized.
-            const int score = int(log(2.0f*visible_items) *
-                                  std::min((float)item_height / (float)m_child_height, 1.0f) *
-                                  taken_area);
-            
-            //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
-            //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
-            //          << "; score = " << score << "\n";
-            
-            if (score > max_score_so_far)
-            {
-                m_row_amount = row_count;
-                max_score_so_far = score;
-            }
+            fprintf(stderr, "[DynamicRibbonWidget] WARNING: the widget is too small for anything to fit in it!!\n");
+            m_row_amount = 1;
         }
-        assert(m_row_amount != -1);
+        else
+        {
+            for (int row_count = 1; row_count < 10; row_count++)
+            {
+                int visible_items;
+                int taken_area;
+                int item_height;
+                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
+                                    aspect_ratio, &visible_items, &taken_area, &item_height);
+                
+                
+                // FIXME: this system to determine the best number of columns is really complicated!
+                // the score is computed from taken screen area AND visible item count.
+                // A number of rows that allows for the screen space to be used a lot will
+                // get a better score. A number of rows that allows showing very few items
+                // will be penalized. A configuration that makes items much smaller than
+                // requested in the XML file will also be penalized.
+                const int score = int(log(2.0f*visible_items) *
+                                      std::min((float)item_height / (float)m_child_height, 1.0f) *
+                                      taken_area);
+                
+                //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
+                //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
+                //          << "; score = " << score << "\n";
+                
+                if (score > max_score_so_far)
+                {
+                    m_row_amount = row_count;
+                    max_score_so_far = score;
+                }
+            }
+            assert(m_row_amount != -1);
+        }
         
         // m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
         
