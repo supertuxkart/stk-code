@@ -33,6 +33,18 @@
             <label height="100%" I18N="In the ui settings" text="Display FPS"/>
         </div>
 
+        <div width="75%" height="40" layout="horizontal-row" >
+            <checkbox id="enable-internet" width="40" height="40"/>
+            <spacer width="20" height="100%" />
+            <label height="100%" I18N="In the ui settings" text="Internet STK news"/>
+        </div>
+
+        <div width="75%" height="40" layout="horizontal-row" >
+            <checkbox id="minimal-racegui" width="40" height="40"/>
+            <spacer width="20" height="100%" />
+            <label height="100%" I18N="In the ui settings" text="Minimal Race GUI"/>
+        </div>
+
         <spacer height="4" width="4"/>
         
     </box>
