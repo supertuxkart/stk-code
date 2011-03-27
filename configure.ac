@@ -351,6 +351,8 @@ fi
 
 LIBS=$save_LIBS
 
+# Libcurl is needed in all build modes
+PKG_CHECK_MODULES(LIBCURL, libcurl >= 0.1)
 
 # ======================================================
 # Try to supply the SVN revision number for the compiler
@@ -405,7 +407,6 @@ ENETTREE="src/enet"
 AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
               [This option is used to enable/disable addons support])])
 if test "x$with_addons" == "xyes" ; then
-    PKG_CHECK_MODULES(LIBCURL, libcurl >= 0.1)
     SUMMARY="$SUMMARY\nEnabling addons support."
     AC_DEFINE(ADDONS_MANAGER)
 fi
