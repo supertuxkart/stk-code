@@ -125,6 +125,11 @@ void OptionsScreenUI::init()
     CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
     assert( min_gui != NULL );
     min_gui->setState( UserConfigParams::m_minimal_race_gui);
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+        min_gui->setDeactivated();
+    else
+        min_gui->setActivated();
+
     
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -146,7 +151,6 @@ void OptionsScreenUI::init()
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }
-    
 }   // init
 
 // -----------------------------------------------------------------------------
