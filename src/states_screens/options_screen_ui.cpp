@@ -17,6 +17,7 @@
 
 #include "states_screens/options_screen_ui.hpp"
 
+#include "addons/network_http.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -181,7 +182,9 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
         assert( news != NULL );
+        delete network_http;
         UserConfigParams::m_enable_internet = news->getState();
+        network_http = new NetworkHttp();
     }
     
 }   // eventCallback

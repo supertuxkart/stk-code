@@ -63,6 +63,10 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
                              m_progress(-1.0f), m_abort(false)
 {
     m_current_news_message = -1;
+    // Don't even start the network threads if networking is disabled.
+    if(!UserConfigParams::m_enable_internet)
+        return;
+
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
 
@@ -173,6 +177,9 @@ void *NetworkHttp::mainLoop(void *obj)
  */
 NetworkHttp::~NetworkHttp()
 {
+    if(!UserConfigParams::m_enable_internet)
+        return;
+
     // if a download should be active (which means it was cancelled by the
     // user, in which case it will still be ongoing in the background)
     // we can't get the mutex, and would have to wait for a timeout,
