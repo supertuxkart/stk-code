@@ -77,6 +77,7 @@ void ListWidget::add()
     list->setAutoScrollEnabled(false);
     
     m_element = list;
+    m_element->setTabOrder( list->getID() );
 }
 
 // -----------------------------------------------------------------------------
