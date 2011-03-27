@@ -331,8 +331,18 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
         break;
         }
 
-        case Input::IT_NONE:
         case Input::IT_STICKHAT:
+            if (value > Input::MAX_VALUE/2)
+            {
+                Input sensed_input;
+                sensed_input.m_type           = Input::IT_STICKHAT;
+                sensed_input.m_device_id      = deviceID;
+                sensed_input.m_button_id      = button;
+                sensed_input.m_character      = deviceID;
+                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                break;
+            }
+        case Input::IT_NONE:
         case Input::IT_MOUSEMOTION:
         case Input::IT_MOUSEBUTTON:
             // uninteresting (but we keep them here to explicitely state we do

@@ -292,7 +292,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     const bool keyboard = (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD &&
                            sensed_input.m_type == Input::IT_KEYBOARD);
     const bool gamepad =  (sensed_input.m_type == Input::IT_STICKMOTION ||
-                           sensed_input.m_type == Input::IT_STICKBUTTON) &&
+                           sensed_input.m_type == Input::IT_STICKBUTTON ||
+                           sensed_input.m_type == Input::IT_STICKHAT) &&
                            m_config->getType() == DEVICE_CONFIG_TYPE_GAMEPAD;
     
     if (keyboard)
@@ -330,6 +331,10 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             else if (sensed_input.m_type == Input::IT_STICKBUTTON)
             {
                 std::cout << "button " << sensed_input.m_button_id<< "\n\n";
+            }
+            else if (sensed_input.m_type == Input::IT_STICKHAT)
+            {
+                std::cout << "Hat " << sensed_input.m_button_id << "\n\n";
             }
             else
             {
