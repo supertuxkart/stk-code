@@ -1,7 +1,5 @@
 <stkgui>
 
-<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
-
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
     <header align="center" width="80%" text="SuperTuxKart Help" text_align="center"/>
@@ -40,5 +38,7 @@
         <spacer width="50" height="25" /> 
     </box>
 </div>
+
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
 </stkgui>
