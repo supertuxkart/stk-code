@@ -987,7 +987,7 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
     
     if (row == -1)
     {
-        std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
+        //std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
         return false;
     }
     

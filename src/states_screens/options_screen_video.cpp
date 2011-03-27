@@ -236,7 +236,11 @@ void OptionsScreenVideo::init()
         if (items[n].m_code_name == searching_for)
         {
             // that's the current one
-            res->setSelection(n, PLAYER_ID_GAME_MASTER, false);
+            if (!res->setSelection(n, PLAYER_ID_GAME_MASTER, false))
+            {
+                std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << n << " ("
+                          << items[n].m_code_name.c_str() << ")\n";
+            }
             break;
         }
     }  // end for
