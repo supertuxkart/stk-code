@@ -17,7 +17,6 @@
 /**
   \page addons Addons
   */
-#ifdef ADDONS_MANAGER
 
 #include "addons/addon.hpp"
 
@@ -87,5 +86,4 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << "\"/>\n";
 }   // writeXML
 
-#endif
 

@@ -14,12 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#ifdef ADDONS_MANAGER
+
 #ifndef HEADER_ZIP_HPP
 #define HEADER_ZIP_HPP
 
 /** Extract a zip. */
 bool extract_zip(const std::string &from, const std::string &to);
 
-#endif
 #endif

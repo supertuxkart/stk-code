@@ -56,7 +56,7 @@ void OptionsScreenUI::loadedFromFile()
 {
     m_inited = false;
     
-    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+    GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
     
     skinSelector->m_properties[PROP_WARP_AROUND] = "true";
@@ -102,7 +102,7 @@ void OptionsScreenUI::loadedFromFile()
 void OptionsScreenUI::init()
 {
     Screen::init();
-    RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
     
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
@@ -110,14 +110,17 @@ void OptionsScreenUI::init()
     ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
     ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
     
-    GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+    GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
 
     // ---- video modes
 
-    CheckBoxWidget* fps = this->getWidget<CheckBoxWidget>("showfps");
+    CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
+    CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
+    assert( news != NULL );
+    news->setState( UserConfigParams::m_enable_internet );
     
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -161,7 +164,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if (name == "skinchoice")
     {
-        GUIEngine::SpinnerWidget* skinSelector = this->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
+        GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
         assert( skinSelector != NULL );
         
         const core::stringw selectedSkin = skinSelector->getStringValue();
@@ -170,9 +173,15 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if (name == "showfps")
     {
-        CheckBoxWidget* fps = this->getWidget<CheckBoxWidget>("showfps");
+        CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
+    }
+    else if (name=="enable-internet")
+    {
+        CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
+        assert( news != NULL );
+        UserConfigParams::m_enable_internet = news->getState();
     }
     
 }   // eventCallback

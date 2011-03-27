@@ -69,9 +69,7 @@ private:
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
     bool              isDirectory(const std::string &path) const;
-#ifdef ADDONS_MANAGER
     void              checkAndCreateAddonsDir();
-#endif
 public:
                       FileManager(char *argv[]);
                      ~FileManager();
@@ -82,14 +80,12 @@ public:
 
     std::string       getConfigDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
-#ifdef ADDONS_MANAGER
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(std::string addons_name,
                                     std::string addons_type);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
-#endif
     std::string getDataDir       () const;
     std::string getTranslationDir() const;
     std::string getGUIDir        () const;

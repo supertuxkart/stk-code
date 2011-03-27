@@ -17,7 +17,6 @@
 /**
   \page addons Addons
   */
-#ifdef ADDONS_MANAGER
 
 #include "addons/addons_manager.hpp"
 
@@ -380,5 +379,3 @@ void AddonsManager::saveInstalled(const std::string &type)
         track_manager->loadTrackList();
 }   // saveInstalled
 
-
-#endif

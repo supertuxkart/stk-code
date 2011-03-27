@@ -40,20 +40,23 @@
 #include <sstream>
 #include <algorithm>
 
+#include "IEventReceiver.h"
+
 #include "main_loop.hpp"
+#include "addons/addons_manager.hpp"
+#include "addons/network_http.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "tutorial/tutorial_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -69,14 +72,8 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tutorial/tutorial_manager.hpp"
 #include "utils/translation.hpp"
-
-#include <IEventReceiver.h>
-
-#ifdef ADDONS_MANAGER
-#include "addons/network_http.hpp"
-#include "addons/addons_manager.hpp"
-#endif
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -762,13 +759,11 @@ void initRest()
     
     GUIEngine::init(device, driver, StateManager::get());
 
-#ifdef ADDONS_MANAGER
     // This only initialises the non-network part of the addons manager. The
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
     addons_manager          = new AddonsManager();
     network_http            = new NetworkHttp();
-#endif
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -820,9 +815,7 @@ void cleanTuxKart()
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     if(race_manager)            delete race_manager;
-#ifdef ADDONS_MANAGER
     if(network_http)            delete network_http;
-#endif
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;

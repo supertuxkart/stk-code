@@ -167,9 +167,7 @@ FileManager::FileManager(char *argv[])
     fprintf(stderr, "[FileManager] Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
     checkAndCreateConfigDir();
-#ifdef ADDONS_MANAGER
     checkAndCreateAddonsDir();
-#endif
 }  // FileManager
 
 //-----------------------------------------------------------------------------
@@ -511,7 +509,6 @@ void FileManager::checkAndCreateConfigDir()
 }   // checkAndCreateConfigDir
 
 // ----------------------------------------------------------------------------
-#ifdef ADDONS_MANAGER
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32)
@@ -587,7 +584,6 @@ std::string FileManager::getAddonsFile(const std::string &name)
 {
     return getAddonsDir()+"/"+name;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getConfigDir() const
@@ -694,7 +690,6 @@ void FileManager::listFiles(std::set<std::string>& result,
 
 //-----------------------------------------------------------------------------
 
-#ifdef ADDONS_MANAGER
 void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
                                              std::string addons_type)
 {
@@ -757,4 +752,3 @@ bool FileManager::removeDirectory(const std::string &name) const
 #endif
 }   // remove directory
 
-#endif

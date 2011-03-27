@@ -21,6 +21,7 @@
 #include <string>
 
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
@@ -102,9 +103,9 @@ void MainMenuScreen::init()
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
     }
+#endif
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
-#endif
 
 }
 
@@ -121,6 +122,8 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             addons_icon->setActivated();
     }
 
+#endif    
+
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     w->update(delta);
     if(w->scrolledOff())
@@ -128,8 +131,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         const core::stringw &news_text = network_http->getNextNewsMessage();
         w->setText(news_text);
     }
-    
-#endif
     
     IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
     if (lang_combo != NULL)

@@ -15,7 +15,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ADDONS_MANAGER
 #include "addons/network_http.hpp"
 
 #include <curl/curl.h>
@@ -115,15 +114,19 @@ void *NetworkHttp::mainLoop(void *obj)
         me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
         me->loadAddonsList(xml, xml_file);
+#ifdef ADDONS_MANAGER
         addons_manager->initOnline(xml);
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Addons manager list downloaded\n");
+#endif
     }
     else
     {
+#ifdef ADDONS_MANAGER
         addons_manager->setErrorState();
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Can't download addons list.\n");
+#endif
     }
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
@@ -608,4 +611,3 @@ float NetworkHttp::getProgress() const
     return m_progress.get();
 }   // getProgress
 
-#endif
