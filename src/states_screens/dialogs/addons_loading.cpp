@@ -63,13 +63,13 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     }
     
     core::stringw name = _("Name: %i", m_addon.getName().c_str() );
-    getWidget<LabelWidget>("name")->setText(name);
+    getWidget<LabelWidget>("name")->setText(name, false);
 
     core::stringw desc = _("Description: %i", m_addon.getDescription().c_str());
-    getWidget<LabelWidget>("description")->setText(desc);
+    getWidget<LabelWidget>("description")->setText(desc, false);
 
     core::stringw version = _("Version: %d", m_addon.getVersion());
-    getWidget<LabelWidget>("version")->setText(version);
+    getWidget<LabelWidget>("version")->setText(version, false);
 
 }   // AddonsLoading
 
@@ -115,7 +115,7 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
-            m_state->setText(_("Download failed.\n"));
+            m_state->setText(_("Download failed.\n"), false);
             m_back_button->setText(_("Back"));
             return;
         }
@@ -165,7 +165,7 @@ void AddonsLoading::doInstall()
             core::stringw msg = StringUtils::insertValues(
                 _("Problems installing the addon '%s'."),
                 core::stringw(m_addon.getName().c_str()));
-            m_state->setText(msg.c_str());
+            m_state->setText(msg.c_str(), false);
         }
     }
     else
@@ -176,7 +176,7 @@ void AddonsLoading::doInstall()
             core::stringw msg = StringUtils::insertValues(
                 _("Problems removing the addon '%s'."),
                 core::stringw(m_addon.getName().c_str()));
-            m_state->setText(msg.c_str());
+            m_state->setText(msg.c_str(), false);
         }
     }
 

@@ -112,7 +112,7 @@ void OptionsScreenInput2::init()
     deleteBtn->moveIrrlichtElement();
     
     LabelWidget* label = this->getWidget<LabelWidget>("title");
-    label->setText( m_config->getName().c_str() );
+    label->setText( m_config->getName().c_str(), false );
     
     GUIEngine::ListWidget* actions = this->getWidget<GUIEngine::ListWidget>("actions");
     assert( actions != NULL );

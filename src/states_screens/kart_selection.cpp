@@ -341,7 +341,7 @@ public:
         
         // ---- Kart name label
         m_kart_name = new LabelWidget();
-        m_kart_name->setText(props->getName());
+        m_kart_name->setText(props->getName(), false);
         m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
         m_kart_name->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
         m_kart_name->m_x = kart_name_x;
@@ -784,7 +784,7 @@ public:
             w3->clearModels();
             w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f), Vec3(35.0f, 35.0f, 35.0f) );
             w3->update(0);
-            m_parent->m_kart_widgets[playerID].m_kart_name->setText( _("Random Kart") );
+            m_parent->m_kart_widgets[playerID].m_kart_name->setText( _("Random Kart"), false );
         }
         else if (selectionID == ID_LOCKED)
         {
@@ -793,7 +793,8 @@ public:
                          Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
             w3->update(0);
             
-            m_parent->m_kart_widgets[playerID].m_kart_name->setText( _("Locked : solve active challenges to gain access to more!") );
+            m_parent->m_kart_widgets[playerID].m_kart_name->setText(
+                    _("Locked : solve active challenges to gain access to more!"), false );
         }
         else
         {
@@ -816,7 +817,7 @@ public:
                               kart_model.getWheelGraphicsPosition(3) );
                 w3->update(0);
 
-                m_parent->m_kart_widgets[playerID].m_kart_name->setText( selectionText.c_str() );
+                m_parent->m_kart_widgets[playerID].m_kart_name->setText( selectionText.c_str(), false );
             }
             else
             {

@@ -335,7 +335,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         unlocked_label->m_y = label_y;
         unlocked_label->m_w = m_area.getWidth() - button_h*2 - 60;
         unlocked_label->m_h = button_h;
-        unlocked_label->setText( _("You unlocked a new feature!") );
+        unlocked_label->setText( _("You unlocked a new feature!"), false );
         unlocked_label->setParent(m_irrlicht_window);
         m_widgets.push_back(unlocked_label);
         unlocked_label->add();

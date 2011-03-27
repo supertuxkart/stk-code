@@ -35,7 +35,7 @@ MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* lis
     m_listener = listener;
     
     LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str() );
+    message->setText( msg.c_str(), false );
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ MessageDialog::MessageDialog(irr::core::stringw msg) :
     m_listener = NULL;
     
     LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str() );
+    message->setText( msg.c_str(), false );
     
     ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
     yesbtn->setVisible(false);

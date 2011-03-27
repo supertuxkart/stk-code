@@ -129,7 +129,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     if(w->scrolledOff())
     {
         const core::stringw &news_text = network_http->getNextNewsMessage();
-        w->setText(news_text);
+        w->setText(news_text, true);
     }
     
     IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");

@@ -97,7 +97,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         }
                 
         LabelWidget* widget = new LabelWidget();
-        widget->setText(translations->fribidize(lineText));
+        widget->setText(translations->fribidize(lineText), false);
         widget->m_x = 20;
         widget->m_y = from_y;
         widget->m_w = m_area.getWidth()/2 - 20;

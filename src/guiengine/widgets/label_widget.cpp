@@ -116,22 +116,34 @@ void LabelWidget::add()
 
 // ----------------------------------------------------------------------------
 /** Sets the text. This is the function used by overloaded functions
- *  as well. It takes esp. care of horizontal scrolling by adding
- *  spaces to the left and right of the string, so that it appears
- *  that the text is appearing from the left and going to the right.
- *  Then a character is removed on the left, resulting in the text
- *  appearing to scroll from the left. 
+ *  as well.
  *  It is important that the scrolling speed (if any) is set before
  *  calling this function!
  *  \param text The string to use as text for this widget.
  */
-void LabelWidget::setText(const wchar_t *text)
+void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
 {
     m_scroll_offset = 0;
     
+    if (expandIfNeeded)
+    {
+        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
+        core::rect<s32> rect = m_element->getRelativePosition();
+        
+        if (rect.getWidth() < fwidth)
+        {
+            rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
+            m_element->setRelativePosition(rect);
+            m_element->updateAbsolutePosition();
+            
+            //((IGUIStaticText*)m_element)->setBackgroundColor( video::SColor(255,255,0,0) );
+        }
+    }
+    
     if (m_scroll_speed > 0)
     {
-        m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
+        //m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
+        m_scroll_offset = m_w;
     }
     
     Widget::setText(text);

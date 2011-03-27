@@ -54,14 +54,14 @@ namespace GUIEngine
         }   // setColor
         
 
-        virtual void setText(const wchar_t *text);
+        virtual void setText(const wchar_t *text, bool expandAsNeeded);
         virtual void update(float dt);
         
         // --------------------------------------------------------------------
         /** Overloaded function which takes a stringw. */
-        virtual void setText(const irr::core::stringw &s) 
+        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded) 
         {
-            setText(s.c_str()); 
+            setText(s.c_str(), expandAsNeeded); 
         }
         
         // --------------------------------------------------------------------
