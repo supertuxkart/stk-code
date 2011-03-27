@@ -122,6 +122,9 @@ void OptionsScreenUI::init()
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_enable_internet );
+    CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
+    assert( min_gui != NULL );
+    min_gui->setState( UserConfigParams::m_minimal_race_gui);
     
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -185,6 +188,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         delete network_http;
         UserConfigParams::m_enable_internet = news->getState();
         network_http = new NetworkHttp();
+    }
+    else if (name=="minimal-racegui")
+    {
+        CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
+        assert( min_gui != NULL );
+        UserConfigParams::m_minimal_race_gui = 
+            !UserConfigParams::m_minimal_race_gui;
     }
     
 }   // eventCallback
