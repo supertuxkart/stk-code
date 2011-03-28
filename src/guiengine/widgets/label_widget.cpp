@@ -143,7 +143,7 @@ void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
     if (m_scroll_speed > 0)
     {
         //m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
-        m_scroll_offset = m_w;
+        m_scroll_offset = (float)m_w;
     }
     
     Widget::setText(text);
