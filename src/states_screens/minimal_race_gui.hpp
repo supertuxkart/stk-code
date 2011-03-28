@@ -89,11 +89,17 @@ private:
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
 
+    /** Length of 'Lap 99/99' */
+    int              m_lap_width;
+
     /** Translated string 'rank' displayed every frame. */
     core::stringw    m_string_rank;
 
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
+    /** Maximum string length for the timer */
+    int              m_timer_width;
+
+    /** A scaling factor for the font for time, rank, and lap display. */
+    float            m_font_scale;
 
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go;
@@ -140,13 +146,6 @@ private:
     int              m_max_font_height;
     int              m_small_font_max_height;
     
-    /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
-     *  the rank/lap text correctly close to the right border. */
-    int              m_rank_lap_width;
-
-    /** Maximum string length for the timer */
-    int              m_timer_width;
-    
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
     Material         *m_icons_frame;
@@ -158,7 +157,7 @@ private:
                               video::S3DVertex *v, unsigned short int *index);
 
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (int x, int y, const Kart *kart,
+    void drawEnergyMeter       (const Kart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawPowerupIcons      (const Kart* kart,
@@ -166,8 +165,6 @@ private:
                                 const core::vector2df &scaling);
     void drawAllMessages       (const Kart* kart,
                                 const core::recti &viewport, 
-                                const core::vector2df &scaling);
-    void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
                                 const core::recti &viewport);

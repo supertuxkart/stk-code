@@ -94,42 +94,34 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_string_lap      = _("Lap");
     m_string_rank     = _("Rank");
     
-    //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-    m_string_top      = _("Top %i");
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_ready    = _("Ready!");
     m_string_set      = _("Set!");
     m_string_go       = _("Go!");
      
+    m_font_scale      = 1.2f;
+
     //read icon frame picture
     m_icons_frame=material_manager->getMaterial("icons-frame.png");
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 
-    m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
-    
-    m_timer_width = font->getDimension(L"99:99:99").Width;
-
-    font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
+    float old_scale = font->getScale();
+    font->setScale(m_font_scale);
+    m_lap_width             = font->getDimension(m_string_lap.c_str()).Width;
+    m_timer_width           = font->getDimension(L"99:99:99").Width;
     
     int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
         race_manager->getNumLaps() > 9)
-        w = font->getDimension(L"99/99").Width;
+        w = font->getDimension(L" 99/99").Width;
     else
-        w = font->getDimension(L"9/9").Width;
-    
-    // In some split screen configuration the energy bar might be next 
-    // to the lap display - so make the lap X/Y display large enough to
-    // leave space for the energy bar (16 pixels) and 10 pixels of space
-    // to the right (see drawEnergyMeter for details).
-    w += 16 + 10;
-    if(m_rank_lap_width < w) m_rank_lap_width = w;
-    w = font->getDimension(m_string_rank.c_str()).Width;
-    if(m_rank_lap_width < w) m_rank_lap_width = w;
-    
+        w = font->getDimension(L" 9/9").Width;
+    font->setScale(old_scale);
+    m_lap_width += w;
+        
 }   // MinimalRaceGUI
 
 //-----------------------------------------------------------------------------
@@ -332,9 +324,7 @@ void MinimalRaceGUI::renderPlayerView(const Kart *kart)
                              plunger_x+plunger_size, offset_y+plunger_size);
         const core::rect<s32> source(core::position2d<s32>(0,0), 
                                      t->getOriginalSize());
-        
-        //static const video::SColor white = video::SColor(255, 255, 255, 255);
-        
+                
         irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 
                                                   NULL /* clip */, 
                                                   NULL /* color */, 
@@ -348,7 +338,7 @@ void MinimalRaceGUI::renderPlayerView(const Kart *kart)
     MinimalRaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
 
     drawPowerupIcons    (kart, viewport, scaling);
-    drawSpeedAndEnergy  (kart, viewport, scaling);
+    drawEnergyMeter     (kart, viewport, scaling);
     drawRankLap         (info, kart, viewport);
 
 }   // renderPlayerView
@@ -365,7 +355,7 @@ void MinimalRaceGUI::drawGlobalTimer()
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(UserConfigParams::m_width - m_timer_width - 10, 10, 
+    core::rect<s32> pos(UserConfigParams::m_width - m_timer_width - 10,  0, 
                         UserConfigParams::m_width,                      50);
     
     // special case : when 3 players play, use available 4th space for such things
@@ -375,7 +365,10 @@ void MinimalRaceGUI::drawGlobalTimer()
     }
     
     gui::ScalableFont* font = GUIEngine::getFont();
+    float old_scale = font->getScale();
+    font->setScale(m_font_scale);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL, true /* ignore RTL */);
+    font->setScale(old_scale);
 }   // drawGlobalTimer
 
 //-----------------------------------------------------------------------------
@@ -482,20 +475,19 @@ void MinimalRaceGUI::drawPowerupIcons(const Kart* kart,
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void MinimalRaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,              
-                              const core::recti &viewport, 
-                              const core::vector2df &scaling)
+void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,              
+                                     const core::recti &viewport, 
+                                     const core::vector2df &scaling)
 {
     float state = (float)(kart->getEnergy()) / MAX_NITRO;
-    if (state < 0.0f) state = 0.0f;
+    if      (state < 0.0f) state = 0.0f;
     else if (state > 1.0f) state = 1.0f;
     
     int h = (int)(viewport.getHeight()/3);
     int w = h/4; // gauge image is so 1:4
     
-    y -= h;
-    
-    x    -= w;
+    int x = viewport.LowerRightCorner.X - w;
+    int y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2- h/2;
     
     // Background
     irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
@@ -541,63 +533,36 @@ void MinimalRaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
-void MinimalRaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
-                                 const core::vector2df &scaling)
-{
-
-    float minRatio         = std::min(scaling.X, scaling.Y);
-    const int SPEEDWIDTH   = 128;
-    int meter_height       = (int)(SPEEDWIDTH*minRatio);
-
-    drawEnergyMeter(viewport.LowerRightCorner.X, 
-                    (int)(viewport.LowerRightCorner.Y - meter_height*0.75f), 
-                    kart, viewport, scaling);
-    
-} // drawSpeedAndEnergy
-
-//-----------------------------------------------------------------------------
 /** Displays the rank and the lap of the kart.
  *  \param info Info object c
 */
-void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart, 
-                          const core::recti &viewport)
+void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info, 
+                                 const Kart* kart,
+                                 const core::recti &viewport)
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
 
     core::recti pos;
-    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
-    // If the time display in the top right is in this viewport,
-    // move the lap/rank display down a little bit so that it is
-    // displayed under the time.
-    if(viewport.UpperLeftCorner.Y==0 && 
-        viewport.LowerRightCorner.X==UserConfigParams::m_width &&
-        race_manager->getNumPlayers()!=3)
-        pos.UpperLeftCorner.Y   += 40;
-    pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
-    pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X 
-                            - m_rank_lap_width - 10;
-    pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
 
-    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
-    int font_height         = (int)(font->getDimension(L"X").Height);
+    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 
+                            ? GUIEngine::getSmallFont() 
+                            : GUIEngine::getFont());
+    float scale = font->getScale();
+    font->setScale(m_font_scale);
     static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
 
     if (world->displayRank())
     {
-        const int rank = kart->getPosition();
-            
-        font->draw(m_string_rank.c_str(), pos, color);
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
-
+        pos.UpperLeftCorner.X   = viewport.UpperLeftCorner.X+10;
+        pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
+        pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
+        pos.LowerRightCorner.Y  = viewport.UpperLeftCorner.Y+50;
         char str[256];
-        const unsigned int kart_amount = world->getCurrentNumKarts();
-        sprintf(str, "%d/%d", rank, kart_amount);
-        font->draw(core::stringw(str).c_str(), pos, color);
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
+        sprintf(str, "%d/%d", kart->getPosition(), 
+                world->getCurrentNumKarts());
+        font->draw(str, pos, color);
     }
     
     // Don't display laps in follow the leader mode
@@ -608,16 +573,21 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* ka
         // don't display 'lap 0/...'
         if(lap>=0)
         {
-            font->draw(m_string_lap.c_str(), pos, color);
+            pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
+            pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y
+                                      -20;
+            pos.UpperLeftCorner.X   = (int)(viewport.LowerRightCorner.X
+                                            - m_lap_width -20      );
+            pos.UpperLeftCorner.Y   = viewport.LowerRightCorner.Y-60;
+
             char str[256];
             sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
-            pos.UpperLeftCorner.Y  += font_height;
-            pos.LowerRightCorner.Y += font_height;
-            font->draw(core::stringw(str).c_str(), pos, color);
-            pos.UpperLeftCorner.Y  += font_height;
-            pos.LowerRightCorner.Y += font_height;
+            core::stringw s = m_string_lap+" "+str;
+            float scale = font->getScale();
+            font->draw(s.c_str(), pos, color);
         }
     }
+    font->setScale(scale);
 
 } // drawRankLap
 
