@@ -18,6 +18,7 @@
 #include "addons/network_http.hpp"
 
 #include <curl/curl.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string>
 
@@ -76,7 +77,12 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    pthread_create(&m_thread_id, &attr, &NetworkHttp::mainLoop, this);
+    int error=pthread_create(&m_thread_id, &attr, &NetworkHttp::mainLoop, this);
+    if(error)
+    {
+        m_thread_id = 0;
+	printf("[addons] Warning: could not create thread, error=%d.\n", errno);
+    }
     pthread_attr_destroy(&attr);
 }   // NetworkHttp
 
@@ -193,11 +199,16 @@ NetworkHttp::~NetworkHttp()
         pthread_cond_signal(&m_cond_command);
     }
     pthread_mutex_unlock(&m_mutex_command);
-    printf("[addons] Mutex unlocked.\n");
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Mutex unlocked.\n");
 
-    void *result;
-    pthread_join(m_thread_id, &result);
-    printf("[addons] Network thread joined.\n");
+    if(m_thread_id)
+    {
+        void *result;
+        pthread_join(m_thread_id, &result);
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Network thread joined.\n");
+    }
 
     pthread_mutex_destroy(&m_mutex_command);
     pthread_cond_destroy(&m_cond_command);

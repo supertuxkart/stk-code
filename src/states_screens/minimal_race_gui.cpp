@@ -580,10 +580,10 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
                                             - m_lap_width -20      );
             pos.UpperLeftCorner.Y   = viewport.LowerRightCorner.Y-60;
 
+	    printf("x %d %d\n", pos.UpperLeftCorner.Y, pos.LowerRightCorner.Y);
             char str[256];
             sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
             core::stringw s = m_string_lap+" "+str;
-            float scale = font->getScale();
             font->draw(s.c_str(), pos, color);
         }
     }
