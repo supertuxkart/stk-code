@@ -195,6 +195,8 @@ NetworkHttp::~NetworkHttp()
     // a download, which mean we can get the mutex and ask the service
     // thread here to cancel properly.
     cancelDownload();
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Trying to lock command mutex.\n");
     pthread_mutex_lock(&m_mutex_command);
     {
         m_command=HC_QUIT;
@@ -207,7 +209,10 @@ NetworkHttp::~NetworkHttp()
     if(m_thread_id)
     {
         void *result;
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Trying to join network thread.\n");
         pthread_join(*m_thread_id, &result);
+        delete m_thread_id;
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Network thread joined.\n");
     }
