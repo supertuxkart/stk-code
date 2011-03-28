@@ -109,7 +109,7 @@ private:
     Synchronised<bool>   m_abort;
 
     /** Thread id of the thread running in this object. */
-    pthread_t     m_thread_id;
+    pthread_t     *m_thread_id;
 
     static void  *mainLoop(void *obj);
     void          checkRedirect(const XMLNode *xml);

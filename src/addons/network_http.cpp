@@ -77,11 +77,13 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    int error=pthread_create(&m_thread_id, &attr, &NetworkHttp::mainLoop, this);
+    m_thread_id = new pthread_t();
+    int error=pthread_create(m_thread_id, &attr, &NetworkHttp::mainLoop, this);
     if(error)
     {
+        delete m_thread_id;
         m_thread_id = 0;
-	printf("[addons] Warning: could not create thread, error=%d.\n", errno);
+    	printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
 }   // NetworkHttp
@@ -205,7 +207,7 @@ NetworkHttp::~NetworkHttp()
     if(m_thread_id)
     {
         void *result;
-        pthread_join(m_thread_id, &result);
+        pthread_join(*m_thread_id, &result);
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Network thread joined.\n");
     }
