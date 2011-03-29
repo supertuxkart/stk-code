@@ -731,7 +731,6 @@ bool Track::loadMainTrack(const XMLNode &root)
                 lod_node->add( group[m].first, scene_node, true );
                 
             }
-            m_all_nodes.push_back( lod_node );
             
 #ifdef DEBUG
             std::string debug_name = model_name+" (LOD track-object)";
