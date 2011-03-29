@@ -63,8 +63,28 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_marker_player_size    = (int)( 34.0f * scaling);
     m_map_width             = (int)(200.0f * scaling);
     m_map_height            = (int)(200.0f * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
+
+    // The location of the minimap varies with number of 
+    // splitscreen players:
+    switch(race_manager->getNumLocalPlayers())
+    {
+    case 1 : // Lower left corner
+             m_map_left   = 10;
+             m_map_bottom = UserConfigParams::m_height-10;
+             break;
+    case 2:  // Middle of left side
+             m_map_left   = 10;
+             m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
+             break;
+    case 3:  // Lower right quarter (which is not used by a player)
+             m_map_left   = UserConfigParams::m_width/2 + 10;
+             m_map_bottom = UserConfigParams::m_height-10;
+             break;
+    case 4:  // Middle of the screen.
+             m_map_left   = UserConfigParams::m_width/2-m_map_width/2;
+             m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
+             break;
+    }
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -73,12 +93,6 @@ MinimalRaceGUI::MinimalRaceGUI()
 
     m_max_font_height       = GUIEngine::getFontHeight() + 10;
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
-
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
-    {
-        m_map_left = UserConfigParams::m_width - m_map_width;
-    }
 
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
     m_music_icon       = material_manager->getMaterial("notes.png");
@@ -99,7 +113,7 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_string_set      = _("Set!");
     m_string_go       = _("Go!");
      
-    m_font_scale      = 1.2f;
+    m_font_scale      = race_manager->getNumLocalPlayers()==1 ? 1.2f : 1.0f;
 
     //read icon frame picture
     m_icons_frame=material_manager->getMaterial("icons-frame.png");
@@ -381,8 +395,8 @@ void MinimalRaceGUI::drawGlobalMiniMap()
 
     const video::ITexture *mini_map=world->getTrack()->getMiniMap();
     
-    int upper_y = UserConfigParams::m_height-m_map_bottom-m_map_height;
-    int lower_y = UserConfigParams::m_height-m_map_bottom;
+    int upper_y = m_map_bottom-m_map_height;
+    int lower_y = m_map_bottom;
     
     core::rect<s32> dest(m_map_left,               upper_y, 
                          m_map_left + m_map_width, lower_y);
@@ -556,8 +570,20 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
     {
         pos.UpperLeftCorner.X   = viewport.UpperLeftCorner.X+10;
         pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
-        pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
-        pos.LowerRightCorner.Y  = viewport.UpperLeftCorner.Y+50;
+        // If the viewport starts at the top of the screen,
+        // display the rank at the top, otherwise at the botton.
+        // This way there is space for the minimap in the middle
+        // if split screen is being used.
+        if(viewport.UpperLeftCorner.Y==0              )
+        {
+            pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
+            pos.LowerRightCorner.Y  = viewport.UpperLeftCorner.Y+50;
+        }
+        else
+        {
+            pos.UpperLeftCorner.Y  = (int)(viewport.LowerRightCorner.Y - 60);
+            pos.LowerRightCorner.Y = viewport.LowerRightCorner.Y;
+        }
         char str[256];
         sprintf(str, "%d/%d", kart->getPosition(), 
                 world->getCurrentNumKarts());
@@ -572,11 +598,19 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
         // don't display 'lap 0/...'
         if(lap>=0)
         {
+            if(race_manager->getNumLocalPlayers()==4 &&
+                viewport.UpperLeftCorner.X==0        &&
+                viewport.UpperLeftCorner.Y==0           )
+            {
+                pos.UpperLeftCorner.X   = 10;
+            }
+            else
+            {
+                pos.UpperLeftCorner.X   = (int)(viewport.LowerRightCorner.X
+                                                - m_lap_width -20      );
+            }
             pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
-            pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y
-                                      -20;
-            pos.UpperLeftCorner.X   = (int)(viewport.LowerRightCorner.X
-                                            - m_lap_width -20      );
+            pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
             pos.UpperLeftCorner.Y   = viewport.LowerRightCorner.Y-60;
 
             char str[256];
