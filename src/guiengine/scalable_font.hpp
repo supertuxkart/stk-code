@@ -121,7 +121,8 @@ public:
     /** Sets if digits are to be mono-spaced. */
     void    setMonospaceDigits(bool mono) {m_mono_space_digits = mono; }
     bool    getMonospaceDigits() const { return m_mono_space_digits;   }
-    void setShadow(irr::video::SColor col);
+    void    setShadow(const irr::video::SColor &col);
+    void    disableShadow() {m_shadow = false;}
 
     //! gets the sprite bank
     virtual IGUISpriteBank* getSpriteBank() const;

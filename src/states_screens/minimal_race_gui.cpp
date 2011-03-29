@@ -580,6 +580,9 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
                             : GUIEngine::getFont());
     float scale = font->getScale();
     font->setScale(m_font_scale);
+    // Add a black shadow to make the text better readable on
+    // 'white' tracks (e.g. with snow and ice).
+    font->setShadow(video::SColor(255, 0, 0, 0));
     static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
 
@@ -637,7 +640,7 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
         }
     }
     font->setScale(scale);
-
+    font->disableShadow();
 } // drawRankLap
 
 //-----------------------------------------------------------------------------

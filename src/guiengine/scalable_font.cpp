@@ -77,7 +77,7 @@ void ScalableFont::updateRTL()
     m_rtl = translations->isRTLLanguage();
 }
     
-void ScalableFont::setShadow(irr::video::SColor col)
+void ScalableFont::setShadow(const irr::video::SColor &col)
 {
     m_shadow = true;
     m_shadow_color = col;
