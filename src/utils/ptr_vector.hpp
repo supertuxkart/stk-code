@@ -251,7 +251,9 @@ public:
     // ------------------------------------------------------------------------
     void insertionSort(unsigned int start=0)
     {
-        for(unsigned int j=start; j<(unsigned)m_contents_vector.size()-1; j++)
+        // We should not used unsigned ints here, because if the vector is empty
+        // j needs to be compared against -1
+        for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
         {
             if(*(m_contents_vector[j])<*(m_contents_vector[j+1])) continue;
             // Now search the proper place for m_contents_vector[j+1] 
