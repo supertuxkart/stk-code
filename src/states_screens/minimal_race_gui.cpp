@@ -113,7 +113,8 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_string_set      = _("Set!");
     m_string_go       = _("Go!");
      
-    m_font_scale      = race_manager->getNumLocalPlayers()==1 ? 1.2f : 1.0f;
+    // Scaled fonts don't look good atm.
+    m_font_scale      = 1.0f; //race_manager->getNumLocalPlayers()==1 ? 1.2f : 1.0f;
 
     //read icon frame picture
     m_icons_frame=material_manager->getMaterial("icons-frame.png");
