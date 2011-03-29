@@ -499,16 +499,25 @@ void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,
     int h = (int)(viewport.getHeight()/3);
     int w = h/4; // gauge image is so 1:4
     
-    int x = viewport.LowerRightCorner.X - w;
+    // In split screen mode of 3 or 4 players, the players on
+    // the left side will have the energy meter on the left side
+    int mirrored = race_manager->getNumLocalPlayers()>=3 &&
+                   viewport.UpperLeftCorner.X==0;
+
+    int x = mirrored ? 0 : viewport.LowerRightCorner.X - w;
     int y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2- h/2;
     
     // Background
-    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+    // ----------
+    core::rect<s32> dest(x+mirrored*w, y+mirrored*h, 
+                         x+(1-mirrored)*w, y+(1-mirrored)*h);
+
+    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, dest,
                                               core::rect<s32>(0, 0, 64, 256) /* source rect */,
                                               NULL /* clip rect */, NULL /* colors */,
                                               true /* alpha */);
-    
     // Target
+    // ------
     if (race_manager->getCoinTarget() > 0)
     {
         float coin_target = (float)race_manager->getCoinTarget() / MAX_NITRO;
@@ -527,6 +536,7 @@ void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,
     }
     
     // Filling (current state)
+    // -----------------------
     if (state > 0.0f)
     {
         const int EMPTY_TOP_PIXELS = 4;
@@ -535,10 +545,17 @@ void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,
                            + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
                               *(1.0f - state)                             );
         if (state >= 1.0f) y1 = y;
-        
+        core::rect<s32> dest(x+mirrored*w,
+                             mirrored ? y+h : y,
+                             x+(1-mirrored)*w,
+                             mirrored ? y : y + h);
         core::rect<s32> clip(x, y1, x + w, y + h);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
-                                                  core::rect<s32>(0, 0, 64, 256) /* source rect */,
+        core::rect<s32> tex_c(0,
+                              mirrored ? 256 :   0,
+                              64,
+                              mirrored ?   0 : 256);
+        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, dest,
+                                                  tex_c,
                                                   &clip, NULL /* colors */, true /* alpha */);
     }
     
