@@ -1,7 +1,9 @@
 import xml.dom.minidom
 import sys
+import codecs
 
 f = open('./data/po/gui_strings.h', 'w')
+f.write( codecs.BOM_UTF8 )
 
 def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
   
@@ -24,7 +26,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                else:
                    line += "//I18N: File : " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("name") + "\");\n\n"
                
-               f.write( line )
+               f.write( line.encode( "utf-8" ) )
            
            # challenges and GPs can have a description file; karts don't
            if e.hasAttribute("description"):
@@ -35,7 +37,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                else:
                    line += "//I18N: File : " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("description") + "\");\n\n"
                
-               f.write( line )
+               f.write( line.encode( "utf-8" ) )
         else:
            if e.hasAttribute("text"):
                # print "Label=", e.getAttribute("text"), " Comment=", comment
@@ -45,7 +47,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                else:
                    line += "//I18N: " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("text") + "\");\n\n"
                
-               f.write( line )
+               f.write( line.encode( "utf-8" ) )
 
         # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
         if not isKart:

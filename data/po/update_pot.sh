@@ -29,10 +29,10 @@ echo "    Generating .pot file..."
 xgettext    -d supertuxkart -s --keyword=_ --keyword=_LTR --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $CPP_FILE_LIST --package-name=supertuxkart
 
 # Lisp files
-xgettext -j -L lisp -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $XML_FILE_LIST --package-name=supertuxkart
+#xgettext -j -L lisp -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $XML_FILE_LIST --package-name=supertuxkart
 
 # XML Files
-xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot ./data/po/gui_strings.h --package-name=supertuxkart
+xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot --from-code=UTF-16 ./data/po/gui_strings.h --package-name=supertuxkart
 
 echo "    Done"
 echo "---------------------------"
