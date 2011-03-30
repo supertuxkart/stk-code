@@ -269,11 +269,13 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
 
         m_news.lock();
         {
-            // While the xml file does not have an id:
-            if(id==-1)
-                id = m_news.getData().size();
+            // Define this if news messages should be removed
+            // after being shown a certain number of times.
+#undef NEWS_MESSAGE_REMOVAL
+#ifdef NEWS_MESSAGE_REMOVAL
             // Only add the news if it's not supposed to be ignored.
             if(id>UserConfigParams::m_ignore_message_id)
+#endif
             {
                 NewsMessage n(core::stringw(news.c_str()), id);
                 m_news.getData().push_back(n);
@@ -291,13 +293,15 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         // a new read on the next start, instead of waiting
         // for some time).
         file_manager->removeFile(filename);
-        NewsMessage n("Can't access stkaddons server...", -1);
+        NewsMessage n(_("Can't access stkaddons server..."), -1);
         m_news.lock();
         m_news.getData().push_back(n);
         m_news.unlock();
     }
+#ifdef NEWS_MESSAGE_REMOVAL
     else
         updateMessageDisplayCount();
+#endif
     
 }   // updateNews
 
@@ -358,10 +362,13 @@ const core::stringw NetworkHttp::getNextNewsMessage()
         if(m_current_news_message>-1)
         {
             NewsMessage &n = m_news.getData()[m_current_news_message];
+#ifdef NEWS_MESSAGE_REMOVAL
             n.increaseDisplayCount();
+#endif
 
             // If the message is being displayed often enough,
             // ignore it from now on.
+#ifdef NEWS_MESSAGE_REMOVAL
             if(n.getDisplayCount()>stk_config->m_max_display_news)
             {
                 // Messages have sequential numbers, so we only store
@@ -371,6 +378,7 @@ const core::stringw NetworkHttp::getNextNewsMessage()
                                        +m_current_news_message  );
 
             }
+#endif
             updateUserConfigFile();
             // 
             if(m_news.getData().size()==0)
@@ -398,6 +406,7 @@ const core::stringw NetworkHttp::getNextNewsMessage()
  */
 void NetworkHttp::updateUserConfigFile() const
 {
+#ifdef NEWS_MESSAGE_REMOVAL
     std::ostringstream o;
     for(unsigned int i=0; i<m_news.getData().size(); i++)
     {
@@ -406,6 +415,12 @@ void NetworkHttp::updateUserConfigFile() const
           << n.getDisplayCount() << " ";
     }
     UserConfigParams::m_display_count = o.str();
+#else
+    // Always set them to be empty to avoid any
+    // invalid data that might create a problem later.
+    UserConfigParams::m_display_count     = "";
+    UserConfigParams::m_ignore_message_id = -1;
+#endif
 }   // updateUserConfigFile
 
 // ----------------------------------------------------------------------------
@@ -414,6 +429,7 @@ void NetworkHttp::updateUserConfigFile() const
  */
 void NetworkHttp::updateMessageDisplayCount()
 {
+#ifdef NEWS_MESSAGE_REMOVAL
     m_news.lock();
     std::vector<std::string> pairs = 
         StringUtils::split(UserConfigParams::m_display_count,' ');
@@ -435,6 +451,7 @@ void NetworkHttp::updateMessageDisplayCount()
         }   // for j <m_news.getData().size()
     }
     m_news.unlock();
+#endif
 }   // updateMessageDisplayCount
 
 // ----------------------------------------------------------------------------
