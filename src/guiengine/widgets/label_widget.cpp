@@ -101,17 +101,20 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
     
-    if (!m_scroll_offset)
-    {
-        m_element->setNotClipped(true);
-    }
-    
     if (m_scroll_speed > 0)
     {
         IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
                                       : GUIEngine::getFont();
         core::dimension2du r = font->getDimension(getText().c_str());
-        m_scroll_offset = (float)r.Width;
+        
+        //m_scroll_offset = (float)r.Width;
+        
+        // start scrolled off
+        m_scroll_offset = (float)(-m_element->getAbsolutePosition().getWidth()-10);
+    }
+    else
+    {
+        m_element->setNotClipped(true);
     }
 }   // add
 
@@ -176,8 +179,7 @@ bool LabelWidget::scrolledOff() const
 /** Sets horizontal scroll speed. */
 void LabelWidget::setScrollSpeed(float speed)
 {
-    // start scrolled off
-    m_scroll_offset = (float)(-m_element->getAbsolutePosition().getWidth()-10);
+    m_scroll_offset = 0;
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 
