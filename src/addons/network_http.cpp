@@ -493,7 +493,12 @@ int NetworkHttp::versionToInt(const std::string &version_string)
 {
     // Special case: SVN
     if(version_string=="SVN")
-        return -1;
+      // SVN version will be version 99.99.99i
+        return 100000*99
+              +  1000*99
+              +    10*99
+              +        9;
+        return ;
 
     std::vector<std::string> l = StringUtils::split(version_string, '.');
     if(l.size()!=3)
