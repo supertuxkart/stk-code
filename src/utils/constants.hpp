@@ -53,4 +53,6 @@ extern bool IS_LITTLE_ENDIAN;
 
 #define DEFAULT_GROUP_NAME "standard"
 
+extern char* VERSION;
+
 #endif

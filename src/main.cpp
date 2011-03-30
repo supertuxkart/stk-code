@@ -73,6 +73,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tutorial/tutorial_manager.hpp"
+#include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
 // ============================================================================

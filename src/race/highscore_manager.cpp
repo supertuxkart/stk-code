@@ -26,6 +26,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_writer.hpp"
 #include "race/race_manager.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 

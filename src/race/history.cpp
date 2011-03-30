@@ -26,6 +26,7 @@
 #include "karts/kart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 History* history = 0;
 
