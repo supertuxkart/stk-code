@@ -366,8 +366,8 @@ const core::stringw NetworkHttp::getNextNewsMessage()
         // displayed --> increase display count.
         if(m_current_news_message>-1)
         {
-            NewsMessage &n = m_news.getData()[m_current_news_message];
 #ifdef NEWS_MESSAGE_REMOVAL
+            NewsMessage &n = m_news.getData()[m_current_news_message];
             n.increaseDisplayCount();
 #endif
 
@@ -448,7 +448,7 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
         if(cond.size()!=3)
         {
             printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i]);
+                   cond_list[i].c_str());
             continue;
         }
         if(cond[0]=="stkversion")
@@ -476,7 +476,7 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
         else
         {
             printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i]);
+                   cond_list[i].c_str());
             continue;
         }
 
