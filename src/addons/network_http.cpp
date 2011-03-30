@@ -454,7 +454,7 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
         if(cond[0]=="stkversion")
         {
             int news_version = versionToInt(cond[2]);
-            int stk_version  = versionToInt(VERSION);
+            int stk_version  = versionToInt(STK_VERSION);
             if(cond[1]=="=")
             {
                 if(news_version!=stk_version) return false;
@@ -574,7 +574,7 @@ std::string NetworkHttp::downloadToStrInternal(std::string url)
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + url;
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-    std::string uagent = (std::string)"SuperTuxKart/" + VERSION;
+    std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
     curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
         
     std::string fout;
@@ -607,7 +607,7 @@ bool NetworkHttp::downloadFileInternal(const std::string &file,
     std::string full_url = (std::string)UserConfigParams::m_server_addons 
                          + "/" + file;
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-    std::string uagent = (std::string)"SuperTuxKart/" + VERSION;
+    std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
     curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
     FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
                          "wb");

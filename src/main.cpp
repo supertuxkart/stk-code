@@ -364,12 +364,9 @@ int handleCmdLinePreliminary(int argc, char **argv)
         else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-V") )
         {
             printf("==============================\n");
-            fprintf ( stdout, "SuperTuxKart, %s.\n", VERSION ) ;
+            fprintf ( stdout, "SuperTuxKart, %s.\n", STK_VERSION ) ;
 #ifdef SVNVERSION
             fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
-#endif
-#if !defined(VERSION) && !defined(SVNVERSION)
-            fprintf ( stdout, "SuperTuxKart, unknown version\n" ) ;
 #endif
             printf("==============================\n");
             exit(0);

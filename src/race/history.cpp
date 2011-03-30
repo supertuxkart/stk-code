@@ -172,7 +172,7 @@ void History::Save()
 
     World *world   = World::getWorld();
     int  num_karts = world->getNumKarts();
-    fprintf(fd, "Version:  %s\n",   VERSION);
+    fprintf(fd, "Version:  %s\n",   STK_VERSION);
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
@@ -251,10 +251,10 @@ void History::Load()
     }
     else
     {
-        if (strcmp(s1,VERSION))
+        if (strcmp(s1,STK_VERSION))
         {
             fprintf(stderr, "WARNING: history is version '%s'\n",s1);
-            fprintf(stderr, "         STK version is '%s'\n",VERSION);
+            fprintf(stderr, "         STK version is '%s'\n",STK_VERSION);
         }
     }
     
