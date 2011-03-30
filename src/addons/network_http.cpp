@@ -267,8 +267,13 @@ void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
         int id=-1;
         node->get("id", &id);
 
+        std::string cond;
+        node->get("condition", &cond);
+        if(!conditionFulfilled(cond))
+            continue;
         m_news.lock();
         {
+
             // Define this if news messages should be removed
             // after being shown a certain number of times.
 #undef NEWS_MESSAGE_REMOVAL
@@ -422,6 +427,95 @@ void NetworkHttp::updateUserConfigFile() const
     UserConfigParams::m_ignore_message_id = -1;
 #endif
 }   // updateUserConfigFile
+
+// ----------------------------------------------------------------------------
+/** Checks if the given condition list are all fulfilled.
+ *  The conditions must be seperated by ";", and each condition
+ *  must be of the form "type comp version".
+ *  Type must be 'stkversion'
+ *  comp must be one of "<", "=", ">"
+ *  version must be a valid STK version string
+ *  \param cond The list of conditions
+ *  \return True if all conditions are true.
+ */
+bool NetworkHttp::conditionFulfilled(const std::string &cond)
+{
+    std::vector<std::string> cond_list;
+    cond_list = StringUtils::split(cond, ';');
+    for(unsigned int i=0; i<cond_list.size(); i++)
+    {
+        std::vector<std::string> cond = StringUtils::split(cond_list[i],' ');
+        if(cond.size()!=3)
+        {
+            printf("Invalid condition '%s' - assumed to be true.\n", 
+                   cond_list[i]);
+            continue;
+        }
+        if(cond[0]=="stkversion")
+        {
+            int news_version = versionToInt(cond[2]);
+            int stk_version  = versionToInt(VERSION);
+            if(cond[1]=="=")
+            {
+                if(news_version!=stk_version) return false;
+                continue;
+            }
+            if(cond[1]=="<")
+            {
+                if(news_version>=stk_version) return false;
+                continue;
+            }
+            if(cond[1]==">")
+            {
+                if(news_version<=stk_version) return false;
+                continue;
+            }
+            printf("Invalid comparison in condition '%s' - assumed true.\n",
+                   cond_list[i].c_str());
+        }
+        else
+        {
+            printf("Invalid condition '%s' - assumed to be true.\n", 
+                   cond_list[i]);
+            continue;
+        }
+
+    }   // for i < cond_list
+    return true;
+}   // conditionFulfilled
+
+// ----------------------------------------------------------------------------
+/** Converts a version string (in the form of 'X.Y.Za' into an
+ *  integer number.
+ *  \param s The version string to convert.
+ */
+int NetworkHttp::versionToInt(const std::string &version_string)
+{
+    // Special case: SVN
+    if(version_string=="SVN")
+        return -1;
+
+    std::vector<std::string> l = StringUtils::split(version_string, '.');
+    if(l.size()!=3)
+    {
+        printf("Invalid version string '%s'.\n", version_string.c_str());
+        return -1;
+    }
+    const std::string &s=l[2];
+    int very_minor=0;
+    if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
+    {
+        very_minor = s[s.size()-1]-'a'+1;
+        l[2] = l[2].substr(0, s.size()-1);
+    }
+    int version = 100000*atoi(l[0].c_str())
+                +   1000*atoi(l[1].c_str())
+                +     10*atoi(l[2].c_str())
+                + very_minor;
+    if(version<=0)
+        printf("Invalid version string '%s'.\n", s.c_str());
+    return version;
+}   // versionToInt
 
 // ----------------------------------------------------------------------------
 /** Reads the information about which message was dislpayed how often from

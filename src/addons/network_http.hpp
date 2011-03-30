@@ -126,7 +126,8 @@ private:
                                        bool is_asynchron);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
-
+    bool          conditionFulfilled(const std::string &cond);
+    int           versionToInt(const std::string &s);
 public:
                   NetworkHttp();
                  ~NetworkHttp();
