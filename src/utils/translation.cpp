@@ -71,6 +71,17 @@ const std::vector<std::string>* Translations::getLanguageList() const
 }
 
 
+char* wide_to_utf8(const wchar_t* input)
+{
+    static std::vector<char> utf8line;
+    utf8line.clear();
+    
+    utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
+    utf8line.push_back(0);
+    
+    return &utf8line[0];
+}
+
 wchar_t* utf8_to_wide(const char* input)
 {
     static std::vector<wchar_t> utf16line;
@@ -80,84 +91,6 @@ wchar_t* utf8_to_wide(const char* input)
     utf16line.push_back(0);
     
     return &utf16line[0];
-    
-    /*
-    static tinygettext_iconv_t cd = 0;
-    
-    if (cd == 0) cd = tinygettext_iconv_open("UTF-16", "UTF-8");
-    if (cd == reinterpret_cast<tinygettext_iconv_t>(-1))
-    {
-        fprintf(stderr, "[utf8_to_wide] ERROR: failed to init libiconv\n");
-        return L"?";
-    }
-    
-    size_t inbytesleft  = strlen(input);
-    size_t outbytesleft = 4*inbytesleft; // Worst case scenario: ASCII -> UTF-32?
-    
-    const unsigned int BUFF_SIZE = 512*4;
-    
-    if (outbytesleft > BUFF_SIZE)
-    {
-        fprintf(stderr, "[utf8_to_wide] ERROR: stirng too long : '%s'\n", input);
-    }
-    
-    static char temp_buffer[BUFF_SIZE];
-    
-    // Try to convert the text.
-    size_t ret = tinygettext_iconv(cd, &input, &inbytesleft, (char**)&temp_buffer, &outbytesleft);
-    if (ret == static_cast<size_t>(-1))
-    {
-        if (errno == EILSEQ || errno == EINVAL)
-        { // invalid multibyte sequence
-            tinygettext_iconv(cd, NULL, NULL, NULL, NULL); // reset state
-            
-            // FIXME: Could try to skip the invalid byte and continue
-            fprintf(stderr, "[Translation] ERROR: invalid multibyte sequence in '%s'\n", input);
-        }
-        else if (errno == E2BIG)
-        { // output buffer to small
-            fprintf(stderr, "[Translation] ERROR: E2BIG: This should never be reached\n");
-        }
-        else if (errno == EBADF)
-        {
-            fprintf(stderr, "[Translation] ERROR: EBADF: This should never be reached\n");
-        }
-        else
-        {
-            fprintf(stderr, "[Translation] ERROR: <unknown>: This should never be reached\n");
-        }
-        return L"?";
-    }
-    else
-    {
-        if (sizeof(wchar_t) == 2)
-        {
-            return (wchar_t*)temp_buffer;
-        }
-        else if (sizeof(wchar_t) == 4)
-        {
-            static wchar_t out_buffer[512];
-
-            // FIXME: endianness?
-            int i = 0;
-            for (char* ptr = temp_buffer; ; ptr += 2)
-            {
-                out_buffer[i] = (*ptr << 8) | *(ptr + 1);
-                
-                if (*ptr == 0 && *(ptr + 1) == 0) break;
-                
-                i++;
-            }
-            
-            return out_buffer;
-        }
-        else
-        {
-            fprintf(stderr, "Unknown wchar_t size : %lui\n", sizeof(wchar_t));
-            return L"?";
-        }
-    }
-     */
 }
 
 // ----------------------------------------------------------------------------
@@ -353,6 +286,11 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
     return in_ptr;
 }
 
+const wchar_t* Translations::w_gettext(const wchar_t* original)
+{
+    return w_gettext( wide_to_utf8(original) );
+}
+
 const wchar_t* Translations::w_gettext(const char* original)
 {
     if (original[0] == '\0') return L"";
@@ -363,26 +301,9 @@ const wchar_t* Translations::w_gettext(const char* original)
 
     const std::string& original_t = m_dictionary.translate(original);
 
-    /*
-    std::cout << "--> original_t==original ? " << (original_t==original) << std::endl;
-    int zeros = 0;
-    for (int n=0;; n+=1)
-    {
-        std::cout << original_t[n] << " (" << (unsigned)(original_t[n]) << ")\n";
-        if (original_t[n] == 0)
-        {
-            zeros++;
-            if (zeros >= 4) break;
-        }
-        else
-        {
-            zeros = 0;
-        }
-    }*/
-
     if (original_t == original)
     {
-        m_converted_string = core::stringw(original);
+        m_converted_string = utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << m_converted_string.c_str() << std::endl;

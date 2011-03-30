@@ -212,12 +212,11 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(warp_around,    PROP_WARP_AROUND);
 #undef READ_PROPERTY
                 
-                // FIXME :(
-                core::stringc text = xml->getAttributeValue( L"text" );
+                const wchar_t* text = xml->getAttributeValue( L"text" );
                 
                 if (text != NULL)
                 {
-                    widget.m_text = _(text.c_str());
+                    widget.m_text = _(text);
                 }
                 
                 if (parent != NULL)
