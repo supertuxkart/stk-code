@@ -114,7 +114,7 @@ namespace GUIEngine
          * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
          * with little analysis or layout performed on them.
          */
-        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& append_to,
+        static void parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& append_to,
                                        irr::gui::IGUIElement* parent = NULL);
         
         

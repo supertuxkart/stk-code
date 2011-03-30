@@ -54,7 +54,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
-    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + xmlFile).c_str() );
+    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + "/" + xmlFile).c_str() );
     if (xml == NULL)
     {
         fprintf(stderr, "Cannot open file %s\n", xmlFile);

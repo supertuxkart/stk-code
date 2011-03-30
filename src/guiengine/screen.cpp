@@ -111,7 +111,7 @@ void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
     
-    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
+    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     if (xml == NULL)
     {
         fprintf(stderr, "Cannot open file %s\n", m_filename.c_str());

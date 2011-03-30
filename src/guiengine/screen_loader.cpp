@@ -34,7 +34,7 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& append_to,
+void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& append_to,
                                 irr::gui::IGUIElement* parent)
 {
     // parse XML file
@@ -51,122 +51,122 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& a
             case irr::io::EXN_ELEMENT:
             {
                 /* find which type of widget is specified by the current tag, and instanciate it */
-                if (!strcmp("div", xml->getNodeName()))
+                if (wcscmp(L"div", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV);
                     append_to.push_back(w);
                 }
-                else if (!strcmp("stkgui", xml->getNodeName()))
+                else if (wcscmp(L"stkgui", xml->getNodeName()) == 0)
                 {
                     // outer node that's there only to comply with XML standard (and expat)
                     continue;
                 }
-                else if (!strcmp("placeholder", xml->getNodeName()))
+                else if (wcscmp(L"placeholder", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV, true);
                     append_to.push_back(w);
                 }
-                else if (!strcmp("box", xml->getNodeName()))
+                else if (wcscmp(L"box", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV);
                     w->m_show_bounding_box = true;
                     append_to.push_back(w);
                 }
-                else if (!strcmp("bottombar", xml->getNodeName()))
+                else if (wcscmp(L"bottombar", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV);
                     w->m_bottom_bar = true;
                     append_to.push_back(w);
                 }
-                else if (!strcmp("roundedbox", xml->getNodeName()))
+                else if (wcscmp(L"roundedbox", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV);
                     w->m_show_bounding_box = true;
                     w->m_is_bounding_box_round = true;
                     append_to.push_back(w);
                 }
-                else if (!strcmp("ribbon", xml->getNodeName()))
+                else if (wcscmp(L"ribbon", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new RibbonWidget());
                 }
-                else if (!strcmp("buttonbar", xml->getNodeName()))
+                else if (wcscmp(L"buttonbar", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new RibbonWidget(RIBBON_TOOLBAR));
                 }
-                else if (!strcmp("tabs", xml->getNodeName()))
+                else if (wcscmp(L"tabs", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new RibbonWidget(RIBBON_TABS));
                 }
-                else if (!strcmp("spinner", xml->getNodeName()))
+                else if (wcscmp(L"spinner", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new SpinnerWidget());
                 }
-                else if (!strcmp("button", xml->getNodeName()))
+                else if (wcscmp(L"button", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new ButtonWidget());
                 }
-                else if (!strcmp("gauge", xml->getNodeName()))
+                else if (wcscmp(L"gauge", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new SpinnerWidget(true));
                 }
-                else if (!strcmp("progressbar", xml->getNodeName()))
+                else if (wcscmp(L"progressbar", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new ProgressBarWidget());
                 }
-                else if (!strcmp("icon-button", xml->getNodeName()))
+                else if (wcscmp(L"icon-button", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new IconButtonWidget());
                 }
-                else if (!strcmp("icon", xml->getNodeName()))
+                else if (wcscmp(L"icon", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO,
                                                              false, false));
                 }
-                else if (!strcmp("checkbox", xml->getNodeName()))
+                else if (wcscmp(L"checkbox", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new CheckBoxWidget());
                 }
-                else if (!strcmp("label", xml->getNodeName()))
+                else if (wcscmp(L"label", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new LabelWidget());
                 }
-                else if (!strcmp("bright", xml->getNodeName()))
+                else if (wcscmp(L"bright", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new LabelWidget(false, true));
                 }
-                else if (!strcmp("bubble", xml->getNodeName()))
+                else if (wcscmp(L"bubble", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new BubbleWidget());
                 }
-                else if (!strcmp("header", xml->getNodeName()))
+                else if (wcscmp(L"header", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new LabelWidget(true));
                 }
-                else if (!strcmp("spacer", xml->getNodeName()))
+                else if (wcscmp(L"spacer", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new Widget(WTYPE_NONE));
                 }
-                else if (!strcmp("ribbon_grid", xml->getNodeName()))
+                else if (wcscmp(L"ribbon_grid", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new DynamicRibbonWidget(false /* combo */, true /* multi-row */));
                 }
-                else if (!strcmp("scrollable_ribbon", xml->getNodeName()))
+                else if (wcscmp(L"scrollable_ribbon", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new DynamicRibbonWidget(true /* combo */, false /* multi-row */));
                 }
-                else if (!strcmp("scrollable_toolbar", xml->getNodeName()))
+                else if (wcscmp(L"scrollable_toolbar", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new DynamicRibbonWidget(false /* combo */, false /* multi-row */));
                 }
-                else if (!strcmp("model", xml->getNodeName()))
+                else if (wcscmp(L"model", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new ModelViewWidget());
                 }
-                else if (!strcmp("list", xml->getNodeName()))
+                else if (wcscmp(L"list", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new ListWidget());
                 }
-                else if (!strcmp("textbox", xml->getNodeName()))
+                else if (wcscmp(L"textbox", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new TextBoxWidget());
                 }
@@ -182,8 +182,8 @@ void Screen::parseScreenFileDiv(irr::io::IrrXMLReader* xml, PtrVector<Widget>& a
                 
                 /* read widget properties using macro magic */
                 
-#define READ_PROPERTY( prop_name, prop_flag ) const char* prop_name = xml->getAttributeValue( #prop_name ); \
-if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_properties[prop_flag] = ""
+#define READ_PROPERTY( prop_name, prop_flag ) const wchar_t* prop_name = xml->getAttributeValue( L###prop_name ); \
+if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).c_str(); else widget.m_properties[prop_flag] = ""
                 
                 READ_PROPERTY(id,             PROP_ID);
                 READ_PROPERTY(proportion,     PROP_PROPORTION);
@@ -212,10 +212,12 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(warp_around,    PROP_WARP_AROUND);
 #undef READ_PROPERTY
                 
-                const char* text = xml->getAttributeValue( "text" );
+                // FIXME :(
+                core::stringc text = xml->getAttributeValue( L"text" );
+                
                 if (text != NULL)
                 {
-                    widget.m_text = _(text);
+                    widget.m_text = _(text.c_str());
                 }
                 
                 if (parent != NULL)
@@ -234,19 +236,19 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
             case irr::io::EXN_ELEMENT_END:
             {
                 // we're done parsing this 'div', return one step back in the recursive call
-                if (!strcmp("div", xml->getNodeName()))
+                if (wcscmp(L"div", xml->getNodeName()) == 0)
                     return;
-                if (!strcmp("box", xml->getNodeName()))
+                if (wcscmp(L"box", xml->getNodeName()) == 0)
                     return;
-                if (!strcmp("placeholder", xml->getNodeName()))
+                if (wcscmp(L"placeholder", xml->getNodeName()) == 0)
                     return;
-                if (!strcmp("roundedbox", xml->getNodeName()))
+                if (wcscmp(L"roundedbox", xml->getNodeName()) == 0)
                     return;
                 
                 // we're done parsing this 'ribbon', return one step back in the recursive call
-                if (!strcmp("ribbon", xml->getNodeName()) ||
-                    !strcmp("buttonbar", xml->getNodeName()) ||
-                    !strcmp("tabs", xml->getNodeName()))
+                if (wcscmp(L"ribbon", xml->getNodeName()) == 0 ||
+                    wcscmp(L"buttonbar", xml->getNodeName()) == 0 ||
+                    wcscmp(L"tabs", xml->getNodeName()) == 0)
                     return;
             }
                 break;
