@@ -7,21 +7,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-19 14:19-0400\n"
-"PO-Revision-Date: 2011-03-20 11:43+0200\n"
+"POT-Creation-Date: 2011-03-30 13:16-0400\n"
+"PO-Revision-Date: 2011-03-20 19:10+0000\n"
 "Last-Translator: Jorge Mariano <jmariano@ymail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-02-18 16:35+0000\n"
-"X-Generator: Launchpad (build 12399)\n"
+"X-Launchpad-Export-Date: 2011-03-30 20:24+0000\n"
+"X-Generator: Launchpad (build 12684)\n"
 
-#: src/utils/translation.cpp:265
+#: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
 msgstr "   Y"
 
-#: src/states_screens/options_screen_input.cpp:94
+#: src/states_screens/options_screen_input.cpp:95
 #, c-format
 msgid "   Keyboard %i"
 msgstr "   מקלדת i%i"
@@ -145,25 +145,34 @@ msgid "(Empty)"
 msgstr "(ריק)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:447
+#: data/po/gui_strings.h:429
 msgid "(network play is not yet available)"
 msgstr "(משחק ברשת עדיין אינו זמין)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:324
+#: data/po/gui_strings.h:318
 msgid "* Current key bindings can be seen/changed in menu Options"
 msgstr "* ניתן לראות ולשנות את מקשי המשחק בתפריט אפשרויות"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:418
-msgid "* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."
-msgstr "* רוב אלה מצבי משחק יכול להיות גם שיחק בצורה גרנד פרי: במקום לשחק במירוץ יחיד, אתה משחק רבות ברציפות. ייטב לך דרגה, יותר נקודות אתה מקבל. בסופו של דבר, השחקן עם הכי הרבה נקודות זוכה בגביע."
+#: data/po/gui_strings.h:404
+msgid ""
+"* Most of these game modes can also be played in a Grand Prix fashion: "
+"instead of playing a single race, you play many in a row. The better you "
+"rank, the more points you get. In the end, the player with the most points "
+"wins the cup."
+msgstr ""
+"* רוב אלה מצבי משחק יכול להיות גם שיחק בצורה גרנד פרי: במקום לשחק במירוץ "
+"יחיד, אתה משחק רבות ברציפות. ייטב לך דרגה, יותר נקודות אתה מקבל. בסופו של "
+"דבר, השחקן עם הכי הרבה נקודות זוכה בגביע."
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:607
-msgid "* Which config to use will be inferred from which 'fire' key is pressed to join the game."
+#: data/po/gui_strings.h:537
+msgid ""
+"* Which config to use will be inferred from which 'fire' key is pressed to "
+"join the game."
 msgstr "המקשים שיהיו פעילים ייקבעו לפי מקש ה'אש' שיילחץ כדי להצטרף למשחק."
 
 #. I18N: Game mode
@@ -173,9 +182,13 @@ msgstr "קרב של שלוש פגיעות"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:414
-msgid "3 Strikes Battle: only in multiplayer games. Hit others with weapons until they lose all their lives."
-msgstr "קרב של שלוש פגיעות:פגע באחרים בעזרת הנשקים עד שהם יאבדו את כל החיים. (רק במשחקים מרובי-משתתפים)"
+#: data/po/gui_strings.h:400
+msgid ""
+"3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
+"they lose all their lives."
+msgstr ""
+"קרב של שלוש פגיעות:פגע באחרים בעזרת הנשקים עד שהם יאבדו את כל החיים. (רק "
+"במשחקים מרובי-משתתפים)"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:189
 msgid "= Highscores ="
@@ -192,12 +205,12 @@ msgstr "בטל גרנד פרי"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:491
+#: data/po/gui_strings.h:469
 msgid "About"
 msgstr "אודות"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:173
+#: src/states_screens/options_screen_input2.cpp:180
 msgid "Accelerate"
 msgstr "האצה"
 
@@ -208,13 +221,13 @@ msgstr "הוסף תצורת מקלדת"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:638
+#: data/po/gui_strings.h:552
 msgid "Add Player"
 msgstr "הוסף שחקן"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:604
+#: data/po/gui_strings.h:534
 msgid "Add a device"
 msgstr "הוסף התקן"
 
@@ -226,12 +239,12 @@ msgstr "תוספים"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:479
+#: data/po/gui_strings.h:457
 msgid "Addons"
 msgstr "הרחבות"
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:880
+#: data/po/gui_strings.h:798
 msgid "Adiumy"
 msgstr "אדיומי"
 
@@ -242,26 +255,24 @@ msgstr "אדיומי"
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/kart_selection.cpp:888
-#: src/states_screens/options_screen_video.cpp:320
-#: src/states_screens/tracks_screen.cpp:85
-#: data/po/gui_strings.h:230
+#: src/states_screens/kart_selection.cpp:889
+#: src/states_screens/options_screen_video.cpp:278
+#: src/states_screens/tracks_screen.cpp:85 data/po/gui_strings.h:230
 msgid "All"
 msgstr "כולם"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:753
+#: data/po/gui_strings.h:670
 msgid "All Tracks"
 msgstr "כל המסלולים"
 
-#: src/states_screens/race_setup_screen.cpp:193
+#: src/states_screens/race_setup_screen.cpp:197
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "הכל מותר, אז תפוס את הנשקים והשתמש בהם בתבונה!"
 
 #. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164
-#: data/po/gui_strings.h:862
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:780
 msgid "All tracks"
 msgstr "כל המסלולים"
 
@@ -271,28 +282,36 @@ msgid "Amazonian Journey"
 msgstr "נסיעה באמזונס"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:369
+#: data/po/gui_strings.h:359
 msgid "Anchor - slows down greatly the kart in the first position"
 msgstr "עוגן - מאט מאוד את מכוניות הקרטינג במיקום הראשון"
 
-#: src/states_screens/options_screen_video.cpp:328
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:289
 #, c-format
 msgid "Animated Characters : %s"
 msgstr "מונפשות מכוניות קרטינג במירוץ : %s"
 
-#: src/states_screens/options_screen_video.cpp:326
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:285
 #, c-format
 msgid "Animated Scenery : %s"
 msgstr "אפקטים מונפשים ונוף : %s"
 
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:292
+#, c-format
+msgid "Anti-aliasing (requires restart) : %s"
+msgstr ""
+
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
-#: data/po/gui_strings.h:681
+#: data/po/gui_strings.h:602
 msgid "Apply new resolution"
 msgstr "להחיל ברזולוציה חדשה"
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_input2.cpp:433
+#: src/states_screens/options_screen_input2.cpp:446
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "האם אתה בטוח שברצונך למחוק לצמיתות את התצורה הזאת?"
 
@@ -315,37 +334,28 @@ msgstr "אררג, %s השליך עוגן, קפטן!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:692
+#: data/po/gui_strings.h:609
 msgid "Assign to ESC key"
 msgstr "הקצה למקש ESC"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167
-#: data/po/gui_strings.h:865
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:783
 msgid "At World's End"
 msgstr "בסוף העולם"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_device.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_players.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: Section in the settings menu
-#: data/po/gui_strings.h:510
-#: data/po/gui_strings.h:557
-#: data/po/gui_strings.h:588
-#: data/po/gui_strings.h:622
-#: data/po/gui_strings.h:653
+#: src/states_screens/options_screen_input.cpp:130
+#: src/states_screens/options_screen_input2.cpp:71
+#: src/states_screens/options_screen_players.cpp:68
+#: src/states_screens/options_screen_ui.cpp:110
+#: src/states_screens/options_screen_video.cpp:80 data/po/gui_strings.h:480
 msgid "Audio"
 msgstr "קול"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:308
+#: data/po/gui_strings.h:302
 msgid "Avoid bananas!"
 msgstr "להימנע מבננה"
 
@@ -359,60 +369,29 @@ msgstr "ציר %d %s"
 #. I18N: In the options menu, to go back to the main menu or game
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #. I18N: Addons
-#. I18N: ./data/gui/help1.stkgui
-#. I18N: In the help menu, to return to the previous screen
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: In the help menu, to return to the previous screen
-#. I18N: ./data/gui/help3.stkgui
-#. I18N: In the help menu, to return to the previous screen
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: In the help menu, to return to the previous screen
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#. I18N: ./data/gui/options_device.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#. I18N: ./data/gui/options_players.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
 #: src/states_screens/dialogs/addons_loading.cpp:119
-#: src/states_screens/dialogs/addons_loading.cpp:124
-#: data/po/gui_strings.h:194
+#: src/states_screens/dialogs/addons_loading.cpp:124 data/po/gui_strings.h:194
 #: data/po/gui_strings.h:211
-#: data/po/gui_strings.h:328
-#: data/po/gui_strings.h:376
-#: data/po/gui_strings.h:422
-#: data/po/gui_strings.h:459
-#: data/po/gui_strings.h:546
-#: data/po/gui_strings.h:577
-#: data/po/gui_strings.h:611
-#: data/po/gui_strings.h:642
-#: data/po/gui_strings.h:685
 msgid "Back"
 msgstr "אחורה"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:703
+#: data/po/gui_strings.h:620
 msgid "Back to Race"
 msgstr "המשך במרוץ"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:573
+#: data/po/gui_strings.h:519
 msgid "Back to device list"
 msgstr "חזור לרשימת ההתקנים"
 
-#. I18N: ./data/gui/challenges.stkgui
-#. I18N: ./data/gui/credits.stkgui
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:237
-#: data/po/gui_strings.h:260
-#: data/po/gui_strings.h:760
-msgid "Back to main menu"
-msgstr "בחזרה לדף הראשי"
+#. I18N: In the options menu, to go back to the main menu or game
+#: data/po/gui_strings.h:678
+msgid "Back to menu"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:389
 msgid "Back to the main menu"
@@ -427,7 +406,7 @@ msgid "Banana? Box? Banana? Box? Banana? Box?"
 msgstr "בננה? קופסה? בננה? קופסה? בננה? קופסה?"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:883
+#: data/po/gui_strings.h:801
 msgid "Beagle"
 msgstr "ביגל"
 
@@ -442,24 +421,31 @@ msgid "Bovine Barnyard"
 msgstr "משק"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:363
-msgid "Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."
+#: data/po/gui_strings.h:353
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
+"backwards."
 msgstr "כדור באולינג - קופץ על הקירות. אם אתה מסתכל אחורה, הוא ייזרק אחורה."
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:176
+#: src/states_screens/options_screen_input2.cpp:183
 msgid "Brake"
 msgstr "מעצור"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:354
+#: data/po/gui_strings.h:344
 msgid "BubbleGum - leave a sticky pink puddle behind you"
 msgstr "מסטיק - משאיר שלולית ורודה דביקה מאחוריך"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:357
-msgid "Cake - thrown at the closest rival, best on short ranges and long straights"
+#: data/po/gui_strings.h:347
+msgid ""
+"Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr "עוגה - מושלכת על היריב הקרוב, יעיל לטווחים קצרים או לקטעים ישרים"
+
+#: src/addons/network_http.cpp:296
+msgid "Can't access stkaddons server..."
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -468,8 +454,7 @@ msgstr "עוגה - מושלכת על היריב הקרוב, יעיל לטווח�
 #: src/states_screens/dialogs/add_device_dialog.cpp:76
 #: src/states_screens/dialogs/addons_loading.cpp:96
 #: src/states_screens/dialogs/player_info_dialog.cpp:89
-#: data/po/gui_strings.h:245
-#: data/po/gui_strings.h:253
+#: data/po/gui_strings.h:242 data/po/gui_strings.h:250
 msgid "Cancel"
 msgstr "ביטול"
 
@@ -479,7 +464,7 @@ msgid "Cancel Remove"
 msgstr "בטל מחיקה"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:212
+#: src/states_screens/options_screen_input2.cpp:219
 msgid "Cancel/Back"
 msgstr "בטל\\חזור"
 
@@ -495,7 +480,7 @@ msgstr "מערת X"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:475
+#: data/po/gui_strings.h:453
 msgid "Challenges"
 msgstr "אתגרים"
 
@@ -507,50 +492,48 @@ msgstr "אתגרים: חדר גביעים"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:463
+#: data/po/gui_strings.h:441
 msgid "Choose a Kart"
 msgstr "בחר מכוניות קרטינג"
 
-#. I18N: ./data/tracks/city/track.xml
-#: data/po/gui_strings.h:8
-msgid "City"
-msgstr "העיר"
-
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86
-#: data/po/gui_strings.h:784
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:702
 msgid "Collect Nitro in Math Class"
 msgstr "אסוף מיכלי ניטרו בכיתת חשבון."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:304
+#: data/po/gui_strings.h:298
 msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr "אסוף קופסאות כחולות: הן יתנו לך נשקים וכוחות אחרים"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128
-#: data/po/gui_strings.h:826
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:744
 msgid "Collect fuel for your rocket"
 msgstr "לאסוף דלק טילים שלך"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152
-#: data/po/gui_strings.h:850
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:768
 msgid "Collect the Pharaohs Treasure"
 msgstr "אסוף את אוצר הפרעונים"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:312
-msgid "Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."
-msgstr "על ידי איסוף מיכלי ניטרו, תוכל להאיץ כשתרצה בלחיצה על המקש המתאים. תוכל לראות את הרמה הנוכחית של הניטרו בפס שנמצא בצד ימין של המסך."
+#: data/po/gui_strings.h:306
+msgid ""
+"Collecting nitro allows you to get speed boosts whenever you wish by "
+"pressing the appropriate key. You can see your current level of nitro in the "
+"bar at the right of the game screen."
+msgstr ""
+"על ידי איסוף מיכלי ניטרו, תוכל להאיץ כשתרצה בלחיצה על המקש המתאים. תוכל "
+"לראות את הרמה הנוכחית של הניטרו בפס שנמצא בצד ימין של המסך."
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71
-#: data/po/gui_strings.h:769
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:687
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
-msgstr "מגיעים לראשונה ב 'סוף העולם' גרנד פרי עם שלושה מכוניות קרטינג הב\"מ  ברמת מומחה."
+msgstr ""
+"מגיעים לראשונה ב 'סוף העולם' גרנד פרי עם שלושה מכוניות קרטינג הב\"מ  ברמת "
+"מומחה."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
@@ -563,17 +546,15 @@ msgstr "אשר הסרה"
 msgid "Confirm resolution within %i seconds"
 msgstr "אשר רזולוציה תוך %i שניות"
 
-#: src/states_screens/race_setup_screen.cpp:200
+#: src/states_screens/race_setup_screen.cpp:204
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "ללא כוחות, כך שרק כישורי הנהיגה משנים!"
 
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
-#: src/states_screens/race_result_gui.cpp:92
-#: data/po/gui_strings.h:271
-#: data/po/gui_strings.h:274
-#: data/po/gui_strings.h:277
+#: src/states_screens/race_result_gui.cpp:92 data/po/gui_strings.h:265
+#: data/po/gui_strings.h:268 data/po/gui_strings.h:271
 msgid "Continue"
 msgstr "המשך"
 
@@ -581,21 +562,15 @@ msgstr "המשך"
 msgid "Continue Grand Prix"
 msgstr "המשך בגרנד פרי"
 
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_players.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: Section in the settings menu
-#: data/po/gui_strings.h:518
-#: data/po/gui_strings.h:565
-#: data/po/gui_strings.h:596
-#: data/po/gui_strings.h:630
-#: data/po/gui_strings.h:661
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_players.cpp:70
+#: src/states_screens/options_screen_ui.cpp:112
+#: src/states_screens/options_screen_video.cpp:83 data/po/gui_strings.h:511
+#: data/po/gui_strings.h:526
 msgid "Controls"
 msgstr "מקשים"
 
@@ -606,7 +581,7 @@ msgstr "קויוטי קניון"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:257
+#: data/po/gui_strings.h:254
 msgid "Credits"
 msgstr "תודות"
 
@@ -617,8 +592,7 @@ msgstr "הסהר מעבר"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: To delete a keyboard configuration
-#: src/states_screens/options_screen_input2.cpp:86
-#: data/po/gui_strings.h:569
+#: src/states_screens/options_screen_input2.cpp:93 data/po/gui_strings.h:515
 msgid "Delete Configuration"
 msgstr "מחק תצורה"
 
@@ -633,15 +607,21 @@ msgid "Description: %i"
 msgstr "תיאור: %i"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:73
-#: src/states_screens/options_screen_input2.cpp:443
+#: src/states_screens/options_screen_input2.cpp:80
+#: src/states_screens/options_screen_input2.cpp:456
 msgid "Disable Device"
 msgstr "להשבית את המכשיר"
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
-#: src/states_screens/options_screen_video.cpp:318
+#: src/states_screens/options_screen_video.cpp:276
 msgid "Disabled"
 msgstr "לא זמין"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+#: data/po/gui_strings.h:567
+msgid "Display FPS"
+msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -658,7 +638,7 @@ msgid "Don't accelerate before go"
 msgstr "לא להאיץ לפני לצאת"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:200
+#: src/states_screens/options_screen_input2.cpp:207
 msgid "Down"
 msgstr "למטה"
 
@@ -667,22 +647,21 @@ msgid "Download failed.\n"
 msgstr "ההורדה נכשלה.\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:886
+#: data/po/gui_strings.h:804
 msgid "Elephpant"
 msgstr "פיל"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:75
-#: src/states_screens/options_screen_input2.cpp:444
+#: src/states_screens/options_screen_input2.cpp:82
+#: src/states_screens/options_screen_input2.cpp:457
 msgid "Enable Device"
 msgstr "הפעלת המכשיר"
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:316
-#: data/po/gui_strings.h:526
-#: data/po/gui_strings.h:538
+#: src/states_screens/options_screen_video.cpp:274 data/po/gui_strings.h:488
+#: data/po/gui_strings.h:500
 msgid "Enabled"
 msgstr "פעיל"
 
@@ -691,17 +670,17 @@ msgid "Energy"
 msgstr "אנרגיה"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:134
+#: src/states_screens/main_menu_screen.cpp:141
 msgid "English"
-msgstr "אנגלית"
+msgstr "עברית"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:264
+#: data/po/gui_strings.h:258
 msgid "Enter the new player's name"
 msgstr "הקלד את שם השחקן החדש"
 
-#: src/states_screens/kart_selection.cpp:1091
+#: src/states_screens/kart_selection.cpp:1092
 msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
@@ -711,13 +690,13 @@ msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:723
+#: data/po/gui_strings.h:640
 msgid "Exit Race"
 msgstr "צא מהמרוץ"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:742
+#: data/po/gui_strings.h:659
 msgid "Expert"
 msgstr "מקצוען"
 
@@ -730,69 +709,85 @@ msgid "Final lap!"
 msgstr "הקפה אחרונה!"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113
-#: data/po/gui_strings.h:811
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:729
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-msgstr "לסיים שלוש הקפות של משק עם שלוש מכוניות קרטינג הב\"מ ברמה קלה מתחת 2:30 דקות."
+msgstr ""
+"לסיים שלוש הקפות של משק עם שלוש מכוניות קרטינג הב\"מ ברמה קלה מתחת 2:30 דקות."
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149
-#: data/po/gui_strings.h:847
-msgid "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
-msgstr "לסיים שלוש הקפות של מגדלור עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה תחת 1:30 דקות."
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:765
+msgid ""
+"Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
+msgstr ""
+"לסיים שלוש הקפות של מגדלור עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה תחת 1:30 "
+"דקות."
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101
-#: data/po/gui_strings.h:799
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:717
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
-msgstr "לסיים שלוש הקפות במכרות עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה מתחת 3:00 דקות."
+msgstr ""
+"לסיים שלוש הקפות במכרות עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה מתחת 3:00 "
+"דקות."
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110
-#: data/po/gui_strings.h:808
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:726
 msgid "Finish Farm in 2:30"
 msgstr "סיום משק ב 2:30"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146
-#: data/po/gui_strings.h:844
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:762
 msgid "Finish Lighthouse in 1:30"
 msgstr "סיום המגדלור ב 1:30"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98
-#: data/po/gui_strings.h:796
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:714
 msgid "Finish Mines in 3:00"
 msgstr "סיום מוקשים ב 3:00"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89
-#: data/po/gui_strings.h:787
-msgid "Finish with at least 10 points of nitro on three laps of Oliver's Math Class in under 55 seconds."
-msgstr "סיום עם לפחות 10 נקודות של ניטרו על שלושה סיבובים של \"שיעור מתמטיקה של אוליבר\"  מתחת 55 שניות"
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:705
+msgid ""
+"Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
+"in under 55 seconds."
+msgstr ""
+"סיום עם לפחות 10 נקודות של ניטרו על שלושה סיבובים של \"שיעור מתמטיקה של "
+"אוליבר\"  מתחת 55 שניות"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155
-#: data/po/gui_strings.h:853
-msgid "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under 2:20 minutes."
-msgstr "סיום עם לפחות 12 נקודות ניטרו ב 3 הקפות של חולות נודדים תחת 2:20 דקות."
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:771
+msgid ""
+"Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
+"2:20 minutes."
+msgstr ""
+"סיום עם לפחות 12 נקודות ניטרו ב 3 הקפות של חולות נודדים תחת 2:20 דקות."
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131
-#: data/po/gui_strings.h:829
-msgid "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 minutes."
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:747
+msgid ""
+"Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
+"minutes."
 msgstr "סיום עם לפחות 16 נקודות ניטרו ב 2 הקפות של XR591 מתחת 2:30 דקות."
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:179
+#: src/states_screens/options_screen_input2.cpp:186
 msgid "Fire"
 msgstr "אש"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:451
-msgid "First, you will need several input devices (having multiple gamepads or joysticks is the best way to play with several people). Go in the input configuration screen and setup the gamepads. It is also possible to play on keyboard(s), however each player will need a different set of keys, and keep in mind that most keyboards are not appropriate for multiplayer gameplay because they do not support large number of keypresses."
-msgstr "ראשית, תצטרך התקני קלט כמה (לאחר בקר מרובים או ג'ויסטיקים היא הדרך הטובה ביותר כדי לשחק עם כמה אנשים). עבור במסך קלט תצורת ההתקנה בקר. אפשר גם לשחק על מקלדת / מקלדות, אולם כל שחקן יצטרך קבוצה שונה של מקשים, וגם לזכור כי רוב מקלדות אינן מתאימות משחק מרובי כי הם אינם תומכים במספר רב של לוחץ המקש."
+#: data/po/gui_strings.h:433
+msgid ""
+"First, you will need several input devices (having multiple gamepads or "
+"joysticks is the best way to play with several people). Go in the input "
+"configuration screen and setup the gamepads. It is also possible to play on "
+"keyboard(s), however each player will need a different set of keys, and keep "
+"in mind that most keyboards are not appropriate for multiplayer gameplay "
+"because they do not support large number of keypresses."
+msgstr ""
+"ראשית, תצטרך התקני קלט כמה (לאחר בקר מרובים או ג'ויסטיקים היא הדרך הטובה "
+"ביותר כדי לשחק עם כמה אנשים). עבור במסך קלט תצורת ההתקנה בקר. אפשר גם לשחק "
+"על מקלדת / מקלדות, אולם כל שחקן יצטרך קבוצה שונה של מקשים, וגם לזכור כי רוב "
+"מקלדות אינן מתאימות משחק מרובי כי הם אינם תומכים במספר רב של לוחץ המקש."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:147
@@ -800,22 +795,25 @@ msgid "Follow the Leader"
 msgstr "עקוב אחרי המוביל"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122
-#: data/po/gui_strings.h:820
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:738
 msgid "Follow the Leader around the Solar System"
 msgstr "אחרי המנהיג סביב מערכת השמש"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74
-#: data/po/gui_strings.h:772
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:690
 msgid "Follow the Leader on a Desert Island"
 msgstr "תאקוב ארחי המנהיג במירוץ \"אי בודד\""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:410
-msgid "Follow the leader: run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"
-msgstr "עקוב אחרי המוביל: להפעיל על המקום השני, כמו מכוניות קרטינג האחרון ייפסל בכל פעם את הלהיטים נגד אפס. היזהרו: הולך מול מנהיג תקבלו בוטלו מדי!"
+#: data/po/gui_strings.h:396
+msgid ""
+"Follow the leader: run for second place, as the last kart will be "
+"disqualified every time the counter hits zero. Beware : going in front of "
+"the leader will get you eliminated too!"
+msgstr ""
+"עקוב אחרי המוביל: להפעיל על המקום השני, כמו מכוניות קרטינג האחרון ייפסל בכל "
+"פעם את הלהיטים נגד אפס. היזהרו: הולך מול מנהיג תקבלו בוטלו מדי!"
 
 #. I18N: ./data/tracks/fortmagma/track.xml
 #: data/po/gui_strings.h:17
@@ -824,7 +822,7 @@ msgstr "פורט מאגמה"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:677
+#: data/po/gui_strings.h:598
 msgid "Fullscreen"
 msgstr "מסך-מלא"
 
@@ -834,7 +832,7 @@ msgid "GP scores :"
 msgstr "ניקוד:"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:117
+#: src/states_screens/options_screen_input2.cpp:124
 msgid "Game Keys"
 msgstr "מקשי משחק"
 
@@ -846,10 +844,8 @@ msgstr "מקשי משחק"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:292
-#: data/po/gui_strings.h:343
-#: data/po/gui_strings.h:391
-#: data/po/gui_strings.h:437
+#: data/po/gui_strings.h:286 data/po/gui_strings.h:333
+#: data/po/gui_strings.h:377 data/po/gui_strings.h:419
 msgid "Game Modes"
 msgstr "מצבי משחק"
 
@@ -873,10 +869,8 @@ msgstr "בקר כובה %d"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:284
-#: data/po/gui_strings.h:335
-#: data/po/gui_strings.h:383
-#: data/po/gui_strings.h:429
+#: data/po/gui_strings.h:278 data/po/gui_strings.h:325
+#: data/po/gui_strings.h:369 data/po/gui_strings.h:411
 msgid "General"
 msgstr "הגדרות כלליות"
 
@@ -885,51 +879,43 @@ msgid "Geronimo!!!"
 msgstr "גירונימו !!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:889
+#: data/po/gui_strings.h:807
 msgid "Gnu"
 msgstr "גנו"
 
-#: src/states_screens/minimal_race_gui.cpp:102
+#: src/states_screens/minimal_race_gui.cpp:114
 #: src/states_screens/race_gui.cpp:113
 msgid "Go!"
 msgstr "צא!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:892
+#: data/po/gui_strings.h:810
 msgid "Gooey"
 msgstr "דביק"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:749
+#: data/po/gui_strings.h:666
 msgid "Grand Prix"
 msgstr "גרנד פרי"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:669
+#: data/po/gui_strings.h:586
 msgid "Graphical Effects Settings"
 msgstr "הגדרות אפקטים גרפיים"
 
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_device.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_players.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: data/po/gui_strings.h:506
-#: data/po/gui_strings.h:553
-#: data/po/gui_strings.h:584
-#: data/po/gui_strings.h:618
-#: data/po/gui_strings.h:649
+#: src/states_screens/options_screen_audio.cpp:63
+#: src/states_screens/options_screen_input.cpp:129
+#: src/states_screens/options_screen_input2.cpp:70
+#: src/states_screens/options_screen_players.cpp:67
+#: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:582
 msgid "Graphics"
 msgstr "גרפיקה"
 
-#: src/config/user_config.cpp:422
+#: src/config/user_config.cpp:487
 msgid "Guest"
 msgstr "אורח"
 
@@ -942,13 +928,12 @@ msgstr "אסיינדה"
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:487
-#: data/po/gui_strings.h:719
+#: data/po/gui_strings.h:465 data/po/gui_strings.h:636
 msgid "Help"
 msgstr "עזרה"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:895
+#: data/po/gui_strings.h:813
 msgid "Hexley"
 msgstr "אקסלי"
 
@@ -956,18 +941,23 @@ msgstr "אקסלי"
 msgid "Highscores"
 msgstr "טבלת אלופים"
 
-#: src/states_screens/race_setup_screen.cpp:222
-msgid "Hit others with weapons until they lose all their lives. (Only in multiplayer games)"
-msgstr "פגע באחרים בעזרת הנשקים עד שהם יאבדו את כל החיים. (רק במשחקים מרובי-משתתפים)"
+#: src/states_screens/race_setup_screen.cpp:226
+msgid ""
+"Hit others with weapons until they lose all their lives. (Only in "
+"multiplayer games)"
+msgstr ""
+"פגע באחרים בעזרת הנשקים עד שהם יאבדו את כל החיים. (רק במשחקים מרובי-משתתפים)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:316
-msgid "If you see a button with a lock like this one, you need to complete a challenge to unlock it."
+#: data/po/gui_strings.h:310
+msgid ""
+"If you see a button with a lock like this one, you need to complete a "
+"challenge to unlock it."
 msgstr "אם אתה רואה כפתור עם מנעול כזה, תצטרך לעבור אתגר כדי לפתוח אותו."
 
 #. I18N: message shown when an input device is used but is not associated to any player
-#: src/input/input_manager.cpp:527
+#: src/input/input_manager.cpp:537
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr "מתעלם מ-'%s', היית צריך להצטרף מוקדם יותר כדי לשחק!"
@@ -980,9 +970,15 @@ msgstr "התקנה"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:738
+#: data/po/gui_strings.h:655
 msgid "Intermediate"
 msgstr "בינוני"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+#: data/po/gui_strings.h:571
+msgid "Internet STK news"
+msgstr ""
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -992,22 +988,22 @@ msgstr "מכוניות קרטינג"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:249
+#: data/po/gui_strings.h:246
 msgid "Keep this resolution"
 msgstr "שמור את הרזולוציה"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:213
+#: src/states_screens/race_setup_screen.cpp:217
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "תמשיכו עם מכוניות קרטינג מנהיג אבל לא לעקוף אותו!"
 
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:898
+#: data/po/gui_strings.h:816
 msgid "Konqi"
 msgstr "קונקי"
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/minimal_race_gui.cpp:94
+#: src/states_screens/minimal_race_gui.cpp:108
 #: src/states_screens/race_gui.cpp:105
 msgid "Lap"
 msgstr "הקפה"
@@ -1017,44 +1013,37 @@ msgstr "הקפה"
 msgid "Lap %i"
 msgstr "הקפות %i"
 
-#: src/modes/follow_the_leader.cpp:196
-#: src/modes/tutorial_race.cpp:192
+#: src/modes/follow_the_leader.cpp:201 src/modes/tutorial_race.cpp:192
 msgid "Leader"
 msgstr "מוביל"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:203
+#: src/states_screens/options_screen_input2.cpp:210
 msgid "Left"
 msgstr "שמאלה"
 
-#: src/guiengine/engine.cpp:1071
+#: src/guiengine/engine.cpp:1077
 msgid "Loading"
 msgstr "טעינה"
 
-#. I18N: ./data/gui/main.stkgui
-#. I18N: In the main screen
-#: data/po/gui_strings.h:499
-msgid "Loading news from stkaddons..."
-msgstr "טוען הרחבות חדשות..."
-
-#: src/states_screens/arenas_screen.cpp:188
-#: src/states_screens/arenas_screen.cpp:211
+#: src/states_screens/arenas_screen.cpp:192
+#: src/states_screens/arenas_screen.cpp:215
 #: src/states_screens/challenges.cpp:96
-#: src/states_screens/kart_selection.cpp:796
-#: src/states_screens/kart_selection.cpp:1713
-#: src/states_screens/kart_selection.cpp:1739
-#: src/states_screens/race_setup_screen.cpp:205
-#: src/states_screens/tracks_screen.cpp:279
-#: src/states_screens/tracks_screen.cpp:303
+#: src/states_screens/kart_selection.cpp:797
+#: src/states_screens/kart_selection.cpp:1718
+#: src/states_screens/kart_selection.cpp:1744
+#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/tracks_screen.cpp:283
+#: src/states_screens/tracks_screen.cpp:307
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "נעול! השלם אתגר פעיל כדי לקבל גישה לעוד!"
 
-#: src/states_screens/tracks_screen.cpp:229
+#: src/states_screens/tracks_screen.cpp:233
 msgid "Locked!"
 msgstr "נעול!"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:188
+#: src/states_screens/options_screen_input2.cpp:195
 msgid "Look Back"
 msgstr "הבט אחורה"
 
@@ -1064,19 +1053,25 @@ msgstr "קסם, בן. שום דבר אחר לא מריח ככה."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:300
+#: data/po/gui_strings.h:294
 msgid "Make your rivals bite dust!"
 msgstr "גרום ליריביך לאכול אבק!"
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:322
+#: src/states_screens/options_screen_video.cpp:280
 msgid "Me Only"
 msgstr "רק אני"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:130
+#: src/states_screens/options_screen_input2.cpp:137
 msgid "Menu Keys"
 msgstr "מקשי תפריט"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+#: data/po/gui_strings.h:575
+msgid "Minimal Race GUI"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:268
@@ -1091,9 +1086,15 @@ msgid "Mouse button %d"
 msgstr "עכבר כפתור %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:901
+#: data/po/gui_strings.h:819
 msgid "Mozilla"
 msgstr "מוזילה"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:449
+msgid "Multiplayer Race"
+msgstr "רב-משתתפים"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1103,22 +1104,14 @@ msgstr "מוזילה"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:296
-#: data/po/gui_strings.h:347
-#: data/po/gui_strings.h:395
-#: data/po/gui_strings.h:441
-msgid "Multiplayer"
-msgstr "רב-משתתפים"
-
-#. I18N: ./data/gui/main.stkgui
-#. I18N: Main menu button
-#: data/po/gui_strings.h:471
-msgid "Multiplayer Race"
-msgstr "רב-משתתפים מרוץ"
+#: data/po/gui_strings.h:290 data/po/gui_strings.h:337
+#: data/po/gui_strings.h:381 data/po/gui_strings.h:423
+msgid "Multi­player"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
-#: data/po/gui_strings.h:522
+#: data/po/gui_strings.h:484
 msgid "Music"
 msgstr "מוזיקה"
 
@@ -1162,17 +1155,17 @@ msgid "New track '%s' now available"
 msgstr "מסלול חדש '%s' זמין כעת"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:182
+#: src/states_screens/options_screen_input2.cpp:189
 msgid "Nitro"
 msgstr "ניטרו"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:904
+#: data/po/gui_strings.h:822
 msgid "Nolok"
 msgstr "נולוק"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:324
+#: src/states_screens/options_screen_video.cpp:282
 msgid "None"
 msgstr "לא זמין"
 
@@ -1188,13 +1181,13 @@ msgstr "הנופש בצפון"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:734
+#: data/po/gui_strings.h:651
 msgid "Novice"
 msgstr "מתחיל"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: In race setup menu
-#: data/po/gui_strings.h:730
+#: data/po/gui_strings.h:647
 msgid "Number of AI karts"
 msgstr "מספר מכוניות קרטינג הב\"מ"
 
@@ -1214,7 +1207,7 @@ msgstr "שיעור מתמטיקה של אוליבר"
 
 #. I18N: message shown when a player that isn't game master tries to modify options that
 #. I18N: only the game master is allowed to
-#: src/input/input_manager.cpp:552
+#: src/input/input_manager.cpp:562
 msgid "Only the Game Master may act at this point!"
 msgstr "רק מנהל המשחק יכול לפעול בשלב זה!"
 
@@ -1222,18 +1215,17 @@ msgstr "רק מנהל המשחק יכול לפעול בשלב זה!"
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:483
-#: data/po/gui_strings.h:715
+#: data/po/gui_strings.h:461 data/po/gui_strings.h:632
 msgid "Options"
 msgstr "אפשרויות"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:366
+#: data/po/gui_strings.h:356
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "מצנח - מאט את כל המכוניות שמלפניך!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
-#: data/po/gui_strings.h:699
+#: data/po/gui_strings.h:616
 msgid "Paused"
 msgstr "מופסק"
 
@@ -1242,36 +1234,27 @@ msgid "Penalty time!!"
 msgstr "זמן קנוס!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170
-#: data/po/gui_strings.h:868
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:786
 msgid "Penguin Playground"
 msgstr "מגרש המשחקים של הפינגווינים"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:907
+#: data/po/gui_strings.h:825
 msgid "Pidgin"
 msgstr "פידג'ין"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:763
+#: data/po/gui_strings.h:681
 msgid "Play all"
 msgstr "שחקו הכל"
 
-#. I18N: ./data/gui/options_audio.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_device.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: Section in the settings menu
-#: data/po/gui_strings.h:514
-#: data/po/gui_strings.h:561
-#: data/po/gui_strings.h:592
-#: data/po/gui_strings.h:626
-#: data/po/gui_strings.h:657
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_input.cpp:132
+#: src/states_screens/options_screen_input2.cpp:73
+#: src/states_screens/options_screen_ui.cpp:111
+#: src/states_screens/options_screen_video.cpp:82 data/po/gui_strings.h:544
 msgid "Players"
 msgstr "שחקנים"
 
@@ -1281,33 +1264,35 @@ msgid "Please re-configure your key bindings."
 msgstr "נא הגדר מחדש את המקשים"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:360
-msgid "Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight!"
-msgstr "פומפה - השלך קדימה כדי למשוך יריב אחורה, או השלך אחורה כדי לעוור יריב!"
+#: data/po/gui_strings.h:350
+msgid ""
+"Plunger - throw straight to pull an opponent back, or throw while looking "
+"back to make one lose sight!"
+msgstr ""
+"פומפה - השלך קדימה כדי למשוך יריב אחורה, או השלך אחורה כדי לעוור יריב!"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: When configuring input
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:268
-#: data/po/gui_strings.h:696
+#: data/po/gui_strings.h:262 data/po/gui_strings.h:613
 msgid "Press ESC to cancel"
 msgstr "לחץ ESC כדי לבטל"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:688
+#: data/po/gui_strings.h:605
 msgid "Press a key"
 msgstr "הקש מקש כלשהו"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In key bindings configuration menu
-#: data/po/gui_strings.h:600
+#: data/po/gui_strings.h:530
 msgid "Press enter or double-click on a device to configure it"
 msgstr "הקש אנטר או הקלק פעמים על התקן כדי להגדיר אותו"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:634
+#: data/po/gui_strings.h:548
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr "הקש אנטר או הקלק פעמיים על שחקן כדי לערוך אותו"
 
@@ -1322,19 +1307,19 @@ msgid "Problems removing the addon '%s'."
 msgstr "בעיות הסרת התוספות '%s'."
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:910
+#: data/po/gui_strings.h:828
 msgid "Puffy"
 msgstr "פאופי"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:495
+#: data/po/gui_strings.h:473
 msgid "Quit"
 msgstr "יציאה"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:467
+#: data/po/gui_strings.h:445
 msgid "Race"
 msgstr "מרוץ"
 
@@ -1343,7 +1328,7 @@ msgid "Race Results"
 msgstr "תוצאות המרוץ"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:726
+#: data/po/gui_strings.h:643
 msgid "Race Setup"
 msgstr "הגדרת מרוץ"
 
@@ -1351,34 +1336,36 @@ msgstr "הגדרת מרוץ"
 msgid "Race in this track again"
 msgstr "התחרה באותו מסלול שוב"
 
-#: src/states_screens/arenas_screen.cpp:221
+#: src/states_screens/arenas_screen.cpp:225
 msgid "Random Arena"
 msgstr "זירה אקראית"
 
 #: src/states_screens/kart_selection.cpp:787
-#: src/states_screens/kart_selection.cpp:1756
+#: src/states_screens/kart_selection.cpp:1761
 msgid "Random Kart"
 msgstr "מכונית קרטינג אקראית"
 
-#: src/states_screens/tracks_screen.cpp:316
+#: src/states_screens/tracks_screen.cpp:320
 msgid "Random Track"
 msgstr "מסלול אקראי"
 
-#: src/states_screens/minimal_race_gui.cpp:95
+#: src/states_screens/minimal_race_gui.cpp:109
 #: src/states_screens/race_gui.cpp:106
 msgid "Rank"
 msgstr "מקום"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/minimal_race_gui.cpp:100
+#: src/states_screens/minimal_race_gui.cpp:112
 #: src/states_screens/race_gui.cpp:111
 msgid "Ready!"
 msgstr "היכון!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:402
-msgid "Regular Race: all blows allowed, so catch weapons and make clever use of them!"
+#: data/po/gui_strings.h:388
+msgid ""
+"Regular Race: all blows allowed, so catch weapons and make clever use of "
+"them!"
 msgstr "מרוץ רגיל: כל המכות מותר, כדי לתפוס את הנשק ולעשות שימוש חכם מהם!"
 
 #. I18N: In the player info dialog
@@ -1392,13 +1379,13 @@ msgid "Rename"
 msgstr "שינוי שם"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:191
+#: src/states_screens/options_screen_input2.cpp:198
 msgid "Rescue"
 msgstr "הצלה"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:673
+#: data/po/gui_strings.h:594
 msgid "Resolution"
 msgstr "רזולוציה"
 
@@ -1408,12 +1395,12 @@ msgstr "התחל מחדש"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:711
+#: data/po/gui_strings.h:628
 msgid "Restart Race"
 msgstr "התחל מחדש את המרוץ"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:206
+#: src/states_screens/options_screen_input2.cpp:213
 msgid "Right"
 msgstr "ימינה"
 
@@ -1437,16 +1424,16 @@ msgid "See unlocked features"
 msgstr "ראה תכונות משוחררות"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:209
+#: src/states_screens/options_screen_input2.cpp:216
 msgid "Select"
 msgstr "בחירה"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:745
+#: data/po/gui_strings.h:662
 msgid "Select a game mode"
 msgstr "בחר מצב משחק"
 
-#: src/states_screens/minimal_race_gui.cpp:101
+#: src/states_screens/minimal_race_gui.cpp:113
 #: src/states_screens/race_gui.cpp:112
 msgid "Set!"
 msgstr "הכן!"
@@ -1454,13 +1441,12 @@ msgstr "הכן!"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_over_dialog.cpp:366
-#: src/states_screens/race_result_gui.cpp:102
-#: data/po/gui_strings.h:707
+#: src/states_screens/race_result_gui.cpp:102 data/po/gui_strings.h:624
 msgid "Setup New Race"
 msgstr "הגדר מרוץ חדש"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:185
+#: src/states_screens/options_screen_input2.cpp:192
 msgid "Sharp Turn"
 msgstr "פנייה חדה"
 
@@ -1469,9 +1455,14 @@ msgstr "פנייה חדה"
 msgid "Shifting Sands"
 msgstr "חולות נודדים"
 
-#. I18N: ./data/gui/options_video.stkgui
+#. I18N: ./data/tracks/city/track.xml
+#: data/po/gui_strings.h:8
+msgid "Shiny Suburbs"
+msgstr ""
+
+#. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:665
+#: data/po/gui_strings.h:563
 msgid "Skin"
 msgstr "סקין"
 
@@ -1481,8 +1472,7 @@ msgid "Skyline"
 msgstr "קו רקיע"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173
-#: data/po/gui_strings.h:871
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:789
 msgid "Snag Drive"
 msgstr "קרע לנהוג"
 
@@ -1493,7 +1483,7 @@ msgstr "שלג פסגת"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
-#: data/po/gui_strings.h:534
+#: data/po/gui_strings.h:496
 msgid "Sound Effects"
 msgstr "אפקטים קוליים"
 
@@ -1522,12 +1512,12 @@ msgid "Status"
 msgstr "סטטוס"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:167
+#: src/states_screens/options_screen_input2.cpp:174
 msgid "Steer Left"
 msgstr "הטיה ימינה"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:170
+#: src/states_screens/options_screen_input2.cpp:177
 msgid "Steer Right"
 msgstr "הטיה שמאלה"
 
@@ -1540,10 +1530,8 @@ msgstr "הרחבות סופרטוקסקארט"
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:280
-#: data/po/gui_strings.h:331
-#: data/po/gui_strings.h:379
-#: data/po/gui_strings.h:425
+#: data/po/gui_strings.h:274 data/po/gui_strings.h:321
+#: data/po/gui_strings.h:365 data/po/gui_strings.h:407
 msgid "SuperTuxKart Help"
 msgstr "סופרטוקסקארט עזרה"
 
@@ -1551,46 +1539,49 @@ msgstr "סופרטוקסקארט עזרה"
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: ./data/gui/options_players.stkgui
+#. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_video.stkgui
-#: data/po/gui_strings.h:502
-#: data/po/gui_strings.h:549
-#: data/po/gui_strings.h:580
-#: data/po/gui_strings.h:614
-#: data/po/gui_strings.h:645
+#: data/po/gui_strings.h:476 data/po/gui_strings.h:507
+#: data/po/gui_strings.h:522 data/po/gui_strings.h:540
+#: data/po/gui_strings.h:555 data/po/gui_strings.h:578
 msgid "SuperTuxKart Options"
 msgstr "אפשרויות של סופרטוקסקארט"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:444
+#: data/po/gui_strings.h:426
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
 msgstr "אפשר לשחק בסופרטוקסקארט במצב מרובה משתתפים על מחשב אחד"
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:398
+#: data/po/gui_strings.h:384
 msgid "SuperTuxKart features several game modes"
 msgstr "סופרטוקסקארט תומך בכמה מצבי משחק"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:372
-msgid "Swapper - gift boxes are transformed into bananas and vice versa for a short time"
+#: data/po/gui_strings.h:362
+msgid ""
+"Swapper - gift boxes are transformed into bananas and vice versa for a short "
+"time"
 msgstr "מחליף - קופסאות מתנה ובננות מתחלפות לזמן קצר"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:192
+#: src/states_screens/main_menu_screen.cpp:199
 msgid "System Language"
 msgstr "השפה של המערכת"
 
 #. I18N: ./data/grandprix/test.grandprix
-#: data/po/gui_strings.h:176
-#: data/po/gui_strings.h:874
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:792
 msgid "Test"
 msgstr "בדיקה"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:320
-msgid "The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"
-msgstr "מקש 'פנייה חדה' מאפשר לך לפנות בחדות, ונותן לך שליטה טובה בסיבובים חזקים."
+#: data/po/gui_strings.h:314
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns and have better control in "
+"tight curves"
+msgstr ""
+"מקש 'פנייה חדה' מאפשר לך לפנות בחדות, ונותן לך שליטה טובה בסיבובים חזקים."
 
 #. I18N: ./data/tracks/islandtrack/track.xml
 #: data/po/gui_strings.h:23
@@ -1629,34 +1620,41 @@ msgstr "נגד הזמן"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:406
+#: data/po/gui_strings.h:392
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr "נגד הזמן: ללא כוחות, כך שרק כישורי הנהיגה משנים!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:49
 msgid ""
-"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it "
+"connected and it will appear in the list.\n"
 "\n"
-"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+"To add a keyboard config, you can use the button below, HOWEVER please note "
+"that most keyboards only support a limited amount of simultaneous keypresses "
+"and are thus inappropriate for multiplayer gameplay. (You can, however, "
+"connect multiple keyboards to the computer. Remember that everyone still "
+"needs different keybindings in this case.)"
 msgstr ""
-"כדי להוסיף \"בקר - ג'ויסטיק\" מכשיר חדש, פשוט להתחיל STK עם זה מחוברים והוא יופיע ברשימה.\n"
+"כדי להוסיף \"בקר - ג'ויסטיק\" מכשיר חדש, פשוט להתחיל STK עם זה מחוברים והוא "
+"יופיע ברשימה.\n"
 "\n"
-"כדי להוסיף תצורת המקלדת, אתה יכול להשתמש בלחצן למטה, עם זאת יש לציין כי רוב המקלדות תומכים רק כמות מוגבלת של לוחץ המקש בו זמנית אינם הולמים ובכך עבור משחק מרובה משתתפים. (אתה יכול, לעומת זאת, קשר מקלדות מרובים למחשב. זכור לכולם כי הוא עדיין צריך איגודי המקש שונים במקרה הזה.)"
+"כדי להוסיף תצורת המקלדת, אתה יכול להשתמש בלחצן למטה, עם זאת יש לציין כי רוב "
+"המקלדות תומכים רק כמות מוגבלת של לוחץ המקש בו זמנית אינם הולמים ובכך עבור "
+"משחק מרובה משתתפים. (אתה יכול, לעומת זאת, קשר מקלדות מרובים למחשב. זכור "
+"לכולם כי הוא עדיין צריך איגודי המקש שונים במקרה הזה.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:351
+#: data/po/gui_strings.h:341
 msgid "To help you win, there are some powerups you can collect :"
 msgstr "כדי לעזור לך לנצח, יש כמה כוחות שאתה יכול לאסוף:"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:179
-#: data/po/gui_strings.h:877
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:795
 msgid "To the Moon and Back"
 msgstr "לירח וחזרה"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/minimal_race_gui.cpp:98
 #: src/states_screens/race_gui.cpp:109
 #, c-format
 msgid "Top %i"
@@ -1680,12 +1678,12 @@ msgstr "נסה שוב"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:757
+#: data/po/gui_strings.h:674
 msgid "Tutorial : Selection Room"
 msgstr "מדריך: חדר בחירה"
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:913
+#: data/po/gui_strings.h:831
 msgid "Tux"
 msgstr "טאקס"
 
@@ -1699,7 +1697,7 @@ msgid "Uninstall"
 msgstr "הסרה"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:197
+#: src/states_screens/options_screen_input2.cpp:204
 msgid "Up"
 msgstr "למעלה"
 
@@ -1711,6 +1709,16 @@ msgstr "עדכון"
 msgid "Updating the list..."
 msgstr "מעדכן את הרשימה..."
 
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:64
+#: src/states_screens/options_screen_input.cpp:131
+#: src/states_screens/options_screen_input2.cpp:72
+#: src/states_screens/options_screen_players.cpp:69
+#: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
+msgid "User Interface"
+msgstr ""
+
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
 msgid "Version:"
@@ -1721,12 +1729,17 @@ msgstr "גרסה:"
 msgid "Version: %d"
 msgstr "גרסה: %d"
 
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+#: data/po/gui_strings.h:590
+msgid "Vertical Sync (requires restart)"
+msgstr ""
+
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Sound volume in options
-#: data/po/gui_strings.h:530
-#: data/po/gui_strings.h:542
+#: data/po/gui_strings.h:492 data/po/gui_strings.h:504
 msgid "Volume"
 msgstr "עצמת קול"
 
@@ -1734,9 +1747,14 @@ msgstr "עצמת קול"
 msgid "WRONG WAY!"
 msgstr "דרך שגויה!"
 
-#: src/states_screens/options_screen_input2.cpp:352
-msgid "Warning, 'Shift' is not a recommended key : when shift is pressed down, all keys that contain a character that is different in upper-case will stop working."
-msgstr "אזהרה, \"Shift\" אינו המקש המומלץ: כאשר המעבר הוא נלחץ, כל מקשים המכילים אופי שונה במקרה העליונה יפסיק לפעול."
+#: src/states_screens/options_screen_input2.cpp:364
+msgid ""
+"Warning, 'Shift' is not a recommended key : when shift is pressed down, all "
+"keys that contain a character that is different in upper-case will stop "
+"working."
+msgstr ""
+"אזהרה, \"Shift\" אינו המקש המומלץ: כאשר המעבר הוא נלחץ, כל מקשים המכילים "
+"אופי שונה במקרה העליונה יפסיק לפעול."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1746,130 +1764,133 @@ msgstr "אזהרה, \"Shift\" אינו המקש המומלץ: כאשר המעב�
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:288
-#: data/po/gui_strings.h:339
-#: data/po/gui_strings.h:387
-#: data/po/gui_strings.h:433
+#: data/po/gui_strings.h:282 data/po/gui_strings.h:329
+#: data/po/gui_strings.h:373 data/po/gui_strings.h:415
 msgid "Weapons"
 msgstr "נשקים"
 
-#: src/states_screens/options_screen_video.cpp:327
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:287
 #, c-format
 msgid "Weather Effects : %s"
 msgstr "מזג אויר אפקטים : %s"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:455
-msgid "When input devices are configured, you are ready to play. Select the 'multiplayer race' icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."
-msgstr "כאשר התקני קלט מוגדרים, אתה מוכן לשחק. בחר הסמל 'המירוץ מרובי \"בתפריט הראשי. כאשר הגיע הזמן לבחור מכוניות קרטינג, כל שחקן יכול ללחוץ על המקש ה 'אש' של הג 'ויסטיק או מקלדת להצטרף למשחק. כל שחקן יכול להשתמש בהתקן קלט שלהם כדי לבחור מכוניות קרטינג שלהם. המשחק ממשיך כאשר כולם נבחרים מכוניות קרטינג שלהם. שים לב כי העכבר לא ניתן להשתמש עבור הפעולה הזאת."
+#: data/po/gui_strings.h:437
+msgid ""
+"When input devices are configured, you are ready to play. Select the "
+"'multiplayer race' icon in the main menu. When it is time to choose a kart, "
+"each player can press on the 'fire' key of their gamepad or keyboard to join "
+"the game. Each player can use their input device to select their kart. The "
+"game continues when everyone selected their kart. Note that the mouse may "
+"not be used for this operation."
+msgstr ""
+"כאשר התקני קלט מוגדרים, אתה מוכן לשחק. בחר הסמל 'המירוץ מרובי \"בתפריט "
+"הראשי. כאשר הגיע הזמן לבחור מכוניות קרטינג, כל שחקן יכול ללחוץ על המקש ה "
+"'אש' של הג 'ויסטיק או מקלדת להצטרף למשחק. כל שחקן יכול להשתמש בהתקן קלט שלהם "
+"כדי לבחור מכוניות קרטינג שלהם. המשחק ממשיך כאשר כולם נבחרים מכוניות קרטינג "
+"שלהם. שים לב כי העכבר לא ניתן להשתמש עבור הפעולה הזאת."
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:916
+#: data/po/gui_strings.h:834
 msgid "Wilber"
 msgstr "ווילבר"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92
-#: data/po/gui_strings.h:790
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:708
 msgid "Win Penguin Playground Grand Prix"
 msgstr "זכה בגראנד פרי \"מגרש המשחקים של הפינגווינים\""
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95
-#: data/po/gui_strings.h:793
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:711
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
-msgstr "זכה בגראנד פרי \"מגרש המשחקים של הפינגווינים\" עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה"
+msgstr ""
+"זכה בגראנד פרי \"מגרש המשחקים של הפינגווינים\" עם שלוש מכוניות קרטינג הב\"מ "
+"ברמה מומחה"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140
-#: data/po/gui_strings.h:838
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:756
 msgid "Win To the Moon and Back Grand Prix"
 msgstr "זכה בגראנד פרי \"עד הירח  וחזרה\""
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137
-#: data/po/gui_strings.h:835
-msgid "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
-msgstr "זכה הקפה אחד בראש בראש סוד הגן הנעלם נגד אחד מכונית קרטינג הב\"מ ברמה מומחה"
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:753
+msgid ""
+"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+msgstr ""
+"זכה הקפה אחד בראש בראש סוד הגן הנעלם נגד אחד מכונית קרטינג הב\"מ ברמה מומחה"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161
-#: data/po/gui_strings.h:859
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:777
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
 msgstr "זכה שלוש הקפות בקניון מול ארבעה מכוניות קרטינג הב\"מ ברמה מומחה"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107
-#: data/po/gui_strings.h:805
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:723
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr "זכה שלוש הקפות בפורט מאגמה נגד שלושה מכוניות קרטינג הב\"מ ברמה מומחה"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119
-#: data/po/gui_strings.h:817
-msgid "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
-msgstr "זכה שלוש הקפות על הר השלג נגד שלוש מכוניות קרטינג הב\"מ ברמה בינוני מתחת 3:05"
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:735
+msgid ""
+"Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
+msgstr ""
+"זכה שלוש הקפות על הר השלג נגד שלוש מכוניות קרטינג הב\"מ ברמה בינוני מתחת 3:05"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83
-#: data/po/gui_strings.h:781
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:699
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
-msgstr "זכה שלוש הקפות בכביש אגרה טוקס נגד ארבעה מכוניות קרטינג הב\"מ ברמה מומחה"
+msgstr ""
+"זכה שלוש הקפות בכביש אגרה טוקס נגד ארבעה מכוניות קרטינג הב\"מ ברמה מומחה"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77
-#: data/po/gui_strings.h:775
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:693
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
-msgstr "זכה מירוץ בתאקוב ארחי המנהיג עם שלושה מכוניות קרטינג הב\"מ על \" אי בודד \""
+msgstr ""
+"זכה מירוץ בתאקוב ארחי המנהיג עם שלושה מכוניות קרטינג הב\"מ על \" אי בודד \""
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125
-#: data/po/gui_strings.h:823
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:741
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
-msgstr "זכה מירוץ בתאקוב ארחי המנהיג עם חמישה מכוניות קרטינג הב\"מ על המסלול הכוכב"
+msgstr ""
+"זכה מירוץ בתאקוב ארחי המנהיג עם חמישה מכוניות קרטינג הב\"מ על המסלול הכוכב"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134
-#: data/po/gui_strings.h:832
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:750
 msgid "Win a Head to Head in the Secret Garden"
 msgstr "זכה ראש בראש ב סוד הגן הנעלם"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158
-#: data/po/gui_strings.h:856
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:774
 msgid "Win a race on Canyon"
 msgstr "זכה במירוץ על הקניון"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104
-#: data/po/gui_strings.h:802
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:720
 msgid "Win a race on Fort Magma"
 msgstr "זכה במירוץ על פורט מאגמה"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116
-#: data/po/gui_strings.h:814
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:732
 msgid "Win a race on Snow Mountain"
 msgstr "זכה במירוץ על הר השלג"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80
-#: data/po/gui_strings.h:778
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:696
 msgid "Win a race on Tux Tollway"
 msgstr "זכה במירוץ על כביש אגרה טוקס"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68
-#: data/po/gui_strings.h:766
+#: data/po/gui_strings.h:68 data/po/gui_strings.h:684
 msgid "Win the At World's End Grand Prix"
 msgstr "נצח בגראנד פרי \"סוך העולם\""
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143
-#: data/po/gui_strings.h:841
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:759
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
-msgstr "זכה בגראנד פרי \"לירח וחזרה\" עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה"
+msgstr ""
+"זכה בגראנד פרי \"לירח וחזרה\" עם שלוש מכוניות קרטינג הב\"מ ברמה מומחה"
 
 #. I18N: ./data/tracks/xr591/track.xml
 #: data/po/gui_strings.h:65
@@ -1878,7 +1899,7 @@ msgstr "XR591"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: data/po/gui_strings.h:241
+#: data/po/gui_strings.h:238
 msgid "Yes"
 msgstr "כן"
 
@@ -1886,8 +1907,7 @@ msgstr "כן"
 msgid "You completed the Grand Prix!"
 msgstr "אתה השלמת את הגרנד פרי!"
 
-#: src/karts/kart.cpp:586
-#: src/karts/kart.cpp:605
+#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
 msgid "You finished the race!"
 msgstr "סיימת את המרוץ!"
 
@@ -1900,17 +1920,20 @@ msgstr "נפסלת!"
 msgid "You unlocked a new feature!"
 msgstr "שחררת תכונה חדשה!"
 
-#: src/karts/kart.cpp:586
-#: src/karts/kart.cpp:605
+#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
 msgid "You won the race!"
 msgstr "ניצחת במרוץ!"
 
-#: src/config/user_config.cpp:465
-msgid "Your config file was malformed, so it was deleted and a new one will be created."
+#: src/config/user_config.cpp:530
+msgid ""
+"Your config file was malformed, so it was deleted and a new one will be "
+"created."
 msgstr "קובץ ההגדרות היה לא תקין, ולכן נמחק וקובץ חדש יווצר."
 
-#: src/config/user_config.cpp:475
-msgid "Your config file was too old, so it was deleted and a new one will be created."
+#: src/config/user_config.cpp:540
+msgid ""
+"Your config file was too old, so it was deleted and a new one will be "
+"created."
 msgstr "קובץ ההגדרות היה ישן מדי, ולכן נמחק וקובץ חדש יווצר"
 
 #: src/input/device_manager.cpp:430
@@ -1923,10 +1946,10 @@ msgid "[none]"
 msgstr "[ריק]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:757
+#: src/states_screens/minimal_race_gui.cpp:785
 #: src/states_screens/race_gui.cpp:1195
 msgid "by"
-msgstr "ל"
+msgstr "על ידי"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
@@ -1941,12 +1964,6 @@ msgstr ""
 "  STK-team https://launchpad.net/~stk\n"
 "  Shimi Chen https://launchpad.net/~shimi-chen"
 
-#~ msgid "Farm"
-#~ msgstr "משק"
-
-#~ msgid "Snow Mountain"
-#~ msgstr "הר השלג"
-
 #~ msgid "Finished"
 #~ msgstr "סיום"
 
@@ -1954,14 +1971,17 @@ msgstr ""
 #~ msgstr "%0 לא ישחק באולינג עם %1 שוב"
 
 #~ msgid ""
-#~ "3 Strikes Battle : only in multiplayer games. Hit others with weapons "
-#~ "until they lose all their lives."
+#~ "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
+#~ "they lose all their lives."
 #~ msgstr ""
 #~ "קרב של שלוש פגיעות: ניתן לשחק רק עם מספר שחקנים. תפגע באחרים עם נשק, עד "
 #~ "שכולם ימותו"
 
 #~ msgid "Apply video changes"
 #~ msgstr "החל שינויי תצוגה"
+
+#~ msgid "Back to main menu"
+#~ msgstr "בחזרה לדף הראשי"
 
 #~ msgid "Networking"
 #~ msgstr "משחק רשת"
@@ -1975,18 +1995,17 @@ msgstr ""
 #~ msgstr "מרוץ רגיל - הכל מותר, אז תפוס את הנשקים והשתמש בהם בחכמה!"
 
 #~ msgid ""
-#~ "Run for second place, as the last kart will be disqualified every time "
-#~ "the counter hits zero. Beware : going in front of the leader will get you "
+#~ "Run for second place, as the last kart will be disqualified every time the "
+#~ "counter hits zero. Beware : going in front of the leader will get you "
 #~ "eliminated too!"
 #~ msgstr ""
-#~ "עקוב אחרי המוביל: התחרה על המקום השני, כשהמכונית האחרונה תיפסל כל פעם "
-#~ "שהשעון יגיע לאפס. היזהר: אם תעקוף את המוביל, גם אתה תיפסל."
+#~ "עקוב אחרי המוביל: התחרה על המקום השני, כשהמכונית האחרונה תיפסל כל פעם שהשעון "
+#~ "יגיע לאפס. היזהר: אם תעקוף את המוביל, גם אתה תיפסל."
 
 #~ msgid ""
 #~ "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
 #~ msgstr ""
-#~ "בוא הראשון בסוף העולם מירוץ גרנד פרי נגד שלושת רוכבות הקארטינג ברמה "
-#~ "\"רייסר\""
+#~ "בוא הראשון בסוף העולם מירוץ גרנד פרי נגד שלושת רוכבות הקארטינג ברמה \"רייסר\""
 
 #~ msgid "Finish Race track in 2:40"
 #~ msgstr "סיום המירוץ במסלול ב 2:40 דקות"
@@ -1994,8 +2013,7 @@ msgstr ""
 #~ msgid ""
 #~ "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
 #~ msgstr ""
-#~ "סיום 3 הקפות של \"במסלולי מקאו\" עם 3  רוכבות הקארטינג ברמה קל מתחת 2:40 "
-#~ "דקות"
+#~ "סיום 3 הקפות של \"במסלולי מקאו\" עם 3  רוכבות הקארטינג ברמה קל מתחת 2:40 דקות"
 
 #~ msgid "Finish the City track in 4:20"
 #~ msgstr "סיום המירוץ במסלול סיטי  ב 4:20 דקות"
@@ -2007,8 +2025,8 @@ msgstr ""
 #~ msgstr "תאקוב ארחי המנהיג במירוץ הג'ונגל"
 
 #~ msgid ""
-#~ "Finish with at least 6 points of nitro on three laps of Oliver's Math "
-#~ "Class in under 52 seconds."
+#~ "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
+#~ "in under 52 seconds."
 #~ msgstr ""
 #~ "סיום עם לפחות 6 נקודות של ניטרו על שלושה סיבובים של \"שיעור מתמטיקה של "
 #~ "אוליבר\"  מתחת 52 שניות"
@@ -2021,16 +2039,18 @@ msgstr ""
 #~ "2:20 דקות."
 
 #~ msgid ""
-#~ "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 "
-#~ "minutes."
+#~ "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
 #~ msgstr ""
-#~ "סיום 3 הקפות של \"מסלולי טוקס טולוויי\" עם 3 רוכבות הקארטינג מתחת 3:35 "
-#~ "דקות"
+#~ "סיום 3 הקפות של \"מסלולי טוקס טולוויי\" עם 3 רוכבות הקארטינג מתחת 3:35 דקות"
 
 #~ msgid ""
 #~ "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
 #~ msgstr "סיום 3 הקפות של \"מסלולי סיטי\" עם 3 רוכבות הקארטינג מתחת 4:20 דקות"
 
+#~ msgid "Loading news from stkaddons..."
+#~ msgstr "טוען הרחבות חדשות..."
+
+#, c-format
 #~ msgid "Version: %i"
 #~ msgstr "גרסה: %i"
 
@@ -2040,8 +2060,8 @@ msgstr ""
 #~ msgid ""
 #~ "* Most of these game modes can also be played in a Grand Prix fashion : "
 #~ "instead of playing a single race, you play many in a row. The better you "
-#~ "rank, the more points you get. In the end, the player with the most "
-#~ "points wins the cup."
+#~ "rank, the more points you get. In the end, the player with the most points "
+#~ "wins the cup."
 #~ msgstr ""
 #~ "ברוב מצבי המשחק הללו ניתן לשחק בסגנון גראנד פר: במקום מירוץ בודד בכל פעם, "
 #~ "עושים הרבה ברצף. ככל שדירוגך גבוה יותר במירוץ כך תקבל יותר נקודות. בסוף "
@@ -2053,6 +2073,10 @@ msgstr ""
 #~ msgid "DEBUG"
 #~ msgstr "דיבג"
 
+#~ msgid "Multiplayer"
+#~ msgstr "רב-משתתפים"
+
+#, c-format
 #~ msgid "Player %i (%s)"
 #~ msgstr "השחקן %i ( %s  )"
 
@@ -2060,19 +2084,18 @@ msgstr ""
 #~ msgstr "מדריך"
 
 #~ msgid ""
-#~ "When input devices are configured, you are ready to play. Simply start a "
-#~ "new race by selecting the race icon in the main menu. When it is time to "
-#~ "choose a kart, each player can press on the 'fire' key of their gamepad "
-#~ "or keyboard to join the game. Each player can use their input device to "
-#~ "select their kart. The game continues when everyone selected their kart. "
-#~ "Note that the mouse may not be used for this operation."
+#~ "When input devices are configured, you are ready to play. Simply start a new "
+#~ "race by selecting the race icon in the main menu. When it is time to choose "
+#~ "a kart, each player can press on the 'fire' key of their gamepad or keyboard "
+#~ "to join the game. Each player can use their input device to select their "
+#~ "kart. The game continues when everyone selected their kart. Note that the "
+#~ "mouse may not be used for this operation."
 #~ msgstr ""
-#~ "כאשר התקני קלט מוגדרים, אתה מוכן לשחק. פשוט ולהתחיל גזע חדש על ידי בחירת "
-#~ "סמל במירוץ בתפריט הראשי. כאשר הגיע הזמן לבחור מכוניות קרטינג, כל שחקן "
-#~ "יכול ללחוץ על המקש ה 'אש' של הג 'ויסטיק או מקלדת להצטרף למשחק. כל שחקן "
-#~ "יכול להשתמש בהתקן קלט שלהם כדי לבחור מכוניות קרטינג שלהם. המשחק ממשיך "
-#~ "כאשר כולם נבחרים מכוניות קרטינג שלהם. שים לב כי העכבר לא ניתן להשתמש עבור "
-#~ "הפעולה הזאת."
+#~ "כאשר התקני קלט מוגדרים, אתה מוכן לשחק. פשוט ולהתחיל גזע חדש על ידי בחירת סמל "
+#~ "במירוץ בתפריט הראשי. כאשר הגיע הזמן לבחור מכוניות קרטינג, כל שחקן יכול ללחוץ "
+#~ "על המקש ה 'אש' של הג 'ויסטיק או מקלדת להצטרף למשחק. כל שחקן יכול להשתמש "
+#~ "בהתקן קלט שלהם כדי לבחור מכוניות קרטינג שלהם. המשחק ממשיך כאשר כולם נבחרים "
+#~ "מכוניות קרטינג שלהם. שים לב כי העכבר לא ניתן להשתמש עבור הפעולה הזאת."
 
 #~ msgid "gamepad"
 #~ msgstr "ג'ויסטיק"
@@ -2080,5 +2103,23 @@ msgstr ""
 #~ msgid "keyboard"
 #~ msgstr "מקלדת"
 
+#~ msgid "Animated Effects and Scenery"
+#~ msgstr "אפקטים מונפשים ונוף"
+
+#~ msgid "Animated Karts"
+#~ msgstr "מונפשות מכוניות קרטינג במירוץ"
+
+#~ msgid "Canyon"
+#~ msgstr "קניון"
+
 #~ msgid "Donwload failed.\n"
 #~ msgstr "ההורדה נכשלה.\n"
+
+#~ msgid "Farm"
+#~ msgstr "משק"
+
+#~ msgid "Snow Mountain"
+#~ msgstr "הר השלג"
+
+#~ msgid "City"
+#~ msgstr "העיר"
