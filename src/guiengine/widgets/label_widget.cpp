@@ -38,6 +38,7 @@ LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
     m_title_font   = title;
     m_has_color    = false;
     m_scroll_speed = 0;
+    m_scroll_offset = 0;
     
     if (bright)
     {
@@ -61,7 +62,7 @@ void LabelWidget::add()
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
     
     IGUIStaticText* irrwidget;
-    if (m_scroll_offset)
+    if (m_scroll_speed != 0)
     {
         IGUIElement* container = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, -1);
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), core::rect<s32>( core::position2di(0,0), widget_size.getSize()),

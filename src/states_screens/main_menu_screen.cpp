@@ -70,6 +70,9 @@ void MainMenuScreen::loadedFromFile()
     RibbonWidget* r = this->getWidget<RibbonWidget>("menu_toprow");
     if (r != NULL) r->deleteChild("addons");
 #endif
+    
+    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    w->setScrollSpeed(15);
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -104,9 +107,6 @@ void MainMenuScreen::init()
         w->setDeactivated();
     }
 #endif
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(15);
-
 }
 
 // ------------------------------------------------------------------------------------------------------
