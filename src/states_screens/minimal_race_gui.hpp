@@ -98,6 +98,9 @@ private:
     /** Maximum string length for the timer */
     int              m_timer_width;
 
+    /** The width of the 'X/Y' rank display. */
+    int              m_rank_width;
+
     /** A scaling factor for the font for time, rank, and lap display. */
     float            m_font_scale;
 

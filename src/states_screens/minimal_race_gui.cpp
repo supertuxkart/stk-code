@@ -126,7 +126,8 @@ MinimalRaceGUI::MinimalRaceGUI()
     font->setScale(m_font_scale);
     m_lap_width             = font->getDimension(m_string_lap.c_str()).Width;
     m_timer_width           = font->getDimension(L"99:99:99").Width;
-    
+    m_rank_width            = font->getDimension(L"9/9").Width;
+
     int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
@@ -134,8 +135,8 @@ MinimalRaceGUI::MinimalRaceGUI()
         w = font->getDimension(L" 99/99").Width;
     else
         w = font->getDimension(L" 9/9").Width;
-    font->setScale(old_scale);
     m_lap_width += w;
+    font->setScale(old_scale);
         
 }   // MinimalRaceGUI
 
@@ -369,14 +370,20 @@ void MinimalRaceGUI::drawGlobalTimer()
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(UserConfigParams::m_width - m_timer_width - 10,  0, 
-                        UserConfigParams::m_width,                      50);
-    
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    int x,y;
+    switch(race_manager->getNumLocalPlayers())
     {
-        pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
-    }
+    case 1: x = 10; y=0; break;
+    case 2: x = 10; y=0; break;
+    case 3: x = UserConfigParams::m_width   - m_timer_width-10; 
+            y = UserConfigParams::m_height/2; break;
+    case 4: x = UserConfigParams::m_width/2 - m_timer_width/2; 
+            y = 0;       break;
+    }   // switch        
+
+    core::rect<s32> pos(x,                         y, 
+                        UserConfigParams::m_width, y+50);
+    
     
     gui::ScalableFont* font = GUIEngine::getFont();
     float old_scale = font->getScale();
@@ -589,22 +596,21 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
 
     if (world->displayRank())
     {
-        pos.UpperLeftCorner.X   = viewport.UpperLeftCorner.X+10;
-        pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
-        // If the viewport starts at the top of the screen,
-        // display the rank at the top, otherwise at the botton.
-        // This way there is space for the minimap in the middle
-        // if split screen is being used.
-        if(viewport.UpperLeftCorner.Y==0              )
+        pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
+        pos.LowerRightCorner.Y  = viewport.UpperLeftCorner.Y+50;
+        // Split screen 3 or 4 players, left side:
+        if(viewport.LowerRightCorner.X < UserConfigParams::m_width)
         {
-            pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
-            pos.LowerRightCorner.Y  = viewport.UpperLeftCorner.Y+50;
+            pos.UpperLeftCorner.X   = 10;
+            pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
         }
         else
         {
-            pos.UpperLeftCorner.Y  = (int)(viewport.LowerRightCorner.Y - 60);
-            pos.LowerRightCorner.Y = viewport.LowerRightCorner.Y;
+            pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
+                                    - m_rank_width-10;
+            pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
         }
+
         char str[256];
         sprintf(str, "%d/%d", kart->getPosition(), 
                 world->getCurrentNumKarts());
@@ -619,20 +625,19 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
         // don't display 'lap 0/...'
         if(lap>=0)
         {
-            if(race_manager->getNumLocalPlayers()==4 &&
-                viewport.UpperLeftCorner.X==0        &&
-                viewport.UpperLeftCorner.Y==0           )
+            pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
+            pos.UpperLeftCorner.Y   = viewport.LowerRightCorner.Y-60;
+            pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
+            // Split screen 3 or 4 players, left side:
+            if(viewport.LowerRightCorner.X < UserConfigParams::m_width)
             {
-                pos.UpperLeftCorner.X   = 10;
+                pos.UpperLeftCorner.X = 10;
             }
             else
             {
-                pos.UpperLeftCorner.X   = (int)(viewport.LowerRightCorner.X
-                                                - m_lap_width -20      );
+                pos.UpperLeftCorner.X = (int)(viewport.LowerRightCorner.X
+                                              - m_lap_width -10          );
             }
-            pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
-            pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
-            pos.UpperLeftCorner.Y   = viewport.LowerRightCorner.Y-60;
 
             char str[256];
             sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
