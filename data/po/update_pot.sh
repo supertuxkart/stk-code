@@ -32,7 +32,7 @@ xgettext    -d supertuxkart -s --keyword=_ --keyword=_LTR --add-comments="I18N:"
 #xgettext -j -L lisp -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $XML_FILE_LIST --package-name=supertuxkart
 
 # XML Files
-xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot --from-code=UTF-16 ./data/po/gui_strings.h --package-name=supertuxkart
+xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot --from-code=UTF-8 ./data/po/gui_strings.h --package-name=supertuxkart
 
 echo "    Done"
 echo "---------------------------"

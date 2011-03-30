@@ -18,7 +18,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
            comment = e.getAttribute("I18N")
          
         if isChallenge or isGP or isKart or isTrack:
-           if e.hasAttribute("name"):
+           if e.hasAttribute("name") and len(e.getAttribute("name")) > 0:
                #print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
                if comment == None:
@@ -29,7 +29,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                f.write( line.encode( "utf-8" ) )
            
            # challenges and GPs can have a description file; karts don't
-           if e.hasAttribute("description"):
+           if e.hasAttribute("description") and len(e.getAttribute("description")) > 0:
                # print "Label=", e.getAttribute("description"), " Comment=", comment
                line = ""
                if comment == None:
@@ -39,7 +39,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                
                f.write( line.encode( "utf-8" ) )
         else:
-           if e.hasAttribute("text"):
+           if e.hasAttribute("text") and len(e.getAttribute("text")) > 0:
                # print "Label=", e.getAttribute("text"), " Comment=", comment
                line = ""
                if comment == None:
