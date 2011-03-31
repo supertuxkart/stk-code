@@ -457,17 +457,17 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
             int stk_version  = versionToInt(STK_VERSION);
             if(cond[1]=="=")
             {
-                if(news_version!=stk_version) return false;
+                if(stk_version!=news_version) return false;
                 continue;
             }
             if(cond[1]=="<")
             {
-                if(news_version>=stk_version) return false;
+                if(stk_version>=news_version) return false;
                 continue;
             }
             if(cond[1]==">")
             {
-                if(news_version<=stk_version) return false;
+                if(stk_version<=news_version) return false;
                 continue;
             }
             printf("Invalid comparison in condition '%s' - assumed true.\n",
