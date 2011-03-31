@@ -65,7 +65,7 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
 {
     m_current_news_message = -1;
     // Don't even start the network threads if networking is disabled.
-    if(!UserConfigParams::m_enable_internet)
+    if(!UserConfigParams::m_internet_status==NetworkHttp::IPERM_ALLOWED)
         return;
 
     pthread_mutex_init(&m_mutex_command, NULL);
@@ -185,7 +185,7 @@ void *NetworkHttp::mainLoop(void *obj)
  */
 NetworkHttp::~NetworkHttp()
 {
-    if(!UserConfigParams::m_enable_internet)
+    if(!UserConfigParams::m_internet_status==NetworkHttp::IPERM_ALLOWED)
         return;
 
     // if a download should be active (which means it was cancelled by the

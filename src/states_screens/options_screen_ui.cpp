@@ -121,7 +121,8 @@ void OptionsScreenUI::init()
     fps->setState( UserConfigParams::m_display_fps );
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
-    news->setState( UserConfigParams::m_enable_internet );
+    news->setState( UserConfigParams::m_internet_status
+                                            ==NetworkHttp::IPERM_ALLOWED );
     CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
     assert( min_gui != NULL );
     min_gui->setState( UserConfigParams::m_minimal_race_gui);
@@ -190,7 +191,9 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
         assert( news != NULL );
         delete network_http;
-        UserConfigParams::m_enable_internet = news->getState();
+        UserConfigParams::m_internet_status = 
+            news->getState() ? NetworkHttp::IPERM_ALLOWED
+                             : NetworkHttp::IPERM_NOT_ALLOWED;
         network_http = new NetworkHttp();
     }
     else if (name=="minimal-racegui")
