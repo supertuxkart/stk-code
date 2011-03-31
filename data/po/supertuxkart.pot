@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-30 13:16-0400\n"
+"POT-Creation-Date: 2011-03-31 18:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,7 +437,7 @@ msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
 
-#: src/addons/network_http.cpp:296
+#: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
 msgstr ""
 
@@ -1164,7 +1164,7 @@ msgstr ""
 msgid "Number of AI karts"
 msgstr ""
 
-#: src/states_screens/dialogs/message_dialog.cpp:57
+#: src/states_screens/dialogs/message_dialog.cpp:59
 msgid "OK"
 msgstr ""
 
@@ -1529,6 +1529,13 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr ""
 
+#: src/main.cpp:935
+msgid ""
+"SuperTuxKart may connect to a news server to display updates. Would you like "
+"this feature to be enabled? (To change this setting at a later time, go to "
+"options, select tab 'User Interface', and edit \"Internet STK news\")."
+msgstr ""
+
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
 msgid ""
@@ -1568,7 +1575,7 @@ msgstr ""
 msgid "The Stadium"
 msgstr ""
 
-#: src/race/highscore_manager.cpp:97
+#: src/race/highscore_manager.cpp:98
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -1770,7 +1777,7 @@ msgstr ""
 #. I18N: ./data/challenges/skyline.challenge
 #: data/po/gui_strings.h:137 data/po/gui_strings.h:753
 msgid ""
-"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+"Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
 
 #. I18N: ./data/challenges/xr591.challenge
