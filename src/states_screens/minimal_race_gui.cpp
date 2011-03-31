@@ -126,7 +126,10 @@ MinimalRaceGUI::MinimalRaceGUI()
     font->setScale(m_font_scale);
     m_lap_width             = font->getDimension(m_string_lap.c_str()).Width;
     m_timer_width           = font->getDimension(L"99:99:99").Width;
-    m_rank_width            = font->getDimension(L"9/9").Width;
+    if(race_manager->getNumberOfKarts()>9)
+        m_rank_width            = font->getDimension(L"99/99").Width;
+    else
+        m_rank_width            = font->getDimension(L"9/9").Width;
 
     int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
