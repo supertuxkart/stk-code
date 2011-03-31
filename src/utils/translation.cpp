@@ -102,7 +102,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         std::set<std::string> flist;
         file_manager->listFiles(flist,
                                 file_manager->getTranslationDir(),
-                                true);
+                                /*is full path*/true);
         
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
@@ -110,9 +110,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         std::set<std::string>::iterator it;
         for ( it=flist.begin() ; it != flist.end(); it++ )
         {
-            if (file_manager->fileExists(file_manager->getTranslationDir() + "/" + (*it).c_str() + "/LC_MESSAGES/supertuxkart.mo"))
+            if (StringUtils::hasSuffix(*it, "po"))
             {
-                g_language_list.push_back( *it );
+                g_language_list.push_back(StringUtils::removeExtension(*it));
                 // printf("Lang : <%s>\n", (*it).c_str());
             }
         }
