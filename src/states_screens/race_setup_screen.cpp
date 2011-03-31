@@ -137,6 +137,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + w->getValue() );
+        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + w->getValue();
     }
     else if (name == "back")
     {
