@@ -1,6 +1,6 @@
 # Process this file with autogen.sh to produce a configure script.
 
-AC_INIT(supertuxkart, SVN)
+AC_INIT(supertuxkart,SVN)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
 AC_PREREQ(2.61)
@@ -232,7 +232,7 @@ fi
 
 case "${host}" in
 *-*-linux* )
-  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht -lXcursor"
   ;;
 *darwin*|*macosx*)
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht -framework Cocoa"
@@ -303,9 +303,10 @@ AC_TRY_RUN(
         #  include "irrlicht.h"
         int main() {
         #if (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR == 7)
-            // ok
+        #error "STK needs irrlicht 1.8* to work properly (which might be only available"
+        #error "as svn trunk atm"
         #else
-        #error "You need irrLicht 1.7.* to build STK, irrlicht 1.8 is not supported yet"
+            // ok
         #endif
         return 0;
         }
@@ -315,7 +316,9 @@ AC_TRY_RUN(
 )
 
 if test x$irrlicht_min_version_met = xfalse; then
-    AC_MSG_ERROR([Your irrLicht is too old, please update irrLicht.])
+    AC_MSG_ERROR([Your irrLicht is too old, please update irrLicht. 
+You need irrlicht 1.8.
+While irrlicht 1.8 is not released, we recommend using version 3629 from irrlicht SVN trunk.])
 else
     echo "yes"
 fi
