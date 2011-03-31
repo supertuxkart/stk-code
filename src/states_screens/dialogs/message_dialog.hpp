@@ -56,16 +56,17 @@ public:
 private:
     
     IConfirmDialogListener* m_listener;
+    bool m_own_listener;
     
 public:
 
     /**
       * \param msg Message to display in the dialog
-      * \param listener A listener object to notify when the user made a choice. Note that
-      *                 MessageDialog does not take ownership of the listener and will not
-      *                 delete it.
+      * \param listener A listener object to notify when the user made a choice.
+      * \param If set to true, 'listener' will be owned by this dialog and deleted
+      *        along with the dialog.
       */
-    MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener);
+    MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener, bool delete_listener);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
@@ -74,7 +75,7 @@ public:
     MessageDialog(irr::core::stringw msg);
 
     
-    ~MessageDialog() { m_listener = NULL; }
+    ~MessageDialog() { if (m_own_listener) delete m_listener; m_listener = NULL; }
     
     virtual void onEnterPressedInternal();
     

@@ -27,12 +27,13 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener) :
+MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {    
     loadFromFile("confirm_dialog.stkgui");
 
     m_listener = listener;
+    m_own_listener = own_listener;
     
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
@@ -46,6 +47,7 @@ MessageDialog::MessageDialog(irr::core::stringw msg) :
     loadFromFile("confirm_dialog.stkgui");
     
     m_listener = NULL;
+    m_own_listener = false;
     
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );

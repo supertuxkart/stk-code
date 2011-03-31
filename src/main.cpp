@@ -912,11 +912,23 @@ int main(int argc, char *argv[] )
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());
             if(UserConfigParams::m_internet_status==NetworkHttp::IPERM_NOT_ASKED)
             {
+                class ConfirmServer : public MessageDialog::IConfirmDialogListener
+                {
+                public:
+                    virtual void onConfirm()
+                    {
+                        UserConfigParams::m_internet_status = NetworkHttp::IPERM_ALLOWED;
+                    }
+                    
+                    virtual void onCancel()
+                    {
+                        UserConfigParams::m_internet_status = NetworkHttp::IPERM_NOT_ALLOWED;
+                    }
+                };
+                
                 new MessageDialog(_("SuperTuxKart now supports a news server "
                     "to display updates. To enable this, go to options, then "
-                    "User Interface, and select \"Internet STK news\"."));
-                // FIXME: Needs feedback from user, then set the value
-                UserConfigParams::m_internet_status=NetworkHttp::IPERM_NOT_ASKED;
+                    "User Interface, and select \"Internet STK news\"."), new ConfirmServer(), true);
             }
         }
         else 
