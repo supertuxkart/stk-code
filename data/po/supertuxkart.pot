@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-31 18:28-0400\n"
+"POT-Creation-Date: 2011-03-31 19:17-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,6 @@ msgstr ""
 
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
-msgstr ""
-
-#: src/states_screens/options_screen_input.cpp:95
-#, c-format
-msgid "   Keyboard %i"
 msgstr ""
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
@@ -261,7 +256,7 @@ msgstr ""
 msgid "All Tracks"
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:197
+#: src/states_screens/race_setup_screen.cpp:198
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
 
@@ -536,7 +531,7 @@ msgstr ""
 msgid "Confirm resolution within %i seconds"
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:204
+#: src/states_screens/race_setup_screen.cpp:205
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
@@ -655,12 +650,12 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:691
+#: src/states_screens/dialogs/race_over_dialog.cpp:679
 msgid "Energy"
 msgstr ""
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:141
+#: src/states_screens/main_menu_screen.cpp:139
 msgid "English"
 msgstr ""
 
@@ -915,7 +910,7 @@ msgstr ""
 msgid "Highscores"
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:226
+#: src/states_screens/race_setup_screen.cpp:227
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
@@ -966,8 +961,13 @@ msgid "Keep this resolution"
 msgstr ""
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:217
+#: src/states_screens/race_setup_screen.cpp:218
 msgid "Keep up with the leader kart but don't overtake it!"
+msgstr ""
+
+#: src/states_screens/options_screen_input.cpp:95
+#, c-format
+msgid "Keyboard %i"
 msgstr ""
 
 #. I18N: ./data/karts/konqi/kart.xml
@@ -1005,7 +1005,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:797
 #: src/states_screens/kart_selection.cpp:1718
 #: src/states_screens/kart_selection.cpp:1744
-#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/race_setup_screen.cpp:210
 #: src/states_screens/tracks_screen.cpp:283
 #: src/states_screens/tracks_screen.cpp:307
 msgid "Locked : solve active challenges to gain access to more!"
@@ -1529,7 +1529,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr ""
 
-#: src/main.cpp:935
+#: src/main.cpp:940
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1544,7 +1544,7 @@ msgid ""
 msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:199
+#: src/states_screens/main_menu_screen.cpp:197
 msgid "System Language"
 msgstr ""
 
@@ -1585,7 +1585,7 @@ msgstr ""
 msgid "This Grand Prix is broken!"
 msgstr ""
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:686
+#: src/states_screens/dialogs/race_over_dialog.cpp:674
 msgid "Time"
 msgstr ""
 
@@ -1899,7 +1899,7 @@ msgid "[none]"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:785
+#: src/states_screens/minimal_race_gui.cpp:788
 #: src/states_screens/race_gui.cpp:1195
 msgid "by"
 msgstr ""
