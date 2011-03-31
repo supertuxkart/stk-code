@@ -498,7 +498,6 @@ int NetworkHttp::versionToInt(const std::string &version_string)
               +  1000*99
               +    10*99
               +        9;
-        return ;
 
     std::vector<std::string> l = StringUtils::split(version_string, '.');
     if(l.size()!=3)
