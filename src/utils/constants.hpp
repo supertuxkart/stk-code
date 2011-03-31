@@ -53,6 +53,6 @@ extern bool IS_LITTLE_ENDIAN;
 
 #define DEFAULT_GROUP_NAME "standard"
 
-extern char* STK_VERSION;
+extern const char* STK_VERSION;
 
 #endif
