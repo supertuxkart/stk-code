@@ -70,6 +70,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tutorial/tutorial_manager.hpp"
@@ -909,6 +910,14 @@ int main(int argc, char *argv[] )
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            if(UserConfigParams::m_internet_status==NetworkHttp::IPERM_NOT_ASKED)
+            {
+                new MessageDialog(_("SuperTuxKart now supports a news server "
+                    "to display updates. To enable this, go to options, then "
+                    "User Interface, and select \"Internet STK news\"."));
+                // FIXME: Needs feedback from user, then set the value
+                UserConfigParams::m_internet_status=NetworkHttp::IPERM_NOT_ASKED
+            }
         }
         else 
         {
