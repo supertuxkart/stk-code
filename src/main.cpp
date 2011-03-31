@@ -1,8 +1,8 @@
 // $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -918,11 +918,13 @@ int main(int argc, char *argv[] )
                     virtual void onConfirm()
                     {
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_ALLOWED;
+                        GUIEngine::ModalDialog::dismiss();
                     }
                     
                     virtual void onCancel()
                     {
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_NOT_ALLOWED;
+                        GUIEngine::ModalDialog::dismiss();
                     }
                 };
                 
