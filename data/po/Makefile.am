@@ -2,8 +2,7 @@
 
 pkgdatadir = $(datadir)/games/@PACKAGE@/data/po
 
-nobase_pkgdata_DATA = $(shell find $(srcdir) -name "*.po") \
-                      $(shell find $(srcdir) -name "*.mo") \
-                      supertuxkart.pot
+dist_pkgdata_DATA = $(shell find $(srcdir) -name "*.po") \
+                    supertuxkart.pot
 
-EXTRA_DIST = $(nobase_pkgdata_DATA) update_pot.sh
+EXTRA_DIST = update_pot.sh
