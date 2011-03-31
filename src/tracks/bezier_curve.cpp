@@ -56,7 +56,7 @@ Vec3 BezierCurve::getXYZ(float t) const
 Vec3 BezierCurve::getHPR(float t) const
 {
     // FIXME: not yet implemented
-    Vec3 hpr;
+    Vec3 hpr(0,0,0);
     return hpr;
 }   // getHPR
 

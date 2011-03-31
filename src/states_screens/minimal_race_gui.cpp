@@ -370,7 +370,7 @@ void MinimalRaceGUI::drawGlobalTimer()
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    int x,y;
+    int x=0,y=0;  // initialise to avoid compiler warning
     switch(race_manager->getNumLocalPlayers())
     {
     case 1: x = 10; y=0; break;
