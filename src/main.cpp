@@ -917,16 +917,20 @@ int main(int argc, char *argv[] )
                 public:
                     virtual void onConfirm()
                     {
+                        delete network_http;
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                    }
-                    
+                        network_http = new NetworkHttp();
+                    }   // onConfirm
+                    // --------------------------------------------------------
                     virtual void onCancel()
                     {
+                        delete network_http;
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                    }
-                };
+                        network_http = new NetworkHttp();
+                    }   // onCancel
+                };   // ConfirmServer
                 
                 new MessageDialog(_("SuperTuxKart may connect to a news server "
                     "to display updates. Would you like this feature to be enabled? "
