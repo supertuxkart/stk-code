@@ -916,7 +916,7 @@ int main(int argc, char *argv[] )
                     "to display updates. To enable this, go to options, then "
                     "User Interface, and select \"Internet STK news\"."));
                 // FIXME: Needs feedback from user, then set the value
-                UserConfigParams::m_internet_status=NetworkHttp::IPERM_NOT_ASKED
+                UserConfigParams::m_internet_status=NetworkHttp::IPERM_NOT_ASKED;
             }
         }
         else 
