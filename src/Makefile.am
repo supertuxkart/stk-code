@@ -255,7 +255,7 @@ supertuxkart_SOURCES = \
  physics/btKart.cpp \
  physics/btKart.hpp \
  physics/btKartRaycast.cpp \
- phsycis/btKartRaycast.hpp \
+ physics/btKartRaycast.hpp \
  physics/btUprightConstraint.cpp \
  physics/btUprightConstraint.hpp \
  physics/irr_debug_drawer.cpp \
@@ -346,7 +346,7 @@ supertuxkart_SOURCES = \
  states_screens/options_screen_players.cpp \
  states_screens/options_screen_players.hpp \
  states_screens/options_screen_ui.cpp \
- states_screens/options_screen_u.hpp \
+ states_screens/options_screen_ui.hpp \
  states_screens/options_screen_video.cpp \
  states_screens/options_screen_video.hpp \
  states_screens/addons_screen.cpp \
@@ -431,9 +431,14 @@ supertuxkart_SOURCES = \
  utils/random_generator.hpp \
  utils/string_utils.cpp \
  utils/string_utils.hpp \
+ utils/synchronised.hpp \
  utils/time.hpp \
  utils/translation.cpp \
  utils/translation.hpp \
+ utils/utf8.h \
+ utils/utf8/checked.h \
+ utils/utf8/core.h \
+ utils/utf8/unchecked.h \
  utils/vec3.cpp \
  utils/vec3.hpp
 
