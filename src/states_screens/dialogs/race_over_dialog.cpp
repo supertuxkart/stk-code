@@ -482,25 +482,13 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
         
         FeatureUnlockedCutScene* scene = 
             FeatureUnlockedCutScene::getInstance();
-        
-        /*
-        scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),
-                               _("Unlocked gnu kart") );
-        scene->addUnlockedPicture(
-                                  irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()),
-                                  _("Unlocked beach track"));
-        scene->addUnlockedPicture(
-                                  irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
-                                  _("Unlocked lighthouse track"));
-        //scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("canyon")->getScreenshotFile().c_str()) );
-         */
 
         assert(unlocked.size() > 0);
         scene->addUnlockedThings(unlocked);
 
         ModalDialog::dismiss();
         
-        // clear the race (FIXME: is this the right way to go?)
+        // clear the race
         World::deleteWorld();
         
         StateManager::get()->pushScreen(scene);

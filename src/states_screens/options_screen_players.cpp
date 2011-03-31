@@ -75,7 +75,9 @@ void OptionsScreenPlayers::init()
     const int playerAmount = UserConfigParams::m_all_players.size();
     for(int n=0; n<playerAmount; n++)
     {
-        // FIXME: encoding issues
+        // FIXME: Using a truncated ASCII string for internal ID. Let's cross our fingers
+        //        and hope no one enters two player names that, when stripped down to ASCII,
+        //        give the same identifier...
         players->addItem( core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
                           UserConfigParams::m_all_players[n].getName() );
     }

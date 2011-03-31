@@ -90,9 +90,9 @@ void OptionsScreenInput::buildDeviceList()
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
         
-        //FIXME: I18N: since irrLicht's list widget has the nasty tendency to put the 
-        //             icons very close to the text, I'm adding spaces to compensate...
-        devices->addItem(internal_name, _("   Keyboard %i", i), 0 /* icon */);
+        // since irrLicht's list widget has the nasty tendency to put the 
+        // icons very close to the text, I'm adding spaces to compensate.
+        devices->addItem(internal_name, (core::stringw("   ") + _("Keyboard %i", i)).c_str(), 0 /* icon */);
     }
     
     const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
@@ -104,9 +104,9 @@ void OptionsScreenInput::buildDeviceList()
         // Don't display the configuration if a matching device is not available
         if (config->isPlugged())
         {
-            //FIXME: since irrLicht's list widget has the nasty tendency to put the 
-            //       icons very close to the text, I'm adding spaces to compensate...
-            const irr::core::stringw name = irr::core::stringw("   ") + config->getName().c_str();
+            // since irrLicht's list widget has the nasty tendency to put the 
+            // icons very close to the text, I'm adding spaces to compensate.
+            const irr::core::stringw name = ("   " + config->getName()).c_str();
             
             std::ostringstream gpname;
             gpname << "gamepad" << i;

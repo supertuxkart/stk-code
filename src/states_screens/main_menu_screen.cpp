@@ -36,14 +36,12 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-
-//FIXME : remove, temporary tutorial test
 #include "states_screens/tutorial_screen.hpp"
 
-// FIXME : remove, temporary test
-#include "states_screens/feature_unlocked.hpp"
-#include "states_screens/grand_prix_lose.hpp"
-#include "states_screens/grand_prix_win.hpp"
+//#include "states_screens/feature_unlocked.hpp"
+//#include "states_screens/grand_prix_lose.hpp"
+//#include "states_screens/grand_prix_win.hpp"
+
 #include "addons/network_http.hpp"
 
 #include "tracks/track_manager.hpp"
@@ -269,6 +267,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
+#if 0
     if (selection == "network")
     {
         // The DEBUG item
@@ -319,7 +318,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             scene->setKarts( losers );
         }
     }
-    else if (selection == "new")
+    else
+#endif
+    if (selection == "new")
     {
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
