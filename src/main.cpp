@@ -362,13 +362,18 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 exit(EXIT_FAILURE);
             }
         }
-        else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-V") )
+        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-V") == 0)
         {
             printf("==============================\n");
             fprintf ( stdout, "SuperTuxKart, %s.\n", STK_VERSION ) ;
 #ifdef SVNVERSION
             fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
 #endif
+            
+            // IRRLICHT_VERSION_SVN
+            fprintf ( stdout, "Irrlicht version %i.%i.%i (%s)\n", IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
+                                                                  IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
+            
             printf("==============================\n");
             exit(0);
         }
