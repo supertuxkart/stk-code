@@ -492,7 +492,7 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
 int NetworkHttp::versionToInt(const std::string &version_string)
 {
     // Special case: SVN
-    if(version_string=="SVN")
+    if(version_string=="SVN" || version_string=="svn")
       // SVN version will be version 99.99.99i
         return 100000*99
               +  1000*99
