@@ -445,7 +445,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam        m_internet_status
             PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
                                                &m_addon_group,
-                                               "Status of internet: 0 user wasn't asked, 1: allowe, 2: not allowed") );
+                                               "Status of internet: 0 user wasn't asked, 1: allowed, 2: not allowed") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
