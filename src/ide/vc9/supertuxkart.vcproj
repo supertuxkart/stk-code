@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib.release ws2_32.lib fribidi.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib.release ws2_32.lib fribidi.lib pthreadVC2.lib libcurld_imp.lib"
 				OutputFile="./../../../$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../dependencies/lib"
