@@ -3177,10 +3177,6 @@
 					"-DADDONS_MANAGER=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-lcurl",
-				);
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = SuperTuxKart;
