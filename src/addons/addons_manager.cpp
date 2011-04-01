@@ -361,7 +361,7 @@ void AddonsManager::saveInstalled(const std::string &type)
 
     //write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;
-    xml_installed << "<addons  xmlns='http://stkaddons.tuxfamily.org/'>"
+    xml_installed << "<addons  xmlns='http://stkaddons.net/'>"
                     << std::endl;
 
     for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)

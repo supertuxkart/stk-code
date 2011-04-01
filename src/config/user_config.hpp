@@ -417,7 +417,7 @@ namespace UserConfigParams
                                             "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT(  StringUserConfigParam("http://stkaddons.tuxfamily.org/dl/xml",
+            PARAM_DEFAULT(  StringUserConfigParam("http://stkaddons.net/dl/xml",
                                                   "server_addons", 
                                                   &m_addon_group,
                                                   "The server used for addon.") );
