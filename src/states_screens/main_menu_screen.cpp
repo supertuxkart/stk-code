@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
