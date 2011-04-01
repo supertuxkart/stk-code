@@ -179,7 +179,8 @@ Kart *World::createKart(const std::string &kart_ident, int index,
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, m_track, position, init_pos, race_manager->getKartType(index));
+    Kart *new_kart         = new Kart(kart_ident, m_track, position, (local_player_id == 0), init_pos,
+                                      race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(race_manager->getKartType(index))
     {

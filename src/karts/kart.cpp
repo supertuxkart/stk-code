@@ -63,9 +63,10 @@
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
  *         number of karts). This is used to determine the start position.
+ *  \param is_first_kart   Indicates whether this is the first *player* kart
  *  \param init_transform  The initial position and rotation for this kart.
  */
-Kart::Kart (const std::string& ident, Track* track, int position,
+Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_kart,
             const btTransform& init_transform, RaceManager::KartType type)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
@@ -172,7 +173,7 @@ Kart::Kart (const std::string& ident, Track* track, int position,
         animations = false;
     }
     
-    loadData(type, track, animations);
+    loadData(type, is_first_kart, track, animations);
 
     reset();
 }   // Kart
@@ -1656,13 +1657,14 @@ void Kart::updatePhysics(float dt)
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
  */
-void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel)
+void Kart::loadData(RaceManager::KartType type, bool is_first_kart, Track* track, bool animatedModel)
 {
     if (animatedModel)
     {
         scene::ISceneNode* staticModel       = m_kart_model->attachModel(false);
         scene::ISceneNode* animatedModelNode = m_kart_model->attachModel(animatedModel);
-        LODNode* node = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager());
+        LODNode* node = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(),
+                                    irr_driver->getSceneManager());
         node->add(50, animatedModelNode, true);
         node->add(500, staticModel, true);
         m_node = node;
@@ -1720,7 +1722,7 @@ void Kart::loadData(RaceManager::KartType type, Track* track, bool animatedModel
         type == RaceManager::KT_PLAYER)
     {
         // camera not yet available at this point
-        m_rain = new Rain(NULL, NULL);
+        m_rain = new Rain(NULL, NULL, is_first_kart);
     }
         
     Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);

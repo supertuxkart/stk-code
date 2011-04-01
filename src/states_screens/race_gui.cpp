@@ -373,7 +373,11 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     if (m_lightning > 0.0f)
     {
         GLint glviewport[4];
-        glGetIntegerv(GL_VIEWPORT, glviewport);
+        glviewport[0] = viewport.UpperLeftCorner.X;
+        glviewport[1] = viewport.UpperLeftCorner.Y;
+        glviewport[2] = viewport.LowerRightCorner.X;
+        glviewport[3] = viewport.LowerRightCorner.Y;
+        //glGetIntegerv(GL_VIEWPORT, glviewport);
 
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);

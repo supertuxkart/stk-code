@@ -37,10 +37,11 @@ class Rain
     float m_y[RAIN_RING_COUNT];
     
     float m_next_lightning;
+    bool m_lightning;
     SFXBase* m_thunder_sound;
     
 public:
-    Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent);
+    Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent, bool lightning);
     ~Rain();
     
     void update(float dt);

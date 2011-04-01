@@ -39,9 +39,11 @@ const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
 const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 
 
-Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent)
+Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent, bool lightning)
 {
-    m_thunder_sound = sfx_manager->createSoundSource("thunder");
+    m_lightning = lightning;
+    
+    if (lightning) m_thunder_sound = sfx_manager->createSoundSource("thunder");
     
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
@@ -120,7 +122,7 @@ Rain::~Rain()
         m_node[r]->remove();
     }
     
-    if (m_thunder_sound) sfx_manager->deleteSFX(m_thunder_sound);
+    if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
 }
 
 // ----------------------------------------------------------------------------
@@ -140,20 +142,23 @@ void Rain::update(float dt)
         matrix.setTextureTranslate(m_x[m], m_y[m]);
     }
     
-    m_next_lightning -= dt;
-    
-    if (m_next_lightning < 0.0f)
+    if (m_lightning)
     {
-        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-        RaceGUI* gui = dynamic_cast<RaceGUI*>(gui_base);
-        if (gui != NULL)
-        {
-            gui->lightning();
-            if (m_thunder_sound) m_thunder_sound->play();
-        }
+        m_next_lightning -= dt;
         
-        RandomGenerator g;
-        m_next_lightning = 35 + (float)g.get(35);
+        if (m_next_lightning < 0.0f)
+        {
+            RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+            RaceGUI* gui = dynamic_cast<RaceGUI*>(gui_base);
+            if (gui != NULL)
+            {
+                gui->lightning();
+                if (m_thunder_sound) m_thunder_sound->play();
+            }
+            
+            RandomGenerator g;
+            m_next_lightning = 35 + (float)g.get(35);
+        }
     }
     
 }   // update

@@ -191,12 +191,13 @@ protected:
     KartModel*            m_kart_model;
     
 public:
-                   Kart(const std::string& ident, Track* track, int position, 
+                   Kart(const std::string& ident, Track* track, int position,  bool is_first_kart,
                         const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
-    void           loadData(RaceManager::KartType type, Track* track, bool animatedModel);
+    void           loadData(RaceManager::KartType type, bool is_first_kart, Track* track,
+                            bool animatedModel);
     virtual void   updateGraphics(const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     void           createPhysics    ();
