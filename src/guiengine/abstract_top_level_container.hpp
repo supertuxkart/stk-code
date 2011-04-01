@@ -28,6 +28,13 @@ namespace GUIEngine
 {
     class Widget;
     
+    /**
+     * \brief Represents a GUI widgets container.
+     * 
+     * Abstract base class for both Screen and ModalDialog.
+     *
+     * \ingroup guiengine
+     */
     class AbstractTopLevelContainer
     {
     protected:

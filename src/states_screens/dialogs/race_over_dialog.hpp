@@ -23,6 +23,9 @@
 
 namespace irr { namespace video { class ITexture; } }
 
+/**
+  * \ingroup states_screens
+  */
 class RaceOverDialog : public GUIEngine::ModalDialog
 {
     void renderThreeStrikesGraph(const int x, const int y, const int w, const int h);

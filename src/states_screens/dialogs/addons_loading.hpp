@@ -29,6 +29,9 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/synchronised.hpp"
 
+/**
+  * \ingroup states_screens
+  */
 class AddonsLoading : public GUIEngine::ModalDialog
 {
 //virtual void escapePressed() {};

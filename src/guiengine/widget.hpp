@@ -312,8 +312,8 @@ namespace GUIEngine
         bool isBottomBar() const { return m_bottom_bar; }
         
         /**
-         * \{
          * \name Enabling or disabling widgets
+         * \{
          */
         
         /** \brief undos setDeactivated() */
@@ -328,8 +328,8 @@ namespace GUIEngine
           */
         
         /**
-         * \{
          * \name Accessing the underlying irrlicht element
+         * \{
          */
         
         /**
@@ -379,12 +379,11 @@ namespace GUIEngine
           */
 
         /**
-         * \{
          * \name Get and set properties
-         *
          * Note that many properties are read only by the Widget::add method; so, while
          * it will generally work to set the properties before add() is called, modifying
          * the widget after it was added will require other widget-specific calls.
+         * \{
          */
         
         /** A map that holds values for all specified widget properties (in the XML file)*/
@@ -422,8 +421,8 @@ namespace GUIEngine
           */
         
         /**
-         * \{
          * \name Focus management
+         * \{
          */
         
         /**
@@ -447,14 +446,13 @@ namespace GUIEngine
           */
         
         /**
-         * \{
          * \name ID Counter Functions
-         *
          * Functions used to generate IDs for new widgets. The domain of each ID
          * encodes whether the widget can receive focus or not (this was implemented
          * this way because navigation in irrlicht happens between sequential IDs; so
          * to prevent navigation to a widget, one needs to give an ID that is not
          * sequential with focusable widgets in order not to break keyboard navigation).
+         * \{
          */
         
         static void resetIDCounters();
@@ -482,10 +480,9 @@ namespace GUIEngine
           */
         
         /**
-         * \{
          * \name Handling children
-         *
          * If this widget is a container and has children.
+         * \{
          */
         
         /**
@@ -506,8 +503,7 @@ namespace GUIEngine
         
         /**
          * \{
-         * \name Callbacks for implementating classes
-         *
+         * \name Callbacks for subclasses
          * Classes that subclass Widget to provide actual implementations may override/implement these
          * methods to change behaviour or be notified of some events.
          */
@@ -550,10 +546,9 @@ namespace GUIEngine
           */
         
         /**
-         * \{
          * \name Badge support
-         *
          * "Badges" are icons that can appear on top of some widgets.
+         * \{
          */
         
         /** 
@@ -597,9 +592,8 @@ namespace GUIEngine
          */
         
         /**
-         * \{
          * \name Tooltip support
-         *
+         * \{
          */
         
         
