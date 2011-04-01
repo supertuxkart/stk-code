@@ -40,7 +40,11 @@
  applied to all widgets, see the docs for a given widget and a given property 
  for full information.
  
+ \n
+ <HR>
  \section toc Table of Contents
+ <HR>
+ 
  \ref widgets
  \li \ref widget1
  \li \ref widget2
@@ -82,7 +86,9 @@
  
  \n
  \n
+ <HR>
  \section widgets Widgets
+ <HR>
  
  This section describes the widgets you can use in STK's GUI XML files. The 
  upper-case name starting with WTYPE_* is the internal name of the widget  
@@ -248,7 +254,8 @@
  \note Contents must be set programmatically.
  
  
-  \subsection widget12 WTYPE_PROGRESS
+ \n
+ \subsection widget12 WTYPE_PROGRESS
  <em> Name in XML files: </em> \c "progressbar" 
  
  Display a progress bar (e.g. for downloads).
@@ -264,7 +271,9 @@
  
  \n
  \n
+ <HR>
  \section props Properties
+ <HR>
  
  \subsection prop1 PROP_ID
  <em> Name in XML files: </em> \c "id" 
@@ -439,7 +448,9 @@
  
  
  \n
+ <HR>
  \section code Using the engine in code
+ <HR>
  
  The first thing to do is to derive a class of your own from 
  AbstractStateManager. There are a few callbacks you will need to override.
@@ -459,16 +470,23 @@
  implement the GUIEngine::Screen::init and GUIEngine::Screen::tearDown methods,
  that will be called, respectively, when a menu is entered/left. For simple 
  menus, it is not unexpected that those methods do nothing. For init and
- tearDown the corresponding function in Screen must be called.
+ tearDown the corresponding function in Screen must be called. Note that init
+ is called after the irrlicht elements have been added on screen; if you wish
+ to alter elements BEFORE they are actually added, use 'GUIEngine::Screen::loadedFromFile'.
+ 
+ GUIEngine::Widget::m_properties contains all the widget properties as loaded
+ from the XML file. They are generally only read from the GUIEngine::Widget::add
+ method, so if you alter a property after 'add()' was called it will not appear
+ on screen.
  
  Note that the same instance of your object may be entered/left more than once,
  so make sure that one instance of your object can be used several times if 
  the same screen is visited several times.
  
  Note that the same instance of your object may be unloaded then loaded back 
- later. It is thus important to do set-up in the 'loadedFromFile' callback 
- rather than in the constructor (after the creation of Screen object, it may 
- be unloaded then loaded back at will, this is why it's important to not rely
+ later. It is thus important to do set-up in the 'GUIEngine::Screen::loadedFromFile'
+ callback rather than in the constructor (after the creation of Screen object, it
+ may be unloaded then loaded back at will, this is why it's important to not rely
  on the constructor to perform set-up).
  
  Do not delete a Screen manually, since the GUIEngine caches them; deleting
@@ -482,7 +500,9 @@
  similar way.
  
  \n
+ <HR>
  \section internals Inside the GUI Engine
+ <HR>
  
  \subsection Widget Widget
  
@@ -496,7 +516,7 @@
    everytime a screen switch occurs.
  
  Each widget contains one (or several) \c irr::gui::IGUIElement instances that represent
- the irrlicht widget that is added to the IGUIEnvironment if the widget is currently
+ the irrlicht widget that is added to the \c IGUIEnvironment if the widget is currently
  shown; if a widget is not currently shown on screen (in irrlicht's \c IGUIEnvironment),
  then its underlying \c IGUIElement pointer will be \c NULL but the widget continues to exist
  and remains ready to re-create its underlying irrlicht widget when the screen it is
