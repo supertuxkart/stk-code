@@ -109,7 +109,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\bullet\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;BT_NO_PROFILE;ENABLE_SSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;BT_NO_PROFILE"
 				MinimalRebuild="true"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -768,11 +768,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
+					RelativePath="..\..\bullet\src\LinearMath\btConvexHull.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\bullet\src\LinearMath\btConvexHull.h"
+					RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
 					>
 				</File>
 				<File

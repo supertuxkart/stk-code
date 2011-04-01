@@ -26,7 +26,7 @@
 // On the other hand, std::vector gives much better debugging features.
 // So SSE is disabled in bullet on windows debug
 #if !defined(DEBUG) && (WIN32)
-#  define USE_ALIGNED 
+#  undef USE_ALIGNED 
 #else
 #  undef  USE_ALIGNED
 #endif
