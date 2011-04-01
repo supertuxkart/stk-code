@@ -29,8 +29,6 @@ struct btWheelContactPoint;
 btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
 
 
-static btRigidBody s_fixedObject( 0,0,0);
-
 btKart::btKart(const btVehicleTuning& tuning,btRigidBody* chassis,
                btVehicleRaycaster* raycaster, float track_connect_accel )
 : btRaycastVehicle(tuning, chassis, raycaster)
@@ -82,7 +80,7 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
         wheel.m_raycastInfo.m_isInContact      = true;
 
-        wheel.m_raycastInfo.m_groundObject     = &s_fixedObject;//todo for driving on dynamic/movable objects!;
+        wheel.m_raycastInfo.m_groundObject     = &getFixedBody();//todo for driving on dynamic/movable objects!;
         //wheel.m_raycastInfo.m_groundObject = object;
 
 
