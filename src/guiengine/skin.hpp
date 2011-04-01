@@ -83,7 +83,7 @@
  \endcode
  
  The center border will be stretched in all directions. The 4 corners will not stretch at all.
- Horizontal borders will stretch horizontally, verticallt borders will stretch vertically.
+ Horizontal borders will stretch horizontally, vertical borders will stretch vertically.
  Use properties left_border="X" right_border="X" top_border="X" bottom_border="X" to specify
  the size of each border in pixels (setting all borders to '0' makes the whole image scaled).
  
