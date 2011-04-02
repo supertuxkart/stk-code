@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="All tracks">
+<supertuxkart_grand_prix name="All Tracks">
 
     <track id="hacienda"         laps="3" />
     <track id="scotland"         laps="3" />
