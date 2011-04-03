@@ -485,7 +485,7 @@ bool NetworkHttp::conditionFulfilled(const std::string &cond)
 }   // conditionFulfilled
 
 // ----------------------------------------------------------------------------
-/** Converts a version string (in the form of 'X.Y.Za' into an
+/** Converts a version string (in the form of 'X.Y.Za-rcU' into an
  *  integer number.
  *  \param s The version string to convert.
  */
@@ -493,29 +493,35 @@ int NetworkHttp::versionToInt(const std::string &version_string)
 {
     // Special case: SVN
     if(version_string=="SVN" || version_string=="svn")
-      // SVN version will be version 99.99.99i
-        return 100000*99
-              +  1000*99
-              +    10*99
-              +        9;
+      // SVN version will be version 99.99.99i-rcJ
+        return 1000000*99     
+              +  10000*99
+              +    100*99
+              +     10* 9
+              +         9;
 
-    std::vector<std::string> l = StringUtils::split(version_string, '.');
-    if(l.size()!=3)
+    std::string s=version_string;
+    int release_candidate=0;
+    if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
+           &release_candidate)==1)
     {
-        printf("Invalid version string '%s'.\n", version_string.c_str());
-        return -1;
+        s = s.substr(0, s.length()-4);
     }
-    const std::string &s=l[2];
     int very_minor=0;
     if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
     {
         very_minor = s[s.size()-1]-'a'+1;
-        l[2] = l[2].substr(0, s.size()-1);
+        s = s.substr(0, s.size()-1);
     }
-    int version = 100000*atoi(l[0].c_str())
-                +   1000*atoi(l[1].c_str())
-                +     10*atoi(l[2].c_str())
-                + very_minor;
+    std::vector<std::string> l = StringUtils::split(s, '.');
+    while(l.size()<3)
+        l.push_back(0);
+    int version = 1000000*atoi(l[0].c_str())
+                +   10000*atoi(l[1].c_str())
+                +     100*atoi(l[2].c_str())
+                +      10*very_minor
+                +         release_candidate;
+
     if(version<=0)
         printf("Invalid version string '%s'.\n", s.c_str());
     return version;
