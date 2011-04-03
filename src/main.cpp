@@ -724,7 +724,9 @@ void initUserConfig(char *argv[])
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
-        SetEnvironmentVariableA("LANGUAGE", UserConfigParams::m_language.c_str());
+        std::string s=std::string("LANGUAGE=")
+                     +UserConfigParams::m_language.c_str();
+        _putenv(s.c_str());
 #else
         setenv("LANGUAGE", UserConfigParams::m_language.c_str(), 1);
 #endif
