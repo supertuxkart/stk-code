@@ -7,24 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: Ivan Putnik <iputnik@msn.com>\n"
-"POT-Creation-Date: 2011-03-30 13:16-0400\n"
-"PO-Revision-Date: 2011-02-20 16:14+0000\n"
-"Last-Translator: dboki89 <Unknown>\n"
+"POT-Creation-Date: 2011-04-02 10:37-0400\n"
+"PO-Revision-Date: 2011-03-31 12:53+0000\n"
+"Last-Translator: STK-team <Unknown>\n"
 "Language-Team: Croatian <hr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-30 20:24+0000\n"
-"X-Generator: Launchpad (build 12684)\n"
+"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
+"X-Generator: Launchpad (build 12710)\n"
 
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
 msgstr "   N"
-
-#: src/states_screens/options_screen_input.cpp:95
-#, c-format
-msgid "   Keyboard %i"
-msgstr "   Tipkovnica %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
@@ -134,7 +129,7 @@ msgstr "%s plaća sljedeči krug pićem od ruma!"
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr "%s bi trebao/la igrati pikado (gumenim strelicama) umjesto kuglanja"
 
-#: src/modes/world.cpp:756
+#: src/modes/world.cpp:757
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' je eliminiran/na."
@@ -246,7 +241,7 @@ msgid "Addons"
 msgstr "Dodaci"
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:794
 msgid "Adiumy"
 msgstr "Adium"
 
@@ -263,21 +258,19 @@ msgstr "Adium"
 msgid "All"
 msgstr "Sve"
 
+#. I18N: ./data/grandprix/alltracks.grandprix
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:670
+#. I18N: ./data/grandprix/alltracks.grandprix
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:670
+#: data/po/gui_strings.h:776
 msgid "All Tracks"
 msgstr "Sve staze"
 
-#: src/states_screens/race_setup_screen.cpp:197
+#: src/states_screens/race_setup_screen.cpp:198
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
 "Svi udarci dozvoljeni, zato uhvatite oružje i pametno ga upotrijebite!"
-
-#. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164 data/po/gui_strings.h:780
-msgid "All tracks"
-msgstr "Sve staze"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
@@ -342,7 +335,7 @@ msgid "Assign to ESC key"
 msgstr "Dodjeli tipku ESC"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:783
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:779
 msgid "At World's End"
 msgstr "Na kraju svijeta"
 
@@ -390,12 +383,6 @@ msgstr "Natrag na utrku"
 msgid "Back to device list"
 msgstr "Povratak na popis uređaja"
 
-#. I18N: ./data/gui/tutorial.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#: data/po/gui_strings.h:678
-msgid "Back to menu"
-msgstr ""
-
 #: src/states_screens/dialogs/race_over_dialog.cpp:389
 msgid "Back to the main menu"
 msgstr "Povratak na glavni izbornik"
@@ -409,7 +396,7 @@ msgid "Banana? Box? Banana? Box? Banana? Box?"
 msgstr "Banana? Kutija? Banana? Kutija? Banana? Kutija?"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:797
 msgid "Beagle"
 msgstr ""
 
@@ -450,7 +437,7 @@ msgstr ""
 "Kolač - bačen na najbližeg igrača, najbolje na kratkim udaljenostima i dugim "
 "ravnim stazama"
 
-#: src/addons/network_http.cpp:296
+#: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
 msgstr ""
 
@@ -504,7 +491,7 @@ msgid "Choose a Kart"
 msgstr "Odaberi karting"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:702
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:698
 msgid "Collect Nitro in Math Class"
 msgstr "Skupljajte nitro na satu matematike"
 
@@ -515,12 +502,12 @@ msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr "Skupljajte plave kutije: one daju oružje i druga poboljšanja"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:744
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:740
 msgid "Collect fuel for your rocket"
 msgstr "Skupljajte gorivo za Vašu raketu"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152 data/po/gui_strings.h:768
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:764
 msgid "Collect the Pharaohs Treasure"
 msgstr "Skupljajte Faraonovo blago"
 
@@ -537,7 +524,7 @@ msgstr ""
 "spremniku na desnoj strani zaslona."
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71 data/po/gui_strings.h:687
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:683
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
 "Idite prvo u Grand Prix \"Na kraju svijeta\" sa 3 Ekspert AI kartinga."
@@ -553,7 +540,7 @@ msgstr "Potvrdi uklanjanje"
 msgid "Confirm resolution within %i seconds"
 msgstr "Potvrdi rezoluciju u narednih %i sekundi"
 
-#: src/states_screens/race_setup_screen.cpp:204
+#: src/states_screens/race_setup_screen.cpp:205
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Ne sadrži pojačanja, tako da samo Vaše vještine vožnje vrijede!"
 
@@ -654,7 +641,7 @@ msgid "Download failed.\n"
 msgstr "Skidanje nije uspjelo.\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:800
 msgid "Elephpant"
 msgstr "Slon"
 
@@ -672,12 +659,12 @@ msgstr "Omogući uređaj"
 msgid "Enabled"
 msgstr "Omogući"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:691
+#: src/states_screens/dialogs/race_over_dialog.cpp:679
 msgid "Energy"
 msgstr "Energija"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:141
+#: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
 msgstr "Hrvatski"
 
@@ -716,13 +703,13 @@ msgid "Final lap!"
 msgstr "Završni krug!"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:729
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:725
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr ""
 "Završite 3 kruga Farme sa 3 lagana AI kartinga za manje od 2:30 minute."
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149 data/po/gui_strings.h:765
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:761
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
@@ -730,28 +717,28 @@ msgstr ""
 "minuta."
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101 data/po/gui_strings.h:717
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:713
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
 "Završite 3 kruga u Rudnicima sa 3 Ekspert AI kartinga za manje od tri minute."
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:726
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:722
 msgid "Finish Farm in 2:30"
 msgstr "Završite Farmu za manje od 2:30 minute"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146 data/po/gui_strings.h:762
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:758
 msgid "Finish Lighthouse in 1:30"
 msgstr "Završite Svjetionik za manje od 1:30 minuta"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:714
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:710
 msgid "Finish Mines in 3:00"
 msgstr "Završite Rudnike za manje od 3:00 minute."
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89 data/po/gui_strings.h:705
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:701
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
@@ -760,7 +747,7 @@ msgstr ""
 "za manje od 55 sekundi."
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155 data/po/gui_strings.h:771
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:767
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
@@ -769,7 +756,7 @@ msgstr ""
 "2:20 minute."
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131 data/po/gui_strings.h:747
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:743
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
@@ -807,12 +794,12 @@ msgid "Follow the Leader"
 msgstr "Slijedite vođu"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122 data/po/gui_strings.h:738
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:734
 msgid "Follow the Leader around the Solar System"
 msgstr "Slijedite vođu oko sunčevog sustava"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:690
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:686
 msgid "Follow the Leader on a Desert Island"
 msgstr "Slijedite vođu na pustom otoku"
 
@@ -892,7 +879,7 @@ msgid "Geronimo!!!"
 msgstr "Đeronimo!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:803
 msgid "Gnu"
 msgstr "Gnu"
 
@@ -902,7 +889,7 @@ msgid "Go!"
 msgstr "Kreni!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:806
 msgid "Gooey"
 msgstr "Gnjecavko"
 
@@ -946,7 +933,7 @@ msgid "Help"
 msgstr "Pomoć"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:809
 msgid "Hexley"
 msgstr "Hexa (Hexley)"
 
@@ -954,7 +941,7 @@ msgstr "Hexa (Hexley)"
 msgid "Highscores"
 msgstr "Najbolji rezultati"
 
-#: src/states_screens/race_setup_screen.cpp:226
+#: src/states_screens/race_setup_screen.cpp:227
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
@@ -1009,12 +996,17 @@ msgid "Keep this resolution"
 msgstr "Spremi ovu rezoluciju"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:217
+#: src/states_screens/race_setup_screen.cpp:218
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Održavajte brzinu kartinga vođe, ali ga ne pretičite!"
 
+#: src/states_screens/options_screen_input.cpp:95
+#, c-format
+msgid "Keyboard %i"
+msgstr ""
+
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:812
 msgid "Konqi"
 msgstr "Konqi"
 
@@ -1038,7 +1030,7 @@ msgstr "Vođa"
 msgid "Left"
 msgstr "Lijevo"
 
-#: src/guiengine/engine.cpp:1077
+#: src/guiengine/engine.cpp:1097
 msgid "Loading"
 msgstr "Učitavanje"
 
@@ -1048,7 +1040,7 @@ msgstr "Učitavanje"
 #: src/states_screens/kart_selection.cpp:797
 #: src/states_screens/kart_selection.cpp:1718
 #: src/states_screens/kart_selection.cpp:1744
-#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/race_setup_screen.cpp:210
 #: src/states_screens/tracks_screen.cpp:283
 #: src/states_screens/tracks_screen.cpp:307
 msgid "Locked : solve active challenges to gain access to more!"
@@ -1103,7 +1095,7 @@ msgid "Mouse button %d"
 msgstr "Tipka miša %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:815
 msgid "Mozilla"
 msgstr "Mozilla"
 
@@ -1177,7 +1169,7 @@ msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:822
+#: data/po/gui_strings.h:818
 msgid "Nolok"
 msgstr "Nolok"
 
@@ -1208,7 +1200,7 @@ msgstr "Početnik"
 msgid "Number of AI karts"
 msgstr "Broj AI kartinga"
 
-#: src/states_screens/dialogs/message_dialog.cpp:57
+#: src/states_screens/dialogs/message_dialog.cpp:59
 msgid "OK"
 msgstr "U redu"
 
@@ -1251,17 +1243,17 @@ msgid "Penalty time!!"
 msgstr "Kazneno vrijeme!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170 data/po/gui_strings.h:786
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:782
 msgid "Penguin Playground"
 msgstr "Pingvinovo igralište"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:825
+#: data/po/gui_strings.h:821
 msgid "Pidgin"
 msgstr "Pismonoša (Pidgin)"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:681
+#: data/po/gui_strings.h:677
 msgid "Play all"
 msgstr "Igraj sve"
 
@@ -1325,7 +1317,7 @@ msgid "Problems removing the addon '%s'."
 msgstr "Problemi s uklanjanjem dodatka '%s'."
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:828
+#: data/po/gui_strings.h:824
 msgid "Puffy"
 msgstr "Debeljuco (Puffy)"
 
@@ -1492,7 +1484,7 @@ msgid "Skyline"
 msgstr "Nebeska linija"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173 data/po/gui_strings.h:789
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:785
 msgid "Snag Drive"
 msgstr "Kvrgava vožnja"
 
@@ -1578,6 +1570,13 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart ima nekoliko načina igre"
 
+#: src/main.cpp:940
+msgid ""
+"SuperTuxKart may connect to a news server to display updates. Would you like "
+"this feature to be enabled? (To change this setting at a later time, go to "
+"options, select tab 'User Interface', and edit \"Internet STK news\")."
+msgstr ""
+
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
 msgid ""
@@ -1586,12 +1585,12 @@ msgid ""
 msgstr "SuperTuxKart ima nekoliko načina/modova igre"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:199
+#: src/states_screens/main_menu_screen.cpp:198
 msgid "System Language"
 msgstr "Jezik operativnog sustava"
 
 #. I18N: ./data/grandprix/test.grandprix
-#: data/po/gui_strings.h:176 data/po/gui_strings.h:792
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:788
 msgid "Test"
 msgstr "Proba"
 
@@ -1619,7 +1618,7 @@ msgstr "Svemirska letjelica (Space Shuttle) je sletjela!"
 msgid "The Stadium"
 msgstr "Stadion"
 
-#: src/race/highscore_manager.cpp:97
+#: src/race/highscore_manager.cpp:98
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -1631,7 +1630,7 @@ msgstr ""
 msgid "This Grand Prix is broken!"
 msgstr "Ovaj Grand Prix je slomljen!"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:686
+#: src/states_screens/dialogs/race_over_dialog.cpp:674
 msgid "Time"
 msgstr "Vrijeme"
 
@@ -1676,7 +1675,7 @@ msgstr ""
 "skupljati:"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:179 data/po/gui_strings.h:795
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:791
 msgid "To the Moon and Back"
 msgstr "Do Mjeseca i natrag"
 
@@ -1709,7 +1708,7 @@ msgid "Tutorial : Selection Room"
 msgstr ""
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:831
+#: data/po/gui_strings.h:827
 msgid "Tux"
 msgstr "Tux"
 
@@ -1815,46 +1814,44 @@ msgid ""
 msgstr ""
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:834
+#: data/po/gui_strings.h:830
 msgid "Wilber"
 msgstr "Vilber"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:708
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:704
 msgid "Win Penguin Playground Grand Prix"
 msgstr "Osvojite Grand Prix Pingvinovo igralište"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95 data/po/gui_strings.h:711
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:707
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
 msgstr "Osvojite Grand Prix Pingvinovo igralište s 3 Ekspert AI kartinga."
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140 data/po/gui_strings.h:756
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:752
 msgid "Win To the Moon and Back Grand Prix"
 msgstr "Osvojite Grand Prix Do Mjeseca i natrag"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137 data/po/gui_strings.h:753
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:749
 msgid ""
-"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+"Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
-"Pobijedite u utrci od jednog kruga Glavom uz glavu u Tajnim vrtovima protiv "
-"1 Ekspert AI kartinga."
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161 data/po/gui_strings.h:777
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:773
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
 msgstr "Pobijedite utrku od 3 kruga na Kanjonu protiv 4 Ekspert AI kartinga."
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:723
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:719
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr ""
 "Pobijedite utrku od 3 kruga na Utvrdi Magma protiv 3 Ekspert AI kartinga."
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119 data/po/gui_strings.h:735
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:731
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
@@ -1862,55 +1859,55 @@ msgstr ""
 "kartinga srednje težine."
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83 data/po/gui_strings.h:699
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:695
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
 msgstr ""
 "Pobijedite utrku od 3 kruga na Tux Tollway protiv 4 Ekspert AI kartinga."
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77 data/po/gui_strings.h:693
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:689
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr ""
 "Pobijedite prateći vođu u utrci protiv 3 AI kartinga na Pustom otoku."
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125 data/po/gui_strings.h:741
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:737
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
 msgstr ""
 "Pobijedite prateći vođu u utrci protiv 5 AI kartinga na Zvjezdanim stazama"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134 data/po/gui_strings.h:750
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:746
 msgid "Win a Head to Head in the Secret Garden"
 msgstr "Pobijedite Glavom uz glavu u Tajnom vrtu"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158 data/po/gui_strings.h:774
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:770
 msgid "Win a race on Canyon"
 msgstr "Pobijedite utrku na Kanjonu"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:720
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:716
 msgid "Win a race on Fort Magma"
 msgstr "Pobijedite utrku na Utvrdi Magma"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:732
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:728
 msgid "Win a race on Snow Mountain"
 msgstr "Pobijedite utrku na Snježnoj planini"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:696
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:692
 msgid "Win a race on Tux Tollway"
 msgstr "Pobijedite utrku na Tux Tollway"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:684
+#: data/po/gui_strings.h:68 data/po/gui_strings.h:680
 msgid "Win the At World's End Grand Prix"
 msgstr "Osvojite Grand Prix Na kraju svijeta"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143 data/po/gui_strings.h:759
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:755
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
 msgstr "Osvojite Grand Prix Do Mjeseca i natrag sa 3 Ekspert AI kartinga."
 
@@ -1929,11 +1926,11 @@ msgstr "Da"
 msgid "You completed the Grand Prix!"
 msgstr "Završili ste Grand Prix!"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You finished the race!"
 msgstr "Završili ste utrku!"
 
-#: src/modes/world.cpp:752
+#: src/modes/world.cpp:753
 msgid "You have been eliminated!"
 msgstr "Eliminirani ste!"
 
@@ -1942,7 +1939,7 @@ msgstr "Eliminirani ste!"
 msgid "You unlocked a new feature!"
 msgstr "Otključali ste novu značajku!"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You won the race!"
 msgstr "Pobijedili ste u utrci!"
 
@@ -1972,8 +1969,8 @@ msgid "[none]"
 msgstr "[ništa]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:785
-#: src/states_screens/race_gui.cpp:1195
+#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "od"
 
@@ -1984,6 +1981,9 @@ msgstr ""
 "  STK-team https://launchpad.net/~stk\n"
 "  dboki89 https://launchpad.net/~dboki89\n"
 "  student4 https://launchpad.net/~iputnik-msn"
+
+#~ msgid "All tracks"
+#~ msgstr "Sve staze"
 
 #~ msgid "Animated Karts"
 #~ msgstr "Animirani kartinzi"
@@ -2004,6 +2004,10 @@ msgstr ""
 #, c-format
 #~ msgid "Version: %i"
 #~ msgstr "Verzija: %i"
+
+#, c-format
+#~ msgid "   Keyboard %i"
+#~ msgstr "   Tipkovnica %i"
 
 #~ msgid "Back to main menu"
 #~ msgstr "Povratak na glavni izbornik"
@@ -2028,6 +2032,12 @@ msgstr ""
 #~ "bi se pridružio igri. Svaki igrač može koristiti vlastiti uređaj za \"unos\" "
 #~ "da izabere svoj karting. Igra se nastavlja kada svako odabere svoj karting. "
 #~ "Primijetite da se miš ne može koristiti za ovu operaciju."
+
+#~ msgid ""
+#~ "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+#~ msgstr ""
+#~ "Pobijedite u utrci od jednog kruga Glavom uz glavu u Tajnim vrtovima protiv "
+#~ "1 Ekspert AI kartinga."
 
 #~ msgid "gamepad"
 #~ msgstr "Igrača palica"

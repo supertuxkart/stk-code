@@ -2,24 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-30 13:16-0400\n"
+"POT-Creation-Date: 2011-04-02 10:37-0400\n"
 "PO-Revision-Date: 2011-03-20 20:19+0000\n"
 "Last-Translator: Asciimonster <asciimonster@myrealbox.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-30 20:24+0000\n"
-"X-Generator: Launchpad (build 12684)\n"
+"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
+"X-Generator: Launchpad (build 12710)\n"
 
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
 msgstr "   N"
-
-#: src/states_screens/options_screen_input.cpp:95
-#, c-format
-msgid "   Keyboard %i"
-msgstr "   Toetsenbord %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
@@ -134,7 +129,7 @@ msgstr "%s geeft een rondje van de zaak!"
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr "%s kan niet bowlen. Misschien kan hij beter softballen"
 
-#: src/modes/world.cpp:756
+#: src/modes/world.cpp:757
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s is uitgeschakeld."
@@ -251,7 +246,7 @@ msgid "Addons"
 msgstr "Uitbreidingen"
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:794
 msgid "Adiumy"
 msgstr "Adiumy"
 
@@ -268,20 +263,18 @@ msgstr "Adiumy"
 msgid "All"
 msgstr "Alle"
 
+#. I18N: ./data/grandprix/alltracks.grandprix
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:670
+#. I18N: ./data/grandprix/alltracks.grandprix
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:670
+#: data/po/gui_strings.h:776
 msgid "All Tracks"
 msgstr "Alle parcours"
 
-#: src/states_screens/race_setup_screen.cpp:197
+#: src/states_screens/race_setup_screen.cpp:198
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "Bruut geweld is toegestaan, dus grijp die wapens en zet ze slim in!"
-
-#. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164 data/po/gui_strings.h:780
-msgid "All tracks"
-msgstr "Alle parcours"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
@@ -346,7 +339,7 @@ msgid "Assign to ESC key"
 msgstr "De ESC toets gebruiken"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:783
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:779
 msgid "At World's End"
 msgstr "Het einde van de wereld"
 
@@ -394,12 +387,6 @@ msgstr "Terug naar de wedstrijd"
 msgid "Back to device list"
 msgstr "Terug naar apparaten"
 
-#. I18N: ./data/gui/tutorial.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#: data/po/gui_strings.h:678
-msgid "Back to menu"
-msgstr ""
-
 #: src/states_screens/dialogs/race_over_dialog.cpp:389
 msgid "Back to the main menu"
 msgstr "Terug naar het hoofdmenu"
@@ -413,7 +400,7 @@ msgid "Banana? Box? Banana? Box? Banana? Box?"
 msgstr "Banaan? Doos? Banaan? Doos? Banaan? Doos?"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:797
 msgid "Beagle"
 msgstr "Beagle"
 
@@ -454,7 +441,7 @@ msgstr ""
 "Taartje - Gooi hem naar je dichtsbijzijnde tegenstander, goed op korte "
 "afstanden en rechte stukken."
 
-#: src/addons/network_http.cpp:296
+#: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
 msgstr ""
 
@@ -508,7 +495,7 @@ msgid "Choose a Kart"
 msgstr "Kies een kart"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:702
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:698
 msgid "Collect Nitro in Math Class"
 msgstr "Verzamel lachgas in het wiskundelokaal"
 
@@ -519,12 +506,12 @@ msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr "Verzamel blauwe dozen: Deze bevatten wapens en powerups"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:744
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:740
 msgid "Collect fuel for your rocket"
 msgstr "Verzamel brandstof voor je raket"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152 data/po/gui_strings.h:768
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:764
 msgid "Collect the Pharaohs Treasure"
 msgstr "Vergaar de schat van de Farao"
 
@@ -541,7 +528,7 @@ msgstr ""
 "beeld, geeft aan hoeveel je nog over hebt."
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71 data/po/gui_strings.h:687
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:683
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
 "Wordt eerste in de Grand Prix \"Het einde van de Wereld\" strijdend tegen 3 "
@@ -558,7 +545,7 @@ msgstr "Verwijderen bevestigen"
 msgid "Confirm resolution within %i seconds"
 msgstr "Bevestig de resolutie binnen %i seconden"
 
-#: src/states_screens/race_setup_screen.cpp:204
+#: src/states_screens/race_setup_screen.cpp:205
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Er zijn geen bonus items, dus alles hangt van je stuurmankunst af!"
 
@@ -659,7 +646,7 @@ msgid "Download failed.\n"
 msgstr "Download mislukt\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:800
 msgid "Elephpant"
 msgstr "Elephant"
 
@@ -677,12 +664,12 @@ msgstr "apparaat inschakelen"
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:691
+#: src/states_screens/dialogs/race_over_dialog.cpp:679
 msgid "Energy"
 msgstr "Energie"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:141
+#: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
 msgstr "Dutch"
 
@@ -721,41 +708,41 @@ msgid "Final lap!"
 msgstr "Laaste ronde!"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:729
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:725
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr ""
 "Voltooi 3 ronden van 'de boerderij' in minder dan 2:30 met 3 AI karts."
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149 data/po/gui_strings.h:765
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:761
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
 "Voltooi 3 ronden van 'de vuurtoren' in minder dan 1:30 met 3 expert AI karts."
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101 data/po/gui_strings.h:717
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:713
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
 "Voltooi 3 ronden in 'de mijn' in minder dan 3:00 met 3 expert AI karts."
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:726
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:722
 msgid "Finish Farm in 2:30"
 msgstr "Voltooi 'de boerderij' binnen 2:30"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146 data/po/gui_strings.h:762
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:758
 msgid "Finish Lighthouse in 1:30"
 msgstr "Voltooi 'de vuurtoren' binnen 1:30"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:714
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:710
 msgid "Finish Mines in 3:00"
 msgstr "Voltooi 'de mijn' binnen 3:00"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89 data/po/gui_strings.h:705
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:701
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
@@ -764,7 +751,7 @@ msgstr ""
 "minste 10 Nitro-punten."
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155 data/po/gui_strings.h:771
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:767
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
@@ -773,7 +760,7 @@ msgstr ""
 "onder de 2:20."
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131 data/po/gui_strings.h:747
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:743
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
@@ -809,12 +796,12 @@ msgid "Follow the Leader"
 msgstr "Zwaan-kleef-aan"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122 data/po/gui_strings.h:738
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:734
 msgid "Follow the Leader around the Solar System"
 msgstr "Volg de leider in de ruimte"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:690
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:686
 msgid "Follow the Leader on a Desert Island"
 msgstr "Zwaan-kleef-aan op een tropisch eiland"
 
@@ -894,7 +881,7 @@ msgid "Geronimo!!!"
 msgstr "Aanvalluh!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:803
 msgid "Gnu"
 msgstr "Gnu"
 
@@ -904,7 +891,7 @@ msgid "Go!"
 msgstr "Start!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:806
 msgid "Gooey"
 msgstr "Gooey"
 
@@ -948,7 +935,7 @@ msgid "Help"
 msgstr "Hulp"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:809
 msgid "Hexley"
 msgstr "Hexley"
 
@@ -956,7 +943,7 @@ msgstr "Hexley"
 msgid "Highscores"
 msgstr "Hoogste scores"
 
-#: src/states_screens/race_setup_screen.cpp:226
+#: src/states_screens/race_setup_screen.cpp:227
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
@@ -1010,12 +997,17 @@ msgid "Keep this resolution"
 msgstr "Deze resolutie behouden"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:217
+#: src/states_screens/race_setup_screen.cpp:218
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Volg de leider, maar passeer hem niet!"
 
+#: src/states_screens/options_screen_input.cpp:95
+#, c-format
+msgid "Keyboard %i"
+msgstr "Toetsenbord %i"
+
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:812
 msgid "Konqi"
 msgstr "Konqi"
 
@@ -1039,7 +1031,7 @@ msgstr "Leider"
 msgid "Left"
 msgstr "Links"
 
-#: src/guiengine/engine.cpp:1077
+#: src/guiengine/engine.cpp:1097
 msgid "Loading"
 msgstr "Laden"
 
@@ -1049,7 +1041,7 @@ msgstr "Laden"
 #: src/states_screens/kart_selection.cpp:797
 #: src/states_screens/kart_selection.cpp:1718
 #: src/states_screens/kart_selection.cpp:1744
-#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/race_setup_screen.cpp:210
 #: src/states_screens/tracks_screen.cpp:283
 #: src/states_screens/tracks_screen.cpp:307
 msgid "Locked : solve active challenges to gain access to more!"
@@ -1103,7 +1095,7 @@ msgid "Mouse button %d"
 msgstr "muisknop %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:815
 msgid "Mozilla"
 msgstr "Mozilla"
 
@@ -1177,7 +1169,7 @@ msgid "Nitro"
 msgstr "Lachgas"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:822
+#: data/po/gui_strings.h:818
 msgid "Nolok"
 msgstr "Nolok"
 
@@ -1208,7 +1200,7 @@ msgstr "Beginner"
 msgid "Number of AI karts"
 msgstr "Aantal karts"
 
-#: src/states_screens/dialogs/message_dialog.cpp:57
+#: src/states_screens/dialogs/message_dialog.cpp:59
 msgid "OK"
 msgstr "OK"
 
@@ -1251,17 +1243,17 @@ msgid "Penalty time!!"
 msgstr "Straftijd!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170 data/po/gui_strings.h:786
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:782
 msgid "Penguin Playground"
 msgstr "Speeltuin voor pinguïns"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:825
+#: data/po/gui_strings.h:821
 msgid "Pidgin"
 msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:681
+#: data/po/gui_strings.h:677
 msgid "Play all"
 msgstr "Speel allemaal"
 
@@ -1325,7 +1317,7 @@ msgid "Problems removing the addon '%s'."
 msgstr "Fout bij verwijderen van addons '%s'."
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:828
+#: data/po/gui_strings.h:824
 msgid "Puffy"
 msgstr "Puffy"
 
@@ -1491,7 +1483,7 @@ msgid "Skyline"
 msgstr "Skyline"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173 data/po/gui_strings.h:789
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:785
 msgid "Snag Drive"
 msgstr "Beren op de weg"
 
@@ -1577,6 +1569,13 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart heeft meerdere speltypen"
 
+#: src/main.cpp:940
+msgid ""
+"SuperTuxKart may connect to a news server to display updates. Would you like "
+"this feature to be enabled? (To change this setting at a later time, go to "
+"options, select tab 'User Interface', and edit \"Internet STK news\")."
+msgstr ""
+
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
 msgid ""
@@ -1585,12 +1584,12 @@ msgid ""
 msgstr "Wisselaar - Voor een korte tijd worden pakjes bananen en vice versa"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:199
+#: src/states_screens/main_menu_screen.cpp:198
 msgid "System Language"
 msgstr "Taal van Besturingssysteem"
 
 #. I18N: ./data/grandprix/test.grandprix
-#: data/po/gui_strings.h:176 data/po/gui_strings.h:792
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:788
 msgid "Test"
 msgstr "Test"
 
@@ -1618,7 +1617,7 @@ msgstr "De spaceshuttle is geland!"
 msgid "The Stadium"
 msgstr "Het Stadion"
 
-#: src/race/highscore_manager.cpp:97
+#: src/race/highscore_manager.cpp:98
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -1630,7 +1629,7 @@ msgstr ""
 msgid "This Grand Prix is broken!"
 msgstr "Deze Grand Prix is gebroken!"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:686
+#: src/states_screens/dialogs/race_over_dialog.cpp:674
 msgid "Time"
 msgstr "Tijd"
 
@@ -1674,7 +1673,7 @@ msgid "To help you win, there are some powerups you can collect :"
 msgstr "Om je te helpen, kun je deze dingen verzamelen en gebruiken:"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:179 data/po/gui_strings.h:795
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:791
 msgid "To the Moon and Back"
 msgstr "Naar de maan (en terug)"
 
@@ -1707,7 +1706,7 @@ msgid "Tutorial : Selection Room"
 msgstr "Klaslokaal: Selectie"
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:831
+#: data/po/gui_strings.h:827
 msgid "Tux"
 msgstr "Tux"
 
@@ -1818,45 +1817,43 @@ msgstr ""
 "hiervoor niet gebruikt worden."
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:834
+#: data/po/gui_strings.h:830
 msgid "Wilber"
 msgstr "Wilber"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:708
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:704
 msgid "Win Penguin Playground Grand Prix"
 msgstr "Win de Grand Prix 'Speeltuin voor pinguïns'"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95 data/po/gui_strings.h:711
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:707
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
 msgstr "Win de 'Speeltuin voor pinguïns' Grand Prix met 3 expert AI karts."
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140 data/po/gui_strings.h:756
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:752
 msgid "Win To the Moon and Back Grand Prix"
 msgstr "Win de Grand Prix 'Naar de maan (en terug)'"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137 data/po/gui_strings.h:753
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:749
 msgid ""
-"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+"Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
-"Win een race van 1 ronde van de 'geheime tuin' tegen slechts 1 expert AI "
-"kart."
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161 data/po/gui_strings.h:777
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:773
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
 msgstr "Win een race van 3 ronden in de Canyon tegen 4 expert AI karts."
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:723
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:719
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr "Win een race van 3 ronden van Fort Magma tegen 3 expert AI karts."
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119 data/po/gui_strings.h:735
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:731
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
@@ -1864,52 +1861,52 @@ msgstr ""
 "blijf binnen 3:05."
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83 data/po/gui_strings.h:699
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:695
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
 msgstr "Win een race van 3 ronden op de Tux snelweg tegen 4 expert AI karts."
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77 data/po/gui_strings.h:693
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:689
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr "Win een zwaan-kleef-aan met 3 tegenstanders op het tropisch eiland"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125 data/po/gui_strings.h:741
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:737
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
 msgstr "Win een zwaan-kleef-aan race met 5 AI karts op het Star track"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134 data/po/gui_strings.h:750
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:746
 msgid "Win a Head to Head in the Secret Garden"
 msgstr "Win een 1 tegen 1 gevecht in de geheime tuin"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158 data/po/gui_strings.h:774
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:770
 msgid "Win a race on Canyon"
 msgstr "Win een race in de Canyon"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:720
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:716
 msgid "Win a race on Fort Magma"
 msgstr "Win een race by Fort Magma"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:732
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:728
 msgid "Win a race on Snow Mountain"
 msgstr "Win een race over de Sneeuwberg"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:696
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:692
 msgid "Win a race on Tux Tollway"
 msgstr "Win een race op de Tux snelweg"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:684
+#: data/po/gui_strings.h:68 data/po/gui_strings.h:680
 msgid "Win the At World's End Grand Prix"
 msgstr "Win de Grand Prix 'Het einde van de wereld'"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143 data/po/gui_strings.h:759
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:755
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
 msgstr "Win de Grand Prix 'naar de maan en terug' tegen 3 expert AI karts."
 
@@ -1928,11 +1925,11 @@ msgstr "Ja"
 msgid "You completed the Grand Prix!"
 msgstr "Je hebt de Grand Prix voltooid!"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You finished the race!"
 msgstr "Race afgelopen!"
 
-#: src/modes/world.cpp:752
+#: src/modes/world.cpp:753
 msgid "You have been eliminated!"
 msgstr "Je bent uitgeschakeld!"
 
@@ -1941,7 +1938,7 @@ msgstr "Je bent uitgeschakeld!"
 msgid "You unlocked a new feature!"
 msgstr "Je hebt een nieuw item ontgrendeld!"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You won the race!"
 msgstr "Je hebt de race gewonnen!"
 
@@ -1972,8 +1969,8 @@ msgid "[none]"
 msgstr "[geen]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:785
-#: src/states_screens/race_gui.cpp:1195
+#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "door"
 
@@ -2059,10 +2056,6 @@ msgstr ""
 
 #~ msgid "Follow the Leader in the Jungle"
 #~ msgstr "Zwaan-kleef-aan in de jungle"
-
-#, c-format
-#~ msgid "Keyboard %i"
-#~ msgstr "Toetsenbord %i"
 
 #~ msgid "Networking"
 #~ msgstr "Netwerk"
@@ -2170,6 +2163,13 @@ msgstr ""
 #~ msgid "bottom"
 #~ msgstr "onder"
 
+#, c-format
+#~ msgid "   Keyboard %i"
+#~ msgstr "   Toetsenbord %i"
+
+#~ msgid "All tracks"
+#~ msgstr "Alle parcours"
+
 #~ msgid "%0 will not play bowling with %1 again"
 #~ msgstr "%0 zal niet meer bowlen met %1"
 
@@ -2233,6 +2233,12 @@ msgstr ""
 
 #~ msgid "For testing purposes"
 #~ msgstr "Voor test doeleinden"
+
+#~ msgid ""
+#~ "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+#~ msgstr ""
+#~ "Win een race van 1 ronde van de 'geheime tuin' tegen slechts 1 expert AI "
+#~ "kart."
 
 #~ msgid "keyboard"
 #~ msgstr "toetsenbord"

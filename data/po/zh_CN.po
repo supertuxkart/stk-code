@@ -2,26 +2,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-30 13:16-0400\n"
-"PO-Revision-Date: 2011-03-27 07:01+0000\n"
+"POT-Creation-Date: 2011-04-02 10:37-0400\n"
+"PO-Revision-Date: 2011-04-03 11:52+0000\n"
 "Last-Translator: acme_pjz <Unknown>\n"
 "Language-Team: acme_pjz <acme_pjz@hotmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-30 20:24+0000\n"
-"X-Generator: Launchpad (build 12684)\n"
+"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
+"X-Generator: Launchpad (build 12710)\n"
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-Language: Chinese\n"
 
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
 msgstr "   N"
-
-#: src/states_screens/options_screen_input.cpp:95
-#, c-format
-msgid "   Keyboard %i"
-msgstr "   键盘 %i"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
@@ -131,7 +126,7 @@ msgstr "%s 被锚了，因为要付下一次的酒钱！"
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr "%s 应该去玩橡皮揣子飞镖，而不是玩保龄球！"
 
-#: src/modes/world.cpp:756
+#: src/modes/world.cpp:757
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s 被淘汰掉了。"
@@ -238,7 +233,7 @@ msgid "Addons"
 msgstr "附加组件"
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:794
 msgid "Adiumy"
 msgstr "Adiumy"
 
@@ -255,20 +250,18 @@ msgstr "Adiumy"
 msgid "All"
 msgstr "所有"
 
+#. I18N: ./data/grandprix/alltracks.grandprix
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:670
+#. I18N: ./data/grandprix/alltracks.grandprix
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:670
+#: data/po/gui_strings.h:776
 msgid "All Tracks"
 msgstr "所有赛道"
 
-#: src/states_screens/race_setup_screen.cpp:197
+#: src/states_screens/race_setup_screen.cpp:198
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "所有道具都可用，合理使用它们会有意想不到的效果哦！"
-
-#. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164 data/po/gui_strings.h:780
-msgid "All tracks"
-msgstr "所有赛道"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
@@ -296,7 +289,7 @@ msgstr "场景动画：%s"
 #: src/states_screens/options_screen_video.cpp:292
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "消除锯齿（需要重新启动游戏）：%s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
@@ -333,7 +326,7 @@ msgid "Assign to ESC key"
 msgstr "设置为ESC键"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:783
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:779
 msgid "At World's End"
 msgstr "世界的尽头"
 
@@ -381,12 +374,6 @@ msgstr "继续游戏"
 msgid "Back to device list"
 msgstr "返回设备列表"
 
-#. I18N: ./data/gui/tutorial.stkgui
-#. I18N: In the options menu, to go back to the main menu or game
-#: data/po/gui_strings.h:678
-msgid "Back to menu"
-msgstr ""
-
 #: src/states_screens/dialogs/race_over_dialog.cpp:389
 msgid "Back to the main menu"
 msgstr "回到主菜单"
@@ -400,7 +387,7 @@ msgid "Banana? Box? Banana? Box? Banana? Box?"
 msgstr "香蕉皮？宝箱？香蕉皮？宝箱？…@#^$…香蕉皮？宝箱？"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:797
 msgid "Beagle"
 msgstr "Beagle"
 
@@ -437,9 +424,9 @@ msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr "蛋糕 - 自动瞄准最近的敌人， 适合于短距离或正前方的对手。"
 
-#: src/addons/network_http.cpp:296
+#: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "无法连接stkaddons服务器。"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -491,7 +478,7 @@ msgid "Choose a Kart"
 msgstr "选择一辆赛车"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:702
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:698
 msgid "Collect Nitro in Math Class"
 msgstr "在数学课上收集氮气"
 
@@ -502,12 +489,12 @@ msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr "收集蓝色宝箱 - 它们是游戏道具， 包含武器或者其它好东西。"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:744
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:740
 msgid "Collect fuel for your rocket"
 msgstr "收集火箭的燃料"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152 data/po/gui_strings.h:768
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:764
 msgid "Collect the Pharaohs Treasure"
 msgstr "收集法老的宝藏"
 
@@ -521,7 +508,7 @@ msgid ""
 msgstr "收集氮气作为燃料， 当你按键使用它时， 赛车可以获得很大的加速。 你可以在屏幕右侧看到当前燃料的数量。"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71 data/po/gui_strings.h:687
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:683
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr "在与 3 个专家级别电脑玩家的对决中， 赢得“在世界的尽头”锦标赛。"
 
@@ -536,7 +523,7 @@ msgstr "确认删除"
 msgid "Confirm resolution within %i seconds"
 msgstr "%i 秒后恢复原有分辨率"
 
-#: src/states_screens/race_setup_screen.cpp:204
+#: src/states_screens/race_setup_screen.cpp:205
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "这个模式下没有道具，就是考验你的驾驶技术！"
 
@@ -611,7 +598,7 @@ msgstr "已禁用"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:567
 msgid "Display FPS"
-msgstr ""
+msgstr "显示帧速率"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -637,7 +624,7 @@ msgid "Download failed.\n"
 msgstr "下载失败。\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:800
 msgid "Elephpant"
 msgstr "象"
 
@@ -655,12 +642,12 @@ msgstr "开启设备"
 msgid "Enabled"
 msgstr "已启用"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:691
+#: src/states_screens/dialogs/race_over_dialog.cpp:679
 msgid "Energy"
 msgstr "能量"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:141
+#: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
 msgstr "简体中文"
 
@@ -699,52 +686,52 @@ msgid "Final lap!"
 msgstr "最后一圈！"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:729
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:725
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr "在与 3 个简单级别电脑玩家的对决中， 于 2 分 30 秒之内跑完三圈“农场”地图。"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149 data/po/gui_strings.h:765
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:761
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr "在与 3 个专家级别电脑玩家的对决中， 于 1 分 30 秒之内跑完三圈“灯塔”地图。"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101 data/po/gui_strings.h:717
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:713
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr "在与 3 个专家级别电脑玩家的对决中， 于 3 分钟之内跑完三圈“矿井”地图。"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:726
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:722
 msgid "Finish Farm in 2:30"
 msgstr "在 2 分 30 秒之内完成“农场”地图"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146 data/po/gui_strings.h:762
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:758
 msgid "Finish Lighthouse in 1:30"
 msgstr "在 1 分 30 秒之内完成“灯塔”地图"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:714
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:710
 msgid "Finish Mines in 3:00"
 msgstr "在 3 分钟之内完成“矿井”地图"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89 data/po/gui_strings.h:705
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:701
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
 msgstr "在 55 秒之内在奥利弗的数学课跑三圈， 完成比赛时留下至少 10 份的氮气。"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155 data/po/gui_strings.h:771
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:767
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr "在 2 分 20 秒之内在“漂移沙漠”跑三圈， 完成比赛时留下至少 9 份的氮气。"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131 data/po/gui_strings.h:747
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:743
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
@@ -775,12 +762,12 @@ msgid "Follow the Leader"
 msgstr "跟紧老大"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122 data/po/gui_strings.h:738
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:734
 msgid "Follow the Leader around the Solar System"
 msgstr "在太阳系中跟紧老大"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:690
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:686
 msgid "Follow the Leader on a Desert Island"
 msgstr "在荒岛上跟紧老大"
 
@@ -857,7 +844,7 @@ msgid "Geronimo!!!"
 msgstr "有人使用降落伞！"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:803
 msgid "Gnu"
 msgstr "Gnu"
 
@@ -867,7 +854,7 @@ msgid "Go!"
 msgstr "开始！"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:806
 msgid "Gooey"
 msgstr "Gooey"
 
@@ -911,7 +898,7 @@ msgid "Help"
 msgstr "帮助"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:809
 msgid "Hexley"
 msgstr "Hexley"
 
@@ -919,7 +906,7 @@ msgstr "Hexley"
 msgid "Highscores"
 msgstr "高分榜"
 
-#: src/states_screens/race_setup_screen.cpp:226
+#: src/states_screens/race_setup_screen.cpp:227
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
@@ -955,7 +942,7 @@ msgstr "中级"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:571
 msgid "Internet STK news"
-msgstr ""
+msgstr "互联网上的STK新闻"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -970,12 +957,17 @@ msgid "Keep this resolution"
 msgstr "保持这个分辨率"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:217
+#: src/states_screens/race_setup_screen.cpp:218
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "跟上打头的车，但不要超过去！"
 
+#: src/states_screens/options_screen_input.cpp:95
+#, c-format
+msgid "Keyboard %i"
+msgstr "键盘 %i"
+
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:812
 msgid "Konqi"
 msgstr "Konqi"
 
@@ -999,7 +991,7 @@ msgstr "领跑"
 msgid "Left"
 msgstr "左"
 
-#: src/guiengine/engine.cpp:1077
+#: src/guiengine/engine.cpp:1097
 msgid "Loading"
 msgstr "正在读取"
 
@@ -1009,7 +1001,7 @@ msgstr "正在读取"
 #: src/states_screens/kart_selection.cpp:797
 #: src/states_screens/kart_selection.cpp:1718
 #: src/states_screens/kart_selection.cpp:1744
-#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/race_setup_screen.cpp:210
 #: src/states_screens/tracks_screen.cpp:283
 #: src/states_screens/tracks_screen.cpp:307
 msgid "Locked : solve active challenges to gain access to more!"
@@ -1048,7 +1040,7 @@ msgstr "菜单键"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:575
 msgid "Minimal Race GUI"
-msgstr ""
+msgstr "最小赛车时界面"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:268
@@ -1063,7 +1055,7 @@ msgid "Mouse button %d"
 msgstr "鼠标按钮 %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:815
 msgid "Mozilla"
 msgstr "Mozilla"
 
@@ -1084,7 +1076,7 @@ msgstr "多人游戏"
 #: data/po/gui_strings.h:290 data/po/gui_strings.h:337
 #: data/po/gui_strings.h:381 data/po/gui_strings.h:423
 msgid "Multi­player"
-msgstr ""
+msgstr "多人游戏"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1137,7 +1129,7 @@ msgid "Nitro"
 msgstr "氮气"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:822
+#: data/po/gui_strings.h:818
 msgid "Nolok"
 msgstr "Nolok"
 
@@ -1168,7 +1160,7 @@ msgstr "初级"
 msgid "Number of AI karts"
 msgstr "电脑玩家数量"
 
-#: src/states_screens/dialogs/message_dialog.cpp:57
+#: src/states_screens/dialogs/message_dialog.cpp:59
 msgid "OK"
 msgstr "确定"
 
@@ -1211,17 +1203,17 @@ msgid "Penalty time!!"
 msgstr "抢跑罚时!!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170 data/po/gui_strings.h:786
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:782
 msgid "Penguin Playground"
 msgstr "企鹅游乐场"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:825
+#: data/po/gui_strings.h:821
 msgid "Pidgin"
 msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:681
+#: data/po/gui_strings.h:677
 msgid "Play all"
 msgstr "玩所有关卡"
 
@@ -1283,7 +1275,7 @@ msgid "Problems removing the addon '%s'."
 msgstr "在移除附加组件“%s”时遇到问题。"
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:828
+#: data/po/gui_strings.h:824
 msgid "Puffy"
 msgstr "Puffy"
 
@@ -1434,7 +1426,7 @@ msgstr "漂移沙漠"
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:8
 msgid "Shiny Suburbs"
-msgstr ""
+msgstr "晴朗的市郊"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
@@ -1448,7 +1440,7 @@ msgid "Skyline"
 msgstr "空中车道"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173 data/po/gui_strings.h:789
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:785
 msgid "Snag Drive"
 msgstr "困难的驾驶"
 
@@ -1533,6 +1525,15 @@ msgstr "SuperTuxKart 支持在同一台计算机上进行多人游戏。"
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart 有多种游戏模式："
 
+#: src/main.cpp:940
+msgid ""
+"SuperTuxKart may connect to a news server to display updates. Would you like "
+"this feature to be enabled? (To change this setting at a later time, go to "
+"options, select tab 'User Interface', and edit \"Internet STK news\")."
+msgstr ""
+"SuperTuxKart可以连接到新闻服务器上以获得更新信息。 你是否希望开启这项功能？ (以后要修改此设置， 请到“选项”中的“用户界面”选项卡， "
+"编辑“互联网上的STK新闻”。)"
+
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
 msgid ""
@@ -1541,12 +1542,12 @@ msgid ""
 msgstr "魔法箱子 - 使得箱子和香蕉皮、 氮气和泡泡糖在短时间内暂时颠倒。"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:199
+#: src/states_screens/main_menu_screen.cpp:198
 msgid "System Language"
 msgstr "使用系统语言"
 
 #. I18N: ./data/grandprix/test.grandprix
-#: data/po/gui_strings.h:176 data/po/gui_strings.h:792
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:788
 msgid "Test"
 msgstr "测试"
 
@@ -1572,7 +1573,7 @@ msgstr "航天飞机降落啦，正在减速！"
 msgid "The Stadium"
 msgstr "体育场"
 
-#: src/race/highscore_manager.cpp:97
+#: src/race/highscore_manager.cpp:98
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -1584,7 +1585,7 @@ msgstr ""
 msgid "This Grand Prix is broken!"
 msgstr "锦标赛文件有误！"
 
-#: src/states_screens/dialogs/race_over_dialog.cpp:686
+#: src/states_screens/dialogs/race_over_dialog.cpp:674
 msgid "Time"
 msgstr "时间"
 
@@ -1622,7 +1623,7 @@ msgid "To help you win, there are some powerups you can collect :"
 msgstr "下面这些道具可以帮助你获得游戏的胜利："
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:179 data/po/gui_strings.h:795
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:791
 msgid "To the Moon and Back"
 msgstr "往返月球"
 
@@ -1655,7 +1656,7 @@ msgid "Tutorial : Selection Room"
 msgstr "教程：关卡选择室"
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:831
+#: data/po/gui_strings.h:827
 msgid "Tux"
 msgstr "Tux"
 
@@ -1689,7 +1690,7 @@ msgstr "正在更新列表..."
 #: src/states_screens/options_screen_players.cpp:69
 #: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
 msgid "User Interface"
-msgstr ""
+msgstr "用户界面"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
@@ -1705,7 +1706,7 @@ msgstr "版本：%d"
 #. I18N: In the video settings
 #: data/po/gui_strings.h:590
 msgid "Vertical Sync (requires restart)"
-msgstr ""
+msgstr "垂直同步（需要重新启动游戏）"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1762,94 +1763,94 @@ msgstr ""
 "并且用各自的输入设备来选择赛车。 当每个人都选好赛车之后游戏将继续。 注意这时不能用鼠标来选择赛车。"
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:834
+#: data/po/gui_strings.h:830
 msgid "Wilber"
 msgstr "Wilber"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:708
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:704
 msgid "Win Penguin Playground Grand Prix"
 msgstr "赢得“企鹅游乐场”锦标赛"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95 data/po/gui_strings.h:711
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:707
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
 msgstr "在与 3 个专家级电脑玩家的对决中， 赢得“企鹅游乐场”锦标赛。"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140 data/po/gui_strings.h:756
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:752
 msgid "Win To the Moon and Back Grand Prix"
 msgstr "赢得“往返月球”锦标赛"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137 data/po/gui_strings.h:753
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:749
 msgid ""
-"Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
-msgstr "在“秘密花园”与一个专家级电脑玩家火拼，并赢得比赛。"
+"Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
+msgstr "在“秘密花园”与一个初级电脑玩家火拼，并赢得比赛。"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161 data/po/gui_strings.h:777
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:773
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
 msgstr "与 4 个专家级电脑玩家对抗， 在“大峡谷”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:723
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:719
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr "与 3 个专家级电脑玩家对抗， 在“熔岩城堡”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119 data/po/gui_strings.h:735
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:731
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr "与 3 个中级电脑玩家对抗， 在 3 分 05 秒之内跑完“雪山”地图。"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83 data/po/gui_strings.h:699
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:695
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
 msgstr "与 4 个专家级电脑玩家对抗， 在“企鹅高速路”地图跑三圈，并赢得比赛。"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77 data/po/gui_strings.h:693
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:689
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr "在荒岛上与 3 个电脑玩家玩“跟随老大”的游戏并赢得比赛。"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125 data/po/gui_strings.h:741
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:737
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
 msgstr "在太阳系中与 5 个电脑玩家玩“跟随老大”的游戏并赢得比赛。"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134 data/po/gui_strings.h:750
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:746
 msgid "Win a Head to Head in the Secret Garden"
 msgstr "赢得“秘密花园”的肉搏战"
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158 data/po/gui_strings.h:774
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:770
 msgid "Win a race on Canyon"
 msgstr "赢得“大峡谷”赛道的比赛"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:720
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:716
 msgid "Win a race on Fort Magma"
 msgstr "赢得“熔岩城堡”赛道的比赛"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:732
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:728
 msgid "Win a race on Snow Mountain"
 msgstr "赢得雪山的比赛"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:696
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:692
 msgid "Win a race on Tux Tollway"
 msgstr "赢得“企鹅高速路”赛道的比赛"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:684
+#: data/po/gui_strings.h:68 data/po/gui_strings.h:680
 msgid "Win the At World's End Grand Prix"
 msgstr "赢得“在世界的尽头”锦标赛"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143 data/po/gui_strings.h:759
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:755
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
 msgstr "与 3 个专家级电脑玩家对抗，赢得“往返月球”锦标赛。"
 
@@ -1868,11 +1869,11 @@ msgstr "是"
 msgid "You completed the Grand Prix!"
 msgstr "恭喜你完成锦标赛！"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You finished the race!"
 msgstr "恭喜你完成比赛！"
 
-#: src/modes/world.cpp:752
+#: src/modes/world.cpp:753
 msgid "You have been eliminated!"
 msgstr "你被淘汰了！"
 
@@ -1881,7 +1882,7 @@ msgstr "你被淘汰了！"
 msgid "You unlocked a new feature!"
 msgstr "你解锁了一个新功能！"
 
-#: src/karts/kart.cpp:586 src/karts/kart.cpp:605
+#: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You won the race!"
 msgstr "恭喜你赢得了比赛！"
 
@@ -1907,8 +1908,8 @@ msgid "[none]"
 msgstr "(无)"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:785
-#: src/states_screens/race_gui.cpp:1195
+#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "作者："
 
@@ -1942,6 +1943,9 @@ msgstr ""
 #~ msgid "(more players can join by pressing 'fire' now)"
 #~ msgstr "(按“使用道具”键以加入更多玩家)"
 
+#~ msgid "All tracks"
+#~ msgstr "所有赛道"
+
 #~ msgid "Audio/Video"
 #~ msgstr "声音/显示"
 
@@ -1953,10 +1957,6 @@ msgstr ""
 
 #~ msgid "Grand Prix Results"
 #~ msgstr "锦标赛成绩"
-
-#, c-format
-#~ msgid "Keyboard %i"
-#~ msgstr "键盘 %i"
 
 #~ msgid "Networking"
 #~ msgstr "联网游戏"
@@ -1985,6 +1985,10 @@ msgstr ""
 
 #~ msgid "Special"
 #~ msgstr "特殊"
+
+#, c-format
+#~ msgid "   Keyboard %i"
+#~ msgstr "   键盘 %i"
 
 #~ msgid "%0 will not play bowling with %1 again"
 #~ msgstr "%0 不会再和 %1 一起玩保龄球了"
@@ -2093,6 +2097,10 @@ msgstr ""
 #~ msgstr "DEBUG"
 
 #~ msgid ""
+#~ "Win a 1 lap Head to Head in the Secret Garden against 1 Expert level AI kart."
+#~ msgstr "在“秘密花园”与一个专家级电脑玩家火拼，并赢得比赛。"
+
+#~ msgid ""
 #~ "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 #~ "in under 52 seconds."
 #~ msgstr "在 52 秒之内在奥利弗的数学课跑三圈， 完成比赛时留下至少 6 份的氮气。"
@@ -2131,3 +2139,6 @@ msgstr ""
 
 #~ msgid "City"
 #~ msgstr "城市赛道"
+
+#~ msgid "Back to menu"
+#~ msgstr "返回主菜单"
