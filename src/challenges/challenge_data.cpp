@@ -30,7 +30,6 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/translation.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
 #ifndef WIN32
@@ -94,10 +93,10 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     if(!root->get("name", &s) ) error("name");
     //std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
-    setName( _(s.c_str()) );
+    setName( s.c_str() );
 
     if(!root->get("description", &s) ) error("description");
-    setChallengeDescription( _(s.c_str()) );
+    setChallengeDescription( s.c_str() );
     //std::cout << "    // Challenge description = <" << s.c_str() << ">\n";
 
     if(!root->get("karts", &m_num_karts)  ) error("karts");

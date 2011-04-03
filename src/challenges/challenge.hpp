@@ -30,6 +30,7 @@
 #include <irrlicht.h>
 
 #include "utils/no_copy.hpp"
+#include "utils/translation.hpp"
 
 class XMLNode;
 
@@ -98,7 +99,8 @@ public:
     const std::string &getId() const              { return m_id;              }
     // ------------------------------------------------------------------------
     /** Returns the name of the challenge. */
-    const irr::core::stringw &getName() const     { return m_name;            }
+    const irr::core::stringw getName() const
+                              { return irr::core::stringw(_(m_name.c_str())); }
     // ------------------------------------------------------------------------
     /** Sets the name of the challenge. */
     void  setName(const irr::core::stringw & s)   { m_name = s;               }
@@ -112,8 +114,9 @@ public:
     void  setChallengeDescription(const irr::core::stringw& d) 
                                                  {m_challenge_description=d;  }
     // ------------------------------------------------------------------------
-    const irr::core::stringw& 
-          getChallengeDescription() const    {return m_challenge_description; }
+    const irr::core::stringw
+          getChallengeDescription() const 
+                                  {return _(m_challenge_description.c_str()); }
     // ------------------------------------------------------------------------
     void  addDependency(const std::string id)  {m_prerequisites.push_back(id);}
     // ------------------------------------------------------------------------
