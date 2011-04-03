@@ -414,45 +414,56 @@ void MinimalRaceGUI::drawGlobalMiniMap()
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
     irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
 
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    // In the first iteration, only draw AI karts, then only draw
+    // player karts. This guarantees that player kart icons are always
+    // on top of AI kart icons.
+    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1; 
+        only_draw_player_kart++)
     {
-        const Kart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        const Vec3& xyz = kart->getXYZ();
-        Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-
-        core::rect<s32> source(i    *m_marker_rendered_size,
-                               0, 
-                               (i+1)*m_marker_rendered_size, 
-                               m_marker_rendered_size);
-        int marker_half_size = (kart->getController()->isPlayerController() 
-                                ? m_marker_player_size 
-                                : m_marker_ai_size                        )>>1;
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
-                                 m_map_left+(int)(draw_at.getX()+marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
-
-        // Highlight the player icons with some backgorund image.
-        if (kart->getController()->isPlayerController())
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
         {
-            video::SColor colors[4];
-            for (unsigned int i=0;i<4;i++)
-            {
-                colors[i]=kart->getKartProperties()->getColor();
-            }
-            const core::rect<s32> rect(core::position2d<s32>(0,0),
-                m_icons_frame->getTexture()->getOriginalSize());
-            
-            irr_driver->getVideoDriver()->draw2DImage(
-                m_icons_frame->getTexture(), position, rect,
-                NULL, colors, true);
-        }   // if isPlayerController
+            const Kart *kart = world->getKart(i);
+            if(kart->isEliminated()) continue;   // don't draw eliminated kart
+            // Make sure to only draw AI kart icons first, then
+            // only player karts.
+            if(kart->getController()->isPlayerController() 
+                !=(only_draw_player_kart==1)) continue;
+            const Vec3& xyz = kart->getXYZ();
+            Vec3 draw_at;
+            world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
 
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
-                                                  NULL, NULL, true);
-    }   // for i<getNumKarts
+            core::rect<s32> source(i    *m_marker_rendered_size,
+                0, 
+                (i+1)*m_marker_rendered_size, 
+                m_marker_rendered_size);
+            int marker_half_size = (kart->getController()->isPlayerController() 
+                ? m_marker_player_size 
+                : m_marker_ai_size                        )>>1;
+            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
+                lower_y   -(int)(draw_at.getY()+marker_half_size),
+                m_map_left+(int)(draw_at.getX()+marker_half_size), 
+                lower_y   -(int)(draw_at.getY()-marker_half_size));
+
+            // Highlight the player icons with some backgorund image.
+            if (kart->getController()->isPlayerController())
+            {
+                video::SColor colors[4];
+                for (unsigned int i=0;i<4;i++)
+                {
+                    colors[i]=kart->getKartProperties()->getColor();
+                }
+                const core::rect<s32> rect(core::position2d<s32>(0,0),
+                    m_icons_frame->getTexture()->getOriginalSize());
+
+                irr_driver->getVideoDriver()->draw2DImage(
+                    m_icons_frame->getTexture(), position, rect,
+                    NULL, colors, true);
+            }   // if isPlayerController
+
+            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
+                NULL, NULL, true);
+        }   // for i<getNumKarts
+    }   // for only_draw_player_kart
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
