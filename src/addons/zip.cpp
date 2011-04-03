@@ -58,9 +58,9 @@ bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    if(!file_system->addZipFileArchive(from.c_str(), 
-                                       /*ignoreCase*/false, 
-                                       /*ignorePath*/true)  )
+    if(!file_system->addFileArchive(from.c_str(), 
+                                    /*ignoreCase*/false, 
+                                   /*ignorePath*/true, io::EFAT_ZIP))
     {
         return false;
     }

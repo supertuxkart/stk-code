@@ -163,7 +163,7 @@ void PhysicalObject::init()
         irr_driver->getSceneManager()->getMeshManipulator();
     core::matrix4 transform(core::matrix4::EM4CONST_IDENTITY);  // 
     transform.setTranslation(offset_from_center.toIrrVector());
-    mesh_manipulator->transformMesh(mesh, transform);
+    mesh_manipulator->transform(mesh, transform);
 
     // 2. Create the rigid object
     // --------------------------
