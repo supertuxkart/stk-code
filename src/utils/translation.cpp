@@ -194,9 +194,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     // This one is just for the xgettext parser to pick up
 #define ignore(X)
 
+    //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
     ignore(_("   Is this a RTL language?"));
 
-    //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
     const std::string isRtl = m_dictionary.translate("   Is this a RTL language?");
     
     m_rtl = false;
