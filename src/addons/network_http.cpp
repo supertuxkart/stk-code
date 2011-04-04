@@ -125,9 +125,8 @@ void *NetworkHttp::mainLoop(void *obj)
         const XMLNode *xml = new XMLNode(xml_file);
         me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
-        me->loadAddonsList(xml, xml_file);
 #ifdef ADDONS_MANAGER
-        addons_manager->initOnline(xml);
+        me->loadAddonsList(xml, xml_file);
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Addons manager list downloaded\n");
 #endif
@@ -171,7 +170,7 @@ void *NetworkHttp::mainLoop(void *obj)
             assert(false);
             break;
         case HC_DOWNLOAD_FILE:
-            me->downloadFileInternal(me->m_file, me->m_save_filename,
+            me->downloadFileInternal(me->m_url, me->m_save_filename,
                                      /*is_asynchron*/true    );
         }   // switch(m_command)
         me->m_command = HC_SLEEP;
@@ -344,7 +343,23 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
     bool download = mtime > UserConfigParams::m_addons_last_updated;
     if(!download)
     {
-        std::string filename=file_manager->getAddonsFile("addon_list.xml");
+        std::string filename=file_manager->getAddonsFile("addons.xml");
+        if(!file_manager->fileExists(filename))
+            download = true;
+    }
+
+    if(!download || downloadFileSynchron(addon_list_url, "addons.xml"))
+    {
+        std::string xml_file = file_manager->getAddonsFile("addons.xml");
+        if(download)
+            UserConfigParams::m_addons_last_updated=Time::getTimeSinceEpoch();
+        const XMLNode *xml = new XMLNode(xml_file);
+#ifdef ADDONS_MANAGER
+        addons_manager->initOnline(xml);
+        if(UserConfigParams::m_verbosity>=3)
+            printf("[addons] Addons manager list downloaded\n");
+#endif
+
     }
 }   // loadAddonsList
 
@@ -603,15 +618,18 @@ std::string NetworkHttp::downloadToStrInternal(std::string url)
  *  will be added to file. 
  *  \param progress_data is used to have the state of the download (in %)
  */
-bool NetworkHttp::downloadFileInternal(const std::string &file,
+bool NetworkHttp::downloadFileInternal(const std::string &url,
                                        const std::string &save_filename,
                                        bool is_asynchron)
 {
     if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Downloading %s\n", file.c_str());
+        printf("[addons] Downloading %s\n", url.c_str());
     CURL *session = curl_easy_init();
-    std::string full_url = (std::string)UserConfigParams::m_server_addons 
-                         + "/" + file;
+    std::string full_url = url;
+    if(url.substr(0, 5)!="http:" && url.substr(0, 4)!="ftp:")
+        full_url = (std::string)UserConfigParams::m_server_addons 
+                 + "/" + url;
+
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
     curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
@@ -664,19 +682,19 @@ void NetworkHttp::cancelDownload()
 // ----------------------------------------------------------------------------
 /** External interface to download a file synchronously, i.e. it will only 
  *  return once the download is complete. 
- *  \param file The file from the server to download.
+ *  \param url The file from the server to download.
  *  \param save The name to save the downloaded file under. Defaults to
  *              the name given in file.
  */
-bool NetworkHttp::downloadFileSynchron(const std::string &file, 
+bool NetworkHttp::downloadFileSynchron(const std::string &url,
                                        const std::string &save)
 {
-    const std::string &save_filename = (save!="") ? save : file;
+    const std::string &save_filename = (save!="") ? save : url;
     if(UserConfigParams::m_verbosity>=3)
         printf("[addons] Download synchron '%s' as '%s'.\n",
-               file.c_str(), save_filename.c_str());
+               url.c_str(), save_filename.c_str());
 
-    return downloadFileInternal(file, save_filename,
+    return downloadFileInternal(url, save_filename,
                                 /*is_asynchron*/false);
 }   // downloadFileSynchron
 
@@ -684,20 +702,20 @@ bool NetworkHttp::downloadFileSynchron(const std::string &file,
 /** External interface to download a file asynchronously. This will wake up 
  *  the thread and schedule it to download the file. The calling program has 
  *  to poll using getProgress() to find out if the download has finished.
- *  \param file The file from the server to download.
+ *  \param url The file from the server to download.
  *  \param save The name to save the downloaded file under. Defaults to
  *              the name given in file.
  */
-void NetworkHttp::downloadFileAsynchron(const std::string &file, 
+void NetworkHttp::downloadFileAsynchron(const std::string &url,
                                         const std::string &save)
 {
     m_progress.set(0.0f);
-    m_file          = file;
-    m_save_filename = (save!="") ? save : file;
+    m_url           = url;
+    m_save_filename = (save!="") ? save : url;
 
     if(UserConfigParams::m_verbosity>=3)
         printf("[addons] Download asynchron '%s' as '%s'.\n", 
-               file.c_str(), m_save_filename.c_str());
+               url.c_str(), m_save_filename.c_str());
     // Wake up the network http thread
     pthread_mutex_lock(&m_mutex_command);
     {

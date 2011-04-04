@@ -12,7 +12,7 @@
     <spacer proportion="1" />
     <div width="50%" height="100%" layout="vertical-row" >
         <label word_wrap="true" id="description" width="100%" text="Description:" proportion="1" />
-        <label id="version" width="100%" text="Version:" proportion="1" />
+        <label id="revision" width="100%" text="Version:" proportion="1" />
     </div>
   </div>
   

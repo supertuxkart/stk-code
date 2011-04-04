@@ -68,8 +68,8 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     core::stringw desc = _("Description: %i", m_addon.getDescription().c_str());
     getWidget<LabelWidget>("description")->setText(desc, false);
 
-    core::stringw version = _("Version: %d", m_addon.getVersion());
-    getWidget<LabelWidget>("version")->setText(version, false);
+    core::stringw revision = _("Version: %d", m_addon.getRevision());
+    getWidget<LabelWidget>("revision")->setText(revision, false);
 
 }   // AddonsLoading
 

@@ -53,12 +53,12 @@ AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
-/** This initialises the online portion of the addons manager. It downloads
- *  the list of available addons. This is called by network_http before it
- *  goes into command-receiving mode, so we can't use any asynchronous calls
+/** This initialises the online portion of the addons manager. It uses the
+ *  downloaded list of available addons. This is called by network_http before
+ *  it goes into command-receiving mode, so we can't use any asynchronous calls
  *  here (though this is being called from a separate thread anyway, so the
- *  main GUI is not blocked). This function will update the state variable
- *  
+ *  main GUI is not blocked anyway). This function will update the state 
+ *  variable
  */
 void AddonsManager::initOnline(const XMLNode *xml)
 {
@@ -77,12 +77,11 @@ void AddonsManager::initOnline(const XMLNode *xml)
             Addon addon(*node);
             int index = getAddonIndex(addon.getId());
 
-            float stk_version=0;
-            node->get("stkversion", &stk_version);
+            int stk_version=0;
+            node->get("format", &stk_version);
             int   testing=-1;
             node->get("testing", &testing);
 
-#ifdef WHILE_WEBPAGE_IS_NOT_UPDATED_YET
             bool wrong_version=false;
 
             if(addon.getType()=="kart")
@@ -91,10 +90,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
             else
                 wrong_version = stk_version <stk_config->m_min_track_version ||
                                 stk_version >stk_config->m_max_track_version   ;
-#endif
             // Check which version to use: only for this stk version,
             // and not addons that are marked as hidden (testing=0)
-            if(stk_version!=0.7f || testing==0)
+            if(wrong_version|| testing==0)
             {
                 // If the version is too old (e.g. after an update of stk)
                 // remove a cached icon.

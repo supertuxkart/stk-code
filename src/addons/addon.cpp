@@ -29,44 +29,44 @@
 
 Addon::Addon(const XMLNode &xml)
 {
-    m_name              = "";
-    m_id                = "";
-    m_installed         = false;
-    m_installed_version = 0;
-    m_version           = 0 ;
-    m_zip_file          = "";
-    m_description       = "";
-    m_icon_url          = "";
-    m_icon_basename     = "";
-    m_icon_version      = 0;
-    m_icon_ready        = false;
-    m_type              = xml.getName();
+    m_name               = "";
+    m_id                 = "";
+    m_installed          = false;
+    m_installed_revision = 0;
+    m_revision           = 0 ;
+    m_zip_file           = "";
+    m_description        = "";
+    m_icon_url           = "";
+    m_icon_basename      = "";
+    m_icon_revision      = 0;
+    m_icon_ready         = false;
+    m_type               = xml.getName();
 
-    xml.get("name",              &m_name             );
+    xml.get("name",               &m_name              );
     m_id                = StringUtils::toLowerCase(m_name);
-    xml.get("id",                &m_id);
-    xml.get("installed",         &m_installed        );
-    xml.get("installed-version", &m_installed_version);
-    xml.get("version",           &m_version          );
-    xml.get("file",              &m_zip_file         );
-    xml.get("description",       &m_description      );
-    xml.get("icon",              &m_icon_url         );
-    xml.get("icon-version",      &m_icon_version     );
+    xml.get("id",                 &m_id);
+    xml.get("installed",          &m_installed         );
+    xml.get("installed-revision", &m_installed_revision);
+    xml.get("revision",           &m_revision          );
+    xml.get("file",               &m_zip_file          );
+    xml.get("description",        &m_description       );
+    xml.get("image",              &m_icon_url          );
+    xml.get("icon-revision",      &m_icon_revision     );
     m_icon_basename = StringUtils::getBasename(m_icon_url);
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------
-/** Copies the installation data (like description, version, icon) from the 
+/** Copies the installation data (like description, revision, icon) from the 
  *  downloaded online list to this entry.
 */
 void Addon::copyInstallData(const Addon &addon)
 {
     m_description   = addon.m_description;
-    m_version       = addon.m_version;
+    m_revision      = addon.m_revision;
     m_zip_file      = addon.m_zip_file;
     m_icon_url      = addon.m_icon_url;
     m_icon_basename = addon.m_icon_basename;
-    m_icon_version  = addon.m_version;
+    m_icon_revision = addon.m_revision;
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
@@ -81,8 +81,8 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << "\" id=\""                << m_id 
                   << "\" installed=\""         
                   << (m_installed ? "true" : "false" )
-                  << "\" installed-version=\"" << m_installed_version 
-                  <<"\" icon-version=\""       << m_icon_version 
+                  << "\" installed-revision=\"" << m_installed_revision 
+                  <<"\" icon-revision=\""       << m_icon_revision 
                   << "\"/>\n";
 }   // writeXML
 

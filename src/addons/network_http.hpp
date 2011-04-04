@@ -106,7 +106,7 @@ private:
     pthread_cond_t  m_cond_command;
 
     /** The file to download when a file download is triggered. */
-    std::string     m_file;
+    std::string     m_url;
 
     /** The name and path under which to save the downloaded file. */
     std::string     m_save_filename;
@@ -131,7 +131,7 @@ private:
                                  const std::string &filename);
     std::string   downloadToStrInternal(std::string url);
     void          updateMessageDisplayCount();
-    bool          downloadFileInternal(const std::string &file,
+    bool          downloadFileInternal(const std::string &url,
                                        const std::string &save_filename,
                                        bool is_asynchron);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
@@ -143,9 +143,9 @@ public:
                  ~NetworkHttp();
     static size_t writeStr(char str [], size_t size, size_t nb_char, 
                            std::string * stream);
-    void          downloadFileAsynchron(const std::string &file, 
+    void          downloadFileAsynchron(const std::string &url, 
                                         const std::string &save = "");
-    bool          downloadFileSynchron(const std::string &file, 
+    bool          downloadFileSynchron(const std::string &url, 
                                        const std::string &save = "");
 
     const core::stringw

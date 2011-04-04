@@ -32,12 +32,12 @@ public:
     /** Internal id for this addon, which is the name in lower case.
      *  This is used to create a subdirectory for this addon. */
     std::string m_id;
-    /** The (highest) version available online. */
-    int         m_version;
-    /** The currently installed version. */
-    int         m_installed_version;
+    /** The (highest) revision number available online. */
+    int         m_revision;
+    /** The currently installed revision. */
+    int         m_installed_revision;
     /** The version of the icon that was downloaded. */
-    int         m_icon_version;
+    int         m_icon_revision;
     /** A description of this addon. */
     std::string m_description;
     /** The URL of the icon (relative to the server) */
@@ -82,13 +82,13 @@ public:
     /** Returns if the addon is installed. */
     bool  isInstalled() const { return m_installed; }
     // ------------------------------------------------------------------------
-    /** Returns the installed version of an addon. */
-    int   getInstalledVersion() const { return m_installed_version; }
+    /** Returns the installed revision number of an addon. */
+    int   getInstalledRevision() const { return m_installed_revision; }
     // ------------------------------------------------------------------------
-    /** Returns the latest version of this addon. 
-    *  m_version>m_installed_version if a newer version is available 
+    /** Returns the latest revision number of this addon. 
+    *  m_revision>m_installed_revision if a newer revision is available 
     *  online. */
-    int   getVersion() const { return m_version; }
+    int   getRevision() const { return m_revision; }
     // ------------------------------------------------------------------------
     /** Returns the ID of this addon. */
     const std::string& getId() const { return m_id; }
@@ -96,26 +96,26 @@ public:
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
     {
-        return m_installed && getInstalledVersion() < getVersion();
+        return m_installed && getInstalledRevision() < getRevision();
     }   // needsUpdate
     // ------------------------------------------------------------------------
     /** Returns true if the (cached) icon needs to be updated. This is the
-     *  case if the addon version number is higher than the version number
+     *  case if the addon revision number is higher than the revision number
      *  of the icon (this leaves some chance of false positives - i.e. icons
      *  that were not changed will still be downloaded). */
     bool iconNeedsUpdate() const
     {
-        return m_version > m_icon_version;
+        return m_revision > m_icon_revision;
     }   // iconNeedsUpdate
     // ------------------------------------------------------------------------
     /** Marks this addon to be installed. If the addon is marked as being
-     *  installed, it also updates the installed  version number to be the 
-     *  same as currently available version number. */
+     *  installed, it also updates the installed revision number to be the 
+     *  same as currently available revision number. */
     void setInstalled(bool state)
     {
         m_installed         = state;
         if(state)
-            m_installed_version = m_version;
+            m_installed_revision = m_revision;
     }   // setInstalled
     // ------------------------------------------------------------------------
     /** Returns true if the icon of this addon was downloaded and is ready 
@@ -125,7 +125,7 @@ public:
     /** Marks that the icon for this addon can be displayed. */
     void setIconReady() 
     { 
-        m_icon_version = m_version;
+        m_icon_revision = m_revision;
         m_icon_ready=true; 
     }   // setIconReady
     // ------------------------------------------------------------------------
