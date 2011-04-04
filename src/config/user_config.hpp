@@ -60,21 +60,24 @@ class XMLWriter;
 class PlayerProfile;
 
 /**
-  * The base of a set of small utilities to enable quickly adding/removing stuff to/from config painlessly.
-  */
+ *  The base of a set of small utilities to enable quickly adding/removing 
+ *  stuff to/from config painlessly.
+ */
 class UserConfigParam
 {
     friend class GroupUserConfigParam;
 protected:
-    std::string paramName, comment;
+    std::string m_param_name;
+    std::string m_comment;
 public:
-    virtual ~UserConfigParam();
+    virtual     ~UserConfigParam();
     virtual void write(XMLWriter& stream) const = 0;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual irr::core::stringw toString() const = 0;
-};
+};   // UserConfigParam
 
+// ============================================================================
 class GroupUserConfigParam : public UserConfigParam
 {
     std::vector<UserConfigParam*> m_children;
@@ -86,8 +89,9 @@ public:
 
     void addChild(UserConfigParam* child);
     irr::core::stringw toString() const;
-};
+};   // GroupUserConfigParam
 
+// ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
     int m_value;
@@ -95,22 +99,27 @@ class IntUserConfigParam : public UserConfigParam
     
 public:
     
-    IntUserConfigParam(int defaultValue, const char* paramName, const char* comment = NULL);
-    IntUserConfigParam(int defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
+    IntUserConfigParam(int default_value, const char* param_name, 
+                       const char* comment = NULL);
+    IntUserConfigParam(int default_value, const char* param_name, 
+                       GroupUserConfigParam* group, 
+                       const char* comment = NULL);
 
     void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     irr::core::stringw toString() const;
-    void revertToDefaults() { m_value = m_default_value; }
+    void revertToDefaults()      { m_value = m_default_value;        }
 
-    operator int() const { return m_value; }
-    int& operator++(int dummy) { m_value++; return m_value; }
-    int& operator=(const int& v) { m_value = v; return m_value; }
-    int& operator=(const IntUserConfigParam& v) { m_value = (int)v; return m_value; }
-};
+    operator int() const         { return m_value;                   }
+    int& operator++(int dummy)   { m_value++; return m_value;        }
+    int& operator=(const int& v) { m_value = v; return m_value;      }
+    int& operator=(const IntUserConfigParam& v) 
+                                 { m_value = (int)v; return m_value; }
+};   // IntUserConfigParam
 
+// ============================================================================
 class TimeUserConfigParam : public UserConfigParam
 {
     Time::TimeType m_value;
@@ -118,9 +127,9 @@ class TimeUserConfigParam : public UserConfigParam
     
 public:
     
-    TimeUserConfigParam(Time::TimeType defaultValue, const char* paramName, 
+    TimeUserConfigParam(Time::TimeType default_value, const char* param_name, 
                         const char* comment = NULL);
-    TimeUserConfigParam(Time::TimeType defaultValue, const char* paramName, 
+    TimeUserConfigParam(Time::TimeType default_value, const char* param_name, 
                         GroupUserConfigParam* group, const char* comment=NULL);
 
     void write(XMLWriter& stream) const;
@@ -134,9 +143,9 @@ public:
                                           { m_value = v; return m_value;      }
     Time::TimeType& operator=(const TimeUserConfigParam& v) 
                                           { m_value = (int)v; return m_value; }
-};
+};   // TimeUserConfigParam
 
-
+// ============================================================================
 class StringUserConfigParam : public UserConfigParam
 {
     std::string m_value;
@@ -144,25 +153,30 @@ class StringUserConfigParam : public UserConfigParam
     
 public:
     
-    StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment = NULL);
-    StringUserConfigParam(const char* defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
+    StringUserConfigParam(const char* default_value, const char* param_name, 
+                          const char* comment = NULL);
+    StringUserConfigParam(const char* default_value, const char* param_name, 
+                          GroupUserConfigParam* group, 
+                          const char* comment = NULL);
 
-    
     void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
     
     void revertToDefaults() { m_value = m_default_value; }
-    
+   
     irr::core::stringw toString() const { return m_value.c_str(); }
     
-    operator std::string() const { return m_value; }
-    std::string& operator=(const std::string& v) { m_value = v; return m_value; }
-    std::string& operator=(const StringUserConfigParam& v) { m_value = (std::string)v; return m_value; }
+    operator std::string() const  { return m_value; }
+    std::string& operator=(const std::string& v)
+                                  { m_value = v; return m_value; }
+    std::string& operator=(const StringUserConfigParam& v) 
+                                  { m_value = (std::string)v; return m_value; }
 
     const char* c_str() const { return m_value.c_str(); }
-};
+};   // StringUserConfigParam
 
+// ============================================================================
 class WStringUserConfigParam : public UserConfigParam
 {
     stringw m_value;
@@ -170,9 +184,13 @@ class WStringUserConfigParam : public UserConfigParam
     
 public:
     
-    WStringUserConfigParam(const stringw& defaultValue, const char* paramName, const char* comment = NULL);
-    WStringUserConfigParam(const stringw& defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
-    
+    WStringUserConfigParam(const stringw& default_value, 
+                           const char* param_name,
+                           const char* comment = NULL);
+    WStringUserConfigParam(const stringw& default_value, 
+                           const char* param_name,
+                           GroupUserConfigParam* group, 
+                           const char* comment = NULL);
     
     void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
@@ -183,22 +201,24 @@ public:
     irr::core::stringw toString() const { return m_value; }
     
     operator stringw() const { return m_value; }
-    stringw& operator=(const stringw& v) { m_value = v; return m_value; }
-    stringw& operator=(const WStringUserConfigParam& v) { m_value = (stringw)v; return m_value; }
-    
+    stringw& operator=(const stringw& v) { m_value = v; return m_value;  }
+    stringw& operator=(const WStringUserConfigParam& v) 
+                                 { m_value = (stringw)v; return m_value; }
     const wchar_t* c_str() const { return m_value.c_str(); }
-};
+};   // WStringUserConfigParam
 
+// ============================================================================
 class BoolUserConfigParam : public UserConfigParam
 {
     bool m_value;
     bool m_default_value;
     
 public:
-    BoolUserConfigParam(bool defaultValue, const char* paramName, const char* comment = NULL);
-    BoolUserConfigParam(bool defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
-
-    
+    BoolUserConfigParam(bool default_value, const char* param_name, 
+                        const char* comment = NULL);
+    BoolUserConfigParam(bool default_value, const char* param_name, 
+                        GroupUserConfigParam* group, 
+                        const char* comment = NULL);
     void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
@@ -208,17 +228,22 @@ public:
     
     operator bool() const { return m_value; }
     bool& operator=(const bool& v) { m_value = v; return m_value; }
-    bool& operator=(const BoolUserConfigParam& v) { m_value = (bool)v; return m_value; }
-};
+    bool& operator=(const BoolUserConfigParam& v) 
+                              { m_value = (bool)v; return m_value; }
+};   // BoolUserConfigParam
 
+// ============================================================================
 class FloatUserConfigParam : public UserConfigParam
 {
     float m_value;
     float m_default_value;
     
 public:
-    FloatUserConfigParam(float defaultValue, const char* paramName, const char* comment = NULL);
-    FloatUserConfigParam(float defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
+    FloatUserConfigParam(float default_value, const char* param_name, 
+                         const char* comment = NULL);
+    FloatUserConfigParam(float default_value, const char* param_name, 
+                         GroupUserConfigParam* group, 
+                         const char* comment = NULL);
 
     void write(XMLWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
@@ -229,18 +254,21 @@ public:
     
     operator float() const { return m_value; }
     float& operator=(const float& v) { m_value = v; return m_value; }
-    float& operator=(const FloatUserConfigParam& v) { m_value = (float)v; return m_value; }
-};
+    float& operator=(const FloatUserConfigParam& v) 
+                              { m_value = (float)v; return m_value; }
+};   // FloatUserConfigParam
 
-const int ANIMS_NONE = 0;
-const int ANIMS_PLAYERS_ONLY = 1;
-const int ANIMS_ALL = 2;
+// ============================================================================
+enum AnimType {ANIMS_NONE         = 0, 
+               ANIMS_PLAYERS_ONLY = 1,
+               ANIMS_ALL          = 2 };
 
-/**
-  * Using X-macros for setting-possible values is not very pretty, but it's a no-maintenance case :
-  * when you want to add a new parameter, just add one signle line below and everything else automagically works
-  * (including default value, saving to file, loading from file)
-  */
+/** Using X-macros for setting-possible values is not very pretty, but it's a 
+ *  no-maintenance case :
+ *  when you want to add a new parameter, just add one signle line below and 
+ *  everything else automagically works (including default value, saving to 
+ *  file, loading from file)
+ */
 
 #ifndef PARAM_PREFIX
 #define PARAM_PREFIX extern
@@ -250,10 +278,10 @@ const int ANIMS_ALL = 2;
 #define PARAM_DEFAULT(X)
 #endif
 
-/**
-  * \brief Contains all parameters that are stored in the user's config file
-  * \ingroup config
-  */
+// ============================================================================
+/** \brief Contains all parameters that are stored in the user's config file
+ *  \ingroup config
+ */
 namespace UserConfigParams
 {
     // ---- Audio
@@ -467,6 +495,7 @@ namespace UserConfigParams
 #undef PARAM_PREFIX
 #undef PARAM_SUFFIX
 
+// ============================================================================
 /**
   * \brief Class for managing general STK user configuration data.
   * \ingroup config
@@ -480,7 +509,8 @@ private:
     irr::core::stringw m_warning;
 
 public:
-          /** Create the user config object; does not actually load it, UserConfig::loadConfig needs to be called */
+          /** Create the user config object; does not actually load it, 
+           *  UserConfig::loadConfig needs to be called. */
           UserConfig();
          ~UserConfig();
 
