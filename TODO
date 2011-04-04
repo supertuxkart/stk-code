@@ -39,53 +39,5 @@ Thanks in advance!
    The SuperTuxKart-Team
 
 
-********************************
-********************************
-**                            **
-**  Incomplete(!!) TODO List  **
-**                            **
-********************************
-********************************
-
-Things that would be nice to fix, but are not urgent
-=====================================================
-- Write some documentation.
-- Display skid marks again (currently disabled due to problems of 
-  skid marks being 'in the air').
-- Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
-- Add a tutorial course
-- Valgrind for memory bugs.
-- Update the web page, make more screen shots, ...
-- Tight/wide corner steering for AI. The AI is hitting the wall
-  in very tight corners (e.g. subseatrack) [coz]
-
-
-long term
-=========
-- Add network multiplayer
-- Make full use of OpenAL
-- Performance tuning
-  - Support for multi-core CPUs
-    (while this is not strictly necessary, it might be a nice headline
-    for news entries. The physics/collision detection would be
-    easy to parallelise)
-- More gadgets
-  - Positive: - squirt oil on track to make karts slip, ...
-  - Negative: - 'dirt on windscreen' - partial blackout of screen
-- More flexibility for items. E.g. 
-  - Tracks might hard code some items, change the distribution of some
-    others (e.g. only a rocket at a certain location, but random choice
-    which one the kart gets. Instead of just specifying 
-    GREENHERRING, one could write: ZIPPER:ANVIL and one of the listed
-    things would be picked randomly)
-  - Grand prixs might want to overwrite this, e.g.:
-    "war" grand prix: only rockets for all gadgets
-  - Perhaps make good and bad things indistinguishable?
-- sound/music manager needed
-  Make it easy to replace sounds (which are currently hardcoded), e.g
-  via a config file. Sound/music should be selectable for a track,
-  but a grand prix should be able to overwrite this to create a consistent
-  ambience, ...
-- More tracks
-- More grand prixs
-- Code cleanup
+For details, see
+        http://supertuxkart.sourceforge.net/Get_involved
