@@ -123,7 +123,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     const XMLNode * root = 0;
     m_root  = StringUtils::getPath(filename);
-    m_ident = StringUtils::getBasename(StringUtils::removeExtension(filename));
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     try
     {
