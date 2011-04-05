@@ -8,7 +8,7 @@
             align="center" text_align="center" />
 
     <box width="100%" height="195">
-        <scrollable_toolbar id="gps" height="175" y="10" x="10" width="100%" align="center" label_location="each"
+        <scrollable_toolbar id="gps" height="175" y="10" x="10" width="98%" align="center" label_location="each"
                             square_items="true" child_width="160" child_height="120" />
     </box>
     
