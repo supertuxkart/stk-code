@@ -225,25 +225,18 @@ void OptionsScreenVideo::init()
     }
     
     // ---- select current resolution every time
-    const std::vector<ItemDescription>& items = res->getItems();
-    const int amount = items.size();
-    
     char searching_for[32];
     snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_width, (int)UserConfigParams::m_height);
     
-    for (int n=0; n<amount; n++)
+    if (res->setSelection(searching_for, PLAYER_ID_GAME_MASTER, false))
     {
-        if (items[n].m_code_name == searching_for)
-        {
-            // that's the current one
-            if (!res->setSelection(n, PLAYER_ID_GAME_MASTER, false))
-            {
-                std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << n << " ("
-                          << items[n].m_code_name.c_str() << ")\n";
-            }
-            break;
-        }
-    }  // end for
+        // ok found
+    }
+    else
+    {
+        std::cerr << "[OptionsScreenVideo] Cannot find resolution '" << searching_for << "'\n";
+    }
+
     
     // --- set gfx settings values
     for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
