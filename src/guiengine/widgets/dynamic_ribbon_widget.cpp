@@ -960,6 +960,29 @@ void DynamicRibbonWidget::update(float dt)
 }
 
 // -----------------------------------------------------------------------------
+
+bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id)
+{
+    int row = -1;
+    int id;
+    
+    for (int r=0; r<m_row_amount; r++)
+    {
+        id = m_rows[r].findItemNamed(name);
+        if (id > -1)
+        {
+            row = r;
+            break;
+        }
+    }
+    
+    *p_row = row;
+    *p_id = id;
+    return (row != -1);
+}
+
+// -----------------------------------------------------------------------------
+
 bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt)
 {
     if (m_deactivated) return false;
@@ -971,26 +994,26 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
 
     const std::string& name = m_items[item_id].m_code_name;
     
-    int row = -1;
+    int row;
     int id;
     
-    for (int r=0; r<m_row_amount; r++)
+    int iterations = 0; // a safeguard to avoid infinite loops (should not happen normally)
+    
+    while (!findItemInRows(name.c_str(), &row, &id))
     {
-        //printf("Looking for %s in row %i\n", name.c_str(), r);
-        id = m_rows[r].findItemNamed(name.c_str());
-        if (id > -1)
+        // if we get here it means the item is scrolled out. Try to find it.
+        scroll(1);
+        
+        if (iterations > 50)
         {
-            row = r;
-            break;
+            assert(false);
+            std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
+            return false;
         }
+        
+        iterations++;
     }
-    
-    if (row == -1)
-    {
-        //std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
-        return false;
-    }
-    
+
     //std::cout << "Player " << playerID << " has item " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
     m_rows[row].setSelection(id, playerID);
     if (focusIt)
