@@ -217,6 +217,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 if (text != NULL)
                 {
                     widget.m_text = _(text);
+                    widget.m_is_text_rtl = (translations->isRTLLanguage() && widget.m_text != text);
                 }
                 
                 if (parent != NULL)

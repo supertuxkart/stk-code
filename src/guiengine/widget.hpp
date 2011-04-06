@@ -116,12 +116,7 @@ namespace GUIEngine
       * \ingroup guiengine
       */
     class Widget : public SkinWidgetContainer
-    {
-    private:
-        /** PROP_TEXT is a special case : since it can be translated it can't
-         *  go in the map above, which uses narrow strings */
-        irr::core::stringw m_text;
-
+    {  
     protected:        
         unsigned int m_magic_number;
 
@@ -136,6 +131,13 @@ namespace GUIEngine
         friend class LayoutManager;
         friend class ModalDialog;
         friend class AbstractTopLevelContainer;
+        
+        /** PROP_TEXT is a special case : since it can be translated it can't
+         *  go in the map above, which uses narrow strings */
+        irr::core::stringw m_text;
+        
+        /** Whether the text in m_text is right-to-left */
+        bool m_is_text_rtl;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
