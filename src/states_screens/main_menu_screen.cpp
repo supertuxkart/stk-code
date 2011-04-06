@@ -137,12 +137,39 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         irr::gui::ScalableFont* font = GUIEngine::getFont();
         
         // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-        font->draw(_("English"),
-                   core::rect<s32>(lang_combo->m_x, lang_combo->m_y,
-                                   (int)(lang_combo->m_x 
-                                         + lang_combo->m_w*0.9f), // multiply to not go over combo arrow
+        core::stringw language_name = _("English");
+        
+        const int LEFT_MARGIN = 5;
+        const int arrow_width = lang_combo->m_h*0.6f; // the arrow is about half wide as the combo is high
+
+        // Below is a not-too-pretty hack. When language name is too long to fit the space allocated by the STK
+        // widget, resize the irrlicht element (but don't resize the STK widget on top of it, because we don't
+        // want the change of size to be permanent - if we switch back to another language the combo needs
+        // to shrink back)
+        int element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
+        const int text_w = (int)font->getDimension(language_name.c_str()).Width;
+        const int needed_additional_space = text_w - (element_width - arrow_width - LEFT_MARGIN);
+        if (needed_additional_space > 0)
+        {
+            // language name too long to fit
+            gui::IGUIElement* el = lang_combo->getIrrlichtElement();
+            core::recti pos = el->getRelativePosition();
+            pos.UpperLeftCorner.X -= needed_additional_space;
+            el->setRelativePosition( pos );
+        }
+        
+        element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
+        
+        const int elem_x = lang_combo->getIrrlichtElement()->getRelativePosition().UpperLeftCorner.X;
+        font->draw(language_name,
+                   core::rect<s32>(elem_x + LEFT_MARGIN,
+                                   lang_combo->m_y,
+                                   // don't go over combo arrow
+                                   (int)(elem_x + LEFT_MARGIN + (element_width - arrow_width)),
                                    lang_combo->m_y + lang_combo->m_h),
-                   video::SColor(255,0,0,0), true /* hcenter */, true /* vcenter */);
+                   // center horizontally only if there is enough room, irrlicht's centering algorithm
+                   // seems to give weird results when space is too tight
+                   video::SColor(255,0,0,0), (element_width - text_w > 5) /* hcenter */, true /* vcenter */);
         
         // Close popup when focus lost
         if (m_lang_popup != NULL)
