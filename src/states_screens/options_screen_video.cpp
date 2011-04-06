@@ -112,13 +112,13 @@ void OptionsScreenVideo::init()
         
         bool found_config_res = false;
         
-        // for some odd reason, irrlicht sometimes fails to erport the good old standard resolutions
+        // for some odd reason, irrlicht sometimes fails to report the good old standard resolutions
         // those are always useful for windowed mode
         bool found_800_600 = false;
         bool found_1024_640 = false;
         bool found_1024_768 = false;
         
-        for(int n=0; n<amount; n++)
+        for (int n=0; n<amount; n++)
         {
             const int w = modes[n].width;
             const int h = modes[n].height;
