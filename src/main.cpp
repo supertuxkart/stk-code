@@ -917,7 +917,7 @@ int main(int argc, char *argv[] )
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());
-            //if(UserConfigParams::m_internet_status==NetworkHttp::IPERM_NOT_ASKED)
+            if(UserConfigParams::m_internet_status==NetworkHttp::IPERM_NOT_ASKED)
             {
                 class ConfirmServer : public MessageDialog::IConfirmDialogListener
                 {
