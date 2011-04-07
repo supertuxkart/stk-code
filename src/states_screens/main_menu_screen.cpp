@@ -106,6 +106,11 @@ void MainMenuScreen::init()
         w->setDeactivated();
     }
 #endif
+    
+    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    const core::stringw &news_text = network_http->getNextNewsMessage();
+    w->setText(news_text, true);
+    w->update(0.01f);
 }
 
 // ------------------------------------------------------------------------------------------------------

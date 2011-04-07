@@ -65,7 +65,8 @@ void LabelWidget::add()
     if (m_scroll_speed != 0)
     {
         IGUIElement* container = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, -1);
-        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), core::rect<s32>( core::position2di(0,0), widget_size.getSize()),
+        core::rect<s32> r(core::position2di(0,0), widget_size.getSize());
+        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), r,
                                                           false, word_wrap, /*m_parent*/ container, -1);
     }
     else
@@ -110,7 +111,7 @@ void LabelWidget::add()
         //m_scroll_offset = (float)r.Width;
         
         // start scrolled off
-        m_scroll_offset = (float)(-m_element->getAbsolutePosition().getWidth()-10);
+        m_scroll_offset = -999;
     }
     else
     {
@@ -179,7 +180,7 @@ bool LabelWidget::scrolledOff() const
 /** Sets horizontal scroll speed. */
 void LabelWidget::setScrollSpeed(float speed)
 {
-    m_scroll_offset = 0;
+    //m_scroll_offset = 0;
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 
