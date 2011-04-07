@@ -1698,7 +1698,14 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert(tabs != NULL);
     
-    const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    std::string selected_kart_group = 
+        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    // This can happen if addons are removed so that also the previously
+    // selected kart group is removed. In this case, select the 
+    // 'standard' group
+    if(!kart_properties_manager->getKartsInGroup(selected_kart_group).size())
+        selected_kart_group = DEFAULT_GROUP_NAME;
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
