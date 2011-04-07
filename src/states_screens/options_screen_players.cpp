@@ -141,7 +141,7 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
     for(int n=0; n<playerAmount; n++)
     {
         players->addItem(core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
-                         UserConfigParams::m_all_players[n].getName());
+                         translations->fribidize(UserConfigParams::m_all_players[n].getName()));
     }
 }   // deletePlayer
 
