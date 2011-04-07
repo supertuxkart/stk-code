@@ -9,13 +9,15 @@
     
     <textbox id="textfield" width="75%" I18N="In the 'add new player' dialog" align="center"/>
 
-    <spacer height="20" width="20" />
+    <label id="preview" width="75%" align="center" text="" />
+    
+    <spacer height="10" width="20" />
     
     <!-- TODO: ok button? -->
     
     <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
 
-    <spacer height="20" width="20" />
+    <spacer height="15" width="20" />
 
 </div>
 

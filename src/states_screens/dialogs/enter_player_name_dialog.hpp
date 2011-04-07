@@ -20,6 +20,7 @@
 #define HEADER_ENTERPLAYERNAME_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 
 namespace GUIEngine
 {
@@ -32,7 +33,7 @@ namespace GUIEngine
  * \brief Dialog that allows the player to enter the name for a new player
  * \ingroup states_screens
  */
-class EnterPlayerNameDialog : public GUIEngine::ModalDialog
+class EnterPlayerNameDialog : public GUIEngine::ModalDialog, public GUIEngine::ITextBoxWidgetListener
 {
     
 public:
@@ -44,6 +45,8 @@ public:
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    
+    virtual void onTextUpdated();
 };
 
 #endif

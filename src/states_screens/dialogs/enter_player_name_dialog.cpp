@@ -41,6 +41,8 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    if (translations->isRTLLanguage()) textCtrl->addListener(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -50,6 +52,17 @@ EnterPlayerNameDialog::~EnterPlayerNameDialog()
     // FIXME: what is this code for?
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     textCtrl->getIrrlichtElement()->remove();
+    textCtrl->clearListeners();
+}
+
+// -----------------------------------------------------------------------------
+
+void EnterPlayerNameDialog::onTextUpdated()
+{
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
+    LabelWidget* lbl = getWidget<LabelWidget>("preview");
+    
+    lbl->setText( core::stringw(translations->fribidize(textCtrl->getText())), false );
 }
 
 // -----------------------------------------------------------------------------
