@@ -20,8 +20,10 @@
 #ifndef HEADER_ADDON_HPP
 #define HEADER_ADDON_HPP
 
+#include <assert.h>
 #include <string>
 
+#include "io/file_manager.hpp"
 class XMLNode;
 
 class Addon
@@ -129,6 +131,29 @@ public:
         m_icon_ready=true; 
     }   // setIconReady
     // ------------------------------------------------------------------------
+    /** Returns the directory in which this type of addons is stored (in a 
+     *  separate subdirectory). A kart is stored in .../karts/X and tracks in
+     *  .../tracks/X. If further types are added here, make sure that the
+     *  name return ends with a "/".
+     */
+    std::string getTypeDirectory() const
+    {
+        if(m_type=="kart") 
+            return "karts/";
+        else if(m_type=="track")
+            return "tracks/";
+        // It must be one of the two
+        assert(false);
+        return "";  // Ignore compiler warning
+    }   // getTypeDirectory
+
+    // ------------------------------------------------------------------------
+    /** Returns the directory in which this addon is installed. */
+    std::string getDataDir() const 
+    {
+        return file_manager->getAddonsFile(getTypeDirectory()+getId());
+    }   // getDataDir
+
 };   // Addon
 
 

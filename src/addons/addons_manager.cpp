@@ -283,13 +283,12 @@ bool AddonsManager::install(const Addon &addon)
 {
     bool success=true;
     const std::string &id = addon.getId();
-    file_manager->checkAndCreateDirForAddons(id, addon.getType()+ "s/");
+    file_manager->checkAndCreateDirForAddons(id, addon.getTypeDirectory());
 
     //extract the zip in the addons folder called like the addons name    
     std::string base_name = StringUtils::getBasename(addon.getZipFileName());
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
-    std::string to        = file_manager->getAddonsDir() + "/"
-                          + addon.getType()+ "s/" + id + "/" ;
+    std::string to        = addon.getDataDir();
     
     success = extract_zip(from, to);
     if (!success)
@@ -307,10 +306,10 @@ bool AddonsManager::install(const Addon &addon)
     if(addon.getType()=="kart")
     {
         // We have to remove the mesh of the kart since otherwise it remains
-        // cashed, and will therefore be found again when reloading the karts.
-        // This is important on one hand since we reload all karts (this
-        // function is easily available) and existing karts will not reload
-        // their meshes.
+        // cashed (if a kart is updated), and will therefore be found again 
+        // when reloading the karts. This is important on one hand since we 
+        // reload all karts (this function is easily available) and existing
+        // karts will not reload their meshes.
         const KartProperties *prop = 
             kart_properties_manager->getKart(addon.getId());
         // If the model already exist (i.e. it's an update, not a new install
@@ -340,12 +339,8 @@ bool AddonsManager::uninstall(const Addon &addon)
     assert(index>=0 && index < (int)m_addons_list.getData().size());
     m_addons_list.getData()[index].setInstalled(false);
 
-    //write the xml file with the informations about installed karts
-    std::string name      = addon.getType()+"s/"+addon.getId();
-    std::string dest_file = file_manager->getAddonsFile(name);
-
     //remove the addons directory
-    bool error = !file_manager->removeDirectory(dest_file);
+    bool error = !file_manager->removeDirectory(addon.getDataDir());
     saveInstalled(addon.getType());
     return !error;
 }   // uninstall
@@ -364,10 +359,7 @@ void AddonsManager::saveInstalled(const std::string &type)
 
     for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)
     {
-        //if(m_addons_list[i].m_installed)
-        {
-            m_addons_list.getData()[i].writeXML(&xml_installed);
-        }
+        m_addons_list.getData()[i].writeXML(&xml_installed);
     }
     xml_installed << "</addons>" << std::endl;
     xml_installed.close();
