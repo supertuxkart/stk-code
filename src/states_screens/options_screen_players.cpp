@@ -108,7 +108,7 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         // add new player
         UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
         
-        players->addItem( newNameC.c_str(), newName );
+        players->addItem( newNameC.c_str(), translations->fribidize(newName) );
     }
     else // ---- Rename existing player
     {
@@ -119,7 +119,7 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            players->addItem(newNameC.c_str(), UserConfigParams::m_all_players[n].getName());
+            players->addItem(newNameC.c_str(), translations->fribidize(UserConfigParams::m_all_players[n].getName()));
         }
         
     }
