@@ -79,7 +79,7 @@ void OptionsScreenPlayers::init()
         //        and hope no one enters two player names that, when stripped down to ASCII,
         //        give the same identifier...
         players->addItem( core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
-                          UserConfigParams::m_all_players[n].getName() );
+                          translations->fribidize(UserConfigParams::m_all_players[n].getName()) );
     }
 }   // init
 
