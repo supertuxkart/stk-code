@@ -228,8 +228,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
                 const int amount = lang_list->size();
                 for (int n=0; n<amount; n++)
                 {
-                    // TODO: retrieve a nice name for each language instead of displaying the language code
-                    m_lang_popup->addItem((*lang_list)[n], core::stringw((*lang_list)[n].c_str()));
+                    std::string code_name = (*lang_list)[n];
+                    std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
+                    m_lang_popup->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
+                                                     nice_name.c_str() + ")");
                 }
 
                 manualAddWidget(m_lang_popup);
