@@ -140,7 +140,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         core::stringw language_name = _("English");
         
         const int LEFT_MARGIN = 5;
-        const int arrow_width = lang_combo->m_h*0.6f; // the arrow is about half wide as the combo is high
+        const int arrow_width = (int)(lang_combo->m_h*0.6f); // the arrow is about half wide as the combo is high
 
         // Below is a not-too-pretty hack. When language name is too long to fit the space allocated by the STK
         // widget, resize the irrlicht element (but don't resize the STK widget on top of it, because we don't
