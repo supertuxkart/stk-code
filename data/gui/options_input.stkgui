@@ -27,7 +27,7 @@
         <list id="devices" proportion="5" width="75%" align="center"/>
         <spacer width="50" height="25" /> 
  
-        <button id="add_device" I18N="In the input configuration screen"  text="Add a device"/>
+        <button id="add_device" I18N="In the input configuration screen"  text="Add a device" align="center"/>
        
         <label text="* Which config to use will be inferred from which 'fire' key is pressed to join the game."
                proportion="2" word_wrap="true"/>
