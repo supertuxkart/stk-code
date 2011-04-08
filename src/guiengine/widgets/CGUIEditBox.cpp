@@ -9,7 +9,7 @@
 #include "IGUIFont.h"
 #include "IVideoDriver.h"
 #include "rect.h"
-#include "os.h"
+//#include "os.h"
 #include "Keycodes.h"
 
 /*
@@ -21,6 +21,13 @@
 	numerical
 */
 
+
+u32 getTime()
+{
+    // FIXME
+    return 0;
+    // os::Timer::getTime()
+}
 
 //! constructor
 CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
@@ -412,7 +419,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				newMarkEnd = 0;
 			}
 			CursorPos = p;
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 		}
 		break;
 	case KEY_HOME:
@@ -437,7 +444,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				newMarkEnd = 0;
 			}
 			CursorPos = p;
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 		}
 		break;
 	case KEY_RETURN:
@@ -470,7 +477,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 		}
 
 		if (CursorPos > 0) CursorPos--;
-		BlinkStartTime = os::Timer::getTime();
+		BlinkStartTime = getTime();
 		break;
 
 	case KEY_RIGHT:
@@ -491,7 +498,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 		}
 
 		if (Text.size() > (u32)CursorPos) CursorPos++;
-		BlinkStartTime = os::Timer::getTime();
+		BlinkStartTime = getTime();
 		break;
 	case KEY_UP:
 		if (MultiLine || (WordWrap && BrokenText.size() > 1) )
@@ -590,7 +597,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
 			if (CursorPos < 0)
 				CursorPos = 0;
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 			newMarkBegin = 0;
 			newMarkEnd = 0;
 			textChanged = true;
@@ -627,7 +634,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 			if (CursorPos > (s32)Text.size())
 				CursorPos = (s32)Text.size();
 
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 			newMarkBegin = 0;
 			newMarkEnd = 0;
 			textChanged = true;
@@ -866,7 +873,7 @@ void CGUIEditBox::draw()
 		charcursorpos = font->getDimension(s.c_str()).Width +
 			font->getKerningWidth(L"_", CursorPos-startPos > 0 ? &((*txtLine)[CursorPos-startPos-1]) : 0);
 
-		if (focus && (os::Timer::getTime() - BlinkStartTime) % 700 < 350)
+		if (focus && (getTime() - BlinkStartTime) % 700 < 350)
 		{
 			setTextRect(cursorLine);
 			CurrentTextRect.UpperLeftCorner.X += charcursorpos;
@@ -980,7 +987,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 	case EMIE_LMOUSE_PRESSED_DOWN:
 		if (!Environment->hasFocus(this))
 		{
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 			MouseMarking = true;
 			CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
 			setTextMarkers(CursorPos, CursorPos );
@@ -1299,7 +1306,7 @@ void CGUIEditBox::inputChar(wchar_t c)
 				++CursorPos;
 			}
 
-			BlinkStartTime = os::Timer::getTime();
+			BlinkStartTime = getTime();
 			setTextMarkers(0, 0);
 		}
 	}
