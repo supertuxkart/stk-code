@@ -290,6 +290,7 @@
 		956C6ED61128D3FB004336C8 /* new_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECF1128D3FB004336C8 /* new_ai_controller.cpp */; };
 		956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ED11128D3FB004336C8 /* player_controller.cpp */; };
 		9574F17C11206881008D202E /* world_status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9574F17A11206881008D202E /* world_status.cpp */; };
+		95757211134F5B890037747B /* CGUIEditBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9575720F134F5B890037747B /* CGUIEditBox.cpp */; };
 		9576460712BAD1CF00DB80C7 /* tutorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460312BAD1CF00DB80C7 /* tutorial.cpp */; };
 		9576460812BAD1CF00DB80C7 /* tutorial_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */; };
 		957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957ED47E1163FF18002AB42C /* ai_base_controller.cpp */; };
@@ -1019,6 +1020,8 @@
 		95702B951306076100EEC3A0 /* vector3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector3d.h; path = /Library/Frameworks/IrrFramework.framework/Versions/A/Headers/vector3d.h; sourceTree = "<absolute>"; };
 		9574F17A11206881008D202E /* world_status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_status.cpp; path = ../../modes/world_status.cpp; sourceTree = SOURCE_ROOT; };
 		9574F17B11206881008D202E /* world_status.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_status.hpp; path = ../../modes/world_status.hpp; sourceTree = SOURCE_ROOT; };
+		9575720F134F5B890037747B /* CGUIEditBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CGUIEditBox.cpp; path = ../../guiengine/widgets/CGUIEditBox.cpp; sourceTree = SOURCE_ROOT; };
+		95757210134F5B890037747B /* CGUIEditBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CGUIEditBox.h; path = ../../guiengine/widgets/CGUIEditBox.h; sourceTree = SOURCE_ROOT; };
 		9576460312BAD1CF00DB80C7 /* tutorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial.cpp; path = ../../tutorial/tutorial.cpp; sourceTree = SOURCE_ROOT; };
 		9576460412BAD1CF00DB80C7 /* tutorial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial.hpp; path = ../../tutorial/tutorial.hpp; sourceTree = SOURCE_ROOT; };
 		9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_manager.cpp; path = ../../tutorial/tutorial_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -2650,6 +2653,8 @@
 				956B0AA21232D45D00767CCD /* bubble_widget.hpp */,
 				95ECA0EC10124C5000D47C5F /* button_widget.cpp */,
 				95ECA0ED10124C5000D47C5F /* button_widget.hpp */,
+				9575720F134F5B890037747B /* CGUIEditBox.cpp */,
+				95757210134F5B890037747B /* CGUIEditBox.h */,
 				95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */,
 				95ECA0EF10124C5000D47C5F /* check_box_widget.hpp */,
 				9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */,
@@ -3078,6 +3083,7 @@
 				958444A51330F89100CEA60A /* stk_file_system.cpp in Sources */,
 				958444A61330F89100CEA60A /* tinygettext.cpp in Sources */,
 				953A959D13367D6E00D86B4D /* options_screen_ui.cpp in Sources */,
+				95757211134F5B890037747B /* CGUIEditBox.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

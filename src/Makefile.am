@@ -119,6 +119,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/bubble_widget.hpp \
  guiengine/widgets/button_widget.cpp \
  guiengine/widgets/button_widget.hpp \
+ guiengine/widgets/CGUIEditBox.cpp \
+ guiengine/widgets/CGUIEditBox.h \
  guiengine/widgets/check_box_widget.cpp \
  guiengine/widgets/check_box_widget.hpp \
  guiengine/widgets/dynamic_ribbon_widget.cpp \

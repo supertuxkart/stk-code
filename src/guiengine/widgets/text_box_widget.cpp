@@ -24,7 +24,7 @@
 
 using namespace irr;
 
-class MyCGUIEditBox : public gui::CGUIEditBox
+class MyCGUIEditBox : public CGUIEditBox
 {
     PtrVector<GUIEngine::ITextBoxWidgetListener, REF> m_listeners;
     
