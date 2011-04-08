@@ -19,7 +19,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
-#include <CGUIEditBox.h>
+#include "guiengine/widgets/CGUIEditBox.h"
 #include "utils/ptr_vector.hpp"
 
 using namespace irr;
