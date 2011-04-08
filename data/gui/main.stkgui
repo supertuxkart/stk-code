@@ -36,11 +36,15 @@
                 <icon-button id="lang_combo" icon="gui/dropdown.png" height="100%" align="center"/>
             </div>
             
+            <spacer width="10" height="10" />
+            
             <label proportion="3" height="100%" id="info_addons"
                    I18N="In the main screen"
                    text=""
                    align="center" text_align="left" />
                
+            <spacer width="10" height="10" />
+            
             <placeholder id="empty_for_now" proportion="1">
             </placeholder>
         </bottombar>
