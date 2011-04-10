@@ -49,12 +49,6 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
  *  created, so only the race manager can be accessed safely.
@@ -73,7 +67,6 @@ RaceGUI::RaceGUI()
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
     m_map_bottom            = (int)( 10.0f * scaling);
-    m_lightning             = 0.0f;
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -274,10 +267,9 @@ void RaceGUI::createRegularPolygon(unsigned int n, float radius,
  */
 void RaceGUI::renderGlobal(float dt)
 {
+    RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
-    
-    if (m_lightning > 0.0f) m_lightning -= dt;
-    
+        
     // Special case : when 3 players play, use 4th window to display such 
     // stuff (but we must clear it)
     if (race_manager->getNumLocalPlayers() == 3 && 
@@ -370,59 +362,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     drawSpeedAndEnergy  (kart, viewport, scaling);
     drawRankLap         (info, kart, viewport);
 
-    if (m_lightning > 0.0f)
-    {
-        GLint glviewport[4];
-        glviewport[0] = viewport.UpperLeftCorner.X;
-        glviewport[1] = viewport.UpperLeftCorner.Y;
-        glviewport[2] = viewport.LowerRightCorner.X;
-        glviewport[3] = viewport.LowerRightCorner.Y;
-        //glGetIntegerv(GL_VIEWPORT, glviewport);
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glColor4f(0.7f*m_lightning, 0.7f*m_lightning, 0.7f*std::min(1.0f, m_lightning*1.5f), 1.0f);
-        glEnable(GL_COLOR_MATERIAL);
-        glDisable(GL_CULL_FACE);
-        glBegin(GL_QUADS);
-        
-        glVertex3d(glviewport[0],glviewport[1],0);
-        glVertex3d(glviewport[0],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[1],0);
-        glEnd();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-#if 0 // Rainy look, off, TODO: needs to be settable per track
-    else
-    {
-        GLint glviewport[4];
-        glGetIntegerv(GL_VIEWPORT, glviewport);
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
-
-        glEnable(GL_COLOR_MATERIAL);
-        glDisable(GL_CULL_FACE);
-        glBegin(GL_QUADS);
-        
-        glVertex3d(glviewport[0],glviewport[1],0);
-        glVertex3d(glviewport[0],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[1],0);
-        glEnd();
-        glEnable(GL_BLEND);
-    }
-#endif
-    
+    RaceGUIBase::renderPlayerView(kart);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

@@ -271,6 +271,7 @@ void MinimalRaceGUI::createRegularPolygon(unsigned int n, float radius,
  */
 void MinimalRaceGUI::renderGlobal(float dt)
 {
+    RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
     
     // Special case : when 3 players play, use 4th window to display such 
@@ -359,6 +360,7 @@ void MinimalRaceGUI::renderPlayerView(const Kart *kart)
     drawEnergyMeter     (kart, viewport, scaling);
     drawRankLap         (info, kart, viewport);
 
+    RaceGUIBase::renderPlayerView(kart);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

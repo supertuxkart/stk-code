@@ -81,9 +81,7 @@ private:
     Material        *m_plunger_face;
     typedef          std::vector<TimedMessage> AllMessageType;
     AllMessageType   m_messages;
-    
-    float m_lightning;
-    
+        
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
     video::ITexture *m_marker;
 
@@ -206,7 +204,6 @@ public:
     virtual const core::dimension2du getMiniMapSize() const 
                   { return core::dimension2du(m_map_width, m_map_height); }
     
-    void lightning() { m_lightning = 1.0f; }
 };   // RaceGUI
 
 #endif

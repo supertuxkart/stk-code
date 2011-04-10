@@ -1059,6 +1059,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\race_gui_base.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\race_result_gui.cpp"
 					>
 				</File>
