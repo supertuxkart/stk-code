@@ -370,6 +370,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\CGUIEditBox.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\check_box_widget.cpp"
 						>
 					</File>
@@ -1265,6 +1269,10 @@
 					</File>
 					<File
 						RelativePath="..\..\guiengine\widgets\button_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\CGUIEditBox.h"
 						>
 					</File>
 					<File
