@@ -22,6 +22,9 @@
 
 #include "items/flyable.hpp"
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#endif
 #include <math.h>
 
 #include "graphics/irr_driver.hpp"
@@ -163,6 +166,8 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     // Apply offset
     btTransform offset_transform;
     offset_transform.setIdentity();
+    assert(!isnan(m_average_height));
+    assert(!isnan(forw_offset));
     offset_transform.setOrigin(Vec3(0,m_average_height,forw_offset));
 
     // turn around
@@ -189,6 +194,9 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
 
     if(m_mass!=0.0f)  // Don't set velocity for kinematic or static objects
     {
+        assert(!isnan(v.getX()));
+        assert(!isnan(v.getY()));
+        assert(!isnan(v.getZ()));
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
@@ -367,6 +375,9 @@ void Flyable::update(float dt)
     // But since we couldn't reproduce the problem, and the epsilon used
     // here does not hurt, I'll leave it in.
     float eps = 0.1f;
+    assert(!isnan(xyz.getX()));
+    assert(!isnan(xyz.getY()));
+    assert(!isnan(xyz.getZ()));
     if(xyz[0]<(*min)[0]+eps || xyz[2]<(*min)[2]+eps || xyz[1]<(*min)[1]+eps ||
        xyz[0]>(*max)[0]-eps || xyz[2]>(*max)[2]-eps || xyz[1]>(*max)[1]-eps   )
     {
@@ -386,11 +397,16 @@ void Flyable::update(float dt)
 
         float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
         Vec3 v = getVelocity();
+        assert(!isnan(v.getX()));
+        assert(!isnan(v.getX()));
+        assert(!isnan(v.getX()));
         float heading = atan2f(v.getX(), v.getZ());
+        assert(!isnan(heading));
         float pitch   = getTerrainPitch(heading);
         float vel_up = m_force_updown*(delta);
         if (hat < m_max_height) // take into account pitch of surface
             vel_up += v.length_2d()*tanf(pitch);
+        assert(!isnan(vel_up));
         v.setY(vel_up);
         setVelocity(v);
     }   // if m_adjust_up_velocity
