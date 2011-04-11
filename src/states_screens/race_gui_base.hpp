@@ -52,14 +52,15 @@ public:
         int lap;
     };   // KartIconDisplayInfo
 
+    /** Delight in seconds between lightnings. */
+    float m_lightning;
+
 public:
     
     bool m_enabled;
 
-                  RaceGUIBase() {};
+                  RaceGUIBase();
     virtual      ~RaceGUIBase() {};
-    virtual void  renderGlobal(float dt) = 0;
-    virtual void  renderPlayerView(const Kart *kart) = 0;
     virtual void  addMessage(const irr::core::stringw &m, const Kart *kart, 
                              float time, 
                              int fonst_size, 
@@ -72,6 +73,12 @@ public:
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du 
                   getMiniMapSize() const = 0;
+    virtual void renderGlobal(float dt);
+    virtual void renderPlayerView(const Kart *kart);
+
+    /** Set the flag that a lightning should be shown. */
+    void doLightning() { m_lightning = 1.0f; }
+
 };   // RaceGUIBase
 
 #endif

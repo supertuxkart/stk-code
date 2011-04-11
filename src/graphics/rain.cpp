@@ -149,10 +149,9 @@ void Rain::update(float dt)
         if (m_next_lightning < 0.0f)
         {
             RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-            RaceGUI* gui = dynamic_cast<RaceGUI*>(gui_base);
-            if (gui != NULL)
+            if (gui_base != NULL)
             {
-                gui->lightning();
+                gui_base->doLightning();
                 if (m_thunder_sound) m_thunder_sound->play();
             }
             
