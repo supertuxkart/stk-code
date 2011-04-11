@@ -765,6 +765,12 @@
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp">
       <Filter>Quelldateien\states_screens</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp">
+      <Filter>Quelldateien\guiengine\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
+      <Filter>Headerdateien\states_screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1450,6 +1456,9 @@
     </ClInclude>
     <ClInclude Include="..\..\utils\time.hpp">
       <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h">
+      <Filter>Headerdateien\guiengine\widgets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
