@@ -192,9 +192,6 @@ bool LoadPoFiles(const char* sListFileName){
 					size.cx = abc.abcB;
 					fa.underhang  = abc.abcA;
 					fa.overhang   = abc.abcC;
-
-					if (abc.abcB-abc.abcA+abc.abcC<1)
-						continue; // nothing of width 0
 				}
 				if (size.cy < 1)
 					continue;
