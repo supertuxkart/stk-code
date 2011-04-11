@@ -765,6 +765,9 @@
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp">
       <Filter>Quelldateien\states_screens</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
+      <Filter>Quelldateien\states_screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">

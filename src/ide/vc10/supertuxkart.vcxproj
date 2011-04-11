@@ -206,6 +206,7 @@
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
+    <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
     <ClCompile Include="..\..\tinygettext\iconv.cpp" />
