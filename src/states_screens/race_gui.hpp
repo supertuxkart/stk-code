@@ -42,51 +42,9 @@ class RaceSetup;
 class RaceGUI : public RaceGUIBase
 {
 private:
-    class TimedMessage
-    {
-     public:
-        irr::core::stringw m_message;            //!< message to display
-        float              m_remaining_time;     //!< time remaining before removing this message from screen
-        video::SColor      m_color;              //!< color of message
-        int                m_font_size;          //!< size
-        const Kart        *m_kart;
-        bool               m_important;          //!< Important msgs are displayed in the middle of the screen
-        // -----------------------------------------------------
-        // std::vector needs standard copy-ctor and std-assignment op.
-        // let compiler create defaults .. they'll do the job, no
-        // deep copies here ..
-        TimedMessage(const irr::core::stringw &message, 
-                     const Kart *kart, float time, int size, 
-                     const video::SColor &color, const bool important)
-        {
-            m_message        = message; 
-            m_font_size      = size;
-            m_kart           = kart;
-            m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
-            m_color          = color;
-            m_important      = important;
-        }   // TimedMessage
-        // -----------------------------------------------------
-        // in follow leader the clock counts backwards
-        bool done(const float dt)
-        {
-            m_remaining_time -= dt;
-            return m_remaining_time < 0;
-        }   // done
-    };   // TimedMessage
-    // ---------------------------------------------------------
 
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
-    Material        *m_plunger_face;
-    typedef          std::vector<TimedMessage> AllMessageType;
-    AllMessageType   m_messages;
-        
-    /** A texture with all mini dots to be displayed in the minimap for all karts. */
-    video::ITexture *m_marker;
-
-    /** Musical notes icon (for music description and credits) */
-    Material        *m_music_icon;
 
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
@@ -96,21 +54,11 @@ private:
 
     /** Translated string 'Top %d' displayed every frame. */
     core::stringw    m_string_top;
-
-    /** Translated strings 'ready', 'set', 'go'. */
-    core::stringw    m_string_ready, m_string_set, m_string_go;
     
-    video::ITexture *m_gauge_empty;
-    video::ITexture *m_gauge_full;
-    video::ITexture *m_gauge_goal;
-
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-    
-    /** The size of a single marker in pixels, must be a power of 2. */
-    int              m_marker_rendered_size;
     
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
@@ -137,10 +85,6 @@ private:
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
-
-    /** Used to display messages without overlapping */
-    int              m_max_font_height;
-    int              m_small_font_max_height;
     
     /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
      *  the rank/lap text correctly close to the right border. */
@@ -157,20 +101,8 @@ private:
     std::vector< core::vector2d<s32> > m_previous_icons_position;
     Material         *m_icons_frame;
     
-    void createMarkerTexture();
-    void createRegularPolygon(unsigned int n, float radius, 
-                              const core::vector2df &center,
-                              const video::SColor &color,
-                              video::S3DVertex *v, unsigned short int *index);
-
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const Kart *kart,
-                                const core::recti &viewport, 
-                                const core::vector2df &scaling);
-    void drawPowerupIcons      (const Kart* kart,
-                                const core::recti &viewport, 
-                                const core::vector2df &scaling);
-    void drawAllMessages       (const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
@@ -181,9 +113,6 @@ private:
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-    void drawGlobalMusicDescription();
-    void cleanupMessages       (const float dt);
-    void drawGlobalReadySetGo  ();
     
 public:
 
@@ -191,15 +120,7 @@ public:
         ~RaceGUI();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Kart *kart);
-    
-    virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
-                            float time, int fonst_size, 
-                            const video::SColor &color=
-                                video::SColor(255, 255, 0, 255),
-                            bool important=true);
-
-    virtual void clearAllMessages() { m_messages.clear(); }
-    
+        
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 
                   { return core::dimension2du(m_map_width, m_map_height); }
