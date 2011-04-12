@@ -185,7 +185,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
         {
-            if (UserConfigParams::m_all_players[n].getName() == selectedPlayer)
+            if (selectedPlayer == translations->fribidize(UserConfigParams::m_all_players[n].getName()))
             {
                 if (!(UserConfigParams::m_all_players[n].isGuestAccount()))
                 {
