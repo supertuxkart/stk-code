@@ -71,20 +71,41 @@ namespace GUIEngine
                          const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
         virtual ~IconButtonWidget() {}
         
-        /** Callback called when this widget needs to be added (see base class Widget) */
+        /** \brief Implement callback from base class Widget */
         virtual void add();
         
-        /** Call this if scale mode is SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO.
-          * \param custom_aspect_ratio  The width/height aspect ratio */
+        /**
+          * \brief Call this if scale mode is SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO.
+          * \param custom_aspect_ratio  The width/height aspect ratio
+          */
         void setCustomAspectRatio(float custom_aspect_ratio) { m_custom_aspect_ratio = custom_aspect_ratio; }
         
-        /** Change the text label if there is a label (label won't be added if there initially wasn't one) */
+        /**
+          * \brief Temporarily change the text label if there is a label (next time this screen is
+          *        visited, the previous label will be back. For a permanent change, edit the 'text'
+          *        property in the base Widget class).
+          *
+          * \precondition Must be called after this widget is add()ed to have any effect
+          * \note         Calling this method on a button without label will have no effect
+          */
         void setLabel(irr::core::stringw new_label);
         
-        /** Change the texture used for this icon. The path is relative to the data directory, just like PROP_ICON. */
+        /**
+         * Change the texture used for this icon.
+         * \precondition At the moment, the new texture must have the same aspct ratio
+         *                as the previous one since the object will not
+         *                be resized to fit a different aspect ratio.
+         * \note May safely be called no matter if the widget is add()ed or not
+         */
         void setImage(const char* path_to_texture, IconPathType pathType=ICON_PATH_TYPE_NO_CHANGE);
         
-        /** Change the texture used for this icon. */
+        /**
+          * Change the texture used for this icon.
+          * \precondition At the moment, the new texture must have the same aspct ratio
+          *                as the previous one since the object will not
+          *                be resized to fit a different aspect ratio.
+          * \note May safely be called no matter if the widget is add()ed or not
+          */
         void setImage(irr::video::ITexture* texture);
     };
 }

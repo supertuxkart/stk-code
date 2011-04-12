@@ -41,9 +41,14 @@ namespace GUIEngine
         ButtonWidget();
         virtual ~ButtonWidget() {}
         
+        /** \brief Implement callback from base class Widget */
         void add();
         
-        /**  Change the label on the button */
+        /** 
+          * \brief Change the label on the button
+          * \precondition This should only be called after a widget has been add()ed (changing the label
+          *               before the widget is added can be done by editing the 'text' property of Widget).
+          */
         void setLabel(const irr::core::stringw &label);
         
         /** When inferring widget size from its label length, this method will be called to

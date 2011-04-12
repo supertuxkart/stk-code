@@ -40,6 +40,7 @@ namespace GUIEngine
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
         
+        /** \brief Implement callback from parent class Widget */
         void add();
         
         /** Get whether the checkbox is checked */

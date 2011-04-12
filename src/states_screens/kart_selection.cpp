@@ -839,19 +839,18 @@ public:
 
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
-    m_removed_widget = NULL;
+    m_removed_widget      = NULL;
     m_multiplayer_message = NULL;
-}
+}   // KartSelectionScreen
 
 // -----------------------------------------------------------------------------
 
 void KartSelectionScreen::loadedFromFile()
 {
-    g_dispatcher = new FocusDispatcher(this);
-    m_first_widget = g_dispatcher;
-    m_player_confirmed = false;
+    g_dispatcher          = new FocusDispatcher(this);
+    m_first_widget        = g_dispatcher;
+    m_player_confirmed    = false;
     m_multiplayer_message = NULL;
-    
     // Dynamically add tabs
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
@@ -871,7 +870,7 @@ void KartSelectionScreen::loadedFromFile()
             tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
             break;
         }
-    }
+    }   // for n<group_amount
     
     // add others after
     for (int n=0; n<group_amount; n++)
@@ -881,7 +880,49 @@ void KartSelectionScreen::loadedFromFile()
             //FIXME: group name not translated
             tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
         }
+    }   // for n<group_amount
+    
+    if (group_amount > 1)
+    {
+        //I18N: name of the tab that will show tracks from all groups
+        tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
     }
+}   // loadedFromFile
+
+// ----------------------------------------------------------------------------- 
+
+void KartSelectionScreen::beforeAddingWidget()
+{
+    // Dynamically add tabs
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert( tabs != NULL );
+    
+    m_last_widget = tabs;
+    tabs->clearAllChildren();
+    
+    const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
+    const int group_amount = groups.size();
+    
+    // add default group first
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] == DEFAULT_GROUP_NAME)
+        {
+            //FIXME: group name not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
+            break;
+        }
+    }   // for n<group_amount
+    
+    // add others after
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] != DEFAULT_GROUP_NAME)
+        {
+            //FIXME: group name not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
+        }
+    }   // for n<group_amount
     
     if (group_amount > 1)
     {
@@ -895,6 +936,9 @@ void KartSelectionScreen::loadedFromFile()
 void KartSelectionScreen::init()
 {
     Screen::init();
+
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert( tabs != NULL );
     
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
@@ -913,8 +957,6 @@ void KartSelectionScreen::init()
     
     m_player_confirmed = false;
     
-    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
-    assert( tabs != NULL );
     tabs->setActivated();
     
     m_kart_widgets.clearAndDeleteAll();

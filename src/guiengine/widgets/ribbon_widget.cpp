@@ -301,6 +301,9 @@ void RibbonWidget::add()
 
 void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
 {
+    // This method should only be called BEFORE a widget is added
+    assert(m_element == NULL);
+    
     ButtonWidget* item = new ButtonWidget();
     item->m_text = text;
     item->m_properties[PROP_ID] = id;
@@ -314,6 +317,9 @@ void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
                                 const int w, const int h, const std::string icon,
                                 const IconButtonWidget::IconPathType iconPathType)
 {
+    // This method should only be called BEFORE a widget is added
+    assert(m_element == NULL);
+    
     IconButtonWidget* ribbon_item = new IconButtonWidget();
     
     ribbon_item->m_properties[PROP_ID] = id;
@@ -331,6 +337,9 @@ void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
 
 void RibbonWidget::clearAllChildren()
 {
+    // This method should only be called BEFORE a widget is added
+    assert(m_element == NULL);
+    
     m_children.clearAndDeleteAll();
 }
 
@@ -574,6 +583,9 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator,
 // -----------------------------------------------------------------------------
 void RibbonWidget::setLabel(const int id, irr::core::stringw new_name)
 {
+    // This method should only be called AFTER a widget is added
+    assert(m_element != NULL);
+    
     if (m_labels.size() == 0) return; // ignore this call for ribbons without labels
     
     assert(id >= 0);

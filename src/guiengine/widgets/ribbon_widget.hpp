@@ -121,10 +121,13 @@ namespace GUIEngine
         /** Select an item in the ribbon by its internal name */
         void select(std::string item, const int playerID);
         
-        /** When each item has a label, this method can be used to rename an item 
-            (especially used in scrolling ribbons, when scrolling occurs by renaming
-            items - note that this statis ribbon doesn't support scrolling, only
-            superclasses/wrappers of this do.) */
+        /**
+          * \brief This method can be used to rename an item.
+          * Has no effect for ribbons without individual labels.
+          *
+          * \precondition Must be called after the ribbon was add()ed
+          * \param id The index of the item to rename, in range [0 .. item count - 1]
+          */
         void setLabel(const int id, irr::core::stringw new_name);
         
         /** Returns the ID of the item, or -1 if not found */
@@ -147,6 +150,7 @@ namespace GUIEngine
     
         /**
           * \brief clear all children of this ribbon (likely because new ones will be added soon after)
+          * \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
           */
         void clearAllChildren();
         

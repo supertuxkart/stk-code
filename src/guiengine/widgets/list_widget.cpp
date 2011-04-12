@@ -84,6 +84,9 @@ void ListWidget::add()
 
 void ListWidget::clear()
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     
@@ -96,6 +99,9 @@ void ListWidget::clear()
 void ListWidget::addItem(const std::string& internalName, 
                          const irr::core::stringw& name, const int icon)
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     ListItem newItem;
     newItem.m_label = name;
     newItem.m_internal_name = internalName;
@@ -121,6 +127,9 @@ void ListWidget::addItem(const std::string& internalName,
 
 void ListWidget::renameItem(const int itemID, const irr::core::stringw newName, const int icon)
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     
@@ -162,6 +171,9 @@ void ListWidget::unfocused(const int playerID)
 
 int ListWidget::getSelectionID() const
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     return getIrrlichtElement<IGUIListBox>()->getSelected();
 }
 
@@ -169,6 +181,9 @@ int ListWidget::getSelectionID() const
 
 void ListWidget::setSelectionID(const int index)
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
     
     // auto-scroll to item when selecting something, don't auto-scroll when selecting nothing
@@ -189,6 +204,9 @@ void ListWidget::setSelectionID(const int index)
 
 int ListWidget::getItemCount() const
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     const int count = getIrrlichtElement<IGUIListBox>()->getItemCount();
     assert((int)m_items.size() == count);
     
@@ -221,6 +239,9 @@ int ListWidget::getItemID(const std::string internalName) const
 
 void ListWidget::markItemRed(const int id)
 {
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
     IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
     
     irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );

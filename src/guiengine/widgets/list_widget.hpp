@@ -61,18 +61,23 @@ namespace GUIEngine
         /** \brief implement callback from base class GUIEngine::Widget */
         virtual void unfocused(const int playerID);
         
+        /** \brief implement callback from base class GUIEngine::Widget */
+        virtual void elementRemoved();
+        
         /** \brief set the icon bank to use for list entries.
+          *
           * The height of list entries will be ajusted to the size of the highest icon.
           * Icons must therefore be at least as high as text.
+          *
           * \note  the list widget does NOT take ownership of the bank, dso you must delete it when
           *        you're done with it (but do not delete it when the list widget is still active)
           * \precondition may only be called after the widget has been added to the screen with add()
           */
         void setIcons(irr::gui::STKModifiedSpriteBank* icons);
         
+        
         // ---- contents management
         
-
         /**
          * \brief add an item to the list
          * \param name   user-visible, potentially translated, name of the item
@@ -120,10 +125,16 @@ namespace GUIEngine
           */
         void setSelectionID(const int index);
         
-        /** \brief rename an item and/or change its icon based on its ID */
+        /**
+          * \brief rename an item and/or change its icon based on its ID
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         void renameItem(const int itemID, const irr::core::stringw newName, const int icon=-1);
         
-        /** \brief rename an item and/or change its icon based on its internal name */
+        /**
+          * \brief rename an item and/or change its icon based on its internal name
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         void renameItem(const std::string internalName, const irr::core::stringw newName,
                         const int icon=-1)
         {
@@ -132,16 +143,22 @@ namespace GUIEngine
             renameItem( id, newName, icon );
         }
         
+        /**
+          * \brief Make an item red to mark an error, for instance
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         void markItemRed(const int id);
         
+        /**
+          * \brief Make an item red to mark an error, for instance
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */        
         void markItemRed(const std::string internalName)
         {
             const int id = getItemID(internalName);
             assert(id != -1);
             markItemRed( id );
         }
-
-        virtual void elementRemoved();
     };
 }
 

@@ -37,12 +37,21 @@ namespace GUIEngine
 
         /** Scroll speed in characters/seconds (0 if no scrolling). */
         float              m_scroll_speed;
+        
         /** Current scroll offset. */
         float              m_scroll_offset;
     public:
-                 LabelWidget(bool title=false, bool bright=false);
+        
+        /** Constructs the label widget. Parameter:
+          * \param title  True if the special title font should be used.
+          * \param bright True if a bright color should be used
+          * \note \c title and \c bright are mutually exclusive
+          */
+         LabelWidget(bool title=false, bool bright=false);
+        
         virtual ~LabelWidget() {}
         
+        /** \brief Callback from base class Widget */
         virtual void add();
                 
         /** Sets the color of the widget. 
@@ -53,11 +62,24 @@ namespace GUIEngine
             m_has_color = true;
         }   // setColor
         
-
-        virtual void setText(const wchar_t *text, bool expandAsNeeded);
+        /** \brief Callback from base class Widget */
         virtual void update(float dt);
+                
+        /**
+          * \brief Sets the text in the label.
+          *
+          * \note The change is permanent (if you visit the screen later this value will
+          *       be remembered, and the old value is lost).
+          *
+          * \note If you wish this label to scroll, set the scroll speed before
+          *       calling this function
+          *
+          * \param text           The string to use as text for this widget.
+          * \param expandAsNeeded If true, the label will resize itself in case that it's
+          *                       too small to contain \c text.
+          */
+        virtual void setText(const wchar_t *text, bool expandAsNeeded);
         
-        // --------------------------------------------------------------------
         /** Overloaded function which takes a stringw. */
         virtual void setText(const irr::core::stringw &s, bool expandAsNeeded) 
         {
@@ -67,9 +89,15 @@ namespace GUIEngine
         // --------------------------------------------------------------------
         
         /** Sets horizontal scroll speed. */
-        void    setScrollSpeed(float speed);
+        void setScrollSpeed(float speed);
         
         // --------------------------------------------------------------------
+        
+        /** 
+          * \brief Check if the current has been fully scrolled
+          * \return true if the text has completely scrolled off
+          * \precondition May only be called after this widget has been add()ed
+          */
         bool scrolledOff() const;
 
     };

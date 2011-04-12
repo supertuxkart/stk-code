@@ -148,11 +148,9 @@ void IconButtonWidget::add()
     if (m_tab_stop) m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 }
+
 // -----------------------------------------------------------------------------
-/** \precondition At the moment, the new texture must have the same aspct ratio
-  *               as the previous one since the object will not be modified
-  *               modified to fit a different aspect ratio
-  */
+
 void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathType)
 {
     if (pathType != ICON_PATH_TYPE_NO_CHANGE)
@@ -180,11 +178,9 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
 }
+
 // -----------------------------------------------------------------------------
-/** \precondition At the moment, the new texture must have the same aspct ratio
- *                as the previous one since the object will not
- *                be modified to fit a different aspect ratio
- */
+
 void IconButtonWidget::setImage(ITexture* texture)
 {
     if (texture != NULL)
@@ -203,7 +199,6 @@ void IconButtonWidget::setImage(ITexture* texture)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabel(stringw new_label)
 {
-    // FIXME: does not update m_text. Is this a behaviour we want?
     if (m_label == NULL) return;
     
     m_label->setText( new_label.c_str() );

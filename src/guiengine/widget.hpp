@@ -388,19 +388,32 @@ namespace GUIEngine
          * \{
          */
         
-        /** A map that holds values for all specified widget properties (in the XML file)*/
+        /**
+          * A map that holds values for all specified widget properties (in the XML file)
+          *
+          * \note Changing any of these properties will only take effect the next time
+          *       this widget is add()ed.
+          * \note Not all widgets use all properties, some widgets may ignore some properties.
+          */
         std::map<Property, std::string> m_properties;
         
         /** 
           * Sets the text of a widget from a wchar_t.
           * Handy for many constant strings used in stk.
+          *
+          * \note Not all widgets use strings, so some widgets may ignore this text property
+          * \note Changing the text property will only take effect the next time this widget
+          *       is add()ed
           */
         virtual void setText(const wchar_t *s);
   
         /** 
           * Sets the text of a widget from a stringw.
-          *  \note This mehtod uses the virtual setText(wchar_t*) function, so only the latter
-          *  needs to be overwritten by other classes.
+          * \note This method uses the virtual setText(wchar_t*) function, so only the latter
+          *       needs to be overwritten by other classes.
+          * \note Not all widgets use strings, so some widgets may ignore this text property
+          * \note Changing the text property will only take effect the next time this widget
+          *       is add()ed
           */
         virtual void setText(const irr::core::stringw &s) { setText(s.c_str()); }
 
@@ -410,7 +423,10 @@ namespace GUIEngine
         /** \return Type of this widget */
         WidgetType getType() const { return m_type; }
         
-        /** Get the irrlicht widget ID attributed to this widget */
+        /**
+          * Get the irrlicht widget ID attributed to this widget
+          * \precondition Only call this method after the widget has been add()ed
+          */
         int getID() const { return m_id; }
 
         /** Get whether this object is allowed to receive focus */

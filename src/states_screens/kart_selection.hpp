@@ -102,6 +102,8 @@ public:
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
+    virtual void beforeAddingWidget();
+    
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
     

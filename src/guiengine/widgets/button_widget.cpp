@@ -44,6 +44,9 @@ void ButtonWidget::add()
 
 void ButtonWidget::setLabel(const irr::core::stringw &label)
 {
+    // This method should only be called AFTER a widget is added
+    assert(m_element != NULL);
+    
     m_element->setText( label.c_str() );
     setText(label);
 }

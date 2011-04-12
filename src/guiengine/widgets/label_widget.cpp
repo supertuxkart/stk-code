@@ -30,9 +30,7 @@ using namespace irr::gui;
 using namespace irr;
 
 // ----------------------------------------------------------------------------
-/** Constructs the label widget. Parameter:
- *  \param title True if the special title font should be used.
- */
+
 LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
 {
     m_title_font   = title;
@@ -120,14 +118,12 @@ void LabelWidget::add()
 }   // add
 
 // ----------------------------------------------------------------------------
-/** Sets the text. This is the function used by overloaded functions
- *  as well.
- *  It is important that the scrolling speed (if any) is set before
- *  calling this function!
- *  \param text The string to use as text for this widget.
- */
+
 void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
 {
+    // This method can only be called AFTER the widget was add()ed
+    assert(m_element != NULL);
+    
     m_scroll_offset = 0;
     
     if (expandIfNeeded)
@@ -168,16 +164,17 @@ void LabelWidget::update(float dt)
     }
 }   // update
 // ----------------------------------------------------------------------------
-/** Returns true if the text has completely scrolled off. This is detected
- *  by checking if the remaining text is empty.
- */
+
 bool LabelWidget::scrolledOff() const
 {
+    // This method may only be called after this widget has been add()ed
+    assert(m_element != NULL);
+    
     return m_scroll_offset <= -m_element->getAbsolutePosition().getWidth();
 }
 
 // ----------------------------------------------------------------------------
-/** Sets horizontal scroll speed. */
+
 void LabelWidget::setScrollSpeed(float speed)
 {
     //m_scroll_offset = 0;
