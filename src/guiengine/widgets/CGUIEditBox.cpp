@@ -12,6 +12,7 @@
 //#include "os.h"
 #include "Keycodes.h"
 
+#include "graphics/irr_driver.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -923,17 +924,24 @@ void CGUIEditBox::draw()
 			startPos = BrokenTextPositions[cursorLine];
 		}
 		s = txtLine->subString(0,CursorPos-startPos);
-		charcursorpos = font->getDimension(s.c_str()).Width +
+		charcursorpos = font->getDimension(s.c_str()).Width ; //==+
 			font->getKerningWidth(L"_", CursorPos-startPos > 0 ? &((*txtLine)[CursorPos-startPos-1]) : 0);
 
 		if (focus && (getTime() - BlinkStartTime) % 2 == 0 && !m_rtl)
 		{
-			setTextRect(cursorLine);
-			CurrentTextRect.UpperLeftCorner.X += charcursorpos;
+			//setTextRect(cursorLine);
+			//CurrentTextRect.UpperLeftCorner.X += charcursorpos;
 
+            core::rect< s32 > caret_rect = CurrentTextRect;
+            caret_rect.UpperLeftCorner.X += charcursorpos - 1;
+            caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
+            irr_driver->getVideoDriver()->draw2DRectangle( video::SColor(255,0,0,0), caret_rect );
+            
+            /*
 			font->draw(L"_", CurrentTextRect,
 				OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
 				false, true, &localClipRect);
+             */
 		}
 	}
 
