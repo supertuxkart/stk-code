@@ -856,37 +856,6 @@ void KartSelectionScreen::loadedFromFile()
     assert( tabs != NULL );
     
     m_last_widget = tabs;
-    tabs->clearAllChildren();
-    
-    const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
-    const int group_amount = groups.size();
-    
-    // add default group first
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] == DEFAULT_GROUP_NAME)
-        {
-            //FIXME: group name not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
-            break;
-        }
-    }   // for n<group_amount
-    
-    // add others after
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] != DEFAULT_GROUP_NAME)
-        {
-            //FIXME: group name not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
-        }
-    }   // for n<group_amount
-    
-    if (group_amount > 1)
-    {
-        //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
-    }
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------- 

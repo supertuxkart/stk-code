@@ -76,7 +76,8 @@ namespace GUIEngine
           *
           * \param text           The string to use as text for this widget.
           * \param expandAsNeeded If true, the label will resize itself in case that it's
-          *                       too small to contain \c text.
+          *                       too small to contain \c text. Note that this option may
+          *                       only be passed after the widget has been add()ed.
           */
         virtual void setText(const wchar_t *text, bool expandAsNeeded);
         

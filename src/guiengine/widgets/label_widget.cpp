@@ -121,13 +121,12 @@ void LabelWidget::add()
 
 void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
 {
-    // This method can only be called AFTER the widget was add()ed
-    assert(m_element != NULL);
-    
     m_scroll_offset = 0;
     
     if (expandIfNeeded)
     {
+        assert(m_element != NULL);
+        
         const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
         
