@@ -71,7 +71,7 @@ namespace GUIEngine
           *
           * \note  the list widget does NOT take ownership of the bank, dso you must delete it when
           *        you're done with it (but do not delete it when the list widget is still active)
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void setIcons(irr::gui::STKModifiedSpriteBank* icons);
         
@@ -82,32 +82,32 @@ namespace GUIEngine
          * \brief add an item to the list
          * \param name   user-visible, potentially translated, name of the item
          * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
-         * \precondition may only be called after the widget has been added to the screen with add()
+         * \pre may only be called after the widget has been added to the screen with add()
          */
         void addItem(const std::string& internal_name, 
                      const irr::core::stringw &name, const int icon=-1);
         
         /**
           * \brief erases all items in the list
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void clear();
         
         /**
           * \return the number of items in the list
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         int getItemCount() const;
         
         /**
           * \return the index of the selected element within the list, or -1 if none
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         int getSelectionID() const;
         
         /**
           * \return the text of the selected item
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         std::string getSelectionInternalName();
         
@@ -121,19 +121,19 @@ namespace GUIEngine
         /**
           * \brief change the selected item
           * \param index the index of the element to select within the list, or -1 to select nothing
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void setSelectionID(const int index);
         
         /**
           * \brief rename an item and/or change its icon based on its ID
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void renameItem(const int itemID, const irr::core::stringw newName, const int icon=-1);
         
         /**
           * \brief rename an item and/or change its icon based on its internal name
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void renameItem(const std::string internalName, const irr::core::stringw newName,
                         const int icon=-1)
@@ -145,13 +145,13 @@ namespace GUIEngine
         
         /**
           * \brief Make an item red to mark an error, for instance
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */
         void markItemRed(const int id);
         
         /**
           * \brief Make an item red to mark an error, for instance
-          * \precondition may only be called after the widget has been added to the screen with add()
+          * \pre may only be called after the widget has been added to the screen with add()
           */        
         void markItemRed(const std::string internalName)
         {

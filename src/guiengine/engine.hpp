@@ -95,7 +95,7 @@ namespace GUIEngine
     
     /**
       * \brief               Call this method to init the GUI engine.
-      * \precondition        A irrlicht device and its corresponding video drivers must have been created
+      * \pre        A irrlicht device and its corresponding video drivers must have been created
       * \param device        An initialized irrlicht device object
       * \param driver        An initialized irrlicht driver object
       * \param state_manager An instance of a class derived from abstract base AbstractStateManager
@@ -151,7 +151,7 @@ namespace GUIEngine
     void clearScreenCache();
     
     /**
-      * \precondition GUIEngine::init must have been called first
+      * \pre GUIEngine::init must have been called first
       * \return       the skin object used to render widgets
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
@@ -168,7 +168,7 @@ namespace GUIEngine
     int   getSmallFontHeight();
     
     /**
-      * \precondition the value returned by this function is only valid when invoked from GUIEngine::render
+      * \pre the value returned by this function is only valid when invoked from GUIEngine::render
       * \return the time delta between the last two frames
       */
     float getLatestDt();

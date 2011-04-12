@@ -181,7 +181,7 @@ namespace GUIEngine
         /** 
           * \brief callback invoked when loading this menu
           *
-          * \precondition Children widgets of this menu have been created by the time this callback
+          * \pre Children widgets of this menu have been created by the time this callback
           *               is invoked.
           * \note this method is not called everytime the screen is shown. Screen::init is.
           *       use this method for persistent setup code (namely, that deals with settupping

@@ -209,7 +209,7 @@ public:
           * \param mesh_location    Location of each fo these meshes
           * \param model_frames     For animated meshes, which frame to use (value can be -1 to set none)
           *                         When frame is not -1, the corresponding IMesh must be an IAnimatedMesh.
-          * \precondition           The 3 vectors have the same size.
+          * \pre           The 3 vectors have the same size.
           */
         void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh, 
                            AlignedArray<Vec3>& mesh_location,

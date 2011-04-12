@@ -425,7 +425,7 @@ namespace GUIEngine
         
         /**
           * Get the irrlicht widget ID attributed to this widget
-          * \precondition Only call this method after the widget has been add()ed
+          * \pre Only call this method after the widget has been add()ed
           */
         int getID() const { return m_id; }
 

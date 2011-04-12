@@ -46,7 +46,7 @@ namespace GUIEngine
         
         /** 
           * \brief Change the label on the button
-          * \precondition This should only be called after a widget has been add()ed (changing the label
+          * \pre This should only be called after a widget has been add()ed (changing the label
           *               before the widget is added can be done by editing the 'text' property of Widget).
           */
         void setLabel(const irr::core::stringw &label);

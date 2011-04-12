@@ -85,14 +85,14 @@ namespace GUIEngine
           *        visited, the previous label will be back. For a permanent change, edit the 'text'
           *        property in the base Widget class).
           *
-          * \precondition Must be called after this widget is add()ed to have any effect
+          * \pre Must be called after this widget is add()ed to have any effect
           * \note         Calling this method on a button without label will have no effect
           */
         void setLabel(irr::core::stringw new_label);
         
         /**
          * Change the texture used for this icon.
-         * \precondition At the moment, the new texture must have the same aspct ratio
+         * \pre At the moment, the new texture must have the same aspct ratio
          *                as the previous one since the object will not
          *                be resized to fit a different aspect ratio.
          * \note May safely be called no matter if the widget is add()ed or not
@@ -101,7 +101,7 @@ namespace GUIEngine
         
         /**
           * Change the texture used for this icon.
-          * \precondition At the moment, the new texture must have the same aspct ratio
+          * \pre At the moment, the new texture must have the same aspct ratio
           *                as the previous one since the object will not
           *                be resized to fit a different aspect ratio.
           * \note May safely be called no matter if the widget is add()ed or not

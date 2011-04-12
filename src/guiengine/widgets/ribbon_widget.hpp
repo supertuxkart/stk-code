@@ -125,7 +125,7 @@ namespace GUIEngine
           * \brief This method can be used to rename an item.
           * Has no effect for ribbons without individual labels.
           *
-          * \precondition Must be called after the ribbon was add()ed
+          * \pre Must be called after the ribbon was add()ed
           * \param id The index of the item to rename, in range [0 .. item count - 1]
           */
         void setLabel(const int id, irr::core::stringw new_name);
@@ -134,15 +134,15 @@ namespace GUIEngine
         int findItemNamed(const char* internalName);
         
         /** \brief        dynamically (at runtime) add a text item to this ribbon
-          * \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
-          * \precondition only valid for ribbons that take text-only contents (e.g. tab bars)
+          * \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
+          * \pre only valid for ribbons that take text-only contents (e.g. tab bars)
           */
         void addTextChild(const wchar_t* text, const std::string id);
         
         
         /** \brief        dynamically (at runtime) add an icon item to this ribbon
-         *  \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
-         *  \precondition only valid for ribbons that take icon contents
+         *  \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
+         *  \pre only valid for ribbons that take icon contents
          */
         void addIconChild(const wchar_t* text, const std::string id,
                           const int w, const int h, const std::string icon,
@@ -150,7 +150,7 @@ namespace GUIEngine
     
         /**
           * \brief clear all children of this ribbon (likely because new ones will be added soon after)
-          * \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
+          * \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
           */
         void clearAllChildren();
         

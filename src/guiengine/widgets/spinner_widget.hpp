@@ -106,7 +106,7 @@ namespace GUIEngine
         
         /**
           * \brief        sets the current value of the spinner
-          * \precondition the 'new_value' string passed must be the name of an item
+          * \pre the 'new_value' string passed must be the name of an item
           *               (added through SpinnerWidget::addLabel)in the spinner
           */
         void setValue(irr::core::stringw new_value);

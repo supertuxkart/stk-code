@@ -97,7 +97,7 @@ namespace GUIEngine
         /** 
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
-          * \precondition May only be called after this widget has been add()ed
+          * \pre May only be called after this widget has been add()ed
           */
         bool scrolledOff() const;
 
