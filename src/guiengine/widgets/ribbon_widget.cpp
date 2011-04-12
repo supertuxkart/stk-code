@@ -513,7 +513,13 @@ const std::string& RibbonWidget::getSelectionIDString(const int playerID)
     static std::string empty;
     if (m_selection[playerID] == -1) return empty;
     if (m_children.size() == 0)      return empty;
-    
+
+    // This can happen if an addon is removed, which causes a tab group
+    // to be removed. If this tab group was previously selected, an
+    // invalid array element would be accessed. In this case just pretend
+    // that the first child was selected previously.
+    if(m_selection[playerID]>=m_children.size())
+        return m_children[0].m_properties[PROP_ID];
     return m_children[m_selection[playerID]].m_properties[PROP_ID];
 }
 
