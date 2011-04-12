@@ -511,6 +511,11 @@ namespace GUIEngine
         /**
           * \brief removes and deletes the child with the given PROP_ID
           * \param id PROP_ID property of the child to remove
+          *
+          * \note  If the widget has been add()ed, it is moved immediately;
+          *        if the widget is not currently visible, it will take the
+          *        new position next time it is add()ed.
+          *
           * \return whether deletion was successful
           */
         bool deleteChild(const char* id);

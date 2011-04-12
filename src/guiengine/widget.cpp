@@ -298,7 +298,8 @@ void Widget::move(const int x, const int y, const int w, const int h)
     m_w = w;
     m_h = h;
     
-    m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
+    if (m_element != NULL)
+        m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
 }
 
 // -----------------------------------------------------------------------------
