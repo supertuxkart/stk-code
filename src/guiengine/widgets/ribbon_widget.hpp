@@ -28,12 +28,12 @@
 
 namespace GUIEngine
 {
-
+    /** Types of ribbons */
     enum RibbonType
     {
-        RIBBON_COMBO, /* select one item out of many, like in a combo box */
-        RIBBON_TOOLBAR, /* a row of individual buttons */
-        RIBBON_TABS /* a tab bar */
+        RIBBON_COMBO,   //!< select one item out of many, like in a combo box
+        RIBBON_TOOLBAR, //!< a row of individual buttons
+        RIBBON_TABS     //!< a tab bar
     };
 
     /** \brief A static text/icons/tabs bar widget.
@@ -103,7 +103,7 @@ namespace GUIEngine
           * You may call this with the listener parameter set to NULL to remove the listener. */
         void setListener(IRibbonListener* listener) { m_listener = listener; }
         
-        /** Returns the type of this ribbon (see guiengine/engine.hpp for detailed descriptions) */
+        /** Returns the type of this ribbon (see the GUI module overview page for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         
         /** Returns the numerical ID of the selected item within the ribbon */

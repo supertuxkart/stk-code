@@ -279,6 +279,15 @@ namespace GUIEngine
                it instead of creating a new ID if it is. In practice, it's not widely implemented (FIXME) */
         int m_reserved_id;
         
+        /**
+         * A map that holds values for all specified widget properties (in the XML file)
+         *
+         * \note Changing any of these properties will only take effect the next time
+         *       this widget is add()ed.
+         * \note Not all widgets use all properties, some widgets may ignore some properties.
+         */
+        std::map<Property, std::string> m_properties;
+        
         Widget(WidgetType type, bool reserve_id = false);
         virtual ~Widget();
         
@@ -382,20 +391,11 @@ namespace GUIEngine
 
         /**
          * \name Get and set properties
+         * \{
          * Note that many properties are read only by the Widget::add method; so, while
          * it will generally work to set the properties before add() is called, modifying
          * the widget after it was added will require other widget-specific calls.
-         * \{
          */
-        
-        /**
-          * A map that holds values for all specified widget properties (in the XML file)
-          *
-          * \note Changing any of these properties will only take effect the next time
-          *       this widget is add()ed.
-          * \note Not all widgets use all properties, some widgets may ignore some properties.
-          */
-        std::map<Property, std::string> m_properties;
         
         /** 
           * Sets the text of a widget from a wchar_t.
