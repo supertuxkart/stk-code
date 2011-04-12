@@ -290,7 +290,8 @@ int handleCmdLinePreliminary(int argc, char **argv)
             cmdLineHelp(argv[0]);
             exit(0);
         }
-        else if(!strcmp(argv[i], "--gamepad-visualisation"))
+        else if(!strcmp(argv[i], "--gamepad-visualisation") ||
+                !strcmp(argv[i], "--gamepad-visualization")   )
         {
             UserConfigParams::m_gamepad_visualisation=true;
         }
