@@ -9,9 +9,7 @@
     
     <textbox id="textfield" width="75%" I18N="In the 'add new player' dialog" align="center"/>
 
-    <label id="preview" width="75%" align="center" text="" />
-    
-    <spacer height="10" width="20" />
+    <spacer height="20" width="20" />
     
     <!-- TODO: ok button? -->
     

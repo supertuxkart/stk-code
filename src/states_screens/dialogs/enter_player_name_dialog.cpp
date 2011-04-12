@@ -42,7 +42,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     
-    if (translations->isRTLLanguage()) textCtrl->addListener(this);
+    //if (translations->isRTLLanguage()) textCtrl->addListener(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -57,6 +57,7 @@ EnterPlayerNameDialog::~EnterPlayerNameDialog()
 
 // -----------------------------------------------------------------------------
 
+/*
 void EnterPlayerNameDialog::onTextUpdated()
 {
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
@@ -64,7 +65,7 @@ void EnterPlayerNameDialog::onTextUpdated()
     
     lbl->setText( core::stringw(translations->fribidize(textCtrl->getText())), false );
 }
-
+*/
 // -----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::string& eventSource)

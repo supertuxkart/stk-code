@@ -20,7 +20,7 @@ using namespace gui;
 
 		//! constructor
 		CGUIEditBox(const wchar_t* text, bool border, IGUIEnvironment* environment,
-			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle);
+			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool is_rtl);
 
 		//! destructor
 		virtual ~CGUIEditBox();
@@ -146,6 +146,8 @@ using namespace gui;
 		s32 HScrollPos, VScrollPos; // scroll position in characters
 		u32 Max;
 
+        bool m_rtl;
+        
 		bool WordWrap, MultiLine, AutoScroll, PasswordBox;
 		wchar_t PasswordChar;
 		EGUI_ALIGNMENT HAlign, VAlign;

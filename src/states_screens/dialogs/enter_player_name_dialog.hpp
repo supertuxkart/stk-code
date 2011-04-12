@@ -33,7 +33,7 @@ namespace GUIEngine
  * \brief Dialog that allows the player to enter the name for a new player
  * \ingroup states_screens
  */
-class EnterPlayerNameDialog : public GUIEngine::ModalDialog, public GUIEngine::ITextBoxWidgetListener
+class EnterPlayerNameDialog : public GUIEngine::ModalDialog//, public GUIEngine::ITextBoxWidgetListener
 {
     
 public:
@@ -46,7 +46,7 @@ public:
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
-    virtual void onTextUpdated();
+    //virtual void onTextUpdated();
 };
 
 #endif

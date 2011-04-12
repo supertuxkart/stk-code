@@ -12,6 +12,8 @@
 //#include "os.h"
 #include "Keycodes.h"
 
+#include "utils/translation.hpp"
+
 /*
 	todo:
 	optional scrollbars
@@ -32,7 +34,7 @@ u32 getTime()
 //! constructor
 CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 		IGUIEnvironment* environment, IGUIElement* parent, s32 id,
-		const core::rect<s32>& rectangle)
+		const core::rect<s32>& rectangle, bool is_rtl)
 	: IGUIEditBox(environment, parent, id, rectangle), MouseMarking(false),
 	Border(border), OverrideColorEnabled(false), MarkBegin(0), MarkEnd(0),
 	OverrideColor(video::SColor(101,255,255,255)), OverrideFont(0), LastBreakFont(0),
@@ -41,6 +43,8 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 	PasswordChar(L'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
 	CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
+    m_rtl = is_rtl;
+    
 	#ifdef _DEBUG
 	setDebugName("CGUIEditBox");
 	#endif
@@ -307,6 +311,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				}
 			}
 			break;
+                
 		case KEY_KEY_V:
 			if ( !isEnabled() )
 				break;
@@ -358,34 +363,40 @@ bool CGUIEditBox::processKey(const SEvent& event)
 			}
 			break;
 		case KEY_HOME:
-			// move/highlight to start of text
-			if (event.KeyInput.Shift)
-			{
-				newMarkEnd = CursorPos;
-				newMarkBegin = 0;
-				CursorPos = 0;
-			}
-			else
-			{
-				CursorPos = 0;
-				newMarkBegin = 0;
-				newMarkEnd = 0;
-			}
+            if (!m_rtl)
+            {
+                // move/highlight to start of text
+                if (event.KeyInput.Shift)
+                {
+                    newMarkEnd = CursorPos;
+                    newMarkBegin = 0;
+                    CursorPos = 0;
+                }
+                else
+                {
+                    CursorPos = 0;
+                    newMarkBegin = 0;
+                    newMarkEnd = 0;
+                }
+            }
 			break;
 		case KEY_END:
-			// move/highlight to end of text
-			if (event.KeyInput.Shift)
-			{
-				newMarkBegin = CursorPos;
-				newMarkEnd = Text.size();
-				CursorPos = 0;
-			}
-			else
-			{
-				CursorPos = Text.size();
-				newMarkBegin = 0;
-				newMarkEnd = 0;
-			}
+            if (!m_rtl)
+            {
+                // move/highlight to end of text
+                if (event.KeyInput.Shift)
+                {
+                    newMarkBegin = CursorPos;
+                    newMarkEnd = Text.size();
+                    CursorPos = 0;
+                }
+                else
+                {
+                    CursorPos = Text.size();
+                    newMarkBegin = 0;
+                    newMarkEnd = 0;
+                }
+            }
 			break;
 		default:
 			return false;
@@ -395,8 +406,36 @@ bool CGUIEditBox::processKey(const SEvent& event)
 	else
 	switch(event.KeyInput.Key)
 	{
+            /*
+        case KEY_KEY_Q:
+            inputChar(L'\u05DC');
+            textChanged = true;
+            return true;
+        case KEY_KEY_W:
+            inputChar(L'\u05DB');
+            textChanged = true;
+            return true;
+        case KEY_KEY_E:
+            inputChar(L'\u05DA');
+            textChanged = true;
+            return true;
+        case KEY_KEY_R:
+            inputChar(L'\u05D9');
+            textChanged = true;
+            return true;
+        case KEY_KEY_T:
+            inputChar(L'\u05D8');
+            textChanged = true;
+            return true;
+        case KEY_KEY_Y:
+            inputChar(L'\u05D7');
+            textChanged = true;
+            return true;
+            */
+            
 	case KEY_END:
-		{
+		if (!m_rtl)
+        {
 			s32 p = Text.size();
 			if (WordWrap || MultiLine)
 			{
@@ -423,6 +462,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 		}
 		break;
 	case KEY_HOME:
+        if (!m_rtl)
 		{
 
 			s32 p = 0;
@@ -459,46 +499,51 @@ bool CGUIEditBox::processKey(const SEvent& event)
 		}
 		break;
 	case KEY_LEFT:
+        if (!m_rtl)
+        {
+            if (event.KeyInput.Shift)
+            {
+                if (CursorPos > 0)
+                {
+                    if (MarkBegin == MarkEnd)
+                        newMarkBegin = CursorPos;
 
-		if (event.KeyInput.Shift)
-		{
-			if (CursorPos > 0)
-			{
-				if (MarkBegin == MarkEnd)
-					newMarkBegin = CursorPos;
+                    newMarkEnd = CursorPos-1;
+                }
+            }
+            else
+            {
+                newMarkBegin = 0;
+                newMarkEnd = 0;
+            }
 
-				newMarkEnd = CursorPos-1;
-			}
-		}
-		else
-		{
-			newMarkBegin = 0;
-			newMarkEnd = 0;
-		}
-
-		if (CursorPos > 0) CursorPos--;
-		BlinkStartTime = getTime();
+            if (CursorPos > 0) CursorPos--;
+            BlinkStartTime = getTime();
+        }
 		break;
 
 	case KEY_RIGHT:
-		if (event.KeyInput.Shift)
-		{
-			if (Text.size() > (u32)CursorPos)
-			{
-				if (MarkBegin == MarkEnd)
-					newMarkBegin = CursorPos;
+        if (!m_rtl)
+        {
+            if (event.KeyInput.Shift)
+            {
+                if (Text.size() > (u32)CursorPos)
+                {
+                    if (MarkBegin == MarkEnd)
+                        newMarkBegin = CursorPos;
 
-				newMarkEnd = CursorPos+1;
-			}
-		}
-		else
-		{
-			newMarkBegin = 0;
-			newMarkEnd = 0;
-		}
+                    newMarkEnd = CursorPos+1;
+                }
+            }
+            else
+            {
+                newMarkBegin = 0;
+                newMarkEnd = 0;
+            }
 
-		if (Text.size() > (u32)CursorPos) CursorPos++;
-		BlinkStartTime = getTime();
+            if (Text.size() > (u32)CursorPos) CursorPos++;
+            BlinkStartTime = getTime();
+        }
 		break;
 	case KEY_UP:
 		if (MultiLine || (WordWrap && BrokenText.size() > 1) )
@@ -804,11 +849,20 @@ void CGUIEditBox::draw()
 				}
 
 
-				// draw normal text
-				font->draw(txtLine->c_str(), CurrentTextRect,
-					OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-					false, true, &localClipRect);
-
+                if (m_rtl)
+                {
+                    font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
+                               OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                               false, true, &localClipRect);
+                }
+                else
+                {
+                    // draw normal text
+                    font->draw(txtLine->c_str(), CurrentTextRect,
+                        OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                        false, true, &localClipRect);
+                }
+                
 				// draw mark and marked text
 				if (focus && MarkBegin != MarkEnd && i >= hlineStart && i < hlineStart + hlineCount)
 				{
@@ -873,7 +927,7 @@ void CGUIEditBox::draw()
 		charcursorpos = font->getDimension(s.c_str()).Width +
 			font->getKerningWidth(L"_", CursorPos-startPos > 0 ? &((*txtLine)[CursorPos-startPos-1]) : 0);
 
-		if (focus && (getTime() - BlinkStartTime) % 700 < 350)
+		if (focus && (getTime() - BlinkStartTime) % 700 < 350 && !m_rtl)
 		{
 			setTextRect(cursorLine);
 			CurrentTextRect.UpperLeftCorner.X += charcursorpos;
@@ -961,7 +1015,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 	switch(event.MouseInput.Event)
 	{
 	case irr::EMIE_LMOUSE_LEFT_UP:
-		if (Environment->hasFocus(this))
+		if (Environment->hasFocus(this) && !m_rtl)
 		{
 			CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
 			if (MouseMarking)
@@ -994,7 +1048,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 			calculateScrollPos();
 			return true;
 		}
-		else
+		else if (!m_rtl)
 		{
 			if (!AbsoluteClippingRect.isPointInside(
 				core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))

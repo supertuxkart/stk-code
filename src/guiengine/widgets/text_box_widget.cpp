@@ -21,6 +21,7 @@
 
 #include "guiengine/widgets/CGUIEditBox.h"
 #include "utils/ptr_vector.hpp"
+#include "utils/translation.hpp"
 
 using namespace irr;
 
@@ -32,8 +33,9 @@ public:
     
     MyCGUIEditBox(const wchar_t* text, bool border, gui::IGUIEnvironment* environment,
                  gui:: IGUIElement* parent, s32 id, const core::rect<s32>& rectangle) :
-        CGUIEditBox(text, border, environment, parent, id, rectangle)
+        CGUIEditBox(text, border, environment, parent, id, rectangle, translations->isRTLLanguage())
     {
+        if (translations->isRTLLanguage()) setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_CENTER);
     }
     
     void addListener(GUIEngine::ITextBoxWidgetListener* listener)
