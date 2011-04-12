@@ -535,6 +535,11 @@
  currently added to the screen). Of course, in some circumstances, the check can be skipped because the
  widget is known to be currently visible.
  
+ VERY IMPORTANT: some methods should only be called before Screen::init, and some methods should only be
+ called after Screen::init. Unfortunately the documentation does not always make this clear at this point :(
+ A good hint is that methods that make calls on a IGUIElement* need to be called after init(), the others
+ needs to be called before.
+ 
  
  \subsection Screen Screen
  
