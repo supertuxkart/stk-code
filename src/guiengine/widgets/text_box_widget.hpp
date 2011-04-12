@@ -27,6 +27,13 @@
 
 namespace GUIEngine
 {
+    class ITextBoxWidgetListener
+    {
+    public:
+        virtual ~ITextBoxWidgetListener() {}
+        virtual void onTextUpdated() = 0;
+    };
+    
     /** \brief A text field widget. 
       * \ingroup widgets
       */
@@ -53,6 +60,9 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID);
         virtual void unfocused(const int playerID);
 
+        void addListener(ITextBoxWidgetListener* listener);
+        void clearListeners();
+        
         irr::core::stringw getText() const;
     };
 }

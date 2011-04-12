@@ -19,6 +19,52 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
+#include "guiengine/widgets/CGUIEditBox.h"
+#include "utils/ptr_vector.hpp"
+#include "utils/translation.hpp"
+
+using namespace irr;
+
+class MyCGUIEditBox : public CGUIEditBox
+{
+    PtrVector<GUIEngine::ITextBoxWidgetListener, REF> m_listeners;
+    
+public:
+    
+    MyCGUIEditBox(const wchar_t* text, bool border, gui::IGUIEnvironment* environment,
+                 gui:: IGUIElement* parent, s32 id, const core::rect<s32>& rectangle) :
+        CGUIEditBox(text, border, environment, parent, id, rectangle, translations->isRTLLanguage())
+    {
+        if (translations->isRTLLanguage()) setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_CENTER);
+    }
+    
+    void addListener(GUIEngine::ITextBoxWidgetListener* listener)
+    {
+        m_listeners.push_back(listener);
+    }
+    
+    void clearListeners()
+    {
+        m_listeners.clearWithoutDeleting();
+    }
+
+    virtual bool OnEvent(const SEvent& event)
+    {
+        bool out = CGUIEditBox::OnEvent(event);
+        
+        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
+        {
+            for (int n=0; n<m_listeners.size(); n++)
+            {
+                m_listeners[n].onTextUpdated();
+            }
+        }
+        
+        return out;
+    }
+    
+};
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -39,12 +85,31 @@ void TextBoxWidget::add()
     // Don't call TextBoxWidget::getText(), which assumes that the irrlicht
     // widget already exists. 
     const stringw& text = Widget::getText();
-    m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
-                                                   true /* border */, m_parent, getNewID());
+    
+    m_element = new MyCGUIEditBox(text.c_str(), true /* border */, GUIEngine::getGUIEnv(),
+                                  (m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement()),
+                                  getNewID(), widget_size);
+    
+    //m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
+    //                                               true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
     m_element->setTabStop(true);
+}
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::addListener(ITextBoxWidgetListener* listener)
+{
+    ((MyCGUIEditBox*)m_element)->addListener(listener);
+}
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::clearListeners()
+{
+    ((MyCGUIEditBox*)m_element)->clearListeners();
 }
 
 // -----------------------------------------------------------------------------

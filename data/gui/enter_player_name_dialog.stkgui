@@ -15,7 +15,7 @@
     
     <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
 
-    <spacer height="20" width="20" />
+    <spacer height="15" width="20" />
 
 </div>
 
