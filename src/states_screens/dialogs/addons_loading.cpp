@@ -116,6 +116,8 @@ void AddonsLoading::onUpdate(float delta)
         if(progress<0)
         {
             m_state->setText(_("Download failed.\n"), false);
+            // Avoid displaying '-100%' in case of an error.
+            m_progress->setVisible(false);
             m_back_button->setText(_("Back"));
             return;
         }
