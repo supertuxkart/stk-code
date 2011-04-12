@@ -13,6 +13,7 @@
 #include "Keycodes.h"
 
 #include "utils/translation.hpp"
+#include "utils/time.hpp"
 
 /*
 	todo:
@@ -26,9 +27,7 @@
 
 u32 getTime()
 {
-    // FIXME
-    return 0;
-    // os::Timer::getTime()
+    return Time::getTimeSinceEpoch();
 }
 
 //! constructor
@@ -927,7 +926,7 @@ void CGUIEditBox::draw()
 		charcursorpos = font->getDimension(s.c_str()).Width +
 			font->getKerningWidth(L"_", CursorPos-startPos > 0 ? &((*txtLine)[CursorPos-startPos-1]) : 0);
 
-		if (focus && (getTime() - BlinkStartTime) % 700 < 350 && !m_rtl)
+		if (focus && (getTime() - BlinkStartTime) % 2 == 0 && !m_rtl)
 		{
 			setTextRect(cursorLine);
 			CurrentTextRect.UpperLeftCorner.X += charcursorpos;
