@@ -464,13 +464,20 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
                            distance);
     const btTransform &trans=m_kart->getTrans();
     wanted_position = trans(relative_position);
-    if(smoothing)
+    if (smoothing)
+    {
         smoothMoveCamera(dt, wanted_position, wanted_target);
+    }
     else
     {
-        if(m_mode!=CM_FALLING)
+        if (m_mode!=CM_FALLING)
             m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
+        
+        if (race_manager->getNumLocalPlayers() < 2)
+        {
+            sfx_manager->positionListener(m_camera->getPosition(),  wanted_target - m_camera->getPosition());
+        }
     }
 
 }   // positionCamera
