@@ -39,6 +39,9 @@ struct Input
 {
     static const int MAX_VALUE = 32768;
     
+    static const int HAT_H_ID = 100;
+    static const int HAT_V_ID = 101;
+    
     enum AxisDirection
     {
         AD_NEGATIVE,
@@ -52,7 +55,7 @@ struct Input
         IT_KEYBOARD,
         IT_STICKMOTION,
         IT_STICKBUTTON,
-        IT_STICKHAT,
+        //IT_STICKHAT,
         IT_MOUSEMOTION,
         IT_MOUSEBUTTON
     };

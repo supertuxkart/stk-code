@@ -159,7 +159,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
     
     if (type == Input::IT_STICKMOTION)
     {
-        if (id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
+        if (id >= m_axis_count && id != Input::HAT_H_ID && id != Input::HAT_V_ID) return false; // this gamepad doesn't even have that many axes
 
         if (player != NULL)
         {

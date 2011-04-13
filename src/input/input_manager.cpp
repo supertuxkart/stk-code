@@ -331,17 +331,6 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
         break;
         }
 
-        case Input::IT_STICKHAT:
-            if (value > Input::MAX_VALUE/2)
-            {
-                Input sensed_input;
-                sensed_input.m_type           = Input::IT_STICKHAT;
-                sensed_input.m_device_id      = deviceID;
-                sensed_input.m_button_id      = button;
-                sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
-                break;
-            }
         case Input::IT_NONE:
         case Input::IT_MOUSEMOTION:
         case Input::IT_MOUSEBUTTON:
@@ -525,8 +514,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
             // early menus where we accept every input because players are not set-up yet
             if (m_master_player_only && player == NULL)
             {
-                if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON ||
-                    type == Input::IT_STICKHAT)
+                if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
                 {
                     GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(deviceID);
 
@@ -621,9 +609,26 @@ EventPropagation InputManager::input(const SEvent& event)
                        event.JoystickEvent.Joystick, axis_id, value);
             }
 
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_NEUTRAL, value);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id,
+                          Input::AD_NEUTRAL, value);
         }
-
+        
+        if (event.JoystickEvent.POV == 65535)
+        {
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_H_ID, Input::AD_NEUTRAL,
+                          0);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_V_ID, Input::AD_NEUTRAL,
+                          0);
+        }
+        else
+        {
+            // *0.017453925f is to convert degrees to radians
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_H_ID, Input::AD_NEUTRAL,
+                          cos(event.JoystickEvent.POV*0.017453925f/100.0f)*Input::MAX_VALUE);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_V_ID, Input::AD_NEUTRAL,
+                          sin(event.JoystickEvent.POV*0.017453925f/100.0f)*Input::MAX_VALUE);
+        }
+        
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
 
         if (gp == NULL)

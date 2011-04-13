@@ -48,6 +48,73 @@ EventHandler::~EventHandler()
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
+    // TO DEBUG HATS (when you don't actually have a hat)
+    /*
+    if (event.EventType == EET_KEY_INPUT_EVENT)
+    {
+        if (event.KeyInput.Key == 'W')
+        {
+            printf("Sending hat up event %i\n", event.KeyInput.PressedDown);
+            SEvent evt2;
+            evt2.EventType = EET_JOYSTICK_INPUT_EVENT;
+            for (int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_AXES; n++)
+            {
+                evt2.JoystickEvent.Axis[n] = 0.0f;
+            }
+            evt2.JoystickEvent.ButtonStates = 0;
+            evt2.JoystickEvent.Joystick = 0;
+            evt2.JoystickEvent.POV = (event.KeyInput.PressedDown ? 0 : 65535); // 0 degrees
+            OnEvent(evt2);
+            return false;
+        }
+        else if (event.KeyInput.Key == 'D')
+        {
+            printf("Sending hat right event %i\n", event.KeyInput.PressedDown);
+            SEvent evt2;
+            evt2.EventType = EET_JOYSTICK_INPUT_EVENT;
+            for (int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_AXES; n++)
+            {
+                evt2.JoystickEvent.Axis[n] = 0.0f;
+            }
+            evt2.JoystickEvent.ButtonStates = 0;
+            evt2.JoystickEvent.Joystick = 0;
+            evt2.JoystickEvent.POV = (event.KeyInput.PressedDown ? 9000 : 65535); // 90 degrees
+            OnEvent(evt2);
+            return false;
+        }
+        else if (event.KeyInput.Key == 'S')
+        {
+            printf("Sending hat down event %i\n", event.KeyInput.PressedDown);
+            SEvent evt2;
+            evt2.EventType = EET_JOYSTICK_INPUT_EVENT;
+            for (int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_AXES; n++)
+            {
+                evt2.JoystickEvent.Axis[n] = 0.0f;
+            }
+            evt2.JoystickEvent.ButtonStates = 0;
+            evt2.JoystickEvent.Joystick = 0;
+            evt2.JoystickEvent.POV = (event.KeyInput.PressedDown ? 18000 : 65535); // 180 degrees
+            OnEvent(evt2);
+            return false;
+        }
+        else if (event.KeyInput.Key == 'A')
+        {
+            printf("Sending hat left event %i\n", event.KeyInput.PressedDown);
+            SEvent evt2;
+            evt2.EventType = EET_JOYSTICK_INPUT_EVENT;
+            for (int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_AXES; n++)
+            {
+                evt2.JoystickEvent.Axis[n] = 0.0f;
+            }
+            evt2.JoystickEvent.ButtonStates = 0;
+            evt2.JoystickEvent.Joystick = 0;
+            evt2.JoystickEvent.POV = (event.KeyInput.PressedDown ? 27000 : 65535); // 270 degrees
+            OnEvent(evt2);
+            return false;
+        }
+    }
+    */
+    
     if (event.EventType == EET_GUI_EVENT)
     {
         return onGUIEvent(event) == EVENT_BLOCK;

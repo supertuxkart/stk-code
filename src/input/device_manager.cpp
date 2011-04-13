@@ -338,7 +338,7 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     PlayerAction* action /* out */ )
 {
     InputDevice *device = NULL;
-
+    
     // If the input event matches a bind on an input device, get a pointer to the device
     switch (type)
     {
