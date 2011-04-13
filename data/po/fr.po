@@ -2,18 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2011-04-01 13:57+0000\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-06 16:26+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Language: French\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -1054,7 +1055,7 @@ msgstr "Regarder en arrière"
 
 #: src/items/powerup.cpp:81
 msgid "Magic, son. Nothing else in the world smells like that."
-msgstr "De la pure magie! Rien au monde n'a la même odeur."
+msgstr "La magie, fiston. Rien au monde ne sent comme ça."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -1566,7 +1567,7 @@ msgstr "SuperTuxKart peut être joué à plusieurs sur le même ordinateur"
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart contient plusieurs modes de jeu"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1989,7 +1990,7 @@ msgid "[none]"
 msgstr "[aucun]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "par"

@@ -7,17 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2011-01-24 13:13+0000\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-13 01:49+0000\n"
 "Last-Translator: Mantas Kriaučiūnas <mantas@akl.lt>\n"
 "Language-Team: Lithuanian <lt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr ""
 
@@ -29,12 +30,12 @@ msgstr ""
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:50
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 suvalgė per daug %1 pyragaičių"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 gavo puošnią kaukę iš %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:74
@@ -44,7 +45,7 @@ msgstr ""
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:52
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 netiki, kad %1 yra geras kepėjas"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:54
@@ -69,7 +70,7 @@ msgstr ""
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:72
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 pataikė į %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
@@ -148,7 +149,7 @@ msgstr ""
 #. I18N: in the help screen
 #: data/po/gui_strings.h:318
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "Valdymo klavišus galite pamatyti bei pakeisti nustatymuose"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -207,7 +208,7 @@ msgstr "Greitinimas"
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:60
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Pridėt klavišų nustatymus kitam žaidėjui"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
@@ -231,7 +232,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:457
 msgid "Addons"
-msgstr ""
+msgstr "Papildymai"
 
 #. I18N: ./data/karts/adiumy/kart.xml
 #: data/po/gui_strings.h:794
@@ -263,6 +264,8 @@ msgstr "Visos trasos"
 #: src/states_screens/race_setup_screen.cpp:198
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
+"Leidžiama viskas, taigi - rinkite ginklus bei kitus gerus dalykėlius ir juos "
+"naudokite tinkamai!"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
@@ -272,7 +275,7 @@ msgstr ""
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:359
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr ""
+msgstr "Inkaras - labai sulėtina pirmaujantį automobilį"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:289
@@ -284,19 +287,19 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:285
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Animuotas peizažas : %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:292
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "Glodinimas (anti-aliasing, įsijungia paleidus iš naujo) : %s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:602
 msgid "Apply new resolution"
-msgstr "Pritaikyti parinktą raišką"
+msgstr "Pritaikyt parinktą raišką"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:446
@@ -329,7 +332,7 @@ msgstr ""
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:167 data/po/gui_strings.h:779
 msgid "At World's End"
-msgstr ""
+msgstr "Pasaulio pakrašty"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -390,12 +393,12 @@ msgstr "Bananas? Dėžė? Bananas? Dėžė? Bananas? Dėžė?"
 #. I18N: ./data/karts/beagle/kart.xml
 #: data/po/gui_strings.h:797
 msgid "Beagle"
-msgstr ""
+msgstr "Biglis"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:251
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Sėkmės lenktyniaujant kitąkart!"
 
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
@@ -417,17 +420,19 @@ msgstr "Stabdymas"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:344
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr ""
+msgstr "Kramtomoji guma - palikite lipnią rožinę balutę už savęs"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:347
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
+"Кекс - бросается в ближайшего соперника. Лучше на близком расстоянии или "
+"длинной прямой."
 
 #: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Nepavyko prisijungti prie stkaddons serverio..."
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -470,7 +475,7 @@ msgstr "Užduotys-iššūkiai"
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:234
 msgid "Challenges : Trophy Room"
-msgstr ""
+msgstr "Užduotys : trofėjų kambarys"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -497,7 +502,7 @@ msgstr "Rink kurą savo raketai"
 #. I18N: ./data/challenges/tothemoonandback.challenge
 #: data/po/gui_strings.h:152 data/po/gui_strings.h:764
 msgid "Collect the Pharaohs Treasure"
-msgstr ""
+msgstr "Surinkite faraono brangenybes"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -522,7 +527,7 @@ msgstr "Patvirtinti pašalinimą"
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
 #, c-format
 msgid "Confirm resolution within %i seconds"
-msgstr "Patvirtinkite naują raišką per %i sek."
+msgstr "Patvirtinkite naują raišką (ankstesnė raiška atsistatys po %i sek.)"
 
 #: src/states_screens/race_setup_screen.cpp:205
 msgid "Contains no powerups, so only your driving skills matter!"
@@ -555,7 +560,7 @@ msgstr "Valdymas"
 #. I18N: ./data/tracks/canyon/track.xml
 #: data/po/gui_strings.h:2
 msgid "Coyote Canyon"
-msgstr ""
+msgstr "Kojotų tarpeklis"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
@@ -593,13 +598,13 @@ msgstr "Išjungti įrenginį"
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
 #: src/states_screens/options_screen_video.cpp:276
 msgid "Disabled"
-msgstr ""
+msgstr "Išjungta"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:567
 msgid "Display FPS"
-msgstr ""
+msgstr "Rodyti kadrų skaičių (FPS)"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -613,7 +618,7 @@ msgstr ""
 
 #: src/karts/controller/player_controller.cpp:282
 msgid "Don't accelerate before go"
-msgstr ""
+msgstr "Nepradėkite važiuoti prieš lenktynių startą"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:207
@@ -622,7 +627,7 @@ msgstr "Žemyn (rodyklė)"
 
 #: src/states_screens/dialogs/addons_loading.cpp:118
 msgid "Download failed.\n"
-msgstr ""
+msgstr "Atsisiųsti nepavyko.\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
 #: data/po/gui_strings.h:800
@@ -650,7 +655,7 @@ msgstr "Energija"
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
 #: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
-msgstr ""
+msgstr "Lietuvių"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -663,6 +668,8 @@ msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
 msgstr ""
+"Pranešimas visiems:\n"
+"Prie lenktynių prisijungsite paspaudę mygtuką „Šauti“!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -696,11 +703,15 @@ msgstr ""
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
+"Įveikite 3 trasos „Švyturys“ ratus per 1 min. 30 sek. lenktyniaudami su trim "
+"patyrusiais priešininkais."
 
 #. I18N: ./data/challenges/fortmagma.challenge
 #: data/po/gui_strings.h:101 data/po/gui_strings.h:713
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
+"Įveikite 3 trasos „Kasykla“ ratus per 3 min. lenktyniaudami su trim "
+"patyrusiais priešininkais."
 
 #. I18N: ./data/challenges/hacienda.challenge
 #: data/po/gui_strings.h:110 data/po/gui_strings.h:722
@@ -715,7 +726,7 @@ msgstr "Įveik trasą aplink švyturį per 1:30 min."
 #. I18N: ./data/challenges/fortmagma.challenge
 #: data/po/gui_strings.h:98 data/po/gui_strings.h:710
 msgid "Finish Mines in 3:00"
-msgstr ""
+msgstr "Įveikite trasą „Kasykla“ per 3 min."
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
 #: data/po/gui_strings.h:89 data/po/gui_strings.h:701
@@ -763,12 +774,12 @@ msgstr "Sek paskui pirmaujantį"
 #. I18N: ./data/challenges/lighthouse.challenge
 #: data/po/gui_strings.h:122 data/po/gui_strings.h:734
 msgid "Follow the Leader around the Solar System"
-msgstr ""
+msgstr "Važiuok paskui pirmaujantį lenktynėse aplink saulės sistemą"
 
 #. I18N: ./data/challenges/atworldsend.challenge
 #: data/po/gui_strings.h:74 data/po/gui_strings.h:686
 msgid "Follow the Leader on a Desert Island"
-msgstr ""
+msgstr "Važiuok paskui pirmaujantį trasoje „Negyvenama sala“"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -845,7 +856,7 @@ msgstr ""
 #. I18N: ./data/karts/gnu/kart.xml
 #: data/po/gui_strings.h:803
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #: src/states_screens/minimal_race_gui.cpp:114
 #: src/states_screens/race_gui.cpp:113
@@ -861,7 +872,7 @@ msgstr ""
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:666
 msgid "Grand Prix"
-msgstr ""
+msgstr "Čempionatai (Grand Prix)"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
@@ -877,11 +888,11 @@ msgstr "Vaizdo efektų nustatymai"
 #: src/states_screens/options_screen_players.cpp:67
 #: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:582
 msgid "Graphics"
-msgstr ""
+msgstr "Vaizdas"
 
 #: src/config/user_config.cpp:487
 msgid "Guest"
-msgstr ""
+msgstr "Svečias"
 
 #. I18N: ./data/tracks/hacienda/track.xml
 #: data/po/gui_strings.h:20
@@ -941,13 +952,13 @@ msgstr "Vidutiniokas"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:571
 msgid "Internet STK news"
-msgstr ""
+msgstr "Supertuxkart naujienos iš interneto"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
 #: data/po/gui_strings.h:186
 msgid "Karts"
-msgstr ""
+msgstr "Automobiliai"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
@@ -963,7 +974,7 @@ msgstr "Važiuok paskui pirmaujantį, bet jo nepralenk!"
 #: src/states_screens/options_screen_input.cpp:95
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Klaviatūra %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:812
@@ -1030,7 +1041,7 @@ msgstr ""
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:280
 msgid "Me Only"
-msgstr ""
+msgstr "Tik mano"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
@@ -1064,7 +1075,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:449
 msgid "Multiplayer Race"
-msgstr ""
+msgstr "Keleto žmonių lenktynės"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1077,7 +1088,7 @@ msgstr ""
 #: data/po/gui_strings.h:290 data/po/gui_strings.h:337
 #: data/po/gui_strings.h:381 data/po/gui_strings.h:423
 msgid "Multi­player"
-msgstr ""
+msgstr "Žaidimas keliems"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1098,7 +1109,7 @@ msgstr "Pavadinimas: %i"
 #: src/challenges/challenge.cpp:60
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Galėsite žaisti naują čempionatą (Grand Prix) „%s“"
 
 #: src/challenges/challenge.cpp:64
 #, c-format
@@ -1112,12 +1123,12 @@ msgstr "Naujas greičiausias ratas"
 #: src/challenges/challenge.cpp:50
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Galėsite žaisti nauju žaidimo būdu „%s“"
 
 #: src/challenges/challenge.cpp:74
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Galėsite žaisti nauju automobiliu „%s“"
 
 #: src/challenges/challenge.cpp:45
 #, c-format
@@ -1530,7 +1541,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart lenktynėse yra keli žaidimo būdai (režimai)"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1903,7 +1914,7 @@ msgid "[none]"
 msgstr "[nėra]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr ""

@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2010-12-20 13:17+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-07 19:02+0000\n"
+"Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:90
@@ -23,9 +23,10 @@ msgstr ""
 msgid "%s is practicing with a blue, big, spheric yo-yo"
 msgstr "O s% está a praticar num azul, grande e esférico yo-yo"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
-msgstr "   Este idioma será RTL?"
+msgstr "   N"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:43
@@ -35,7 +36,7 @@ msgstr "O %0 mordeu o isco de %1"
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:50
 msgid "%0 eats too much of %1's cake"
-msgstr "O %0 comeu demasiado bolo de %1"
+msgstr ""
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
@@ -666,7 +667,7 @@ msgstr "Energia"
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
 #: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
-msgstr ""
+msgstr "Português"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -1567,7 +1568,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "O SuperTuxKart apresenta vários modos de jogo"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1968,7 +1969,7 @@ msgid "[none]"
 msgstr "[nenhum]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr ""
@@ -1977,6 +1978,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Auria https://launchpad.net/~auria-mg\n"
 "  Fátima de Menezes Dantas https://launchpad.net/~fatima-menezes19\n"
 "  João Frade / 100 NOME https://launchpad.net/~100nome-portugal\n"
 "  Max Perkins https://launchpad.net/~maxperkinstoki\n"
