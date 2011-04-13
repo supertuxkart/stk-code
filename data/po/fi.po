@@ -2,18 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2011-02-04 19:56+0000\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-09 17:24+0000\n"
 "Last-Translator: Kristian Laakkonen <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Language: finnish\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -282,19 +283,19 @@ msgstr "Ankkuri - hidastaa merkittävästi ensimmäisenä olevaa autoa"
 #: src/states_screens/options_screen_video.cpp:289
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "Animoidut hahmot: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:285
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Animoidut maisemat: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:292
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "Reunanpehmennys (vaatii uudelleenkäynnistyksen): %s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
@@ -404,7 +405,7 @@ msgstr "Parempi onni ensi kerralla!"
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
 msgid "Bovine Barnyard"
-msgstr ""
+msgstr "Pihamaa"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:353
@@ -435,7 +436,7 @@ msgstr ""
 
 #: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Yhteyttä stkaddons-palvelimeen ei saada..."
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -569,7 +570,7 @@ msgstr "Ohjaimet"
 #. I18N: ./data/tracks/canyon/track.xml
 #: data/po/gui_strings.h:2
 msgid "Coyote Canyon"
-msgstr ""
+msgstr "Kojoottikanjoni"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
@@ -607,13 +608,13 @@ msgstr "Poista laite käytöstä"
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
 #: src/states_screens/options_screen_video.cpp:276
 msgid "Disabled"
-msgstr ""
+msgstr "Ei käytössä"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:567
 msgid "Display FPS"
-msgstr ""
+msgstr "Näytä FPS"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -627,7 +628,7 @@ msgstr "Haluatko lennättää leijaa?"
 
 #: src/karts/controller/player_controller.cpp:282
 msgid "Don't accelerate before go"
-msgstr ""
+msgstr "Älä kiihdytä ennen lähtömerkkiä"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:207
@@ -980,7 +981,7 @@ msgstr "Keskitaso"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:571
 msgid "Internet STK news"
-msgstr ""
+msgstr "STK:n uutiset internetissä"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -1002,7 +1003,7 @@ msgstr "Pysy johtaja-auton vauhdissa, mutta älä ohita sitä!"
 #: src/states_screens/options_screen_input.cpp:95
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Näppäimistö %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:812
@@ -1069,7 +1070,7 @@ msgstr "Jätä kilpailijasi katselemaan perävalojasi!"
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:280
 msgid "Me Only"
-msgstr ""
+msgstr "Vain oma auto"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
@@ -1080,7 +1081,7 @@ msgstr "Valikkonäppäimet"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:575
 msgid "Minimal Race GUI"
-msgstr ""
+msgstr "Suppea näkymä kilpailtaessa"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:268
@@ -1116,7 +1117,7 @@ msgstr "Moninpeli"
 #: data/po/gui_strings.h:290 data/po/gui_strings.h:337
 #: data/po/gui_strings.h:381 data/po/gui_strings.h:423
 msgid "Multi­player"
-msgstr ""
+msgstr "Moninpeli"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1176,7 +1177,7 @@ msgstr "Nolok"
 #. I18N: if no kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:282
 msgid "None"
-msgstr ""
+msgstr "Ei"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
@@ -1186,7 +1187,7 @@ msgstr "Normaali kilpailu"
 #. I18N: ./data/tracks/snowmountain/track.xml
 #: data/po/gui_strings.h:50
 msgid "Northern Resort"
-msgstr ""
+msgstr "Pohjoinen hiihtokeskus"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1471,7 +1472,7 @@ msgstr "Liikkuvat hiekat"
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:8
 msgid "Shiny Suburbs"
-msgstr ""
+msgstr "Kaupunki"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
@@ -1570,12 +1571,16 @@ msgstr "SuperTuxKartia voi pelata moninpelinä yhdellä tietokoneella"
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart sisältää erilaisia pelimuotoja"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
 "options, select tab 'User Interface', and edit \"Internet STK news\")."
 msgstr ""
+"SuperTuxKart voi ottaa yhteyden uutispalvelimeen näyttääkseen päivityksiä. "
+"Haluatko sallia tämän? (Asetuksen voi myöhemmin vaihtaa asetuksista "
+"muuttamalla asetusta \"STK:n uutiset internetissä\" välilehdellä "
+"Käyttöliittymä.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
@@ -1743,7 +1748,7 @@ msgstr "Päivitetään listaa..."
 #: src/states_screens/options_screen_players.cpp:69
 #: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
 msgid "User Interface"
-msgstr ""
+msgstr "Käyttöliittymä"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
@@ -1759,7 +1764,7 @@ msgstr "Versio: %d"
 #. I18N: In the video settings
 #: data/po/gui_strings.h:590
 msgid "Vertical Sync (requires restart)"
-msgstr ""
+msgstr "Pystytahdistus (vsync) (vaatii uudelleenkäynnistyksen)"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1800,7 +1805,7 @@ msgstr "Aseet"
 #: src/states_screens/options_screen_video.cpp:287
 #, c-format
 msgid "Weather Effects : %s"
-msgstr ""
+msgstr "Sääilmiöt: %s"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1846,6 +1851,8 @@ msgstr "Voita Kuuhun ja takaisin -grand prix"
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
+"Voita yhden kierroksen kaksinkamppailu Salaisessa puutarhassa yhtä "
+"tietokoneen ohjaamaa helppotasoista pelaajaa vastaan."
 
 #. I18N: ./data/challenges/xr591.challenge
 #: data/po/gui_strings.h:161 data/po/gui_strings.h:773
@@ -1983,7 +1990,7 @@ msgid "[none]"
 msgstr "[ei mitään]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "tekijä:"

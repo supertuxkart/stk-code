@@ -2,19 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
 "PO-Revision-Date: 2011-04-02 20:14+0000\n"
 "Last-Translator: Magne Djupvik <Unknown>\n"
 "Language-Team: STK norwegian team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Country: NORWAY\n"
 "X-Poedit-Language: Norwegian Bokmal\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -1564,7 +1565,7 @@ msgstr "SuperTuxKart kan spilles i flerspillermodus på samme datamaskin"
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart inneholder flere spillmoduser"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1975,7 +1976,7 @@ msgid "[none]"
 msgstr "[ingen]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "av"

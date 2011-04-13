@@ -2,19 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2011-03-31 12:56+0000\n"
-"Last-Translator: Pedro Folha <pedrovi@hotmail.com>\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-05 19:01+0000\n"
+"Last-Translator: Edvaldo de Souza Cruz <edvaldoscruz@hotmail.com>\n"
 "Language-Team: Flávio Zavan <flavio@nebososo.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Country: BRAZIL\n"
 "X-Poedit-Language: Portuguese\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -285,13 +286,13 @@ msgstr "Ãncora - diminui significantemente a velocidade do líder da corrida"
 #: src/states_screens/options_screen_video.cpp:289
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "Personagens Animados : %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:285
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Cenário Animado : %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:292
@@ -438,7 +439,7 @@ msgstr ""
 
 #: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Não foi possível acessar o servidor stkaddons"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -615,7 +616,7 @@ msgstr "Desativar"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:567
 msgid "Display FPS"
-msgstr ""
+msgstr "Mostrar FPS"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -638,7 +639,7 @@ msgstr "Para baixo"
 
 #: src/states_screens/dialogs/addons_loading.cpp:118
 msgid "Download failed.\n"
-msgstr ""
+msgstr "Download falhou.\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
 #: data/po/gui_strings.h:800
@@ -1003,7 +1004,7 @@ msgstr "Siga o líder, mas não o ultrapasse!"
 #: src/states_screens/options_screen_input.cpp:95
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Teclado %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:812
@@ -1068,7 +1069,7 @@ msgstr "Faça seus rivais comerem poeira!"
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:280
 msgid "Me Only"
-msgstr ""
+msgstr "Somente Eu"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
@@ -1115,7 +1116,7 @@ msgstr "Corrida Multijogador"
 #: data/po/gui_strings.h:290 data/po/gui_strings.h:337
 #: data/po/gui_strings.h:381 data/po/gui_strings.h:423
 msgid "Multi­player"
-msgstr ""
+msgstr "Multitocador"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1175,7 +1176,7 @@ msgstr "Nolok"
 #. I18N: if no kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:282
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
@@ -1254,7 +1255,7 @@ msgstr "Pidgin"
 #. I18N: ./data/gui/tutorial.stkgui
 #: data/po/gui_strings.h:677
 msgid "Play all"
-msgstr ""
+msgstr "Tocar todas"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -1570,7 +1571,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart apresenta vários modos de jogo"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1742,7 +1743,7 @@ msgstr "Atualizando a lista..."
 #: src/states_screens/options_screen_players.cpp:69
 #: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
 msgid "User Interface"
-msgstr ""
+msgstr "Interface do usuário"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
@@ -1975,7 +1976,7 @@ msgid "[none]"
 msgstr "[nenhuma]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "por"
@@ -1984,6 +1985,7 @@ msgstr "por"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Edvaldo de Souza Cruz https://launchpad.net/~edvaldoscruz\n"
 "  Flávio Zavan https://launchpad.net/~nebososo\n"
 "  Pedro Folha https://launchpad.net/~pedrovi\n"
 "  Rodrigo Borges https://launchpad.net/~rbm0407\n"

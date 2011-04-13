@@ -7,19 +7,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2010-12-13 07:02+0000\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-10 09:11+0000\n"
 "Last-Translator: Andrej Znidarsic <andrej.znidarsic@gmail.com>\n"
 "Language-Team: STK SLO Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Country: SLOVENIA\n"
 "X-Poedit-Language: Slovenian\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -56,7 +57,7 @@ msgstr "%0 se ne bi smel igrati z %1-evo malico"
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:70
 msgid "%0 will not go bowling with %1 again"
-msgstr ""
+msgstr "%0 ne bo več kegljal z %1"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
@@ -288,19 +289,19 @@ msgstr "Sidro - močno upočasni prvo vozilo"
 #: src/states_screens/options_screen_video.cpp:289
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "Animirani vozniki: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:285
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Animiran scenarij: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:292
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "Glajenje robov (zahtevan je ponovni zagon) : %s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
@@ -383,7 +384,7 @@ msgstr "Nazaj na dirko"
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:519
 msgid "Back to device list"
-msgstr "Nazaj na seznamu naprav"
+msgstr "Nazaj na seznam naprav"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:389
 msgid "Back to the main menu"
@@ -400,7 +401,7 @@ msgstr "Banana? Škatla? Banana? Škatla? Banana? Škatla?"
 #. I18N: ./data/karts/beagle/kart.xml
 #: data/po/gui_strings.h:797
 msgid "Beagle"
-msgstr ""
+msgstr "Beagle"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:251
@@ -410,7 +411,7 @@ msgstr "Več sreče prihodnjič!"
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
 msgid "Bovine Barnyard"
-msgstr ""
+msgstr "Goveja farma"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:353
@@ -440,7 +441,7 @@ msgstr ""
 
 #: src/addons/network_http.cpp:301
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Ni mogoče dostopati do strežnika stkaddons ..."
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -471,7 +472,7 @@ msgstr "Igralca s tem imenom ni mogoče dodati."
 #. I18N: ./data/tracks/cave/track.xml
 #: data/po/gui_strings.h:5
 msgid "Cave X"
-msgstr ""
+msgstr "Jama X"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -570,7 +571,7 @@ msgstr "Tipke"
 #. I18N: ./data/tracks/canyon/track.xml
 #: data/po/gui_strings.h:2
 msgid "Coyote Canyon"
-msgstr ""
+msgstr "Kojotov kanjon"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
@@ -608,13 +609,13 @@ msgstr "Onemogoči napravo"
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
 #: src/states_screens/options_screen_video.cpp:276
 msgid "Disabled"
-msgstr ""
+msgstr "Onemogočeno"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:567
 msgid "Display FPS"
-msgstr ""
+msgstr "Prikaži število slik na sekundo"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:139
@@ -628,7 +629,7 @@ msgstr "Ali želite spuščati zmaje?"
 
 #: src/karts/controller/player_controller.cpp:282
 msgid "Don't accelerate before go"
-msgstr ""
+msgstr "Ne pospešujte pred napisom zdaj"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:207
@@ -637,7 +638,7 @@ msgstr "Dol"
 
 #: src/states_screens/dialogs/addons_loading.cpp:118
 msgid "Download failed.\n"
-msgstr ""
+msgstr "Prejem je spodletel.\n"
 
 #. I18N: ./data/karts/elephpant/kart.xml
 #: data/po/gui_strings.h:800
@@ -665,7 +666,7 @@ msgstr "Energija"
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
 #: src/states_screens/main_menu_screen.cpp:140
 msgid "English"
-msgstr ""
+msgstr "Slovenščina"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -678,6 +679,8 @@ msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
 msgstr ""
+"Vsi:\n"
+"Pritisnite 'Ogenj' zdaj za pridružitev igri!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -742,6 +745,8 @@ msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
 msgstr ""
+"Končajte z vsaj 10 nitro točkami v treh krogih Oliverjeve matematične "
+"učilnice v manj kot 55 sekundah."
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
 #: data/po/gui_strings.h:155 data/po/gui_strings.h:767
@@ -912,12 +917,12 @@ msgstr "Grafika"
 
 #: src/config/user_config.cpp:487
 msgid "Guest"
-msgstr ""
+msgstr "Gost"
 
 #. I18N: ./data/tracks/hacienda/track.xml
 #: data/po/gui_strings.h:20
 msgid "Hacienda"
-msgstr ""
+msgstr "Hacienda"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -976,7 +981,7 @@ msgstr "Voznik"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:571
 msgid "Internet STK news"
-msgstr ""
+msgstr "Internetne novice STK"
 
 #. I18N: ./data/gui/addons.stkgui
 #. I18N: Section in the addons menu
@@ -1063,7 +1068,7 @@ msgstr "Prisilite nasprotnike, da žrejo prah!"
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:280
 msgid "Me Only"
-msgstr ""
+msgstr "Le jaz"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
@@ -1074,7 +1079,7 @@ msgstr "Menijske tipke"
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:575
 msgid "Minimal Race GUI"
-msgstr ""
+msgstr "Najmanjši grafični vmesnik dirkanja"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:268
@@ -1097,7 +1102,7 @@ msgstr "Mozilla"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:449
 msgid "Multiplayer Race"
-msgstr ""
+msgstr "Večigralska igra"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1110,7 +1115,7 @@ msgstr ""
 #: data/po/gui_strings.h:290 data/po/gui_strings.h:337
 #: data/po/gui_strings.h:381 data/po/gui_strings.h:423
 msgid "Multi­player"
-msgstr ""
+msgstr "Večigralstvo"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
@@ -1170,7 +1175,7 @@ msgstr "Nolok"
 #. I18N: if no kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:282
 msgid "None"
-msgstr ""
+msgstr "Brez"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
@@ -1180,7 +1185,7 @@ msgstr "Običajna dirka"
 #. I18N: ./data/tracks/snowmountain/track.xml
 #: data/po/gui_strings.h:50
 msgid "Northern Resort"
-msgstr ""
+msgstr "Severno letovišče"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1201,7 +1206,7 @@ msgstr "V redu"
 #. I18N: ./data/tracks/mines/track.xml
 #: data/po/gui_strings.h:32
 msgid "Old Mine"
-msgstr ""
+msgstr "Zapuščeni rudnik"
 
 #. I18N: ./data/tracks/olivermath/track.xml
 #: data/po/gui_strings.h:35
@@ -1249,7 +1254,7 @@ msgstr "Pidgin"
 #. I18N: ./data/gui/tutorial.stkgui
 #: data/po/gui_strings.h:677
 msgid "Play all"
-msgstr ""
+msgstr "Predvajaj vse"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -1306,12 +1311,12 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:166
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr ""
+msgstr "Težave med nameščanjem dodatka '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr ""
+msgstr "Težave med odstranjevanjem dodatka '%s'."
 
 #. I18N: ./data/karts/puffy/kart.xml
 #: data/po/gui_strings.h:824
@@ -1416,12 +1421,12 @@ msgstr "Desno"
 #. I18N: ./data/tracks/scotland/track.xml
 #: data/po/gui_strings.h:41
 msgid "Scotland"
-msgstr ""
+msgstr "Škotska"
 
 #. I18N: ./data/tracks/secretgarden/track.xml
 #: data/po/gui_strings.h:44
 msgid "Secret Garden"
-msgstr ""
+msgstr "Skrivni vrt"
 
 #: src/states_screens/race_result_gui.cpp:82
 msgid "See unlocked feature"
@@ -1467,7 +1472,7 @@ msgstr "Premikajoče sipine"
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:8
 msgid "Shiny Suburbs"
-msgstr ""
+msgstr "Bleščeče predmestje"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
@@ -1488,7 +1493,7 @@ msgstr "Težavna vožnja"
 #. I18N: ./data/tracks/snowtuxpeak/track.xml
 #: data/po/gui_strings.h:53
 msgid "Snow Peak"
-msgstr ""
+msgstr "Snežni vrh"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
@@ -1518,7 +1523,7 @@ msgstr "Začni dirko"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:214
 msgid "Status"
-msgstr ""
+msgstr "Stanje"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:174
@@ -1567,12 +1572,15 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart vsebuje več načinov igre"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
 "options, select tab 'User Interface', and edit \"Internet STK news\")."
 msgstr ""
+"SuperTuxKart se lahko poveže na strežnik novic za prikaz posodobitev. Ali "
+"želite to zmožnost omogočiti? (Za spremembo te nastavitve kasneje pojdite v "
+"možnosti 'Uporabniški vmesnik' in uredite \"Internetne novice STK\")."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:362
@@ -1586,7 +1594,7 @@ msgstr ""
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/main_menu_screen.cpp:198
 msgid "System Language"
-msgstr ""
+msgstr "Sistem jezik"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:176 data/po/gui_strings.h:788
@@ -1615,7 +1623,7 @@ msgstr "Space Shuttle je pristal!"
 #. I18N: ./data/tracks/stadium/track.xml
 #: data/po/gui_strings.h:56
 msgid "The Stadium"
-msgstr ""
+msgstr "Stadion"
 
 #: src/race/highscore_manager.cpp:98
 msgid ""
@@ -1697,13 +1705,13 @@ msgstr "Proge"
 
 #: src/states_screens/dialogs/addons_loading.cpp:187
 msgid "Try again"
-msgstr ""
+msgstr "Poskusite znova"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
 #: data/po/gui_strings.h:674
 msgid "Tutorial : Selection Room"
-msgstr ""
+msgstr "Vodnik: Soba za izbiro"
 
 #. I18N: ./data/karts/tux/kart.xml
 #: data/po/gui_strings.h:827
@@ -1740,7 +1748,7 @@ msgstr "Posodabljanje seznama ..."
 #: src/states_screens/options_screen_players.cpp:69
 #: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
 msgid "User Interface"
-msgstr ""
+msgstr "Uporabniški vmesnik"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
@@ -1750,13 +1758,13 @@ msgstr "Različica:"
 #: src/states_screens/dialogs/addons_loading.cpp:71
 #, c-format
 msgid "Version: %d"
-msgstr ""
+msgstr "Različica: %d"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 #: data/po/gui_strings.h:590
 msgid "Vertical Sync (requires restart)"
-msgstr ""
+msgstr "Navpično usklajevanje (zahteva ponoven zagon)"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
@@ -1797,7 +1805,7 @@ msgstr "Orožja"
 #: src/states_screens/options_screen_video.cpp:287
 #, c-format
 msgid "Weather Effects : %s"
-msgstr ""
+msgstr "Vremenski učinki: %s"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1810,6 +1818,12 @@ msgid ""
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
 msgstr ""
+"Ko so vnosne naprave nastavljene, lahko začnete igrati. V glavnem meniju "
+"izberite ikono 'večigralska dirka'. Ko je čas za izbiro dirkalnika mora vsak "
+"igralec za pridružitev igri pritisniti tipko 'ogenj' na tipkovnici ali "
+"igralnemu ploščku. Vsak igralec lahko za izbiro svojega dirkalnika uporabi "
+"svojo vnosno napravo. Igra se nadaljuje, ko vsi igralci izberejo svoj "
+"dirkalnik. Za to opravilo ne morete uporabiti miške."
 
 #. I18N: ./data/karts/wilber/kart.xml
 #: data/po/gui_strings.h:830
@@ -1838,6 +1852,7 @@ msgstr "Zmagajte turnir Na luno in nazaj"
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
+"Zmagajte dirko 1 na 1 v Skritem vrtu proti 1 nasprotniku ravni začetnik."
 
 #. I18N: ./data/challenges/xr591.challenge
 #: data/po/gui_strings.h:161 data/po/gui_strings.h:773
@@ -1975,10 +1990,10 @@ msgid "[none]"
 msgstr "[brez]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
-msgstr ""
+msgstr ","
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
@@ -1987,7 +2002,8 @@ msgstr ""
 "  Andrej Znidarsic https://launchpad.net/~andrej.znidarsic\n"
 "  Auria https://launchpad.net/~auria-mg\n"
 "  Domen Knez https://launchpad.net/~dmen\n"
-"  Matic Gradišer https://launchpad.net/~0micky"
+"  Matic Gradišer https://launchpad.net/~0micky\n"
+"  Sir Drinksalot https://launchpad.net/~sirdrinksalotth"
 
 #~ msgid "Audio/Video"
 #~ msgstr "Zvok / Slika"

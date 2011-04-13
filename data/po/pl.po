@@ -2,19 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7 PL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-02 10:37-0400\n"
-"PO-Revision-Date: 2011-03-30 20:26+0000\n"
+"POT-Creation-Date: 2011-04-04 17:04-0400\n"
+"PO-Revision-Date: 2011-04-05 18:25+0000\n"
 "Last-Translator: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "Language-Team: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-03 21:12+0000\n"
-"X-Generator: Launchpad (build 12710)\n"
+"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Generator: Launchpad (build 12792)\n"
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-Language: Polish\n"
 
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+#: src/utils/translation.cpp:198
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -702,30 +703,19 @@ msgstr "Ostatnie okrążenie!"
 #. I18N: ./data/challenges/hacienda.challenge
 #: data/po/gui_strings.h:113 data/po/gui_strings.h:725
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-msgstr ""
-"Trasa: Farma\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 2:30\r\n"
-"Przeciwnicy: 3, prosty"
+msgstr "Trasa: Farma, okrążenia: 3, czas: 2:30, przeciwnicy: 3, prosty"
 
 #. I18N: ./data/challenges/tollway.challenge
 #: data/po/gui_strings.h:149 data/po/gui_strings.h:761
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
-"Trasa: Latarnia morska\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 1:30\r\n"
-"Przeciwnicy: 3, ekspert"
+"Trasa: Latarnia morska, okrążenia: 3, czas: 1:30, przeciwnicy: 3, ekspert"
 
 #. I18N: ./data/challenges/fortmagma.challenge
 #: data/po/gui_strings.h:101 data/po/gui_strings.h:713
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
-msgstr ""
-"Trasa: Kopalnia\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 3:00\r\n"
-"Przeciwnicy: 3, ekspert"
+msgstr "Trasa: Kopalnia, okrążenia: 3, czas: 3:00, przeciwnicy: 3, ekspert"
 
 #. I18N: ./data/challenges/hacienda.challenge
 #: data/po/gui_strings.h:110 data/po/gui_strings.h:722
@@ -747,33 +737,21 @@ msgstr "Ukończ Kopalnię w 3:00"
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
-msgstr ""
-"Trasa: Klasa matematyczna\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 0:55\r\n"
-"Nitro: 10"
+msgstr "Trasa: Klasa matematyczna, okrążenia: 3, czas: 0:55, nitro: 10"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
 #: data/po/gui_strings.h:155 data/po/gui_strings.h:767
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
-msgstr ""
-"Trasa: Zmienne Piaski\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 2:20\r\n"
-"Nitro: 12"
+msgstr "Trasa: Zmienne Piaski, okrążenia: 3, czas: 2:20, nitro: 12"
 
 #. I18N: ./data/challenges/mines.challenge
 #: data/po/gui_strings.h:131 data/po/gui_strings.h:743
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
-msgstr ""
-"Trasa: XR591\r\n"
-"Okrążenia: 2\r\n"
-"Czas: 2:30\r\n"
-"Nitro: 16"
+msgstr "Trasa: XR591, okrążenia: 2, czas: 2:30, nitro: 16"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:186
@@ -1187,7 +1165,7 @@ msgstr "Zwykły wyścig"
 #. I18N: ./data/tracks/snowmountain/track.xml
 #: data/po/gui_strings.h:50
 msgid "Northern Resort"
-msgstr "Północny Resort"
+msgstr "Północny Kurort"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1572,7 +1550,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart oferuje kilka trybów gry"
 
-#: src/main.cpp:940
+#: src/main.cpp:942
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1842,52 +1820,34 @@ msgstr ""
 #. I18N: ./data/challenges/xr591.challenge
 #: data/po/gui_strings.h:161 data/po/gui_strings.h:773
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
-msgstr ""
-"Trasa: Kanion\r\n"
-"Okrążenia: 3\r\n"
-"Przeciwnicy: 4, ekspert"
+msgstr "Trasa: Kanion, okrążenia: 3, przeciwnicy: 4, ekspert"
 
 #. I18N: ./data/challenges/gnu.challenge
 #: data/po/gui_strings.h:107 data/po/gui_strings.h:719
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
-msgstr ""
-"Trasa: Fort Magma\r\n"
-"Okrążenia: 3\r\n"
-"Przeciwnicy: 3, ekspert"
+msgstr "Trasa: Fort Magma, okrążenia: 3, przeciwnicy: 3, ekspert"
 
 #. I18N: ./data/challenges/island.challenge
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:731
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
-"Trasa: Śnieżna Góra\r\n"
-"Okrążenia: 3\r\n"
-"Czas: 3:05\r\n"
-"Przeciwnicy: 3, średni"
+"Trasa: Śnieżna Góra, okrążenia: 3, czas: 3:05, przeciwnicy: 3, średni"
 
 #. I18N: ./data/challenges/canyon.challenge
 #: data/po/gui_strings.h:83 data/po/gui_strings.h:695
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
-msgstr ""
-"Trasa: Autostrada Tuxa\r\n"
-"Okrążenia: 3\r\n"
-"Przeciwnicy: 4, ekspert"
+msgstr "Trasa: Autostrada Tuxa, okrążenia: 3, przeciwnicy: 4, ekspert"
 
 #. I18N: ./data/challenges/atworldsend.challenge
 #: data/po/gui_strings.h:77 data/po/gui_strings.h:689
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
-msgstr ""
-"Trasa: Wyspa Pustynna\r\n"
-"Tryb: śledź lidera\r\n"
-"Przeciwnicy: 3, ekspert"
+msgstr "Trasa: Wyspa Pustynna, tryb: śledź lidera, przeciwnicy: 3, ekspert"
 
 #. I18N: ./data/challenges/lighthouse.challenge
 #: data/po/gui_strings.h:125 data/po/gui_strings.h:737
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
-msgstr ""
-"Trasa: Gwiezdna Ścieżka\r\n"
-"Tryb: śledź lidera\r\n"
-"Przeciwnicy: 5, ekspert"
+msgstr "Trasa: Gwiezdna Ścieżka, tryb: śledź lidera, przeciwnicy: 5, ekspert"
 
 #. I18N: ./data/challenges/skyline.challenge
 #: data/po/gui_strings.h:134 data/po/gui_strings.h:746
@@ -1980,7 +1940,7 @@ msgid "[none]"
 msgstr "[nic]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/minimal_race_gui.cpp:788
+#: src/states_screens/minimal_race_gui.cpp:799
 #: src/states_screens/race_gui.cpp:1199
 msgid "by"
 msgstr "przez"
