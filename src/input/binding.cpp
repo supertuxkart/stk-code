@@ -248,18 +248,27 @@ irr::core::stringw Binding::getAsString() const
             
             break;
         case Input::IT_STICKMOTION:
-            //I18N: to appear in input configuration screen, for gamepad axes
-            s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+            
+            if (m_id == Input::HAT_H_ID)
+            {
+                //I18N: to appear in input configuration screen, for gamepad hats
+                s = _("Gamepad hat %d", (m_dir == Input::AD_NEGATIVE ? L"0-" : L"0+"));
+            }
+            else if (m_id == Input::HAT_V_ID)
+            {
+                //I18N: to appear in input configuration screen, for gamepad hats
+                s = _("Gamepad hat %d", (m_dir == Input::AD_NEGATIVE ? L"1-" : L"1+"));
+            }
+            else
+            {
+                //I18N: to appear in input configuration screen, for gamepad axes
+                s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+            }
             break;
         case Input::IT_STICKBUTTON:
             //I18N: to appear in input configuration screen, for gamepad buttons
             s = ( _("Gamepad button %d", m_id+1));
-            break;
-        case Input::IT_STICKHAT:
-            //I18N: to appear in input configuration screen, for gamepad hats
-            s = _("Gamepad hat %d", (m_id+1));
-            break;
-        case Input::IT_MOUSEBUTTON:
+            break;        case Input::IT_MOUSEBUTTON:
             //I18N: to appear in input configuration screen, for mouse (might not be used at all)
             s = _("Mouse button %d", (m_id+1));
             break;

@@ -65,12 +65,7 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
                 returnString += "stkbt_";
                 returnString += id;
                 break;
-                
-            case Input::IT_STICKHAT:
-                returnString += "stkht_";
-                returnString += id;
-                break;
-                
+
             case Input::IT_MOUSEMOTION:
                 returnString += "mousemo_";
                 returnString += id;
