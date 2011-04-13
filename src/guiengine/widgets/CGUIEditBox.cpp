@@ -26,7 +26,7 @@
 */
 
 
-u32 getTime()
+Time::TimeType getTime()
 {
     return Time::getTimeSinceEpoch();
 }

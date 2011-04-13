@@ -10,6 +10,7 @@
 #include "irrArray.h"
 #include "IOSOperator.h"
 
+#include "utils/time.hpp"
 
 using namespace irr;
 using namespace gui;
@@ -141,7 +142,7 @@ using namespace gui;
 		gui::IGUIFont *OverrideFont, *LastBreakFont;
 		IOSOperator* Operator;
 
-		u32 BlinkStartTime;
+        Time::TimeType BlinkStartTime;
 		s32 CursorPos;
 		s32 HScrollPos, VScrollPos; // scroll position in characters
 		u32 Max;
