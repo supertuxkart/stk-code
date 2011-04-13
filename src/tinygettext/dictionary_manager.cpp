@@ -122,7 +122,8 @@ DictionaryManager::get_dictionary(const Language& language)
         // check if filename matches requested language
         if (has_suffix(*filename, ".po"))
         { // ignore anything that isn't a .po file
-          Language po_language = Language::from_env(filename->substr(0, filename->size()-3));
+
+            Language po_language = Language::from_env(fixPOFilename(*filename));
 
           if (!po_language)
           {
@@ -241,7 +242,41 @@ DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
 {
   filesystem = filesystem_;
 }
+// ----------------------------------------------------------------------------
+    // On case insensitive file systems (windows) the
+    // country specification is lower case (zh_TW is read
+    // as zh_tw). Convert the lower case characters back
+    // to upper case, otherwise tinygettext does not
+    // identify the country correctly.
+std::string DictionaryManager::fixPOFilename(const std::string &s_in) const
+{
+    std::string s;
+    if(s_in.substr(s_in.size()-3, 3)==".po")
+        s = s_in.substr(0, s_in.size()-3);
+    else
+        s = s_in;
+
+    bool underscore_found = false;
+    for(unsigned int i=0; i<s.size(); i++)
+    {
+        if(underscore_found)
+        {
+            // If we get a non-alphanumerical character/
+            // we are done (en_GB.UTF-8) - only convert
+            // the 'gb' part ... if we ever get this kind
+            // of filename.
+            if(!::isalpha(s[i]))
+                break;
+            s[i]=::toupper(s[i]);
+        }
+        else
+            underscore_found = s[i]=='_';
+    }
+    return s;
+}   // fixPOFilename
+
 
 } // namespace tinygettext
+
 
 /* EOF */

@@ -112,7 +112,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         {
             if (StringUtils::hasSuffix(*it, "po"))
             {
-                g_language_list.push_back(StringUtils::removeExtension(*it));
+                g_language_list.push_back
+                    (m_dictionary_manager.fixPOFilename(*it) );
                 // printf("Lang : <%s>\n", (*it).c_str());
             }
         }

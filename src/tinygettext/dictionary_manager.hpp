@@ -86,6 +86,8 @@ public:
   std::set<Language> get_languages();
 
   void set_filesystem(std::auto_ptr<FileSystem> filesystem);
+  std::string fixPOFilename(const std::string &s) const;
+
 
 private:
   DictionaryManager (const DictionaryManager&);
