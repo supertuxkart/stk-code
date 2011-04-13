@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
+//                2009-2011 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +21,7 @@
 #if HAVE_OGGVORBIS
 
 #include "audio/sfx_openal.hpp"
-
+#include "audio/sfx_buffer.hpp"
 #include <assert.h>
 #include <stdio.h>
 #include <string>
@@ -219,7 +220,16 @@ void SFXOpenAL::play()
  */
 void SFXOpenAL::position(const Vec3 &position)
 {
-    if(!m_ok||!m_positional) return;
+    if (!m_ok)
+    {
+        fprintf(stderr, "WARNING, position called on non-ok SFX\n");
+        return;
+    }
+    if (!m_positional)
+    {
+        fprintf(stderr, "WARNING, position called on non-positional SFX\n");
+        return;
+    }
 
     alSource3f(m_soundSource, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());

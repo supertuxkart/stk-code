@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_buffer.hpp"
 
 #include <sstream>
 #include <stdexcept>
@@ -264,11 +265,13 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
+    //printf("CREATING %s (%x), positional = %i (race_manager->getNumLocalPlayers() = %i, buffer->isPositional() = %i)\n",
+    //       buffer->getFileName().c_str(), (unsigned int)buffer,
+    //       positional,
+    //       race_manager->getNumLocalPlayers(), buffer->isPositional());
+    
     assert( alIsBuffer(buffer->getBuffer()) );
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain());
-    
-    // debugging
-    /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
     
     sfx->volume(m_master_gain);
     

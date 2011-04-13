@@ -20,7 +20,6 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
-#include "audio/sfx_buffer.hpp"
 
 #include <string>
 #include <vector>
@@ -35,6 +34,7 @@
 #include "utils/vec3.hpp"
 
 class SFXBase;
+class SFXBuffer;
 class XMLNode;
 
 /**
