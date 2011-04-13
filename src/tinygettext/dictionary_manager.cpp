@@ -123,7 +123,7 @@ DictionaryManager::get_dictionary(const Language& language)
         if (has_suffix(*filename, ".po"))
         { // ignore anything that isn't a .po file
 
-            Language po_language = Language::from_env(fixPOFilename(*filename));
+            Language po_language = Language::from_env(convertFilename2Language(*filename));
 
           if (!po_language)
           {
@@ -243,12 +243,14 @@ DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
   filesystem = filesystem_;
 }
 // ----------------------------------------------------------------------------
-    // On case insensitive file systems (windows) the
-    // country specification is lower case (zh_TW is read
-    // as zh_tw). Convert the lower case characters back
-    // to upper case, otherwise tinygettext does not
-    // identify the country correctly.
-std::string DictionaryManager::fixPOFilename(const std::string &s_in) const
+/** This function converts a .po filename (e.g. zh_TW.po) into a language
+ *  specification (zh_TW). On case insensitive file systems (think windows) 
+ *  the filename and therefore the country specification is lower case 
+ *  (zh_tw). It Converts the lower case characters of the country back to 
+ *  upper case, otherwise tinygettext does not identify the country 
+ *  correctly.
+ */
+std::string DictionaryManager::convertFilename2Language(const std::string &s_in) const
 {
     std::string s;
     if(s_in.substr(s_in.size()-3, 3)==".po")
@@ -273,7 +275,7 @@ std::string DictionaryManager::fixPOFilename(const std::string &s_in) const
             underscore_found = s[i]=='_';
     }
     return s;
-}   // fixPOFilename
+}   // convertFilename2Language
 
 
 } // namespace tinygettext
