@@ -932,9 +932,9 @@ void IrrDriver::displayFPS()
     }
 
     // Ask for current frames per second and last number of triangles processed (trimed to thousands)
-    const int fps       = m_device->getVideoDriver()->getFPS();
-    const int kilotris  = (int)(m_device->getVideoDriver()->getPrimitiveCountDrawn(0)
-                                * (1.f / 1000.f)                                     );
+    const int fps         = m_device->getVideoDriver()->getFPS();
+    const float kilotris  = m_device->getVideoDriver()->getPrimitiveCountDrawn(0)
+                                * (1.f / 1000.f);
 
     // Min and max info tracking, per mode, so user can check game vs menus
     bool current_state     = StateManager::get()->getGameState() == GUIEngine::GAME;
@@ -953,10 +953,18 @@ void IrrDriver::displayFPS()
 
     if (min > fps && fps > 1) min = fps; // Start moments sometimes give useless 1
     if (max < fps) max = fps;
-
+    
     static char buffer[32];
-    sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max, kilotris);
-
+    
+    if (UserConfigParams::m_artist_debug_mode)
+    {
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f KTris", min, fps, max, kilotris);
+    }
+    else
+    {
+        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max, (int)round(kilotris));
+    }
+    
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
