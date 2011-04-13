@@ -43,7 +43,6 @@ SFXBuffer::SFXBuffer(const std::string& file,
     m_buffer     = 0;
     m_gain       = 1.0f;
     m_rolloff    = 0.1f;
-    m_positional = false;
     m_loaded     = false;
     m_file       = file;
     
