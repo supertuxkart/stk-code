@@ -112,11 +112,12 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         {
             if (StringUtils::hasSuffix(*it, "po"))
             {
-                g_language_list.push_back(StringUtils::removeExtension(*it));
+                g_language_list.push_back
+                    (m_dictionary_manager.convertFilename2Language(*it) );
                 // printf("Lang : <%s>\n", (*it).c_str());
             }
-        }
-    }
+        }   // for it in flist
+    }   // if (g_language_list.size() == 0)
     
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
