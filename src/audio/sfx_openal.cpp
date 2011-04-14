@@ -220,6 +220,8 @@ void SFXOpenAL::play()
  */
 void SFXOpenAL::position(const Vec3 &position)
 {
+    if(!UserConfigParams::m_sfx)
+        return;
     if (!m_ok)
     {
         fprintf(stderr, "WARNING, position called on non-ok SFX\n");
