@@ -125,8 +125,8 @@ void *NetworkHttp::mainLoop(void *obj)
         const XMLNode *xml = new XMLNode(xml_file);
         me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
-        me->loadAddonsList(xml, xml_file);
 #ifdef ADDONS_MANAGER
+        me->loadAddonsList(xml, xml_file);
         addons_manager->initOnline(xml);
         if(UserConfigParams::m_verbosity>=3)
             printf("[addons] Addons manager list downloaded\n");
