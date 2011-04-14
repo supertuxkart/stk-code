@@ -2,17 +2,18 @@ SuperTuxKart 0.7.1
 ~~~~~~~~~~~~~~~~~~
 * Particle  (smoke, splash, fire) and weather effects
 * New Fort Magma by Samuncle, new Shiny Suburbs track by Horace
-* Renamed many tracks to nicer names
+* New Beagle kart by wolterh
 * Added internet news
-* Added optional minimal race UI
-* Added support for full-screen anti-aliasing
 * Support for live language switch
+* Added optional minimal race UI
+* Temporary invincibility after being hit
+* Added support for full-screen anti-aliasing
 * Clearer multiplayer setup
+* Renamed many tracks to nicer names
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
-* Temporary invincibility after being hit
+* Update to bullet 2.77
 * Replace more sounds to be DFSG-compliant
-* New Beagle kart by wolterh
 * Fixed character names that contain non-ASCII characters
 * Full RTL (right to left) support
 * Various other tweaks done and glitches fixed
