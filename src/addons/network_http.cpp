@@ -516,11 +516,20 @@ int NetworkHttp::versionToInt(const std::string &version_string)
               +         9;
 
     std::string s=version_string;
-    int release_candidate=0;
+    // To guarantee that a release gets a higher version number than 
+    // a release candidate, we assign a 'release_candidate' number
+    // of 9 to versions which are not a RC. We assert that any RC
+    // is less than 9 to guarantee the ordering.
+    int release_candidate=9;
     if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
            &release_candidate)==1)
     {
         s = s.substr(0, s.length()-4);
+        // Otherwise a RC can get a higher version number than
+        // the corresponding release! If this should ever get
+        // triggered, multiply all scaling factors above and
+        // below by 10, to get two digits for RC numbers.
+        assert(release_candidate<9);
     }
     int very_minor=0;
     if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
