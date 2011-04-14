@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-04-04 17:04-0400\n"
-"PO-Revision-Date: 2011-04-13 01:49+0000\n"
+"PO-Revision-Date: 2011-04-14 18:44+0000\n"
 "Last-Translator: Mantas Kriaučiūnas <mantas@akl.lt>\n"
 "Language-Team: Lithuanian <lt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-13 02:08+0000\n"
+"X-Launchpad-Export-Date: 2011-04-14 22:20+0000\n"
 "X-Generator: Launchpad (build 12792)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
@@ -192,7 +192,7 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:421
 #: src/states_screens/race_result_gui.cpp:95
 msgid "Abort Grand Prix"
-msgstr "Nutraukti „Grand Prix“"
+msgstr "Nutraukti čempionatą (Grand Prix)"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -543,7 +543,7 @@ msgstr "Tęsti"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:406
 msgid "Continue Grand Prix"
-msgstr "Tęsti Grand Prix"
+msgstr "Tęsti čempionatą (Grand Prix)"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: Section in the settings menu
@@ -1075,7 +1075,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:449
 msgid "Multiplayer Race"
-msgstr "Keleto žmonių lenktynės"
+msgstr "Lenktynės keliems žmonėms"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1133,7 +1133,7 @@ msgstr "Galėsite žaisti nauju automobiliu „%s“"
 #: src/challenges/challenge.cpp:45
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Galėsite žaisti naujoje trasoje „%s“"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:189
@@ -1148,7 +1148,7 @@ msgstr ""
 #. I18N: if no kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:282
 msgid "None"
-msgstr ""
+msgstr "Nieko"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
@@ -1179,12 +1179,12 @@ msgstr "Gerai"
 #. I18N: ./data/tracks/mines/track.xml
 #: data/po/gui_strings.h:32
 msgid "Old Mine"
-msgstr ""
+msgstr "Sena kasykla"
 
 #. I18N: ./data/tracks/olivermath/track.xml
 #: data/po/gui_strings.h:35
 msgid "Oliver's Math Class"
-msgstr ""
+msgstr "Oliverio matematikos pamoka"
 
 #. I18N: message shown when a player that isn't game master tries to modify options that
 #. I18N: only the game master is allowed to
@@ -1203,7 +1203,7 @@ msgstr "Nustatymai"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:356
 msgid "Parachute - slows down all karts in a better position!"
-msgstr ""
+msgstr "Parašiutas - sulėtina visus už jus greitesnius automobilius"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #: data/po/gui_strings.h:616
@@ -1320,7 +1320,7 @@ msgstr "Važiuoti šia trasa dar kartą"
 
 #: src/states_screens/arenas_screen.cpp:225
 msgid "Random Arena"
-msgstr ""
+msgstr "Atsitiktinė arena"
 
 #: src/states_screens/kart_selection.cpp:787
 #: src/states_screens/kart_selection.cpp:1761
@@ -1334,7 +1334,7 @@ msgstr "Atsitiktinė trąsa"
 #: src/states_screens/minimal_race_gui.cpp:109
 #: src/states_screens/race_gui.cpp:106
 msgid "Rank"
-msgstr ""
+msgstr "Vieta"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/minimal_race_gui.cpp:112
@@ -1349,6 +1349,8 @@ msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
 msgstr ""
+"Paprastos lenktynės: viskas leidžiama, taigi - rinkite ginklus bei kitus "
+"gerus dalykus ir juos naudokite tinkamai!"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:108
@@ -1394,7 +1396,7 @@ msgstr "Škotija"
 #. I18N: ./data/tracks/secretgarden/track.xml
 #: data/po/gui_strings.h:44
 msgid "Secret Garden"
-msgstr ""
+msgstr "Paslaptingas sodas"
 
 #: src/states_screens/race_result_gui.cpp:82
 msgid "See unlocked feature"
@@ -1482,7 +1484,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:144
 msgid "Start Grand Prix"
-msgstr "Pradėti Grand Prix"
+msgstr "Pradėti čempionatą"
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:143
 msgid "Start Race"
@@ -1491,7 +1493,7 @@ msgstr "Pradėti lenktynes"
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:214
 msgid "Status"
-msgstr ""
+msgstr "Būklė"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:174
@@ -1506,7 +1508,7 @@ msgstr "Sukimas dešinėn"
 #. I18N: ./data/gui/addons.stkgui
 #: data/po/gui_strings.h:182
 msgid "SuperTuxKart Addons"
-msgstr ""
+msgstr "SuperTuxKart papildiniai"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
@@ -1558,7 +1560,7 @@ msgstr ""
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/main_menu_screen.cpp:198
 msgid "System Language"
-msgstr ""
+msgstr "Nustatyta operacinėje sistemoje"
 
 #. I18N: ./data/grandprix/test.grandprix
 #: data/po/gui_strings.h:176 data/po/gui_strings.h:788
@@ -1595,7 +1597,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:149
 msgid "This Grand Prix is broken!"
-msgstr "Šis Grand Prix yra sugadintas!"
+msgstr "Šis čempionatas (Grand Prix) yra sugadintas!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:674
 msgid "Time"
@@ -1655,7 +1657,7 @@ msgstr "Trasos"
 
 #: src/states_screens/dialogs/addons_loading.cpp:187
 msgid "Try again"
-msgstr ""
+msgstr "Bandyti dar kartą"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
@@ -1698,7 +1700,7 @@ msgstr "Atnaujinamas sąrašas..."
 #: src/states_screens/options_screen_players.cpp:69
 #: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:559
 msgid "User Interface"
-msgstr ""
+msgstr "Naudotojo sąsaja"
 
 #. I18N: ./data/gui/addons_view_dialog.stkgui
 #: data/po/gui_strings.h:203
@@ -1754,7 +1756,7 @@ msgstr "Ginklai"
 #: src/states_screens/options_screen_video.cpp:287
 #, c-format
 msgid "Weather Effects : %s"
-msgstr ""
+msgstr "Lietus, sniegas ir pan.: %s"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -1776,7 +1778,7 @@ msgstr ""
 #. I18N: ./data/challenges/followtheleader.challenge
 #: data/po/gui_strings.h:92 data/po/gui_strings.h:704
 msgid "Win Penguin Playground Grand Prix"
-msgstr ""
+msgstr "Laimėkite čempionatą „Pingvinų žaidimų aikštelė“"
 
 #. I18N: ./data/challenges/followtheleader.challenge
 #: data/po/gui_strings.h:95 data/po/gui_strings.h:707
@@ -1793,6 +1795,8 @@ msgstr ""
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
+"Laimėkite vieną trasos „Paslaptingas sodas“ ratą prieš nepatyrusį "
+"lenktynininką."
 
 #. I18N: ./data/challenges/xr591.challenge
 #: data/po/gui_strings.h:161 data/po/gui_strings.h:773
@@ -1828,17 +1832,17 @@ msgstr ""
 #. I18N: ./data/challenges/skyline.challenge
 #: data/po/gui_strings.h:134 data/po/gui_strings.h:746
 msgid "Win a Head to Head in the Secret Garden"
-msgstr ""
+msgstr "Aplenkite priešiniką trasoje „Paslaptingas sodas“"
 
 #. I18N: ./data/challenges/xr591.challenge
 #: data/po/gui_strings.h:158 data/po/gui_strings.h:770
 msgid "Win a race on Canyon"
-msgstr ""
+msgstr "Laimėkite lenktynes trasoje „Tarpeklis“"
 
 #. I18N: ./data/challenges/gnu.challenge
 #: data/po/gui_strings.h:104 data/po/gui_strings.h:716
 msgid "Win a race on Fort Magma"
-msgstr ""
+msgstr "Laimėkite lenktynes trasoje „Fort Magma“"
 
 #. I18N: ./data/challenges/island.challenge
 #: data/po/gui_strings.h:116 data/po/gui_strings.h:728
@@ -1848,12 +1852,12 @@ msgstr "Laimėkite lenktynes apsnigtuose kalnuose"
 #. I18N: ./data/challenges/canyon.challenge
 #: data/po/gui_strings.h:80 data/po/gui_strings.h:692
 msgid "Win a race on Tux Tollway"
-msgstr ""
+msgstr "Laimėkite lenktynes trasoje „Tux Tollway“"
 
 #. I18N: ./data/challenges/alltracks.challenge
 #: data/po/gui_strings.h:68 data/po/gui_strings.h:680
 msgid "Win the At World's End Grand Prix"
-msgstr ""
+msgstr "Laimėkite čempionatą „Pasaulio pakrašty“"
 
 #. I18N: ./data/challenges/snagdrive.challenge
 #: data/po/gui_strings.h:143 data/po/gui_strings.h:755
@@ -1873,7 +1877,7 @@ msgstr "Taip"
 
 #: src/states_screens/grand_prix_win.cpp:378
 msgid "You completed the Grand Prix!"
-msgstr "Jūs pabaigėte Grand Prix!"
+msgstr "Jūs baigėte čempionatą (Grand Prix)!"
 
 #: src/karts/kart.cpp:587 src/karts/kart.cpp:606
 msgid "You finished the race!"
