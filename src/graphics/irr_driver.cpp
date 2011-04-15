@@ -44,6 +44,10 @@ using namespace irr::core;
 using namespace irr::scene;
 using namespace irr::video;
 
+#ifndef round
+#  define round(x)  (floor(x+0.5f))
+#endif
+
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
