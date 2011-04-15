@@ -27,6 +27,8 @@
 #include <irrString.h>
 #include <stdexcept>
 
+#include "utils/translation.hpp"
+
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
   * \ingroup race
@@ -59,7 +61,7 @@ public:
                        GrandPrixData  ()       {}; // empty for initialising
     
     /** @return the (potentially translated) user-visible name of the Grand Prix */
-    const irr::core::stringw& getName ()        const { return m_name;          }
+    const irr::core::stringw getName ()         const { return translations->w_gettext(m_name.c_str()); }
     
     /** @return the (potentially translated) user-visible description of the Grand Prix */
     //const irr::core::stringw& getDescription () const { return m_description;   }
