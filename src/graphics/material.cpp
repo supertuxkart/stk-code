@@ -71,14 +71,15 @@ Material::Material(const XMLNode *node, int index)
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
     node->get("friction",         &m_friction          );
-    node->get("reset",            &m_resetter          );
+    node->get("reset",            &m_drive_reset       );
+    node->get("crash-reset",      &m_crash_reset       );
     node->get("below-surface",    &m_below_surface     );
     node->get("falling-effect",   &m_falling_effect    );
     // A terrain with falling effect has to force a reset
-    // since. So to make it easier for artists, force
-    // the reset flag in this case.
+    // when the kart is on it. So to make it easier for artists, 
+    // force the reset flag in this case.
     if(m_falling_effect)
-        m_resetter=true;
+        m_drive_reset=true;
     node->get("surface",          &m_surface           );
     node->get("ignore",           &m_ignore            );
 
@@ -219,7 +220,8 @@ void Material::init(unsigned int index)
     m_falling_effect            = false;
     m_surface                   = false;
     m_ignore                    = false;
-    m_resetter                  = false;
+    m_drive_reset               = false;
+    m_crash_reset               = false;
     m_add                       = false;
     m_disable_z_write           = false;
     m_max_speed_fraction        = 1.0f;

@@ -25,6 +25,7 @@
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
 // ----------------------------------------------------------------------------
@@ -290,7 +291,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 
         // FIXME: Must be a moving physics object
         // FIXME: A rocket should explode here!
-
         if(!upA || !upB) continue;
         // 1) object A is a track
         // =======================
@@ -302,7 +302,11 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             {
                 Kart *kart=upB->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
-                kart->crashed(NULL);
+                int n = contactManifold->getContactPoint(0).m_index0;
+                const Material *m 
+                    = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                kart->crashed(NULL, m);
             }
         }
         // 2) object a is a kart
@@ -313,7 +317,11 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             {
                 Kart *kart = upA->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
-                kart->crashed(NULL);   // Kart hit track
+                int n = contactManifold->getContactPoint(0).m_index1;
+                const Material *m 
+                    = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                kart->crashed(NULL, m);   // Kart hit track
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart

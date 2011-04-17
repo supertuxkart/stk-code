@@ -372,7 +372,7 @@ void World::resetAllKarts()
                     const Vec3 &xyz = kart->getTrans().getOrigin()+Vec3(0,0.3f,0);
                     ((TerrainInfo*)kart)->update(xyz);
                     const Material *material = kart->getMaterial();
-                    if(!material || material->isReset())
+                    if(!material || material->isDriveReset())
                         kart_over_ground = false;
                 }
                 if(!kart_over_ground)

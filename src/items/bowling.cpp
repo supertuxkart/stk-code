@@ -117,7 +117,7 @@ void Bowling::update(float dt)
     if(hat-0.5f*m_extend.getY()<0.01f)
     {
         const Material *material = getMaterial();
-        if(!material || material->isReset())
+        if(!material || material->isDriveReset())
         {
             hit(NULL);
             return;

@@ -863,8 +863,10 @@ void Kart::update(float dt)
     else
     {
         handleMaterialSFX(material);
-        if     (material->isReset()  && isOnGround()) forceRescue();
-        else if(material->isZipper() && isOnGround()) handleZipper(material);
+        if     (material->isDriveReset() && isOnGround())
+            forceRescue();
+        else if(material->isZipper()     && isOnGround())
+            handleZipper(material);
         else
         {
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
@@ -1236,9 +1238,10 @@ void Kart::resetBrakes()
 
 // -----------------------------------------------------------------------------
 /** Called when the kart crashes against the track (k=NULL) or another kart.
- *  \params k Either a kart if a kart was hit, or NULL if the track was hit.
+ *  \param k Either a kart if a kart was hit, or NULL if the track was hit.
+ *  \param m 
  */
-void Kart::crashed(Kart *k)
+void Kart::crashed(Kart *k, const Material *m)
 {
     m_controller->crashed();
     /** If a kart is crashing against the track, the collision is often
@@ -1246,6 +1249,8 @@ void Kart::crashed(Kart *k)
      *  long disabling of the engine. Therefore, this reaction is disabled
      *  for 0.5 seconds after a crash.
      */
+    if(m && m->isCrashReset() && !playingEmergencyAnimation())
+        forceRescue();
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
     m_time_last_crash = World::getWorld()->getTime();

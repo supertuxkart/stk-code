@@ -72,8 +72,10 @@ private:
     bool             m_surface;
     /** If the material is a zipper, i.e. gives a speed boost. */
     bool             m_zipper;
-    /** If a kart is rescued when touching this surface. */
-    bool             m_resetter;
+    /** If a kart is rescued when driving on this surface. */
+    bool             m_drive_reset;
+    /** If a kart is rescued when crashing into this surface. */
+    bool             m_crash_reset;
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
@@ -163,7 +165,12 @@ public:
     /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
     bool  isSphereMap        () const { return m_sphere_map;         }
-    bool  isReset            () const { return m_resetter;           }
+    /** Returns if this material should trigger a rescue if a kart
+     *  is driving on it. */
+    bool  isDriveReset       () const { return m_drive_reset;        }
+    /** Returns if this material should trigger a rescue if a kart
+     *  crashes against it. */
+    bool  isCrashReset       () const { return m_crash_reset;        }
     float getFriction        () const { return m_friction;           }
     const std::string& 
           getTexFname        () const { return m_texname;            }
