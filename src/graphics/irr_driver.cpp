@@ -903,6 +903,8 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture, const std::string& mask
     }
     
     return m_scene_manager->getVideoDriver()->addTexture(texture->getName().getPath().c_str(), img, NULL);  
+    img->drop();
+    mask->drop();
 }
 
 // ----------------------------------------------------------------------------
