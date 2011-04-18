@@ -39,6 +39,7 @@ Addon::Addon(const XMLNode &xml)
     m_icon_url           = "";
     m_icon_basename      = "";
     m_icon_revision      = 0;
+    m_size               = 0;
     m_icon_ready         = false;
     m_type               = xml.getName();
 
@@ -52,6 +53,7 @@ Addon::Addon(const XMLNode &xml)
     xml.get("description",        &m_description       );
     xml.get("image",              &m_icon_url          );
     xml.get("icon-revision",      &m_icon_revision     );
+    xml.get("size",               &m_size              );
     m_icon_basename = StringUtils::getBasename(m_icon_url);
 };   // Addon(const XML&)
 
@@ -76,13 +78,14 @@ void Addon::copyInstallData(const Addon &addon)
  */
 void Addon::writeXML(std::ofstream *out_stream)
 {
-    (*out_stream) << "  <"                     << m_type 
-                  << " name=\""                << m_name 
-                  << "\" id=\""                << m_id 
+    (*out_stream) << "  <"                       << m_type 
+                  << " name=\""                  << m_name 
+                  << "\" id=\""                  << m_id 
                   << "\" installed=\""         
                   << (m_installed ? "true" : "false" )
-                  << "\" installed-revision=\"" << m_installed_revision 
-                  <<"\" icon-revision=\""       << m_icon_revision 
+                  << "\" installed-revision=\""  << m_installed_revision 
+                  << "\" size=\""                << m_size
+                  << "\" icon-revision=\""       << m_icon_revision 
                   << "\"/>\n";
 }   // writeXML
 

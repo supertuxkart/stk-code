@@ -71,6 +71,27 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);
 
+    int n = m_addon.getSize();
+    core::stringw unit="";
+    if(n>1024*1024)
+    {
+        float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
+        char s[32];
+        sprintf(s, "%.1f", f);
+        unit=_("%s MB", s);
+    }
+    else if(n>1024)
+    {
+        float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
+        char s[32];
+        sprintf(s, "%.1f", f);
+        unit=_("%s KB", s);
+    }
+    else
+        // Anything smaller just let it be 1 KB
+        unit=_("1 KB");
+    core::stringw size = _("Size: %s", unit.c_str());
+    getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------

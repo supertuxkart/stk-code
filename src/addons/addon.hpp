@@ -52,6 +52,8 @@ public:
     std::string m_zip_file;
     /** True if the addon is installed. */
     bool        m_installed;
+    /** Compressed size of the addon package. */
+    int         m_size;
     /** Type, must be 'kart' or 'track'. */
     std::string m_type;
 
@@ -130,6 +132,9 @@ public:
         m_icon_revision = m_revision;
         m_icon_ready=true; 
     }   // setIconReady
+    // ------------------------------------------------------------------------
+    /** Returns the size of the compressed package. */
+    int getSize() const { return m_size; }
     // ------------------------------------------------------------------------
     /** Returns the directory in which this type of addons is stored (in a 
      *  separate subdirectory). A kart is stored in .../karts/X and tracks in
