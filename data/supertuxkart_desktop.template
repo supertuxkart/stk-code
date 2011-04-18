@@ -13,5 +13,5 @@ Terminal=false
 StartupNotify=false
 Type=Application
 TryExec=PREFIX/games/supertuxkart
-Categories=Game;ArcadeGame
+Categories=Game;ArcadeGame;
 GenericName=
