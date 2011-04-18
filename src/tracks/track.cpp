@@ -569,6 +569,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         
         std::string lodgroup;
         int detail = -1;
+        bool is_instance = false;
         
         size_t loc = model_name.find("_LOD");
         if (loc != std::string::npos)
@@ -577,7 +578,11 @@ bool Track::loadMainTrack(const XMLNode &root)
             
             std::string detail_str = StringUtils::removeExtension(model_name.substr(loc+4));
             
-            if (!StringUtils::parseString(detail_str, &detail))
+            if (detail_str == "x")
+            {
+                is_instance = true;
+            }
+            else if (!StringUtils::parseString(detail_str, &detail))
             {
                 lodgroup = "";
                 fprintf(stderr, "WARNING : invalid level-of-detail model name '%s'\n", model_name.c_str());
@@ -621,8 +626,16 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (!lodgroup.empty())
         {
-            lod_groups[lodgroup][detail] = model_name;
-            lod_instances[lodgroup].push_back(n);
+            if (is_instance)
+            {
+                lod_instances[lodgroup].push_back(n);
+                //printf("LOD instance : '%s' @ (%.2f, %.2f, %.2f)\n", lodgroup.c_str(), xyz.X, xyz.Y, xyz.Z);
+            }
+            else
+            {
+                lod_groups[lodgroup][detail] = model_name;
+                //printf("LOD Model Definition : group='%s', detail='%i', model='%s'\n", lodgroup.c_str(), detail, model_name.c_str());
+            }
         }
         else
         {
@@ -696,10 +709,9 @@ bool Track::loadMainTrack(const XMLNode &root)
                 continue;
             }
 
-            // Only instanciate those at the highest level of detail
-            model_name="";
+            model_name = "";
             node->get("model", &model_name);
-            if (model_name != sorted_lod_groups[it3->first][0].second) continue;
+            //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
                 
             core::vector3df xyz(0,0,0);
             node->get("xyz", &xyz);
