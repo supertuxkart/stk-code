@@ -105,6 +105,13 @@ private:
     /** A conditional variable to wake up the main loop. */
     pthread_cond_t  m_cond_command;
 
+    /** A mutex used in cancelling the network thread with timeout. */
+    pthread_mutex_t m_mutex_quit;
+
+    /** Conidtional variable used in cancelling the network 
+     *  thread with timeout. */
+    pthread_cond_t m_cond_quit;
+
     /** The file to download when a file download is triggered. */
     std::string     m_url;
 

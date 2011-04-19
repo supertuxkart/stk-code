@@ -71,6 +71,10 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
     pthread_mutex_init(&m_mutex_command, NULL);
     pthread_cond_init(&m_cond_command, NULL);
 
+    // Initialise the variables for cancelling the network thread.
+    pthread_mutex_init(&m_mutex_quit, NULL);
+    pthread_cond_init(&m_cond_quit, NULL);
+
     // Since there are no threads at this stage, just init
     // m_command without mutex.
     m_command = HC_SLEEP;
@@ -176,6 +180,16 @@ void *NetworkHttp::mainLoop(void *obj)
         me->m_command = HC_SLEEP;
     }   // while 1
     pthread_mutex_unlock(&me->m_mutex_command);
+
+    // Signal that we are quitting properly.
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Signaling that network thread is quitting.\n");
+    pthread_mutex_lock(&me->m_mutex_quit);
+    pthread_cond_broadcast(&me->m_cond_quit);
+    pthread_mutex_unlock(&me->m_mutex_quit);
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[addons] Network thread is quitting.\n");
+
     return NULL;
 }   // mainLoop
 
@@ -203,21 +217,41 @@ NetworkHttp::~NetworkHttp()
     }
     pthread_mutex_unlock(&m_mutex_command);
     if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Mutex unlocked.\n");
+        printf("[addons] Command mutex unlocked.\n");
 
     if(m_thread_id)
     {
-        void *result;
         if(UserConfigParams::m_verbosity>=3)
-            printf("[addons] Trying to join network thread.\n");
-        pthread_join(*m_thread_id, &result);
+            printf("[addons] Trying to stop network thread.\n");
+
+        pthread_mutex_lock(&m_mutex_quit);
+        timespec timeout;
+        timeout.tv_nsec = 0;
+        timeout.tv_sec  = 1;
+        int error = pthread_cond_timedwait(&m_cond_quit, &m_mutex_quit, 
+                                           &timeout);
+        pthread_mutex_unlock(&m_mutex_quit);
+        if(error==ETIMEDOUT)
+        {
+            printf("[addons] Timeout waiting for joining. Cancelling.\n");
+            int e = pthread_cancel(*m_thread_id);
+            printf("[addons] Cancelled network thread. Return code: %d\n", e);
+        }
+        else
+        {
+            if(UserConfigParams::m_verbosity>=3)
+                printf("[addons] Trying to cancel network thread.\n");
+            pthread_join(*m_thread_id, NULL);
+            if(UserConfigParams::m_verbosity>=3)
+                printf("[addons] Network thread joined.\n");
+        }
         delete m_thread_id;
-        if(UserConfigParams::m_verbosity>=3)
-            printf("[addons] Network thread joined.\n");
     }
 
     pthread_mutex_destroy(&m_mutex_command);
     pthread_cond_destroy(&m_cond_command);
+    pthread_mutex_destroy(&m_mutex_quit);
+    pthread_cond_destroy(&m_cond_quit);
 }   // ~NetworkHttp
 
 // ---------------------------------------------------------------------------
