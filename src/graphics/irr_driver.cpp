@@ -902,10 +902,11 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture, const std::string& mask
         return NULL;
     }
     
-    return m_scene_manager->getVideoDriver()->addTexture(texture->getName().getPath().c_str(), img, NULL);  
+    ITexture *t = m_scene_manager->getVideoDriver()->addTexture(texture->getName().getPath().c_str(), img, NULL);  
     img->drop();
     mask->drop();
-}
+    return t;
+}   // applyMask
 
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
