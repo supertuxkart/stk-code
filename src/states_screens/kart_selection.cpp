@@ -504,7 +504,9 @@ public:
                                                m_player_ident_spinner->m_y),
                             core::dimension2di(m_player_ident_spinner->m_w,
                                                m_player_ident_spinner->m_h));
-        m_ready_text = GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString), rect);
+        // 'playerNameString' is already fribidize, so we need to use 'insertValues' and not _("...", a) so it's not flipped again
+        m_ready_text = GUIEngine::getGUIEnv()->addStaticText(StringUtils::insertValues(_("%s is ready"), playerNameString).c_str(),
+                                                             rect);
         m_ready_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
                 
         m_children.remove(m_player_ident_spinner);

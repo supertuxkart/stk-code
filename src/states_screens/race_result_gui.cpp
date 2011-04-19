@@ -248,7 +248,7 @@ void RaceResultGUI::determineTableLayout()
         std::string time_string  = StringUtils::timeToString(time);
         ri->m_finish_time_string = time_string.c_str();
 
-        core::dimension2d<u32> rect = m_font->getDimension(ri->m_kart_name);
+        core::dimension2d<u32> rect = m_font->getDimension(ri->m_kart_name.c_str());
         if(rect.Width > m_width_kart_name)
             m_width_kart_name = rect.Width;
     }   // for position
