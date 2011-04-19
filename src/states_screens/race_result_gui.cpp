@@ -237,7 +237,7 @@ void RaceResultGUI::determineTableLayout()
         // Save a pointer to the current row_info entry
         RowInfo *ri              = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
-        ri->m_kart_name          = kart->getName();
+        ri->m_kart_name          = translations->fribidize(kart->getName());
 
         video::ITexture *icon    = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -248,7 +248,7 @@ void RaceResultGUI::determineTableLayout()
         std::string time_string  = StringUtils::timeToString(time);
         ri->m_finish_time_string = time_string.c_str();
 
-        core::dimension2d<u32> rect = m_font->getDimension(kart->getName());
+        core::dimension2d<u32> rect = m_font->getDimension(ri->m_kart_name);
         if(rect.Width > m_width_kart_name)
             m_width_kart_name = rect.Width;
     }   // for position
@@ -533,7 +533,7 @@ void RaceResultGUI::determineGPLayout()
         RowInfo *ri          = &(m_all_row_infos[rank]);
         ri->m_kart_icon      = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        ri->m_kart_name      = kart->getName();
+        ri->m_kart_name      = translations->fribidize(kart->getName());
         ri->m_is_player_kart = kart->getController()->isPlayerController();
 
         float time           = race_manager->getOverallTime(kart_id);
