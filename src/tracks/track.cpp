@@ -1305,8 +1305,11 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
         loc += Vec3(0,0.1f,0);
+#ifndef DEBUG
+        // Avoid unused variable warning in case of non-debug compilation.
+        setTerrainHeight(&loc);
+#else
         bool drop_success = setTerrainHeight(&loc);
-#ifdef DEBUG
         if(!drop_success)
         {
             printf("Item at position (%f,%f,%f) can not be dropped\n",
