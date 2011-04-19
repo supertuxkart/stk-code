@@ -380,6 +380,7 @@ Kart::~Kart()
     if(m_slipstream)             delete m_slipstream;
     if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
+    if(m_attachment)             delete m_attachment;
 
     delete m_shadow;
 
