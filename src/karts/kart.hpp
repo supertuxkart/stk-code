@@ -143,6 +143,9 @@ private:
     /** Graphical effect when using a nitro. */
     ParticleEmitter *m_nitro;
 
+    /** The particle kind for the nitro. */
+    ParticleKind    *m_nitro_kind;
+
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
     

@@ -96,6 +96,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_shadow               = NULL;
     m_terrain_particles    = NULL;
     m_nitro                = NULL;
+    m_nitro_kind           = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
     m_camera               = NULL;
@@ -377,6 +378,7 @@ Kart::~Kart()
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_terrain_particles)      delete m_terrain_particles;
     if(m_nitro)                  delete m_nitro;
+    if(m_nitro_kind)             delete m_nitro_kind;
     if(m_slipstream)             delete m_slipstream;
     if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -1735,9 +1737,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart, Track* track
     
     try
     {
-        m_nitro  = new ParticleEmitter(
-                        new ParticleKind(file_manager->getGfxFile("nitro.xml")),
-                        position, getNode());
+        m_nitro_kind = new ParticleKind(file_manager->getGfxFile("nitro.xml"));
+        m_nitro      = new ParticleEmitter(m_nitro_kind, position, getNode());
     }
     catch (std::runtime_error& e)
     {
