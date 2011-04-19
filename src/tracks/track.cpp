@@ -510,14 +510,17 @@ bool Track::loadMainTrack(const XMLNode &root)
     scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
-    // FIXME: LEAK: What happens to this mesh? If it is dropped here,
-    // something breaks in the Batching mesh (and the conversion to
-    // bullet crashes), but atm this mesh is not freed.
-    //mesh->drop();
 
-    m_all_meshes.push_back(merged_mesh);
+    // The merged mesh is grabbed by the octtree, so we don't need
+    // to keep a reference to it.
     //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
     scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    merged_mesh->drop();
+
+    // The reference count of the mesh is 1, since it is in irrlicht's
+    // cache. So we only have to remove it from the cache.
+    irr_driver->removeMesh(mesh);
+
 #ifdef DEBUG
     std::string debug_name=model_name+" (main track, octtree)";
     scene_node->setName(debug_name.c_str());
