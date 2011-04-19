@@ -247,6 +247,7 @@ scene::ISceneNode* KartModel::attachModel(bool animatedModels)
  */
 bool KartModel::loadModels(const KartProperties &kart_properties)
 {
+    assert(m_is_master);
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     
