@@ -46,7 +46,8 @@ struct VideoMode
 };
 
 /**
-  * \brief class that creates the irrLicht device and offers higher-level ways to manage the 3D scene
+  * \brief class that creates the irrLicht device and offers higher-level 
+  *  ways to manage the 3D scene
   * \ingroup graphics
   */
 class IrrDriver : public IEventReceiver, public NoCopy
@@ -105,7 +106,8 @@ public:
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     
-    video::ITexture      *applyMask(video::ITexture* texture, const std::string& mask_path);
+    video::ITexture      *applyMask(video::ITexture* texture, 
+                                    const std::string& mask_path);
     
     void                  displayFPS();
     /** this is not really used to process events, it's only used to shut down irrLicht's
@@ -119,14 +121,19 @@ public:
                                      bool is_prediv=false);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 
                                          bool create_one_quad=false);
-    scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h);
+    scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material, 
+                                                 const double w, const double h);
     scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
-    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh, scene::ICameraSceneNode* node, scene::ISceneNode *parent = NULL);
-    scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent=NULL);
+    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh, 
+                                           scene::ICameraSceneNode* node,
+                                           scene::ISceneNode *parent = NULL);
+    scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, 
+                                       video::ITexture *texture, 
+                                       scene::ISceneNode* parent=NULL);
 
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
@@ -164,16 +171,19 @@ public:
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c, 
                         const video::ITexture *texture = NULL,
-                        const video::SColor *ca=NULL,  const video::SColor *cb=NULL,
+                        const video::SColor *ca=NULL,  
+                        const video::SColor *cb=NULL,
                         const video::SColor *cc=NULL);
     
     // --------------------- RTT --------------------
     /**
-      * Class that provides RTT (currently, only when no other 3D rendering in the main scene is required)
-      * Provides an optional 'setupRTTScene' method to make it quick and easy to prepare rendering of 3D objects
-      * but you can also manually set the scene/camera. If you use the factory 'setupRTTScene', cleanup can be
-      * done through 'tearDownRTTScene' (destructor will also do this). If you set it up manually, you need
-      * to clean it up manually.
+      * Class that provides RTT (currently, only when no other 3D rendering 
+      * in the main scene is required)
+      * Provides an optional 'setupRTTScene' method to make it quick and easy
+      * to prepare rendering of 3D objects but you can also manually set the 
+      * scene/camera. If you use the factory 'setupRTTScene', cleanup can be
+      * done through 'tearDownRTTScene' (destructor will also do this). If 
+      * you set it up manually, you need to clean it up manually.
       */
     class RTTProvider
     {
@@ -198,17 +208,21 @@ public:
         ~RTTProvider();
         
         /**
-          * \brief Quick utility method to setup a scene from a plain list of models
+          * \brief Quick utility method to setup a scene from a plain list 
+          *  of models
           *
-          * Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
-          * object inside the GUI. If there are multiple meshes, the first mesh is considered
-          * to be the root, and all following meshes will have their locations relative to
-          * the location of the first mesh.
+          * Sets up a given vector of meshes for render-to-texture. Ideal to
+          * embed a 3D object inside the GUI. If there are multiple meshes,
+          * the first mesh is considered to be the root, and all following 
+          * meshes will have their locations relative to the location of the 
+          * first mesh.
           *
           * \param mesh             The list of meshes to add to the scene
           * \param mesh_location    Location of each fo these meshes
-          * \param model_frames     For animated meshes, which frame to use (value can be -1 to set none)
-          *                         When frame is not -1, the corresponding IMesh must be an IAnimatedMesh.
+          * \param model_frames     For animated meshes, which frame to use 
+          *                         (value can be -1 to set none)
+          *                         When frame is not -1, the corresponding 
+          *                         IMesh must be an IAnimatedMesh.
           * \pre           The 3 vectors have the same size.
           */
         void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh, 
@@ -216,7 +230,8 @@ public:
                            AlignedArray<Vec3>& mesh_scale,
                            const std::vector<int>& model_frames);
         
-        /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
+        /** Optional 'angle' parameter will rotate the object added 
+         *  *through setupRTTScene* */
         video::ITexture* renderToTexture(float angle=-1,
                                          bool is_2d_render=false);
         
@@ -230,4 +245,3 @@ public:
 extern IrrDriver *irr_driver;
 
 #endif   // HEADER_IRR_DRIVER_HPP
-
