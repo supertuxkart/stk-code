@@ -256,13 +256,16 @@ void Material::install(bool is_full_path)
     m_texture = irr_driver->getTexture(full_path,
                                        isPreMul(), isPreDiv());
 
-    if (m_mask.size() > 0)
-    {
-        m_texture = irr_driver->applyMask(m_texture, m_mask);
-    }
-    
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
+    
+    if (m_mask.size() > 0)
+    {
+        video::ITexture* tex = irr_driver->applyMask(m_texture, m_mask);
+        if (tex) m_texture = tex;
+        else fprintf(stderr, "Applying mask failed for '%s'!\n", m_texname.c_str());
+    }
+    
 }   // install
 //-----------------------------------------------------------------------------
 Material::~Material()

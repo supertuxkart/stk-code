@@ -900,7 +900,8 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture,
         return NULL;
     }
     
-    ITexture *t = m_video_driver->addTexture(texture->getName().getPath().c_str(), 
+    //printf("* Adding '%s'\n", texture->getName().getPath().c_str());
+    ITexture *t = m_video_driver->addTexture(StringUtils::getBasename(texture->getName().getPath().c_str()).c_str(),
                                              img, NULL);
     img->drop();
     mask->drop();
