@@ -267,6 +267,8 @@ void Material::install(bool is_full_path)
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
+    if(m_texture)
+        irr_driver->removeTexture(m_texture);
     // If a special sfx is installed (that isn't part of stk itself), the
     // entry needs to be removed from the sfx_manager's mapping, since other
     // tracks might use the same name.
