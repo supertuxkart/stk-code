@@ -984,7 +984,7 @@ void IrrDriver::displayFPS()
 
 #ifdef DEBUG
 
-void drawJoint(int frame, bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* joint,
+void drawJoint(bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* joint,
                ISkinnedMesh* mesh, int id)
 {
     //if (joint->PositionKeys.size() == 0) return;
@@ -1066,8 +1066,12 @@ void drawJoint(int frame, bool drawline, bool drawname, irr::scene::ISkinnedMesh
                 break;
         }
         
-        core::vector3df v(0.0f, 1.0f, 0.0f);
-        joint->LocalMatrix.transformVect(v);
+        // This code doesn't quite work. 0.25 is used so that the bone is not way too long (not sure why I need to manually size it down)
+        // and the rotation of the bone is often rather off
+        core::vector3df v(0.0f, 0.25f, 0.0f);
+        //joint->GlobalMatrix.rotateVect(v);
+        joint->LocalMatrix.rotateVect(v);
+        v *= joint->LocalMatrix.getScale();
         irr_driver->getVideoDriver()->draw3DLine(jointpos,
                                                  jointpos + v,
                                                  color);
@@ -1211,15 +1215,11 @@ void IrrDriver::update(float dt)
         IMesh* mesh = debug_meshes[n]->getMesh();
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
         const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
-        
-        static int frame = 0;
-        frame++;
-        if (frame > 100) frame = 0;
-        
+
         for (unsigned int j=0; j<joints.size(); j++)
         {
             //drawJoint(debug_meshes[n]->getFrameNr(), joints[j]);
-            drawJoint(frame, false, true, joints[j], smesh, j);
+            drawJoint( false, true, joints[j], smesh, j);
         }
     }
     
@@ -1241,17 +1241,13 @@ void IrrDriver::update(float dt)
         
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
         const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
-        
-        static int frame = 0;
-        frame++;
-        if (frame > 100) frame = 0;
-        
+
         for (unsigned int j=0; j<joints.size(); j++)
         {
             IMesh* mesh = debug_meshes[n]->getMesh();
             ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
             
-            drawJoint(frame, true, false, joints[j], smesh, j);
+            drawJoint(true, false, joints[j], smesh, j);
         }
     }
 #endif
