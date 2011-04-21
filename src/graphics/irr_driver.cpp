@@ -982,6 +982,126 @@ void IrrDriver::displayFPS()
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
+#ifdef DEBUG
+
+void drawJoint(int frame, bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* joint,
+               ISkinnedMesh* mesh, int id)
+{
+    //if (joint->PositionKeys.size() == 0) return;
+    
+    irr::scene::ISkinnedMesh::SJoint* parent = NULL;
+    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = mesh->getAllJoints();
+    for (unsigned int j=0; j<joints.size(); j++)
+    {
+        if (joints[j]->Children.linear_search(joint) != -1)
+        {
+            parent = joints[j];
+            break;
+        }
+    }
+    
+    core::vector3df jointpos = joint->GlobalMatrix.getTranslation();
+
+    SColor color(255, 255,255,255);
+    if (parent == NULL) color = SColor(255,0,255,0);
+    
+    switch (id % 4)
+    {
+        case 0:
+            color = SColor(255,255,0,255);
+            break;
+        case 1:
+            color = SColor(255,255,0,0);
+            break;
+        case 2:
+            color = SColor(255,0,0,255);
+            break;
+        case 3:
+            color = SColor(255,0,255,255);
+            break;
+    }
+    
+
+    if (parent)
+    {
+        core::vector3df parentpos = parent->GlobalMatrix.getTranslation();
+        
+        jointpos = joint->GlobalMatrix.getTranslation();
+        
+        if (drawline)
+        {
+            irr_driver->getVideoDriver()->draw3DLine(jointpos,
+                                                     parentpos,
+                                                     color);
+        }
+            
+    }
+    else
+    {
+        /*
+        if (drawline)
+        {
+            irr_driver->getVideoDriver()->draw3DLine(jointpos,
+                                                     core::vector3df(0,0,0),
+                                                     color);
+        }
+         */
+    }
+
+    if (joint->Children.size() == 0)
+    {
+        switch ((id + 1) % 4)
+        {
+            case 0:
+                color = SColor(255,255,0,255);
+                break;
+            case 1:
+                color = SColor(255,255,0,0);
+                break;
+            case 2:
+                color = SColor(255,0,0,255);
+                break;
+            case 3:
+                color = SColor(255,0,255,255);
+                break;
+        }
+        
+        core::vector3df v(0.0f, 1.0f, 0.0f);
+        joint->LocalMatrix.transformVect(v);
+        irr_driver->getVideoDriver()->draw3DLine(jointpos,
+                                                 jointpos + v,
+                                                 color);
+    }
+    
+    switch ((id + 1) % 4)
+    {
+        case 0:
+            color = SColor(255,255,0,255);
+            break;
+        case 1:
+            color = SColor(255,255,0,0);
+            break;
+        case 2:
+            color = SColor(255,0,0,255);
+            break;
+        case 3:
+            color = SColor(255,0,255,255);
+            break;
+    }
+    
+    if (drawname)
+    {
+        irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+        
+        core::vector2di textpos = irr_driver->getSceneManager()->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition(jointpos);
+        
+        GUIEngine::getSmallFont()->draw( stringw(joint->Name.c_str()),
+                                   core::rect<s32>(textpos, core::dimension2d<s32>(500,50)),
+                                   color, false, false );
+    }
+}
+#endif
+
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
@@ -1074,6 +1194,7 @@ void IrrDriver::update(float dt)
             m_scene_manager->drawAll();
         }
         
+        
         // The render and displayFPS calls interfere with bullet debug
         // rendering, so they can not be called.
         //FIXME   if(!inRace || !UserConfigParams::m_bullet_debug)
@@ -1083,6 +1204,58 @@ void IrrDriver::update(float dt)
         }
 
     }   // just to mark the begin/end scene block
+    
+#if DEBUG
+    for (unsigned int n=0; n<debug_meshes.size(); n++)
+    {
+        IMesh* mesh = debug_meshes[n]->getMesh();
+        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
+        
+        static int frame = 0;
+        frame++;
+        if (frame > 100) frame = 0;
+        
+        for (unsigned int j=0; j<joints.size(); j++)
+        {
+            //drawJoint(debug_meshes[n]->getFrameNr(), joints[j]);
+            drawJoint(frame, false, true, joints[j], smesh, j);
+        }
+    }
+    
+    video::SColor color(255,255,255,255);
+    video::SMaterial material;
+    material.Thickness = 2;
+    material.AmbientColor = color;
+    material.DiffuseColor = color;
+    material.EmissiveColor= color;
+    material.BackfaceCulling = false;
+    material.setFlag(video::EMF_LIGHTING, false);
+    getVideoDriver()->setMaterial(material);
+    getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+
+    for (unsigned int n=0; n<debug_meshes.size(); n++)
+    {
+        IMesh* mesh = debug_meshes[n]->getMesh();
+        
+        
+        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
+        
+        static int frame = 0;
+        frame++;
+        if (frame > 100) frame = 0;
+        
+        for (unsigned int j=0; j<joints.size(); j++)
+        {
+            IMesh* mesh = debug_meshes[n]->getMesh();
+            ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+            
+            drawJoint(frame, true, false, joints[j], smesh, j);
+        }
+    }
+#endif
+    
     m_video_driver->endScene();
     // Enable this next print statement to get render information printed
     // E.g. number of triangles rendered, culled etc. The stats is only

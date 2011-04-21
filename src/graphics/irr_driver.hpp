@@ -39,6 +39,7 @@ using namespace irr;
 class Camera;
 class Kart;
 class PerCameraNode;
+namespace irr { namespace scene { class IAnimatedMeshSceneNode; } }
 
 struct VideoMode
 {
@@ -238,6 +239,10 @@ public:
         void tearDownRTTScene();
         
     };
+    
+#ifdef DEBUG
+    std::vector<irr::scene::IAnimatedMeshSceneNode*> debug_meshes;
+#endif
     
 
 };   // IrrDriver

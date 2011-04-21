@@ -184,6 +184,9 @@ KartModel* KartModel::makeCopy()
 }   // makeCopy
 
 // ----------------------------------------------------------------------------
+
+#define SKELETON_DEBUG 0
+
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
  */
@@ -197,6 +200,12 @@ scene::ISceneNode* KartModel::attachModel(bool animatedModels)
     {
         node = irr_driver->addAnimatedMesh(m_mesh);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+#ifdef DEBUG
+#if SKELETON_DEBUG
+        irr_driver->debug_meshes.push_back(m_animated_node);
+#endif
+#endif
+        
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
     }
