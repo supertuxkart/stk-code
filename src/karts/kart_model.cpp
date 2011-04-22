@@ -27,6 +27,8 @@
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
+#define SKELETON_DEBUG 1
+
 float KartModel::UNDEFINED = -99.9f;
 
 /** Default constructor which initialises all variables with defaults.
@@ -140,6 +142,12 @@ KartModel::~KartModel()
         }
     }
 
+#ifdef DEBUG
+#if SKELETON_DEBUG
+    irr_driver->debug_meshes.clear();
+#endif
+#endif
+    
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
@@ -184,8 +192,6 @@ KartModel* KartModel::makeCopy()
 }   // makeCopy
 
 // ----------------------------------------------------------------------------
-
-#define SKELETON_DEBUG 0
 
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
