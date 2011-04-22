@@ -110,12 +110,23 @@ bool DeviceManager::initialize()
                 printf("using existing configuration.\n");
         }
 
+        core::stringc name = m_irrlicht_gamepads[id].Name.c_str();
+        
+        // On Windows, unless we use DirectInput, all gamepads are given the same name...
+        // This makes configuration totally useless, so append an ID to the name
+        core::stringc name_lower = name;
+        name_lower.make_lower();
+        if (name_lower == "microsoft pc-joystick driver")
+        {
+            name = name + " " + StringUtils::toString(id).c_str();
+        }
+        
         gamepadConfig->setPlugged(true);
-        gamepadDevice = new GamePadDevice( id, 
-                                           m_irrlicht_gamepads[id].Name.c_str(),
-                                           m_irrlicht_gamepads[id].Axes,
-                                           m_irrlicht_gamepads[id].Buttons,
-                                           gamepadConfig );
+        gamepadDevice = new GamePadDevice(id, 
+                                          name.c_str(),
+                                          m_irrlicht_gamepads[id].Axes,
+                                          m_irrlicht_gamepads[id].Buttons,
+                                          gamepadConfig );
         addGamepad(gamepadDevice);
     } // end for
 
