@@ -1209,7 +1209,7 @@ void IrrDriver::update(float dt)
 
     }   // just to mark the begin/end scene block
     
-#if DEBUG
+#ifdef DEBUG
     for (unsigned int n=0; n<debug_meshes.size(); n++)
     {
         IMesh* mesh = debug_meshes[n]->getMesh();
