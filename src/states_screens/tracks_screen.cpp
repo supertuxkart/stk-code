@@ -108,6 +108,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
                 assert( tabs != NULL );
                 
+                if (m_random_track_list.empty()) return;
+                
+                /*
                 const std::vector<int>& curr_group = track_manager->getTracksInGroup( tabs->getSelectionIDString(0) );
                 
                 RandomGenerator random;
@@ -123,6 +126,15 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 while (unlock_manager->isLocked( track_manager->getTrack(curr_group[randomID])->getIdent()));
                 
                 Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
+                 */
+                
+                
+                std::string track = m_random_track_list.front();
+                m_random_track_list.pop_front();
+                m_random_track_list.push_back(track);
+                Track* clickedTrack = track_manager->getTrack( track );
+
+                
                 if (clickedTrack != NULL)
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
@@ -243,7 +255,7 @@ void TracksScreen::init()
     gps_widget->updateItemDisplay();
     
     buildTrackList();
-       
+    
     // select something for the game master
     // FIXME: 'setSelection' will not scroll up to the passed track, so if given track is not visible
     //         with current scrolling this fails
@@ -265,6 +277,7 @@ void TracksScreen::buildTrackList()
     
     // Reset track list everytime (accounts for locking changes, etc.)
     tracks_widget->clearItems();
+    m_random_track_list.clear();
     
     const std::string curr_group_name = tabs->getSelectionIDString(0);
     
@@ -288,6 +301,7 @@ void TracksScreen::buildTrackList()
             {
                 tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
                                        curr->getScreenshotFile(), 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                m_random_track_list.push_back(curr->getIdent());
             }
         }
         
@@ -313,6 +327,7 @@ void TracksScreen::buildTrackList()
                 tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
                                        curr->getScreenshotFile(), 0 /* no badge */,
                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                m_random_track_list.push_back(curr->getIdent());
             }
         }
     }
@@ -320,7 +335,8 @@ void TracksScreen::buildTrackList()
     tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
                            0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     
-    tracks_widget->updateItemDisplay();       
+    tracks_widget->updateItemDisplay(); 
+    std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
 }
 
 // -----------------------------------------------------------------------------------------------

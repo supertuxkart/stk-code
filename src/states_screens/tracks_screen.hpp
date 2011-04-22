@@ -19,7 +19,7 @@
 #define HEADER_TRACKS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-
+#include <deque>
 
 namespace GUIEngine { class Widget; }
 
@@ -35,6 +35,8 @@ class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
+    
+    std::deque<std::string> m_random_track_list;
     
 public:
     
