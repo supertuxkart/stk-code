@@ -349,17 +349,20 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
         m_chest->setRotation( core::vector3df(0.0f, 160.0f, 0.0f) );
     }
     
+    
+    // Make sure it doesn't continue on its own, WE animated it ourselves here
+    m_chest->setAnimationSpeed(0);
+    
     const float current_frame = keepInRange(0.0f, (float)last_image,
                                             (float)(m_global_time - ANIM_FROM)
                                            /(ANIM_TO - ANIM_FROM) * last_image);
-    //std::cout << "current_frame: " << current_frame << std::endl;
     m_chest->setCurrentFrame( current_frame );
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
     {
-                
+        
         for (int n=0; n<unlockedStuffCount; n++)
         {
             if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
