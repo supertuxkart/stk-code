@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#define DEBUG_MENU_ITEM 0
+
 #include "states_screens/main_menu_screen.hpp"
 
 #include <iostream>
@@ -39,9 +41,11 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tutorial_screen.hpp"
 
-//#include "states_screens/feature_unlocked.hpp"
-//#include "states_screens/grand_prix_lose.hpp"
-//#include "states_screens/grand_prix_win.hpp"
+#if DEBUG_MENU_ITEM
+#include "states_screens/feature_unlocked.hpp"
+#include "states_screens/grand_prix_lose.hpp"
+#include "states_screens/grand_prix_win.hpp"
+#endif
 
 #include "addons/network_http.hpp"
 
@@ -301,8 +305,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
-#if 0
-    if (selection == "network")
+#if DEBUG_MENU_ITEM
+    if (selection == "options")
     {
         // The DEBUG item
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
