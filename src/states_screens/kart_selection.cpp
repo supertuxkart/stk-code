@@ -795,8 +795,15 @@ public:
                          Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
             w3->update(0);
             
-            m_parent->m_kart_widgets[playerID].m_kart_name->setText(
-                    _("Locked : solve active challenges to gain access to more!"), false );
+            if (m_parent->m_multiplayer)
+            {
+                m_parent->m_kart_widgets[playerID].m_kart_name->setText(_("Locked"), false );
+            }
+            else
+            {
+                m_parent->m_kart_widgets[playerID].m_kart_name->setText(
+                        _("Locked : solve active challenges to gain access to more!"), false );
+            }
         }
         else
         {
