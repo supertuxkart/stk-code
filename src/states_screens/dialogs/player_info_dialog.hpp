@@ -44,6 +44,9 @@ public:
      */
     PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
+    
+    virtual ~PlayerInfoDialog();
+    
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };

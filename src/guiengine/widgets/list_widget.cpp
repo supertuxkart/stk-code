@@ -159,6 +159,15 @@ irr::core::stringw ListWidget::getSelectionLabel() const
 
 // -----------------------------------------------------------------------------
 
+void ListWidget::selectItemWithLabel(const irr::core::stringw& name)
+{
+    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    assert(list != NULL);
+    return list->setSelected( name.c_str() );
+}
+
+// -----------------------------------------------------------------------------
+
 void ListWidget::unfocused(const int playerID)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();

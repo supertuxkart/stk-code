@@ -113,6 +113,8 @@ namespace GUIEngine
         
         irr::core::stringw getSelectionLabel() const;
         
+        void selectItemWithLabel(const irr::core::stringw& name);
+        
         /**
           * \brief Finds the ID of the item that has a given internal name
           */

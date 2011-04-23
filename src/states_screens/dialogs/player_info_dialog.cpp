@@ -39,6 +39,14 @@ PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const f
     
     showRegularDialog();
 }
+
+// ------------------------------------------------------------------------------------------------------
+
+PlayerInfoDialog::~PlayerInfoDialog()
+{
+    OptionsScreenPlayers::getInstance()->selectPlayer( translations->fribidize(m_player->getName()) );
+}
+
 // ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::showRegularDialog()
 {

@@ -53,6 +53,8 @@ public:
     bool gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
     
+    void selectPlayer(const irr::core::stringw& name);
+    
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     

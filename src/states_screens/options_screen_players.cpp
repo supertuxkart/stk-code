@@ -199,3 +199,12 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
+
+void OptionsScreenPlayers::selectPlayer(const irr::core::stringw& name)
+{
+    ListWidget* players = this->getWidget<ListWidget>("players");
+    assert(players != NULL);
+    players->selectItemWithLabel(name);
+    
+    players->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+}
