@@ -1045,7 +1045,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     if (StateManager::get()->activePlayerCount() >= MAX_PLAYER_COUNT)
     {
         std::cerr << "[KartSelectionScreen] Maximum number of players reached\n";
-        sfx_manager->quickSound( "use_anvil" );
+        sfx_manager->quickSound( "anvil" );
         return false;
     }
     
@@ -1173,7 +1173,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             // Check that this player has not already confirmed, then they can't back out
             if (m_kart_widgets[n].isReady())
             {
-                sfx_manager->quickSound( "use_anvil" );
+                sfx_manager->quickSound( "anvil" );
                 return true;
             }
             
@@ -1325,7 +1325,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
             if (UserConfigParams::m_verbosity>=5)
                 printf("[KartSelectionScreen] You can't select this identity or kart, someone already took it!!\n");
             
-            sfx_manager->quickSound( "use_anvil" );
+            sfx_manager->quickSound( "anvil" );
             return;
         }
         

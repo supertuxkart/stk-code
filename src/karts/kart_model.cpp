@@ -27,7 +27,7 @@
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
-#define SKELETON_DEBUG 1
+#define SKELETON_DEBUG 0
 
 float KartModel::UNDEFINED = -99.9f;
 

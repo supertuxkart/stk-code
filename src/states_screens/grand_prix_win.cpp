@@ -222,7 +222,7 @@ void GrandPrixWin::init()
     m_light->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
     
-    sfx_manager->quickSound("winner");
+    sfx_manager->quickSound("gp_end");
 }   // init
 
 // -------------------------------------------------------------------------------------

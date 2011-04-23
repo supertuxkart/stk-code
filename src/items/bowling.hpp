@@ -42,7 +42,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual void update(float dt);
     
-    const char* getExplosionSound() const { return "bowling_strike"; }
+    const char* getExplosionSound() const { return "strike"; }
     
 };   // Bowling
 

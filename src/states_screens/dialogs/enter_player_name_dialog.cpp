@@ -115,7 +115,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         {
             LabelWidget* label = getWidget<LabelWidget>("title");
             label->setText(_("Cannot add a player with this name."), false);
-            sfx_manager->quickSound( "use_anvil" );
+            sfx_manager->quickSound( "anvil" );
             return;
         }
         
@@ -130,7 +130,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     {
         LabelWidget* label = getWidget<LabelWidget>("title");
         label->setText(_("Cannot add a player with this name."), false);
-        sfx_manager->quickSound( "use_anvil" );
+        sfx_manager->quickSound( "anvil" );
     }
 }
 

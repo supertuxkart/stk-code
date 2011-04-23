@@ -54,8 +54,8 @@ PlayerController::PlayerController(Kart *kart, StateManager::ActivePlayer *playe
     m_bzzt_sound  = sfx_manager->createSoundSource( "bzzt" );
     m_wee_sound   = sfx_manager->createSoundSource( "wee"  );
     m_ugh_sound   = sfx_manager->createSoundSource( "ugh"  );
-    m_grab_sound  = sfx_manager->createSoundSource( "grab" );
-    m_full_sound  = sfx_manager->createSoundSource( "full" );
+    m_grab_sound  = sfx_manager->createSoundSource( "grab_collectable" );
+    m_full_sound  = sfx_manager->createSoundSource( "energy_bar_full" );
 
     reset();
 }   // PlayerController

@@ -219,13 +219,15 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
         return;
     }
     
-    std::string sfx_name;
+    std::string sfx_name = StringUtils::removeExtension(filename);
+    /*
     if (node->get("name", &sfx_name) == 0)
     {
         fprintf(stderr, 
                 "/!\\ The 'name' attribute is mandatory in the SFX XML file!\n");
         return;
     }
+     */
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         fprintf(stderr, 

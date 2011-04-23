@@ -202,7 +202,7 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
     }
     else if (eventSource == "cannot_start")
     {
-        sfx_manager->quickSound( "use_anvil" );
+        sfx_manager->quickSound( "anvil" );
     }
     
     return GUIEngine::EVENT_LET;

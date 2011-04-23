@@ -150,11 +150,11 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
             
         case PowerupManager::POWERUP_ANVIL:
-            m_sound_use = sfx_manager->createSoundSource("use_anvil");
+            m_sound_use = sfx_manager->createSoundSource("anvil");
             break;
             
         case PowerupManager::POWERUP_PARACHUTE:
-            m_sound_use = sfx_manager->createSoundSource("use_parachute");
+            m_sound_use = sfx_manager->createSoundSource("parachute");
             break;
             
         case PowerupManager::POWERUP_BUBBLEGUM:
@@ -169,7 +169,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
         default :
-            m_sound_use = sfx_manager->createSoundSource("shot");
+            m_sound_use = sfx_manager->createSoundSource("shoot");
             break ;
     }
     
@@ -201,7 +201,7 @@ void Powerup::use()
     {
         //if (m_type == POWERUP_SWITCH) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
         //else                          
-        m_sound_use = sfx_manager->createSoundSource("shot");
+        m_sound_use = sfx_manager->createSoundSource("shoot");
     }
     
     m_number--;

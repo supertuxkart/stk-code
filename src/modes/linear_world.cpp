@@ -37,7 +37,7 @@
 LinearWorld::LinearWorld() : WorldWithRank()
 {
     m_kart_display_info   = NULL;
-    m_last_lap_sfx        = sfx_manager->createSoundSource("lastlap");
+    m_last_lap_sfx        = sfx_manager->createSoundSource("last_lap_fanfare");
     m_last_lap_sfx_played = false;
     m_last_lap_sfx_playing = false;
 }   // LinearWorld

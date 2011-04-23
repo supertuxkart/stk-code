@@ -132,7 +132,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     }*/
 
     m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound    = sfx_manager->createSoundSource( "beep"  );
+    m_beep_sound    = sfx_manager->createSoundSource( "horn"  );
     m_crash_sound   = sfx_manager->createSoundSource( "crash" );
     m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
     m_skid_sound    = sfx_manager->createSoundSource( "skid"  );

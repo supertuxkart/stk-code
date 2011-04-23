@@ -36,8 +36,8 @@ WorldStatus::WorldStatus()
     m_phase             = SETUP_PHASE;
     m_previous_phase    = UNDEFINED_PHASE;  // initialise it just in case
     
-    m_prestart_sound    = sfx_manager->createSoundSource("prestart");
-    m_start_sound       = sfx_manager->createSoundSource("start");
+    m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
+    m_start_sound       = sfx_manager->createSoundSource("start_race");
     m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
 
     music_manager->stopMusic();

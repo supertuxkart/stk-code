@@ -164,7 +164,7 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         
         if (UserConfigParams::m_sfx)
         {
-            sfx_manager->quickSound("beep");
+            sfx_manager->quickSound("horn");
         }
     }
 }   // eventCallback
