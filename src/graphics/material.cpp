@@ -288,12 +288,17 @@ Material::~Material()
  */
 void Material::initCustomSFX(const XMLNode *sfx)
 {
-    m_sfx_name="";
-    // The name of the 'name' attribute must be the same as the one
-    // used in sfx_manager, since the sfx_manager will be reading this
-    // xml node, too.
-    sfx->get("name", &m_sfx_name);
-    if(m_sfx_name=="") m_sfx_name = m_texname;
+
+    std::string filename;
+    sfx->get("filename", &filename);
+    
+    if (filename.empty())
+    {
+        fprintf(stderr, "[Material] WARNING: sfx node has no 'filename' attribute, sound effect will be ignored\n");
+        return;
+    }
+    
+    m_sfx_name = StringUtils::removeExtension(filename);
     sfx->get("min-speed", &m_sfx_min_speed);
     sfx->get("max-speed", &m_sfx_max_speed);
     sfx->get("min-pitch", &m_sfx_min_pitch);
@@ -303,8 +308,7 @@ void Material::initCustomSFX(const XMLNode *sfx)
 
     if(!sfx_manager->soundExist(m_sfx_name))
     {
-        std::string filename;
-        sfx->get("filename", &filename);
+
         // The directory for the track was added to the model search path
         // so just misuse the getModelFile function
         const std::string full_path = file_manager->getModelFile(filename);
