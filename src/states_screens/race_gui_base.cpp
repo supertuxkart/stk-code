@@ -226,6 +226,8 @@ void RaceGUIBase::drawAllMessages(const Kart* kart,
         font_height = m_small_font_max_height;
     }
     
+    irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
+    
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
@@ -234,7 +236,7 @@ void RaceGUIBase::drawAllMessages(const Kart* kart,
     {
         TimedMessage const &msg = *i;
 
-         // less important messages were already displayed
+        // less important messages were already displayed
         if (!msg.m_important) continue;
         
         // Display only messages for all karts, or messages for this kart

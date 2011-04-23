@@ -224,6 +224,7 @@ void IrrDriver::initDevice()
     m_scene_manager->getParameters()
         ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
     m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
+    m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY,true);
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();        
 
@@ -231,12 +232,14 @@ void IrrDriver::initDevice()
     material2D.setFlag(video::EMF_ANTI_ALIASING, true);
     for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
     {
+        material2D.TextureLayer[n].BilinearFilter = false;
         material2D.TextureLayer[n].TrilinearFilter = true;
         //material2D.TextureLayer[n].TextureWrap = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapU = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapV = ETC_CLAMP_TO_EDGE;
         
-        //material2D.TextureLayer[n].LODBias = 8;
+        //material2D.TextureLayer[n].LODBias = 16;
+        material2D.UseMipMaps = true;
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();

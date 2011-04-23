@@ -1155,6 +1155,13 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
     
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
     
+    if (widget->m_type == WTYPE_MODEL_VIEW)
+    {
+        // Model view widgets don't generate mipmaps so disable material 2D
+        irr_driver->getVideoDriver()->enableMaterial2D(false);
+    }
+
+    
     if (widget->m_deactivated || ID_DEBUG)
     {
         SColor colors[] =  { SColor(100,255,255,255),
@@ -1172,6 +1179,10 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
                                             0 /* no clipping */, 0, true /* alpha */);
     }
     
+    if (widget->m_type == WTYPE_MODEL_VIEW)
+    {
+        irr_driver->getVideoDriver()->enableMaterial2D();
+    }
 }
         
 
