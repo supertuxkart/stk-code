@@ -231,12 +231,12 @@ void IrrDriver::initDevice()
     material2D.setFlag(video::EMF_ANTI_ALIASING, true);
     for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
     {
-        material2D.TextureLayer[n].BilinearFilter = true;
+        material2D.TextureLayer[n].TrilinearFilter = true;
         //material2D.TextureLayer[n].TextureWrap = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapU = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapV = ETC_CLAMP_TO_EDGE;
         
-        material2D.TextureLayer[n].LODBias = 8;
+        //material2D.TextureLayer[n].LODBias = 8;
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
