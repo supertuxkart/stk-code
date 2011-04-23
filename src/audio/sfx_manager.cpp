@@ -178,11 +178,11 @@ void SFXManager::loadSfx()
  *  \return        whether loading this sound effect was successful
 
 */
-bool SFXManager::addSingleSfx(const std::string &sfx_name,
-                              const std::string &sfx_file,
-                              bool               positional,
-                              float              rolloff,
-                              float              gain)
+SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
+                                    const std::string &sfx_file,
+                                    bool               positional,
+                                    float              rolloff,
+                                    float              gain)
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, gain);
@@ -193,22 +193,23 @@ bool SFXManager::addSingleSfx(const std::string &sfx_name,
     {
         // Keep the buffer even if SFX is disabled, in case
         // SFX is enabled back later
-        return false;
+        return NULL;
     }
 
     if (UserConfigParams::m_verbosity>=5) 
         printf("Loading SFX %s\n", sfx_file.c_str());
     
-    return buffer->load();
+    if (buffer->load()) return buffer;
     
+    return NULL;
 } // addSingleSFX
 
 //----------------------------------------------------------------------------
 /** Loads a single sfx from the XML specification.
  *  \param node The XML node with the data for this sfx.
  */
-void SFXManager::loadSingleSfx(const XMLNode* node,
-                               const std::string &path)
+SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
+                                     const std::string &path)
 {
     std::string filename;
 
@@ -216,7 +217,7 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
     {
         fprintf(stderr, 
                 "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
-        return;
+        return NULL;
     }
     
     std::string sfx_name = StringUtils::removeExtension(filename);
@@ -233,7 +234,7 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
         fprintf(stderr, 
                 "There is already a sfx named '%s' installed - new one is ignored.\n",
                 sfx_name.c_str());
-        return;
+        return NULL;
     }
 
     // Only use the filename if no full path is specified. This is used
@@ -243,10 +244,10 @@ void SFXManager::loadSingleSfx(const XMLNode* node,
     
     SFXBuffer tmpbuffer(full_path, node);
 
-    addSingleSfx(sfx_name, full_path,
-                 tmpbuffer.isPositional(),
-                 tmpbuffer.getRolloff(),
-                 tmpbuffer.getGain());
+    return addSingleSfx(sfx_name, full_path,
+                        tmpbuffer.isPositional(),
+                        tmpbuffer.getRolloff(),
+                        tmpbuffer.getGain());
     
 }   // loadSingleSfx
 

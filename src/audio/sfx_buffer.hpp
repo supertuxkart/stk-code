@@ -85,16 +85,18 @@ public:
     void     unload();
     
     /** \return whether this buffer was loaded from disk */
-    bool     isLoaded() const { return m_loaded; }
+    bool     isLoaded()       const { return m_loaded; }
     
     /** Only returns a valid buffer if isLoaded() returned true */
-    ALuint   getBuffer() const { return m_buffer; }
+    ALuint   getBuffer()      const { return m_buffer; }
     
-    bool     isPositional() const { return m_positional; }
-    float    getRolloff() const { return m_rolloff; }
-    float    getGain() const { return m_gain; }
-    
+    bool     isPositional()   const { return m_positional; }
+    float    getRolloff()     const { return m_rolloff; }
+    float    getGain()        const { return m_gain; }
     std::string getFileName() const { return m_file; }
+    
+    void     setPositional(bool positional) { m_positional = positional; }
+
 
 };
 

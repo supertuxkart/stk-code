@@ -100,9 +100,9 @@ public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    void                     loadSingleSfx(const XMLNode* node,
+    SFXBuffer*               loadSingleSfx(const XMLNode* node,
                                            const std::string &path=std::string(""));
-    bool                     addSingleSfx(const std::string &sfx_name,
+    SFXBuffer*               addSingleSfx(const std::string &sfx_name,
                                           const std::string &filename,
                                           bool               positional,
                                           float              rolloff,

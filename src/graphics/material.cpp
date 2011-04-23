@@ -23,6 +23,7 @@
 #include <stdexcept>
 
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -312,7 +313,12 @@ void Material::initCustomSFX(const XMLNode *sfx)
         // The directory for the track was added to the model search path
         // so just misuse the getModelFile function
         const std::string full_path = file_manager->getModelFile(filename);
-        sfx_manager->loadSingleSfx(sfx, full_path);
+        SFXBuffer* buffer = sfx_manager->loadSingleSfx(sfx, full_path);
+        
+        if (buffer != NULL)
+        {
+            buffer->setPositional(true);
+        }
     }
 }   // initCustomSFX
 
