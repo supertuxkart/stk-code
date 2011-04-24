@@ -84,7 +84,9 @@ void RibbonWidget::add()
     int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
     {
-        LayoutManager::readCoords(m_children.get(i), NULL, this);
+        // FIXME: why do I manually invoke the Layout Manager here?
+        LayoutManager::readCoords(m_children.get(i));
+        LayoutManager::applyCoords(m_children.get(i), NULL, this);
         
         if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {

@@ -132,6 +132,11 @@ namespace GUIEngine
         friend class ModalDialog;
         friend class AbstractTopLevelContainer;
         
+        /** Used during loading, by the layout engine. After layout is done this is not read anymore. */
+        int m_absolute_x, m_absolute_y, m_absolute_w, m_absolute_h;
+        int m_absolute_reverse_x, m_absolute_reverse_y;
+        float m_relative_x, m_relative_y, m_relative_w, m_relative_h;
+        
         /** PROP_TEXT is a special case : since it can be translated it can't
          *  go in the map above, which uses narrow strings */
         irr::core::stringw m_text;

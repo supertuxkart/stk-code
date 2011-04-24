@@ -83,7 +83,7 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
 
 // ----------------------------------------------------------------------------
 
-void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent)
+void LayoutManager::readCoords(Widget* self)
 {    
     // determine widget position and size if not already done by sizers
     std::string x      = self->m_properties[PROP_X];
@@ -91,6 +91,7 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
     std::string width  = self->m_properties[PROP_WIDTH];
     std::string height = self->m_properties[PROP_HEIGHT];
     
+    /*
     // retrieve parent size (or screen size if none). Will be useful for layout
     // and especially for percentages.
     unsigned int parent_w, parent_h, parent_x, parent_y;
@@ -111,39 +112,40 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
         parent_x = parent->m_x;
         parent_y = parent->m_y;
     }
+    */
     
     // ---- try converting to number
     // x coord
     {
         int abs_x = -1, percent_x = -1;
-        if(convertToCoord(x, &abs_x, &percent_x ))
+        if (convertToCoord(x, &abs_x, &percent_x ))
         {
-            if      (abs_x > -1)     self->m_x = parent_x + abs_x;
-            else if (abs_x < -1)     self->m_x = parent_x + (parent_w + abs_x);
-            else if (percent_x > -1) self->m_x = parent_x + parent_w*percent_x/100;
+            if      (abs_x > -1)     self->m_absolute_x = abs_x;
+            else if (abs_x < -1)     self->m_absolute_reverse_x = abs(abs_x);
+            else if (percent_x > -1) self->m_relative_x = percent_x;
         }
     }
     
     // y coord
     {
         int abs_y = -1, percent_y = -1;
-        if(convertToCoord(y, &abs_y, &percent_y ))
+        if (convertToCoord(y, &abs_y, &percent_y ))
         {
-            if      (abs_y > -1)     self->m_y = parent_y + abs_y;
-            else if (abs_y < -1)     self->m_y = parent_y + (parent_h + abs_y);
-            else if (percent_y > -1) self->m_y = parent_y + parent_h*percent_y/100;
+            if      (abs_y > -1)     self->m_absolute_y = abs_y;
+            else if (abs_y < -1)     self->m_absolute_reverse_y = abs(abs_y);
+            else if (percent_y > -1) self->m_relative_y = percent_y;
         }
     }
     
     // ---- if this widget has an icon, get icon size. this can helpful determine its optimal size
     int texture_w = -1, texture_h = -1;
     
-    if(self->m_properties[PROP_ICON].size() > 0)
+    if (self->m_properties[PROP_ICON].size() > 0)
     {
         ITexture* texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
                                                     self->m_properties[PROP_ICON]).c_str());
         
-        if(texture != NULL)
+        if (texture != NULL)
         {
             texture_w = texture->getSize().Width;
             texture_h = texture->getSize().Height;
@@ -175,17 +177,20 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
         }
     }
     
+    // ---- if this widget has children, get their size size. this can helpful determine its optimal size
+    int child_max_width = -1, child_max_height = -1;
+    
     // ---- read dimension
     // width
     {
         int abs_w = -1, percent_w = -1;
-        if(convertToCoord(width, &abs_w, &percent_w ))
+        if (convertToCoord(width, &abs_w, &percent_w ))
         {
-            if      (abs_w > -1)     self->m_w = abs_w;
-            else if (percent_w > -1) self->m_w = (int)round(parent_w*percent_w/100.0);
+            if      (abs_w > -1)     self->m_absolute_w = abs_w;
+            else if (percent_w > -1) self->m_relative_w = percent_w;
         }
-        else if(texture_w > -1) self->m_w = texture_w;
-        else if(label_w > -1)   self->m_w = label_w;
+        else if(texture_w > -1) self->m_absolute_w = texture_w;
+        else if(label_w > -1)   self->m_absolute_w = label_w;
     }
     
     // height
@@ -193,13 +198,53 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
         int abs_h = -1, percent_h = -1;
         if (convertToCoord(height, &abs_h, &percent_h ))
         {
-            if      (abs_h > -1)     self->m_h = abs_h;
-            else if (percent_h > -1) self->m_h = parent_h*percent_h/100;
+            if      (abs_h > -1)     self->m_absolute_h = abs_h;
+            else if (percent_h > -1) self->m_relative_h = percent_h;
         }
-        else if (texture_h > -1 && label_h > -1) self->m_h = texture_h + label_h; // label + icon
-        else if (texture_h > -1)                 self->m_h = texture_h;
-        else if (label_h > -1)                   self->m_h = label_h;
+        else if (texture_h > -1 && label_h > -1) self->m_absolute_h = texture_h + label_h; // label + icon
+        else if (texture_h > -1)                 self->m_absolute_h = texture_h;
+        else if (label_h > -1)                   self->m_absolute_h = label_h;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent)
+{
+    // retrieve parent size (or screen size if none). Will be useful for layout
+    // and especially for percentages.
+    unsigned int parent_w, parent_h, parent_x, parent_y;
+    if(parent == NULL)
+    {
+        //core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        //parent_w = frame_size.Width;
+        //parent_h = frame_size.Height;
+        parent_w = topLevelContainer->getWidth();
+        parent_h = topLevelContainer->getHeight();
+        parent_x = 0;
+        parent_y = 0;
+    }
+    else
+    {
+        parent_w = parent->m_w;
+        parent_h = parent->m_h;
+        parent_x = parent->m_x;
+        parent_y = parent->m_y;
+    }
+    
+    if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
+    else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_h - self->m_absolute_reverse_x);
+    else if (self->m_relative_x > -1)         self->m_x = parent_x + parent_w*self->m_relative_x/100;
+    
+    if      (self->m_absolute_y > -1)         self->m_y = parent_y + self->m_absolute_y;
+    else if (self->m_absolute_reverse_y > -1) self->m_y = parent_y + (parent_h - self->m_absolute_reverse_y);
+    else if (self->m_relative_y > -1)         self->m_y = parent_y + parent_h*self->m_relative_y/100;
+    
+    if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
+    else if (self->m_relative_w > -1) self->m_w = (int)round(parent_w*self->m_relative_w/100.0);
+    
+    if (self->m_absolute_h > -1)      self->m_h = self->m_absolute_h;
+    else if (self->m_relative_h > -1) self->m_h = (int)round(parent_h*self->m_relative_h/100.0);
     
     // ---- can't make widget bigger than parent
     if (self->m_h > (int)parent_h)
@@ -239,16 +284,42 @@ void LayoutManager::readCoords(Widget* self, AbstractTopLevelContainer* topLevel
 
 // ----------------------------------------------------------------------------
 
-void LayoutManager::calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
-                                    Widget* parent)
+void LayoutManager::recursivelyReadCoords(PtrVector<Widget>& widgets)
 {
     const unsigned short widgets_amount = widgets.size();
+    
+    // ----- deal with containers' children
+    for (int n=0; n<widgets_amount; n++)
+    {
+        if (widgets[n].m_type == WTYPE_DIV) recursivelyReadCoords(widgets[n].m_children);
+    }
     
     // ----- read x/y/size parameters
     for (unsigned short n=0; n<widgets_amount; n++)
     {
-        readCoords(widgets.get(n), topLevelContainer, parent);
-    }//next widget        
+        readCoords(widgets.get(n));
+    }//next widget     
+}
+    
+// ----------------------------------------------------------------------------
+
+void LayoutManager::calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer)
+{
+    recursivelyReadCoords(widgets);
+    doCalculateLayout(widgets, topLevelContainer, NULL);
+}
+
+// ----------------------------------------------------------------------------
+
+void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
+                                      Widget* parent)
+{
+    const unsigned short widgets_amount = widgets.size();
+ 
+    for (int n=0; n<widgets_amount; n++)
+    {
+        applyCoords(widgets.get(n), topLevelContainer, parent);
+    }
     
     // ----- manage 'layout's if relevant
     do // i'm using 'while false' here just to be able to 'break' ...
@@ -522,9 +593,9 @@ void LayoutManager::calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevel
     } while(false);
     
     // ----- also deal with containers' children
-    for(int n=0; n<widgets_amount; n++)
+    for (int n=0; n<widgets_amount; n++)
     {
-        if(widgets[n].m_type == WTYPE_DIV) calculateLayout(widgets[n].m_children, topLevelContainer, &widgets[n]);
+        if (widgets[n].m_type == WTYPE_DIV) doCalculateLayout(widgets[n].m_children, topLevelContainer, &widgets[n]);
     }
 }   // calculateLayout
 

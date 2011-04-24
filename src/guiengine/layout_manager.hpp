@@ -39,12 +39,7 @@ namespace GUIEngine
          */
         static bool convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */);
         
-    public:
-        /**
-         * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
-         * Most notably, expands coords relative to parent and percentages.
-         */
-        static void readCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent);
+        static void recursivelyReadCoords(PtrVector<Widget>& widgets);
         
         /**
          * \brief Recursive call that lays out children widget within parent (or screen if none).
@@ -52,9 +47,31 @@ namespace GUIEngine
          * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
          * of the remaining children, as well as absolute sizes and locations.
          */
-        static void calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
-                                    Widget* parent=NULL);
+        static void doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
+                                      Widget* parent);
         
+        
+    public:
+        
+        /**
+         * \brief Recursive call that lays out children widget within parent (or screen if none).
+         *
+         * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
+         * of the remaining children, as well as absolute sizes and locations.
+         */
+        static void calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer);
+        
+        /**
+         * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
+         * Most notably, expands coords relative to parent and percentages.
+         */
+        static void applyCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent);
+        
+        /**
+         * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
+         * (First step; 'applyCoords' is the second step)
+         */
+        static void readCoords(Widget* self);
     };
 }
 

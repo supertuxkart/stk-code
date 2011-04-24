@@ -82,6 +82,11 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_has_tooltip           = false;
     m_is_text_rtl           = false;
     
+    m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
+    m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
+    m_absolute_reverse_x = m_absolute_reverse_y = -1;
+    
+    
     m_tab_down_root = -1;
     m_tab_up_root = -1;
     
