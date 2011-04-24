@@ -87,7 +87,6 @@ Material::Material(const XMLNode *node, int index)
     node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
-    node->get("anisotropic",      &m_anisotropic       );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
 
@@ -213,7 +212,6 @@ void Material::init(unsigned int index)
     m_adjust_image              = ADJ_NONE;
     m_alpha_blending            = false;
     m_lighting                  = true;
-    m_anisotropic               = false;
     m_backface_culling          = true;
     m_sphere_map                = false;
     m_friction                  = 1.0f;
