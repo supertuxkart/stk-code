@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "config/user_config.hpp"
 #include "graphics/material.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -72,6 +73,17 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
             return;
         }
     }   // for i
+    
+    // This material does not appear in materials.xml. Set some common flags...
+    if (UserConfigParams::m_anisotropic)
+    {
+        mb->getMaterial().setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    }
+    else if (UserConfigParams::m_trilinear)
+    {
+        mb->getMaterial().setFlag(video::EMF_TRILINEAR_FILTER, true);
+    }    
+    
 }   // setAllMaterialFlags
 //-----------------------------------------------------------------------------
 void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
