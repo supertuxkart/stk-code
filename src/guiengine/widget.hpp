@@ -288,7 +288,8 @@ namespace GUIEngine
          * A map that holds values for all specified widget properties (in the XML file)
          *
          * \note Changing any of these properties will only take effect the next time
-         *       this widget is add()ed.
+         *       this widget is add()ed (EXCEPT for for x, y, width and height properties,
+         *       which are only read on load; after that use method Widget::move).
          * \note Not all widgets use all properties, some widgets may ignore some properties.
          */
         std::map<Property, std::string> m_properties;
