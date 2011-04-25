@@ -190,6 +190,7 @@ void TrackInfoDialog::addHighScoreWidgets(const int hscores_y_from, const int hs
     IGUIStaticText* hscores_header = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), hiscores_title_area,
                                                                            false , true , // border, word warp
                                                                            m_irrlicht_window);
+    hscores_header->setTextRestrainedInside(false);
     hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
     // fill highscore entries
