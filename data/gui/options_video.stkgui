@@ -30,11 +30,11 @@
         <spacer height="15" width="10"/>
         
         <!-- ************ VSYNC ************ -->
-        <!-- FIXME don't hardcode height, should depend on text height -->
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="75%" height="fit" layout="horizontal-row" >
+            <!-- FIXME don't hardcode height -->
             <checkbox id="vsync" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
+            <label I18N="In the video settings" text="Vertical Sync (requires restart)"/>
         </div>
         
         <spacer width="20" height="25"/>
@@ -51,6 +51,7 @@
         
         <div width="75%" height="fit" layout="horizontal-row" >
             <spacer width="40" height="100%" />
+            <!-- FIXME don't hardcode height -->
             <checkbox id="fullscreen" width="40" height="40"/>
             <spacer width="20" height="100%" />
             <label height="100%" I18N="In the video settings" text="Fullscreen"/>

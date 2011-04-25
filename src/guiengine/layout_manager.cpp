@@ -163,6 +163,14 @@ void LayoutManager::readCoords(Widget* self)
         // lines are required, we need to specify a height explicitely
         label_h = dim.Height + self->getHeightNeededAroundLabel();
     }
+    else if (self->getType() == WTYPE_SPINNER)
+    {
+        // User text height to guess spinner height
+        IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
+        core::dimension2d< u32 > dim = font->getDimension( L"X" );
+        label_h = dim.Height + self->getHeightNeededAroundLabel();        
+    }
+    
     if (label_h == -1)
     {
         if (self->getType() == WTYPE_TEXTBOX ||

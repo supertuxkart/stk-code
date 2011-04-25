@@ -21,8 +21,7 @@
         <!-- ************ SKIN CHOICE ************ -->
         <label I18N="In the graphics settings" text="Skin"/>
         
-        <!-- FIXME: don't hardcode size -->
-        <spinner id="skinchoice" width="30%" height="40"/>
+        <spinner id="skinchoice" width="30%"/>
         
         <spacer width="20" height="40" />
         

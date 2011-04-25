@@ -34,8 +34,7 @@
             <label proportion="1" height="100%" text_align="right" I18N="Music volume in options" text="Volume"/>
             <div proportion="1" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="100%" />
-                <!-- FIXME: don't hardcode height -->
-                <gauge id="music_volume" proportion="1" height="40" min_value="1" max_value="10"/>
+                <gauge id="music_volume" proportion="1" min_value="1" max_value="10"/>
             </div>
         </div>
         
@@ -44,18 +43,19 @@
         <!-- ******** SFX ******** -->
         <label width="100%" I18N="Section in audio/video settings submenu" text="Sound Effects"/>
                     
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="75%" height="fit" layout="horizontal-row" >
             <label proportion="1" height="100%" text_align="right" I18N="Next to checkbox in settings menu" text="Enabled"/>
-            <div proportion="1" height="40" layout="horizontal-row" >
+            <div proportion="1" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="100%" />
+                <!-- FIXME: don't hardcode height -->
                 <checkbox id="sfx_enabled" width="40" height="40"/>
             </div>
         </div>
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="75%" height="fit" layout="horizontal-row" >
             <label proportion="1" height="100%" text_align="right" I18N="Sound volume in options" text="Volume"/>
-            <div proportion="1" height="40" layout="horizontal-row" >
+            <div proportion="1" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="100%" />
-                <gauge id="sfx_volume" proportion="1" height="100%" min_value="1" max_value="10"/>
+                <gauge id="sfx_volume" proportion="1" min_value="1" max_value="10"/>
             </div>
         </div>
         
