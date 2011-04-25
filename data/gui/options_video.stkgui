@@ -31,7 +31,7 @@
         <div width="75%" height="fit" layout="horizontal-row" >
             <checkbox id="vsync"/>
             <spacer width="20" height="100%" />
-            <label I18N="In the video settings" text="Vertical Sync (requires restart)"/>
+            <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
         </div>
         
         <spacer width="20" height="25"/>
