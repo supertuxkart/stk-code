@@ -89,27 +89,11 @@ bool DeviceManager::initialize()
                numGamepads);
     }
 
+    
+    
     // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
     for (int id = 0; id < numGamepads; id++)
     {
-        if(UserConfigParams::m_verbosity>=4)
-        {
-            printf("#%d: %s detected...", id, 
-                   m_irrlicht_gamepads[id].Name.c_str());
-        }
-        // Returns true if new configuration was created
-        if (getConfigForGamepad(id, &gamepadConfig) == true)
-        {
-            if(UserConfigParams::m_verbosity>=4) 
-                printf("creating new configuration.\n");
-            created = true;
-        }
-        else
-        {
-            if(UserConfigParams::m_verbosity>=4)
-                printf("using existing configuration.\n");
-        }
-
         core::stringc name = m_irrlicht_gamepads[id].Name.c_str();
         
         // On Windows, unless we use DirectInput, all gamepads are given the same name...
@@ -121,6 +105,23 @@ bool DeviceManager::initialize()
             name = name + " " + StringUtils::toString(id).c_str();
         }
         
+        if (UserConfigParams::m_verbosity>=4)
+        {
+            printf("#%d: %s detected...", id, name.c_str());
+        }
+        // Returns true if new configuration was created
+        if (getConfigForGamepad(id, name, &gamepadConfig) == true)
+        {
+            if(UserConfigParams::m_verbosity>=4) 
+                printf("creating new configuration.\n");
+            created = true;
+        }
+        else
+        {
+            if(UserConfigParams::m_verbosity>=4)
+                printf("using existing configuration.\n");
+        }
+
         gamepadConfig->setPlugged(true);
         gamepadDevice = new GamePadDevice(id, 
                                           name.c_str(),
@@ -179,16 +180,15 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
  * Check if we already have a config object for gamepad 'irr_id' as reported by irrLicht
  * If no, create one. Returns true if new configuration was created, otherwise false.
  */
-bool DeviceManager::getConfigForGamepad(const int irr_id, GamepadConfig **config)
+bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& name, GamepadConfig **config)
 {
     bool found = false;
     bool configCreated = false;
-    std::string name = m_irrlicht_gamepads[irr_id].Name.c_str();
     
     // Find appropriate configuration
     for(int n=0; n < m_gamepad_configs.size(); n++)
     {
-        if(m_gamepad_configs[n].getName() == name)
+        if(m_gamepad_configs[n].getName() == name.c_str())
         {
             *config = m_gamepad_configs.get(n);
             found = true;
@@ -198,7 +198,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id, GamepadConfig **config
     // If we can't find an appropriate configuration then create one.
     if (!found)
     {
-        *config = new GamepadConfig( m_irrlicht_gamepads[irr_id].Name.c_str(), 
+        *config = new GamepadConfig( name.c_str(), 
                                      m_irrlicht_gamepads[irr_id].Axes, 
                                      m_irrlicht_gamepads[irr_id].Buttons );
 

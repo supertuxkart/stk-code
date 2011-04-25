@@ -112,7 +112,7 @@ public:
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads()                     { m_gamepads.clearAndDeleteAll();  }
     /** Returns the keyboard that has a binding for this button, or NULL if none */
-    bool                getConfigForGamepad(const int sdl_id, GamepadConfig **config);    
+    bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);    
     
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();
