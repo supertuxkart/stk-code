@@ -350,6 +350,9 @@
  and plain icons. Other widgets will also automativally manage the position 
  and size of their children, for instance ribbons.
  
+ Another possible value is "fit", which will make a \<div\> fit to its
+ contents.
+ 
  \n
  \subsection prop9 PROP_MAX_WIDTH, PROP_MAX_HEIGHT    
  <em> Names in XML files: </em> \c "max_width", \c "max_height" 

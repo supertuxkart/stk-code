@@ -49,8 +49,7 @@
         
         <spacer height="10" width="10"/>
         
-        <!-- FIXME don't hardcode height, should depend on text height -->
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="75%" height="fit" layout="horizontal-row" >
             <spacer width="40" height="100%" />
             <checkbox id="fullscreen" width="40" height="40"/>
             <spacer width="20" height="100%" />
@@ -59,7 +58,7 @@
         
         <spacer height="10" width="10"/>
 
-        <div width="75%" height="40" layout="horizontal-row" >
+        <div width="100%" height="fit" layout="horizontal-row" >
             <spacer width="40" height="100%" />
             <button id="apply_resolution"
                 I18N="In the video settings menu" text="Apply new resolution" />

@@ -178,7 +178,37 @@ void LayoutManager::readCoords(Widget* self)
     }
     
     // ---- if this widget has children, get their size size. this can helpful determine its optimal size
-    int child_max_width = -1, child_max_height = -1;
+    if (self->m_properties[PROP_WIDTH] == "fit" || self->m_properties[PROP_HEIGHT] == "fit")
+    {
+        int child_max_width = -1, child_max_height = -1;
+        for (int child=0; child<self->m_children.size(); child++)
+        {
+            if (self->m_children[child].m_absolute_w > -1)
+            {
+                if (child_max_width == -1 || self->m_children[child].m_absolute_w > child_max_width)
+                {
+                    child_max_width = self->m_children[child].m_absolute_w;
+                }
+            }
+            
+            if (self->m_children[child].m_absolute_h > -1)
+            {
+                if (child_max_height == -1 || self->m_children[child].m_absolute_h > child_max_height)
+                {
+                    child_max_height = self->m_children[child].m_absolute_h;
+                }
+            }
+        }
+        
+        if (self->m_properties[PROP_WIDTH] == "fit")
+        {
+            self->m_absolute_w = child_max_width;
+        }
+        if (self->m_properties[PROP_HEIGHT] == "fit")
+        {
+            self->m_absolute_h = child_max_height;
+        }
+    }
     
     // ---- read dimension
     // width
