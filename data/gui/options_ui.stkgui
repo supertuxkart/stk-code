@@ -26,19 +26,19 @@
         <spacer width="20" height="40" />
         
         <div width="75%" height="fit" layout="horizontal-row" >
-            <checkbox id="showfps" width="40" height="40"/>
+            <checkbox id="showfps"/>
             <spacer width="20" height="100%" />
             <label height="100%" I18N="In the ui settings" text="Display FPS"/>
         </div>
 
         <div width="75%" height="fit" layout="horizontal-row" >
-            <checkbox id="enable-internet" width="40" height="40"/>
+            <checkbox id="enable-internet"/>
             <spacer width="20" height="100%" />
             <label height="100%" I18N="In the ui settings" text="Internet STK news"/>
         </div>
 
-        <div width="75%" height="40" layout="horizontal-row" >
-            <checkbox id="minimal-racegui" width="40" height="40"/>
+        <div width="75%" height="fit" layout="horizontal-row" >
+            <checkbox id="minimal-racegui"/>
             <spacer width="20" height="100%" />
             <label height="100%" I18N="In the ui settings" text="Minimal Race GUI"/>
         </div>

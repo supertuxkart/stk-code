@@ -163,19 +163,21 @@ void LayoutManager::readCoords(Widget* self)
         // lines are required, we need to specify a height explicitely
         label_h = dim.Height + self->getHeightNeededAroundLabel();
     }
-    else if (self->getType() == WTYPE_SPINNER)
+    else if (self->getType() == WTYPE_CHECKBOX)
     {
-        // User text height to guess spinner height
+        // User text height to guess checkbox size
         IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
         core::dimension2d< u32 > dim = font->getDimension( L"X" );
-        label_h = dim.Height + self->getHeightNeededAroundLabel();        
+        label_h = dim.Height + self->getHeightNeededAroundLabel();   
+        label_w = label_h; // a checkbox is square
     }
     
     if (label_h == -1)
     {
         if (self->getType() == WTYPE_TEXTBOX ||
-            self->getType() == WTYPE_BUTTON ||
-            self->getType() == WTYPE_LABEL)
+            self->getType() == WTYPE_BUTTON  ||
+            self->getType() == WTYPE_LABEL   ||
+            self->getType() == WTYPE_SPINNER)
         {
             IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
 

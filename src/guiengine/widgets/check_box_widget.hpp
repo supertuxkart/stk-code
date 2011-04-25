@@ -48,6 +48,10 @@ namespace GUIEngine
         
         /** Set whether the checkbox is checked */
         void setState(const bool checked)  { m_state = checked; }
+        
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getHeightNeededAroundLabel() const { return 10; }
     };  
 }
 
