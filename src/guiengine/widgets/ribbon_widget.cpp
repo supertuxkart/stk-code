@@ -586,6 +586,11 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator,
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );
     
+    if (m_selection[playerID] != -1)
+    {
+        if (m_children[m_selection[playerID]].m_deactivated) return EVENT_BLOCK;
+    }
+    
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
