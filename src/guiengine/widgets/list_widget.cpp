@@ -144,6 +144,7 @@ void ListWidget::renameItem(const int itemID, const irr::core::stringw newName, 
 
 std::string ListWidget::getSelectionInternalName()
 {
+    if (getSelectionID() == -1) return "";
     return m_items[ getSelectionID() ].m_internal_name;
 
 }
