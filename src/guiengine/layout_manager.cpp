@@ -122,7 +122,7 @@ void LayoutManager::readCoords(Widget* self)
         {
             if      (abs_x > -1)     self->m_absolute_x = abs_x;
             else if (abs_x < -1)     self->m_absolute_reverse_x = abs(abs_x);
-            else if (percent_x > -1) self->m_relative_x = percent_x;
+            else if (percent_x > -1) self->m_relative_x = (float)percent_x;
         }
     }
     
@@ -133,7 +133,7 @@ void LayoutManager::readCoords(Widget* self)
         {
             if      (abs_y > -1)     self->m_absolute_y = abs_y;
             else if (abs_y < -1)     self->m_absolute_reverse_y = abs(abs_y);
-            else if (percent_y > -1) self->m_relative_y = percent_y;
+            else if (percent_y > -1) self->m_relative_y = (float)percent_y;
         }
     }
     
@@ -227,7 +227,7 @@ void LayoutManager::readCoords(Widget* self)
         if (convertToCoord(width, &abs_w, &percent_w ))
         {
             if      (abs_w > -1)     self->m_absolute_w = abs_w;
-            else if (percent_w > -1) self->m_relative_w = percent_w;
+            else if (percent_w > -1) self->m_relative_w = (float)percent_w;
         }
         else if(texture_w > -1) self->m_absolute_w = texture_w;
         else if(label_w > -1)   self->m_absolute_w = label_w;
@@ -239,7 +239,7 @@ void LayoutManager::readCoords(Widget* self)
         if (convertToCoord(height, &abs_h, &percent_h ))
         {
             if      (abs_h > -1)     self->m_absolute_h = abs_h;
-            else if (percent_h > -1) self->m_relative_h = percent_h;
+            else if (percent_h > -1) self->m_relative_h = (float)percent_h;
         }
         else if (texture_h > -1 && label_h > -1) self->m_absolute_h = texture_h + label_h; // label + icon
         else if (texture_h > -1)                 self->m_absolute_h = texture_h;
@@ -274,11 +274,11 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
     else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_h - self->m_absolute_reverse_x);
-    else if (self->m_relative_x > -1)         self->m_x = parent_x + parent_w*self->m_relative_x/100;
+    else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
     
     if      (self->m_absolute_y > -1)         self->m_y = parent_y + self->m_absolute_y;
     else if (self->m_absolute_reverse_y > -1) self->m_y = parent_y + (parent_h - self->m_absolute_reverse_y);
-    else if (self->m_relative_y > -1)         self->m_y = parent_y + parent_h*self->m_relative_y/100;
+    else if (self->m_relative_y > -1)         self->m_y = (int)(parent_y + parent_h*self->m_relative_y/100);
     
     if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
     else if (self->m_relative_w > -1) self->m_w = (int)round(parent_w*self->m_relative_w/100.0);
