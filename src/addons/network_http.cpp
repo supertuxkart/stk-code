@@ -87,7 +87,7 @@ NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()),
     {
         delete m_thread_id;
         m_thread_id = 0;
-    	printf("[addons] Warning: could not create thread, error=%d.\n", errno);
+        printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
 }   // NetworkHttp
@@ -639,7 +639,7 @@ std::string NetworkHttp::downloadToStrInternal(std::string url)
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
     curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
-	curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
         
     std::string fout;
         
@@ -666,7 +666,8 @@ bool NetworkHttp::downloadFileInternal(const std::string &url,
                                        bool is_asynchron)
 {
     if(UserConfigParams::m_verbosity>=3)
-        printf("[addons] Downloading %s\n", url.c_str());
+        printf("[addons] Downloading '%s' as '%s').\n", url.c_str(),
+               file_manager->getAddonsFile(save_filename).c_str());
     CURL *session = curl_easy_init();
     std::string full_url = url;
     if(url.substr(0, 5)!="http:" && url.substr(0, 4)!="ftp:")
@@ -676,7 +677,8 @@ bool NetworkHttp::downloadFileInternal(const std::string &url,
     curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
     curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
-	curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
+
     FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
                          "wb");
         
