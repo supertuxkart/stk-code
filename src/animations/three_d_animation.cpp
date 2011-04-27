@@ -57,9 +57,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    scene::IAnimatedMesh *mesh =
-        ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
-    MeshTools::minMax3D(mesh, &min, &max);
+    MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 extend = max-min;
     if(shape=="box")
     {

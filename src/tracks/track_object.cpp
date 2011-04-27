@@ -53,30 +53,31 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     if(model_name=="")
     {
         m_node = NULL;
+        m_mesh = NULL;
     }
     else
     {
         std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
-        scene::IAnimatedMesh *mesh=NULL;
         if(file_manager->fileExists(full_path))
         {
-            mesh = irr_driver->getAnimatedMesh(full_path);
+            m_mesh = irr_driver->getAnimatedMesh(full_path);
         }
-        if(!mesh)
+        if(!m_mesh)
         {
             // If the model isn't found in the track directory, look 
             // in STK's model directory.
             full_path = file_manager->getModelFile(model_name);
-            mesh      = irr_driver->getAnimatedMesh(full_path);
-            if(!mesh)
+            m_mesh      = irr_driver->getAnimatedMesh(full_path);
+            if(!m_mesh)
             {
                 fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
-                       xml_node.getName().c_str(), model_name.c_str());
+                        xml_node.getName().c_str(), model_name.c_str());
                 return;
-            }   // if(!mesh)
+            }   // if(!m_mesh)
         }
 
-        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(mesh);
+        m_mesh->grab();
+        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
         m_node = node;
 #ifdef DEBUG
         std::string debug_name = model_name+" (track-object)";
@@ -103,6 +104,12 @@ TrackObject::~TrackObject()
 {
     if(m_node)
         irr_driver->removeNode(m_node);
+    if(m_mesh)
+    {
+        m_mesh->drop();
+        if(m_mesh->getReferenceCount()==1)
+            irr_driver->removeMeshFromCache(m_mesh);
+    }
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

@@ -59,7 +59,11 @@ private:
 
 protected:
     /** The irrlicht scene node this object is attached to. */
-    scene::ISceneNode *m_node;
+    scene::ISceneNode             *m_node;
+
+    /** The mesh used here. It needs to be stored so that it can be 
+     *  removed from irrlicht's mesh cache when it is deleted. */
+    scene::IAnimatedMesh          *m_mesh;
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
