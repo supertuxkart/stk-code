@@ -284,6 +284,12 @@ enum AnimType {ANIMS_NONE         = 0,
  */
 namespace UserConfigParams
 {
+    /** Some constants to bitmask to enable various messages to be printed. */
+    enum { LOG_MEMORY = 0x0001,
+           LOG_GUI    = 0x0002,
+           LOG_ADDONS = 0x0004,
+           LOG_MISC   = 0x0008};
+
     // ---- Audio
     PARAM_PREFIX GroupUserConfigParam        m_audio_group
             PARAM_DEFAULT( GroupUserConfigParam("Audio", "Audio Settings") );

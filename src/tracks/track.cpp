@@ -176,7 +176,7 @@ void Track::cleanup()
     // remove temporary materials loaded by the material manager
     material_manager->popTempMaterial();
 
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::m_verbosity&UserConfigParams::LOG_MEMORY)
         printf("[memory] Number of meshes in cache after cleaning up '%s': %d.\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
@@ -941,7 +941,7 @@ void Track::createWater(const XMLNode &node)
 void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
     assert(m_all_cached_meshes.size()==0);
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::m_verbosity&UserConfigParams::LOG_MEMORY)
         printf("[memory] Number of meshes in cache before loading '%s': %d.\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
@@ -1255,7 +1255,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         printf("Lap counting will not work, and start positions might be incorrect.\n");
     }
 
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::m_verbosity&UserConfigParams::LOG_MEMORY)
         printf("[memory] Number of meshes in cache after loading '%s': %d.\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
