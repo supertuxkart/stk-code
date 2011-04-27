@@ -939,7 +939,7 @@ void Track::createWater(const XMLNode &node)
     std::string debug_name = model_name+"(water node)";
     scene_node->setName(debug_name.c_str());
 #endif
-    mesh->drop();
+    mesh->grab();
     m_all_cached_meshes.push_back(mesh);
 
     core::vector3df xyz(0,0,0);
