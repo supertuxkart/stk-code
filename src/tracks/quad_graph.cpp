@@ -415,7 +415,7 @@ void QuadGraph::cleanupDebugMesh()
 {
     irr_driver->removeNode(m_node);
     m_node = NULL;
-    // No need to call irr_driber->removeMesh, since the mesh
+    // No need to call irr_driber->removeMeshFromCache, since the mesh
     // was manually made and so never added to the mesh cache.
     m_mesh->drop();
     m_mesh = NULL;

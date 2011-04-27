@@ -43,7 +43,7 @@ Moveable::~Moveable()
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
     if(m_node) irr_driver->removeNode(m_node);
-    if(m_mesh) irr_driver->removeMesh(m_mesh);
+    if(m_mesh) irr_driver->removeMeshFromCache(m_mesh);
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------

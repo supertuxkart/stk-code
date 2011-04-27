@@ -60,11 +60,11 @@ PowerupManager::~PowerupManager()
             mesh->drop();
             // If the ref count is 1, the only reference is in
             // irrlicht's mesh cache, from which the mesh can
-            // then be deleted
+            // then be deleted.
             // Note that this test is necessary, since some meshes
             // are also used in attachment_manager!!!
             if(mesh->getReferenceCount()==1)
-                irr_driver->removeMesh(mesh);
+                irr_driver->removeMeshFromCache(mesh);
         }
     }
 }   // ~PowerupManager

@@ -194,7 +194,7 @@ void MaterialManager::popTempMaterial()
     {
         delete m_materials[i];
         m_materials.pop_back();
-    }   // for i
+    }   // for i6
 }   // popTempMaterial
 
 //-----------------------------------------------------------------------------

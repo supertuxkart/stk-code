@@ -499,8 +499,6 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
         for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
         {
             video::ITexture* t=irr_material.getTexture(j);
-            //if (!t) material_manager->setAllFlatMaterialFlags(mb);
-            //else    material_manager->setAllMaterialFlags(t, mb);
             if(t) material_manager->setAllMaterialFlags(t, mb);
             
         }   // for j<MATERIAL_MAX_TEXTURES
@@ -694,10 +692,10 @@ void IrrDriver::removeNode(scene::ISceneNode *node)
 /** Removes a mesh from the mesh cache, freeing the memory.
  *  \param mesh The mesh to remove.
  */
-void IrrDriver::removeMesh(scene::IMesh *mesh)
+void IrrDriver::removeMeshFromCache(scene::IMesh *mesh)
 {
     m_scene_manager->getMeshCache()->removeMesh(mesh);
-}   // removeMesh
+}   // removeMeshFromCache
 
 // ----------------------------------------------------------------------------
 /** Removes a texture from irrlicht's texture cache.
@@ -1317,8 +1315,8 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
     }
     
     m_rtt_main_node = NULL;
-    m_camera = NULL;
-    m_light = NULL;
+    m_camera        = NULL;
+    m_light         = NULL;
 }   // RTTProvider
 
 // ----------------------------------------------------------------------------

@@ -80,7 +80,9 @@ private:
     std::string              m_root;
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
-    std::vector<scene::IMesh*>      m_all_meshes;
+    /** The list of all meshes that are loaded from disk, which means
+     *  that those meshes are being cached by irrlicht, and need to be freed. */
+    std::vector<scene::IMesh*>      m_all_cached_meshes;
     PtrVector<ParticleEmitter>      m_all_emitters;
     scene::ILightSceneNode  *m_sun;
     /** Used to collect the triangles for the bullet mesh. */

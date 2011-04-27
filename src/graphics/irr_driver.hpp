@@ -143,7 +143,7 @@ public:
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
-    void                  removeMesh(scene::IMesh *mesh);
+    void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
                          *addAnimatedMesh(scene::IAnimatedMesh *mesh);

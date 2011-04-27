@@ -312,11 +312,12 @@ bool AddonsManager::install(const Addon &addon)
         // karts will not reload their meshes.
         const KartProperties *prop = 
             kart_properties_manager->getKart(addon.getId());
-        // If the model already exist (i.e. it's an update, not a new install
+        // If the model already exist (i.e. it's an update, not a new install)
+        // make sure to remove the cached copy of the mesh
         if(prop)
         {
             const KartModel &model = prop->getMasterKartModel();
-            irr_driver->removeMesh(model.getModel());
+            irr_driver->removeMeshFromCache(model.getModel());
         }
     }
     saveInstalled(addon.getType());

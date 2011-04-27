@@ -72,7 +72,7 @@ Track::Track(std::string filename)
     m_track_mesh            = new TriangleMesh();
     m_gfx_effect_mesh       = new TriangleMesh();
     m_all_nodes.clear();
-    m_all_meshes.clear();
+    m_all_cached_meshes.clear();
     m_is_arena              = false;
     m_camera_far            = 1000.0f;
     m_quad_graph            = NULL;
@@ -139,15 +139,6 @@ void Track::cleanup()
     
     m_all_emitters.clearAndDeleteAll();
     
-    // The meshes stored in the scene nodes are dropped now.
-    // But to really remove all track meshes from memory
-    // they have to be removed from the cache.
-    for(unsigned int i=0; i<m_all_meshes.size(); i++)
-    {
-        irr_driver->removeMesh(m_all_meshes[i]);
-    }
-    m_all_meshes.clear();
-
     if(m_check_manager)
     {
         delete m_check_manager;
@@ -165,8 +156,31 @@ void Track::cleanup()
     delete m_gfx_effect_mesh;
     m_gfx_effect_mesh = new TriangleMesh();
 
+
+    // The m_all_cached_mesh contains each mesh loaded from a file, which
+    // means that the mesh is stored in irrlichts mesh cache. To clean
+    // everything loaded by this track, we drop the ref count for each mesh
+    // here, till the ref count is 1, which means the mesh is only contained
+    // in the mesh cache, and can therefore be removed. Meshes load more 
+    // than once are in m_all_cached_mesh more than once (which is easier
+    // than storing the mesh only once, but then having to test for each
+    // mesh if it is already contained in the list or not).
+    for(unsigned int i=0; i<m_all_cached_meshes.size(); i++)
+    {
+        m_all_cached_meshes[i]->drop();
+        if(m_all_cached_meshes[i]->getReferenceCount()==1)
+            irr_driver->removeMeshFromCache(m_all_cached_meshes[i]);
+    }
+    m_all_cached_meshes.clear();
+
     // remove temporary materials loaded by the material manager
     material_manager->popTempMaterial();
+
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[memory] Number of meshes in cache after cleaning up '%s': %d.\n",
+                getIdent().c_str(),
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -519,7 +533,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // The reference count of the mesh is 1, since it is in irrlicht's
     // cache. So we only have to remove it from the cache.
-    irr_driver->removeMesh(mesh);
+    irr_driver->removeMeshFromCache(mesh);
 
 #ifdef DEBUG
     std::string debug_name=model_name+" (main track, octtree)";
@@ -613,7 +627,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             scene_node->remove();
             
             scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
-            m_all_meshes.push_back(mesh);
+            mesh->grab();
+            m_all_cached_meshes.push_back(mesh);
             scene_node = irr_driver->addMesh(mesh);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
@@ -649,7 +664,17 @@ bool Track::loadMainTrack(const XMLNode &root)
                         full_path.c_str());
                 continue;
             }
-            m_all_meshes.push_back(a_mesh);
+
+            // The meshes loaded here are in irrlicht's mesh cache. So we
+            // have to keep track of them in order to properly remove them
+            // from memory. We could add each track only once in a list, but
+            // it's actually faster to add meshes multipl times (if they are
+            // used more than once), and increase the ref count each time.
+            // When removing the meshes, we drop them till the ref count is
+            // 1 - which means that the only reference is now in the cache,
+            // and can therefore be removed.
+            m_all_cached_meshes.push_back(a_mesh);
+            a_mesh->grab();
             scene_node = irr_driver->addAnimatedMesh(a_mesh);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
@@ -737,8 +762,10 @@ bool Track::loadMainTrack(const XMLNode &root)
                             full_path.c_str());
                     continue;
                 }
-                m_all_meshes.push_back(a_mesh);
-                scene::IAnimatedMeshSceneNode* scene_node = irr_driver->addAnimatedMesh(a_mesh);
+                a_mesh->grab();  // see above for usage in m_all_cached_meshes
+                m_all_cached_meshes.push_back(a_mesh);
+                scene::IAnimatedMeshSceneNode* scene_node = 
+                    irr_driver->addAnimatedMesh(a_mesh);
                 scene_node->setPosition(xyz);
                 scene_node->setRotation(hpr);
                 scene_node->setScale(scale);
@@ -890,9 +917,8 @@ void Track::createWater(const XMLNode &node)
     std::string debug_name = model_name+"(water node)";
     scene_node->setName(debug_name.c_str());
 #endif
-    
-    mesh->grab();
-    m_all_meshes.push_back(mesh);
+    mesh->drop();
+    m_all_cached_meshes.push_back(mesh);
 
     core::vector3df xyz(0,0,0);
     node.get("xyz", &xyz);
@@ -914,6 +940,12 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
+    assert(m_all_cached_meshes.size()==0);
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[memory] Number of meshes in cache before loading '%s': %d.\n",
+                getIdent().c_str(),
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+
     Camera::clearEndCameras();
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
@@ -1222,6 +1254,12 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                m_ident.c_str());
         printf("Lap counting will not work, and start positions might be incorrect.\n");
     }
+
+    if(UserConfigParams::m_verbosity>=3)
+        printf("[memory] Number of meshes in cache after loading '%s': %d.\n",
+                getIdent().c_str(),
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

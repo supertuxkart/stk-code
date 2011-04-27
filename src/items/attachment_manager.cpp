@@ -66,7 +66,7 @@ AttachmentManager::~AttachmentManager()
         // Note that this test is necessary, since some meshes
         // are also used in powerup_manager!!!
         if(mesh->getReferenceCount()==1)
-            irr_driver->removeMesh(mesh);
+            irr_driver->removeMeshFromCache(mesh);
     }
 }   // ~AttachmentManager
 

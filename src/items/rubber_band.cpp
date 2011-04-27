@@ -85,12 +85,6 @@ RubberBand::RubberBand(Plunger *plunger, Kart *kart) :
 RubberBand::~RubberBand()
 {
     irr_driver->removeNode(m_node);
-
-    // This mesh is self made and so not stored in the
-    // mesh cache. So no reason to call
-    // irr_driver->removeMesh(m_mesh);
-    // But it was implicitly 'grabbed' during creation, so we have
-    // to drop it here.
     m_mesh->drop();
 }   // RubberBand
 
