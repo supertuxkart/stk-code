@@ -295,6 +295,12 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_gamepad_visualisation=true;
         }
+        else if ( !strcmp(argv[i], "-v") && i+1<argc )
+        {
+            UserConfigParams::m_verbosity = atoi(argv[i+1]);
+	    printf("Setting verbosity to %d\n",UserConfigParams::m_verbosity); 
+            i++;
+        }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
             stk_config->load(file_manager->getDataFile(argv[i+1]));
@@ -657,11 +663,6 @@ int handleCmdLine(int argc, char **argv)
             ProfileWorld::setProfileModeTime(20);
             race_manager->setNumLaps(999999); // profile end depends on time
         }
-        else if ( !strcmp(argv[i], "-v") && i+1<argc )
-        {
-            UserConfigParams::m_verbosity = atoi(argv[i+1]);
-            i++;
-        }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
             history->doReplayHistory( (History::HistoryReplayMode)n);
@@ -689,6 +690,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
+        else if( !strcmp(argv[i], "-v")          && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
