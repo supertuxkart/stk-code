@@ -114,6 +114,9 @@ void Track::reset()
 /** Removes the physical body from the world.
  *  Called at the end of a race.
  */
+
+std::vector<std::string> m_old_mesh_buffers;
+
 void Track::cleanup()
 {
     if(m_quad_graph)    
@@ -177,9 +180,28 @@ void Track::cleanup()
     material_manager->popTempMaterial();
 
     if(UserConfigParams::m_verbosity&UserConfigParams::LOG_MEMORY)
+    {
         printf("[memory] Number of meshes in cache after cleaning up '%s': %d.\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+#ifdef DEBUG
+        scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
+        for(unsigned int i=0; i<cache->getMeshCount(); i++)
+        {
+            const io::SNamedPath &name = cache->getMeshName(i);
+            std::vector<std::string>::iterator p;
+            p = std::find(m_old_mesh_buffers.begin(), m_old_mesh_buffers.end(),
+                         name.getInternalName().c_str());
+            if(p!=m_old_mesh_buffers.end())
+                m_old_mesh_buffers.erase(p);
+            else
+            {
+                printf("[memory] Leaked mesh buffer '%s'.\n", 
+                       name.getInternalName().c_str());
+            }   // if name not found
+        }   // for i < cache size
+#endif
+    }   // if verbose
 
 }   // cleanup
 
@@ -938,13 +960,25 @@ void Track::createWater(const XMLNode &node)
  *  \param mode_id Which of the modes of a track to use. This determines which
  *         scene, quad, and graph file to load.
  */
+
 void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::m_verbosity&UserConfigParams::LOG_MEMORY)
+    {
         printf("[memory] Number of meshes in cache before loading '%s': %d.\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+#ifdef DEBUG
+        scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
+        m_old_mesh_buffers.clear();
+        for(unsigned int i=0; i<cache->getMeshCount(); i++)
+        {
+            const io::SNamedPath &name=cache->getMeshName(i);
+            m_old_mesh_buffers.push_back(name.getInternalName().c_str());
+        }
+#endif
+    }
 
     Camera::clearEndCameras();
     m_sky_type             = SKY_NONE;
