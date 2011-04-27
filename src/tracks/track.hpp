@@ -83,6 +83,14 @@ private:
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
     std::vector<scene::IMesh*>      m_all_cached_meshes;
+#ifdef DEBUG
+    /** Used to store all buffers in irrlicht's memory cache before a track
+     *  is loaded. After cleanup of a track we can test which meshes are
+     *  still in the cache, and print a report of leaked meshes (of course in
+     *  debug mode only). */
+    std::vector<std::string> m_old_mesh_buffers;
+#endif
+
     PtrVector<ParticleEmitter>      m_all_emitters;
     scene::ILightSceneNode  *m_sun;
     /** Used to collect the triangles for the bullet mesh. */

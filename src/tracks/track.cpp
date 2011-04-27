@@ -115,8 +115,6 @@ void Track::reset()
  *  Called at the end of a race.
  */
 
-std::vector<std::string> m_old_mesh_buffers;
-
 void Track::cleanup()
 {
     if(m_quad_graph)    
