@@ -83,6 +83,9 @@ private:
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
     std::vector<scene::IMesh*>      m_all_cached_meshes;
+    /** A list of textures to help in removing unused textures from irrlicht's
+     *  texture cache after cleanup. */
+    std::vector<video::ITexture*>   m_all_used_textures;
 #ifdef DEBUG
     /** Used to store all buffers in irrlicht's memory cache before a track
      *  is loaded. After cleanup of a track we can test which meshes are

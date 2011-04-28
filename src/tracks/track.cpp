@@ -179,9 +179,10 @@ void Track::cleanup()
 
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] Number of meshes in cache after cleaning up '%s': %d.\n",
+        printf("[memory] After cleaning '%s': mesh cache %d texture cache %d\n",
                 getIdent().c_str(),
-                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
+                irr_driver->getVideoDriver()->getTextureCount());
 #ifdef DEBUG
         scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
         for(unsigned int i=0; i<cache->getMeshCount(); i++)
@@ -198,6 +199,24 @@ void Track::cleanup()
                        name.getInternalName().c_str());
             }   // if name not found
         }   // for i < cache size
+
+        video::IVideoDriver *vd = irr_driver->getVideoDriver();
+        for(unsigned int i=0; i<vd->getTextureCount(); i++)
+        {
+            video::ITexture *t = vd->getTextureByIndex(i);
+            std::vector<video::ITexture*>::iterator p;
+            p = std::find(m_all_used_textures.begin(), m_all_used_textures.end(),
+                          t);
+            if(p!=m_all_used_textures.end())
+            {
+                m_all_used_textures.erase(p);
+            }
+            else
+            {
+                printf("[memory] Leaked texture '%s'.\n", 
+                    t->getName().getInternalName().c_str());
+            }
+        }
 #endif
     }   // if verbose
 
@@ -964,9 +983,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] Number of meshes in cache before loading '%s': %d.\n",
-                getIdent().c_str(),
-                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+        printf("[memory] Before loading '%s': mesh cache %d texture cache %d\n",
+            getIdent().c_str(),
+            irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
+            irr_driver->getVideoDriver()->getTextureCount());
 #ifdef DEBUG
         scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
         m_old_mesh_buffers.clear();
@@ -974,6 +994,14 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         {
             const io::SNamedPath &name=cache->getMeshName(i);
             m_old_mesh_buffers.push_back(name.getInternalName().c_str());
+        }
+
+        m_all_used_textures.clear();
+        video::IVideoDriver *vd = irr_driver->getVideoDriver();
+        for(unsigned int i=0; i<vd->getTextureCount(); i++)
+        {
+            video::ITexture *t=vd->getTextureByIndex(i);
+            m_all_used_textures.push_back(t);
         }
 #endif
     }
@@ -1288,9 +1316,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     }
 
     if(UserConfigParams::logMemory())
-        printf("[memory] Number of meshes in cache after loading '%s': %d.\n",
+        printf("[memory] After loading  '%s': mesh cache %d texture cache %d\n",
                 getIdent().c_str(),
-                irr_driver->getSceneManager()->getMeshCache()->getMeshCount());
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
+                irr_driver->getVideoDriver()->getTextureCount());
 
 }   // loadTrackModel
 
