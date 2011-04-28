@@ -53,7 +53,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
     b->setTabStop(false);
     b->setRightToLeft(translations->isRTLLanguage());
     b->setText(msg.c_str()); // because it looks like 'setRightToLeft' applies next time setText is called only
-       
+    
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "addkeyboard";

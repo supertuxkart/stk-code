@@ -266,7 +266,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;
-                                
+                
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
             }

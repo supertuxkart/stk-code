@@ -499,13 +499,13 @@ namespace UserConfigParams
            LOG_MISC   = 0x0008};
 
     /** Returns true if the user want additional messages for memory usage. */
-    static bool   logMemory() { return (m_verbosity&LOG_MEMORY) == LOG_MEMORY;}
+    bool   logMemory();
     /** Returns true if the user want additional messages related to GUI. */
-    static bool   logGUI   () { return (m_verbosity&LOG_GUI)    == LOG_GUI;   }
+    bool   logGUI   ();
     /** Returns true if the user want additional messages related to addons. */
-    static bool   logAddons() { return (m_verbosity&LOG_ADDONS) == LOG_ADDONS;}
+    bool   logAddons();
     /** Returns true if the user want additional messages for general items. */
-    static bool   logMisc  () { return (m_verbosity&LOG_MISC)   == LOG_MISC;  }
+    bool   logMisc  ();
 
 
 }
