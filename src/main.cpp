@@ -90,8 +90,8 @@ void gamepadVisualisation()
         
     struct Gamepad
     {
-        s16 	m_axis[SEvent::SJoystickEvent::NUMBER_OF_AXES];
-        bool 	m_button_state[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
+        s16   m_axis[SEvent::SJoystickEvent::NUMBER_OF_AXES];
+        bool  m_button_state[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
     };
     
     #define GAMEPAD_COUNT 8 // const won't work
@@ -295,10 +295,26 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_gamepad_visualisation=true;
         }
+        else if ( !strcmp(argv[i], "--debug=memory") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
+        }
+        else if ( !strcmp(argv[i], "--debug=addons") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_ADDONS;
+        }
+        else if ( !strcmp(argv[i], "--debug=gui") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_GUI;
+        }
+        else if ( !strcmp(argv[i], "--debug=misc") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
+        }
         else if ( !strcmp(argv[i], "-v") && i+1<argc )
         {
             UserConfigParams::m_verbosity = atoi(argv[i+1]);
-	    printf("Setting verbosity to %d\n",UserConfigParams::m_verbosity); 
+            printf("Setting verbosity to %d\n",UserConfigParams::m_verbosity); 
             i++;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
@@ -691,6 +707,10 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "-v")          && i+1<argc ) { i++; }
+        else if( !strcmp(argv[i], "--debug=memory")                        ) {}
+        else if( !strcmp(argv[i], "--debug=addons")                        ) {}
+        else if( !strcmp(argv[i], "--debug=gui"   )                        ) {}
+        else if( !strcmp(argv[i], "--debug=misc"  )                        ) {}
         else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
