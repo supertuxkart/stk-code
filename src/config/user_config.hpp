@@ -284,11 +284,6 @@ enum AnimType {ANIMS_NONE         = 0,
  */
 namespace UserConfigParams
 {
-    /** Some constants to bitmask to enable various messages to be printed. */
-    enum { LOG_MEMORY = 0x0001,
-           LOG_GUI    = 0x0002,
-           LOG_ADDONS = 0x0004,
-           LOG_MISC   = 0x0008};
 
     // ---- Audio
     PARAM_PREFIX GroupUserConfigParam        m_audio_group
@@ -496,6 +491,22 @@ namespace UserConfigParams
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
     PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
+
+    /** Some constants to bitmask to enable various messages to be printed. */
+    enum { LOG_MEMORY = 0x0001,
+           LOG_GUI    = 0x0002,
+           LOG_ADDONS = 0x0004,
+           LOG_MISC   = 0x0008};
+
+    /** Returns true if the user want additional messages for memory usage. */
+    static bool   logMemory() { return (m_verbosity&LOG_MEMORY) == LOG_MEMORY;}
+    /** Returns true if the user want additional messages related to GUI. */
+    static bool   logGUI   () { return (m_verbosity&LOG_GUI)    == LOG_GUI;   }
+    /** Returns true if the user want additional messages related to addons. */
+    static bool   logAddons() { return (m_verbosity&LOG_ADDONS) == LOG_ADDONS;}
+    /** Returns true if the user want additional messages for general items. */
+    static bool   logMisc  () { return (m_verbosity&LOG_MISC)   == LOG_MISC;  }
+
 
 }
 #undef PARAM_PREFIX
