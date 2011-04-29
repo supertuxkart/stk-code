@@ -1258,7 +1258,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     
     // Sky dome and boxes support
     // --------------------------
-    if(m_sky_type==SKY_DOME)
+    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
                                                          m_sky_hori_segments,
@@ -1279,7 +1279,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
         m_all_nodes.push_back(node);
     }
-    else if(m_sky_type==SKY_BOX)
+    else if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
     {
         m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
     }
@@ -1365,14 +1365,21 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::string s;
         xml_node.get("texture",          &s                   );
         video::ITexture *t = irr_driver->getTexture(s);
-        t->grab();
-        m_sky_textures.push_back(t);
-        xml_node.get("vertical",        &m_sky_vert_segments  );
-        xml_node.get("horizontal",      &m_sky_hori_segments  );
-        xml_node.get("sphere-percent",  &m_sky_sphere_percent );
-        xml_node.get("texture-percent", &m_sky_texture_percent);
-        xml_node.get("speed-x", &m_sky_dx );
-        xml_node.get("speed-y", &m_sky_dy);
+        if (t != NULL)
+        {
+            t->grab();
+            m_sky_textures.push_back(t);
+            xml_node.get("vertical",        &m_sky_vert_segments  );
+            xml_node.get("horizontal",      &m_sky_hori_segments  );
+            xml_node.get("sphere-percent",  &m_sky_sphere_percent );
+            xml_node.get("texture-percent", &m_sky_texture_percent);
+            xml_node.get("speed-x", &m_sky_dx );
+            xml_node.get("speed-y", &m_sky_dy);
+        }
+        else
+        {
+            printf("Sky-dome texture '%s' not found - ignored.\n", s.c_str());
+        }
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")
     {
