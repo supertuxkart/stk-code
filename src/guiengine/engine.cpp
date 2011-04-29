@@ -1102,6 +1102,7 @@ namespace GUIEngine
                                             true /* alpha */);
         
         
+        irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
         g_title_font->draw(_("Loading"),
                            core::rect< s32 >( 0, screen_h/2 + texture_h/2,
                                               screen_w, screen_h ),
