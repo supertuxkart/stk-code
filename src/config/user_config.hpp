@@ -496,7 +496,8 @@ namespace UserConfigParams
     enum { LOG_MEMORY = 0x0001,
            LOG_GUI    = 0x0002,
            LOG_ADDONS = 0x0004,
-           LOG_MISC   = 0x0008};
+           LOG_MISC   = 0x0008,
+           LOG_ALL    = 0xffff };
 
     /** Returns true if the user want additional messages for memory usage. */
     bool   logMemory();

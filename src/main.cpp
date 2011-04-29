@@ -311,6 +311,10 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
         }
+        else if ( !strcmp(argv[i], "--debug=all") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
+        }
         else if ( !strcmp(argv[i], "-v") && i+1<argc )
         {
             UserConfigParams::m_verbosity = atoi(argv[i+1]);
@@ -711,6 +715,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=addons")                        ) {}
         else if( !strcmp(argv[i], "--debug=gui"   )                        ) {}
         else if( !strcmp(argv[i], "--debug=misc"  )                        ) {}
+        else if( !strcmp(argv[i], "--debug=all"   )                        ) {}
         else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
