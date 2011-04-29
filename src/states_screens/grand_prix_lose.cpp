@@ -104,8 +104,10 @@ void GrandPrixLose::init()
     m_phase = 1;
     m_sky_angle = 0.0f;
     m_global_time = 0.0f;
-    
-    m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("clouds.png"),
+
+    video::ITexture *t = irr_driver->getTexture(
+                                file_manager->getTextureFile("clouds.png"));
+    m_sky = irr_driver->addSkyDome(t,
                                    16 /* hori_res */, 16 /* vert_res */,
                                    1.0f /* texture_percent */,  2.0f /* sphere_percent */);
     

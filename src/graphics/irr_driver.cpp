@@ -728,12 +728,11 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
  *          between 0 and 2, where 1 is an exact half-sphere and 2 is a full
  *          sphere.
  */
-scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name,
+scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
                                          int hori_res, int vert_res,
                                          float texture_percent,
                                          float sphere_percent)
 {
-    ITexture *texture = getTexture(texture_name);
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
                                                 texture_percent,
                                                 sphere_percent);
@@ -750,14 +749,12 @@ scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name,
  *  \param front: Texture for the front plane of the box.
  *  \param back: Texture for the back plane of the box.
  */
-scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<std::string> &texture_names)
+scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> 
+                                        &texture)
 {
-    std::vector<video::ITexture*> t;
-    for(unsigned int i=0; i<texture_names.size(); i++)
-    {
-        t.push_back(getTexture(texture_names[i]));
-    }
-    return m_scene_manager->addSkyBoxSceneNode(t[0], t[1], t[2], t[3], t[4], t[5]);
+    return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1], 
+                                               texture[2], texture[3],
+                                               texture[4], texture[5]);
 }   // addSkyBox
 
 // ----------------------------------------------------------------------------

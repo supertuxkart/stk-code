@@ -138,10 +138,10 @@ public:
 
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
-    scene::ISceneNode    *addSkyDome(const std::string &texture, int hori_res,
+    scene::ISceneNode    *addSkyDome(video::ITexture *texture, int hori_res,
                                      int vert_res, float texture_percent, 
                                      float sphere_percent);
-    scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
+    scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);

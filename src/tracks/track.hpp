@@ -128,7 +128,7 @@ private:
     
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
-    std::vector<std::string> m_sky_textures;
+    std::vector<video::ITexture*> m_sky_textures;
 
     /** Used if m_sky_type is SKY_COLOR only */
     irr::video::SColor m_sky_color;

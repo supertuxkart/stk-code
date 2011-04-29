@@ -173,7 +173,13 @@ void FeatureUnlockedCutScene::init()
     texture_names[3] = file_manager->getTextureFile("purplenebula2.png");
     texture_names[4] = file_manager->getTextureFile("purplenebula.jpg");
     texture_names[5] = file_manager->getTextureFile("purplenebula2.png");
-    m_sky = irr_driver->addSkyBox(texture_names);
+    std::vector<video::ITexture*> textures;
+    for(unsigned int i=0; i<texture_names.size(); i++)
+    {
+        video::ITexture *t = irr_driver->getTexture(texture_names[i]);
+        textures.push_back(t);
+    }
+    m_sky = irr_driver->addSkyBox(textures);
 #ifdef DEBUG
     m_sky->setName("skybox");
 #endif

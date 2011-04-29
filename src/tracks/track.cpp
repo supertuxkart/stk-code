@@ -89,11 +89,6 @@ Track::Track(std::string filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-    if(m_quad_graph)    delete m_quad_graph;
-    if(m_check_manager) delete m_check_manager;
-    if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
-    delete m_track_mesh;
-    delete m_gfx_effect_mesh;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -173,6 +168,23 @@ void Track::cleanup()
             irr_driver->removeMeshFromCache(m_all_cached_meshes[i]);
     }
     m_all_cached_meshes.clear();
+
+    if(m_quad_graph)    delete m_quad_graph;
+    if(m_check_manager) delete m_check_manager;
+    if(m_mini_map)      
+    {
+        assert(m_mini_map->getReferenceCount()==1);
+        irr_driver->removeTexture(m_mini_map);
+        m_mini_map = NULL;
+    }
+
+    for(unsigned int i=0; i<m_sky_textures.size(); i++)
+    {
+        m_sky_textures[i]->drop();
+        if(m_sky_textures[i]->getReferenceCount()==1)
+            irr_driver->removeTexture(m_sky_textures[i]);
+    }
+    m_sky_textures.clear();
 
     // remove temporary materials loaded by the material manager
     material_manager->popTempMaterial();
@@ -1352,7 +1364,9 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         m_sky_texture_percent = 1.0f;
         std::string s;
         xml_node.get("texture",          &s                   );
-        m_sky_textures.push_back(s);
+        video::ITexture *t = irr_driver->getTexture(s);
+        t->grab();
+        m_sky_textures.push_back(t);
         xml_node.get("vertical",        &m_sky_vert_segments  );
         xml_node.get("horizontal",      &m_sky_hori_segments  );
         xml_node.get("sphere-percent",  &m_sky_sphere_percent );
@@ -1364,7 +1378,21 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
     {
         std::string s;
         xml_node.get("texture", &s);
-        m_sky_textures = StringUtils::split(s, ' ');
+        std::vector<std::string> v = StringUtils::split(s, ' ');
+        for(unsigned int i=0; i<v.size(); i++)
+        {
+            video::ITexture *t = irr_driver->getTexture(v[i]);
+            if(t)
+            {
+                t->grab();
+                m_sky_textures.push_back(t);
+            }
+            else
+            {
+                printf("Sky-box texture '%s' not found - ignored.\n",
+                       v[i].c_str());
+            }
+        }   // for i<v.size()
         if(m_sky_textures.size()!=6)
         {
             fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
