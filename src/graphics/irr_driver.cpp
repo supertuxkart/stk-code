@@ -214,6 +214,11 @@ void IrrDriver::initDevice()
     
     m_device->setResizable(false);
     
+    if (!UserConfigParams::m_fbo)
+    {
+        m_device->getVideoDriver()->disableFeature(EVDF_FRAMEBUFFER_OBJECT);
+    }
+    
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");

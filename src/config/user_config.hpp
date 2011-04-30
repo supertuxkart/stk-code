@@ -389,6 +389,20 @@ namespace UserConfigParams
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
     
+    // On OSX 10.4 and before there may be driver issues with FBOs, so to be safe disable them by default
+#ifdef __APPLE__
+    #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    #define FBO_DEFAULT false
+    #else
+    #define FBO_DEFAULT true
+    #endif
+#else
+#define FBO_DEFAULT true
+#endif
+    
+    PARAM_PREFIX BoolUserConfigParam        m_fbo
+        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo", &m_graphics_quality, "Use frame buffer objects (FBOs)") );
+    
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx", &m_graphics_quality, "Scenery animations") );
     
