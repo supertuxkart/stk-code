@@ -1162,6 +1162,8 @@ void IrrDriver::update(float dt)
 
         if (inRace)
         {
+            irr_driver->getVideoDriver()->enableMaterial2D();
+
             RaceGUIBase *rg = world->getRaceGUI();
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
@@ -1178,11 +1180,13 @@ void IrrDriver::update(float dt)
                         World::getWorld()->getPhysics()->draw();
                 }   // if kart->Camera
             }   // for i<world->getNumKarts()
+            
             // To draw the race gui we set the viewport back to the full
             // screen. 
             m_video_driver->setViewPort(core::recti(0, 0,
                 UserConfigParams::m_width,
                 UserConfigParams::m_height));
+
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
                 Kart *kart = world->getKart(i);

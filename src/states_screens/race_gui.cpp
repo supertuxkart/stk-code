@@ -181,7 +181,6 @@ void RaceGUI::renderGlobal(float dt)
     
     KartIconDisplayInfo* info = world->getKartsDisplayInfo();
     
-    irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
     drawGlobalPlayerIcons(info);
 }   // renderGlobal
 
@@ -235,11 +234,8 @@ void RaceGUI::renderPlayerView(const Kart *kart)
 
     RaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
 
-    irr_driver->getVideoDriver()->enableMaterial2D(); // not sure why I need to call it again but with this, it works
     drawPowerupIcons    (kart, viewport, scaling);
-    irr_driver->getVideoDriver()->enableMaterial2D();
     drawSpeedAndEnergy  (kart, viewport, scaling);
-    irr_driver->getVideoDriver()->enableMaterial2D();
     drawRankLap         (info, kart, viewport);
 
     RaceGUIBase::renderPlayerView(kart);
