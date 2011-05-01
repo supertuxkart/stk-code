@@ -261,20 +261,50 @@ io::path FileManager::createAbsoluteFilename(const std::string &f)
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
+    const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
+    // A later added file archive should be searched first (so that
+    // track specific models are found before models in data/models). 
+    // This is not necessary if this is the first member, of ir the
+    // addFileArchive call did not add this file systems (this can
+    // happen if the file archive has been added prevously, which
+    // commonly happens since each kart/track specific path is added
+    // twice: once for textures and once for models.
+    if(n>0 && (int)m_file_system->getFileArchiveCount()>n)
+    {
+        // In this case move the just added file archive
+        // (which has index n) to position 0 (by -n positions):
+        m_file_system->moveFileArchive(n, -n);
+    }
 }   // pushModelSearchPath
 
 //-----------------------------------------------------------------------------
 void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
+    const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
+    // A later added file archive should be searched first (so that
+    // e.g. track specific textures are found before textures in
+    // data/textures). 
+    // This is not necessary if this is the first member, of ir the
+    // addFileArchive call did not add this file systems (this can
+    // happen if the file archive has been added prevously, which
+    // commonly happens since each kart/track specific path is added
+    // twice: once for textures and once for models.
+    // (which has index n) to position 0 (by -n positions):
+    if(n>0 && (int)m_file_system->getFileArchiveCount()>n)
+    {
+        // In this case move the just added file archive
+        // (which has index n) to position 0 (by -n positions):
+        m_file_system->moveFileArchive(n, -n);
+    }
 }   // pushTextureSearchPath
 
 //-----------------------------------------------------------------------------
