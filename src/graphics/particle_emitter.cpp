@@ -338,7 +338,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                    );
             break;
         }
-            
+        
         case EMITTER_BOX:
         {
             const float box_size_x = type->getBoxSizeX()/2.0f;
@@ -356,7 +356,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                  );            
             break;
         }
-            
+        
         default:
         {
             fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
@@ -369,8 +369,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     m_node->setEmitter(m_emitter); // this grabs the emitter
     m_emitter->drop();             // so we can drop our references
     
-    // FIXME: this is ridiculous, the fadeout time should be equal to the lifetime, except that the
-    //        lifetime is random...
     scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 255, 255),
                                                                                 type->getFadeoutTime());
     m_node->addAffector(af);
