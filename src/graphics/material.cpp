@@ -264,12 +264,14 @@ void Material::install(bool is_full_path)
         if (tex) m_texture = tex;
         else fprintf(stderr, "Applying mask failed for '%s'!\n", m_texname.c_str());
     }
-    
+    m_texture->grab();
 }   // install
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
-    if(m_texture)
+    assert(m_texture);
+    m_texture->drop();
+    if(m_texture->getReferenceCount()==1)
         irr_driver->removeTexture(m_texture);
     // If a special sfx is installed (that isn't part of stk itself), the
     // entry needs to be removed from the sfx_manager's mapping, since other

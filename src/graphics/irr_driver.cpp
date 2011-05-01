@@ -869,6 +869,54 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 }   // getTexture
 
 // ----------------------------------------------------------------------------
+/** Appends a pointer to each texture used in this mesh to the vector.
+ *  \param mesh The mesh from which the textures are being determined.
+ *  \param texture_list The list to which to attach the pointer to.
+ */
+void IrrDriver::grabAllTextures(const scene::IMesh *mesh)
+{
+    const unsigned int n = mesh->getMeshBufferCount();
+
+    for(unsigned int i=0; i<n; i++)
+    {
+        scene::IMeshBuffer *b = mesh->getMeshBuffer(i);
+        video::SMaterial   &m = b->getMaterial();
+        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+        {
+            video::ITexture *t = m.getTexture(j);
+            if(t)
+                t->grab();
+        }   // for j < MATERIAL_MAX_TEXTURE
+    }   // for i <getMeshBufferCount
+}   // grabAllTextures
+
+// ----------------------------------------------------------------------------
+/** Appends a pointer to each texture used in this mesh to the vector.
+ *  \param mesh The mesh from which the textures are being determined.
+ *  \param texture_list The list to which to attach the pointer to.
+ */
+void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
+{
+    const unsigned int n = mesh->getMeshBufferCount();
+
+    for(unsigned int i=0; i<n; i++)
+    {
+        scene::IMeshBuffer *b = mesh->getMeshBuffer(i);
+        video::SMaterial   &m = b->getMaterial();
+        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+        {
+            video::ITexture *t = m.getTexture(j);
+            if(t)
+            {
+                t->drop();
+                if(t->getReferenceCount()==1)
+                    removeTexture(t);
+            }   // if t
+        }   // for j < MATERIAL_MAX_TEXTURE
+    }   // for i <getMeshBufferCount
+}   // dropAllTextures
+
+// ----------------------------------------------------------------------------
 ITexture* IrrDriver::applyMask(video::ITexture* texture, 
                                const std::string& mask_path)
 {

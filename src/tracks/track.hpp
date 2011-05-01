@@ -76,17 +76,27 @@ private:
     std::string              m_designer;
     /** The full filename of the config (xml) file. */
     std::string              m_filename;
+
     /** The base dir of all files of this track. */
     std::string              m_root;
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
+
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
     std::vector<scene::IMesh*>      m_all_cached_meshes;
-    /** A list of textures to help in removing unused textures from irrlicht's
-     *  texture cache after cleanup. */
-    std::vector<video::ITexture*>   m_all_used_textures;
+
+    /** A list of all textures loaded by the track, so that they can
+     *  be removed from the cache at cleanup time. */
+    std::vector<video::ITexture*>   m_all_cached_textures;
+
 #ifdef DEBUG
+    /** A list of textures that were cached before the track is loaded. 
+     *  After cleanup of ta track it can be tested which new textures
+     *  are still in the cache, and print a report of leaked textures
+     *  (in debug mode only). */
+    std::vector<video::ITexture*>   m_old_textures;
+
     /** Used to store all buffers in irrlicht's memory cache before a track
      *  is loaded. After cleanup of a track we can test which meshes are
      *  still in the cache, and print a report of leaked meshes (of course in

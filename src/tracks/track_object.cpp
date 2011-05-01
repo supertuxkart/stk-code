@@ -77,6 +77,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         }
 
         m_mesh->grab();
+        irr_driver->grabAllTextures(m_mesh);
         scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
         m_node = node;
 #ifdef DEBUG
@@ -104,6 +105,7 @@ TrackObject::~TrackObject()
 {
     if(m_node)
         irr_driver->removeNode(m_node);
+    irr_driver->dropAllTextures(m_mesh);
     if(m_mesh)
     {
         m_mesh->drop();

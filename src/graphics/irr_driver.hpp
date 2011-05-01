@@ -120,6 +120,8 @@ public:
     video::ITexture      *getTexture(const std::string &filename,
                                      bool is_premul=false,
                                      bool is_prediv=false);
+    void                  grabAllTextures(const scene::IMesh *mesh);
+    void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 
                                          bool create_one_quad=false);
     scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material, 

@@ -217,11 +217,11 @@ void Track::cleanup()
         {
             video::ITexture *t = vd->getTextureByIndex(i);
             std::vector<video::ITexture*>::iterator p;
-            p = std::find(m_all_used_textures.begin(), m_all_used_textures.end(),
+            p = std::find(m_old_textures.begin(), m_old_textures.end(),
                           t);
-            if(p!=m_all_used_textures.end())
+            if(p!=m_old_textures.end())
             {
-                m_all_used_textures.erase(p);
+                m_old_textures.erase(p);
             }
             else
             {
@@ -1008,12 +1008,12 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             m_old_mesh_buffers.push_back(name.getInternalName().c_str());
         }
 
-        m_all_used_textures.clear();
+        m_old_textures.clear();
         video::IVideoDriver *vd = irr_driver->getVideoDriver();
         for(unsigned int i=0; i<vd->getTextureCount(); i++)
         {
             video::ITexture *t=vd->getTextureByIndex(i);
-            m_all_used_textures.push_back(t);
+            m_old_textures.push_back(t);
         }
 #endif
     }
