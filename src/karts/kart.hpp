@@ -201,7 +201,7 @@ public:
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData(RaceManager::KartType type, bool is_first_kart, Track* track,
                             bool animatedModel);
-    virtual void   updateGraphics(const Vec3& off_xyz,  
+    virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     void           createPhysics    ();
     bool           isInRest         () const;
@@ -365,7 +365,7 @@ public:
     btUprightConstraint *getUprightConstraint() const 
                                                   {return m_uprightConstraint;}
     // ------------------------------------------------------------------------
-    /** Returns the speed of the kart. */
+    /** Returns the speed of the kart in meters/second. */
     float          getSpeed         () const {return m_speed;                 }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart

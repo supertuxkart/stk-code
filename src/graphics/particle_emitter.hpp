@@ -26,6 +26,12 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#define VISUALIZE_BOX_EMITTER 0
+
+#if VISUALIZE_BOX_EMITTER
+#include <vector>
+#endif
+
 class Material;
 class ParticleKind;
 class Track;
@@ -49,6 +55,10 @@ private:
      *  particles per second. */
     scene::IParticleEmitter         *m_emitter;
 
+#if VISUALIZE_BOX_EMITTER
+    std::vector<scene::ISceneNode*> m_visualisation;
+#endif
+    
     const ParticleKind              *m_particle_type;
     
     unsigned int m_magic_number;
@@ -67,6 +77,8 @@ public:
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
     
     void         setParticleType(const ParticleKind* p);
+    
+    void resizeBox(float size);
     
     scene::IParticleSystemSceneNode* getNode() { return m_node; }
     

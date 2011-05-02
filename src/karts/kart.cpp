@@ -1805,7 +1805,7 @@ void Kart::applyEngineForce(float force)
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Kart::updateGraphics(const Vec3& offset_xyz, 
+void Kart::updateGraphics(float dt, const Vec3& offset_xyz, 
                           const btQuaternion& rotation)
 {
     float wheel_up_axis[4];
@@ -1845,6 +1845,10 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
             m_nitro->setCreationRate(m_controls.m_nitro && isOnGround() && 
                                      m_collected_energy>0
                                      ? (min_rate + rate*(max_rate - min_rate)) : 0);
+            
+            // the emitter box should spread from last frame's position to the current position
+            // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
+            m_nitro->resizeBox(std::max(0.25f, getSpeed()*dt));
         }
     }
 
@@ -1852,7 +1856,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
-    Moveable::updateGraphics(center_shift, 
+    Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(offset_heading, 0, 0));
 }   // updateGraphics
 

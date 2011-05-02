@@ -343,9 +343,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         {
             const float box_size_x = type->getBoxSizeX()/2.0f;
             const float box_size_y = type->getBoxSizeY()/2.0f;
-            const float box_size_z = type->getBoxSizeZ()/2.0f;
-            m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -box_size_z,
-                                                                 box_size_x,  box_size_y,  box_size_z),
+            
+            m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -0.6f,
+                                                                 box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
                                                  core::vector3df(m_particle_type->getVelocityX(),
                                                                  m_particle_type->getVelocityY(),
                                                                  m_particle_type->getVelocityZ()),   // velocity in m/ms
@@ -353,10 +353,30 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                  type->getMinColor(), type->getMaxColor(),
                                                  lifeTimeMin, lifeTimeMax,
                                                  m_particle_type->getAngleSpread() /* angle */
-                                                 );            
+                                                 );
+            
+#if VISUALIZE_BOX_EMITTER
+            if (m_parent != NULL)
+            {
+                for (int x=0; x<2; x++)
+                {
+                    for (int y=0; y<2; y++)
+                    {
+                        for (int z=0; z<2; z++)
+                        {
+                            m_visualisation.push_back(
+                            irr_driver->getSceneManager()->addSphereSceneNode(0.05f, 16, m_parent, -1,
+                                                                               core::vector3df((x ? box_size_x : -box_size_x),
+                                                                                               (y ? box_size_y : -box_size_y),
+                                                                                               -0.6 - (z ? 0 : type->getBoxSizeZ())))
+                                                      );
+                        }
+                    }
+                }
+            }
+#endif
             break;
         }
-        
         default:
         {
             fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
@@ -399,4 +419,38 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
     HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
     m_node->addAffector(hmca);
     hmca->drop();
+}
+
+void ParticleEmitter::resizeBox(float size)
+{
+    scene::IParticleBoxEmitter* emitter = (scene::IParticleBoxEmitter*)m_emitter;
+    
+    const float box_size_x = m_particle_type->getBoxSizeX()/2.0f;
+    const float box_size_y = m_particle_type->getBoxSizeY()/2.0f;
+    
+    
+    emitter->setBox( core::aabbox3df(-box_size_x, -box_size_y, -0.6f,
+                                     box_size_x,  box_size_y,  -0.6f - size) );
+    
+#if VISUALIZE_BOX_EMITTER
+    if (m_parent != NULL)
+    {
+        int n = 0;
+        for (int x=0; x<2; x++)
+        {
+            for (int y=0; y<2; y++)
+            {
+                for (int z=0; z<2; z++)
+                {
+                    m_visualisation[n]->setPosition(
+                                                    core::vector3df((x ? box_size_x : -box_size_x),
+                                                                    (y ? box_size_y : -box_size_y),
+                                                                    -0.6 - (z ? 0 : size))
+                                                    );
+                    n++;
+                }
+            }
+        }
+    }
+#endif
 }

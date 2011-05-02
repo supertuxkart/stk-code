@@ -97,7 +97,7 @@ public:
         m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
-    virtual void  updateGraphics(const Vec3& off_xyz,  
+    virtual void  updateGraphics(float dt, const Vec3& off_xyz,  
                                  const btQuaternion& off_rotation);
     virtual void  reset();
     virtual void  update(float dt) ;

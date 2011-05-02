@@ -62,7 +62,7 @@ void Moveable::setNode(scene::ISceneNode *n)
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(const Vec3& offset_xyz,  
+void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,  
                               const btQuaternion& rotation)
 {
     Vec3 xyz=getXYZ()+offset_xyz;
@@ -129,7 +129,7 @@ void Moveable::update(float dt)
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
 
-    updateGraphics(Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
+    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
 }   // update
 
 //-----------------------------------------------------------------------------
