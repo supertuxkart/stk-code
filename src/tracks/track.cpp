@@ -163,6 +163,16 @@ void Track::cleanup()
     // mesh if it is already contained in the list or not).
     for(unsigned int i=0; i<m_all_cached_meshes.size(); i++)
     {
+        irr_driver->dropAllTextures(m_all_cached_meshes[i]);
+        // If a mesh is not in Irrlicht's texture cache, its refcount is 
+        // 1 (since its scene node was removed, so the only other reference 
+        // is in m_all_cached_meshes). In this case we only drop it once
+        // and don't try to remove it from the cache.
+        if(m_all_cached_meshes[i]->getReferenceCount()==1)
+        {
+            m_all_cached_meshes[i]->drop();
+            continue;
+        }
         m_all_cached_meshes[i]->drop();
         if(m_all_cached_meshes[i]->getReferenceCount()==1)
             irr_driver->removeMeshFromCache(m_all_cached_meshes[i]);
@@ -580,7 +590,11 @@ bool Track::loadMainTrack(const XMLNode &root)
     // to keep a reference to it.
     //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
     scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
-    merged_mesh->drop();
+    // We should drop the merged mesh (since it's now referred to in the
+    // scene node), but then we need to grab it since it's in the 
+    // m_all_cached_meshes.
+    m_all_cached_meshes.push_back(merged_mesh);
+    irr_driver->grabAllTextures(merged_mesh);
 
     // The reference count of the mesh is 1, since it is in irrlicht's
     // cache. So we only have to remove it from the cache.
@@ -679,6 +693,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             
             scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
             mesh->grab();
+            irr_driver->grabAllTextures(mesh);
             m_all_cached_meshes.push_back(mesh);
             scene_node = irr_driver->addMesh(mesh);
             scene_node->setPosition(xyz);
@@ -725,6 +740,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             // 1 - which means that the only reference is now in the cache,
             // and can therefore be removed.
             m_all_cached_meshes.push_back(a_mesh);
+            irr_driver->grabAllTextures(a_mesh);
             a_mesh->grab();
             scene_node = irr_driver->addAnimatedMesh(a_mesh);
             scene_node->setPosition(xyz);
@@ -815,6 +831,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 }
                 a_mesh->grab();  // see above for usage in m_all_cached_meshes
                 m_all_cached_meshes.push_back(a_mesh);
+                irr_driver->grabAllTextures(a_mesh);
                 scene::IAnimatedMeshSceneNode* scene_node = 
                     irr_driver->addAnimatedMesh(a_mesh);
                 scene_node->setPosition(xyz);
@@ -970,6 +987,7 @@ void Track::createWater(const XMLNode &node)
 #endif
     mesh->grab();
     m_all_cached_meshes.push_back(mesh);
+    irr_driver->grabAllTextures(mesh);
 
     core::vector3df xyz(0,0,0);
     node.get("xyz", &xyz);
