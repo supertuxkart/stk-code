@@ -986,64 +986,64 @@ void Kart::handleMaterialSFX(const Material *material)
  */
 void Kart::handleMaterialGFX()
 {
-    // Nothing to do if there are no particles.
-    if (!m_terrain_particles) return;
-
     const Material *material = getMaterial();
     
-    // First test: give the terrain effect, if the kart is
-    // on top of a surface (i.e. not falling), actually touching
-    // something with the wheels, and the material has not the
-    // below surface property set.
-    if(material && isOnGround() && !material->isBelowSurface() && m_kart_mode != EA_RESCUE)
+    if (m_terrain_particles)
     {
-        Vec3 xyz;
-        m_wheel_toggle = 1 - m_wheel_toggle;
-        const btWheelInfo &wi = 
-            getVehicle()->getWheelInfo(2 + m_wheel_toggle);
-        xyz = wi.m_raycastInfo.m_contactPointWS;
-        // FIXME: the X position is not yet always accurate.
-        xyz += Vec3(0.06f * (m_wheel_toggle ? +1 : -1),
-                    0,
-                    0.06f);
-        m_terrain_particles->setPosition(xyz.toIrrVector());
-        // Get the appropriate particle data depending on
-        // wether the kart is skidding or driving.
-        const ParticleKind* pk = 
-            material->getParticlesWhen(m_skidding > 1.0f
-                                       ? Material::EMIT_ON_SKID
-                                       : Material::EMIT_ON_DRIVE);
-        if(!pk) 
+        // First test: give the terrain effect, if the kart is
+        // on top of a surface (i.e. not falling), actually touching
+        // something with the wheels, and the material has not the
+        // below surface property set.
+        if(material && isOnGround() && !material->isBelowSurface() && m_kart_mode != EA_RESCUE)
         {
-            // Disable potentially running particle effects
-            m_terrain_particles->setCreationRate(0);
-            return;  // no particle effect, return
-        }
+            Vec3 xyz;
+            m_wheel_toggle = 1 - m_wheel_toggle;
+            const btWheelInfo &wi = 
+                getVehicle()->getWheelInfo(2 + m_wheel_toggle);
+            xyz = wi.m_raycastInfo.m_contactPointWS;
+            // FIXME: the X position is not yet always accurate.
+            xyz += Vec3(0.06f * (m_wheel_toggle ? +1 : -1),
+                        0,
+                        0.06f);
+            m_terrain_particles->setPosition(xyz.toIrrVector());
+            // Get the appropriate particle data depending on
+            // wether the kart is skidding or driving.
+            const ParticleKind* pk = 
+                material->getParticlesWhen(m_skidding > 1.0f
+                                           ? Material::EMIT_ON_SKID
+                                           : Material::EMIT_ON_DRIVE);
+            if(!pk) 
+            {
+                // Disable potentially running particle effects
+                m_terrain_particles->setCreationRate(0);
+                return;  // no particle effect, return
+            }
 
-        // Now compute the particle creation rate:
-        float rate = 0;
-        const float speed = fabsf(getSpeed());
+            // Now compute the particle creation rate:
+            float rate = 0;
+            const float speed = fabsf(getSpeed());
 
-        if (m_skidding > 1.0f)
-        {
-            rate = fabsf(m_controls.m_steer) > 0.8 ? m_skidding - 1 : 0;
-        }
-        else if (speed >= 0.5f)
-        {
-            rate = speed/m_kart_properties->getMaxSpeed();
-        }
-        else
-        {
-            m_terrain_particles->setCreationRate(0);
+            if (m_skidding > 1.0f)
+            {
+                rate = fabsf(m_controls.m_steer) > 0.8 ? m_skidding - 1 : 0;
+            }
+            else if (speed >= 0.5f)
+            {
+                rate = speed/m_kart_properties->getMaxSpeed();
+            }
+            else
+            {
+                m_terrain_particles->setCreationRate(0);
+                return;
+            }
+
+            float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
+            m_terrain_particles->setParticleType(pk);
+            m_terrain_particles->setCreationRate(create);
             return;
         }
-
-        float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
-        m_terrain_particles->setParticleType(pk);
-        m_terrain_particles->setCreationRate(create);
-        return;
     }
-
+    
     // Now the kart is either falling, or driving on a terrain which
     // has the 'below surface' flag set. Detect if there is a surface 
     // on top of the kart.
@@ -1059,65 +1059,66 @@ void Kart::handleMaterialGFX()
         }
     }
     
-    // Use the middle of the contact points of the two rear wheels
-    // as the point from which to cast the ray upwards
-    const btWheelInfo::RaycastInfo &ri2 = 
-            getVehicle()->getWheelInfo(2).m_raycastInfo;
-    const btWheelInfo::RaycastInfo &ri3 = 
-            getVehicle()->getWheelInfo(3).m_raycastInfo;
-    Vec3 from = (ri2.m_contactPointWS + ri3.m_contactPointWS)*0.5f;
-    Vec3 xyz;
-    const Material *surface_material;
-    if(!getSurfaceInfo(from, &xyz, &surface_material))
+    if (m_terrain_particles)
     {
-        m_terrain_particles->setCreationRate(0);
-        return;
-    }
-    const ParticleKind *pk = 
-        surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
-    if(pk && !m_flying && m_kart_mode != EA_RESCUE)
-    {
-        const float distance = xyz.distance2(from);
-        m_terrain_particles->setParticleType(pk);
-        m_terrain_particles->setPosition(xyz.toIrrVector());
-        //const float speed = fabsf(getSpeed());
-        //float rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
-        //                           : 0;
+        // Use the middle of the contact points of the two rear wheels
+        // as the point from which to cast the ray upwards
+        const btWheelInfo::RaycastInfo &ri2 = 
+                getVehicle()->getWheelInfo(2).m_raycastInfo;
+        const btWheelInfo::RaycastInfo &ri3 = 
+                getVehicle()->getWheelInfo(3).m_raycastInfo;
+        Vec3 from = (ri2.m_contactPointWS + ri3.m_contactPointWS)*0.5f;
+        Vec3 xyz;
+        const Material *surface_material;
+        if(!getSurfaceInfo(from, &xyz, &surface_material))
+        {
+            m_terrain_particles->setCreationRate(0);
+            return;
+        }
+        const ParticleKind *pk = 
+            surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
+        if(pk && !m_flying && m_kart_mode != EA_RESCUE)
+        {
+            const float distance = xyz.distance2(from);
+            m_terrain_particles->setParticleType(pk);
+            m_terrain_particles->setPosition(xyz.toIrrVector());
+            //const float speed = fabsf(getSpeed());
+            //float rate = (speed>=0.5f) ? speed/m_kart_properties->getMaxSpeed()
+            //                           : 0;
 
-        float create;
-        if (distance < 2.0f)
-        {
-            create = (float)pk->getMaxRate();
-        }
-        else if (distance < 4.0f)
-        {
-            create = pk->getMinRate() + (pk->getMaxRate() - pk->getMinRate())*(distance - 2.0f)/2.0f;
-        }
-        else
-        {
-            create = 0.0f;
-        }
-        m_terrain_particles->setCreationRate(create);
-        
-        
-        const std::string s = surface_material->getSFXName();
-        if (s != "" && m_kart_mode != EA_RESCUE &&
-            (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
-        {
-            if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-            m_previous_terrain_sound = m_terrain_sound;
-            if(m_previous_terrain_sound)
-                m_previous_terrain_sound->setLoop(false);
+            float create;
+            if (distance < 2.0f)
+            {
+                create = (float)pk->getMaxRate();
+            }
+            else if (distance < 4.0f)
+            {
+                create = pk->getMinRate() + (pk->getMaxRate() - pk->getMinRate())*(distance - 2.0f)/2.0f;
+            }
+            else
+            {
+                create = 0.0f;
+            }
+            m_terrain_particles->setCreationRate(create);
             
-            m_terrain_sound = sfx_manager->createSoundSource(s);
-            m_terrain_sound->play();
-            m_terrain_sound->setLoop(false);
+            
+            const std::string s = surface_material->getSFXName();
+            if (s != "" && m_kart_mode != EA_RESCUE &&
+                (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+            {
+                if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+                m_previous_terrain_sound = m_terrain_sound;
+                if(m_previous_terrain_sound)
+                    m_previous_terrain_sound->setLoop(false);
+                
+                m_terrain_sound = sfx_manager->createSoundSource(s);
+                m_terrain_sound->play();
+                m_terrain_sound->setLoop(false);
+            }
+            
+            // handleMaterialSFX(surface_material);
         }
-        
-        // handleMaterialSFX(surface_material);
     }
-    //if (m_camera != NULL) m_camera->setFallMode(true);
-    //m_camera->setFallMode(false);
 
 }   // handleMaterialGFX
 
