@@ -71,6 +71,8 @@ namespace GUIEngine
         
         void update(float delta);
         
+        virtual void elementRemoved();
+        
         /** Disables any model rotation */
         void setRotateOff();
         

@@ -83,7 +83,7 @@ void RaceGUIBase::createMarkerTexture()
     IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size
                                                           *npower2,
                                                           m_marker_rendered_size),
-                                     "RaceGUI::markers");
+                                     "RaceGUI::markers", true);
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH((float)(m_marker_rendered_size*npower2), 

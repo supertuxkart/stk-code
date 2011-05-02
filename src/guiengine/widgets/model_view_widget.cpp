@@ -150,7 +150,7 @@ void ModelViewWidget::update(float delta)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-        m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name );
+        m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name, false);
         m_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
     
@@ -184,3 +184,9 @@ void ModelViewWidget::setRotateTo(float targetAngle, float speed)
     m_rotation_target = targetAngle;
 }
 
+void ModelViewWidget::elementRemoved()
+{
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
+    IconButtonWidget::elementRemoved();
+}

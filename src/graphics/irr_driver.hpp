@@ -194,6 +194,8 @@ public:
          *  in between beginRenderToTexture() and endRenderToTexture calls. */
         video::ITexture            *m_render_target_texture;
         
+        bool                        m_persistent_texture;
+        
         /** Main node of the RTT scene */
         scene::ISceneNode          *m_rtt_main_node;
         
@@ -206,7 +208,7 @@ public:
         
     public:
         RTTProvider(const core::dimension2du &dimension, 
-                    const std::string &name);
+                    const std::string &name, bool persistent_texture);
         
         ~RTTProvider();
         

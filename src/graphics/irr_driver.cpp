@@ -1354,10 +1354,13 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 /** Begins a rendering to a texture.
  *  \param dimension The size of the texture. 
  *  \param name Name of the texture.
+ *  \param persistent_texture Whether the created RTT texture should persist in
+ *                            memory after the RTTProvider is deleted
  */
 IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
-                                    const std::string &name)
-{    
+                                    const std::string &name, bool persistent_texture)
+{
+    m_persistent_texture = persistent_texture;
     m_video_driver = irr_driver->getVideoDriver();
     m_render_target_texture = 
         m_video_driver->addRenderTargetTexture(dimension, 
@@ -1377,6 +1380,9 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
 IrrDriver::RTTProvider::~RTTProvider()
 {
     tearDownRTTScene();
+    
+    if (!m_persistent_texture)
+        irr_driver->removeTexture(m_render_target_texture);
 }   // ~RTTProvider
 
 // ----------------------------------------------------------------------------

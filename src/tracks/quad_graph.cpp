@@ -624,7 +624,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                         const std::string &name,
                                         const video::SColor &fill_color)
 {
-    IrrDriver::RTTProvider rttProvider(dimension, name);
+    IrrDriver::RTTProvider rttProvider(dimension, name, true);
     video::SColor red(128, 255, 0, 0);
     createMesh(/*show_invisible part of the track*/ false,
                /*track_color*/    &fill_color,
