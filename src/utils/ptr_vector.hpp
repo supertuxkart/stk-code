@@ -47,12 +47,14 @@ public:
     }
 
     // ------------------------------------------------------------------------
+    
     ~PtrVector()
     {
         if(type == HOLD) clearAndDeleteAll();
     }
-
+    
     // ------------------------------------------------------------------------
+    
     void push_back(TYPE* t)
     {
         m_contents_vector.push_back(t);
@@ -76,7 +78,6 @@ public:
     // ------------------------------------------------------------------------
     TYPE* get(const int ID)
     {
-
         assert(ID > -1);
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
@@ -84,9 +85,8 @@ public:
     }
 
     // ------------------------------------------------------------------------
-    const TYPE* getConst(const int ID) const
+    const TYPE* get(const int ID) const
     {
-
         assert(ID > -1);
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
@@ -271,6 +271,16 @@ public:
 
 
 };   // class ptrVector
+
+
+template<typename T, typename U>
+int init_foreach(T& val, const U& vect)
+{
+    val = vect.get(0);
+    return 0;
+}
+
+#define for_each( VAR, VECTOR ) for (int _foreach_i = init_foreach(VAR, VECTOR); VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
 
 
 #endif

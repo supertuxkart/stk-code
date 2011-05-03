@@ -89,7 +89,7 @@ bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
     const int count = within->size();
     for (int n=0; n<count; n++)
     {
-        if (isMyChildHelperFunc(&within->getConst(n)->getChildren(), widget))
+        if (isMyChildHelperFunc(&within->get(n)->getChildren(), widget))
         {
             return true;
         }

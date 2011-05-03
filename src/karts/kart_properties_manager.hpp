@@ -20,7 +20,7 @@
 #ifndef HEADER_KART_PROPERTIES_MANAGER_HPP
 #define HEADER_KART_PROPERTIES_MANAGER_HPP
 
-#include <vector>
+#include "utils/ptr_vector.hpp"
 #include <map>
 
 #include "network/remote_kart_info.hpp"
@@ -53,7 +53,7 @@ private:
     bool                     loadKart(const std::string &dir);
 protected:
 
-    typedef std::vector<KartProperties*> KartPropertiesVector;
+    typedef PtrVector<KartProperties> KartPropertiesVector;
     /** All available kart configurations */
     KartPropertiesVector m_karts_properties;
 
