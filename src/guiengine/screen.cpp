@@ -135,7 +135,7 @@ void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
     Widget* w;
-    for_each (w, m_widgets)
+    for_in (w, m_widgets)
     {
         assert(w->m_magic_number == 0xCAFEC001);
     }

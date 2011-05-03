@@ -186,7 +186,7 @@ const int KartPropertiesManager::getKartId(const std::string &ident) const
 const KartProperties* KartPropertiesManager::getKart(const std::string &ident) const
 {
     const KartProperties* kp;
-    for_each (kp, m_karts_properties)
+    for_in (kp, m_karts_properties)
     {
         if (kp->getIdent() == ident)
             return kp;

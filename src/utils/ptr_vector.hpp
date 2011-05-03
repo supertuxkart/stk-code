@@ -281,7 +281,7 @@ int init_foreach(T& val, U& vect)
     return 0;
 }
 
-#define for_each( VAR, VECTOR ) for (int _foreach_i = init_foreach(VAR, VECTOR); VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
+#define for_in( VAR, VECTOR ) for (int _foreach_i = init_foreach(VAR, VECTOR); VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
 
 
 #endif

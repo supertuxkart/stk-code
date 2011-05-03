@@ -1207,7 +1207,7 @@ void IrrDriver::update(float dt)
             // This code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
             GUIEngine::Widget* widget;
-            for_each (widget, GUIEngine::needsUpdate)
+            for_in (widget, GUIEngine::needsUpdate)
             {
                 widget->update(dt);
             }
