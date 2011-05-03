@@ -245,6 +245,10 @@ Controller* World::loadAIController(Kart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    // In case that a race is aborted (e.g. track not found) m_track is 0.
+    if(m_track)
+        m_track->cleanup();
+
     // Delete the in-race-gui:
     if(m_saved_race_gui)
     {
@@ -261,9 +265,6 @@ World::~World()
         delete m_race_gui;
     }
     delete race_state;
-    // In case that a race is aborted (e.g. track not found) m_track is 0.
-    if(m_track)
-        m_track->cleanup();
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
