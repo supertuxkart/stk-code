@@ -133,10 +133,10 @@ namespace GUIEngine
         Widget* m_right_widget;
         
         /** Returns the currently selected row */
-        RibbonWidget* getSelectedRibbon(const int playerID) const;
+        RibbonWidget* getSelectedRibbon(const int playerID);
         
         /** Returns the row */
-        RibbonWidget* getRowContaining(Widget* w) const;
+        RibbonWidget* getRowContaining(Widget* w);
         
         /** Updates the visible label to match the currently selected item */
         void updateLabel(RibbonWidget* from_this_ribbon=NULL);

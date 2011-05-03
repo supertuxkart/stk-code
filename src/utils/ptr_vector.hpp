@@ -274,9 +274,10 @@ public:
 
 
 template<typename T, typename U>
-int init_foreach(T& val, const U& vect)
+int init_foreach(T& val, U& vect)
 {
-    val = vect.get(0);
+    if (vect.size() > 0)
+        val = vect.get(0);
     return 0;
 }
 

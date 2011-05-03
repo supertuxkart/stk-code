@@ -138,10 +138,10 @@ ModalDialog::~ModalDialog()
 void ModalDialog::clearWindow()
 {
     // TODO: extract this code and its eqauivalent from Screen into the common base class?
-    const int children_amount = m_widgets.size();
-    for(int i=0; i<children_amount; i++)
+    Widget* w;
+    for_each (w, m_widgets);
     {
-        m_irrlicht_window->removeChild( m_widgets[i].getIrrlichtElement() );
+        m_irrlicht_window->removeChild( w->getIrrlichtElement() );
     }
     m_widgets.clearAndDeleteAll();   
     

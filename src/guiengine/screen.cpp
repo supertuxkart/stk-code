@@ -134,9 +134,10 @@ void Screen::loadFromFile()
 void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
-    for (int n=0; n<m_widgets.size(); n++)
+    Widget* w;
+    for_each (w, m_widgets)
     {
-        assert(m_widgets[n].m_magic_number == 0xCAFEC001);
+        assert(w->m_magic_number == 0xCAFEC001);
     }
     
     m_loaded = false;

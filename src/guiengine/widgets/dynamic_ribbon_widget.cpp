@@ -488,35 +488,31 @@ const irr::core::stringw& DynamicRibbonWidget::getSelectionText(const int player
     return nothing;
 }
 // -----------------------------------------------------------------------------
-RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w) const
+RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w)
 {
-    const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
+    RibbonWidget* row;
+    for_each (row, m_rows)
     {
-        const RibbonWidget* row = &m_rows[n];
-        if(row != NULL)
+        if (row != NULL)
         {
-            if(m_children.contains( w ) ) return (RibbonWidget*)row;
+            if (row->m_children.contains( w ) ) return row;
         }
     }
     
     return NULL;
 }
 // -----------------------------------------------------------------------------
-RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID) const
+RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID)
 {    
-
-    const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
+    RibbonWidget* row;
+    for_each (row, m_rows)
     {
-        const RibbonWidget* row = &m_rows[n];
         if (GUIEngine::isFocusedForPlayer(row, playerID))
         {
-            return (RibbonWidget*)row;
+            return row;
         }
     }
         
-
     return NULL;
 }
 
@@ -568,11 +564,11 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
         updateLabel();
         propagateSelection();
         
-        const int listenerAmount = m_hover_listeners.size();
-        for (int n=0; n<listenerAmount; n++)
+        DynamicRibbonHoverListener* listener;
+        for_each( listener, m_hover_listeners )
         {
-            m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString(playerID),
-                                                    w->getSelectionText(playerID), playerID);
+            listener->onSelectionChanged(this, w->getSelectionIDString(playerID),
+                                         w->getSelectionText(playerID), playerID);
         }
     }
     
@@ -621,11 +617,11 @@ EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int play
     
     if (getSelectedRibbon(playerID) != NULL)
     {
-        const int listenerAmount = m_hover_listeners.size();
-        for (int n=0; n<listenerAmount; n++)
+        DynamicRibbonHoverListener* listener;
+        for_each( listener, m_hover_listeners )
         {
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
-                                                    getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
+            listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
+                                         getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
     
@@ -637,11 +633,11 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
     Widget::focused(playerID);
     updateLabel();
     
-    const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
+    DynamicRibbonHoverListener* listener;
+    for_each( listener, m_hover_listeners )
     {
-        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
-                                                getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
+        listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
+                                     getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
     }
     
     return EVENT_LET;
@@ -667,11 +663,11 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
     
     updateLabel(emitter);
     
-    const int listenerAmount = m_hover_listeners.size();
-    for (int n=0; n<listenerAmount; n++)
+    DynamicRibbonHoverListener* listener;
+    for_each( listener, m_hover_listeners )
     {
-        m_hover_listeners[n].onSelectionChanged(this, emitter->getSelectionIDString(playerID),
-                                                emitter->getSelectionText(playerID), playerID);
+        listener->onSelectionChanged(this, emitter->getSelectionIDString(playerID),
+                                     emitter->getSelectionText(playerID), playerID);
     }    
 }
 
@@ -743,10 +739,9 @@ void DynamicRibbonWidget::propagateSelection()
         }
         
         // set same selection in all ribbons
-        const int row_amount = m_rows.size();
-        for (int n=0; n<row_amount; n++)
+        RibbonWidget* ribbon;
+        for_each( ribbon, m_rows )
         {
-            RibbonWidget* ribbon = m_rows.get(n);
             if (ribbon != selected_ribbon)
             {
                 ribbon->m_selection[p] = (int)round(where*(ribbon->m_children.size()-1));
@@ -778,7 +773,7 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
             return;
         }
     }
-
+    
     if (selection_id == RibbonWidget::NO_ITEM_ID) m_label->setText( L"" );
     else                                          m_label->setText( L"Unknown Item" );
 }

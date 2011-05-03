@@ -1206,10 +1206,10 @@ void IrrDriver::update(float dt)
         {
             // This code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
-            const int updateAmount = GUIEngine::needsUpdate.size();
-            for(int n=0; n<updateAmount; n++)
+            GUIEngine::Widget* widget;
+            for_each (widget, GUIEngine::needsUpdate)
             {
-                GUIEngine::needsUpdate[n].update(dt);
+                widget->update(dt);
             }
         }
 
