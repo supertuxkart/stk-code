@@ -258,12 +258,12 @@ void CreditsScreen::init()
 
 void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    m_x = x;
+    m_y = y;
+    m_w = w;
+    m_h = h;
     
-    m_section_rect = core::rect< s32 >( x, y, x+w, y+h/6 );
+    m_section_rect = core::rect< s32 >( x, y, x + w, y + h/6 );
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -346,34 +346,33 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
         
         
         GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_name.c_str(),
-                                   core::rect< s32 >( x + text_offset, y+h/6, x+w+text_offset, y+h/3 ), color,
-                                   false /* center h */, true /* center v */, NULL, true /* ignore RTL */ );
+                                   core::rect< s32 >( m_x + text_offset, m_y + m_h/6, m_x + m_w + text_offset, m_y + m_h/3 ),
+                                   color, false /* center h */, true /* center v */, NULL, true /* ignore RTL */ );
         
         const int subamount = m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
-        int suby = y+h/3;
-        const int inc = subamount == 0 ? h/8 : std::min(h/8, (h - h/3)/(subamount+1));
+        int suby = m_y + m_h/3;
+        const int inc = subamount == 0 ? m_h/8 : std::min(m_h/8, (m_h - m_h/3)/(subamount+1));
         for(int i=0; i<subamount; i++)
         {
             GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_subentries[i].c_str(),
-                                       core::rect< s32 >( x + 32, suby + text_offset/(1+1), x+w+32, suby+h/8 + text_offset/(1+1) ),
-                                       color,
-                                       false/* center h */, true /* center v */, NULL, true /* ignore RTL */ );
+                                       core::rect< s32 >( m_x + 32, suby + text_offset/(1+1), m_x + m_w + 32, suby + m_h/8 + text_offset/(1+1) ),
+                                       color, false/* center h */, true /* center v */, NULL, true /* ignore RTL */ );
             suby += inc;
         }
         
     }
     
     // is it time to move on?
-    if(time_before_next_step < 0)
+    if (time_before_next_step < 0)
     {
-        if(after_last_elem)
+        if (after_last_elem)
         {
             // switch to next element
             m_curr_section++;
             m_curr_element = -1;
             time_before_next_step = TIME_SECTION_FADE;
             
-            if(m_curr_section >= (int)m_sections.size()) reset();
+            if (m_curr_section >= (int)m_sections.size()) reset();
         }
         else
         {
@@ -404,7 +403,7 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
 
 void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
 {
-    if(name == "back")
+    if (name == "back")
     {
         StateManager::get()->escapePressed();
     }

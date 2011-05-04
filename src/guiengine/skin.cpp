@@ -86,13 +86,13 @@ namespace SkinConfig
         
         
         BoxRenderParams newParam;
-        newParam.left_border = leftborder;
-        newParam.right_border = rightborder;
-        newParam.top_border = topborder;
-        newParam.bottom_border = bottomborder;
-        newParam.hborder_out_portion = hborder_out_portion;
-        newParam.vborder_out_portion = vborder_out_portion;
-        newParam.preserve_h_aspect_ratios = preserve_h_aspect_ratios;
+        newParam.m_left_border = leftborder;
+        newParam.m_right_border = rightborder;
+        newParam.m_top_border = topborder;
+        newParam.m_bottom_border = bottomborder;
+        newParam.m_hborder_out_portion = hborder_out_portion;
+        newParam.m_vborder_out_portion = vborder_out_portion;
+        newParam.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
         
         // call last since it calculates coords considering all other parameters
         newParam.setTexture( irr_driver->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() ) );
@@ -178,18 +178,18 @@ namespace SkinConfig
 /** load default values */
 BoxRenderParams::BoxRenderParams()
 {
-    left_border = 0;
-    right_border = 0;
-    top_border = 0;
-    bottom_border = 0;
-    preserve_h_aspect_ratios = false;
+    m_left_border = 0;
+    m_right_border = 0;
+    m_top_border = 0;
+    m_bottom_border = 0;
+    m_preserve_h_aspect_ratios = false;
     
-    hborder_out_portion = 0.5;
-    vborder_out_portion = 1.0;
+    m_hborder_out_portion = 0.5;
+    m_vborder_out_portion = 1.0;
     
     areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
-    vertical_flip = false;
-    y_flip_set = false;
+    m_vertical_flip = false;
+    m_y_flip_set = false;
 }
 void BoxRenderParams::setTexture(ITexture* image)
 {
@@ -199,7 +199,7 @@ void BoxRenderParams::setTexture(ITexture* image)
         return;
     }
     
-    this->image = image;
+    m_image = image;
     /*
      The source texture is split this way to allow for a stretchable center and borders that don't stretch :
      
@@ -216,30 +216,30 @@ void BoxRenderParams::setTexture(ITexture* image)
     const int texture_w = image->getSize().Width;
     const int texture_h = image->getSize().Height;
     
-    const int ax = left_border;
-    const int ay = top_border;
-    const int bx = texture_w - right_border;
-    const int by = top_border;
-    const int cx = left_border;
-    const int cy = texture_h - bottom_border;
-    const int dx = texture_w - right_border;
-    const int dy = texture_h - bottom_border;
+    const int ax = m_left_border;
+    const int ay = m_top_border;
+    const int bx = texture_w - m_right_border;
+    const int by = m_top_border;
+    const int cx = m_left_border;
+    const int cy = texture_h - m_bottom_border;
+    const int dx = texture_w - m_right_border;
+    const int dy = texture_h - m_bottom_border;
     
-    source_area_left = core::rect<s32>(0, ay, cx, cy);
-    source_area_center = core::rect<s32>(ax, ay, dx, dy);
-    source_area_right = core::rect<s32>(bx, top_border, texture_w, dy);
+    m_source_area_left = core::rect<s32>(0, ay, cx, cy);
+    m_source_area_center = core::rect<s32>(ax, ay, dx, dy);
+    m_source_area_right = core::rect<s32>(bx, m_top_border, texture_w, dy);
     
-    source_area_top = core::rect<s32>(ax, 0, bx, by);
-    source_area_bottom = core::rect<s32>(cx, cy, dx, texture_h);
+    m_source_area_top = core::rect<s32>(ax, 0, bx, by);
+    m_source_area_bottom = core::rect<s32>(cx, cy, dx, texture_h);
     
-    source_area_top_left = core::rect<s32>(0, 0, ax, ay);
-    source_area_top_right = core::rect<s32>(bx, 0, texture_w, top_border);
-    source_area_bottom_left = core::rect<s32>(0, cy, cx, texture_h);
-    source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);    
+    m_source_area_top_left = core::rect<s32>(0, 0, ax, ay);
+    m_source_area_top_right = core::rect<s32>(bx, 0, texture_w, m_top_border);
+    m_source_area_bottom_left = core::rect<s32>(0, cy, cx, texture_h);
+    m_source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);    
 }
 void BoxRenderParams::calculateYFlipIfNeeded()
 {
-    if(y_flip_set) return;
+    if (m_y_flip_set) return;
     
 #define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y; \
 const int y2 = X.LowerRightCorner.Y; \
@@ -247,21 +247,21 @@ X##_yflip = X; \
 X##_yflip.UpperLeftCorner.Y =  y2;\
 X##_yflip.LowerRightCorner.Y =  y1;}
     
-    FLIP_Y(source_area_left)
-    FLIP_Y(source_area_center)
-    FLIP_Y(source_area_right)
+    FLIP_Y(m_source_area_left)
+    FLIP_Y(m_source_area_center)
+    FLIP_Y(m_source_area_right)
     
-    FLIP_Y(source_area_top)
-    FLIP_Y(source_area_bottom)
+    FLIP_Y(m_source_area_top)
+    FLIP_Y(m_source_area_bottom)
     
-    FLIP_Y(source_area_top_left)
-    FLIP_Y(source_area_top_right)
-    FLIP_Y(source_area_bottom_left)
-    FLIP_Y(source_area_bottom_right)
+    FLIP_Y(m_source_area_top_left)
+    FLIP_Y(m_source_area_top_right)
+    FLIP_Y(m_source_area_bottom_left)
+    FLIP_Y(m_source_area_bottom_right)
 #undef FLIP_Y
     
     
-    y_flip_set = true;
+    m_y_flip_set = true;
 }
 
 #if 0
@@ -349,16 +349,16 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         //std::cout << "widget moved, calculating again\n";
     }
 
-    const ITexture* source = params.getImage();
-    const int left_border = params.left_border;
-    const int right_border = params.right_border;
-    const int top_border = params.top_border;
-    const int bottom_border = params.bottom_border;
-    const bool preserve_h_aspect_ratios = params.preserve_h_aspect_ratios;
-    const float hborder_out_portion = params.hborder_out_portion;
-    const float vborder_out_portion = params.vborder_out_portion;
+    const ITexture* source              = params.getImage();
+    const int left_border               = params.m_left_border;
+    const int right_border              = params.m_right_border;
+    const int top_border                = params.m_top_border;
+    const int bottom_border             = params.m_bottom_border;
+    const bool preserve_h_aspect_ratios = params.m_preserve_h_aspect_ratios;
+    const float hborder_out_portion     = params.m_hborder_out_portion;
+    const float vborder_out_portion     = params.m_vborder_out_portion;
+    const bool vertical_flip            = params.m_vertical_flip;
     int areas = params.areas;
-    const bool vertical_flip = params.vertical_flip;
     
     const int texture_h = source->getSize().Height;
     
@@ -495,17 +495,17 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + (w->m_skin_dest_y2 - w->m_skin
     }
     
 #define GET_AREA( X ) X = (vertical_flip ? params.X##_yflip : params.X)
-    core::rect<s32>& GET_AREA(source_area_left);
-    core::rect<s32>& GET_AREA(source_area_center);
-    core::rect<s32>& GET_AREA(source_area_right);
+    core::rect<s32>& GET_AREA(m_source_area_left);
+    core::rect<s32>& GET_AREA(m_source_area_center);
+    core::rect<s32>& GET_AREA(m_source_area_right);
     
-    core::rect<s32>& GET_AREA(source_area_top);
-    core::rect<s32>& GET_AREA(source_area_bottom);
+    core::rect<s32>& GET_AREA(m_source_area_top);
+    core::rect<s32>& GET_AREA(m_source_area_bottom);
     
-    core::rect<s32>& GET_AREA(source_area_top_left);
-    core::rect<s32>& GET_AREA(source_area_top_right);
-    core::rect<s32>& GET_AREA(source_area_bottom_left);
-    core::rect<s32>& GET_AREA(source_area_bottom_right); 
+    core::rect<s32>& GET_AREA(m_source_area_top_left);
+    core::rect<s32>& GET_AREA(m_source_area_top_right);
+    core::rect<s32>& GET_AREA(m_source_area_bottom_left);
+    core::rect<s32>& GET_AREA(m_source_area_bottom_right); 
 #undef GET_AREA
     
 #define GET_AREA( X ) X = (vertical_flip ? w->m_skin_##X##_yflip : w->m_skin_##X)
@@ -546,51 +546,51 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + (w->m_skin_dest_y2 - w->m_skin
     
     if ((areas & BoxRenderParams::LEFT) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_left, m_source_area_left,
                                             clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::BODY) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_center, m_source_area_center,
                                             clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::RIGHT) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_right, m_source_area_right,
                                             clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::TOP) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top, m_source_area_top,
                                             clipRect, colorptr, true /* alpha */);
     }
     if ((areas & BoxRenderParams::BOTTOM) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, m_source_area_bottom,
                                             clipRect, colorptr, true /* alpha */);
     }
     
     if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, m_source_area_top_left,
                                             clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, m_source_area_top_right,
                                             clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, m_source_area_bottom_left,
                                             clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, m_source_area_bottom_right,
                                             clipRect, colorptr, true /* alpha */);
     }
     
@@ -738,7 +738,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip = (unsigned int)rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
-        params->vertical_flip = vertical_flip;
+        params->m_vertical_flip = vertical_flip;
         
         core::rect< s32 > rect2 = rect;
         if (mark_selected)
@@ -1038,7 +1038,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     if (w->isGauge() && !w->m_deactivated)
     {
-        const int handle_size = (int)( widget->m_h*params.left_border/(float)params.getImage()->getSize().Height );
+        const int handle_size = (int)( widget->m_h*params.m_left_border/(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
         
         
@@ -1326,7 +1326,7 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
     
     BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_background::neutral"];
     
-    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect2, p.source_area_center,
+    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect2, p.m_source_area_center,
                                         0 /* no clipping */, 0, true /* alpha */);
     
     //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_background::neutral"]);
@@ -1336,7 +1336,7 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
 {
     BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
-    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.m_source_area_center,
                                         0 /* no clipping */, 0, true /* alpha */);
     
     //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_thumb::neutral"]);
@@ -1352,13 +1352,13 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bo
 
         if (!bottomArrow)
         {
-            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.m_source_area_center,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         else
         {
             // flip image
-            const irr::core::rect<irr::s32>& source_area = p.source_area_center;
+            const irr::core::rect<irr::s32>& source_area = p.m_source_area_center;
             const int x0 = source_area.UpperLeftCorner.X;
             const int x1 = source_area.LowerRightCorner.X;
             const int y0 = source_area.UpperLeftCorner.Y;
@@ -1375,13 +1375,13 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bo
 
         if (!bottomArrow)
         {
-            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.m_source_area_center,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         else
         {   
             // flip image
-            const irr::core::rect<irr::s32>& source_area = p.source_area_center;
+            const irr::core::rect<irr::s32>& source_area = p.m_source_area_center;
             const int x0 = source_area.UpperLeftCorner.X;
             const int x1 = source_area.LowerRightCorner.X;
             const int y0 = source_area.UpperLeftCorner.Y;

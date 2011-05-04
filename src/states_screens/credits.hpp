@@ -37,7 +37,7 @@ class CreditsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     PtrVector<CreditsSection, HOLD> m_sections;
     CreditsSection* getCurrentSection();
     
-    int x, y, w, h;
+    int m_x, m_y, m_w, m_h;
     core::rect< s32 > m_section_rect;
     
     int m_curr_section;

@@ -177,18 +177,18 @@ namespace GUIEngine
       */
     class BoxRenderParams
     {
-        irr::video::ITexture* image;
-        bool y_flip_set;
+        irr::video::ITexture* m_image;
+        bool m_y_flip_set;
 
     public:
-        irr::video::ITexture* getImage() { return image; }
+        irr::video::ITexture* getImage() { return m_image; }
         
-        int left_border, right_border, top_border, bottom_border;
-        bool preserve_h_aspect_ratios;
-        float hborder_out_portion, vborder_out_portion;
+        int m_left_border, m_right_border, m_top_border, m_bottom_border;
+        bool m_preserve_h_aspect_ratios;
+        float m_hborder_out_portion, m_vborder_out_portion;
         
         // this parameter is a bit special since it's the only one that can change at runtime
-        bool vertical_flip;
+        bool m_vertical_flip;
         
         /** bitmap containing which areas to render */
         int areas;
@@ -199,31 +199,31 @@ namespace GUIEngine
         static const int TOP = 8;
         static const int BOTTOM = 16;
         
-        irr::core::rect<irr::s32> source_area_left;
-        irr::core::rect<irr::s32> source_area_center;
-        irr::core::rect<irr::s32> source_area_right;
+        irr::core::rect<irr::s32> m_source_area_left;
+        irr::core::rect<irr::s32> m_source_area_center;
+        irr::core::rect<irr::s32> m_source_area_right;
         
-        irr::core::rect<irr::s32> source_area_top;
-        irr::core::rect<irr::s32> source_area_bottom;
+        irr::core::rect<irr::s32> m_source_area_top;
+        irr::core::rect<irr::s32> m_source_area_bottom;
         
-        irr::core::rect<irr::s32> source_area_top_left;
-        irr::core::rect<irr::s32> source_area_top_right;
-        irr::core::rect<irr::s32> source_area_bottom_left;
-        irr::core::rect<irr::s32> source_area_bottom_right; 
+        irr::core::rect<irr::s32> m_source_area_top_left;
+        irr::core::rect<irr::s32> m_source_area_top_right;
+        irr::core::rect<irr::s32> m_source_area_bottom_left;
+        irr::core::rect<irr::s32> m_source_area_bottom_right; 
         
         
         // y-flipped coords
-        irr::core::rect<irr::s32> source_area_left_yflip;
-        irr::core::rect<irr::s32> source_area_center_yflip;
-        irr::core::rect<irr::s32> source_area_right_yflip;
+        irr::core::rect<irr::s32> m_source_area_left_yflip;
+        irr::core::rect<irr::s32> m_source_area_center_yflip;
+        irr::core::rect<irr::s32> m_source_area_right_yflip;
         
-        irr::core::rect<irr::s32> source_area_top_yflip;
-        irr::core::rect<irr::s32> source_area_bottom_yflip;
+        irr::core::rect<irr::s32> m_source_area_top_yflip;
+        irr::core::rect<irr::s32> m_source_area_bottom_yflip;
         
-        irr::core::rect<irr::s32> source_area_top_left_yflip;
-        irr::core::rect<irr::s32> source_area_top_right_yflip;
-        irr::core::rect<irr::s32> source_area_bottom_left_yflip;
-        irr::core::rect<irr::s32> source_area_bottom_right_yflip; 
+        irr::core::rect<irr::s32> m_source_area_top_left_yflip;
+        irr::core::rect<irr::s32> m_source_area_top_right_yflip;
+        irr::core::rect<irr::s32> m_source_area_bottom_left_yflip;
+        irr::core::rect<irr::s32> m_source_area_bottom_right_yflip; 
         
         BoxRenderParams();
         void setTexture(irr::video::ITexture* image);
