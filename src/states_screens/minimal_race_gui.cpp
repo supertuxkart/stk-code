@@ -106,7 +106,6 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_font_scale      = 1.0f; //race_manager->getNumLocalPlayers()==1 ? 1.2f : 1.0f;
 
     //read icon frame picture
-    m_icons_frame=material_manager->getMaterial("icons-frame.png");
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.

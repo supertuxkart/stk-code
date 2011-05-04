@@ -51,13 +51,19 @@ RaceGUIBase::RaceGUIBase()
     m_string_ready          = _("Ready!");
     m_string_set            = _("Set!");
     m_string_go             = _("Go!");
-    m_plunger_face          = material_manager->getMaterial("plungerface.png");
-    const std::string &guidir = file_manager->getGUIDir();
-    m_gauge_full            = irr_driver->getTexture(guidir+"gauge_full.png" );
-    m_gauge_empty           = irr_driver->getTexture(guidir+"gauge_empty.png");
-    m_gauge_goal            = irr_driver->getTexture(guidir+"gauge_goal.png" );
-
-
+    // Make the two materials permanent (in case that they are not listed
+    // in the textures/materials.xml file).
+    m_plunger_face          = material_manager->getMaterial("plungerface.png", 
+                                                            /*full path*/false,
+                                                            /*permanent*/true);
+    //read frame picture for icons in the mini map.
+    m_icons_frame           = material_manager->getMaterial("icons-frame.png", 
+                                                            /*full_path*/false, 
+                                                            /*permanent*/true);
+    const std::string &guid = file_manager->getGUIDir();
+    m_gauge_full            = irr_driver->getTexture(guid+"gauge_full.png" );
+    m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
+    m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
 
 }   // RaceGUIBase
 

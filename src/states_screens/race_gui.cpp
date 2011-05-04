@@ -95,9 +95,6 @@ RaceGUI::RaceGUI()
     m_dist_show_overlap=2;
     m_icons_inertia=2;
     
-    //read icon frame picture
-    m_icons_frame=material_manager->getMaterial("icons-frame.png");
-
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 

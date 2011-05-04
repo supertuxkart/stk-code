@@ -40,10 +40,8 @@ void ProjectileManager::loadData()
 void ProjectileManager::removeTextures()
 {
     cleanup();
-    //ssgDeRefDelete(m_explosion_model);
     // Only the explosion is here, all other models are actually managed
     // by powerup_manager.
-    //callback_manager->clear(CB_EXPLOSION);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------

@@ -120,7 +120,8 @@ protected:
     video::ITexture *m_gauge_full;
     video::ITexture *m_gauge_goal;
 
-
+    /** The frame around player karts in the mini map. */
+    Material         *m_icons_frame;
     
     void cleanupMessages(const float dt);
     void createMarkerTexture();

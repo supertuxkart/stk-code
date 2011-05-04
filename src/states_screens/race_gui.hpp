@@ -99,7 +99,6 @@ private:
     
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
-    Material         *m_icons_frame;
     
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const Kart *kart,

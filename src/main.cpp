@@ -923,13 +923,16 @@ int main(int argc, char *argv[] )
         file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
         const std::string materials_file = file_manager->getModelFile("materials.xml");
         if(materials_file!="")
-            material_manager->pushTempMaterial(materials_file);
         {
-            powerup_manager         -> loadAllPowerups ();
-            item_manager            -> loadDefaultItems();
+            // Some of the materials might be needed later, so just add
+            // them all permanently (i.e. as shared). Adding them temporary
+            // will actually not be possible: powerup_manager adds some
+            // permanent icon materials, which would (with the current
+            // implementation) make the temporary materials permanent anyway.
+            material_manager->addSharedMaterial(materials_file);
         }
-        if(materials_file!="")
-            material_manager->popTempMaterial();
+        powerup_manager         -> loadAllPowerups ();
+        item_manager            -> loadDefaultItems();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
 
