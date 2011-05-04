@@ -64,7 +64,8 @@ void AddonsScreen::init()
     Screen::init();
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
-    std::cout << "[addons] Using directory <" + file_manager->getAddonsDir() 
+    if(UserConfigParams::logAddons())
+        std::cout << "[addons] Using directory <" + file_manager->getAddonsDir() 
               << ">\n";
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");

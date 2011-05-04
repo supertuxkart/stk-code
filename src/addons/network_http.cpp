@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Lucas Baudin
+//                2011 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -118,7 +119,7 @@ void *NetworkHttp::mainLoop(void *obj)
     }
 
     // Initialise the online portion of the addons manager.
-    if(download && UserConfigParams::m_verbosity>=3)
+    if(download && UserConfigParams::logAddons())
         printf("[addons] Downloading list.\n");
 
     if(!download || me->downloadFileSynchron("news.xml"))
@@ -131,7 +132,7 @@ void *NetworkHttp::mainLoop(void *obj)
         me->updateNews(xml, xml_file);
 #ifdef ADDONS_MANAGER
         me->loadAddonsList(xml, xml_file);
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
             printf("[addons] Addons manager list downloaded\n");
 #endif
     }
@@ -139,7 +140,7 @@ void *NetworkHttp::mainLoop(void *obj)
     {
 #ifdef ADDONS_MANAGER
         addons_manager->setErrorState();
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
             printf("[addons] Can't download addons list.\n");
 #endif
     }
@@ -182,12 +183,12 @@ void *NetworkHttp::mainLoop(void *obj)
     pthread_mutex_unlock(&me->m_mutex_command);
 
     // Signal that we are quitting properly.
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Signaling that network thread is quitting.\n");
     pthread_mutex_lock(&me->m_mutex_quit);
     pthread_cond_broadcast(&me->m_cond_quit);
     pthread_mutex_unlock(&me->m_mutex_quit);
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Network thread is quitting.\n");
 
     return NULL;
@@ -201,14 +202,14 @@ NetworkHttp::~NetworkHttp()
     if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
         return;
 
-    // if a download should be active (which means it was cancelled by the
+    // If a download should be active (which means it was cancelled by the
     // user, in which case it will still be ongoing in the background)
     // we can't get the mutex, and would have to wait for a timeout,
     // and we couldn't finish STK. This way we request an abort of
     // a download, which mean we can get the mutex and ask the service
     // thread here to cancel properly.
     cancelDownload();
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Trying to lock command mutex.\n");
     pthread_mutex_lock(&m_mutex_command);
     {
@@ -216,12 +217,12 @@ NetworkHttp::~NetworkHttp()
         pthread_cond_signal(&m_cond_command);
     }
     pthread_mutex_unlock(&m_mutex_command);
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Command mutex unlocked.\n");
 
     if(m_thread_id)
     {
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
             printf("[addons] Trying to stop network thread.\n");
 
         pthread_mutex_lock(&m_mutex_quit);
@@ -239,10 +240,10 @@ NetworkHttp::~NetworkHttp()
         }
         else
         {
-            if(UserConfigParams::m_verbosity>=3)
+            if(UserConfigParams::logAddons())
                 printf("[addons] Trying to cancel network thread.\n");
             pthread_join(*m_thread_id, NULL);
-            if(UserConfigParams::m_verbosity>=3)
+            if(UserConfigParams::logAddons())
                 printf("[addons] Network thread joined.\n");
         }
         delete m_thread_id;
@@ -265,7 +266,7 @@ void NetworkHttp::checkRedirect(const XMLNode *xml)
     int result = xml->get("redirect", &new_server);
     if(result==1 && new_server!="")
     {
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
         {
             std::cout << "[Addons] Current server: " 
                       << (std::string)UserConfigParams::m_server_addons 
@@ -390,7 +391,7 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
         const XMLNode *xml = new XMLNode(xml_file);
 #ifdef ADDONS_MANAGER
         addons_manager->initOnline(xml);
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
             printf("[addons] Addons manager list downloaded\n");
 #endif
 
@@ -665,7 +666,7 @@ bool NetworkHttp::downloadFileInternal(const std::string &url,
                                        const std::string &save_filename,
                                        bool is_asynchron)
 {
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Downloading '%s' as '%s').\n", url.c_str(),
                file_manager->getAddonsFile(save_filename).c_str());
     CURL *session = curl_easy_init();
@@ -719,7 +720,7 @@ bool NetworkHttp::downloadFileInternal(const std::string &url,
  *  return a non-zero value which causes libcurl to abort. */
 void NetworkHttp::cancelDownload() 
 { 
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Requesting cancellation of download.\n");
     m_abort.set(true); 
 }   // cancelDownload
@@ -735,7 +736,7 @@ bool NetworkHttp::downloadFileSynchron(const std::string &url,
                                        const std::string &save)
 {
     const std::string &save_filename = (save!="") ? save : url;
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Download synchron '%s' as '%s'.\n",
                url.c_str(), save_filename.c_str());
 
@@ -758,7 +759,7 @@ void NetworkHttp::downloadFileAsynchron(const std::string &url,
     m_url           = url;
     m_save_filename = (save!="") ? save : url;
 
-    if(UserConfigParams::m_verbosity>=3)
+    if(UserConfigParams::logAddons())
         printf("[addons] Download asynchron '%s' as '%s'.\n", 
                url.c_str(), m_save_filename.c_str());
     // Wake up the network http thread
@@ -786,7 +787,7 @@ int NetworkHttp::progressDownload(void *clientp,
     // back to libcurl by returning a non-zero status.
     if(network_http->m_abort.get())
     {
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logAddons())
             printf("[addons] Aborting download in progress.\n");
         return 1;
     }

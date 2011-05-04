@@ -101,7 +101,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
                                                 +addon.getIconBasename());
                 if(file_manager->fileExists(full_path))
                 {
-                    if(UserConfigParams::m_verbosity>=3)
+                    if(UserConfigParams::logAddons())
                         printf("[addons] Removing cached icon '%s'.\n", 
                                addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
