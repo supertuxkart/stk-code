@@ -69,8 +69,8 @@ Track::Track(std::string filename)
     m_designer              = "";
     m_screenshot            = "";
     m_version               = 0;
-    m_track_mesh            = new TriangleMesh();
-    m_gfx_effect_mesh       = new TriangleMesh();
+    m_track_mesh            = NULL;
+    m_gfx_effect_mesh       = NULL;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
@@ -147,10 +147,10 @@ void Track::cleanup()
     irr_driver->removeNode(m_sun);
 
     delete m_track_mesh;
-    m_track_mesh = new TriangleMesh();
+    m_track_mesh = NULL;
 
     delete m_gfx_effect_mesh;
-    m_gfx_effect_mesh = new TriangleMesh();
+    m_gfx_effect_mesh = NULL;
 
 
     // The m_all_cached_mesh contains each mesh loaded from a file, which
@@ -562,6 +562,10 @@ bool PairCompare(const std::pair<int, std::string>& i, const std::pair<int, std:
  */
 bool Track::loadMainTrack(const XMLNode &root)
 {
+    assert(m_track_mesh==NULL);
+    assert(m_gfx_effect_mesh==NULL);
+    m_track_mesh      = new TriangleMesh();
+    m_gfx_effect_mesh = new TriangleMesh();
     const XMLNode *track_node= root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
