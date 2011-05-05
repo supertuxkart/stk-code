@@ -373,6 +373,9 @@ void IrrDriver::applyResolutionSettings()
 
     // Clear the pointer stored in the file manager
     file_manager->dropFileSystem();
+    delete material_manager;
+    material_manager = NULL;
+
     m_device->drop();
     m_device        = NULL;
     m_video_driver  = NULL;
@@ -389,7 +392,9 @@ void IrrDriver::applyResolutionSettings()
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
     
-    material_manager->reInit();
+    //material_manager->reInit();
+    material_manager = new MaterialManager();
+    material_manager->loadMaterial();
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
     
@@ -399,18 +404,13 @@ void IrrDriver::applyResolutionSettings()
     const std::string materials_file = file_manager->getModelFile("materials.xml");
     if (materials_file != "")
     {
-        material_manager->pushTempMaterial(materials_file);
+        material_manager->addSharedMaterial(materials_file);
     }
     
     powerup_manager         -> loadAllPowerups ();
     item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();
     GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
-    
-    if (materials_file != "")
-    {
-        material_manager->popTempMaterial();
-    }
     
     file_manager->popTextureSearchPath();
 
