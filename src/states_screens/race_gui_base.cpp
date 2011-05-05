@@ -46,13 +46,15 @@ RaceGUIBase::RaceGUIBase()
     m_lightning             = 0.0f;
     m_max_font_height       = GUIEngine::getFontHeight() + 10;
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
-    m_music_icon            = material_manager->getMaterial("notes.png");
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_ready          = _("Ready!");
     m_string_set            = _("Set!");
     m_string_go             = _("Go!");
     // Make the two materials permanent (in case that they are not listed
     // in the textures/materials.xml file).
+    m_music_icon            = material_manager->getMaterial("notes.png",
+                                                            /*full path*/false,
+                                                            /*permanent*/true);
     m_plunger_face          = material_manager->getMaterial("plungerface.png", 
                                                             /*full path*/false,
                                                             /*permanent*/true);
