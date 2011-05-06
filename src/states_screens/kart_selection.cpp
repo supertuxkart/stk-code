@@ -1377,7 +1377,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         setKartsFromCurrentGroup();
 
         const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
+                
         RandomGenerator random;
         
         const int num_players = m_kart_widgets.size();
@@ -1724,14 +1724,17 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     // This can happen if addons are removed so that also the previously
     // selected kart group is removed. In this case, select the 
     // 'standard' group
-    if(!kart_properties_manager->getKartsInGroup(selected_kart_group).size())
+    if (selected_kart_group != ALL_KART_GROUPS_ID &&
+        !kart_properties_manager->getKartsInGroup(selected_kart_group).size())
+    {
         selected_kart_group = DEFAULT_GROUP_NAME;
+    }
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
         
     int usableKartCount = 0;
-
+    
     if (selected_kart_group == ALL_KART_GROUPS_ID)
     {
         const int kart_amount = kart_properties_manager->getNumberOfKarts();
