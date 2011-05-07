@@ -2268,13 +2268,13 @@
 			children = (
 				9528CC221291E7A10078A5EF /* binding.cpp */,
 				9528CC231291E7A10078A5EF /* binding.hpp */,
-				95A118290F77EA3100B18B3D /* input.hpp */,
-				95A1182A0F77EA3100B18B3D /* input_manager.cpp */,
-				95A1182B0F77EA3100B18B3D /* input_manager.hpp */,
-				95A1184A0F77FC3900B18B3D /* input_device.cpp */,
-				95A1184C0F77FC8800B18B3D /* input_device.hpp */,
 				95A1187A0F78024E00B18B3D /* device_manager.cpp */,
 				95A1187C0F78026D00B18B3D /* device_manager.hpp */,
+				95A118290F77EA3100B18B3D /* input.hpp */,
+				95A1184A0F77FC3900B18B3D /* input_device.cpp */,
+				95A1184C0F77FC8800B18B3D /* input_device.hpp */,
+				95A1182A0F77EA3100B18B3D /* input_manager.cpp */,
+				95A1182B0F77EA3100B18B3D /* input_manager.hpp */,
 			);
 			name = input;
 			path = ../../input;
