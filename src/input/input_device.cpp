@@ -102,6 +102,7 @@ GamePadDevice::~GamePadDevice()
 {
     delete[] m_prevAxisDirections;
     delete[] m_prevAxisValue;
+    delete[] m_axis_ok;
 
     // FIXME - any need to close devices?
 }   // ~GamePadDevice
@@ -154,6 +155,8 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
                                        StateManager::ActivePlayer* player,
                                        PlayerAction* action /* out */)
 {
+    if (!m_configuration->isEnabled()) return false;
+    
     bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open
     
