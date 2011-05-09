@@ -238,7 +238,7 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     }
     catch (std::runtime_error& e)
     {
-        if (UserConfigParams::m_verbosity >= 3)
+        if (UserConfigParams::logMisc())
         {
             fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
         }
