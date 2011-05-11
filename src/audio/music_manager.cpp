@@ -140,7 +140,7 @@ void MusicManager::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
-void MusicManager::startMusic(MusicInformation* mi)
+void MusicManager::startMusic(MusicInformation* mi, bool startRightNow)
 {
     // If this music is already playing, ignore this call.
     if (m_current_music != NULL && 
@@ -157,7 +157,7 @@ void MusicManager::startMusic(MusicInformation* mi)
     if(!mi || !UserConfigParams::m_music || !m_initialized) return;
     
     mi->volumeMusic(m_masterGain);
-    mi->startMusic();
+    if (startRightNow) mi->startMusic();
 }   // startMusic
 
 //-----------------------------------------------------------------------------

@@ -153,14 +153,18 @@ void WorldStatus::update(const float dt)
                 m_phase=GO_PHASE;  
                 m_start_sound->play();
                 
+                World::getWorld()->getTrack()->startMusic();
+                
                 // event
                 onGo();
             }
             m_auxiliary_timer += dt;
             return;
         case GO_PHASE  :
-            if(m_auxiliary_timer>2.5f)
-                World::getWorld()->getTrack()->startMusic();
+            
+            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic())
+                music_manager->startMusic(music_manager->getCurrentMusic());
+            
             if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message  
                 m_phase=MUSIC_PHASE;    
             m_auxiliary_timer += dt;

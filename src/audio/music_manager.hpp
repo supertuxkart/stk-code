@@ -54,7 +54,7 @@ public:
     MusicManager();
     virtual ~MusicManager();
 
-    void                    startMusic(MusicInformation* mi);
+    void                    startMusic(MusicInformation* mi, bool startRightNow=true);
     void                    stopMusic();
     bool                    initialized() const {return m_initialized;                 }
     void                    update(float dt)    {if(m_current_music)

@@ -256,8 +256,9 @@ public:
     const std::vector<std::string>
                        getGroups         () const {return m_groups;             }
 
-    /** Starts the music for this track. */
+    /** Select and set the music for this track (doesn't actually start it yet) */
     void               startMusic        () const;
+    
     bool               setTerrainHeight(Vec3 *pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
