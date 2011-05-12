@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "addons/network_http.hpp"
+#include "addons/request.hpp"
 #include "addons/zip.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -45,18 +46,16 @@ AddonsManager* addons_manager = 0;
  *  later from a separate thread in network_http (once network_http is setup).
  */
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
-                                 m_icon_queue(std::vector<std::string>() ),
                                  m_state(STATE_INIT)
 {
     m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
-
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
 /** This initialises the online portion of the addons manager. It uses the
  *  downloaded list of available addons. This is called by network_http before
  *  it goes into command-receiving mode, so we can't use any asynchronous calls
- *  here (though this is being called from a separate thread anyway, so the
+ *  here (though this is being called from a separate thread , so the
  *  main GUI is not blocked anyway). This function will update the state 
  *  variable
  */
@@ -131,82 +130,36 @@ void AddonsManager::initOnline(const XMLNode *xml)
 
     m_state.set(STATE_READY);
 
-    pthread_t      id;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_create(&id, &attr, downloadIcons, this);
-
+    downloadIcons();
 }   // initOnline
 
 // ----------------------------------------------------------------------------
-/** A separate thread to download all necessary icons (i.e. icons that are
- *  either missing or have been updated since they were downloaded).
+/** Download all necessary icons (i.e. icons that are either missing or have 
+ *  been updated since they were downloaded).
  */
-void *AddonsManager::downloadIcons(void *obj)
+void *AddonsManager::downloadIcons()
 {
-    AddonsManager *me=(AddonsManager*)obj;
-    me->m_icon_queue.lock();
-    me->m_icon_queue.getData().clear();
-    me->m_icon_queue.unlock();
-
-    for(unsigned int i=0; i<me->m_addons_list.getData().size(); i++)
+    for(unsigned int i=0; i<m_addons_list.getData().size(); i++)
     {
-        const Addon &addon      = me->m_addons_list.getData()[i];
+        Addon &addon            = m_addons_list.getData()[i];
         const std::string &icon = addon.getIconBasename();
-        if(addon.iconNeedsUpdate())
+        const std::string &icon_full
+                                = file_manager->getAddonsFile("icons/"+icon); 
+        if(addon.iconNeedsUpdate() ||
+            !file_manager->fileExists(icon_full))
         {
-            me->m_icon_queue.lock();
-            me->m_icon_queue.getData().push_back(addon.getId());
-            me->m_icon_queue.unlock();
-            continue;
-        }
-        std::string icon_path=file_manager->getAddonsFile("icons/"+icon);
-        if(!file_manager->fileExists(icon_path))
-        {
-            me->m_icon_queue.lock();
-            me->m_icon_queue.getData().push_back(addon.getId());
-            me->m_icon_queue.unlock();
-            continue;
-        }
-        me->m_addons_list.getData()[i].setIconReady();
-    }   // for i<m_addons_list.size()
-
-    me->m_icon_queue.lock();
-    int count = me->m_icon_queue.getData().size();
-    me->m_icon_queue.unlock();
-    while(count!=0)
-    {
-        me->m_icon_queue.lock();
-        std::vector<std::string> &icon_queue = me->m_icon_queue.getData();
-            unsigned int indx = me->getAddonIndex(icon_queue[0]);
-            Addon *addon      = &(me->m_addons_list.getData()[indx]);
-            icon_queue.erase(icon_queue.begin());
-            count --;
-        me->m_icon_queue.unlock();
-
-        const std::string &url = addon->getIconURL();
-        const std::string &icon = addon->getIconBasename();
-        std::string save = "icons/"+icon;
-        if(network_http->downloadFileSynchron(url, save))
-        {
-            addon->setIconReady();
+            const std::string &url  = addon.getIconURL();
+            const std::string &icon = addon.getIconBasename();
+            std::string save        = "icons/"+icon;
+            Request *r = network_http->downloadFileAsynchron(url, save, 
+                                                 /*priority*/1,
+                                               /*manage_mem*/false);
+            r->setAddonIconNotification(&addon);            
         }
         else
-        {
-            printf("[addons] Could not download icon '%s' from '%s'.\n",
-                   icon.c_str(), url.c_str());
-        }
-    }   // while count!=0
+            m_addons_list.getData()[i].setIconReady();
+    }   // for i<m_addons_list.size()
 
-    // Now check if we have any entries in m_addons_list, that is not
-    // in the online list anymore 
-    for(unsigned int i=0; i<me->m_addons_list.getData().size(); i++)
-    {
-        if(!me->m_addons_list.getData()[i].iconReady())
-            printf("[addons] No icon for '%s'.\n", 
-                    me->m_addons_list.getData()[i].getId().c_str());
-    }
-    me->saveInstalled();
     return NULL;
 }   // downloadIcons
 
@@ -221,9 +174,7 @@ bool AddonsManager::onlineReady()
 }   // onlineReady
 
 // ----------------------------------------------------------------------------
-/** Loads the installed addons from .../addons/addons_installed.xml. This is
- *  called before network_http is constructed (so no need to protect 
- *  m_addons_list with a mutex).
+/** Loads the installed addons from .../addons/addons_installed.xml.
  */
 void AddonsManager::loadInstalledAddons()
 {

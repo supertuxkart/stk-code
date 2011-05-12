@@ -18,6 +18,10 @@ supertuxkart_SOURCES = \
  addons/addons_manager.hpp \
  addons/network_http.cpp \
  addons/network_http.hpp \
+ addons/news_manager.cpp \
+ addons/news_manager.hpp \
+ addons/request.cpp \
+ addons/request.hpp \
  addons/zip.cpp \
  addons/zip.hpp \
  animations/animation_base.hpp \

@@ -1147,6 +1147,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\addons\news_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\request.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\addons\zip.cpp"
 					>
 				</File>
@@ -2162,6 +2170,14 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\network_http.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\news_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\request.hpp"
 					>
 				</File>
 				<File

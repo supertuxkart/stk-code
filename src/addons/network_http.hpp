@@ -23,30 +23,22 @@
 #include <string>
 #include <vector>
 
+#ifdef WIN32
+#  include <winsock2.h>
+#endif
+#include <curl/curl.h>
+
 #include "irrlicht.h"
 using namespace irr;
 
 #include "utils/synchronised.hpp"
 
-
+class Request;
 class XMLNode;
 
 class NetworkHttp
 {
 public:
-    /** List of 'http commands' for this object:
-     *  HC_SLEEP: No command, sleep
-     *  HC_INIT: Object is being initialised
-     *  HC_DOWNLOAD_FILE : download a file
-     *  HC_QUIT:  Stop loop and terminate thread.
-     *  HC_NEWS:  Update the news
-     */
-    enum HttpCommands {HC_SLEEP,
-                       HC_QUIT,
-                       HC_INIT,
-                       HC_DOWNLOAD_FILE,
-                       HC_NEWS    };
-
     /** If stk has permission to access the internet (for news
      *  server etc).
      *  IPERM_NOT_ASKED: The user needs to be asked if he wants to 
@@ -57,108 +49,37 @@ public:
                              IPERM_ALLOWED    =1,
                              IPERM_NOT_ALLOWED=2 };
 private:
-    // A wrapper class to store news message together with
-    // a message id and a display count.
-    class NewsMessage
-    {
-        // The actual news message
-        core::stringw m_news;
-        // A message id used to store some information in the
-        // user config file.
-        int           m_message_id;
-        // Counts how often a message has been displayed.
-        int           m_display_count;
-    public:
-        NewsMessage(const core::stringw &m, int id)
-        {
-            m_news          = m;
-            m_message_id    = id;
-            m_display_count = 0;
-        }   // NewsMessage
-        /** Returns the news message. */
-        const core::stringw& getNews() const {return m_news;}
-        /** Increases how often this message was being displayed. */
-        void increaseDisplayCount() {m_display_count++;}
-        /** Returns the news id. */
-        int  getMessageId() const {return m_message_id;}
-        /** Returns the display count. */
-        int getDisplayCount() const {return m_display_count; }
-        /** Sets the display count for this message. */
-        void setDisplayCount(int n) {m_display_count = n; }
-    };   // NewsMessage
 
-    mutable Synchronised< std::vector<NewsMessage> > m_news;
-
-    /** Index of the current news message that is being displayed. */
-    int             m_current_news_message;
-
-    /** Stores the news message display count from the user config file. 
-    */
-    std::vector<int> m_saved_display_count;
-
-    /** Which command to execute next. Access to this variable is guarded
-     *  by m_mutex_command and m_cond_command. */
-    HttpCommands    m_command;
-
-    /** A mutex for accessing m_commands. */
-    pthread_mutex_t m_mutex_command;
+    /** The list of pointes to all requests. */
+    mutable Synchronised< std::vector<Request*> >  m_all_requests;
 
     /** A conditional variable to wake up the main loop. */
-    pthread_cond_t  m_cond_command;
-
-    /** A mutex used in cancelling the network thread with timeout. */
-    pthread_mutex_t m_mutex_quit;
-
-    /** Conidtional variable used in cancelling the network 
-     *  thread with timeout. */
-    pthread_cond_t m_cond_quit;
-
-    /** The file to download when a file download is triggered. */
-    std::string     m_url;
-
-    /** The name and path under which to save the downloaded file. */
-    std::string     m_save_filename;
-
-    /** Progress of a download in percent. It is guaranteed that
-     *  this value only becomes 1.0f, if the download is completed.*/
-    Synchronised<float>  m_progress;
+    pthread_cond_t       m_cond_request;
 
     /** Signal an abort in case that a download is still happening. */
     Synchronised<bool>   m_abort;
 
     /** Thread id of the thread running in this object. */
-    pthread_t     *m_thread_id;
+    pthread_t           *m_thread_id;
+
+    /** The curl session. */
+    CURL                *m_curl_session;
 
     static void  *mainLoop(void *obj);
-    void          checkRedirect(const XMLNode *xml);
-
-    void          updateNews(const XMLNode *xml,
-                             const std::string &filename);
-    void          updateUserConfigFile() const;
+    int           init();
     void          loadAddonsList(const XMLNode *xml,
                                  const std::string &filename);
-    std::string   downloadToStrInternal(std::string url);
-    void          updateMessageDisplayCount();
-    bool          downloadFileInternal(const std::string &url,
-                                       const std::string &save_filename,
-                                       bool is_asynchron);
+    bool          downloadFileInternal(Request *request);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
-    bool          conditionFulfilled(const std::string &cond);
-    int           versionToInt(const std::string &s);
+    void          insertRequest(Request *request);
 public:
                   NetworkHttp();
                  ~NetworkHttp();
-    static size_t writeStr(char str [], size_t size, size_t nb_char, 
-                           std::string * stream);
-    void          downloadFileAsynchron(const std::string &url, 
-                                        const std::string &save = "");
-    bool          downloadFileSynchron(const std::string &url, 
-                                       const std::string &save = "");
-
-    const core::stringw
-                  getNextNewsMessage();
-    float         getProgress() const;
+    Request      *downloadFileAsynchron(const std::string &url, 
+                                        const std::string &save = "",
+                                        int   priority = 1,
+                                        bool  manage_memory=true);
     void          cancelDownload();
 };   // NetworkHttp
 

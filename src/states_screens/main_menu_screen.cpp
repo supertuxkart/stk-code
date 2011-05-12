@@ -47,8 +47,7 @@
 #include "states_screens/grand_prix_win.hpp"
 #endif
 
-#include "addons/network_http.hpp"
-
+#include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -112,7 +111,7 @@ void MainMenuScreen::init()
 #endif
     
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
-    const core::stringw &news_text = network_http->getNextNewsMessage();
+    const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
 }
@@ -136,7 +135,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     w->update(delta);
     if(w->scrolledOff())
     {
-        const core::stringw &news_text = network_http->getNextNewsMessage();
+        const core::stringw &news_text = news_manager->getNextNewsMessage();
         w->setText(news_text, true);
     }
     

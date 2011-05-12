@@ -46,7 +46,6 @@ public:
               MaterialManager();
              ~MaterialManager();
     void      loadMaterial     ();
-    void      reInit           ();
     void      setAllMaterialFlags(video::ITexture* t, 
                                   scene::IMeshBuffer *mb) const;
     

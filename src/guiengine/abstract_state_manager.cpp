@@ -86,7 +86,7 @@ void AbstractStateManager::pushMenu(std::string name)
     
     assert(!ModalDialog::isADialogActive()); // you need to close any dialog before calling this
     
-    if (UserConfigParams::m_verbosity >= 3)
+    if (UserConfigParams::logGUI())
     {
         std::cout << "[AbstractStateManager::pushMenu] switching to screen "
                   << name.c_str() << std::endl;
@@ -116,7 +116,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
 {
     assert(!ModalDialog::isADialogActive()); // you need to close any dialog before calling this
     
-    if (UserConfigParams::m_verbosity >= 3)
+    if (UserConfigParams::logGUI())
     {
         std::cout << "[AbstractStateManager::pushScreen] switching to screen "
                   << screen->getName().c_str() << std::endl;
@@ -139,7 +139,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     if (!screen->isLoaded()) screen->loadFromFile();
     std::string name = screen->getName();
     
-    if (UserConfigParams::m_verbosity >= 3)
+    if (UserConfigParams::logGUI())
     {
         std::cout << "[AbstractStateManager::replaceTopmostScreen] switching to screen "
                   << name.c_str() << std::endl;
@@ -199,7 +199,7 @@ void AbstractStateManager::popMenu()
         return;
     }
     
-    if (UserConfigParams::m_verbosity >= 3)
+    if (UserConfigParams::logGUI())
     {
         std::cout << "[AbstractStateManager::popMenu] switching to screen "
                   << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
@@ -231,7 +231,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     
     std::string name = screen->getName();
     
-    if (UserConfigParams::m_verbosity >= 3)
+    if (UserConfigParams::logGUI())
     {
         std::cout << "[AbstractStateManager::resetAndGoToScreen] switching to screen "
                   << name.c_str() << std::endl;

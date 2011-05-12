@@ -112,18 +112,6 @@ int MaterialManager::addEntity(Material *m)
 }
 
 //-----------------------------------------------------------------------------
-void MaterialManager::reInit()
-{
-    for(std::vector<Material*>::const_iterator i=m_materials.begin();
-        i!=m_materials.end(); i++)
-    {
-        delete *i;
-    }
-    m_materials.clear();
-    loadMaterial();
-}   // reInit
-
-//-----------------------------------------------------------------------------
 void MaterialManager::loadMaterial()
 {
     // Use temp material for reading, but then set the shared

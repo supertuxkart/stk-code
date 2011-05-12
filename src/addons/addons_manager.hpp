@@ -42,10 +42,6 @@ private:
     /** List of loaded icons. */
     std::vector<std::string> m_icon_list;
 
-    /** Queue of icons to download. This queue is used by the
-     *  GUI to increase priority of icons that are needed now. */
-    Synchronised<std::vector<std::string> > m_icon_queue;
-
     /** Which state the addons manager is:
     *  INIT:  Waiting to download the list of addons.
     *  READY: List is downloaded, manager is ready.
@@ -54,36 +50,27 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
-    void         saveInstalled(const std::string &type="");
-    void         loadInstalledAddons();
-    static void *downloadIcons(void *obj);
+    void  saveInstalled(const std::string &type="");
+    void  loadInstalledAddons();
+    void *downloadIcons();
 
 public:
-         AddonsManager();
-    void initOnline(const XMLNode *xml);
-    bool onlineReady();
+                 AddonsManager();
+    void         initOnline(const XMLNode *xml);
+    bool         onlineReady();
     /** Marks addon as not being available. */
-    void setErrorState() { m_state.set(STATE_ERROR); }
+    void         setErrorState() { m_state.set(STATE_ERROR); }
+    const Addon* getAddon(const std::string &id) const;
+    int          getAddonIndex(const std::string &id) const;
+    bool         install(const Addon &addon);
+    bool         uninstall(const Addon &addon);
 
+    // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
-    unsigned int getNumAddons() const 
-    {
-        return m_addons_list.getData().size(); 
-    }
-
+    unsigned int getNumAddons() const { return m_addons_list.getData().size();}
+    // ------------------------------------------------------------------------
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}
-    const Addon* getAddon(const std::string &id) const;
-    int   getAddonIndex(const std::string &id) const;
-
-    bool install(const Addon &addon);
-
-    /** Uninstall the selected addon. This method will remove all the 
-    *  directory of the addon.*/
-    bool uninstall(const Addon &addon);
-
-    /** Get the install state (if it is the download, unzip...)*/
-    const std::string& getDownloadStateAsStr() const;
 
 };
 

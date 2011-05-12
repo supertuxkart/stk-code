@@ -31,7 +31,8 @@
 #  include <math.h>
 #endif
 
-
+#include "addons/news_manager.hpp"
+#include "addons/request.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
@@ -47,7 +48,7 @@
 #  include <unistd.h>
 #endif
 
-NetworkHttp *network_http;
+NetworkHttp *network_http=NULL;
 
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the 
@@ -61,29 +62,33 @@ NetworkHttp *network_http;
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : m_news(std::vector<NewsMessage>()), 
-                             m_progress(-1.0f), m_abort(false)
+NetworkHttp::NetworkHttp() : m_abort(false),
+                             m_all_requests(std::vector<Request*>())
 {
-    m_current_news_message = -1;
     // Don't even start the network threads if networking is disabled.
-    if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+    if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
         return;
 
-    pthread_mutex_init(&m_mutex_command, NULL);
-    pthread_cond_init(&m_cond_command, NULL);
+    curl_global_init(CURL_GLOBAL_ALL);
+    m_curl_session = curl_easy_init();
+    // Abort if curl error occurred.
+    if(!m_curl_session)
+        return;
 
-    // Initialise the variables for cancelling the network thread.
-    pthread_mutex_init(&m_mutex_quit, NULL);
-    pthread_cond_init(&m_cond_quit, NULL);
+    pthread_cond_init(&m_cond_request, NULL);
 
-    // Since there are no threads at this stage, just init
-    // m_command without mutex.
-    m_command = HC_SLEEP;
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     m_thread_id = new pthread_t();
-    int error=pthread_create(m_thread_id, &attr, &NetworkHttp::mainLoop, this);
+
+    Request *request = new Request(Request::HC_INIT, 9999);
+    m_all_requests.lock();
+    m_all_requests.getData().push_back(request);
+    m_all_requests.unlock();
+
+    int error = pthread_create(m_thread_id, &attr, 
+                               &NetworkHttp::mainLoop, this);
     if(error)
     {
         delete m_thread_id;
@@ -103,94 +108,64 @@ void *NetworkHttp::mainLoop(void *obj)
 {
     NetworkHttp *me=(NetworkHttp*)obj;
 
-    // The news message must be updated if either it has never been updated,
-    // or if the time of the last update was more than news_frequency ago.
-    bool download = UserConfigParams::m_news_last_updated==0  ||
-                    UserConfigParams::m_news_last_updated
-                        +UserConfigParams::m_news_frequency
-                    < Time::getTimeSinceEpoch();
-
-    if(!download)
-    {
-        // If there is no old news message file, force a new download
-        std::string xml_file = file_manager->getAddonsFile("news.xml");
-        if(!file_manager->fileExists(xml_file))
-            download=true;
-    }
-
-    // Initialise the online portion of the addons manager.
-    if(download && UserConfigParams::logAddons())
-        printf("[addons] Downloading list.\n");
-
-    if(!download || me->downloadFileSynchron("news.xml"))
-    {
-        std::string xml_file = file_manager->getAddonsFile("news.xml");
-        if(download)
-            UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
-        const XMLNode *xml = new XMLNode(xml_file);
-        me->checkRedirect(xml);
-        me->updateNews(xml, xml_file);
-#ifdef ADDONS_MANAGER
-        me->loadAddonsList(xml, xml_file);
-        if(UserConfigParams::logAddons())
-            printf("[addons] Addons manager list downloaded\n");
-#endif
-    }
-    else
-    {
-#ifdef ADDONS_MANAGER
-        addons_manager->setErrorState();
-        if(UserConfigParams::logAddons())
-            printf("[addons] Can't download addons list.\n");
-#endif
-    }
-
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    // Wait in the main loop till a command is received
-    pthread_mutex_lock(&me->m_mutex_command);
-
-    // Handle the case that STK is cancelled before the while loop
-    // is entered. If this would happen, this thread hangs in 
-    // pthread_cond_wait (since cond_signal was done before the wait),
-    // and stk hangs since the thread can't join.
-    if(me->m_command==HC_QUIT)
+    me->m_all_requests.lock();
+    while(me->m_all_requests.getData().size()           == 0               ||
+          me->m_all_requests.getData()[0]->getCommand() != Request::HC_QUIT   )
     {
-        return NULL;
-    }
-
-    while(1)
-    {
-        pthread_cond_wait(&me->m_cond_command, &me->m_mutex_command);
-        switch(me->m_command)
+        bool empty = me->m_all_requests.getData().size()==0;
+        // Wait in cond_wait for a request to arrive. The 'while' is necessary
+        // since "spurious wakeups from the pthread_cond_wait ... may occur"
+        // (pthread_cond_wait man page)!
+        while(empty)
         {
-        case HC_QUIT: 
-            pthread_exit(NULL);
-            break;
-        case HC_SLEEP: 
-        case HC_INIT:
-            break;
-        case HC_NEWS:
-            assert(false);
-            break;
-        case HC_DOWNLOAD_FILE:
-            me->downloadFileInternal(me->m_url, me->m_save_filename,
-                                     /*is_asynchron*/true    );
-        }   // switch(m_command)
-        me->m_command = HC_SLEEP;
-    }   // while 1
-    pthread_mutex_unlock(&me->m_mutex_command);
+            if(UserConfigParams::logAddons())
+                printf("[addons] No request, sleeping.\n");
 
-    // Signal that we are quitting properly.
-    if(UserConfigParams::logAddons())
-        printf("[addons] Signaling that network thread is quitting.\n");
-    pthread_mutex_lock(&me->m_mutex_quit);
-    pthread_cond_broadcast(&me->m_cond_quit);
-    pthread_mutex_unlock(&me->m_mutex_quit);
-    if(UserConfigParams::logAddons())
-        printf("[addons] Network thread is quitting.\n");
+            pthread_cond_wait(&me->m_cond_request, 
+                              me->m_all_requests.getMutex());
+            empty = me->m_all_requests.getData().size()==0;
+        }
+        // Get the first (=highest priority) request and remove it from the 
+        // queue. Only this code actually removes requests from the queue,
+        // so it is certain that even 
+        Request *request = me->m_all_requests.getData()[0];
+        me->m_all_requests.getData().erase(me->m_all_requests.getData().begin());
+        me->m_all_requests.unlock();
+        if(UserConfigParams::logAddons())
+        {
+            if(request->getCommand()==Request::HC_DOWNLOAD_FILE)
+                printf("[addons] Executing download '%s' to '%s' priority %d.\n",
+                       request->getURL().c_str(), request->getSavePath().c_str(),
+                       request->getPriority());
+            else
+                printf("[addons] Executing command '%d' priority %d.\n",
+                       request->getCommand(), request->getPriority()); 
+        }
+        if(request->getCommand()==Request::HC_QUIT)
+            break;
+        switch(request->getCommand())
+        {
+        case Request::HC_QUIT:                break;
+        case Request::HC_INIT: me->init();    break;            
+        case Request::HC_NEWS: assert(false); break;
+        case Request::HC_DOWNLOAD_FILE:
+             me->downloadFileInternal(request);
+             break;
+        }   // switch(request->getCommand())
 
+        if(request->manageMemory())
+            delete request;
+        // We have to lock here so that we can access m_all_requests
+        // in the while condition at the top of the loop
+        me->m_all_requests.lock();
+    }   // while !quit
+    if(UserConfigParams::logAddons())
+        printf("[addons] Network thread terminating.\n");
+
+    me->m_thread_id = 0;
     return NULL;
 }   // mainLoop
 
@@ -211,138 +186,86 @@ NetworkHttp::~NetworkHttp()
     cancelDownload();
     if(UserConfigParams::logAddons())
         printf("[addons] Trying to lock command mutex.\n");
-    pthread_mutex_lock(&m_mutex_command);
+
+    m_all_requests.lock();
     {
-        m_command=HC_QUIT;
-        pthread_cond_signal(&m_cond_command);
+        Request *r = new Request(Request::HC_QUIT, 999);
+        // Insert the Quit request as the first element of the queue.
+        m_all_requests.getData().insert(m_all_requests.getData().begin(), r);
+        pthread_cond_signal(&m_cond_request);
     }
-    pthread_mutex_unlock(&m_mutex_command);
+    m_all_requests.unlock();
+
     if(UserConfigParams::logAddons())
         printf("[addons] Command mutex unlocked.\n");
 
     if(m_thread_id)
     {
-        if(UserConfigParams::logAddons())
-            printf("[addons] Trying to stop network thread.\n");
-
-        pthread_mutex_lock(&m_mutex_quit);
-        timespec timeout;
-        timeout.tv_nsec = 0;
-        timeout.tv_sec  = 1;
-        int error = pthread_cond_timedwait(&m_cond_quit, &m_mutex_quit, 
-                                           &timeout);
-        pthread_mutex_unlock(&m_mutex_quit);
-        if(error==ETIMEDOUT)
-        {
-            printf("[addons] Timeout waiting for joining. Cancelling.\n");
-            int e = pthread_cancel(*m_thread_id);
-            printf("[addons] Cancelled network thread. Return code: %d\n", e);
-        }
-        else
-        {
-            if(UserConfigParams::logAddons())
-                printf("[addons] Trying to cancel network thread.\n");
-            pthread_join(*m_thread_id, NULL);
-            if(UserConfigParams::logAddons())
-                printf("[addons] Network thread joined.\n");
-        }
+        printf("[addons] Cancelling network thread.\n");
+        int e = pthread_cancel(*m_thread_id);
+        printf("[addons] Cancelled network thread. Return code: %d\n", e);
         delete m_thread_id;
     }
 
-    pthread_mutex_destroy(&m_mutex_command);
-    pthread_cond_destroy(&m_cond_command);
-    pthread_mutex_destroy(&m_mutex_quit);
-    pthread_cond_destroy(&m_cond_quit);
+    pthread_cond_destroy(&m_cond_request);
+
+    curl_easy_cleanup(m_curl_session);
+    m_curl_session = NULL;
+    curl_global_cleanup();
 }   // ~NetworkHttp
 
 // ---------------------------------------------------------------------------
-/** Checks if a redirect is received, causing a new server to be used for
- *  downloading addons.
- *  \param xml XML data structure containing the redirect information.
+/** Initialises the online part of the network manager. It downloads the
+ *  news.xml file from the server (if the frequency of downloads makes this
+ *  necessary), and (again if necessary) the addons.xml file.
+ *  \return 0 if an error happened and no online connection will be available,
+ *          1 otherwise.
  */
-void NetworkHttp::checkRedirect(const XMLNode *xml)
+int NetworkHttp::init()
 {
-    std::string new_server;
-    int result = xml->get("redirect", &new_server);
-    if(result==1 && new_server!="")
+    // The news message must be updated if either it has never been updated,
+    // or if the time of the last update was more than news_frequency ago.
+    bool download = UserConfigParams::m_news_last_updated==0  ||
+                    UserConfigParams::m_news_last_updated
+                        +UserConfigParams::m_news_frequency
+                    < Time::getTimeSinceEpoch();
+
+    if(!download)
     {
-        if(UserConfigParams::logAddons())
-        {
-            std::cout << "[Addons] Current server: " 
-                      << (std::string)UserConfigParams::m_server_addons 
-                      << std::endl
-                      << "[Addons] New server: " << new_server << std::endl;
-        }
-        UserConfigParams::m_server_addons = new_server;
+        // If there is no old news message file, force a new download
+        std::string xml_file = file_manager->getAddonsFile("news.xml");
+        if(!file_manager->fileExists(xml_file))
+            download=true;
     }
-}   // checkRedirect
 
-// ----------------------------------------------------------------------------
-/** Updates the 'news' string to be displayed in the main menu.
- *  \param xml The XML data from the news file.
- *  \param filename The filename of the news xml file. Only needed
- *         in case of an error (e.g. the file might be corrupted) 
- *         - the file will be deleted so that on next start of stk it 
- *         will be updated again.
- */
-void NetworkHttp::updateNews(const XMLNode *xml, const std::string &filename)
-{
-    bool error = true;
-    int frequency=0;
-    if(xml->get("frequency", &frequency))
-        UserConfigParams::m_news_frequency = frequency;
+    // Initialise the online portion of the addons manager.
+    if(download && UserConfigParams::logAddons())
+        printf("[addons] Downloading list.\n");
 
-    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
+              "news.xml", "news.xml");
+    if(!download || downloadFileInternal(&r))
     {
-        const XMLNode *node = xml->getNode(i);
-        if(node->getName()!="message") continue;
-        std::string news;
-        node->get("content", &news);
-        int id=-1;
-        node->get("id", &id);
-
-        std::string cond;
-        node->get("condition", &cond);
-        if(!conditionFulfilled(cond))
-            continue;
-        m_news.lock();
-        {
-
-            // Define this if news messages should be removed
-            // after being shown a certain number of times.
-#undef NEWS_MESSAGE_REMOVAL
-#ifdef NEWS_MESSAGE_REMOVAL
-            // Only add the news if it's not supposed to be ignored.
-            if(id>UserConfigParams::m_ignore_message_id)
+        std::string xml_file = file_manager->getAddonsFile("news.xml");
+        if(download)
+            UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
+        const XMLNode *xml = new XMLNode(xml_file);
+        news_manager->init();
+#ifdef ADDONS_MANAGER
+        loadAddonsList(xml, xml_file);
 #endif
-            {
-                NewsMessage n(core::stringw(news.c_str()), id);
-                m_news.getData().push_back(n);
-            }
-        }
-        m_news.unlock();
-
-        error = false;
     }
-    if(error)
-    {
-        // In case of an error (e.g. the file only contains
-        // an error message from the server), delete the file
-        // so that it is not read again (and this will force
-        // a new read on the next start, instead of waiting
-        // for some time).
-        file_manager->removeFile(filename);
-        NewsMessage n(_("Can't access stkaddons server..."), -1);
-        m_news.lock();
-        m_news.getData().push_back(n);
-        m_news.unlock();
-    }
-#ifdef NEWS_MESSAGE_REMOVAL
     else
-        updateMessageDisplayCount();
+    {
+#ifdef ADDONS_MANAGER
+        addons_manager->setErrorState();
+        if(UserConfigParams::logAddons())
+            printf("[addons] Can't download addons list.\n");
+        return 0;
 #endif
-    
-}   // updateNews
+    }
+    return 1;
+}   // init
 
 // ----------------------------------------------------------------------------
 /** Checks the last modified date and if necessary updates the
@@ -368,10 +291,7 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
     if(addon_list_url.size()==0)
     {
         file_manager->removeFile(filename);
-        NewsMessage n("Can't access stkaddons server...", -1);
-        m_news.lock();
-        m_news.getData().push_back(n);
-        m_news.unlock();
+        news_manager->addNewsMessage(_("Can't access stkaddons server..."));
         return;
     }
 
@@ -383,7 +303,9 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
             download = true;
     }
 
-    if(!download || downloadFileSynchron(addon_list_url, "addons.xml"))
+    Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
+              addon_list_url, "addons.xml");
+    if(!download || downloadFileInternal(&r))
     {
         std::string xml_file = file_manager->getAddonsFile("addons.xml");
         if(download)
@@ -399,318 +321,66 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
 }   // loadAddonsList
 
 // ----------------------------------------------------------------------------
-/** Returns the next loaded news message. It will 'wrap around', i.e.
- *  if there is only one message it will be returned over and over again.
- *  To be used by the the main menu to get the next news message after
- *  one message was scrolled off screen.
+/** Download a file. The file name isn't absolute, the server in the config 
+ *  will be added to file. The file is downloaded with a ".part" extention,
+ *  and the file is renamed after it was downloaded successfully.
+ *  \param request The request object containing the url and the path where
+ *         the file is saved to.
  */
-const core::stringw NetworkHttp::getNextNewsMessage()
+bool NetworkHttp::downloadFileInternal(Request *request)
 {
-    if(m_news.getData().size()==0)
-        return "";
+    std::string full_save = 
+        file_manager->getAddonsFile(request->getSavePath());
 
-    core::stringw m("");
-    m_news.lock();
+    if(UserConfigParams::logAddons())
+        printf("[addons] Downloading '%s' as '%s').\n", 
+               request->getURL().c_str(), request->getSavePath().c_str());
+    std::string full_url = request->getURL();
+    if(full_url.substr(0, 5)!="http:" && full_url.substr(0, 4)!="ftp:")
+        full_url = (std::string)UserConfigParams::m_server_addons 
+                 + "/" + full_url;
+
+    curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
+    std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
+    curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
+    curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, request);
+    FILE * fout = fopen((full_save+".part").c_str(), "wb");
+        
+    //from and out
+    curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
+    curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
+    
+    curl_easy_setopt(m_curl_session,  CURLOPT_PROGRESSFUNCTION, 
+                     &NetworkHttp::progressDownload);
+    curl_easy_setopt(m_curl_session,  CURLOPT_NOPROGRESS, 0);
+                
+    int status = curl_easy_perform(m_curl_session);
+    fclose(fout);
+    if(status==CURLE_OK)
     {
-        // Check if we have a message that was finished being
-        // displayed --> increase display count.
-        if(m_current_news_message>-1)
+        if(UserConfigParams::logAddons())
+            printf("[addons] Download successful.\n");
+
+        int ret = rename((full_save+".part").c_str(), full_save.c_str());
+        // In case of an error, set the status to indicate this
+        if(ret!=0)
         {
-#ifdef NEWS_MESSAGE_REMOVAL
-            NewsMessage &n = m_news.getData()[m_current_news_message];
-            n.increaseDisplayCount();
-#endif
-
-            // If the message is being displayed often enough,
-            // ignore it from now on.
-#ifdef NEWS_MESSAGE_REMOVAL
-            if(n.getDisplayCount()>stk_config->m_max_display_news)
-            {
-                // Messages have sequential numbers, so we only store
-                // the latest message id (which is the current one)
-                UserConfigParams::m_ignore_message_id = n.getMessageId();
-                m_news.getData().erase(m_news.getData().begin()
-                                       +m_current_news_message  );
-
-            }
-#endif
-            updateUserConfigFile();
-            // 
-            if(m_news.getData().size()==0)
-            {
-                m_news.unlock();
-                return "";
-            }
-        }
-        m_current_news_message++;
-        if(m_current_news_message >= (int)m_news.getData().size())
-            m_current_news_message = 0;            
-
-        m = m_news.getData()[m_current_news_message].getNews();
-    }
-    m_news.unlock();
-    return m;
-}   // getNextNewsMessage
-
-// ----------------------------------------------------------------------------
-/** Saves the information about which message was being displayed how often
- *  to the user config file. It dnoes not actually save the user config
- *  file, this is left to the main program (user config is saved at
- *  the exit of the program).
- *  Note that this function assumes that m_news is already locked!
- */
-void NetworkHttp::updateUserConfigFile() const
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    std::ostringstream o;
-    for(unsigned int i=0; i<m_news.getData().size(); i++)
-    {
-        const NewsMessage &n=m_news.getData()[i];
-        o << n.getMessageId()    << ":"
-          << n.getDisplayCount() << " ";
-    }
-    UserConfigParams::m_display_count = o.str();
-#else
-    // Always set them to be empty to avoid any
-    // invalid data that might create a problem later.
-    UserConfigParams::m_display_count     = "";
-    UserConfigParams::m_ignore_message_id = -1;
-#endif
-}   // updateUserConfigFile
-
-// ----------------------------------------------------------------------------
-/** Checks if the given condition list are all fulfilled.
- *  The conditions must be seperated by ";", and each condition
- *  must be of the form "type comp version".
- *  Type must be 'stkversion'
- *  comp must be one of "<", "=", ">"
- *  version must be a valid STK version string
- *  \param cond The list of conditions
- *  \return True if all conditions are true.
- */
-bool NetworkHttp::conditionFulfilled(const std::string &cond)
-{
-    std::vector<std::string> cond_list;
-    cond_list = StringUtils::split(cond, ';');
-    for(unsigned int i=0; i<cond_list.size(); i++)
-    {
-        std::vector<std::string> cond = StringUtils::split(cond_list[i],' ');
-        if(cond.size()!=3)
-        {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
-            continue;
-        }
-        if(cond[0]=="stkversion")
-        {
-            int news_version = versionToInt(cond[2]);
-            int stk_version  = versionToInt(STK_VERSION);
-            if(cond[1]=="=")
-            {
-                if(stk_version!=news_version) return false;
-                continue;
-            }
-            if(cond[1]=="<")
-            {
-                if(stk_version>=news_version) return false;
-                continue;
-            }
-            if(cond[1]==">")
-            {
-                if(stk_version<=news_version) return false;
-                continue;
-            }
-            printf("Invalid comparison in condition '%s' - assumed true.\n",
-                   cond_list[i].c_str());
+            if(UserConfigParams::logAddons())
+               printf("[addons] Could not rename downloaded file!\n");
+            status=CURLE_WRITE_ERROR;
         }
         else
-        {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
-            continue;
-        }
-
-    }   // for i < cond_list
-    return true;
-}   // conditionFulfilled
-
-// ----------------------------------------------------------------------------
-/** Converts a version string (in the form of 'X.Y.Za-rcU' into an
- *  integer number.
- *  \param s The version string to convert.
- */
-int NetworkHttp::versionToInt(const std::string &version_string)
-{
-    // Special case: SVN
-    if(version_string=="SVN" || version_string=="svn")
-      // SVN version will be version 99.99.99i-rcJ
-        return 1000000*99     
-              +  10000*99
-              +    100*99
-              +     10* 9
-              +         9;
-
-    std::string s=version_string;
-    // To guarantee that a release gets a higher version number than 
-    // a release candidate, we assign a 'release_candidate' number
-    // of 9 to versions which are not a RC. We assert that any RC
-    // is less than 9 to guarantee the ordering.
-    int release_candidate=9;
-    if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
-           &release_candidate)==1)
-    {
-        s = s.substr(0, s.length()-4);
-        // Otherwise a RC can get a higher version number than
-        // the corresponding release! If this should ever get
-        // triggered, multiply all scaling factors above and
-        // below by 10, to get two digits for RC numbers.
-        assert(release_candidate<9);
+            request->notifyAddon();
     }
-    int very_minor=0;
-    if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
+    else
     {
-        very_minor = s[s.size()-1]-'a'+1;
-        s = s.substr(0, s.size()-1);
+        printf("[addons] Problems downloading file - return code %d.\n",
+               status);
     }
-    std::vector<std::string> l = StringUtils::split(s, '.');
-    while(l.size()<3)
-        l.push_back(0);
-    int version = 1000000*atoi(l[0].c_str())
-                +   10000*atoi(l[1].c_str())
-                +     100*atoi(l[2].c_str())
-                +      10*very_minor
-                +         release_candidate;
-
-    if(version<=0)
-        printf("Invalid version string '%s'.\n", s.c_str());
-    return version;
-}   // versionToInt
-
-// ----------------------------------------------------------------------------
-/** Reads the information about which message was dislpayed how often from
- *  the user config file.
- */
-void NetworkHttp::updateMessageDisplayCount()
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    m_news.lock();
-    std::vector<std::string> pairs = 
-        StringUtils::split(UserConfigParams::m_display_count,' ');
-    for(unsigned int i=0; i<pairs.size(); i++)
-    {
-        std::vector<std::string> v = StringUtils::split(pairs[i], ':');
-        int id, count;
-        StringUtils::fromString(v[0], id);
-        StringUtils::fromString(v[1], count);
-        // Search all downloaded messages for this id. 
-        for(unsigned int j=0; j<m_news.getData().size(); j++)
-        {
-            if(m_news.getData()[j].getMessageId()!=id)
-                continue;
-            m_news.getData()[j].setDisplayCount(count);
-            if(count>stk_config->m_max_display_news)
-                m_news.getData().erase(m_news.getData().begin()+j);
-            break;
-        }   // for j <m_news.getData().size()
-    }
-    m_news.unlock();
-#endif
-}   // updateMessageDisplayCount
-
-// ----------------------------------------------------------------------------
-
-size_t NetworkHttp::writeStr(char ptr [], size_t size, size_t nb_char, 
-                             std::string * stream)
-{
-    *stream = std::string(ptr);
     
-    //needed, otherwise, the download failed
-    return nb_char;
-}   // writeStr
-
-// ----------------------------------------------------------------------------
-
-std::string NetworkHttp::downloadToStrInternal(std::string url)
-{
-    m_abort.set(false);
-    CURL *session = curl_easy_init();
-
-    std::string full_url = (std::string)UserConfigParams::m_server_addons 
-                         + "/" + url;
-    curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-    std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
-    curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
-    curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
-        
-    std::string fout;
-        
-    //from and out
-    curl_easy_setopt(session, CURLOPT_WRITEDATA,     &fout                 );
-    curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, &NetworkHttp::writeStr);
-        
-    int success = curl_easy_perform(session);
-    
-    //stop curl
-    curl_easy_cleanup(session);
-    
-    if (success == 0) return fout;
-    else             return "";
-}   // downloadToStrInternal
-
-// ----------------------------------------------------------------------------
-/** Download a file. The file name isn't absolute, the server in the config 
- *  will be added to file. 
- *  \param progress_data is used to have the state of the download (in %)
- */
-bool NetworkHttp::downloadFileInternal(const std::string &url,
-                                       const std::string &save_filename,
-                                       bool is_asynchron)
-{
-    if(UserConfigParams::logAddons())
-        printf("[addons] Downloading '%s' as '%s').\n", url.c_str(),
-               file_manager->getAddonsFile(save_filename).c_str());
-    CURL *session = curl_easy_init();
-    std::string full_url = url;
-    if(url.substr(0, 5)!="http:" && url.substr(0, 4)!="ftp:")
-        full_url = (std::string)UserConfigParams::m_server_addons 
-                 + "/" + url;
-
-    curl_easy_setopt(session, CURLOPT_URL, full_url.c_str());
-    std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
-    curl_easy_setopt(session, CURLOPT_USERAGENT, uagent.c_str());
-    curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
-
-    FILE * fout = fopen(file_manager->getAddonsFile(save_filename).c_str(),
-                         "wb");
-        
-    //from and out
-    curl_easy_setopt(session,  CURLOPT_WRITEDATA,     fout  );
-    curl_easy_setopt(session,  CURLOPT_WRITEFUNCTION, fwrite);
-    
-    // FIXME: if a network problem prevent the first 'list' download
-    // to finish, the thread can not be cancelled. 
-    // If we disable this test it works as expected, but I am not sure
-    // if there are any side effects if synchron downloads use the
-    // progress bar as well.
-    if(is_asynchron)
-    {
-        curl_easy_setopt(session,  CURLOPT_PROGRESSFUNCTION, 
-            &NetworkHttp::progressDownload);
-        // Necessary, oyherwise the progress function doesn't work
-        curl_easy_setopt(session,  CURLOPT_NOPROGRESS, 0);
-    }
-                
-    int success = curl_easy_perform(session);
-        
-    //close the file where we downloaded the content
-    fclose(fout);
-    
-    //stop curl
-    curl_easy_cleanup(session);
-
-    if(is_asynchron)
-        m_progress.set( (success==CURLE_OK) ? 1.0f : -1.0f );
-    return success==CURLE_OK;
+    request->setProgress( (status==CURLE_OK) ? 1.0f : -1.0f );
+    return status==CURLE_OK;
 }   // downloadFileInternal
 
 // ----------------------------------------------------------------------------
@@ -726,50 +396,55 @@ void NetworkHttp::cancelDownload()
 }   // cancelDownload
 
 // ----------------------------------------------------------------------------
-/** External interface to download a file synchronously, i.e. it will only 
- *  return once the download is complete. 
- *  \param url The file from the server to download.
- *  \param save The name to save the downloaded file under. Defaults to
- *              the name given in file.
- */
-bool NetworkHttp::downloadFileSynchron(const std::string &url,
-                                       const std::string &save)
-{
-    const std::string &save_filename = (save!="") ? save : url;
-    if(UserConfigParams::logAddons())
-        printf("[addons] Download synchron '%s' as '%s'.\n",
-               url.c_str(), save_filename.c_str());
-
-    return downloadFileInternal(url, save_filename,
-                                /*is_asynchron*/false);
-}   // downloadFileSynchron
-
-// ----------------------------------------------------------------------------
 /** External interface to download a file asynchronously. This will wake up 
  *  the thread and schedule it to download the file. The calling program has 
  *  to poll using getProgress() to find out if the download has finished.
  *  \param url The file from the server to download.
  *  \param save The name to save the downloaded file under. Defaults to
  *              the name given in file.
+ *  \param priority Priority of the request (must be <=99)
  */
-void NetworkHttp::downloadFileAsynchron(const std::string &url,
-                                        const std::string &save)
+Request *NetworkHttp::downloadFileAsynchron(const std::string &url,
+                                            const std::string &save,
+                                            int                priority,
+                                            bool               manage_memory)
 {
-    m_progress.set(0.0f);
-    m_url           = url;
-    m_save_filename = (save!="") ? save : url;
+    // Limit priorities to 99 so that important system requests
+    // (init and quit) will have highest priority.
+    assert(priority<=99);
+    Request *request = new Request(Request::HC_DOWNLOAD_FILE, priority, 
+                                   manage_memory,
+                                   url, (save!="") ? save : url          );
 
     if(UserConfigParams::logAddons())
         printf("[addons] Download asynchron '%s' as '%s'.\n", 
-               url.c_str(), m_save_filename.c_str());
-    // Wake up the network http thread
-    pthread_mutex_lock(&m_mutex_command);
-    {
-        m_command = HC_DOWNLOAD_FILE;
-        pthread_cond_signal(&m_cond_command);
-    }
-    pthread_mutex_unlock(&m_mutex_command);
+               request->getURL().c_str(), request->getSavePath().c_str());
+    insertRequest(request);
+    return request;
 }   // downloadFileAsynchron
+
+// ----------------------------------------------------------------------------
+/** Inserts a request into the queue of all requests. The request will be
+ *  sorted by priority.
+ *  \param request The pointer to the new request to insert.
+ */
+void NetworkHttp::insertRequest(Request *request)
+{
+    // Wake up the network http thread
+    m_all_requests.lock();
+    {
+        m_all_requests.getData().push_back(request);
+        unsigned int i=m_all_requests.getData().size()-1;
+        while(i>0 && *(m_all_requests.getData()[i])<*request)
+        {
+                m_all_requests.getData()[i] = m_all_requests.getData()[i-1];
+                i--;
+        }
+        m_all_requests.getData()[i] = request;
+        pthread_cond_signal(&m_cond_request);
+    }
+    m_all_requests.unlock();
+}   // insertRequest
 
 // ----------------------------------------------------------------------------
 /** Callback function from curl: inform about progress.
@@ -783,6 +458,7 @@ int NetworkHttp::progressDownload(void *clientp,
                                   double download_total, double download_now, 
                                   double upload_total,   double upload_now)
 {
+    Request *request = (Request *)clientp;
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
     if(network_http->m_abort.get())
@@ -805,17 +481,8 @@ int NetworkHttp::progressDownload(void *clientp,
         // after checking curls return code!
         f= download_total==0 ? 0 : 0.99f;
     }
-    network_http->m_progress.set(f);
+    request->setProgress(f);
     return 0;
 }   // progressDownload
 
-// ----------------------------------------------------------------------------
-/** Returns the progress of a download that has been started.
- *  \return <0 in case of an error, between 0 and smaller than 1 while the
- *  download is in progress, and 1.0f if the download has finished.
- */
-float NetworkHttp::getProgress() const
-{
-    return m_progress.get();
-}   // getProgress
 

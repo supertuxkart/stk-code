@@ -24,6 +24,7 @@
 
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"
+#include "addons/request.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
@@ -41,15 +42,16 @@ AddonsLoading::AddonsLoading(const float w, const float h,
              : ModalDialog(w, h)
 {
     loadFromFile("addons_view_dialog.stkgui");
-    m_addon          = *(addons_manager->getAddon(id));
-    m_icon_shown     = false;
+    m_addon            = *(addons_manager->getAddon(id));
+    m_icon_shown       = false;
+    m_download_request = NULL;
 
     /*Init the icon here to be able to load a single image*/
-    m_icon           = getWidget<IconButtonWidget> ("icon"    );
-    m_progress       = getWidget<ProgressBarWidget>("progress");
-    m_install_button = getWidget<ButtonWidget>     ("install" );
-    m_back_button    = getWidget<ButtonWidget>     ("cancel"  );
-    m_state          = getWidget<LabelWidget>      ("state"   );
+    m_icon             = getWidget<IconButtonWidget> ("icon"    );
+    m_progress         = getWidget<ProgressBarWidget>("progress");
+    m_install_button   = getWidget<ButtonWidget>     ("install" );
+    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
+    m_state            = getWidget<LabelWidget>      ("state"   );
 
     if(m_progress)
         m_progress->setVisible(false);
@@ -132,7 +134,7 @@ void AddonsLoading::onUpdate(float delta)
 {
     if(m_progress->isVisible())
     {
-        float progress = network_http->getProgress();
+        float progress = m_download_request->getProgress();
         m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
@@ -168,10 +170,12 @@ void AddonsLoading::onUpdate(float delta)
  **/
 void AddonsLoading::startDownload()
 {
-    std::string file = m_addon.getZipFileName();
-    std::string save = "tmp/"
-                     + StringUtils::getBasename(m_addon.getZipFileName());
-    network_http->downloadFileAsynchron(file, save);
+    std::string file   = m_addon.getZipFileName();
+    std::string save   = "tmp/"
+                       + StringUtils::getBasename(m_addon.getZipFileName());
+    m_download_request = network_http->downloadFileAsynchron(file, save, 
+                                                 /*priority*/5, 
+                                            /*manage memory*/false);
 }   // startDownload
 
 // ----------------------------------------------------------------------------

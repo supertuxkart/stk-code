@@ -29,6 +29,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/synchronised.hpp"
 
+class Request;
+
 /**
   * \ingroup states_screens
   */
@@ -50,6 +52,10 @@ private:
     
     /** True if the icon is being displayed. */
     bool m_icon_shown;
+
+    /** A pointer to the download request, which gives access
+     *  to the progress of a download. */
+    Request *m_download_request;
 
 public:
     /**

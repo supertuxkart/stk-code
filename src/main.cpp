@@ -45,6 +45,7 @@
 #include "main_loop.hpp"
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"
+#include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -794,6 +795,7 @@ void initRest()
     // This only initialises the non-network part of the addons manager. The
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
+    news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
     network_http            = new NetworkHttp();
     music_manager           = new MusicManager();
@@ -848,6 +850,7 @@ void cleanTuxKart()
     //see InitTuxkart()
     if(race_manager)            delete race_manager;
     if(network_http)            delete network_http;
+    if(news_manager)            delete news_manager;
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;

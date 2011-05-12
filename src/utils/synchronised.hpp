@@ -95,6 +95,11 @@ public:
     /** Unlocks the mutex. 
      */
     void unlock() {pthread_mutex_unlock(&m_mutex); }
+    // ------------------------------------------------------------------------
+    /** Gives access to the mutex, which can then be used in other pthread
+     *  calls (e.g. pthread_cond_wait). 
+     */
+    pthread_mutex_t* getMutex() { return &m_mutex; }
 private:
     // Make sure that no actual copying is taking place
     // ------------------------------------------------------------------------
