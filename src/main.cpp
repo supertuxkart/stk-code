@@ -133,6 +133,20 @@ void gamepadVisualisation()
                     break;
                 }
                 
+                case EET_KEY_INPUT_EVENT:
+                {
+                    const SEvent::SKeyInput& evt = event.KeyInput;
+                    
+                    if (evt.PressedDown)
+                    {
+                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE || evt.Key == KEY_SPACE)
+                        {
+                            exit(0);
+                        }
+                    }
+
+                }
+                
                 default:
                     // don't care about others
                     break;
