@@ -64,11 +64,9 @@ AddonsLoading::AddonsLoading(const float w, const float h,
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
     }
     
-    core::stringw name = _("Name: %i", m_addon.getName().c_str() );
-    getWidget<LabelWidget>("name")->setText(name, false);
+    getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
 
-    core::stringw desc = _("Description: %i", m_addon.getDescription().c_str());
-    getWidget<LabelWidget>("description")->setText(desc, false);
+    getWidget<BubbleWidget>("description")->setText(m_addon.getDescription().c_str());
 
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);

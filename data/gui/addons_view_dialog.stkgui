@@ -11,7 +11,7 @@
     </div>
     <spacer proportion="1" />
     <div width="50%" height="100%" layout="vertical-row" >
-        <label word_wrap="true" id="description" width="100%" text="Description:" proportion="1" />
+        <bubble word_wrap="true" id="description" height="100%" width="100%" text="" proportion="6" />
         <label id="size" width="100%" text="Size:" proportion="1" />
         <label id="revision" width="100%" text="Version:" proportion="1" />
     </div>
