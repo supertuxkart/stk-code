@@ -76,6 +76,8 @@ private:
 public:
                   NetworkHttp();
                  ~NetworkHttp();
+    void          startNetworkThread();
+    void          stopNetworkThread();
     Request      *downloadFileAsynchron(const std::string &url, 
                                         const std::string &save = "",
                                         int   priority = 1,

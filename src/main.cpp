@@ -812,6 +812,10 @@ void initRest()
     news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
     network_http            = new NetworkHttp();
+    // Note that the network thread must be started after the assignment
+    // to network_http (since the thread might use network_http, otherwise
+    // a race condition can be introduced resulting in a crash).
+    network_http->startNetworkThread();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -860,6 +864,8 @@ void initRest()
 //=============================================================================
 void cleanTuxKart()
 {
+    if(network_http)
+        network_http->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     if(race_manager)            delete race_manager;

@@ -77,16 +77,26 @@ NetworkHttp::NetworkHttp() : m_abort(false),
 
     pthread_cond_init(&m_cond_request, NULL);
 
-    pthread_attr_t  attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    m_thread_id = new pthread_t();
-
     Request *request = new Request(Request::HC_INIT, 9999);
     m_all_requests.lock();
     m_all_requests.getData().push_back(request);
-    m_all_requests.unlock();
+    m_all_requests.unlock();    
+}   // NetworkHttp
 
+// ---------------------------------------------------------------------------
+/** Start the actual network thread. This can not be done as part of
+ *  the constructor, since the assignment to the global network_http
+ *  variable has not been assigned at that stage, and the thread might
+ *  use network_http - a very subtle race condition. So the thread can 
+ *  only be started after the assignment (in main) has been done.
+ */
+void NetworkHttp::startNetworkThread()
+{
+    pthread_attr_t  attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    m_thread_id = new pthread_t();
     int error = pthread_create(m_thread_id, &attr, 
                                &NetworkHttp::mainLoop, this);
     if(error)
@@ -96,7 +106,7 @@ NetworkHttp::NetworkHttp() : m_abort(false),
         printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
-}   // NetworkHttp
+}   // startNetworkThread
 
 // ---------------------------------------------------------------------------
 /** The actual main loop, which is started as a separate thread from the
@@ -170,9 +180,12 @@ void *NetworkHttp::mainLoop(void *obj)
 }   // mainLoop
 
 // ---------------------------------------------------------------------------
-/** Aborts the thread running here, and returns then.
+/** This function inserts a high priority request to quit into the request
+ *  queue of the network thead, and also aborts any ongoing download.
+ *  Separating this allows more time for the thread to finish cleanly, 
+ *  before it gets cancelled in the destructor.
  */
-NetworkHttp::~NetworkHttp()
+void NetworkHttp::stopNetworkThread()
 {
     if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
         return;
@@ -184,17 +197,18 @@ NetworkHttp::~NetworkHttp()
     // a download, which mean we can get the mutex and ask the service
     // thread here to cancel properly.
     cancelDownload();
-    if(UserConfigParams::logAddons())
-        printf("[addons] Trying to lock command mutex.\n");
 
-    m_all_requests.lock();
-    {
-        Request *r = new Request(Request::HC_QUIT, 999);
-        // Insert the Quit request as the first element of the queue.
-        m_all_requests.getData().insert(m_all_requests.getData().begin(), r);
-        pthread_cond_signal(&m_cond_request);
-    }
-    m_all_requests.unlock();
+    Request *r = new Request(Request::HC_QUIT, 9999);
+    if(UserConfigParams::logAddons())
+        printf("[addons] Inserting QUIT request.\n");
+    insertRequest(r);
+}   // stopNetworkThread
+
+// ---------------------------------------------------------------------------
+/** Aborts the thread running here, and returns then.
+ */
+NetworkHttp::~NetworkHttp()
+{
 
     if(UserConfigParams::logAddons())
         printf("[addons] Command mutex unlocked.\n");
