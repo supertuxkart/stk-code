@@ -61,6 +61,9 @@ namespace GUIEngine
          */
         ModalDialog(const float percentWidth, const float percentHeight);
 
+        /** \brief Load a XML file to create the dialog from
+          * \note  This method automatically calls Widget::add() on each widget
+          */
         void loadFromFile(const char* xmlFile);
 
         virtual void onEnterPressedInternal();
