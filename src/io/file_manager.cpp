@@ -545,7 +545,7 @@ void FileManager::checkAndCreateAddonsDir()
     m_addons_dir  = m_config_dir+"/addons";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
-    m_addons_dir += "/Library/Application Support/SuperTuxKart";
+    m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons";
 #else
     // Remaining unix variants. Use the new standards for config directory
     // i.e. either XDG_CONFIG_HOME or $HOME/.config
