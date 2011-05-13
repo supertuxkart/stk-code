@@ -255,6 +255,8 @@ void Material::install(bool is_full_path)
     m_texture = irr_driver->getTexture(full_path,
                                        isPreMul(), isPreDiv());
 
+    if (m_texture == NULL) return;
+    
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
     
@@ -277,10 +279,13 @@ void Material::install(bool is_full_path)
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
-    assert(m_texture);
-    m_texture->drop();
-    if(m_texture->getReferenceCount()==1)
-        irr_driver->removeTexture(m_texture);
+    if (m_texture != NULL)
+    {
+        m_texture->drop();
+        if(m_texture->getReferenceCount()==1)
+            irr_driver->removeTexture(m_texture);
+    }
+    
     // If a special sfx is installed (that isn't part of stk itself), the
     // entry needs to be removed from the sfx_manager's mapping, since other
     // tracks might use the same name.
