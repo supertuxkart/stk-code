@@ -295,6 +295,26 @@ void KartPropertiesManager::selectKartName(const std::string &kart_name)
 }   // selectKartName
 
 //-----------------------------------------------------------------------------
+
+
+const std::vector<int> KartPropertiesManager::getKartsInGroup(const std::string& g)
+{
+    if (g == ALL_KART_GROUPS_ID)
+    {
+        std::vector<int> out;
+        for (int n=0; n<m_karts_properties.size(); n++)
+        {
+            out.push_back(n);
+        }
+        return out;
+    }
+    else
+    {
+        return m_groups[g];
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** Returns a list of randomly selected karts. This list firstly contains
  *  karts in the currently selected group, but which are not in the list
  *  of 'existing karts'. If not enough karts are available in the current
@@ -315,12 +335,12 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     std::vector<bool> used;
     used.resize(getNumberOfKarts(), false);
     
-    std::vector<std::string> all_karts;
-    for(unsigned int i=0; i<existing_karts.size(); i++)
+    std::vector<std::string> randomKartQueue;
+    for (unsigned int i=0; i<existing_karts.size(); i++)
     {
         try
         {
-            int id=getKartId(existing_karts[i].getKartName());
+            int id = getKartId(existing_karts[i].getKartName());
             used[id] = true;
         }
         catch (std::runtime_error& ex)
@@ -330,82 +350,48 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         }
     }
 
-    // Add karts from the current group
-    // --------------------------------
-    std::vector<int> karts = getKartsInGroup(UserConfigParams::m_kart_group);
-    std::vector<int>::iterator k;
-    // Remove karts that are already used or generally not available
-    // (i.e. locked or not available on all clients)
-    for(unsigned int i=0; i<karts.size();)
-    {
-        if(used[karts[i]] || !m_kart_available[karts[i]] || 
-            unlock_manager->isLocked(m_karts_properties[karts[i]].getIdent()))
-            karts.erase(karts.begin()+i);
-        else
-            i++;
-    }
-    std::random_shuffle(karts.begin(), karts.end());
-
-    // Loop over all karts to fill till either all slots are filled, or
-    // there are no more karts in the current group
-    while(count>0 && karts.size()>0)
-    {
-        //used[karts.back()] = true;
-        random_karts.push_back(m_karts_properties[karts.back()].getIdent());
-        karts.pop_back();
-        count --;
-    }
-    if(count==0) return random_karts;
-
-    // Not enough karts in chosen group, so fill the rest with arbitrary karts
-    // -----------------------------------------------------------------------
-    // First create an index list with all unused karts.
-    karts.clear();
-    for(unsigned int i=0; i<getNumberOfKarts(); i++)
-    {
-        if(!used[i] && m_kart_available[i] &&
-            !unlock_manager->isLocked(m_karts_properties[i].getIdent()) )
-            karts.push_back(i);
-    }
-    std::random_shuffle(karts.begin(), karts.end());
-    
-    // Then fill up the remaining empty spaces
     do
     {
-        while(count>0 && karts.size()>0)
+        // if we have no karts left in our queue, re-fill it
+        if (count > 0 && randomKartQueue.size() == 0)
         {
-            random_karts.push_back(m_karts_properties[karts.back()].getIdent());
-            karts.pop_back();
+            randomKartQueue.clear();
+            std::vector<int> kartsInGroup = getKartsInGroup(UserConfigParams::m_kart_group);
+            
+            assert(kartsInGroup.size() > 0);
+            
+            // first try not to use a kart already used by a player
+            for (unsigned int i=0; i<kartsInGroup.size(); i++)
+            {
+                if (!used[kartsInGroup[i]] && m_kart_available[kartsInGroup[i]] &&
+                    !unlock_manager->isLocked(m_karts_properties[kartsInGroup[i]].getIdent()) )
+                {
+                    randomKartQueue.push_back(m_karts_properties[kartsInGroup[i]].getIdent());
+                }
+            }
+            
+            // if we really need to, reuse the same kart as the player
+            if (randomKartQueue.size() == 0)
+            {
+                for (unsigned int i=0; i<kartsInGroup.size(); i++)
+                {
+                    randomKartQueue.push_back(m_karts_properties[kartsInGroup[i]].getIdent());
+                }
+            }
+            
+            assert(randomKartQueue.size() > 0);
+            
+            std::random_shuffle(randomKartQueue.begin(), randomKartQueue.end());
+        }
+        
+        while (count > 0 && randomKartQueue.size() > 0)
+        {
+            random_karts.push_back(randomKartQueue.back());
+            randomKartQueue.pop_back();
             count --;
         }
         
-        // we used all karts but still need more... we'll have no choice but
-        // to use the same karts more than once.
-        if (count>0 && karts.size() == 0)
-        {
-            for(unsigned int i=0; i<getNumberOfKarts(); i++)
-            {
-                if(!used[i] && m_kart_available[i] &&
-                   !unlock_manager->isLocked(m_karts_properties[i].getIdent()) )
-                    karts.push_back(i);
-            }
-            // If there are no unused karts, use used karts again.
-            // This means that e.g. if only one kart is availabe, which is
-            // used by the player, it will still be used by AI karts (which
-            // can be useful for debugging).
-            if(karts.size()==0)
-            {
-                for(unsigned int i=0; i<getNumberOfKarts(); i++)
-                {
-                    if(m_kart_available[i] &&
-                        !unlock_manager->isLocked(m_karts_properties[i].getIdent()) )
-                        karts.push_back(i);
-                }
-            }
-            std::random_shuffle(karts.begin(), karts.end());
-        }
-        
-    } while(count>0);
+    } while (count > 0);
     
     // There should always be enough karts
     assert(count==0);

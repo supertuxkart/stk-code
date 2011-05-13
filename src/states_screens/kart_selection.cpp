@@ -51,7 +51,6 @@ using namespace GUIEngine;
 using irr::core::stringw;
 
 const char* RANDOM_KART_ID = "randomkart";
-const char* ALL_KART_GROUPS_ID  = "all";
 const char* ID_DONT_USE = "x";
 const char* ID_LOCKED = "locked";
 
@@ -1375,9 +1374,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         assert(w != NULL);
         
         setKartsFromCurrentGroup();
-
+        
         const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-                
+        
         RandomGenerator random;
         
         const int num_players = m_kart_widgets.size();
@@ -1458,9 +1457,16 @@ void KartSelectionScreen::allPlayersDone()
 {
     input_manager->setMasterPlayerOnly(true);
     
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert(tabs != NULL);
+    
+    std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    UserConfigParams::m_kart_group = selected_kart_group;
+    
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    
+        
     const PtrVector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
     
     // ---- Print selection (for debugging purposes)
@@ -1721,6 +1727,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     std::string selected_kart_group = 
         tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
+    UserConfigParams::m_kart_group = selected_kart_group;
+    
     // This can happen if addons are removed so that also the previously
     // selected kart group is removed. In this case, select the 
     // 'standard' group

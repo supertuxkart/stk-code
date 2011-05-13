@@ -26,6 +26,8 @@
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
+#define ALL_KART_GROUPS_ID  "all"
+
 class KartProperties;
 
 /**
@@ -73,8 +75,7 @@ public:
     const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
     const std::vector<std::string>& 
                              getAllGroups           () const {return m_all_groups;     }
-    const std::vector<int>&  getKartsInGroup        (const std::string& g)
-                                                             {return m_groups[g];      }
+    const std::vector<int>   getKartsInGroup        (const std::string& g);
     void                     clearAllSelectedKarts()         {m_selected_karts.clear();}
     void                     removeLastSelectedKart()        {m_selected_karts.pop_back();}
     int                      getNumSelectedKarts() const     {return m_selected_karts.size();}

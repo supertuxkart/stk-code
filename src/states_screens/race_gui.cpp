@@ -172,9 +172,9 @@ void RaceGUI::renderGlobal(float dt)
     }
 
     // minimap has no mipmaps so disable material2D
-    irr_driver->getVideoDriver()->enableMaterial2D(false);
+    //irr_driver->getVideoDriver()->enableMaterial2D(false);
     drawGlobalMiniMap();
-    irr_driver->getVideoDriver()->enableMaterial2D();
+    //irr_driver->getVideoDriver()->enableMaterial2D();
     
     KartIconDisplayInfo* info = world->getKartsDisplayInfo();
     
