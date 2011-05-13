@@ -63,6 +63,7 @@ NetworkHttp *network_http=NULL;
  *  ending up with an corrupted file).
  */
 NetworkHttp::NetworkHttp() : m_abort(false),
+                             m_thread_id(NULL),
                              m_all_requests(std::vector<Request*>())
 {
     // Don't even start the network threads if networking is disabled.
@@ -96,13 +97,15 @@ void NetworkHttp::startNetworkThread()
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    m_thread_id = new pthread_t();
-    int error = pthread_create(m_thread_id, &attr, 
+    m_thread_id.set(new pthread_t());
+    int error = pthread_create(m_thread_id.getData(), &attr, 
                                &NetworkHttp::mainLoop, this);
     if(error)
     {
-        delete m_thread_id;
-        m_thread_id = 0;
+        m_thread_id.lock();
+        delete m_thread_id.getData();
+        m_thread_id.set(0);
+        m_thread_id.unlock();
         printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
@@ -175,7 +178,7 @@ void *NetworkHttp::mainLoop(void *obj)
     if(UserConfigParams::logAddons())
         printf("[addons] Network thread terminating.\n");
 
-    me->m_thread_id = 0;
+    me->m_thread_id.set(0);
     return NULL;
 }   // mainLoop
 
@@ -213,13 +216,15 @@ NetworkHttp::~NetworkHttp()
     if(UserConfigParams::logAddons())
         printf("[addons] Command mutex unlocked.\n");
 
-    if(m_thread_id)
+    m_thread_id.lock();
+    if(m_thread_id.getData())
     {
         printf("[addons] Cancelling network thread.\n");
-        int e = pthread_cancel(*m_thread_id);
+        int e = pthread_cancel(*m_thread_id.getData());
         printf("[addons] Cancelled network thread. Return code: %d\n", e);
-        delete m_thread_id;
+        delete m_thread_id.getData();
     }
+    m_thread_id.unlock();
 
     pthread_cond_destroy(&m_cond_request);
 

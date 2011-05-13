@@ -51,19 +51,19 @@ public:
 private:
 
     /** The list of pointes to all requests. */
-    mutable Synchronised< std::vector<Request*> >  m_all_requests;
+    Synchronised< std::vector<Request*> >  m_all_requests;
 
     /** A conditional variable to wake up the main loop. */
-    pthread_cond_t       m_cond_request;
+    pthread_cond_t            m_cond_request;
 
     /** Signal an abort in case that a download is still happening. */
-    Synchronised<bool>   m_abort;
+    Synchronised<bool>        m_abort;
 
     /** Thread id of the thread running in this object. */
-    pthread_t           *m_thread_id;
+    Synchronised<pthread_t *> m_thread_id;
 
     /** The curl session. */
-    CURL                *m_curl_session;
+    CURL                     *m_curl_session;
 
     static void  *mainLoop(void *obj);
     int           init();
