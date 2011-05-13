@@ -37,22 +37,23 @@ using namespace GUIEngine;
 using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
+
 AddonsLoading::AddonsLoading(const float w, const float h,
                              const std::string &id)
              : ModalDialog(w, h)
 {
-    loadFromFile("addons_view_dialog.stkgui");
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
-
-    /*Init the icon here to be able to load a single image*/
+    
+    loadFromFile("addons_view_dialog.stkgui");
+    
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_install_button   = getWidget<ButtonWidget>     ("install" );
     m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
     m_state            = getWidget<LabelWidget>      ("state"   );
-
+    
     if(m_progress)
         m_progress->setVisible(false);
     
@@ -63,6 +64,20 @@ AddonsLoading::AddonsLoading(const float w, const float h,
         else
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
     }
+    
+}
+
+// ----------------------------------------------------------------------------
+
+void AddonsLoading::beforeAddingWidgets()
+{
+    /*Init the icon here to be able to load a single image*/
+    m_icon             = getWidget<IconButtonWidget> ("icon"    );
+    m_progress         = getWidget<ProgressBarWidget>("progress");
+    m_install_button   = getWidget<ButtonWidget>     ("install" );
+    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
+    m_state            = getWidget<LabelWidget>      ("state"   );
+
     
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
 

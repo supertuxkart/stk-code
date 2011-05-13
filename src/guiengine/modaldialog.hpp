@@ -94,6 +94,12 @@ namespace GUIEngine
         virtual void onUpdate(float dt) { }
         
         /**
+         * \brief Optional callback invoked very early, before widgets have been added (contrast with
+         *        init(), which is invoked afer widgets were added)
+         */
+        virtual void beforeAddingWidgets() {}
+        
+        /**
           * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getWidth()  { return m_area.getWidth(); }

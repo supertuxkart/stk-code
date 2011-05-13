@@ -38,10 +38,10 @@ BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
 // ----------------------------------------------------------------------------
 
 void BubbleWidget::add()
-{
+{    
     m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
     stringw message = getText();
-        
+    
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;

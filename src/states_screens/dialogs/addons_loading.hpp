@@ -63,7 +63,10 @@ public:
      */
     AddonsLoading(const float percent_width, const float percent_height,
                   const std::string &addon_name);
-    GUIEngine::EventPropagation processEvent(const std::string& event_source);
+    
+    virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
+    
+    virtual void beforeAddingWidgets();
     
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
