@@ -20,6 +20,7 @@
 #define __HEADER_OPTIONS_SCREEN_INPUT_HPP__
 
 #include <string>
+//#include <map>
 #include "irrlicht.h"
 
 #include "guiengine/screen.hpp"
@@ -43,6 +44,8 @@ class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSin
     void buildDeviceList();
     
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    
+   // std::map<std::string, float> m_highlights;
     
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
@@ -71,6 +74,8 @@ public:
                                                       const unsigned int value,
                                                       Input::InputType type,
                                                       int playerId);
+    
+    virtual void onUpdate(float dt, irr::video::IVideoDriver* drv);
 };
 
 #endif

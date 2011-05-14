@@ -251,7 +251,7 @@ EventPropagation OptionsScreenInput::filterActions(PlayerAction action, int devi
                                                    Input::InputType type, int playerId)
 {
     /*
-    if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
+    if (value > Input::MAX_VALUE*2/3 && (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON))
     {
         GamePadDevice* gamepad = input_manager->getDeviceList()->getGamePadFromIrrID(deviceID);
         if (gamepad != NULL && gamepad->getConfiguration() != NULL)
@@ -275,13 +275,41 @@ EventPropagation OptionsScreenInput::filterActions(PlayerAction action, int devi
                     internal_name = gpname.str();
                 }
             }
-
+            
             if (internal_name.size() > 0)
             {
-                devices->markItemRed(internal_name.c_str(), value > Input::MAX_VALUE*2/3);
+                devices->markItemRed(internal_name.c_str());
+                m_highlights[internal_name] = 0.25f;
             }
         }
     }
-     */
+    */
     return EVENT_LET;
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
+{
+    /*
+    std::map<std::string, float>::iterator it;
+    for (it = m_highlights.begin(); it != m_highlights.end();)
+    {
+        it->second -= dt;
+        if (it->second < 0.0f)
+        {            
+            ListWidget* devices = this->getWidget<ListWidget>("devices");
+            assert(devices != NULL);
+            
+            devices->markItemRed(it->first.c_str(), false);
+            
+            m_highlights.erase(it++);
+        }
+        else
+        {
+            it++;
+        }
+    }
+     */
+    //m_highlights[internal_name]
 }
