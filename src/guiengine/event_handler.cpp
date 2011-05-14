@@ -171,6 +171,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 // -----------------------------------------------------------------------------
 
 void EventHandler::processGUIAction(const PlayerAction action,
+                                    int deviceID,
                                     const unsigned int value,
                                     Input::InputType type,
                                     const int playerID)
@@ -178,7 +179,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
     Screen* screen = GUIEngine::getCurrentScreen();
     if (screen != NULL)
     {
-        EventPropagation propg = screen->filterActions(action, value,
+        EventPropagation propg = screen->filterActions(action, deviceID, value,
                                                        type, playerID);
         if (propg == EVENT_BLOCK) return;
     }

@@ -264,7 +264,7 @@ namespace GUIEngine
         /**
           * \brief override this if you need to be notified of player actions in subclasses
           */
-        virtual EventPropagation filterActions(PlayerAction action, const unsigned int value,
+        virtual EventPropagation filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                                Input::InputType type, int playerId) { return EVENT_LET; }
         
     };

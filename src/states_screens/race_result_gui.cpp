@@ -350,10 +350,11 @@ bool RaceResultGUI::onEscapePressed()
  *  no widget is active, the event would be lost, so we act on fire events
  *  here and trigger the next phase.
  */
-GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action, 
-                                              const unsigned int value,
-                                              Input::InputType type, 
-                                              int playerId)
+GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action,
+                                                         int deviceID,
+                                                         const unsigned int value,
+                                                         Input::InputType type, 
+                                                         int playerId)
 {
     if(action!=PA_FIRE) return GUIEngine::EVENT_LET;
 

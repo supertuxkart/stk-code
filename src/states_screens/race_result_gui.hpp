@@ -178,7 +178,7 @@ public:
     virtual void tearDown();    
     virtual bool onEscapePressed();
     virtual GUIEngine::EventPropagation 
-                 filterActions(PlayerAction action, const unsigned int value,
+                 filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                Input::InputType type, int playerId);
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
                        const int playerID);

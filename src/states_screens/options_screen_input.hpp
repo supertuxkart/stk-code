@@ -65,6 +65,12 @@ public:
      */
     void rebuildDeviceList();
 
+    /** \brief Override callback from base class */
+    virtual GUIEngine::EventPropagation filterActions(PlayerAction action,
+                                                      int deviceID,
+                                                      const unsigned int value,
+                                                      Input::InputType type,
+                                                      int playerId);
 };
 
 #endif

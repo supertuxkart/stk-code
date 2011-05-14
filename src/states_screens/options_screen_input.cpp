@@ -244,3 +244,44 @@ void OptionsScreenInput::unloaded()
     m_icon_bank = NULL;
 }   // unloaded
 
+// -----------------------------------------------------------------------------
+
+EventPropagation OptionsScreenInput::filterActions(PlayerAction action, int deviceID,
+                                                   const unsigned int value,
+                                                   Input::InputType type, int playerId)
+{
+    /*
+    if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
+    {
+        GamePadDevice* gamepad = input_manager->getDeviceList()->getGamePadFromIrrID(deviceID);
+        if (gamepad != NULL && gamepad->getConfiguration() != NULL)
+        {
+            //printf("'%s'\n", gamepad->getConfiguration()->getName().c_str());
+            
+            ListWidget* devices = this->getWidget<ListWidget>("devices");
+            assert(devices != NULL);
+            
+            std::string internal_name;
+            const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
+            for (int i = 0; i < gpad_config_count; i++)
+            {
+                GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
+                
+                // Don't display the configuration if a matching device is not available
+                if (config == gamepad->getConfiguration())
+                {
+                    std::ostringstream gpname;
+                    gpname << "gamepad" << i;
+                    internal_name = gpname.str();
+                }
+            }
+
+            if (internal_name.size() > 0)
+            {
+                devices->markItemRed(internal_name.c_str(), value > Input::MAX_VALUE*2/3);
+            }
+        }
+    }
+     */
+    return EVENT_LET;
+}

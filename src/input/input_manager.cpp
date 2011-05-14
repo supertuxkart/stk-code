@@ -552,7 +552,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
                 }
                 
                 // all is good, pass the translated input event on to the event handler
-                GUIEngine::EventHandler::get()->processGUIAction(action, abs(value), type, playerID);
+                GUIEngine::EventHandler::get()->processGUIAction(action, deviceID, abs(value), type, playerID);
             }
         }
     }

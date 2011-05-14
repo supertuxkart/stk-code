@@ -80,7 +80,7 @@ namespace GUIEngine
          * and this action needs to be applied to the GUI (e.g. fire pressed, left
          * pressed, etc.) this method is called back by the input module.
          */
-        void processGUIAction(const PlayerAction action, const unsigned int value,
+        void processGUIAction(const PlayerAction action, int deviceID, const unsigned int value,
                               Input::InputType type, const int playerID);
         
         /** singleton access */

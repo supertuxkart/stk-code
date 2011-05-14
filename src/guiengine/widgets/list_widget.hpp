@@ -149,17 +149,17 @@ namespace GUIEngine
           * \brief Make an item red to mark an error, for instance
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void markItemRed(const int id);
+        void markItemRed(const int id, bool red=true);
         
         /**
           * \brief Make an item red to mark an error, for instance
           * \pre may only be called after the widget has been added to the screen with add()
           */        
-        void markItemRed(const std::string internalName)
+        void markItemRed(const std::string internalName, bool red=true)
         {
             const int id = getItemID(internalName);
             assert(id != -1);
-            markItemRed( id );
+            markItemRed( id, red );
         }
     };
 }

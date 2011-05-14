@@ -247,15 +247,23 @@ int ListWidget::getItemID(const std::string internalName) const
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::markItemRed(const int id)
+void ListWidget::markItemRed(const int id, bool red)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
     
     IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
     
-    irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );
-    irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,0,0) );
+    if (red)
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,0,0) );
+    }
+    else
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,0) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+    }
 }
 
 // -----------------------------------------------------------------------------
