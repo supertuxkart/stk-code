@@ -104,7 +104,7 @@ void AddonsLoading::beforeAddingWidgets()
     }
     else
         // Anything smaller just let it be 1 KB
-        unit=_("1 KB");
+        unit=_("%s KB", 1);
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
