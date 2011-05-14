@@ -69,13 +69,20 @@ void TracksScreen::loadedFromFile()
         }
     }
     
+    // Make group names being picked up by gettext
+#define IGNORE(x)
+    //I18N: kart group name
+    IGNORE( _("standard") )
+    //I18N: kart group name
+    IGNORE( _("Add-Ons") )
+    
     // add others after
     for (int n=0; n<group_amount; n++)
     {
         if (groups[n] != DEFAULT_GROUP_NAME)
         {
-            // FIXME: group name is not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
+            // try to translate the group name
+            tabs->addTextChild( _(groups[n].c_str()), groups[n] );
         }
     }
     
