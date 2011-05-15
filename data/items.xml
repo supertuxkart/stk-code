@@ -7,6 +7,6 @@
   <!-- While a bubble gum technically 
        isn't an item, it is internally 
        handled as one, so list it here    -->
-  <bubblegum   model="bubblegum.b3d"       />
+  <bubblegum   model="bubblegum.b3d"       lowmodel="bubblegum-low.b3d"       />
 </items>
 
