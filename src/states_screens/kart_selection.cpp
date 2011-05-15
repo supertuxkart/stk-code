@@ -892,11 +892,11 @@ void KartSelectionScreen::beforeAddingWidget()
     }   // for n<group_amount
     
     // Make group names being picked up by gettext
-#define IGNORE(x)
+#define FOR_GETTEXT_ONLY(x)
     //I18N: kart group name
-    IGNORE( _("standard") )
+    FOR_GETTEXT_ONLY( _("standard") )
     //I18N: kart group name
-    IGNORE( _("Add-Ons") )
+    FOR_GETTEXT_ONLY( _("Add-Ons") )
     
     // add others after
     for (int n=0; n<group_amount; n++)
