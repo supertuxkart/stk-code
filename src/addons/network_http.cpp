@@ -380,7 +380,9 @@ bool NetworkHttp::downloadFileInternal(Request *request)
     {
         if(UserConfigParams::logAddons())
             printf("[addons] Download successful.\n");
-
+        // The behaviour of rename is unspecified if the target 
+        // file should already exist - so remove it.
+        file_manager->removeFile(full_save);
         int ret = rename((full_save+".part").c_str(), full_save.c_str());
         // In case of an error, set the status to indicate this
         if(ret!=0)
@@ -484,6 +486,8 @@ int NetworkHttp::progressDownload(void *clientp,
     {
         if(UserConfigParams::logAddons())
             printf("[addons] Aborting download in progress.\n");
+        // Reset abort flag so that the next download will work as expected.
+        network_http->m_abort.set(false);
         return 1;
     }
     float f;
