@@ -22,6 +22,7 @@
 
 #include "audio/sfx_openal.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "race/race_manager.hpp"
 #include <assert.h>
 #include <stdio.h>
 #include <string>
@@ -229,7 +230,12 @@ void SFXOpenAL::position(const Vec3 &position)
     }
     if (!m_positional)
     {
-        fprintf(stderr, "WARNING, position called on non-positional SFX\n");
+        // in multiplayer, all sounds are positional, so in this case don't bug users with
+        // an error messageif (race_manager->getNumLocalPlayers() > 1)
+        if (race_manager->getNumLocalPlayers() == 1)
+        {
+            fprintf(stderr, "WARNING, position called on non-positional SFX\n");
+        }
         return;
     }
 
