@@ -144,15 +144,6 @@ void DynamicRibbonWidget::add()
                                                average_y - button_h/2,
                                                m_x + m_w,
                                                average_y + button_h/2);
-    /*
-    stringw  rmessage = ">>";
-    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID());//, rmessage.c_str(), L"");
-    right_arrow->setTabStop(false);
-    right_arrow->setImage( GUIEngine::getSkin()->getImage("right_arrow::neutral")  );
-    right_arrow->setScaleImage(true);
-    right_arrow->setUseAlphaChannel(true);
-     */
-    //m_right_widget->m_element = right_arrow;
     m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
     m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
     m_right_widget->m_w = right_arrow_location.getWidth();
@@ -160,7 +151,6 @@ void DynamicRibbonWidget::add()
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
-    //m_right_widget->m_id = right_arrow->getID();
     m_right_widget->setImage(GUIEngine::getSkin()->getImage("right_arrow::neutral"));
     m_right_widget->add();
     m_right_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("right_arrow::focus"));
@@ -173,12 +163,6 @@ void DynamicRibbonWidget::add()
                                               m_x + m_arrows_w,
                                               average_y + button_h/2);
     stringw  lmessage = "<<";
-    //IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID()); //, lmessage.c_str(), L"");
-    //left_arrow->setTabStop(false);
-    //left_arrow->setImage( GUIEngine::getSkin()->getImage("left_arrow::neutral") );
-    //left_arrow->setScaleImage(true);
-    //left_arrow->setUseAlphaChannel(true);
-    //m_left_widget->m_element = left_arrow;
     m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
     m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
     m_left_widget->m_w = left_arrow_location.getWidth();
@@ -186,7 +170,6 @@ void DynamicRibbonWidget::add()
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
-    //m_left_widget->m_id = left_arrow->getID();
     m_left_widget->setImage( GUIEngine::getSkin()->getImage("left_arrow::neutral") );
     m_left_widget->add();
     m_left_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("left_arrow::focus"));
