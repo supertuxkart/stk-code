@@ -144,10 +144,12 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     {
         if (type == RaceManager::KT_PLAYER)
         {
-            m_goo_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
-            m_skid_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
-            m_crash_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
-            m_beep_sound->volume( 1.0f / race_manager->getNumLocalPlayers() );
+            // players have louder sounds than AIs
+            const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
+            m_goo_sound->volume( 1.0f / factor );
+            m_skid_sound->volume( 1.0f / factor );
+            m_crash_sound->volume( 1.0f / factor );
+            m_beep_sound->volume( 1.0f / factor );
         }
         else
         {

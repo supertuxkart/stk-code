@@ -232,9 +232,6 @@ void Powerup::use()
         // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
         if (race_manager->getNumLocalPlayers() > 1)
         {
-            const int np = race_manager->getNumLocalPlayers();
-            const int nai = race_manager->getNumberOfKarts() - np;
-            
             // player karts played at full volume; AI karts much dimmer
             
             if (m_owner->getController()->isPlayerController())
@@ -243,7 +240,7 @@ void Powerup::use()
             }
             else
             {
-                m_sound_use->volume( 1.0f / nai );
+                m_sound_use->volume( std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
             }
         }
         
