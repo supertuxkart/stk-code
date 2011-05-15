@@ -79,7 +79,12 @@ void ItemManager::removeTextures()
     {
         i->second->drop();
     }
+    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
+    {
+        i->second->drop();
+    }
     m_all_meshes.clear();
+    m_all_low_meshes.clear();
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
@@ -90,6 +95,12 @@ ItemManager::~ItemManager()
         i->second->drop();
     }
     m_all_meshes.clear();
+    
+    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
+    {
+        i->second->drop();
+    }
+    m_all_low_meshes.clear();
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
@@ -106,10 +117,19 @@ void ItemManager::loadDefaultItems()
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
         const XMLNode *node = root->getNode(item_names[i]);
-        std::string model_filename;
+        std::string model_filename, lowres_model_filename;
         if (node)
+        {
             node->get("model", &model_filename);
+            node->get("lowmodel", &lowres_model_filename);
+        }
+        
         scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
+        scene::IMesh *lowres_mesh = NULL;
+        
+        if (lowres_model_filename.size() > 0)
+            lowres_mesh = irr_driver->getMesh(lowres_model_filename);
+        
         if(!node || model_filename.size()==0 || !mesh)
         {
             fprintf(stderr, "Item model '%s' in items.xml could not be loaded - aborting",
@@ -118,9 +138,14 @@ void ItemManager::loadDefaultItems()
         }
         std::string shortName =
             StringUtils::getBasename(StringUtils::removeExtension(model_filename));
-        m_all_meshes[shortName] = mesh;
-        m_item_mesh[i]          = mesh;
+        m_all_meshes[shortName]     = mesh;
+        m_item_mesh[i]              = mesh;
+        m_item_lowres_mesh[i]       = lowres_mesh;
         mesh->grab();
+        
+        if (lowres_mesh != NULL)
+            m_all_low_meshes[shortName] = lowres_mesh;
+        if (lowres_mesh != NULL) lowres_mesh->grab();
     }   // for i
     delete root;
 }   // loadDefaultItems
@@ -143,12 +168,12 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 
     if(index==-1) index = m_all_items.size();
     Item* item;
-    item = new Item(type, xyz, normal, m_item_mesh[type], index);
+    item = new Item(type, xyz, normal, m_item_mesh[type], m_item_lowres_mesh[type], index);
     if(parent != NULL) item->setParent(parent);
     if(m_switch_time>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type]);
+        item->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
     }
     if(index<(int)m_all_items.size())
         m_all_items[index] = item;
@@ -293,7 +318,7 @@ void ItemManager::switchItems()
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_time<0)
-            (*i)->switchTo(new_type, m_item_mesh[(int)new_type]);
+            (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
         else
             (*i)->switchBack();
     }   // for m_all_items

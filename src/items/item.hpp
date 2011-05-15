@@ -30,6 +30,8 @@ using namespace irr;
 #include "karts/kart.hpp"
 #include "utils/no_copy.hpp"
 
+class LODNode;
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -79,10 +81,11 @@ private:
     float         m_time_till_return;
 
     /** Scene node of this item. */
-    scene::IMeshSceneNode *m_node;
+    LODNode *m_node;
 
     /** Stores the original mesh in order to reset it. */
     scene::IMesh *m_original_mesh;
+    scene::IMesh *m_original_lowmesh;
 
     /** The original position - saves calls to m_node->getPosition() 
      * and then converting this value to a Vec3. */
@@ -111,7 +114,7 @@ private:
     void          setType(ItemType type);
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
-                        scene::IMesh* mesh, unsigned int item_id);
+                        scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id);
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  collected(const Kart *kart, float t=2.0f);
@@ -159,7 +162,7 @@ public:
     // ------------------------------------------------------------------------
     void          setParent(Kart* parent);
     void          reset();
-    void          switchTo(ItemType type, scene::IMesh *mesh);
+    void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
     void          switchBack();
 };   // class Item
 

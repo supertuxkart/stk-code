@@ -42,9 +42,11 @@ private:
 
     /** This stores all item models. */
     scene::IMesh *m_item_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
+    scene::IMesh *m_item_lowres_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
 
     /** Stores all meshes for all items. */
     std::map<std::string,scene::IMesh*> m_all_meshes;
+    std::map<std::string,scene::IMesh*> m_all_low_meshes;
 
     std::string m_user_filename;
 

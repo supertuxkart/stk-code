@@ -20,6 +20,7 @@
 #include "items/item.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "karts/kart.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
@@ -28,7 +29,7 @@
 #include "utils/vec3.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           scene::IMesh* mesh, unsigned int item_id)
+           scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id)
 {
     setType(type);
     m_event_handler     = NULL;
@@ -43,8 +44,26 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_disappear_counter = m_type==ITEM_BUBBLEGUM 
                         ? stk_config->m_bubble_gum_counter
                         : -1 ;
-    m_original_mesh    = mesh;
-    m_node             = irr_driver->addMesh(mesh);
+    m_original_mesh     = mesh;
+    m_original_lowmesh  = lowres_mesh;
+    
+    LODNode* lodnode    = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager());
+    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh);
+    
+    if (lowres_mesh != NULL)
+    {
+        lodnode->add(35, meshnode, true);
+        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh);
+        lodnode->add(100, meshnode, true);
+    }
+    else
+    { 
+        lodnode->add(100, meshnode, true);
+    }
+    
+    m_node              = lodnode;
+    
+    //m_node             = irr_driver->addMesh(mesh);
 #ifdef DEBUG
     std::string debug_name("item: ");
     debug_name += m_type;
@@ -74,11 +93,19 @@ void Item::setType(ItemType type)
  *  \param type New type of this item.
  *  \param mesh Mesh to use to display this item.
  */
-void Item::switchTo(ItemType type, scene::IMesh *mesh)
+void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
     m_original_type = m_type;
     setType(type);
-    m_node->setMesh(mesh);
+    
+    scene::ISceneNode* node = m_node->getAllNodes()[0];
+    ((scene::IMeshSceneNode*)node)->setMesh(mesh);
+    if (lowmesh != NULL)
+    {
+        node = m_node->getAllNodes()[1];
+        ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
+    }
+    
     World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo
 
@@ -95,7 +122,15 @@ void Item::switchBack()
     
     setType(m_original_type);
     m_original_type = ITEM_NONE;
-    m_node->setMesh(m_original_mesh);
+    
+    scene::ISceneNode* node = m_node->getAllNodes()[0];
+    ((scene::IMeshSceneNode*)node)->setMesh(m_original_mesh);
+    if (m_original_lowmesh != NULL)
+    {
+        node = m_node->getAllNodes()[1];
+        ((scene::IMeshSceneNode*)node)->setMesh(m_original_lowmesh);
+    }
+    
     World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setRotation(m_original_hpr.toIrrHPR());
 }   // switchBack
@@ -174,6 +209,7 @@ void Item::update(float dt)
         core::vector3df r = m_node->getRotation();
         r.Y += dt*180.0f;
         if(r.Y>360.0f) r.Y -= 360.0f;
+        
         m_node->setRotation(r);
         return;
     }   // not m_collected

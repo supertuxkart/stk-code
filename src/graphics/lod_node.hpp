@@ -77,6 +77,8 @@ public:
     /** Get the highest level of detail node */
     scene::ISceneNode* getFirstNode() { return m_nodes[0]; }
     
+    std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
+    
     virtual void OnRegisterSceneNode();
     virtual void render();
     

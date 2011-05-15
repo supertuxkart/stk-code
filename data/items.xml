@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <items>
-  <bonus-box   model="gift-box.b3d"        />
-  <banana      model="banana.b3d"          />
-  <nitro-big   model="nitrotank-big.b3d"   />
-  <nitro-small model="nitrotank-small.b3d" />
+  <bonus-box   model="gift-box.b3d"        lowmodel="gift-box-low.b3d"        />
+  <banana      model="banana.b3d"          lowmodel="banana-low.b3d"          />
+  <nitro-big   model="nitrotank-big.b3d"   lowmodel="nitrotank-big-low.b3d"   />
+  <nitro-small model="nitrotank-small.b3d" lowmodel="nitrotank-small-low.b3d" />
   <!-- While a bubble gum technically 
        isn't an item, it is internally 
        handled as one, so list it here    -->
