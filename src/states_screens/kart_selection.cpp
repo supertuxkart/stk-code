@@ -1846,7 +1846,7 @@ EventPropagation FocusDispatcher::focused(const int playerID)
         }
     }
     
-    std::cerr << "[KartSelectionScreen] WARNING: the focus dispatcher can't find the widget for player " << playerID << "!\n";
+    //std::cerr << "[KartSelectionScreen] WARNING: the focus dispatcher can't find the widget for player " << playerID << "!\n";
     //assert(false);
     return GUIEngine::EVENT_LET;        
 }
