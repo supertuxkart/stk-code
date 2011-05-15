@@ -227,6 +227,26 @@ void Powerup::use()
     case PowerupManager::POWERUP_PLUNGER:
         
         m_sound_use->position(m_owner->getXYZ());
+        
+        // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
+        // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
+        if (race_manager->getNumLocalPlayers() > 1)
+        {
+            const int np = race_manager->getNumLocalPlayers();
+            const int nai = race_manager->getNumberOfKarts() - np;
+            
+            // player karts played at full volume; AI karts much dimmer
+            
+            if (m_owner->getController()->isPlayerController())
+            {
+                m_sound_use->volume( 1.0f );
+            }
+            else
+            {
+                m_sound_use->volume( 1.0f / nai );
+            }
+        }
+        
         m_sound_use->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
@@ -245,6 +265,26 @@ void Powerup::use()
         if(!material_hit)
             return;
         normal.normalize();
+        
+        // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
+        // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
+        if (race_manager->getNumLocalPlayers() > 1)
+        {
+            const int np = race_manager->getNumLocalPlayers();
+            const int nai = race_manager->getNumberOfKarts() - np;
+            
+            // player karts played at full volume; AI karts much dimmer
+            
+            if (m_owner->getController()->isPlayerController())
+            {
+                m_sound_use->volume( 1.0f );
+            }
+            else
+            {
+                m_sound_use->volume( 1.0f / nai );
+            }
+        }
+        
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
         
