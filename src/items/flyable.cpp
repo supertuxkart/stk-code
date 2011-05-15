@@ -259,7 +259,8 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-tProjectile.getOrigin();
-        float distance2 = delta.length2();
+        // the Y distance is added again because karts above or below should not be prioritized when aiming
+        float distance2 = delta.length2() + abs(t.getOrigin().getY() - tProjectile.getOrigin().getY())*2;
 
         if(inFrontOf != NULL)
         {
