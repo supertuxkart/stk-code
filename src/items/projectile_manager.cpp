@@ -85,7 +85,7 @@ void ProjectileManager::update(float dt)
             if(! (*p)->hasHit()) { p++; continue; }
             if((*p)->needsExplosion())
             {
-                newExplosion((*p)->getXYZ(), (*p)->getExplosionSound() );
+                newExplosion((*p)->getXYZ(), (*p)->getExplosionSound(), false );
             }
             Flyable *f=*p;
             Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
@@ -187,9 +187,10 @@ Flyable *ProjectileManager::newProjectile(Kart *kart,
 /** See if there is an old, unused explosion object available. If so,
  *  reuse this object, otherwise create a new one. */
 Explosion* ProjectileManager::newExplosion(const Vec3& coord, 
-                                           const char* explosion_sound)
+                                           const char* explosion_sound,
+                                           bool player_kart_hit)
 {
-    Explosion *e = new Explosion(coord, explosion_sound);
+    Explosion *e = new Explosion(coord, explosion_sound, player_kart_hit);
     m_active_explosions.push_back(e);
     return e;
 }   // newExplosion

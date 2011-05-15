@@ -38,10 +38,11 @@ class Explosion : public NoCopy
 private:
     SFXBase*       m_explode_sound;
     float          m_remaining_time;
+    bool           m_player_kart_hit;
     scene::IParticleSystemSceneNode   *m_node;
-        
+    
 public:
-         Explosion(const Vec3& coord, const char* explosion_sound);
+         Explosion(const Vec3& coord, const char* explosion_sound, bool player_hit);
         ~Explosion();
     void init     (const Vec3& coord);
     void update   (float delta_t);

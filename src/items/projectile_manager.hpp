@@ -72,7 +72,8 @@ public:
     Flyable*         newProjectile    (Kart *kart, 
                                        PowerupManager::PowerupType type);
     Explosion*       newExplosion     (const Vec3& coord, 
-                                       const char* explosion_sound="explosion");
+                                       const char* explosion_sound="explosion",
+                                       bool is_player_kart_hit = false);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
 };

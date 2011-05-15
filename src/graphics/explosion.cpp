@@ -25,14 +25,17 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
 
 const float burst_time = 0.1f;
 
-Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
+Explosion::Explosion(const Vec3& coord, const char* explosion_sound, bool player_kart_hit)
 {    
     m_remaining_time = burst_time; // short emision time, explosion, not constant flame
     m_node = irr_driver->addParticleNode();
+    m_player_kart_hit = player_kart_hit;
+    
 #ifdef DEBUG
     m_node->setName("explosion");
 #endif
@@ -89,6 +92,17 @@ Explosion::~Explosion()
 void Explosion::init(const Vec3& coord)
 {
     m_explode_sound->position(coord);
+    
+    // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
+    // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
+    if (race_manager->getNumLocalPlayers() > 1)
+    {
+        m_explode_sound->volume(m_player_kart_hit ? 1.0f : 0.5f);
+    }
+    else
+    {
+        m_explode_sound->volume(1.0f);
+    }
     m_explode_sound->play();
 }   // init
 
