@@ -33,6 +33,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
 {
     m_label = NULL;
     m_texture = NULL;
+    m_highlight_texture = NULL;
     m_custom_aspect_ratio = 1.0f;
 
     m_tab_stop = tab_stop;
@@ -45,14 +46,17 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
 void IconButtonWidget::add()
 {
     // ---- Icon
-    if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+    if (m_texture == NULL)
     {
-        m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
-    }
-    else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
-    {
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
-                                            m_properties[PROP_ICON]).c_str());
+        if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+        {
+            m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
+        }
+        else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
+        {
+            m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
+                                                m_properties[PROP_ICON]).c_str());
+        }
     }
     
     if (m_texture == NULL)
@@ -60,7 +64,6 @@ void IconButtonWidget::add()
         std::cerr << "IconButtonWidget::add() : error, cannot find texture "
                   << m_properties[PROP_ICON].c_str() << std::endl;
         m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
-        return;
     }
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;

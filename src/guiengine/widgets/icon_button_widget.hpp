@@ -57,6 +57,8 @@ namespace GUIEngine
         
         irr::gui::IGUIStaticText* m_label;
         irr::video::ITexture* m_texture;
+        irr::video::ITexture* m_highlight_texture;
+
         int m_texture_w, m_texture_h;
         
         ScaleMode m_scale_mode;
@@ -107,6 +109,11 @@ namespace GUIEngine
           * \note May safely be called no matter if the widget is add()ed or not
           */
         void setImage(irr::video::ITexture* texture);
+        
+        void setHighlightedImage(irr::video::ITexture* texture)
+        {
+            m_highlight_texture = texture;
+        }
     };
 }
 

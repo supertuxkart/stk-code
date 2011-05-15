@@ -2,6 +2,7 @@
 
 Glass skin by Marianne Gagnon, released under creative-commons BY-SA 3.0+
 Except background.jpg, by elisee
+Except left_arrow and right_arrow by Dakal
 
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
@@ -170,6 +171,11 @@ when the border that intersect at this corner are enabled.
 <element type="scrollbar_thumb"               image="glass/scrollbar_thumb.png" />
 <element type="scrollbar_button"              image="glass/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="glass/scrollbar_btn_down.png" />
+
+<element type="left_arrow"  state="neutrual" image="glass/left_arrow.png" />
+<element type="right_arrow" state="neutrual" image="glass/right_arrow.png" />
+<element type="left_arrow"  state="focus"    image="glass/left_arrow_focus.png" />
+<element type="right_arrow" state="focus"    image="glass/right_arrow_focus.png" />
 
 <!-- Stateless -->
 <element type="section" image="glass/glass_section.png"

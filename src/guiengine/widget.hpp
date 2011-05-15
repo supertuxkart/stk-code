@@ -636,6 +636,8 @@ namespace GUIEngine
         /**
          * \}
          */
+        
+        bool ok() const { return (m_magic_number == 0xCAFEC001); }
     };
 
     

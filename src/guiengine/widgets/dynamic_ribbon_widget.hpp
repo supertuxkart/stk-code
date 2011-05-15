@@ -28,6 +28,8 @@
 
 namespace GUIEngine
 {
+    class IconButtonWidget;
+    
     /**
      * Even if you have a ribbon that only acts on click/enter, you may wish to know which
      * item is currently highlighted. In this case, create a listener and pass it to the ribbon.
@@ -129,8 +131,8 @@ namespace GUIEngine
         bool m_combo;
         
         /* reference pointers only, the actual instances are owned by m_children */
-        Widget* m_left_widget;
-        Widget* m_right_widget;
+        IconButtonWidget* m_left_widget;
+        IconButtonWidget* m_right_widget;
         
         /** Returns the currently selected row */
         RibbonWidget* getSelectedRibbon(const int playerID);

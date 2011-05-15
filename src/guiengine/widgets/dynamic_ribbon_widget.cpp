@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
@@ -131,11 +132,11 @@ void DynamicRibbonWidget::add()
         delete m_left_widget;
         delete m_right_widget;
     }
-    m_left_widget  = new Widget(WTYPE_NONE);
-    m_right_widget = new Widget(WTYPE_NONE);
+    m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
+    m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
     
     const int average_y = m_y + (m_h - m_label_height)/2;
-    m_arrows_w = 30;
+    m_arrows_w = 40;
     const int button_h = 50;
     
     // right arrow
@@ -143,14 +144,27 @@ void DynamicRibbonWidget::add()
                                                average_y - button_h/2,
                                                m_x + m_w,
                                                average_y + button_h/2);
+    /*
     stringw  rmessage = ">>";
-    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID(), rmessage.c_str(), L"");
+    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID());//, rmessage.c_str(), L"");
     right_arrow->setTabStop(false);
-    m_right_widget->m_element = right_arrow;
+    right_arrow->setImage( GUIEngine::getSkin()->getImage("right_arrow::neutral")  );
+    right_arrow->setScaleImage(true);
+    right_arrow->setUseAlphaChannel(true);
+     */
+    //m_right_widget->m_element = right_arrow;
+    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
+    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
+    m_right_widget->m_w = right_arrow_location.getWidth();
+    m_right_widget->m_h = right_arrow_location.getHeight();
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
-    m_right_widget->m_id = right_arrow->getID();
+    //m_right_widget->m_id = right_arrow->getID();
+    m_right_widget->setImage(GUIEngine::getSkin()->getImage("right_arrow::neutral"));
+    m_right_widget->add();
+    m_right_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("right_arrow::focus"));
+
     m_children.push_back( m_right_widget );
     
     // left arrow
@@ -159,15 +173,30 @@ void DynamicRibbonWidget::add()
                                               m_x + m_arrows_w,
                                               average_y + button_h/2);
     stringw  lmessage = "<<";
-    IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID(), lmessage.c_str(), L"");
-    left_arrow->setTabStop(false);
-    m_left_widget->m_element = left_arrow;
+    //IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID()); //, lmessage.c_str(), L"");
+    //left_arrow->setTabStop(false);
+    //left_arrow->setImage( GUIEngine::getSkin()->getImage("left_arrow::neutral") );
+    //left_arrow->setScaleImage(true);
+    //left_arrow->setUseAlphaChannel(true);
+    //m_left_widget->m_element = left_arrow;
+    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
+    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
+    m_left_widget->m_w = left_arrow_location.getWidth();
+    m_left_widget->m_h = left_arrow_location.getHeight();
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
-    m_left_widget->m_id = left_arrow->getID();
+    //m_left_widget->m_id = left_arrow->getID();
+    m_left_widget->setImage( GUIEngine::getSkin()->getImage("left_arrow::neutral") );
+    m_left_widget->add();
+    m_left_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("left_arrow::focus"));
+
     m_children.push_back( m_left_widget );
     
+    assert( m_left_widget->ok() );
+    assert( m_right_widget->ok() );
+    m_left_widget->m_element->setVisible(true);
+
     // ---- Determine number of rows
     
     // Find children size (and ratio)
@@ -251,6 +280,10 @@ void DynamicRibbonWidget::add()
         m_row_amount = 1;
     }
     
+    assert( m_left_widget->ok() );
+    assert( m_right_widget->ok() );
+    m_left_widget->m_element->setVisible(true);
+    
     // get and build a list of IDs (by now we may not yet know everything about items,
     // but we need to get IDs *now* in order for tabbing to work.
     m_ids.resize(m_row_amount);
@@ -281,11 +314,14 @@ void DynamicRibbonWidget::buildInternalStructure()
     }
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
     
+    m_left_widget->m_element->setVisible(true);
+    assert( m_left_widget->ok() );
+    assert( m_right_widget->ok() );
+    
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
     m_col_amount = (int)round( m_w / ( m_child_width*ratio_zoom ) );
-    
     
     // ajust column amount to not add more item slots than we actually need
     const int item_count = m_items.size();
@@ -295,7 +331,10 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
         //std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
-        
+    
+    assert( m_left_widget->ok() );
+    assert( m_right_widget->ok() );
+    
     // Hide arrows when everything is visible
     if (item_count <= m_row_amount*m_col_amount)
     {

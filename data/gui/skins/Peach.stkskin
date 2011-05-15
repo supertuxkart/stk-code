@@ -171,6 +171,11 @@ when the border that intersect at this corner are enabled.
 <element type="scrollbar_button"              image="peach/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="peach/scrollbar_btn_down.png" />
 
+<element type="left_arrow"  state="neutral" image="peach/left_arrow.png" />
+<element type="right_arrow" state="neutral" image="peach/right_arrow.png" />
+<element type="left_arrow"  state="focus"   image="peach/left_arrow_focus.png" />
+<element type="right_arrow" state="focus"   image="peach/right_arrow_focus.png" />
+
 <!-- Stateless -->
 <element type="section" image="peach/glass_section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"

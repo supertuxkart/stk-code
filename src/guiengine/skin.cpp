@@ -1174,7 +1174,15 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
     }
     else
     {
-        GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
+        video::ITexture* t = icon_widget->m_texture;
+        
+        const bool mouseInside = rect.isPointInside(irr_driver->getDevice()->getCursorControl()->getPosition());
+        if (icon_widget->m_highlight_texture != NULL && (focused || mouseInside))
+        {
+            t = icon_widget->m_highlight_texture;
+        }
+        
+        GUIEngine::getDriver()->draw2DImage(t, sized_rect,
                                             core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
                                             0 /* no clipping */, 0, true /* alpha */);
     }
@@ -1830,6 +1838,14 @@ void Skin::draw3DTabButton (IGUIElement *element, bool active, const core::rect<
 
 void Skin::draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
+}
+
+// -----------------------------------------------------------------------------
+
+ITexture* Skin::getImage(const char* name)
+{
+    BoxRenderParams& p = SkinConfig::m_render_params[name];
+    return p.getImage();
 }
 
 // -----------------------------------------------------------------------------

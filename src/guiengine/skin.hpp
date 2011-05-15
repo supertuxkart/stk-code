@@ -325,6 +325,8 @@ namespace GUIEngine
         
         void drawTooltips();
         
+        irr::video::ITexture* getImage(const char* name);
+
         static irr::video::SColor getColor(const std::string name);
 
     };
