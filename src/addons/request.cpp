@@ -30,6 +30,7 @@ Request::Request(HttpCommands command, int priority, bool manage_memory)
     m_full_path     = "";
     m_manage_memory = manage_memory;
     m_icon_addon    = NULL;
+    m_cancel        = false;
     m_progress.set(0);
 }   // Request
 
@@ -44,6 +45,7 @@ Request::Request(HttpCommands command, int priority, bool manage_memory,
     m_full_path     = save;
     m_icon_addon    = NULL;
     m_manage_memory = manage_memory;
+    m_cancel        = false;
     m_progress.set(0);
 }   // Request
 

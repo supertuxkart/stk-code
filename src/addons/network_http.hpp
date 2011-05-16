@@ -53,6 +53,9 @@ private:
     /** The list of pointes to all requests. */
     Synchronised< std::vector<Request*> >  m_all_requests;
 
+    /** The current requested being worked on. */
+    Request                  *m_current_request;
+
     /** A conditional variable to wake up the main loop. */
     pthread_cond_t            m_cond_request;
 
@@ -82,7 +85,7 @@ public:
                                         const std::string &save = "",
                                         int   priority = 1,
                                         bool  manage_memory=true);
-    void          cancelDownload();
+    void          cancelAllDownloads();
 };   // NetworkHttp
 
 extern NetworkHttp *network_http;

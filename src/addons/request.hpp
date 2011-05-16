@@ -53,6 +53,8 @@ private:
     /** The priority of this request. The higher the value the more
     important this request is. */
     int                 m_priority;
+    /** Cancel this request if it is active. */
+    bool                m_cancel;
     /** The actual command to use. */
     HttpCommands        m_command;
 
@@ -94,6 +96,12 @@ public:
     // --------------------------------------------------------------------
     /** Used in sorting requests by priority. */
     bool operator<(const Request &r) { return r.m_priority < m_priority;}
+    // --------------------------------------------------------------------
+    /** Signals that this request should be cancelled. */
+    void cancel() { m_cancel = true; }
+    // --------------------------------------------------------------------
+    /** Returns if this request is to be cancelled. */
+    bool isCancelled() const { return m_cancel; }
     // --------------------------------------------------------------------
     /** Returns if the memory for this object should be managed by
     *  by network_http (i.e. freed once the request is handled). */

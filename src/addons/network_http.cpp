@@ -64,6 +64,7 @@ NetworkHttp *network_http=NULL;
  */
 NetworkHttp::NetworkHttp() : m_abort(false),
                              m_thread_id(NULL),
+                             m_current_request(NULL),
                              m_all_requests(std::vector<Request*>())
 {
     // Don't even start the network threads if networking is disabled.
@@ -104,8 +105,8 @@ void NetworkHttp::startNetworkThread()
     {
         m_thread_id.lock();
         delete m_thread_id.getData();
-        m_thread_id.set(0);
         m_thread_id.unlock();
+        m_thread_id.set(0);
         printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
@@ -122,8 +123,9 @@ void *NetworkHttp::mainLoop(void *obj)
     NetworkHttp *me=(NetworkHttp*)obj;
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
+    me->m_current_request = NULL;
     me->m_all_requests.lock();
     while(me->m_all_requests.getData().size()           == 0               ||
           me->m_all_requests.getData()[0]->getCommand() != Request::HC_QUIT   )
@@ -144,42 +146,53 @@ void *NetworkHttp::mainLoop(void *obj)
         // Get the first (=highest priority) request and remove it from the 
         // queue. Only this code actually removes requests from the queue,
         // so it is certain that even 
-        Request *request = me->m_all_requests.getData()[0];
+        me->m_current_request = me->m_all_requests.getData()[0];
         me->m_all_requests.getData().erase(me->m_all_requests.getData().begin());
         me->m_all_requests.unlock();
         if(UserConfigParams::logAddons())
         {
-            if(request->getCommand()==Request::HC_DOWNLOAD_FILE)
+            if(me->m_current_request->getCommand()==Request::HC_DOWNLOAD_FILE)
                 printf("[addons] Executing download '%s' to '%s' priority %d.\n",
-                       request->getURL().c_str(), request->getSavePath().c_str(),
-                       request->getPriority());
+                       me->m_current_request->getURL().c_str(), 
+                       me->m_current_request->getSavePath().c_str(),
+                       me->m_current_request->getPriority());
             else
                 printf("[addons] Executing command '%d' priority %d.\n",
-                       request->getCommand(), request->getPriority()); 
+                       me->m_current_request->getCommand(), 
+                       me->m_current_request->getPriority()); 
         }
-        if(request->getCommand()==Request::HC_QUIT)
+        if(me->m_current_request->getCommand()==Request::HC_QUIT)
             break;
-        switch(request->getCommand())
+        switch(me->m_current_request->getCommand())
         {
         case Request::HC_QUIT:                break;
         case Request::HC_INIT: me->init();    break;            
         case Request::HC_NEWS: assert(false); break;
         case Request::HC_DOWNLOAD_FILE:
-             me->downloadFileInternal(request);
+             me->downloadFileInternal(me->m_current_request);
              break;
         }   // switch(request->getCommand())
 
-        if(request->manageMemory())
-            delete request;
+        if(me->m_current_request->manageMemory())
+        {
+            delete me->m_current_request;
+            me->m_current_request = NULL;
+        }
         // We have to lock here so that we can access m_all_requests
         // in the while condition at the top of the loop
         me->m_all_requests.lock();
     }   // while !quit
     if(UserConfigParams::logAddons())
-        printf("[addons] Network thread terminating.\n");
+        printf("[addons] Network thread waiting to be cancelled.\n");
 
-    me->m_thread_id.set(0);
-    return NULL;
+    // If  the thread would exit here, it would be a lot more complicated for
+    // the main thread (which deletes this object) to detect this - locking
+    // a mutex (e.g. to signal the main thread when this object is finished)
+    // leads to a race condition since a thread waiting for a mutex apparently
+    // can't be cancelled, resulting in a deadlock. 
+    while(1)
+        pthread_testcancel();
+    return 0;
 }   // mainLoop
 
 // ---------------------------------------------------------------------------
@@ -199,7 +212,7 @@ void NetworkHttp::stopNetworkThread()
     // and we couldn't finish STK. This way we request an abort of
     // a download, which mean we can get the mutex and ask the service
     // thread here to cancel properly.
-    cancelDownload();
+    cancelAllDownloads();
 
     Request *r = new Request(Request::HC_QUIT, 9999);
     if(UserConfigParams::logAddons())
@@ -409,12 +422,12 @@ bool NetworkHttp::downloadFileInternal(Request *request)
  *  cancelled. This function can also be called if there is actually no 
  *  download atm. The function progressDownload checks m_abort and will 
  *  return a non-zero value which causes libcurl to abort. */
-void NetworkHttp::cancelDownload() 
+void NetworkHttp::cancelAllDownloads() 
 { 
     if(UserConfigParams::logAddons())
         printf("[addons] Requesting cancellation of download.\n");
     m_abort.set(true); 
-}   // cancelDownload
+}   // cancelAllDownload
 
 // ----------------------------------------------------------------------------
 /** External interface to download a file asynchronously. This will wake up 
@@ -482,14 +495,25 @@ int NetworkHttp::progressDownload(void *clientp,
     Request *request = (Request *)clientp;
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
-    if(network_http->m_abort.get())
+    if(network_http->m_abort.get() || request->isCancelled() )
     {
         if(UserConfigParams::logAddons())
-            printf("[addons] Aborting download in progress.\n");
-        // Reset abort flag so that the next download will work as expected.
-        network_http->m_abort.set(false);
+        {
+            if(network_http->m_abort.get())
+            {
+                // Reset abort flag so that the next download will work 
+                // as expected.
+                network_http->m_abort.set(false);
+                printf("[addons] Global abort of downloads.\n");
+            }
+            else
+                printf("[addons] Cancel this download.\n");
+        }
+        // Indicates to abort the current download, which means that this
+        // thread will go back to the mainloop and handle the next request.
         return 1;
     }
+
     float f;
     if(download_now < download_total)
     {
