@@ -98,7 +98,7 @@ void NetworkHttp::startNetworkThread()
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    m_thread_id.set(new pthread_t());
+    m_thread_id.setAtomic(new pthread_t());
     int error = pthread_create(m_thread_id.getData(), &attr, 
                                &NetworkHttp::mainLoop, this);
     if(error)
@@ -106,7 +106,7 @@ void NetworkHttp::startNetworkThread()
         m_thread_id.lock();
         delete m_thread_id.getData();
         m_thread_id.unlock();
-        m_thread_id.set(0);
+        m_thread_id.setAtomic(0);
         printf("[addons] Warning: could not create thread, error=%d.\n", errno);
     }
     pthread_attr_destroy(&attr);
@@ -426,7 +426,7 @@ void NetworkHttp::cancelAllDownloads()
 { 
     if(UserConfigParams::logAddons())
         printf("[addons] Requesting cancellation of download.\n");
-    m_abort.set(true); 
+    m_abort.setAtomic(true); 
 }   // cancelAllDownload
 
 // ----------------------------------------------------------------------------
@@ -495,15 +495,15 @@ int NetworkHttp::progressDownload(void *clientp,
     Request *request = (Request *)clientp;
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
-    if(network_http->m_abort.get() || request->isCancelled() )
+    if(network_http->m_abort.getAtomic() || request->isCancelled() )
     {
         if(UserConfigParams::logAddons())
         {
-            if(network_http->m_abort.get())
+            if(network_http->m_abort.getAtomic())
             {
                 // Reset abort flag so that the next download will work 
                 // as expected.
-                network_http->m_abort.set(false);
+                network_http->m_abort.setAtomic(false);
                 printf("[addons] Global abort of downloads.\n");
             }
             else

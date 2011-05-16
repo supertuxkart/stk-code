@@ -53,7 +53,7 @@ public:
     /** Sets the value of this variable using a mutex. 
      *  \param v Value to be set. 
      */
-    void set(const TYPE &v)
+    void setAtomic(const TYPE &v)
     {
         pthread_mutex_lock(&m_mutex);
         m_data = v;
@@ -63,7 +63,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a copy of this variable. 
      */
-    TYPE get() const 
+    TYPE getAtomic() const 
     {
         TYPE v;
         pthread_mutex_lock(&m_mutex);

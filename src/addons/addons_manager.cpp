@@ -128,7 +128,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
     }   // for i<xml->getNumNodes
     delete xml;
 
-    m_state.set(STATE_READY);
+    m_state.setAtomic(STATE_READY);
 
     downloadIcons();
 }   // initOnline
@@ -177,7 +177,7 @@ void *AddonsManager::downloadIcons()
  */
 bool AddonsManager::onlineReady()
 {
-    return m_state.get()==STATE_READY;
+    return m_state.getAtomic()==STATE_READY;
 }   // onlineReady
 
 // ----------------------------------------------------------------------------

@@ -89,10 +89,10 @@ public:
     int                getPriority() const { return m_priority; }
     // --------------------------------------------------------------------
     /** Returns the current progress. */
-    float getProgress() const { return m_progress.get(); }
+    float getProgress() const { return m_progress.getAtomic(); }
     // --------------------------------------------------------------------
     /** Sets the current progress. */
-    void setProgress(float f) { m_progress.set(f); }
+    void setProgress(float f) { m_progress.setAtomic(f); }
     // --------------------------------------------------------------------
     /** Used in sorting requests by priority. */
     bool operator<(const Request &r) { return r.m_priority < m_priority;}

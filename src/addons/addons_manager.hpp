@@ -59,7 +59,7 @@ public:
     void         initOnline(const XMLNode *xml);
     bool         onlineReady();
     /** Marks addon as not being available. */
-    void         setErrorState() { m_state.set(STATE_ERROR); }
+    void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
