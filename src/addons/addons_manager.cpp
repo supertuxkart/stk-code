@@ -150,6 +150,13 @@ void *AddonsManager::downloadIcons()
         {
             const std::string &url  = addon.getIconURL();
             const std::string &icon = addon.getIconBasename();
+            if(icon=="")
+            {
+                if(UserConfigParams::logAddons())
+                    printf("[addons] No icon or image specified for '%s'.\n",
+                           addon.getId());
+                continue;
+            }
             std::string save        = "icons/"+icon;
             Request *r = network_http->downloadFileAsynchron(url, save, 
                                                  /*priority*/1,
