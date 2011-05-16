@@ -118,8 +118,11 @@ GUIEngine::EventPropagation
     {
         // Cancel a download only if we are installing/upgrading one
         // (and not uninstalling an installed one):
-        if(!m_addon.isInstalled() || m_addon.needsUpdate())
-            network_http->cancelDownload();
+        if(m_download_request)
+        {
+            assert(m_download_request);
+            m_download_request->cancel();
+        }
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
