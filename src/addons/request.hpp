@@ -29,14 +29,12 @@ class Request
 {
 public:
     /** List of 'http commands' for this object:
-     *  HC_SLEEP: No command, sleep
      *  HC_INIT: Object is being initialised
      *  HC_DOWNLOAD_FILE : download a file
      *  HC_QUIT:  Stop loop and terminate thread.
      *  HC_NEWS:  Update the news
      */
-    enum HttpCommands {HC_SLEEP,
-                       HC_QUIT,
+    enum HttpCommands {HC_QUIT,
                        HC_INIT,
                        HC_DOWNLOAD_FILE,
                        HC_NEWS    };
