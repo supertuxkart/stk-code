@@ -77,9 +77,6 @@ void AddonsScreen::init()
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setIcons(m_icon_bank);
     
-    getWidget<GUIEngine::LabelWidget>("update_status")
-        ->setText(_("Updating the list..."), false);
-    
     m_type = "kart";
     loadList();
 }   // init
@@ -113,7 +110,6 @@ void AddonsScreen::loadList()
     }
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
-	getWidget<GUIEngine::LabelWidget>("update_status")->setText("", false);
 	if(m_type == "kart")
     	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart", 
                                                         PLAYER_ID_GAME_MASTER);
