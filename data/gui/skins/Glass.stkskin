@@ -2,7 +2,7 @@
 
 Glass skin by Marianne Gagnon, released under creative-commons BY-SA 3.0+
 Except background.jpg, by elisee
-Except left_arrow and right_arrow by Dakal
+Except left_arrow, right_arrow and list_sort_up by Dakal
 
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
@@ -176,6 +176,10 @@ when the border that intersect at this corner are enabled.
 <element type="right_arrow" state="neutrual" image="glass/right_arrow.png" />
 <element type="left_arrow"  state="focus"    image="glass/left_arrow_focus.png" />
 <element type="right_arrow" state="focus"    image="glass/right_arrow_focus.png" />
+
+<element type="list_header"  state="neutral" image="glass/table_header.png" />
+<element type="list_header"  state="down"    image="glass/table_header_down.png" />
+<element type="list_sort_up" state="neutral" image="glass/list_sort_up.png" />
 
 <!-- Stateless -->
 <element type="section" image="glass/glass_section.png"

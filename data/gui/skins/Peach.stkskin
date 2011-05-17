@@ -178,6 +178,7 @@ when the border that intersect at this corner are enabled.
 
 <element type="list_header"  state="neutral" image="peach/table_header.png" />
 <element type="list_sort_up" state="neutral" image="peach/list_sort_up.png" />
+<element type="list_header"  state="down"    image="peach/table_header_down.png" />
 
 <!-- Stateless -->
 <element type="section" image="peach/glass_section.png"

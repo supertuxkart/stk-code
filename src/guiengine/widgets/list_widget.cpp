@@ -35,6 +35,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
 {
     m_use_icons = false;
     m_icons = NULL;
+    m_listener = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -88,7 +89,7 @@ void ListWidget::add()
     {
         const int col_size = m_w / m_header.size();
         
-        for (int n=0; n<m_header.size(); n++)
+        for (unsigned int n=0; n<m_header.size(); n++)
         {
             std::ostringstream name;
             name << m_properties[PROP_ID];
@@ -322,6 +323,8 @@ EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, c
             m_header_elements[n].getIrrlichtElement<IGUIButton>()->setPressed(false);
         }
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
+        
+        if (m_listener) m_listener->onColumnClicked(col);
         
         return EVENT_BLOCK;
     }

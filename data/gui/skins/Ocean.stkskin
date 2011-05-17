@@ -176,6 +176,10 @@ when the border that intersect at this corner are enabled.
 <element type="left_arrow"  state="focus"   image="ocean/left_arrow_focus.png" />
 <element type="right_arrow" state="focus"   image="ocean/right_arrow_focus.png" />
 
+<element type="list_header"  state="neutral" image="ocean/table_header.png" />
+<element type="list_sort_up" state="neutral" image="ocean/list_sort_up.png" />
+<element type="list_header"  state="down"    image="ocean/table_header_down.png" />
+
 <!-- Stateless -->
 <element type="section" image="ocean/glass_section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"

@@ -30,6 +30,14 @@ namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
 namespace GUIEngine
 {
+    class IListWidgetHeaderListener
+    {
+    public:
+        virtual ~IListWidgetHeaderListener(){}
+        
+        virtual void onColumnClicked(int columnId) = 0;
+    };
+    
     /** \brief A vertical list widget with text entries
       * \ingroup widgets
       * \note items you add to a list are not kept after the the list is in was removed
@@ -55,6 +63,8 @@ namespace GUIEngine
         
         /** Leave empty for no header */
         std::vector< irr::core::stringw > m_header;
+        
+        IListWidgetHeaderListener* m_listener;
         
     public:
         ListWidget();
@@ -170,6 +180,12 @@ namespace GUIEngine
 
         /** Override callback from Widget */
         virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        
+        void setColumnListener(IListWidgetHeaderListener* listener)
+        {
+            if (m_listener) delete m_listener;
+            m_listener = listener;
+        }
         
         /** To be called before Widget::add(); columns are persistent across multiple add/remove cycles
           */
