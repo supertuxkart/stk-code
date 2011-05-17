@@ -23,6 +23,7 @@
 #include <irrlicht.h>
 
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -50,6 +51,11 @@ namespace GUIEngine
         };
         std::vector< ListItem > m_items;
 
+        PtrVector< ButtonWidget > m_header_elements;
+        
+        /** Leave empty for no header */
+        std::vector< irr::core::stringw > m_header;
+        
     public:
         ListWidget();
         
@@ -161,6 +167,13 @@ namespace GUIEngine
             assert(id != -1);
             markItemRed( id, red );
         }
+
+        /** Override callback from Widget */
+        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        
+        /** To be called before Widget::add(); columns are persistent across multiple add/remove cycles
+          */
+        void addColumn(irr::core::stringw col) { m_header.push_back( col ); }
     };
 }
 

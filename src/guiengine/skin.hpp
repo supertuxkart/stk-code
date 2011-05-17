@@ -265,6 +265,7 @@ namespace GUIEngine
         void drawGaugeFill(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawCheckBox(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawList(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawListHeader(const irr::core::rect< irr::s32 > &rect, Widget* widget);
         void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused, const irr::core::rect< irr::s32 > *clip);
         void drawIconButton(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
 

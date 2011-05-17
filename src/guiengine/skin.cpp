@@ -1265,6 +1265,27 @@ void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool
     }
 }
 
+void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect, Widget* widget)
+{
+    //ListWidget* list = dynamic_cast<ListWidget*>(widget);
+    //assert(list != NULL);
+    
+    drawBoxFromStretchableTexture(widget, rect,
+                                  SkinConfig::m_render_params["list_header::neutral"], false, NULL /* clip */);
+    
+    IGUIButton* btn = widget->getIrrlichtElement<IGUIButton>();
+    if (btn->isPressed())
+    {
+        ITexture* img = SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
+        core::rect< s32 > destRect(rect.UpperLeftCorner,
+                                   core::dimension2d<s32>(rect.getHeight(), rect.getHeight()));
+        core::rect< s32 > srcRect(core::position2d<s32>(0,0), img->getSize());
+        irr_driver->getVideoDriver()->draw2DImage(img, destRect, srcRect, NULL, NULL, true /* alpha */);
+    }
+    
+    //GUIEngine::getFont()->draw( list->getHeader(), rect, irr::video::SColor(255,0,0,0) ); //getColor("text") );
+}
+
 /** recursive function to render all sections (recursion allows to easily traverse the tree of children
   * and sub-children)
   */
@@ -1520,9 +1541,16 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawIconButton(rect, widget, pressed, focused);
     }
-    else if(type == WTYPE_BUTTON)
+    else if (type == WTYPE_BUTTON)
     {
-        drawButton(widget, rect, pressed, focused);
+        if (widget->m_event_handler != NULL && widget->m_event_handler->getType() == WTYPE_LIST)
+        {
+            drawListHeader(rect, widget);
+        }
+        else
+        {
+            drawButton(widget, rect, pressed, focused);
+        }
     }
     else if(type == WTYPE_PROGRESS)
     {
@@ -1718,7 +1746,19 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     }
     else if (type == WTYPE_LIST)
     {
-        drawList(rect, widget, focused);
+        //drawList(rect, widget, focused);
+        
+        drawList(core::rect<s32>(widget->m_x, widget->m_y, widget->m_x + widget->m_w, widget->m_y + widget->m_h),
+                 widget, focused);
+        
+        /*
+        if (((ListWidget*)widget)->getHeader().size() > 0)
+        {
+            drawListHeader(core::rect<s32>(widget->m_x, widget->m_y, widget->m_x + widget->m_w, rect.UpperLeftCorner.Y),
+                           widget);
+        }
+         */
+        
     }
     else if (type == WTYPE_BUBBLE)
     {

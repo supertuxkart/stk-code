@@ -55,6 +55,11 @@ void AddonsScreen::loadedFromFile()
     m_icon_installed     = m_icon_bank->addTextureAsSprite(icon1);
     m_icon_not_installed = m_icon_bank->addTextureAsSprite(icon2);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
+    
+    GUIEngine::ListWidget* w_list = 
+        getWidget<GUIEngine::ListWidget>("list_addons");
+    w_list->addColumn( L"Add-on name" );
+    w_list->addColumn( L"Updated date" );
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -67,12 +72,14 @@ void AddonsScreen::init()
     if(UserConfigParams::logAddons())
         std::cout << "[addons] Using directory <" + file_manager->getAddonsDir() 
               << ">\n";
+    
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setIcons(m_icon_bank);
-
+    
     getWidget<GUIEngine::LabelWidget>("update_status")
         ->setText(_("Updating the list..."), false);
+    
     m_type = "kart";
     loadList();
 }   // init

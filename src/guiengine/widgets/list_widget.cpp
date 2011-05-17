@@ -23,6 +23,8 @@
 
 #include "guiengine/CGUISpriteBank.h"
 
+#include <sstream>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -71,13 +73,47 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons)
 
 void ListWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    const int header_height = GUIEngine::getFontHeight() + 15;
+    
+    rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
+                                                   rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
     
     IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
     list->setAutoScrollEnabled(false);
     
     m_element = list;
     m_element->setTabOrder( list->getID() );
+    
+    if (m_header.size() > 0)
+    {
+        const int col_size = m_w / m_header.size();
+        
+        for (int n=0; n<m_header.size(); n++)
+        {
+            std::ostringstream name;
+            name << m_properties[PROP_ID];
+            name << "_column_";
+            name << n;
+            
+            ButtonWidget* header = new ButtonWidget();
+            header->m_y = m_y;
+            header->m_h = header_height;
+            
+            header->m_x = m_x + col_size*n;
+            header->m_w = col_size;
+            
+            header->setText( m_header[n] );
+            header->m_properties[PROP_ID] = name.str();
+            
+            header->add();
+            header->m_event_handler = this;
+                        
+            m_children.push_back(header);
+            m_header_elements.push_back(header);
+        }
+        
+        m_check_inside_me = true;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -229,6 +265,13 @@ void ListWidget::elementRemoved()
 {
     Widget::elementRemoved();
     m_items.clear();
+    
+    for (int n=0; n<m_header_elements.size(); n++)
+    {
+        m_header_elements[n].elementRemoved();
+        m_children.remove( m_header_elements.get(n) );
+    }
+    m_header_elements.clearAndDeleteAll();
 }
 
 // -----------------------------------------------------------------------------
@@ -267,3 +310,21 @@ void ListWidget::markItemRed(const int id, bool red)
 }
 
 // -----------------------------------------------------------------------------
+
+EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+{
+    if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
+    {        
+        int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
+
+        for (int n=0; n<m_header_elements.size(); n++)
+        {
+            m_header_elements[n].getIrrlichtElement<IGUIButton>()->setPressed(false);
+        }
+        m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
+        
+        return EVENT_BLOCK;
+    }
+    
+    return EVENT_LET;
+}
