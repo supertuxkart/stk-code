@@ -26,6 +26,6 @@
   
   <button      id="cancel"   proportion="1" x="5%" width="70%" I18N="Addons" text="Back" align="center"/>
   
-  <label       id="state"    proportion="1" width="100%" text="Status" text_align="center" />
+  <label       id="state"    proportion="1" width="100%" text="" text_align="center" />
 </div>
 </stkgui>
