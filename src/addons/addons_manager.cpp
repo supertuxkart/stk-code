@@ -153,8 +153,9 @@ void *AddonsManager::downloadIcons()
             if(icon=="")
             {
                 if(UserConfigParams::logAddons())
-                    printf("[addons] No icon or image specified for '%s'.\n",
-                           addon.getId());
+                    fprintf(stderr,
+                            "[addons] No icon or image specified for '%s'.\n",
+                            addon.getId().c_str());
                 continue;
             }
             std::string save        = "icons/"+icon;
