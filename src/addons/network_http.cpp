@@ -62,10 +62,10 @@ NetworkHttp *network_http=NULL;
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : m_abort(false),
-                             m_thread_id(NULL),
-                             m_current_request(NULL),
-                             m_all_requests(std::vector<Request*>())
+NetworkHttp::NetworkHttp() : m_all_requests(std::vector<Request*>()),
+			     m_current_request(NULL),
+			     m_abort(false),
+                             m_thread_id(NULL)
 {
     // Don't even start the network threads if networking is disabled.
     if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
