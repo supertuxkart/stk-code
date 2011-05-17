@@ -29,17 +29,33 @@ class XMLNode;
 class Addon
 {
 public:
+    /** AddonStatus flags - a bit pattern. */
+    enum AddonStatus {AS_APPROVED = 0x0001,
+                      AS_ALPHA    = 0x0002,
+                      AS_BETA     = 0x0004,
+                      AS_RC       = 0x0008,
+                      AS_FAN      = 0x0010,
+                      AS_HQ       = 0x0020,
+                      AS_DFSG     = 0x0040,
+                      AS_FEATURED = 0x0080,
+                      AS_LATEST   = 0X0100,
+                      AS_BAD_DIM  = 0x0200
+    };
     /** The name to be displayed. */
     std::string m_name;
     /** Internal id for this addon, which is the name in lower case.
      *  This is used to create a subdirectory for this addon. */
     std::string m_id;
+    /** The name of the designer of the addon. */
+    std::string m_designer;
     /** The (highest) revision number available online. */
     int         m_revision;
     /** The currently installed revision. */
     int         m_installed_revision;
     /** The version of the icon that was downloaded. */
     int         m_icon_revision;
+    /** The status flags of this addon. */
+    int         m_status;
     /** A description of this addon. */
     std::string m_description;
     /** The URL of the icon (relative to the server) */
@@ -97,6 +113,9 @@ public:
     /** Returns the ID of this addon. */
     const std::string& getId() const { return m_id; }
     // ------------------------------------------------------------------------
+    /** Returns the designer of the addon. */
+    const std::string &getDesigner() const { return m_designer; }
+    // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
     {
@@ -152,6 +171,9 @@ public:
         return "";  // Ignore compiler warning
     }   // getTypeDirectory
 
+    // ------------------------------------------------------------------------
+    /** Returns if a certain status flag is set. */
+    bool testStatus(AddonStatus n) const {return (m_status & n) !=0; }
     // ------------------------------------------------------------------------
     /** Returns the directory in which this addon is installed. */
     std::string getDataDir() const 

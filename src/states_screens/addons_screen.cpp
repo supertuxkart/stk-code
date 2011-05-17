@@ -105,8 +105,13 @@ void AddonsScreen::loadList()
 	    else
         	icon = m_icon_not_installed;
 
-        w_list->addItem(addon.getId(), addon.getName().c_str(), 
-                        icon);
+        core::stringw s;
+        if(addon.getDesigner().size()==0)
+            s = addon.getName().c_str();
+        else
+            s = _("%s by %s",  addon.getName().c_str(),
+                               addon.getDesigner().c_str());
+        w_list->addItem(addon.getId(), s.c_str(), icon);
     }
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();

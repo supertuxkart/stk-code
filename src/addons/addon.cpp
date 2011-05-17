@@ -31,6 +31,8 @@ Addon::Addon(const XMLNode &xml)
 {
     m_name               = "";
     m_id                 = "";
+    m_designer           = "";
+    m_status             = 0;
     m_installed          = false;
     m_installed_revision = 0;
     m_revision           = 0 ;
@@ -44,8 +46,10 @@ Addon::Addon(const XMLNode &xml)
     m_type               = xml.getName();
 
     xml.get("name",               &m_name              );
-    m_id                = StringUtils::toLowerCase(m_name);
-    xml.get("id",                 &m_id);
+    m_id                 = StringUtils::toLowerCase(m_name);
+    xml.get("id",                 &m_id                );
+    xml.get("designer",           &m_designer          );
+    xml.get("status",             &m_status            );
     xml.get("installed",          &m_installed         );
     xml.get("installed-revision", &m_installed_revision);
     xml.get("revision",           &m_revision          );
@@ -72,6 +76,8 @@ void Addon::copyInstallData(const Addon &addon)
     m_icon_url      = addon.m_icon_url;
     m_icon_basename = addon.m_icon_basename;
     m_icon_revision = addon.m_revision;
+    m_designer      = addon.m_designer;
+    m_status        = addon.m_status;
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
@@ -84,12 +90,13 @@ void Addon::writeXML(std::ofstream *out_stream)
     (*out_stream) << "  <"                       << m_type 
                   << " name=\""                  << m_name 
                   << "\" id=\""                  << m_id 
+                  << "\" designer=\""            << m_designer
+                  << "\" status=\""              << m_status
                   << "\" installed=\""         
                   << (m_installed ? "true" : "false" )
-                  << "\" installed-revision=\""  << m_installed_revision 
+                  << "\" installed-revision=\""  << m_installed_revision
                   << "\" size=\""                << m_size
                   << "\" icon-revision=\""       << m_icon_revision 
                   << "\"/>\n";
 }   // writeXML
-
 
