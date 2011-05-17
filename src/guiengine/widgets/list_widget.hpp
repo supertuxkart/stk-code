@@ -45,6 +45,9 @@ namespace GUIEngine
       */
     class ListWidget : public Widget
     {
+        friend class Skin;
+
+        
         /** \brief whether this list has icons */
         bool m_use_icons;
         
@@ -60,6 +63,8 @@ namespace GUIEngine
         std::vector< ListItem > m_items;
 
         PtrVector< ButtonWidget > m_header_elements;
+        
+        ButtonWidget* m_selected_column;
         
         /** Leave empty for no header */
         std::vector< irr::core::stringw > m_header;

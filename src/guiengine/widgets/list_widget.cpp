@@ -36,6 +36,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_use_icons = false;
     m_icons = NULL;
     m_listener = NULL;
+    m_selected_column = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -273,6 +274,7 @@ void ListWidget::elementRemoved()
         m_children.remove( m_header_elements.get(n) );
     }
     m_header_elements.clearAndDeleteAll();
+    m_selected_column = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -318,11 +320,14 @@ EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, c
     {        
         int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
 
+        m_selected_column = m_header_elements.get(col);
+        /*
         for (int n=0; n<m_header_elements.size(); n++)
         {
             m_header_elements[n].getIrrlichtElement<IGUIButton>()->setPressed(false);
         }
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
+        */
         
         if (m_listener) m_listener->onColumnClicked(col);
         

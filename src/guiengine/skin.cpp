@@ -1284,15 +1284,17 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect, Widget* widge
     //ListWidget* list = dynamic_cast<ListWidget*>(widget);
     //assert(list != NULL);
     
-    IGUIButton* btn = widget->getIrrlichtElement<IGUIButton>();
+    //IGUIButton* btn = widget->getIrrlichtElement<IGUIButton>();
 
+    bool isSelected = (((ListWidget*)widget->m_event_handler)->m_selected_column == widget);
+    
     
     drawBoxFromStretchableTexture(widget, rect,
-                                  (btn->isPressed() ? SkinConfig::m_render_params["list_header::down"] :
-                                                      SkinConfig::m_render_params["list_header::neutral"]),
+                                  (isSelected ? SkinConfig::m_render_params["list_header::down"] :
+                                                SkinConfig::m_render_params["list_header::neutral"]),
                                   false, NULL /* clip */);
     
-    if (btn->isPressed())
+    if (isSelected)
     {
         ITexture* img = SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
         core::rect< s32 > destRect(rect.UpperLeftCorner,
