@@ -46,7 +46,7 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_icon_shown       = false;
     m_download_request = NULL;
     
-    loadFromFile("addons_view_dialog.stkgui");
+    loadFromFile("addons_loading.stkgui");
     
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
