@@ -365,7 +365,7 @@ bool NetworkHttp::downloadFileInternal(Request *request)
         file_manager->getAddonsFile(request->getSavePath());
 
     if(UserConfigParams::logAddons())
-        printf("[addons] Downloading '%s' as '%s').\n", 
+        printf("[addons] Downloading '%s' as '%s'.\n", 
                request->getURL().c_str(), request->getSavePath().c_str());
     std::string full_url = request->getURL();
     if(full_url.substr(0, 5)!="http:" && full_url.substr(0, 4)!="ftp:")
