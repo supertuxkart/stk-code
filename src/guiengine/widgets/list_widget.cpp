@@ -98,6 +98,9 @@ void ListWidget::add()
             name << n;
             
             ButtonWidget* header = new ButtonWidget();
+            
+            header->m_reserved_id = getNewNoFocusID();
+            
             header->m_y = m_y;
             header->m_h = header_height;
             
@@ -109,7 +112,9 @@ void ListWidget::add()
             
             header->add();
             header->m_event_handler = this;
-                        
+            
+            header->getIrrlichtElement()->setTabStop(false);
+            
             m_children.push_back(header);
             m_header_elements.push_back(header);
         }

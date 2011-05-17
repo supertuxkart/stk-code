@@ -33,7 +33,9 @@ void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     const stringw&  message = getText();
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), message.c_str(), L"");
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent,
+                                                  (m_reserved_id == -1 ? getNewID() : m_reserved_id),
+                                                  message.c_str(), L"");
     
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
