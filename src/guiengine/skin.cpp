@@ -274,7 +274,21 @@ Skin::Skin(IGUISkin* fallback_skin)
     skin_name += "/skins/";
     skin_name += UserConfigParams::m_skin_file.c_str();
     
-    SkinConfig::loadFromFile( skin_name );
+    try
+    {
+        SkinConfig::loadFromFile( skin_name );
+    }
+    catch (std::runtime_error& e)
+    {
+        // couldn't load skin. Try to revert to default
+        UserConfigParams::m_skin_file.revertToDefaults();
+        
+        skin_name = file_manager->getGUIDir();
+        skin_name += "/skins/";
+        skin_name += UserConfigParams::m_skin_file.c_str();
+        SkinConfig::loadFromFile( skin_name );
+    }
+    
     bg_image = NULL;
     
     m_fallback_skin = fallback_skin;
