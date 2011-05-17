@@ -280,6 +280,7 @@ Skin::Skin(IGUISkin* fallback_skin)
     }
     catch (std::runtime_error& e)
     {
+        (void)e;   // avoid compiler warning
         // couldn't load skin. Try to revert to default
         UserConfigParams::m_skin_file.revertToDefaults();
         
