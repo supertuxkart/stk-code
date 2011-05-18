@@ -292,3 +292,9 @@ void SkidMarks::SkidMarkQuads::fade(float f)
     }
 }   // fade
 
+// ----------------------------------------------------------------------------
+
+void SkidMarks::adjustFog(bool enabled)
+{
+    m_material->FogEnable = enabled; 
+}

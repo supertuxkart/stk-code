@@ -88,6 +88,9 @@ public:
         ~SkidMarks();
     void update  (float dt); 
     void reset();
+    
+    void adjustFog(bool enabled);
+    
 };   // SkidMarks
 
 #endif

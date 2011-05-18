@@ -52,6 +52,7 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -543,6 +544,7 @@ void Kart::reset()
     }
 
     TerrainInfo::update(getXYZ());
+    m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
@@ -1764,8 +1766,11 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart, Track* track
     m_slipstream = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
+    {
         m_skidmarks = new SkidMarks(*this);
-       
+        m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
+    }
+    
     m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
                           m_node);
 }   // loadData
