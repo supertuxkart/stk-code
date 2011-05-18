@@ -60,6 +60,7 @@ void AddonsScreen::loadedFromFile()
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->addColumn( L"Add-on name" );
     w_list->addColumn( L"Updated date" );
+    w_list->setColumnListener(this);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -96,6 +97,9 @@ void AddonsScreen::loadList()
         const Addon &addon = addons_manager->getAddon(i);
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
+        if(!UserConfigParams::m_artist_debug_mode &&
+            !addon.testStatus(Addon::AS_APPROVED)    )
+            continue;
         
         // Get the right icon to display
         int icon;
@@ -126,6 +130,11 @@ void AddonsScreen::loadList()
                                                         PLAYER_ID_GAME_MASTER);
 }   // loadList
 
+// ----------------------------------------------------------------------------
+void AddonsScreen::onColumnClicked(int columnId)
+{
+    printf("Clicked on column %d.\n", columnId);
+}   // onColumnClicked
 // ----------------------------------------------------------------------------
 void AddonsScreen::eventCallback(GUIEngine::Widget* widget, 
                                  const std::string& name, const int playerID)

@@ -37,7 +37,8 @@ namespace GUIEngine { class Widget; }
   * \ingroup states_screens
   */
 class AddonsScreen : public GUIEngine::Screen, 
-                     public GUIEngine::ScreenSingleton<AddonsScreen>
+                     public GUIEngine::ScreenSingleton<AddonsScreen>,
+                     public GUIEngine::IListWidgetHeaderListener
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
@@ -68,6 +69,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+
+    virtual void onColumnClicked(int columnId);
 
     virtual void init();
 

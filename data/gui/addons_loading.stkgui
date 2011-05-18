@@ -2,7 +2,6 @@
 
 <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row">
   
-  <label width="100%" id="name" text_align="center"/>
   
   <div x="5%" y="0%" width="90%" proportion="6" layout="horizontal-row" >
     <div width="50%" height="100%" layout="vertical-row" >
@@ -10,22 +9,24 @@
         <spacer proportion="1" /> 
     </div>
     <spacer proportion="1" />
-    <div width="50%" height="100%" layout="vertical-row" >
-        <bubble word_wrap="true" id="description" height="100%" width="100%" proportion="1" />
-        <label id="size" width="100%" text=""/>
+    <div width="50%" height="50%" layout="vertical-row" >
+        <label id="name"     width="100%" text_align="left"/>
+        <label id="size"     width="100%" text=""/>
         <label id="revision" width="100%" text=""/>
+        <label id="flags1"    width="100%" text=""/>
+        <label id="flags2"    width="100%" text=""/>
     </div>
   </div>
-  
-  <div width="70%" proportion="1" align="center">
+
+  <bubble word_wrap="true" id="description" height="100%" x="5%" width="90%" proportion="6" />
+
+  <div width="90%" proportion="2" align="center">
     <button      id="install"  x="0" y="0" width="100%" height="100%" I18N="Addons" text="Install"/>
     <progressbar id="progress" x="0" y="20%" width="100%" height="60%"  />
   </div>
   
   <spacer height="10" />
   
-  <button      id="cancel"   proportion="1" x="5%" width="70%" I18N="Addons" text="Back" align="center"/>
-  
-  <label       id="state"    proportion="1" width="100%" text="" text_align="center" />
+  <button id="cancel" proportion="2" x="5%" width="90%" I18N="Addons" text="Back" align="center"/>
 </div>
 </stkgui>

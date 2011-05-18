@@ -25,6 +25,7 @@
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"
 #include "addons/request.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
@@ -52,7 +53,6 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_install_button   = getWidget<ButtonWidget>     ("install" );
     m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
-    m_state            = getWidget<LabelWidget>      ("state"   );
     
     if(m_progress)
         m_progress->setVisible(false);
@@ -63,29 +63,69 @@ AddonsLoading::AddonsLoading(const float w, const float h,
             getWidget<ButtonWidget>("install")->setLabel(_("Update"));
         else
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
-    }
-    
-}
+    }   // if isInstalled
+}   // AddonsLoading
 
 // ----------------------------------------------------------------------------
 
 void AddonsLoading::beforeAddingWidgets()
 {
-    /*Init the icon here to be able to load a single image*/
+    /* Init the icon here to be able to load a single image*/
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_install_button   = getWidget<ButtonWidget>     ("install" );
     m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
-    m_state            = getWidget<LabelWidget>      ("state"   );
 
-    
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
-
     getWidget<BubbleWidget>("description")->setText(m_addon.getDescription().c_str());
-
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);
 
+    // Display flags for this addon
+    // ============================
+    std::vector<core::stringw> l;
+    if(UserConfigParams::m_artist_debug_mode)
+    {
+        if(m_addon.testStatus(Addon::AS_ALPHA))
+            l.push_back("alpha");
+        if(m_addon.testStatus(Addon::AS_BETA))
+            l.push_back("beta");
+        if(m_addon.testStatus(Addon::AS_RC))
+            l.push_back("RC");
+        if(m_addon.testStatus(Addon::AS_BAD_DIM))
+            l.push_back("bad-texture");
+        if(!m_addon.testStatus(Addon::AS_DFSG))
+            l.push_back("non-DFSG");
+    }
+    if(m_addon.testStatus(Addon::AS_FAN))
+        l.push_back("fan-made");
+    else
+        l.push_back("official");
+    if(m_addon.testStatus(Addon::AS_FEATURED))
+        l.push_back("featured");
+
+    GUIEngine::LabelWidget *flags1 = getWidget<LabelWidget>("flags1");
+    GUIEngine::LabelWidget *flags2 = getWidget<LabelWidget>("flags2");
+    core::stringw s1(""), s2("");
+    for(unsigned int i=0; i<l.size(); i++)
+    {
+        if(i%2==0)
+        {
+            s1+=l[i];
+            if(i+2<l.size())
+                s1+=",";
+        }
+        else
+        {
+            s2+=l[i];
+            if(i+2<l.size())
+                s2+=",";
+        }
+    }
+    if(flags1) flags1->setText(s1, false);
+    if(flags2) flags2->setText(s2, false);
+
+    // Display the size
+    // ================
     int n = m_addon.getSize();
     core::stringw unit="";
     if(n>1024*1024)
@@ -157,10 +197,10 @@ void AddonsLoading::onUpdate(float delta)
         m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
-            m_state->setText(_("Download failed.\n"), false);
+            m_back_button->setText(_("Download failed.\n"));
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_back_button->setText(_("Back"));
+            m_back_button->setVisible(false);
             return;
         }
         else if(progress>=1.0f)
@@ -211,7 +251,7 @@ void AddonsLoading::doInstall()
             core::stringw msg = StringUtils::insertValues(
                 _("Problems installing the addon '%s'."),
                 core::stringw(m_addon.getName().c_str()));
-            m_state->setText(msg.c_str(), false);
+            m_back_button->setText(msg.c_str());
         }
     }
     else
@@ -225,7 +265,7 @@ void AddonsLoading::doInstall()
             core::stringw msg = StringUtils::insertValues(
                 _("Problems removing the addon '%s'."),
                 core::stringw(m_addon.getName().c_str()));
-            m_state->setText(msg.c_str(), false);
+            m_back_button->setText(msg.c_str());
         }
     }
 
