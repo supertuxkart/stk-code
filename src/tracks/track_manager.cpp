@@ -70,10 +70,8 @@ Track* TrackManager::getTrack(const std::string& ident) const
         if ((*i)->getIdent() == ident)
             return *i;
     }
-
-    std::ostringstream msg;
-    msg<<"TrackManager: Couldn't find track: '"<<ident<<"'";
-    std::cerr << msg.str() << std::endl;
+    
+    std::cerr << "TrackManager: Couldn't find track: '" << ident << "'" << std::endl;
     return NULL;
     
 }   // getTrack
