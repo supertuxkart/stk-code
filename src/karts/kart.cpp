@@ -537,14 +537,18 @@ void Kart::reset()
     applyEngineForce (0.0f);
 
     Moveable::reset();
-    if(m_skidmarks) m_skidmarks->reset();
+    if (m_skidmarks)
+    {
+        m_skidmarks->reset();
+        m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
+    }
+    
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
     }
 
     TerrainInfo::update(getXYZ());
-    m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
