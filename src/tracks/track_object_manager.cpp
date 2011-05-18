@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"
+#include "graphics/lod_node.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
@@ -120,3 +121,21 @@ void TrackObjectManager::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+
+void TrackObjectManager::enableFog(bool enable)
+{
+    const unsigned int count = m_all_objects.size();
+    for(unsigned int i=0; i<count; i++)
+    {
+        m_all_objects[i]->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+                
+        if (m_all_objects[i]->getNode()->getType() == scene::ESNT_LOD_NODE)
+        {
+            std::vector<scene::ISceneNode*>& nodes = ((LODNode*)m_all_objects[i]->getNode())->getAllNodes();
+            for (unsigned int n=0; n<nodes.size(); n++)
+            {
+                nodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
+            }
+        }
+    }
+}

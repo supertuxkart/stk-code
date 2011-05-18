@@ -1274,9 +1274,11 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     {
         const unsigned int count = m_all_nodes.size();
         for(unsigned int i=0; i<count; i++)
-            m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+        {
+            adjustForFog(m_all_nodes[i]);
+        }
     }
-    
+    m_track_object_manager->enableFog(m_use_fog);
     
     // Sky dome and boxes support
     // --------------------------
@@ -1365,6 +1367,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 void Track::adjustForFog(scene::ISceneNode *node)
 {
     node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+    
+    if (node->getType() == scene::ESNT_LOD_NODE)
+    {
+        std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
+        for (unsigned int n=0; n<subnodes.size(); n++)
+        {
+            subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+        }
+    }
 }   // adjustForFog
 
 //-----------------------------------------------------------------------------

@@ -86,6 +86,8 @@ public:
      *  e.g. be overwritten by physical objects etc. */
     virtual void handleExplosion(const Vec3& pos, bool directHit) {};
     void         setEnable(bool mode);
+    
+    scene::ISceneNode* getNode() { return m_node; }
 };   // TrackObject
 
 #endif

@@ -49,6 +49,10 @@ public:
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     void reset();
     void init();
+    
+    /** Enable or disable fog on objects */
+    void enableFog(bool enable);
+
 };   // class TrackObjectManager
 
 #endif
