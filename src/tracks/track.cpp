@@ -1373,7 +1373,7 @@ void Track::adjustForFog(scene::ISceneNode *node)
         std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
         for (unsigned int n=0; n<subnodes.size(); n++)
         {
-            subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+            subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
         }
     }
 }   // adjustForFog
