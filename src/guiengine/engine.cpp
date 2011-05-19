@@ -314,6 +314,14 @@
  the space under the button's text may be rendered unclickable by the label
  widget overlapping other widgets under.
  
+ Line breaks are done on space characters; if one word is too long to fit
+ on one line, then SHY (soft hyphen) characters are searched and breaks
+ can be added there.
+ 
+ Note that for multiline labels, the layout engine is unable to guess their
+ width and height on their own so you should explicitely give a width and
+ height for labels that use this flag.
+ 
  \n
  \subsection prop6 PROP_MIN_VALUE, PROP_MAX_VALUE
  <em> Name in XML files: </em> \c "min_value", \c "max_value" 
