@@ -27,6 +27,8 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
+Addon::SortOrder Addon::m_sort_order=Addon::SO_DEFAULT;
+
 Addon::Addon(const XMLNode &xml)
 {
     m_name               = "";

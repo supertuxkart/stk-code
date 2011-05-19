@@ -43,6 +43,14 @@ public:
                       AS_LATEST   = 0X0100,
                       AS_BAD_DIM  = 0x0200
     };
+
+    /** Set the sort order used in the comparison function. */
+    enum SortOrder { SO_DEFAULT,   // featured first, then alphabetically
+                     SO_NAME,      // Sorted alphabetically by name
+                     SO_DATE       // Sorted by date, newest first
+    };
+
+private:
     /** The name to be displayed. */
     std::string m_name;
     /** Internal id for this addon, which is the name in lower case.
@@ -77,9 +85,17 @@ public:
     /** Type, must be 'kart' or 'track'. */
     std::string m_type;
 
-    Addon() {};
-    /** Initialises the object from an XML node. */
-    Addon(const XMLNode &xml);
+    /** The sort order to be used in the comparison. */
+    static SortOrder m_sort_order;
+
+public:
+         Addon() {};
+         /** Initialises the object from an XML node. */
+         Addon(const XMLNode &xml);
+    // ------------------------------------------------------------------------
+    /** Sets the sort order used in the comparison function. It is static, so 
+     *  that each instance can access the sort order. */
+    static void setSortOrder(SortOrder so) { m_sort_order = so; }
     // ------------------------------------------------------------------------
     void writeXML(std::ofstream *out_stram);
     // ------------------------------------------------------------------------
@@ -191,6 +207,31 @@ public:
     {
         return file_manager->getAddonsFile(getTypeDirectory()+getId());
     }   // getDataDir
+    // ------------------------------------------------------------------------
+    /** Compares two addons according to the sort order currently defined.
+     *  \param a The addon to compare this addon to.
+     */
+    bool operator<(const Addon &a) const
+    {
+        switch(m_sort_order)
+        {
+        case SO_DEFAULT: 
+            if(testStatus(AS_FEATURED) && 
+                !a.testStatus(AS_FEATURED))  return true;
+            if(!testStatus(AS_FEATURED) && 
+                a.testStatus(AS_FEATURED))  return false;
+            // Otherwise fall through to name comparison!
+            case SO_NAME:
+                // m_id is the lower case name
+                return m_id < a.m_id;
+                break;
+            case SO_DATE:
+                return m_date < a.m_date;
+                break;
+        }   // switch
+        // Fix compiler warning.
+        return true;
+    }   // operator<
 
 };   // Addon
 

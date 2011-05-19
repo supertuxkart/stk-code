@@ -30,12 +30,13 @@
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/ptr_vector.hpp"
 
 DEFINE_SCREEN_SINGLETON( AddonsScreen );
 
 // ------------------------------------------------------------------------------------------------------
 
-AddonsScreen::AddonsScreen() : Screen("addons.stkgui")
+AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 {
 }
 
@@ -43,7 +44,6 @@ AddonsScreen::AddonsScreen() : Screen("addons.stkgui")
 
 void AddonsScreen::loadedFromFile()
 {
-
     video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir()
                                                     + "/package.png"         );
     video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir()
@@ -79,6 +79,9 @@ void AddonsScreen::init()
     w_list->setIcons(m_icon_bank);
     
     m_type = "kart";
+
+    // Set the default sort order
+    Addon::setSortOrder(Addon::SO_DEFAULT);
     loadList();
 }   // init
 
@@ -89,9 +92,8 @@ void AddonsScreen::init()
  */
 void AddonsScreen::loadList()
 {
-    GUIEngine::ListWidget* w_list = 
-        getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->clear();
+    // First create a list of sorted entries
+    PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
         const Addon &addon = addons_manager->getAddon(i);
@@ -100,23 +102,39 @@ void AddonsScreen::loadList()
         if(!UserConfigParams::m_artist_debug_mode &&
             !addon.testStatus(Addon::AS_APPROVED)    )
             continue;
+        sorted_list.push_back(&addon);
+    }
+    sorted_list.insertionSort(/*start=*/0);
+
+    GUIEngine::ListWidget* w_list = 
+        getWidget<GUIEngine::ListWidget>("list_addons");
+    w_list->clear();
+
+    for(int i=0; i<sorted_list.size(); i++)
+    {
+        const Addon *addon = &(sorted_list[i]);
+        // Ignore addons of a different type
+        if(addon->getType()!=m_type) continue;
+        if(!UserConfigParams::m_artist_debug_mode &&
+            !addon->testStatus(Addon::AS_APPROVED)    )
+            continue;
         
         // Get the right icon to display
         int icon;
-        if(addon.isInstalled())
-            icon = addon.needsUpdate() ? m_icon_needs_update 
-                                       : m_icon_installed;
+        if(addon->isInstalled())
+            icon = addon->needsUpdate() ? m_icon_needs_update 
+                                        : m_icon_installed;
 	    else
         	icon = m_icon_not_installed;
 
         core::stringw s;
-        if(addon.getDesigner().size()==0)
-            s = (addon.getName()+"\t"+addon.getDateAsString()).c_str();
+        if(addon->getDesigner().size()==0)
+            s = (addon->getName()+"\t"+addon->getDateAsString()).c_str();
         else
-            s = _("%s by %s\t%d",  addon.getName().c_str(),
-                                   addon.getDesigner().c_str(),
-                                   addon.getDateAsString().c_str());
-        w_list->addItem(addon.getId(), s.c_str(), icon);
+            s = _("%s by %s\t%d",  addon->getName().c_str(),
+                                   addon->getDesigner().c_str(),
+                                   addon->getDateAsString().c_str());
+        w_list->addItem(addon->getId(), s.c_str(), icon);
     }
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
@@ -132,9 +150,15 @@ void AddonsScreen::loadList()
 }   // loadList
 
 // ----------------------------------------------------------------------------
-void AddonsScreen::onColumnClicked(int columnId)
+void AddonsScreen::onColumnClicked(int column_id)
 {
-    printf("Clicked on column %d.\n", columnId);
+    switch(column_id)
+    {
+    case 0: Addon::setSortOrder(Addon::SO_NAME); break;
+    case 1: Addon::setSortOrder(Addon::SO_DATE); break;
+    default: assert(0);
+    }   // switch
+    loadList();
 }   // onColumnClicked
 // ----------------------------------------------------------------------------
 void AddonsScreen::eventCallback(GUIEngine::Widget* widget, 
