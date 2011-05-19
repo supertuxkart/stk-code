@@ -127,7 +127,7 @@ void TrackObjectManager::enableFog(bool enable)
     const unsigned int count = m_all_objects.size();
     for(unsigned int i=0; i<count; i++)
     {
-        m_all_objects[i]->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, true);
+        m_all_objects[i]->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
                 
         if (m_all_objects[i]->getNode()->getType() == scene::ESNT_LOD_NODE)
         {
