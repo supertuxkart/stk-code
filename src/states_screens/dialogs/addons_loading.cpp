@@ -76,7 +76,8 @@ void AddonsLoading::beforeAddingWidgets()
     m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
 
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
-    getWidget<BubbleWidget>("description")->setText(m_addon.getDescription().c_str());
+    getWidget<BubbleWidget>("description")
+        ->setText(m_addon.getDescription().c_str());
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);
 
@@ -85,44 +86,43 @@ void AddonsLoading::beforeAddingWidgets()
     std::vector<core::stringw> l;
     if(UserConfigParams::m_artist_debug_mode)
     {
+        // In non artist-debug-mode only approved items will be shown anyway,
+        // but give even tester an idea about the status:
+        if(m_addon.testStatus(Addon::AS_APPROVED))
+            l.push_back("approved");
+
+        // Note that an approved addon should never have alpha, beta, or 
+        // RC status - and only one of those should be used
         if(m_addon.testStatus(Addon::AS_ALPHA))
             l.push_back("alpha");
-        if(m_addon.testStatus(Addon::AS_BETA))
+        else if(m_addon.testStatus(Addon::AS_BETA))
             l.push_back("beta");
-        if(m_addon.testStatus(Addon::AS_RC))
+        else if(m_addon.testStatus(Addon::AS_RC))
             l.push_back("RC");
+
         if(m_addon.testStatus(Addon::AS_BAD_DIM))
             l.push_back("bad-texture");
         if(!m_addon.testStatus(Addon::AS_DFSG))
             l.push_back("non-DFSG");
     }
-    if(m_addon.testStatus(Addon::AS_FAN))
-        l.push_back("fan-made");
-    else
-        l.push_back("official");
     if(m_addon.testStatus(Addon::AS_FEATURED))
-        l.push_back("featured");
+        l.push_back(_("featured"));
 
-    GUIEngine::LabelWidget *flags1 = getWidget<LabelWidget>("flags1");
-    GUIEngine::LabelWidget *flags2 = getWidget<LabelWidget>("flags2");
-    core::stringw s1(""), s2("");
-    for(unsigned int i=0; i<l.size(); i++)
+    // 
+    GUIEngine::LabelWidget *flags = getWidget<LabelWidget>("flags");
+    if(flags)
     {
-        if(i%2==0)
+        core::stringw s1("");
+        for(unsigned int i=0; i<l.size(); i++)
         {
             s1+=l[i];
-            if(i+2<l.size())
-                s1+=",";
+            // if it's not the last item, add a ",".
+            // Don't test for l.size()-1 - since this is unsigned!
+            if(i+1<l.size())
+                s1+=", ";
         }
-        else
-        {
-            s2+=l[i];
-            if(i+2<l.size())
-                s2+=",";
-        }
+        flags->setText(s1, false);
     }
-    if(flags1) flags1->setText(s1, false);
-    if(flags2) flags2->setText(s2, false);
 
     // Display the size
     // ================
