@@ -1379,7 +1379,7 @@ void Kart::updatePhysics(float dt)
         m_has_started = true;
         float f       = m_kart_properties->getStartupBoost();
         m_vehicle->activateZipper(f);
-        MaxSpeed::increaseMaxSpeed(MS_INCREASE_ZIPPER, 0.6f*f,
+        MaxSpeed::increaseMaxSpeed(MS_INCREASE_ZIPPER, 0.9f*f,
                                    5.0f, 5.0f);
 
     }
