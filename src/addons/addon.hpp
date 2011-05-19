@@ -24,6 +24,8 @@
 #include <string>
 
 #include "io/file_manager.hpp"
+#include "utils/time.hpp"
+
 class XMLNode;
 
 class Addon
@@ -56,6 +58,8 @@ public:
     int         m_icon_revision;
     /** The status flags of this addon. */
     int         m_status;
+    /** Date when the addon was added. */
+    Time::TimeType m_date;
     /** A description of this addon. */
     std::string m_description;
     /** The URL of the icon (relative to the server) */
@@ -98,6 +102,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const std::string& getDescription() const { return m_description; }
+    // ------------------------------------------------------------------------
+    /** Returns the date (in seconds since epoch) when the addon was 
+     *  uploaded. */
+    Time::TimeType getDate() const { return m_date; }
+    // ------------------------------------------------------------------------
+    /** Returns a user readable date as a string. */
+    std::string getDateAsString() const;
     // ------------------------------------------------------------------------
     /** Returns if the addon is installed. */
     bool  isInstalled() const { return m_installed; }

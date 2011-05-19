@@ -111,10 +111,11 @@ void AddonsScreen::loadList()
 
         core::stringw s;
         if(addon.getDesigner().size()==0)
-            s = addon.getName().c_str();
+            s = (addon.getName()+"\t"+addon.getDateAsString()).c_str();
         else
-            s = _("%s by %s",  addon.getName().c_str(),
-                               addon.getDesigner().c_str());
+            s = _("%s by %s\t%d",  addon.getName().c_str(),
+                                   addon.getDesigner().c_str(),
+                                   addon.getDateAsString().c_str());
         w_list->addItem(addon.getId(), s.c_str(), icon);
     }
 

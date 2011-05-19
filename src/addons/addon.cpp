@@ -21,7 +21,7 @@
 #include "addons/addon.hpp"
 
 #include <fstream>
-//#include <iostream>
+#include <time.h>
 
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -42,6 +42,7 @@ Addon::Addon(const XMLNode &xml)
     m_icon_basename      = "";
     m_icon_revision      = 0;
     m_size               = 0;
+    m_date               = 0;
     m_icon_ready         = false;
     m_type               = xml.getName();
 
@@ -50,6 +51,7 @@ Addon::Addon(const XMLNode &xml)
     xml.get("id",                 &m_id                );
     xml.get("designer",           &m_designer          );
     xml.get("status",             &m_status            );
+    xml.get("date",               &m_date              );
     xml.get("installed",          &m_installed         );
     xml.get("installed-revision", &m_installed_revision);
     xml.get("revision",           &m_revision          );
@@ -78,6 +80,7 @@ void Addon::copyInstallData(const Addon &addon)
     m_icon_revision = addon.m_revision;
     m_designer      = addon.m_designer;
     m_status        = addon.m_status;
+    m_date          = addon.m_date;
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
@@ -92,6 +95,7 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << "\" id=\""                  << m_id 
                   << "\" designer=\""            << m_designer
                   << "\" status=\""              << m_status
+                  << "\" date=\""                << m_date
                   << "\" installed=\""         
                   << (m_installed ? "true" : "false" )
                   << "\" installed-revision=\""  << m_installed_revision
@@ -100,3 +104,11 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << "\"/>\n";
 }   // writeXML
 
+// ----------------------------------------------------------------------------
+std::string Addon::getDateAsString() const
+{    
+    const struct tm *t = gmtime((time_t*)&m_date);
+    char s[16];
+    strftime(s, 128, "%d.%m.%Y", t);
+    return s;
+}   // getDateAsString
