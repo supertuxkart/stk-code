@@ -482,25 +482,29 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 /** Positional sound is cool, but creating a new object just to play a simple
  *  menu sound is not. This function allows for 'quick sounds' in a single call.
  *  \param sound_type Internal name of the sfx to play.
+ *  \return a pointer to the sound, for instance to check when the sound finished.
+ *          don't delete the returned pointer.
  */
-
-void SFXManager::quickSound(const std::string &sound_type)
+SFXBase* SFXManager::quickSound(const std::string &sound_type)
 {
-    if(!sfxAllowed()) return;
+    if (!sfxAllowed()) return NULL;
     std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(sound_type);
     
     if (sound == m_quick_sounds.end())
     {
         // sound not yet in our local list of quick sounds
         SFXBase* newSound = sfx_manager->createSoundSource(sound_type, false);
+        if (newSound == NULL) return NULL;
         newSound->play();
         m_quick_sounds[sound_type] = newSound;
+        return newSound;
     }
     else
     {
         (*sound).second->play();
+        return (*sound).second;
     }
-    
+
     //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
     // m_locked_sound->play();
 }

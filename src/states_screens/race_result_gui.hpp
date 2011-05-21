@@ -160,6 +160,8 @@ private:
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
+    SFXBase*                   m_finish_sound;
+    
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
     void determineTableLayout();

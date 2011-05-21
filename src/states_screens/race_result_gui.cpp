@@ -19,6 +19,8 @@
 
 #include "states_screens/race_result_gui.hpp"
 
+#include "audio/music_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -55,6 +57,9 @@ void RaceResultGUI::init()
     getWidget("top")->setVisible(false);
     getWidget("middle")->setVisible(false);
     getWidget("bottom")->setVisible(false);
+    
+    music_manager->stopMusic();
+    m_finish_sound = sfx_manager->quickSound("race_finish");
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -374,6 +379,11 @@ GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action,
 void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
 {
     renderGlobal(dt);
+    
+    if (m_finish_sound != NULL && m_finish_sound->getStatus() != SFXManager::SFX_PLAYING)
+    {
+        music_manager->startMusic( music_manager->getMusicInformation("race_summary.music") );
+    }
 }   // onUpdate
 
 //-----------------------------------------------------------------------------
