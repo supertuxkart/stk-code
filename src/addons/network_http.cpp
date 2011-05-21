@@ -348,8 +348,6 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
         if(UserConfigParams::logAddons())
             printf("[addons] Addons manager list downloaded\n");
 #endif
-        delete xml;
-
     }
 }   // loadAddonsList
 
