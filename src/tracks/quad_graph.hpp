@@ -94,7 +94,7 @@ public:
     video::ITexture *makeMiniMap(const core::dimension2du &where,
                                  const std::string &name, 
                                  const video::SColor &fill_color
-                                        =video::SColor(127, 255, 255, 255) );
+                                        =video::SColor(175, 255, 255, 255) );
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
 
     /** Returns the number of nodes in the graph. */
