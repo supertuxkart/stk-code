@@ -21,8 +21,6 @@
 #ifndef HEADER_ADDONS_LOADING_HPP
 #define HEADER_ADDONS_LOADING_HPP
 
-#include <pthread.h>
-
 #include "addons/addon.hpp"
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
