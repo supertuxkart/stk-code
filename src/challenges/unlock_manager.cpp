@@ -81,6 +81,12 @@ UnlockManager::~UnlockManager()
 {
     save();
     
+    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
+        i!=m_all_challenges.end();  i++)
+    {
+        delete i->second;
+    }
+    
     // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
     // sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
