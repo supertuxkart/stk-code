@@ -1,6 +1,6 @@
 <stkgui>
 
-<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+<div x="2%" y="2%" width="96%" height="97%" layout="vertical-row" >
 
     <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
@@ -20,12 +20,12 @@
 
         <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
         <div width="75%" height="50" layout="horizontal-row" >
-            <label I18N="In the graphics settings" text="Graphical Effects Settings"/>
+            <label I18N="In the graphics settings" text="Graphical Effects Level" align="center"/>
             <spacer width="20" height="20"/>
             <gauge id="gfx_level" min_value="1" max_value="5" width="300" />
         </div>
         
-        <spacer height="15" width="10"/>
+        <spacer height="10" width="10"/>
         
         <!-- ************ VSYNC ************ -->
         <div width="75%" height="fit" layout="horizontal-row" >
@@ -34,7 +34,16 @@
             <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
         </div>
         
-        <spacer width="20" height="25"/>
+        <spacer height="5" width="10"/>
+        
+        <!-- ************ FBO ************ -->
+        <div width="75%" height="fit" layout="horizontal-row" >
+            <checkbox id="fbos"/>
+            <spacer width="20" height="100%" />
+            <label height="100%" I18N="In the video settings" text="Use Frame Buffer Objects (requires restart)"/>
+        </div>
+        
+        <spacer height="10" width="10"/>
         
         <!-- ************ RESOLUTION CHOICE ************ -->
         <spacer height="10" width="10"/>
