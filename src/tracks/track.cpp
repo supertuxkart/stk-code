@@ -975,8 +975,7 @@ void Track::createWater(const XMLNode &node)
     node.get("height", &wave_height);
     node.get("speed",  &wave_speed);
     node.get("length", &wave_length);
-    scene::ISceneNode* scene_node;
-    
+    scene::ISceneNode* scene_node = NULL;
     
     if (UserConfigParams::m_graphical_effects)
     {
