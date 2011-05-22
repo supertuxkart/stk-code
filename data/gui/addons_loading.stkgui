@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <bubble word_wrap="true" id="description" height="100%" x="5%" width="90%" proportion="6" />
+  <bubble word_wrap="true" id="description" height="100%" width="90%" proportion="6" align="center" />
 
   <div width="90%" proportion="2" align="center">
     <button      id="install"  x="0" y="0" width="100%" height="100%" I18N="Addons" text="Install"/>
@@ -26,6 +26,6 @@
   
   <spacer height="10" />
   
-  <button id="cancel" proportion="2" x="5%" width="90%" I18N="Addons" text="Back" align="center"/>
+  <button id="cancel" proportion="2" width="90%" I18N="Addons" text="Back" align="center"/>
 </div>
 </stkgui>

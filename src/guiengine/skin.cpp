@@ -1810,10 +1810,10 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
         core::rect< s32 > rect2 = rect;
 
         // minor adjustments...
-        rect2.UpperLeftCorner.X -= 7;
+        //rect2.UpperLeftCorner.X -= 7;
         rect2.LowerRightCorner.Y += 7;
         rect2.LowerRightCorner.X += BUBBLE_MARGIN_ON_RIGHT;
-
+        
         if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["textbubble::focused"]);
         else
@@ -1905,8 +1905,15 @@ void Skin::draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, c
 
 ITexture* Skin::getImage(const char* name)
 {
-    BoxRenderParams& p = SkinConfig::m_render_params[name];
-    return p.getImage();
+    if (SkinConfig::m_render_params.find(name) != SkinConfig::m_render_params.end())
+    {
+        BoxRenderParams& p = SkinConfig::m_render_params[name];
+        return p.getImage();
+    }
+    else
+    {
+        return irr_driver->getTexture(file_manager->getDataDir() + "/gui/main_help.png");
+    }
 }
 
 // -----------------------------------------------------------------------------
