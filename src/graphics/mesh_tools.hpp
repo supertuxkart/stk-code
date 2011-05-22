@@ -20,7 +20,10 @@
 #ifndef HEADER_MESH_TOOLS_HPP
 #define HEADER_MESH_TOOLS_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 using namespace irr;
 
 #include "utils/vec3.hpp"

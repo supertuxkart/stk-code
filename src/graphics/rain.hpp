@@ -22,7 +22,14 @@
 
 class PerCameraNode;
 
-#include <irrlicht.h>
+#include <vector3d.h>
+namespace irr
+{
+    namespace video { class SMaterial; }
+    namespace scene { class ICameraSceneNode; class ISceneNode; }
+}
+using namespace irr;
+
 const int RAIN_RING_COUNT = 5;
 
 class SFXBase;

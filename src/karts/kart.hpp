@@ -48,6 +48,7 @@ class SFXBase;
 class SkidMarks;
 class SlipStream;
 class ParticleEmitter;
+class ParticleKind;
 class Rain;
 
 /** The main kart class. All type of karts are of this object, but with 

@@ -18,6 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/mesh_tools.hpp"
+#include <IMesh.h>
+#include <IMeshBuffer.h>
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
     

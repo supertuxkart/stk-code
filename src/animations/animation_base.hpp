@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "irrlicht.h"
+#include <vector3d.h>
 using namespace irr;
 
 #include "tracks/track_object.hpp"

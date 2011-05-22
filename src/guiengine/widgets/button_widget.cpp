@@ -17,6 +17,9 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr;

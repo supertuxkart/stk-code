@@ -19,6 +19,9 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/per_camera_node.hpp"
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+#include <IMeshSceneNode.h>
 
 PerCameraNode::PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
                              scene::ICameraSceneNode* camera, scene::IMesh* mesh)

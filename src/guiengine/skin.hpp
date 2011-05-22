@@ -19,7 +19,16 @@
 #ifndef HEADER_SKIN_HPP
 #define HEADER_SKIN_HPP
 
-#include "irrlicht.h"
+#include <rect.h>
+#include <SColor.h>
+#include <vector2d.h>
+#include <dimension2d.h>
+#include <IGUISkin.h>
+namespace irr
+{
+    namespace video { class ITexture;    }
+    namespace gui   { class IGUIElement; class IGUIFont; class IGUISpriteBank; }
+}
 #include "utils/ptr_vector.hpp"
 
 /**

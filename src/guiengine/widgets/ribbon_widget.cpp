@@ -29,6 +29,10 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;

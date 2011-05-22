@@ -33,6 +33,7 @@
 
 #include "audio/music_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -40,6 +41,8 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
+
+#include <ICameraSceneNode.h>
 
 RaceGUIBase::RaceGUIBase()
 {

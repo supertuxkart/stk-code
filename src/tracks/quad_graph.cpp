@@ -21,6 +21,9 @@
 
 #include "LinearMath/btTransform.h"
 
+#include <IMesh.h>
+#include <ICameraSceneNode.h>
+
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"

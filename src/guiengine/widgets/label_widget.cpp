@@ -22,6 +22,11 @@
 #include "guiengine/skin.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
+#include <IGUIButton.h>
+
 #include <assert.h>
 
 using namespace GUIEngine;

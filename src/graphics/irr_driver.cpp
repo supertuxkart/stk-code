@@ -40,6 +40,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
 
+#include <irrlicht.h>
+
 using namespace irr::core;
 using namespace irr::scene;
 using namespace irr::video;

@@ -317,6 +317,13 @@ void Widget::setParent(IGUIElement* parent)
 
 // -----------------------------------------------------------------------------
 
+bool Widget::isVisible() const
+{
+    return m_element && m_element->isVisible();
+}
+
+// -----------------------------------------------------------------------------
+
 void Widget::setVisible(bool visible)
 {
     if (m_element != NULL)
@@ -329,6 +336,17 @@ void Widget::setVisible(bool visible)
     for (int n=0; n<childrenCount; n++)
     {
         m_children[n].setVisible(visible);
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void Widget::moveIrrlichtElement()
+{
+    if (m_element != NULL)
+    {
+        m_element->setRelativePosition( irr::core::recti(irr::core::position2di(m_x, m_y),
+                                                         irr::core::dimension2di(m_w, m_h) ) );
     }
 }
 

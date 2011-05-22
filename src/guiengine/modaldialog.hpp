@@ -18,10 +18,7 @@
 #ifndef HEADER_MODAL_DIALOG_HPP
 #define HEADER_MODAL_DIALOG_HPP
 
-namespace irr
-{
-    namespace gui { class IGUIWindow; }
-}
+#include <IGUIWindow.h>
 
 #include "utils/ptr_vector.hpp"
 #include "guiengine/abstract_top_level_container.hpp"

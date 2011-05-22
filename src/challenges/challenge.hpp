@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "utils/no_copy.hpp"
 #include "utils/translation.hpp"

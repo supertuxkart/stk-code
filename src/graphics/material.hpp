@@ -24,7 +24,10 @@
 
 #include <string>
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace video { class ITexture; class SMaterial; }
+}
 using namespace irr;
 
 class XMLNode;

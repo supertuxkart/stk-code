@@ -36,6 +36,11 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <ILightSceneNode.h>
+#include <ICameraSceneNode.h>
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;

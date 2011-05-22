@@ -19,6 +19,7 @@
 
 #include "graphics/slip_stream.hpp"
 
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -26,6 +27,10 @@
 #include "modes/world.hpp"
 #include "tracks/quad.hpp"
 #include "utils/constants.hpp"
+
+#include <SMesh.h>
+#include <SMeshBuffer.h>
+#include <IMeshSceneNode.h>
 
 /** Creates the slip stream object using a moving texture.
  *  \param kart Pointer to the kart to which the slip stream

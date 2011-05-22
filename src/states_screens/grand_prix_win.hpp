@@ -23,7 +23,7 @@
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
 
-namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
+namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 class KartProperties;
 
 /**

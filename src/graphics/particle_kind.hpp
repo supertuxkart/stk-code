@@ -23,7 +23,7 @@
 #include "utils/no_copy.hpp"
 
 #include <string>
-#include "irrlicht.h"
+#include <SColor.h>
 using namespace irr;
 
 class Material;

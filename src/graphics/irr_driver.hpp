@@ -27,7 +27,17 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+#include <IVideoDriver.h>
+#include <vector2d.h>
+#include <dimension2d.h>
+#include <SColor.h>
+#include <IrrlichtDevice.h>
+namespace irr
+{
+    namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
+        class IMeshSceneNode; class IParticleSystemSceneNode; class ICameraSceneNode; class ILightSceneNode; }
+    namespace gui   { class IGUIEnvironment; class IGUIFont; }
+}
 using namespace irr;
 
 #include "utils/aligned_array.hpp"
@@ -39,7 +49,6 @@ using namespace irr;
 class Camera;
 class Kart;
 class PerCameraNode;
-namespace irr { namespace scene { class IAnimatedMeshSceneNode; } }
 
 struct VideoMode
 {

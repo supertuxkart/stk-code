@@ -17,6 +17,9 @@
 
 #include "guiengine/event_handler.hpp"
 
+#include <IGUIEnvironment.h>
+#include <IGUIListBox.h>
+
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"

@@ -28,6 +28,10 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
+#include <ITexture.h>
+#include <Smaterial.h>
+#include <ImeshBuffer.h>
+
 MaterialManager *material_manager=0;
 
 MaterialManager::MaterialManager()

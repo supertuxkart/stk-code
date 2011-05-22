@@ -19,6 +19,8 @@
 
 #include "karts/kart_model.hpp"
 
+#include <IMeshSceneNode.h>
+
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"

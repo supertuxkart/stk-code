@@ -22,6 +22,11 @@
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
+#include <IGUIStaticText.h>
+
 using namespace GUIEngine;
 using namespace irr::video;
 using namespace irr::core;

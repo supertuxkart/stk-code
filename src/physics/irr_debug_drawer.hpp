@@ -20,9 +20,6 @@
 #ifndef HEADER_IRR_DEBUG_DRAWER_HPP
 #define HEADER_IRR_DEBUG_DRAWER_HPP
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "btBulletDynamicsCommon.h"
 
 #include "graphics/irr_driver.hpp"

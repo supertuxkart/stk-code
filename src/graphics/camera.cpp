@@ -37,6 +37,9 @@
 #include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 
 Camera::Camera(int camera_index, const Kart* kart)

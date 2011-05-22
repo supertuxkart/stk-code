@@ -19,6 +19,11 @@
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "utils/string_utils.hpp"
 #include <string.h>
+
+#include <IGUIEnvironment.h>
+#include <IGUIElement.h>
+#include <IGUIButton.h>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr;

@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/camera.hpp"
+#include "graphics/material.hpp"
 #include "io/xml_node.hpp"
 #include "items/bowling.hpp"
 #include "karts/kart.hpp"

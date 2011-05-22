@@ -23,6 +23,10 @@
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
+
 using namespace irr;
 
 class MyCGUIEditBox : public CGUIEditBox

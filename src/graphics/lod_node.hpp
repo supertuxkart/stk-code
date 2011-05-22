@@ -19,7 +19,13 @@
 #ifndef HEADER_LOD_NODE_HPP
 #define HEADER_LOD_NODE_HPP
 
-#include "irrlicht.h"
+#include <aabbox3d.h>
+#include <matrix4.h>
+#include <ISceneNode.h>
+namespace irr
+{
+    namespace scene { class ISceneManager; }
+}
 using namespace irr;
 
 #include <set>

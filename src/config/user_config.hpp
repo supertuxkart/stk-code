@@ -45,7 +45,7 @@ const int CURRENT_CONFIG_VERSION = 8;
 #include <vector>
 #include <fstream>
 
-#include "irrlicht.h"
+#include <irrString.h>
 using irr::core::stringc;
 using irr::core::stringw;
 

@@ -27,6 +27,13 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
+#include <SParticle.h>
+#include <IParticleAffector.h>
+#include <ICameraSceneNode.h>
+#include <IParticleSystemSceneNode.h>
+#include <IParticleBoxEmitter.h>
+#include <ISceneManager.h>
+
 class FadeAwayAffector : public scene::IParticleAffector
 {
     /** (Squared) distance from camera at which a particle started being faded out */

@@ -26,6 +26,8 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <IGUIStaticText.h>
+
 namespace GUIEngine
 {
     /** Types of ribbons */

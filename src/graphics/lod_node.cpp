@@ -19,6 +19,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 
+#include <ISceneManager.h>
+#include <ICameraSceneNode.h>
 
 LODNode::LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id)
 : ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)

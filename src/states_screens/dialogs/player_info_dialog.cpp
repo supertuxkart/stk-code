@@ -17,6 +17,9 @@
 
 #include "states_screens/dialogs/player_info_dialog.hpp"
 
+#include <IGUIStaticText.h>
+#include <IGUIEnvironment.h>
+
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"

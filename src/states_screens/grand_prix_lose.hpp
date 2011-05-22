@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 
-namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
+namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 class KartProperties;
 
 /**

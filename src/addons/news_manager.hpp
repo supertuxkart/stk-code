@@ -22,7 +22,7 @@
 #include <vector>
 
 
-#include "irrlicht.h"
+#include <irrString.h>
 using namespace irr;
 
 #include "utils/synchronised.hpp"

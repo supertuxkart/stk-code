@@ -28,9 +28,6 @@
 #endif
 #include <curl/curl.h>
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "utils/synchronised.hpp"
 
 class Request;

@@ -19,7 +19,14 @@
 #ifndef HEADER_PER_CAMERA_HPP
 #define HEADER_PER_CAMERA_HPP
 
-#include "irrlicht.h"
+#include <matrix4.h>
+#include <aabbox3d.h>
+#include <IDummyTransformationSceneNode.h>
+#include <ESceneNodeTypes.h>
+namespace irr
+{
+    namespace scene { class ICameraSceneNode; class ISceneNode; class ISceneManager; class IMesh; }
+}
 using namespace irr;
 
 

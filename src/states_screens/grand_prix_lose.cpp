@@ -19,8 +19,6 @@
 
 #include "states_screens/grand_prix_lose.hpp"
 
-#include <SColor.h>
-#include <iostream>
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -35,6 +33,13 @@
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+
+#include <ISceneManager.h>
+#include <SColor.h>
+#include <ICameraSceneNode.h>
+#include <ILightSceneNode.h>
+#include <IMeshSceneNode.h>
+//#include <iostream>
 
 using namespace irr::core;
 using namespace irr::gui;

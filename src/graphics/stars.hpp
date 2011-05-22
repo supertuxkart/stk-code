@@ -21,7 +21,11 @@
 
 #include <vector>
 
-#include "irrlicht.h"
+#include <vector3d.h>
+namespace irr
+{
+    namespace scene { class ISceneNode; }
+}
 using namespace irr;
 
 /**

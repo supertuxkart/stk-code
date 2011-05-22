@@ -20,7 +20,10 @@
 #ifndef HEADER_SMOKE_HPP
 #define HEADER_SMOKE_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IParticleSystemSceneNode; class ISceneNode; class IParticleEmitter; }
+}
 using namespace irr;
 
 #include "utils/no_copy.hpp"

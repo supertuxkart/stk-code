@@ -23,7 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+#include <vector2d.h>
+#include <vector3d.h>
 using namespace irr;
 
 #include "utils/no_copy.hpp"

@@ -17,6 +17,8 @@
 
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 
+#include <IGUIEnvironment.h>
+
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"

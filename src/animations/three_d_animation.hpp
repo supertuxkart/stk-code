@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "irrlicht.h"
+#include <vector3d.h>
 using namespace irr;
 
 #include "btBulletDynamicsCommon.h"

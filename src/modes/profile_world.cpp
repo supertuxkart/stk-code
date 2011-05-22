@@ -23,6 +23,8 @@
 #include "graphics/irr_driver.hpp"
 #include "tracks/track.hpp"
 
+#include <ISceneManager.h>
+
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps = 0;
 float ProfileWorld::m_time   = 0.0f;

@@ -29,6 +29,9 @@
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
+#include <SMeshBuffer.h>
+#include <SMesh.h>
+
 const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
 const float RAIN_Y_TO = 25.0f;
 const float RAIN_Y_FROM = -10.0f;

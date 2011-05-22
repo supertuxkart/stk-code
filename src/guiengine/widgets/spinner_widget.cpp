@@ -23,6 +23,12 @@
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
+#include <IGUIStaticText.h>
+#include <IGUIImage.h>
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;

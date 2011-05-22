@@ -16,12 +16,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/irr_driver.hpp"
+#include "guiengine/CGUISpriteBank.h"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-
 #include "io/file_manager.hpp"
 
-#include "guiengine/CGUISpriteBank.h"
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+#include <IGUIListBox.h>
 
 #include <sstream>
 

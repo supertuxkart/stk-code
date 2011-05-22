@@ -24,6 +24,9 @@
 #include <iostream>
 #include <algorithm> // for min and max
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"

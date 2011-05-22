@@ -23,7 +23,7 @@
 #include <string>
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
-#include "irrlicht.h"
+#include <irrString.h>
 using namespace irr;
 
 /**

@@ -30,6 +30,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIStaticText.h>
+#include <IGUIEnvironment.h>
+
 using namespace GUIEngine;
 using namespace irr::gui;
 using namespace irr::core;

@@ -28,6 +28,8 @@
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
 
+#include <IParticleSystemSceneNode.h>
+
 const float burst_time = 0.1f;
 
 Explosion::Explosion(const Vec3& coord, const char* explosion_sound, bool player_kart_hit)

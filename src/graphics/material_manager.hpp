@@ -22,7 +22,11 @@
 
 #include "utils/no_copy.hpp"
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace video { class ITexture;    }
+    namespace scene { class IMeshBuffer; }
+}
 using namespace irr;
 
 #include <string>

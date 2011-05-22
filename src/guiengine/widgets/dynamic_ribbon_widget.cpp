@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
+#include <IGUIEnvironment.h>
 #include <sstream>
 
 using namespace GUIEngine;

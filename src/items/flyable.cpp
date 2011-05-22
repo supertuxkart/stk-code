@@ -27,6 +27,8 @@
 #endif
 #include <math.h>
 
+#include <IMeshSceneNode.h>
+
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stars.hpp"

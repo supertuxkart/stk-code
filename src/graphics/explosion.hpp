@@ -22,7 +22,10 @@
 
 #include "utils/no_copy.hpp"
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IParticleSystemSceneNode;  }
+}
 using namespace irr;
 
 class Vec3;

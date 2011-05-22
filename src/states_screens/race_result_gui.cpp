@@ -22,6 +22,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"

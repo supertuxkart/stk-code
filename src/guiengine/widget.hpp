@@ -316,7 +316,7 @@ namespace GUIEngine
         void setVisible(bool visible);
 
         /** Returns if the element is visible. */
-        bool isVisible() const {return m_element && m_element->isVisible(); }
+        bool isVisible() const;
         
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
@@ -384,15 +384,7 @@ namespace GUIEngine
          */
         irr::gui::IGUIElement* getIrrlichtElement() { return m_element; }
         
-        void moveIrrlichtElement()
-        {
-            if (m_element != NULL)
-            {
-                m_element->setRelativePosition( irr::core::recti(irr::core::position2di(m_x, m_y),
-                                                                 irr::core::dimension2di(m_w, m_h) ) );
-            }
-        }
-        
+        void moveIrrlichtElement();
         bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
 
         /**

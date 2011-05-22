@@ -22,12 +22,8 @@
 
 #include <string>
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "animations/animation_base.hpp"
 
-class Track;
 class XMLNode;
 
 /**

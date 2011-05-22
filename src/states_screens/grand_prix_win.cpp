@@ -36,6 +36,13 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIEnvironment.h>
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+#include <ILightSceneNode.h>
+#include <IGUIImage.h>
+#include <IMeshSceneNode.h>
+
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;

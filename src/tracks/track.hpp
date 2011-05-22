@@ -25,8 +25,8 @@
 
 namespace irr
 {
-    namespace video { class ITexture; class SColor; }
-    namespace scene { class IMesh;                  }
+    namespace video { class ITexture; class SColor;       }
+    namespace scene { class IMesh; class ILightSceneNode; }
 }
 using namespace irr;
 

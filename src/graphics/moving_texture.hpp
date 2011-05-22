@@ -23,7 +23,7 @@
 #include "utils/no_copy.hpp"
 
 #include <string>
-#include "irrlicht.h"
+#include <matrix4.h>
 using namespace irr;
 
 class XMLNode;
