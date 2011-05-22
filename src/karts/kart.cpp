@@ -818,7 +818,7 @@ void Kart::update(float dt)
             m_rain->update(dt);
         }
     }  // UserConfigParams::m_graphical_effects
-
+    
     m_nitro->update();
     
     updatePhysics(dt);
@@ -1012,13 +1012,13 @@ void Kart::handleMaterialGFX()
 {
     const Material *material = getMaterial();
     
-    if (m_terrain_particles)
+    // First test: give the terrain effect, if the kart is
+    // on top of a surface (i.e. not falling), actually touching
+    // something with the wheels, and the material has not the
+    // below surface property set.
+    if (material && isOnGround() && !material->isBelowSurface() && m_kart_mode != EA_RESCUE)
     {
-        // First test: give the terrain effect, if the kart is
-        // on top of a surface (i.e. not falling), actually touching
-        // something with the wheels, and the material has not the
-        // below surface property set.
-        if(material && isOnGround() && !material->isBelowSurface() && m_kart_mode != EA_RESCUE)
+        if (m_terrain_particles)
         {
             Vec3 xyz;
             m_wheel_toggle = 1 - m_wheel_toggle;
@@ -1064,9 +1064,11 @@ void Kart::handleMaterialGFX()
             float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
             m_terrain_particles->setParticleType(pk);
             m_terrain_particles->setCreationRate(create);
-            return;
         }
+        
+        return;
     }
+
     
     // Now the kart is either falling, or driving on a terrain which
     // has the 'below surface' flag set. Detect if there is a surface 
