@@ -29,7 +29,7 @@
 #include "utils/string_utils.hpp"
 
 #include <ITexture.h>
-#include <Smaterial.h>
+#include <SMaterial.h>
 #include <IMeshBuffer.h>
 
 MaterialManager *material_manager=0;
