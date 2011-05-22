@@ -20,7 +20,7 @@
 #define __HEADER_OPTIONS_SCREEN_INPUT2_HPP__
 
 #include <string>
-#include "irrlicht.h"
+#include <irrString.h>
 
 #include "guiengine/screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"

@@ -23,7 +23,11 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace video { class ITexture; class SColor; }
+    namespace scene { class IMesh;                  }
+}
 using namespace irr;
 
 #include "LinearMath/btTransform.h"

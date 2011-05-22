@@ -23,7 +23,13 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "irrlicht.h"
+
+#include <irrString.h>
+#include <IXMLReader.h>
+#include <SColor.h>
+#include <vector2d.h>
+#include <vector3d.h>
+#include <path.h>
 using namespace irr;
 
 #include "utils/no_copy.hpp"

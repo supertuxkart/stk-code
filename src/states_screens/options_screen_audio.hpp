@@ -20,7 +20,6 @@
 #define __HEADER_OPTIONS_SCREEN_AUDIO_HPP__
 
 #include <string>
-#include "irrlicht.h"
 
 #include "guiengine/screen.hpp"
 

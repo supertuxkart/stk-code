@@ -21,7 +21,10 @@
 #ifndef HEADER_MOVEABLE_HPP
 #define HEADER_MOVEABLE_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; class IMeshSceneNode; }
+}
 using namespace irr;
 #include "btBulletDynamicsCommon.h"
 

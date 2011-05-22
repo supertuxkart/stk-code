@@ -20,7 +20,6 @@
 #include "race/grand_prix_manager.hpp"
 
 #include <set>
-
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 

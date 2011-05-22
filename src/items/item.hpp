@@ -24,7 +24,10 @@
   * \defgroup items
   */
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 using namespace irr;
 
 #include "karts/kart.hpp"

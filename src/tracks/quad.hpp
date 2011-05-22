@@ -20,10 +20,7 @@
 #ifndef HEADER_QUAD_HPP
 #define HEADER_QUAD_HPP
 
-#include <vector>
-
-#include "irrlicht.h"
-
+#include <SColor.h>
 #include "utils/vec3.hpp"
 
 class btTransform;

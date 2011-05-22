@@ -20,14 +20,11 @@
 #define __HEADER_OPTIONS_SCREEN_INPUT_HPP__
 
 #include <string>
-//#include <map>
-#include "irrlicht.h"
-
 #include "guiengine/screen.hpp"
 
 namespace GUIEngine { class Widget; }
 class DeviceConfig;
-namespace irr { namespace gui { class STKModifiedSpriteBank; } }
+namespace irr { namespace gui { class STKModifiedSpriteBank; } namespace video { class IVideoDriver; } }
 
 
 struct Input;

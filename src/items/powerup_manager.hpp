@@ -20,7 +20,10 @@
 #ifndef HEADER_POWERUPMANAGER_HPP
 #define HEADER_POWERUPMANAGER_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 #include <string>
 #include <vector>

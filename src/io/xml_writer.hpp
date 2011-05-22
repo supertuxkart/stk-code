@@ -21,7 +21,7 @@
 #define HEADER_XML_WRITER_HPP
 
 #include <fstream>
-#include <irrlicht.h>
+#include <irrString.h>
 
 /**
  * \brief utility class used to write wide (UTF-16 or UTF-32, depending of size of wchar_t) XML files

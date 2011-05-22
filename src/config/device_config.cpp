@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "config/device_config.hpp"
+#include <keycodes.h>
 
 //==== D E V I C E C O N F I G =================================================
 

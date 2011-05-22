@@ -35,8 +35,6 @@
 #include <iostream>
 #include <vector>
 
-#include "irrlicht.h"
-
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 

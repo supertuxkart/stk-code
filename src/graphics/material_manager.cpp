@@ -227,7 +227,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     m_materials.push_back(m);
     if(make_permanent) 
     {
-        assert(m_shared_material_index==m_materials.size()-1);
+        assert(m_shared_material_index==(int)m_materials.size()-1);
         m_shared_material_index = (int)m_materials.size();
     }
     return m ;

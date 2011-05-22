@@ -21,7 +21,11 @@
 #define HEADER_PROJECTILEMANAGER_HPP
 
 #include <vector>
-#include "irrlicht.h"
+
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 #include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"

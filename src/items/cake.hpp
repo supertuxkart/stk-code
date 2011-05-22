@@ -23,7 +23,10 @@
 #ifndef HEADER_CAKE_HPP
 #define HEADER_CAKE_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 #include "items/flyable.hpp"
 

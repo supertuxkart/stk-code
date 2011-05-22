@@ -20,7 +20,7 @@
 #ifndef HEADER_RIBBONGRID_HPP
 #define HEADER_RIBBONGRID_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"

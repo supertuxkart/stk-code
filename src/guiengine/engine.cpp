@@ -587,7 +587,6 @@
 
 #include <iostream>
 #include <assert.h>
-
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "guiengine/event_handler.hpp"

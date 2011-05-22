@@ -19,9 +19,13 @@
 #ifndef HEADER_CHALLENGES_HPP
 #define HEADER_CHALLENGES_HPP
 
-#include "irrlicht.h"
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
+
+namespace irr
+{
+    namespace video { class IVideoDriver; }
+}
 
  
 /**

@@ -23,9 +23,10 @@
 
 #include <fstream>
 
-#include "irrlicht.h"
+#include <irrString.h>
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
+#include <irrXML.h>
 
 /**
   * \ingroup config

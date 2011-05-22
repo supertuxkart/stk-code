@@ -20,7 +20,8 @@
 #ifndef HEADER_CHECK_LINE_HPP
 #define HEADER_CHECK_LINE_HPP
 
-#include "irrlicht.h"
+#include <line2d.h>
+#include <IMeshSceneNode.h>
 using namespace irr;
 
 #include "tracks/check_structure.hpp"

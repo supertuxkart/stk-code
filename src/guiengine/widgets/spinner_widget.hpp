@@ -20,7 +20,11 @@
 #ifndef HEADER_SPINNER_HPP
 #define HEADER_SPINNER_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
+namespace irr
+{
+    namespace video { class ITexture; }
+}
 
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"

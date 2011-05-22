@@ -20,7 +20,7 @@
 #ifndef HEADER_LISTWIDGET_HPP
 #define HEADER_LISTWIDGET_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"

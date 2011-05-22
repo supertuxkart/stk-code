@@ -25,7 +25,7 @@
 
 #include "race/race_manager.hpp"
 
-#include "irrlicht.h"
+#include <irrString.h>
 
 class XMLNode;
 class XMLWriter;

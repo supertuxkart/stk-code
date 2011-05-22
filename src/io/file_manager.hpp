@@ -28,7 +28,9 @@
 #include <vector>
 #include <set>
 
-#include "irrlicht.h"
+#include <irrString.h>
+#include <IFileSystem.h>
+namespace irr { class IrrlichtDevice; }
 using namespace irr;
 
 #include "io/xml_node.hpp"

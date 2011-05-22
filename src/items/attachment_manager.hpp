@@ -19,7 +19,11 @@
 #ifndef HEADER_ATTACHMENT_MANAGER_HPP
 #define HEADER_ATTACHMENT_MANAGER_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; }
+}
+
 #include "items/attachment.hpp"
 #include "utils/no_copy.hpp"
 

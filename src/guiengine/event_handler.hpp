@@ -18,7 +18,7 @@
 #ifndef HEADER_EVENT_HANDLER_HPP
 #define HEADER_EVENT_HANDLER_HPP
 
-#include "irrlicht.h"
+#include <IEventReceiver.h>
 #include "input/input.hpp"
 
 /**

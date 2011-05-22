@@ -18,7 +18,11 @@
 #ifndef HEADER_MODAL_DIALOG_HPP
 #define HEADER_MODAL_DIALOG_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace gui { class IGUIWindow; }
+}
+
 #include "utils/ptr_vector.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
 //#include "guiengine/event_handler.hpp"

@@ -40,7 +40,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include "IEventReceiver.h"
+#include <IEventReceiver.h>
 
 #include "main_loop.hpp"
 #include "addons/addons_manager.hpp"

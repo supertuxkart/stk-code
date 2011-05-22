@@ -24,7 +24,13 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+#include <vector2d.h>
+#include <irrString.h>
+#include <dimension2d.h>
+namespace irr
+{
+    namespace video { class ITexture; }
+}
 using namespace irr;
 
 #include "config/player.hpp"

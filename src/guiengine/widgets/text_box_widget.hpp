@@ -20,7 +20,7 @@
 #ifndef HEADER_TEXTBOX_HPP
 #define HEADER_TEXTBOX_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"

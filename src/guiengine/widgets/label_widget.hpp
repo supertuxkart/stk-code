@@ -20,7 +20,8 @@
 #ifndef HEADER_LABEL_HPP
 #define HEADER_LABEL_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
+#include <SColor.h>
 
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"

@@ -18,7 +18,9 @@
 #ifndef __BUBBLE_WIDGET_HPP__
 #define __BUBBLE_WIDGET_HPP__
 
-#include <irrlicht.h>
+#include <rect.h>
+#include <irrString.h>
+
 #include "guiengine/widget.hpp"
 
 namespace GUIEngine

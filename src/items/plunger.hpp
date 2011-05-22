@@ -23,9 +23,6 @@
 #ifndef HEADER_MISSILE_HPP
 #define HEADER_MISSILE_HPP
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "items/flyable.hpp"
 
 class Kart;

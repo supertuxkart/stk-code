@@ -20,8 +20,6 @@
 #ifndef HEADER_CHECKBOX_HPP
 #define HEADER_CHECKBOX_HPP
 
-#include <irrlicht.h>
-
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 

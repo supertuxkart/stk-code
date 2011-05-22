@@ -23,7 +23,10 @@
 #ifndef HEADER_FLYABLE_HPP
 #define HEADER_FLYABLE_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 using namespace irr;
 
 #include "audio/sfx_manager.hpp"

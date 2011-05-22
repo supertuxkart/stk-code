@@ -20,7 +20,12 @@
 #ifndef HEADER_IBTN_HPP
 #define HEADER_IBTN_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
+namespace irr
+{
+    namespace gui   { class IGUIStaticText; }
+    namespace video { class ITexture;       }
+}
 
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"

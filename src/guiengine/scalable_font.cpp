@@ -5,12 +5,12 @@
 #include "guiengine/scalable_font.hpp"
 
 #include <iostream>
+#include <IGUIEnvironment.h>
+#include <IXMLReader.h>
+#include <IReadFile.h>
+#include <IVideoDriver.h>
+#include <IGUISpriteBank.h>
 
-#include "IGUIEnvironment.h"
-#include "IXMLReader.h"
-#include "IReadFile.h"
-#include "IVideoDriver.h"
-#include "IGUISpriteBank.h"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"

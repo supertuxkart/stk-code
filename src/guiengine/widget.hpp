@@ -19,7 +19,11 @@
 #ifndef HEADER_WIDGET_HPP
 #define HEADER_WIDGET_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
+namespace irr
+{
+    namespace gui { class IGUIElement; }
+}
 #include <map>
 
 #include "guiengine/event_handler.hpp"

@@ -23,19 +23,17 @@
  * \defgroup guiengine
  */
 
+namespace irr
+{
+    class IrrlichtDevice;
+    namespace gui   { class IGUIEnvironment; class ScalableFont; }
+    namespace video { class IVideoDriver; class ITexture;        }
+}
 
-#include <irrlicht.h>
 #include <string>
 
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
-namespace irr
-{
-    namespace gui
-    {
-        class ScalableFont;
-    }
-}
 
 /**
  * \ingroup guiengine

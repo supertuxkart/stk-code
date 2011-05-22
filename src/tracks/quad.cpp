@@ -20,6 +20,7 @@
 #include "tracks/quad.hpp"
 
 #include "irrlicht.h"
+#include <algorithm>
 
 #include "LinearMath/btTransform.h"
 

@@ -20,7 +20,10 @@
 #ifndef HEADER_BOWLING_HPP
 #define HEADER_BOWLING_HPP
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 using namespace irr;
 
 #include "items/flyable.hpp"

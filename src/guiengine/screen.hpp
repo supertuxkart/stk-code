@@ -23,7 +23,12 @@
 #include <string>
 #include <typeinfo>
 
-#include "irrlicht.h"
+#include <irrString.h>
+namespace irr
+{
+    namespace gui { class IGUIElement; }
+}
+using namespace irr;
 
 #include "config/stk_config.hpp"
 #include "guiengine/abstract_top_level_container.hpp"

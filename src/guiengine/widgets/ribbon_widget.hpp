@@ -20,7 +20,7 @@
 #ifndef HEADER_RIBBON_HPP
 #define HEADER_RIBBON_HPP
 
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"

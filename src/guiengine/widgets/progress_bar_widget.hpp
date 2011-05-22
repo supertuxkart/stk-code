@@ -24,7 +24,7 @@
   * \defgroup widgets Guiengine/Widgets
   */
 
-#include <irrlicht.h>
+#include <irrString.h>
 
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
