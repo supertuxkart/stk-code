@@ -141,7 +141,7 @@ void ModalDialog::clearWindow()
 {
     // TODO: extract this code and its eqauivalent from Screen into the common base class?
     Widget* w;
-    for_in (w, m_widgets);
+    for_in (w, m_widgets)
     {
         m_irrlicht_window->removeChild( w->getIrrlichtElement() );
     }
