@@ -63,8 +63,8 @@ NetworkHttp *network_http=NULL;
  *  ending up with an corrupted file).
  */
 NetworkHttp::NetworkHttp() : m_all_requests(std::vector<Request*>()),
-			     m_current_request(NULL),
-			     m_abort(false),
+                             m_current_request(NULL),
+                             m_abort(false),
                              m_thread_id(NULL)
 {
     // Don't even start the network threads if networking is disabled.
@@ -94,6 +94,9 @@ NetworkHttp::NetworkHttp() : m_all_requests(std::vector<Request*>()),
  */
 void NetworkHttp::startNetworkThread()
 {
+    if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
+        return;
+
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -225,9 +228,8 @@ void NetworkHttp::stopNetworkThread()
  */
 NetworkHttp::~NetworkHttp()
 {
-
-    if(UserConfigParams::logAddons())
-        printf("[addons] Command mutex unlocked.\n");
+    if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+        return;
 
     m_thread_id.lock();
     if(m_thread_id.getData())

@@ -190,11 +190,19 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
         assert( news != NULL );
-        delete network_http;
+        if(network_http)
+        {
+            network_http->stopNetworkThread();
+            delete network_http;
+        }
         UserConfigParams::m_internet_status = 
             news->getState() ? NetworkHttp::IPERM_ALLOWED
                              : NetworkHttp::IPERM_NOT_ALLOWED;
         network_http = new NetworkHttp();
+        // Note that the network thread must be started after the assignment
+        // to network_http (since the thread might use network_http, otherwise
+        // a race condition can be introduced resulting in a crash).
+        network_http->startNetworkThread();
     }
     else if (name=="minimal-racegui")
     {

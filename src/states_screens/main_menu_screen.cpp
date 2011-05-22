@@ -22,6 +22,7 @@
 #include <iostream>
 #include <string>
 
+#include "addons/network_http.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -103,7 +104,8 @@ void MainMenuScreen::init()
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
 #ifdef ADDONS_MANAGER
-    if(!addons_manager->onlineReady())
+    if(!addons_manager->onlineReady() ||
+        UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
     {
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
@@ -123,7 +125,8 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
-        if(!addons_manager->onlineReady())
+        if(!addons_manager->onlineReady() ||
+            UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
             addons_icon->setDeactivated();
         else
             addons_icon->setActivated();
