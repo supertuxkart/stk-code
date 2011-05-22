@@ -25,7 +25,7 @@
 
 namespace irr
 {
-    namespace video { class S3DVertex; }
+    namespace video { struct S3DVertex; }
 }
 using namespace irr;
 

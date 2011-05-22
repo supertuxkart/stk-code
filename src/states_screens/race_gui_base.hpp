@@ -29,7 +29,7 @@
 #include <SColor.h>
 namespace irr
 {
-    namespace video { class ITexture; class S3DVertex; }
+    namespace video { class ITexture; struct S3DVertex; }
 }
 using namespace irr;
 
