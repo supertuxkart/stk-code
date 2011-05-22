@@ -35,8 +35,6 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshManipulator.h>
-#include <IMeshBuffer.h>
-#include <SMaterial.h>
 
 // -----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
