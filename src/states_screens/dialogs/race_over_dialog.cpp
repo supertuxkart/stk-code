@@ -37,6 +37,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIEnvironment.h>
+#include <IGUIImage.h>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;

@@ -19,8 +19,9 @@
 
 #include "tracks/quad.hpp"
 
-#include "irrlicht.h"
 #include <algorithm>
+#include <S3DVertex.h>
+#include <triangle3d.h>
 
 #include "LinearMath/btTransform.h"
 

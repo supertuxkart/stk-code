@@ -34,7 +34,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include "irrlicht.h"
+#include <IGUIEnvironment.h>
+#include <IGUIImage.h>
+#include <IGUIStaticText.h>
 
 using namespace irr::gui;
 using namespace irr::video;

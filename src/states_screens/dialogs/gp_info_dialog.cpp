@@ -32,8 +32,8 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-
-#include "irrlicht.h"
+#include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
 
 using namespace irr::gui;
 using namespace irr::video;

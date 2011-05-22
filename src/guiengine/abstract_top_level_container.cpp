@@ -24,9 +24,10 @@
 #include "utils/ptr_vector.hpp"
 #include <sstream>
 
+#include <IGUIElement.h>
+
 using namespace GUIEngine;
 
-#include "irrlicht.h"
 using namespace irr;
 using namespace core;
 using namespace scene;

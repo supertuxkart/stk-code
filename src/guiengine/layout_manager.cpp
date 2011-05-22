@@ -19,13 +19,11 @@
 
 #include <sstream>
 
-#include "irrlicht.h"
+#include <IGUIFont.h>
+#include <ITexture.h>
 using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
 using namespace gui;
+using namespace video;
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_top_level_container.hpp"

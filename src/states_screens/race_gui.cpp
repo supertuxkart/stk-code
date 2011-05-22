@@ -20,7 +20,6 @@
 
 #include "states_screens/race_gui.hpp"
 
-#include "irrlicht.h"
 using namespace irr;
 
 #include <algorithm>

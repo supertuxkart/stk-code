@@ -20,10 +20,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "irrlicht.h"
+#include <IGUIElement.h>
+
 using namespace irr;
 using namespace core;
-using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;

@@ -20,8 +20,6 @@
 #include <sstream>
 #include <assert.h>
 
-#include "irrlicht.h"
-
 #include "input/input.hpp"
 #include "io/file_manager.hpp"
 #include "guiengine/engine.hpp"

@@ -19,7 +19,10 @@
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "utils/translation.hpp"
 
-#include <irrlicht.h>
+#include <IGUIStaticText.h>
+#include <IGUIElement.h>
+#include <IGUIEnvironment.h>
+
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr;

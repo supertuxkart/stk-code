@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
 using namespace irr;
 
 #include "graphics/irr_driver.hpp"
@@ -33,6 +32,9 @@ using namespace irr;
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
+
+#include <ISceneManager.h>
+#include <ImeshManipulator.h>
 
 // -----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)

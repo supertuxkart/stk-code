@@ -24,7 +24,6 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "irrlicht.h"
 using namespace irr;
 
 #include "audio/music_manager.hpp"
@@ -56,6 +55,12 @@ using namespace irr;
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <ISceneManager.h>
+#include <IMeshSceneNode.h>
+#include <IMeshManipulator.h>
+#include <ILightSceneNode.h>
+#include <IMeshCache.h>
 
 const float Track::NOHIT           = -99999.9f;
 

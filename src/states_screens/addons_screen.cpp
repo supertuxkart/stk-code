@@ -21,8 +21,6 @@
 
 #include <sstream>
 
-#include "irrlicht.h"
-
 #include "addons/addons_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"

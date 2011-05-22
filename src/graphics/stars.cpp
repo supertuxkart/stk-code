@@ -18,12 +18,13 @@
 
 #include <cmath>
 
-#include "irrlicht.h"
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <ISceneNode.h>
+#include <IBillboardSceneNode.h>
 
 const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;

@@ -18,10 +18,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/shadow.hpp"
-
-#include "irrlicht.h"
-
 #include "graphics/irr_driver.hpp"
+
+#include <IMesh.h>
+#include <IMeshSceneNode.h>
+#include <ISceneNode.h>
 
 Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node)
 {

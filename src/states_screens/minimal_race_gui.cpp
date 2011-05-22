@@ -20,7 +20,6 @@
 
 #include "states_screens/minimal_race_gui.hpp"
 
-#include "irrlicht.h"
 using namespace irr;
 
 #include "config/user_config.hpp"

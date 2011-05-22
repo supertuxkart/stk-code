@@ -21,7 +21,6 @@
 
 #include <string>
 
-#include "irrlicht.h"
 
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"

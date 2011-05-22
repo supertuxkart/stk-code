@@ -24,7 +24,8 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 
-#include "irrlicht.h"
+#include <IGUIEnvironment.h>
+
 using namespace irr;
 using namespace core;
 using namespace scene;

@@ -44,6 +44,9 @@
 #include "utils/string_utils.hpp"
 
 #include <string>
+#include <IGUIEnvironment.h>
+#include <IGUIImage.h>
+#include <IGUIButton.h>
 
 InputDevice* player_1_device = NULL;
 
