@@ -22,7 +22,6 @@
 
 #include <string>
 #include <vector>
-#include <irrlicht.h>
 #include <set>
 
 #include "guiengine/event_handler.hpp"

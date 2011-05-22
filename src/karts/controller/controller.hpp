@@ -20,7 +20,7 @@
 #ifndef HEADER_CONTROLLER_HPP
 #define HEADER_CONTROLLER_HPP
 
-#include "irrlicht.h"
+#include <irrString.h>
 using namespace irr;
 
 #include "input/input.hpp"

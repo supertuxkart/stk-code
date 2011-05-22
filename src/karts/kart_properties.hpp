@@ -23,7 +23,12 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+#include <SColor.h>
+#include <irrString.h>
+namespace irr
+{
+    namespace video { class ITexture; }
+}
 using namespace irr;
 
 #include "audio/sfx_manager.hpp"

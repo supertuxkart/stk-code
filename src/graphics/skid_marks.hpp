@@ -22,7 +22,13 @@
 
 #include <vector>
 
-#include "irrlicht.h"
+#include <aabbox3d.h>
+#include <SMeshBuffer.h>
+namespace irr
+{
+    namespace video { class SMaterial;      }
+    namespace scene { class IMeshSceneNode; }
+}
 using namespace irr;
 
 #include "utils/no_copy.hpp"

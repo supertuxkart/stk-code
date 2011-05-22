@@ -55,6 +55,10 @@ private:
 
   void clear_cache();
 
+#ifdef DEBUG
+    unsigned int m_magic_number;
+#endif
+    
 public:
   DictionaryManager(const std::string& charset_ = "UTF-8");
   ~DictionaryManager();

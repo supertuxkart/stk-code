@@ -48,10 +48,17 @@ DictionaryManager::DictionaryManager(const std::string& charset_) :
   empty_dict(),
   filesystem(new StkFileSystem)
 {
+#ifdef DEBUG
+    m_magic_number = 0xD1C70471;
+#endif
 }
 
 DictionaryManager::~DictionaryManager()
 {
+#ifdef DEBUG
+    assert(m_magic_number == 0xD1C70471);
+    m_magic_number = 0xDEADBEEF;
+#endif
   for(Dictionaries::iterator i = dictionaries.begin(); i != dictionaries.end(); ++i)
   {
     delete i->second;

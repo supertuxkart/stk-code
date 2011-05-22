@@ -22,7 +22,11 @@
 
 #include <string>
 
-#include "irrlicht.h"
+#include <IAnimatedMeshSceneNode.h>
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class IMesh; class ISceneNode; }
+}
 using namespace irr;
 
 #include "utils/no_copy.hpp"

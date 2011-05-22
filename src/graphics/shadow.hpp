@@ -24,7 +24,11 @@
 
 #include <string>
 
-#include "irrlicht.h"
+namespace irr
+{
+    namespace scene { class ISceneNode; class IMesh; }
+    namespace video { class ITexture; }
+}
 using namespace irr;
 
 /** 

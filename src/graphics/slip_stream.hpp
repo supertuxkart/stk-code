@@ -20,7 +20,12 @@
 #ifndef HEADER_SLIP_STREAM_HPP
 #define HEADER_SLIP_STREAM_HPP
 
-#include "irrlicht.h"
+#include <matrix4.h>
+namespace irr
+{
+    namespace video { class SMaterial; class SColor; }
+    namespace scene { class IMeshSceneNode; class IMesh; class IMesh; }
+}
 using namespace irr;
 
 #include "graphics/moving_texture.hpp"
