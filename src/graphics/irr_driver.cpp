@@ -416,6 +416,9 @@ void IrrDriver::applyResolutionSettings()
     
     file_manager->popTextureSearchPath();
 
+#ifdef ADDONS_MANAGER
+    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsFile("karts"));
+#endif
     kart_properties_manager -> loadAllKarts();
     
     attachment_manager      -> loadModels();
