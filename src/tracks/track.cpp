@@ -48,7 +48,6 @@ using namespace irr;
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/race_gui_base.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_graph.hpp"
@@ -63,6 +62,10 @@ const float Track::NOHIT           = -99999.9f;
 // ----------------------------------------------------------------------------
 Track::Track(std::string filename)
 {
+#ifdef DEBUG
+    m_magic_number          = 0x17AC3802;
+#endif
+    
     m_filename              = filename;
     m_root                  = StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);
@@ -89,6 +92,10 @@ Track::Track(std::string filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
+#ifdef DEBUG
+    assert(m_magic_number == 0x17AC3802);
+    m_magic_number = 0xDEADBEEF;
+#endif
 }   // ~Track
 
 //-----------------------------------------------------------------------------

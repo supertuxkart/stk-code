@@ -18,7 +18,7 @@
 #ifndef TUTORIALSCREEN_H
 #define TUTORIALSCREEN_H
 
-#include "irrlicht.h"
+#include <irrString.h>
 #include "guiengine/screen.hpp"
 #include "guiengine/CGUISpriteBank.h"
 

@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "irrlicht.h"
+#include <irrString.h>
 using namespace irr;
 
 #include "config/player.hpp"

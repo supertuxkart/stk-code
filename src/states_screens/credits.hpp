@@ -19,7 +19,14 @@
 #ifndef HEADER_CREDITS_HPP
 #define HEADER_CREDITS_HPP
 
-#include "irrlicht.h"
+#include <rect.h>
+namespace irr
+{
+    namespace video { class IVideoDriver; }
+}
+
+using namespace irr;
+
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
 

@@ -23,6 +23,12 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+namespace irr
+{
+    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
+}
+using namespace irr;
+
 class Kart;
 class Plunger;
 

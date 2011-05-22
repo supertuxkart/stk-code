@@ -21,7 +21,7 @@
 #define HEADER_REMOTE_KART_INFO_HPP
 
 #include <string>
-#include "irrlicht.h"
+#include <irrString.h>
 
 class RemoteKartInfo
 {

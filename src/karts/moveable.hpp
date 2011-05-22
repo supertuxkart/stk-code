@@ -23,7 +23,7 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; class IMeshSceneNode; }
+    namespace scene { class IMesh; class IMeshSceneNode; class ISceneNode; }
 }
 using namespace irr;
 #include "btBulletDynamicsCommon.h"

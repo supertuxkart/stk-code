@@ -23,6 +23,12 @@
 #include <SColor.h>
 #include "utils/vec3.hpp"
 
+namespace irr
+{
+    namespace video { class S3DVertex; }
+}
+using namespace irr;
+
 class btTransform;
 
 /**

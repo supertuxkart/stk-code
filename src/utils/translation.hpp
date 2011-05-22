@@ -20,7 +20,7 @@
 #ifndef TRANSLATION_HPP
 #define TRANSLATION_HPP
 
-#include "irrlicht.h"
+#include <irrString.h>
 #include <vector>
 #include <string>
 #include "utils/string_utils.hpp"

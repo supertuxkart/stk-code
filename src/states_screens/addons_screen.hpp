@@ -18,9 +18,7 @@
 #ifdef ADDONS_MANAGER
 
 #ifndef HEADER_ADDONS_SCREEN_HPP
-#define HEADER_ADDONS_SCREEN_HPP
-
-#include "irrlicht.h"
+#define HEADER_ADDONS_SCREEN_HPP\
 
 #include "addons/addons_manager.hpp"
 #include "guiengine/screen.hpp"

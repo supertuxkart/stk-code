@@ -21,7 +21,8 @@
 #ifndef HEADER_VEC3_HPP
 #define HEADER_VEC3_HPP
 
-#include "irrlicht.h"
+#include <vector3d.h>
+#include <vector2d.h>
 using namespace irr;
 
 #include "LinearMath/btVector3.h"

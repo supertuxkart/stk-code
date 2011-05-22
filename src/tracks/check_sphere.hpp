@@ -20,9 +20,6 @@
 #ifndef HEADER_CHECK_SPHERE_HPP
 #define HEADER_CHECK_SPHERE_HPP
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "tracks/check_structure.hpp"
 
 class XMLNode;

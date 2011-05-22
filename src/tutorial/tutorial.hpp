@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <irrlicht.h>
+#include <irrString.h>
 
 // SuperTuxKart includes
 #include "utils/no_copy.hpp"

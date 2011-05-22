@@ -20,7 +20,7 @@
 #define __HEADER_OPTIONS_SCREEN_PLAYERS_HPP__
 
 #include <string>
-#include "irrlicht.h"
+#include <irrString.h>
 
 #include "guiengine/screen.hpp"
 

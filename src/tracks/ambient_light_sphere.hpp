@@ -20,7 +20,7 @@
 #ifndef HEADER_AMBIENT_LIGHT_SPHERE_HPP
 #define HEADER_AMBIENT_LIGHT_SPHERE_HPP
 
-#include "irrlicht.h"
+#include <SColor.h>
 using namespace irr;
 
 #include "tracks/check_sphere.hpp"

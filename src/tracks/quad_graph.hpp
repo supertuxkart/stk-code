@@ -27,6 +27,14 @@
 #include "tracks/quad_set.hpp"
 #include "utils/aligned_array.hpp"
 
+#include <dimension2d.h>
+namespace irr
+{
+    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
+    namespace video { class ITexture; }
+}
+using namespace irr;
+
 class CheckLine;
 
 /**

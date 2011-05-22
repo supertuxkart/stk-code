@@ -20,7 +20,12 @@
 #ifndef HEADER_TRACK_OBJECT_HPP
 #define HEADER_TRACK_OBJECT_HPP
 
-#include "irrlicht.h"
+#include <vector3d.h>
+#include <IAnimatedMeshSceneNode.h>
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class ISceneNode; }
+}
 using namespace irr;
 
 #include "utils/vec3.hpp"

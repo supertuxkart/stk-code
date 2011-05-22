@@ -66,6 +66,11 @@ enum WeatherType
 class Track
 {
 private:
+    
+#ifdef DEBUG
+    unsigned int             m_magic_number;
+#endif
+    
     float                    m_gravity;
     std::string              m_ident;
     std::string              m_screenshot;
@@ -181,9 +186,28 @@ private:
         std::string m_quad_name;   /**< Name of the quad file to use.    */
         std::string m_graph_name;  /**< Name of the graph file to use.   */
         std::string m_scene;       /**< Name of the scene file to use.   */
+        
+#ifdef DEBUG
+        unsigned int m_magic_number;
+#endif
+        
         /** Default constructor, sets default names for all fields. */
         TrackMode() : m_name("default"),         m_quad_name("quads.xml"),
-                      m_graph_name("graph.xml"), m_scene("scene.xml")   {};
+                      m_graph_name("graph.xml"), m_scene("scene.xml") 
+        {
+#ifdef DEBUG
+            m_magic_number = 0x46825179;
+#endif
+        }
+        
+        ~TrackMode()
+        {
+#ifdef DEBUG
+            assert(m_magic_number == 0x46825179);
+            m_magic_number = 0xDEADBEEF;
+#endif
+        }
+        
     };   // TrackMode
 
     /** List of all modes for a track. */

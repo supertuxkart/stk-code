@@ -22,7 +22,15 @@
 
 #include <vector>
 
-#include "irrlicht.h"
+#include <irrString.h>
+#include <vector2d.h>
+#include <rect.h>
+#include <dimension2d.h>
+#include <SColor.h>
+namespace irr
+{
+    namespace video { class ITexture; class S3DVertex; }
+}
 using namespace irr;
 
 
@@ -50,7 +58,7 @@ public:
         float r, g, b;
         
         /** if this kart has a special title, e.g. "leader" in follow-the-leader */
-        irr::core::stringw special_title;
+        core::stringw special_title;
         
         /** Current lap of this kart, or -1 if irrelevant */
         int lap;
