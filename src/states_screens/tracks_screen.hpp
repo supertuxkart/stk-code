@@ -49,6 +49,10 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget();
+
+    
     void setFocusOnTrack(const std::string& trackName);
     void setFocusOnGP(const std::string& gpName);
 

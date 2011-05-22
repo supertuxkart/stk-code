@@ -49,48 +49,6 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 
 void TracksScreen::loadedFromFile()
 {
-    // Dynamically add tabs
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
-    
-    tabs->clearAllChildren();
-    
-    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    const int group_amount = groups.size();
-    
-    // add standard group first
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] == DEFAULT_GROUP_NAME)
-        {
-            // FIXME: group name is not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
-            break;
-        }
-    }
-    
-    // Make group names being picked up by gettext
-#define FOR_GETTEXT_ONLY(x)
-    //I18N: kart group name
-    FOR_GETTEXT_ONLY( _("standard") )
-    //I18N: kart group name
-    FOR_GETTEXT_ONLY( _("Add-Ons") )
-    
-    // add others after
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] != DEFAULT_GROUP_NAME)
-        {
-            // try to translate the group name
-            tabs->addTextChild( _(groups[n].c_str()), groups[n] );
-        }
-    }
-    
-    if (group_amount > 1)
-    {
-        //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
-    }
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -207,9 +165,57 @@ printf("back in tracks_screen\n");
 
 // -----------------------------------------------------------------------------------------------
 
-void TracksScreen::init()
+void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
+    // Dynamically add tabs
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+    assert( tabs != NULL );
+    
+    tabs->clearAllChildren();
+    
+    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
+    const int group_amount = groups.size();
+    
+    // add standard group first
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] == DEFAULT_GROUP_NAME)
+        {
+            // FIXME: group name is not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
+            break;
+        }
+    }
+    
+    // Make group names being picked up by gettext
+#define FOR_GETTEXT_ONLY(x)
+    //I18N: kart group name
+    FOR_GETTEXT_ONLY( _("standard") )
+    //I18N: kart group name
+    FOR_GETTEXT_ONLY( _("Add-Ons") )
+    
+    // add others after
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] != DEFAULT_GROUP_NAME)
+        {
+            // try to translate the group name
+            tabs->addTextChild( _(groups[n].c_str()), groups[n] );
+        }
+    }
+    
+    if (group_amount > 1)
+    {
+        //I18N: name of the tab that will show tracks from all groups
+        tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
+    }
+}
+
+// -----------------------------------------------------------------------------------------------
+
+void TracksScreen::init()
+{
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
     assert( gps_widget != NULL );
     
