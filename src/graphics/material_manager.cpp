@@ -30,7 +30,7 @@
 
 #include <ITexture.h>
 #include <Smaterial.h>
-#include <ImeshBuffer.h>
+#include <IMeshBuffer.h>
 
 MaterialManager *material_manager=0;
 

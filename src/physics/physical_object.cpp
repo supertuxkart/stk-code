@@ -34,7 +34,9 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
-#include <ImeshManipulator.h>
+#include <IMeshManipulator.h>
+#include <ImeshBuffer.h>
+#include <Smaterial.h>
 
 // -----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
