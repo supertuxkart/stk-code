@@ -20,7 +20,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "utils/translation.hpp"
-#include <irrlicht.h>
 #include <iostream>
 #include <irrXML.h>
 #include <sstream>

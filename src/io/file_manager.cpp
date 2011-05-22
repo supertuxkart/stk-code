@@ -56,8 +56,6 @@
 #  include <unistd.h>
 #endif
 
-
-#include "irrlicht.h"
 #include "btBulletDynamicsCommon.h"
 
 #include "config/user_config.hpp"
