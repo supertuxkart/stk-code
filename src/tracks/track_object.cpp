@@ -105,9 +105,9 @@ TrackObject::~TrackObject()
 {
     if(m_node)
         irr_driver->removeNode(m_node);
-    irr_driver->dropAllTextures(m_mesh);
     if(m_mesh)
     {
+        irr_driver->dropAllTextures(m_mesh);
         m_mesh->drop();
         if(m_mesh->getReferenceCount()==1)
             irr_driver->removeMeshFromCache(m_mesh);
