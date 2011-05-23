@@ -117,6 +117,12 @@ std::vector<std::string> TrackManager::getAllTrackIdentifiers()
 void TrackManager::loadTrackList()
 {
     m_all_track_dirs.clear();
+    m_track_group_names.clear();
+    m_track_groups.clear();
+    m_arena_group_names.clear();
+    m_arena_groups.clear();
+    m_track_avail.clear();
+    
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
         const std::string &dir = m_track_search_path[i];
