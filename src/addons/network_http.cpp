@@ -100,6 +100,9 @@ void NetworkHttp::startNetworkThread()
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    // Should be the default, but just in case:
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
     int error = pthread_create(m_thread_id.getData(), &attr, 
