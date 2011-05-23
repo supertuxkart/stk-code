@@ -368,19 +368,26 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         for (int n=1; n<10 && !found; n++)
         {
             closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() - n, true);
-            
+                        
             if (closest != NULL && Widget::isFocusableId(closest->getID()))
             {
                 if (NAVIGATION_DEBUG) std::cout << "Navigating up to " << closest->getID() << std::endl;
                 Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
-                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
-
-                //FIXME: something's wrong here, I use 'closestWidget', THEN verify it's not NULL xD
                 
-                closestWidget->setFocusForPlayer(playerID);
+                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+                
+                // if a dialog is shown, restrict to items in the dialog
+                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(closestWidget))
+                {
+                    continue;
+                }
                 
                 // when focusing a list by going up, select the last item of the list
-                if (closestWidget != NULL && closestWidget->m_type == WTYPE_LIST)
+                assert (closestWidget != NULL);
+                
+                closestWidget->setFocusForPlayer(playerID);
+
+                if (closestWidget->m_type == WTYPE_LIST)
                 {
                     IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
                     assert(list != NULL);
@@ -389,6 +396,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
                     return;
                 }
                 found = true;
+                
             }
         } // end for
         
@@ -487,8 +495,15 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
             
             if (closest != NULL && Widget::isFocusableId(closest->getID()))
             {
+                
                 Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
                 if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+                
+                // if a dialog is shown, restrict to items in the dialog
+                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(closestWidget))
+                {
+                    continue;
+                }
                 
                 if (NAVIGATION_DEBUG)
                 {
