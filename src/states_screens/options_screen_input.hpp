@@ -42,7 +42,7 @@ class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSin
     
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
     
-   // std::map<std::string, float> m_highlights;
+    std::map<std::string, float> m_highlights;
     
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
@@ -65,13 +65,14 @@ public:
      */
     void rebuildDeviceList();
 
-    /** \brief Override callback from base class */
-    virtual GUIEngine::EventPropagation filterActions(PlayerAction action,
-                                                      int deviceID,
-                                                      const unsigned int value,
-                                                      Input::InputType type,
-                                                      int playerId);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void filterInput(Input::InputType type,
+                             int deviceID,
+                             int btnID,
+                             int axisDir,
+                             int value);
     
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver* drv);
 };
 

@@ -348,6 +348,11 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     StateManager::ActivePlayer** player /* out */,
                                     PlayerAction* action /* out */ )
 {
+    if (GUIEngine::getCurrentScreen() != NULL)
+    {
+        GUIEngine::getCurrentScreen()->filterInput(type, deviceID, btnID, axisDir, value);
+    }
+    
     InputDevice *device = NULL;
     
     // If the input event matches a bind on an input device, get a pointer to the device

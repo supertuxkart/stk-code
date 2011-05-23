@@ -272,6 +272,15 @@ namespace GUIEngine
         virtual EventPropagation filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                                Input::InputType type, int playerId) { return EVENT_LET; }
         
+        /**
+         * \brief override this if you need to be notified of raw input in subclasses
+         */
+        virtual void filterInput(Input::InputType type,
+                                 int deviceID,
+                                 int btnID,
+                                 int axisDir,
+                                 int value) {}
+        
     };
     
 }

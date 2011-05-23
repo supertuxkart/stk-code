@@ -246,12 +246,13 @@ void OptionsScreenInput::unloaded()
 
 // -----------------------------------------------------------------------------
 
-EventPropagation OptionsScreenInput::filterActions(PlayerAction action, int deviceID,
-                                                   const unsigned int value,
-                                                   Input::InputType type, int playerId)
+void OptionsScreenInput::filterInput(Input::InputType type,
+                                     int deviceID,
+                                     int btnID,
+                                     int axisDir,
+                                     int value)
 {
-    /*
-    if (value > Input::MAX_VALUE*2/3 && (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON))
+    if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
     {
         GamePadDevice* gamepad = input_manager->getDeviceList()->getGamePadFromIrrID(deviceID);
         if (gamepad != NULL && gamepad->getConfiguration() != NULL)
@@ -283,15 +284,12 @@ EventPropagation OptionsScreenInput::filterActions(PlayerAction action, int devi
             }
         }
     }
-    */
-    return EVENT_LET;
 }
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
 {
-    /*
     std::map<std::string, float>::iterator it;
     for (it = m_highlights.begin(); it != m_highlights.end();)
     {
@@ -310,6 +308,5 @@ void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
             it++;
         }
     }
-     */
     //m_highlights[internal_name]
 }
