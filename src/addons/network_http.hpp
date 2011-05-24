@@ -69,7 +69,7 @@ private:
     int           init();
     void          loadAddonsList(const XMLNode *xml,
                                  const std::string &filename);
-    bool          downloadFileInternal(Request *request);
+    CURLcode      downloadFileInternal(Request *request);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
     void          insertRequest(Request *request);

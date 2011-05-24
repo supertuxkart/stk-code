@@ -102,7 +102,7 @@ void NetworkHttp::startNetworkThread()
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     // Should be the default, but just in case:
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
     int error = pthread_create(m_thread_id.getData(), &attr, 
@@ -133,7 +133,9 @@ void *NetworkHttp::mainLoop(void *obj)
 
     me->m_current_request = NULL;
     me->m_all_requests.lock();
-    while(me->m_all_requests.getData().size()           == 0               ||
+    bool abort = false;
+    while(!abort ||
+          me->m_all_requests.getData().size()           == 0               ||
           me->m_all_requests.getData()[0]->getCommand() != Request::HC_QUIT   )
     {
         bool empty = me->m_all_requests.getData().size()==0;
@@ -175,10 +177,13 @@ void *NetworkHttp::mainLoop(void *obj)
         case Request::HC_INIT: me->init();    break;            
         case Request::HC_NEWS: assert(false); break;
         case Request::HC_DOWNLOAD_FILE:
-             me->downloadFileInternal(me->m_current_request);
+             CURLcode status = me->downloadFileInternal(me->m_current_request);
+             if(status==CURLE_ABORTED_BY_CALLBACK)
+                abort = true;
              break;
         }   // switch(request->getCommand())
-
+        if(abort)
+            break;
         if(me->m_current_request->manageMemory())
         {
             delete me->m_current_request;
@@ -189,15 +194,9 @@ void *NetworkHttp::mainLoop(void *obj)
         me->m_all_requests.lock();
     }   // while !quit
     if(UserConfigParams::logAddons())
-        printf("[addons] Network thread waiting to be cancelled.\n");
+        printf("[addons] Network exiting.\n");
 
-    // If  the thread would exit here, it would be a lot more complicated for
-    // the main thread (which deletes this object) to detect this - locking
-    // a mutex (e.g. to signal the main thread when this object is finished)
-    // leads to a race condition since a thread waiting for a mutex apparently
-    // can't be cancelled, resulting in a deadlock. 
-    while(1)
-        pthread_testcancel();
+    pthread_exit(NULL);
     return 0;
 }   // mainLoop
 
@@ -233,16 +232,7 @@ NetworkHttp::~NetworkHttp()
 {
     if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
         return;
-
-    m_thread_id.lock();
-    if(m_thread_id.getData())
-    {
-        printf("[addons] Cancelling network thread.\n");
-        int e = pthread_cancel(*m_thread_id.getData());
-        printf("[addons] Cancelled network thread. Return code: %d\n", e);
-        delete m_thread_id.getData();
-    }
-    m_thread_id.unlock();
+    pthread_join(*m_thread_id.getData(), NULL);
 
     pthread_cond_destroy(&m_cond_request);
 
@@ -281,7 +271,9 @@ int NetworkHttp::init()
 
     Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
               "news.xml", "news.xml");
-    if(!download || downloadFileInternal(&r))
+    CURLcode status = download ? downloadFileInternal(&r)
+                               : CURLE_OK;
+    if(status==CURLE_OK)
     {
         std::string xml_file = file_manager->getAddonsFile("news.xml");
         if(download)
@@ -291,17 +283,18 @@ int NetworkHttp::init()
 #ifdef ADDONS_MANAGER
         loadAddonsList(xml, xml_file);
 #endif
+        return 1;
     }
-    else
-    {
-#ifdef ADDONS_MANAGER
-        addons_manager->setErrorState();
-        if(UserConfigParams::logAddons())
-            printf("[addons] Can't download addons list.\n");
+
+    // Abort requested by stk -> display no error message
+    if(status==CURLE_ABORTED_BY_CALLBACK)
         return 0;
+#ifdef ADDONS_MANAGER
+    addons_manager->setErrorState();
+    if(UserConfigParams::logAddons())
+        printf("[addons] Can't download addons list.\n");
+    return 0;
 #endif
-    }
-    return 1;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -342,7 +335,9 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
 
     Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
               addon_list_url, "addons.xml");
-    if(!download || downloadFileInternal(&r))
+    CURLcode status = download ? downloadFileInternal(&r) 
+                               : CURLE_OK;
+    if(status==CURLE_OK)
     {
         std::string xml_file = file_manager->getAddonsFile("addons.xml");
         if(download)
@@ -354,6 +349,13 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
             printf("[addons] Addons manager list downloaded\n");
 #endif
     }
+
+    // Aborted by STK in progress callback, don't display error message
+    if(status==CURLE_ABORTED_BY_CALLBACK)
+        return;
+    printf("[addons] Error on download addons.xml: %d\n",
+        status);
+    return;
 }   // loadAddonsList
 
 // ----------------------------------------------------------------------------
@@ -363,7 +365,7 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
  *  \param request The request object containing the url and the path where
  *         the file is saved to.
  */
-bool NetworkHttp::downloadFileInternal(Request *request)
+CURLcode NetworkHttp::downloadFileInternal(Request *request)
 {
     std::string full_save = 
         file_manager->getAddonsFile(request->getSavePath());
@@ -391,7 +393,7 @@ bool NetworkHttp::downloadFileInternal(Request *request)
                      &NetworkHttp::progressDownload);
     curl_easy_setopt(m_curl_session,  CURLOPT_NOPROGRESS, 0);
                 
-    int status = curl_easy_perform(m_curl_session);
+    CURLcode status = curl_easy_perform(m_curl_session);
     fclose(fout);
     if(status==CURLE_OK)
     {
@@ -418,7 +420,7 @@ bool NetworkHttp::downloadFileInternal(Request *request)
     }
     
     request->setProgress( (status==CURLE_OK) ? 1.0f : -1.0f );
-    return status==CURLE_OK;
+    return status;
 }   // downloadFileInternal
 
 // ----------------------------------------------------------------------------
