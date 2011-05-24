@@ -718,7 +718,7 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, st
             if (*best_highscore_rank == -1 || highscore_rank < *best_highscore_rank)
             {
                 *best_highscore_rank = highscore_rank;
-                *best_finish_time = k->getFinishTime();
+                *best_finish_time = (int)(k->getFinishTime());
                 *highscore_who = k->getIdent();
             }
             
