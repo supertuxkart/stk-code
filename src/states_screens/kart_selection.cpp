@@ -1434,8 +1434,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else
     {
-        // Transmit to all subwindows, maybe *they* care about this event
-        //FIXME: this may now be done automatically by the caller, so maybe I nee to remove this
+        // Transmit to all subwidgets, maybe *they* care about this event
         const int amount = m_kart_widgets.size();
         for (int n=0; n<amount; n++)
         {
