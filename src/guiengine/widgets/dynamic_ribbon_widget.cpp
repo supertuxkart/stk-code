@@ -227,8 +227,9 @@ void DynamicRibbonWidget::add()
                 // will be penalized. A configuration that makes items much smaller than
                 // requested in the XML file will also be penalized.
                 float ratio = (float)item_height / (float)m_child_height;
+                float total_area = m_w * m_h;
                 const int score = int(log(2.0f*visible_items) *
-                                      std::min(ratio, 1.0f) * taken_area);
+                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f));
                 
                 //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
                 //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
