@@ -202,7 +202,7 @@ void DynamicRibbonWidget::add()
         // const int count = m_items.size();
         
         m_row_amount = -1;
-        int max_score_so_far = -1;
+        float max_score_so_far = -1;
 
         if (m_h - m_label_height < 0)
         {
@@ -228,8 +228,8 @@ void DynamicRibbonWidget::add()
                 // requested in the XML file will also be penalized.
                 float ratio = (float)item_height / (float)m_child_height;
                 float total_area = m_w * m_h;
-                const int score = int(log(2.0f*visible_items) *
-                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f));
+                const float score = log(2.0f*visible_items) *
+                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
                 
                 //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
                 //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
