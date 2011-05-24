@@ -1140,8 +1140,8 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     if (!firstPlayer)
     {
-        // select something (anything) in the ribbon so that the selection array does not contain
-        // garbage (FIXME: the ribbon should handle this internally!)
+        // select something (anything) in the ribbon; by default, only the game master has something selected.
+        // Thus, when a new player joins, we need to select something for them
         w->setSelection(new_player_id, new_player_id, true);
             
         newPlayerWidget->m_player_ident_spinner->setFocusForPlayer(new_player_id);
