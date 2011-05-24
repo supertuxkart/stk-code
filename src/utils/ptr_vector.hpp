@@ -273,15 +273,7 @@ public:
 };   // class ptrVector
 
 
-template<typename T, typename U>
-int init_foreach(T& val, U& vect)
-{
-    if (vect.size() > 0)
-        val = vect.get(0);
-    return 0;
-}
-
-#define for_in( VAR, VECTOR ) for (int _foreach_i = init_foreach(VAR, VECTOR); VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
+#define for_in( VAR, VECTOR ) for (int _foreach_i = 0; VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
 
 
 #endif
