@@ -72,8 +72,7 @@ void ArenasScreen::loadedFromFile()
     {
         if (groups[n] != DEFAULT_GROUP_NAME)
         {
-            //FIXME: group name not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n]);
+            tabs->addTextChild( _( stringw(groups[n].c_str()).c_str() ), groups[n]);
         }
     }
     
