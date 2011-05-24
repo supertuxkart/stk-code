@@ -168,6 +168,8 @@ namespace GUIEngine
         
         bool findItemInRows(const char* name, int* p_row, int* p_id);
         
+        int m_item_count_hint;
+        
     public:
     
         
@@ -270,6 +272,10 @@ namespace GUIEngine
         virtual void onSelectionChange(){}
 
         virtual void update(float delta);
+        
+        /** Set approximately how many items are expected to be in this ribbon; will help the layout
+          * algorithm next time add() is called */
+        void setItemCountHint(int hint) { m_item_count_hint = hint; }
     };
     
 }

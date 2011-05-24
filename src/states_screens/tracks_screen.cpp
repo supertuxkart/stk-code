@@ -210,6 +210,10 @@ void TracksScreen::beforeAddingWidget()
         //I18N: name of the tab that will show tracks from all groups
         tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
     }
+    
+    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( tracks_widget != NULL );
+    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks() );
 }
 
 // -----------------------------------------------------------------------------------------------

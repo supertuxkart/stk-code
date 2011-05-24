@@ -916,6 +916,11 @@ void KartSelectionScreen::beforeAddingWidget()
         //I18N: name of the tab that will show tracks from all groups
         tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
     }
+    
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    
+    w->setItemCountHint( kart_properties_manager->getNumberOfKarts() );
 }
 
 // ----------------------------------------------------------------------------- 

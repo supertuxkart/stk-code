@@ -53,6 +53,8 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
         m_selected_item[n] = -1;
     }
     m_selected_item[0] = 0; // only player 0 has a selection by default
+    
+    m_item_count_hint = 0;
 }
 // -----------------------------------------------------------------------------
 DynamicRibbonWidget::~DynamicRibbonWidget()
@@ -75,7 +77,7 @@ DynamicRibbonWidget::~DynamicRibbonWidget()
   */
 void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
                          const int width, const int height,
-                         const float iconAspectRatio,
+                         const float iconAspectRatio, const int maxIcons,
                          int* visibleItems, int* takenArea, int* itemHeight)
 {
     assert(height > 0);
@@ -87,7 +89,7 @@ void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
     
     const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
     
-    *visibleItems = icons_per_row * rowCount ;
+    *visibleItems = std::min(maxIcons, icons_per_row * rowCount);
     *takenArea = int(*visibleItems * icon_width * icon_height);
 }
 
@@ -216,9 +218,22 @@ void DynamicRibbonWidget::add()
                 int visible_items;
                 int taken_area;
                 int item_height;
-                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
-                                    aspect_ratio, &visible_items, &taken_area, &item_height);
                 
+                int item_count = m_item_count_hint;
+                
+                if (item_count < 1)
+                {
+                    item_count = m_items.size();
+                }
+
+                if (item_count < 1)
+                {
+                    // No idea so make assumptions
+                    item_count = 20;
+                }
+                
+                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
+                                    aspect_ratio, item_count, &visible_items, &taken_area, &item_height);
                 
                 // FIXME: this system to determine the best number of columns is really complicated!
                 // the score is computed from taken screen area AND visible item count.
