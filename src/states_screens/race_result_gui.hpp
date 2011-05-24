@@ -211,6 +211,18 @@ public:
     virtual void clearAllMessages() {assert(false); }
     
     void nextPhase();
+    
+    /** Show no highscore */
+    void clearHighscores();
+    
+    /**
+      * To call if the user got a new highscore
+      * \param who identity of the kart that made the highscore
+      * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
+      * \param time Finish time in seconds
+      */
+    void setHighscore(std::string who, int rank, int time);
+    
 };   // RaceResultGUI
 
 #endif

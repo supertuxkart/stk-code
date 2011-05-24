@@ -665,3 +665,16 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
 }   // displayOneEntry
 
+//-----------------------------------------------------------------------------
+
+void RaceResultGUI::clearHighscores()
+{
+    // TODO
+}
+
+//-----------------------------------------------------------------------------
+
+void RaceResultGUI::setHighscore(std::string who, int rank, int time)
+{
+    // TODO
+}

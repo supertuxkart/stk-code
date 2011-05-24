@@ -316,7 +316,13 @@ void World::terminateRace()
 
         }
     }   // i<kart_amount
-    updateHighscores();
+    
+    // Update highscores, and retrieve the best highscore if relevant to show it in the GUI
+    int best_highscore_rank = -1;
+    int best_finish_time = -1;
+    std::string highscore_who = "";
+    updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who);
+    
     unlock_manager->raceFinished();
     
     if (m_race_gui) m_race_gui->clearAllMessages();
@@ -327,8 +333,20 @@ void World::terminateRace()
     // and save the pointer.
     assert(m_saved_race_gui==NULL);
     m_saved_race_gui = m_race_gui;
-    m_race_gui       = RaceResultGUI::getInstance();
-    StateManager::get()->pushScreen(RaceResultGUI::getInstance());
+    
+    RaceResultGUI* results = RaceResultGUI::getInstance();
+    m_race_gui       = results;
+    
+    if (best_highscore_rank > 0)
+    {
+        results->setHighscore(highscore_who, best_highscore_rank, best_finish_time);
+    }
+    else
+    {
+        results->clearHighscores();
+    }
+    
+    StateManager::get()->pushScreen(results);
     WorldStatus::terminateRace();
 }   // terminateRace
 
@@ -637,10 +655,12 @@ Highscores* World::getHighscores() const
  *  score, if so it notifies the HighscoreManager so the new score is added 
  *  and saved.
  */
-void World::updateHighscores()
+void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, std::string* highscore_who)
 {
-    if(!m_use_highscores) return;
+    *best_highscore_rank = -1;
 
+    if(!m_use_highscores) return;
+    
     // Add times to highscore list. First compute the order of karts,
     // so that the timing of the fastest kart is added first (otherwise
     // someone might get into the highscore list, only to be kicked out
@@ -660,9 +680,8 @@ void World::updateHighscores()
         index[pos] = i;
     }
 
-    for(unsigned int pos=0; pos<kart_amount; pos++)
+    for (unsigned int pos=0; pos<kart_amount; pos++)
     {
-
         if(index[pos] == 999)
         {
             // no kart claimed to be in this position, most likely means
@@ -689,10 +708,20 @@ void World::updateHighscores()
         Highscores* highscores = getHighscores();
 
         PlayerController *controller = (PlayerController*)(k->getController());
-        if(highscores->addData(k->getIdent(),
-                               controller->getPlayer()->getProfile()->getName(),
-                               k->getFinishTime())>0 )
+        
+        int highscore_rank = highscores->addData(k->getIdent(),
+                                                 controller->getPlayer()->getProfile()->getName(),
+                                                 k->getFinishTime());
+        
+        if (highscore_rank > 0)
         {
+            if (*best_highscore_rank == -1 || highscore_rank < *best_highscore_rank)
+            {
+                *best_highscore_rank = highscore_rank;
+                *best_finish_time = k->getFinishTime();
+                *highscore_who = k->getIdent();
+            }
+            
             highscore_manager->saveHighscores();
         }
     } // next position

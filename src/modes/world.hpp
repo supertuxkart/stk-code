@@ -83,7 +83,7 @@ protected:
     */
     bool        m_use_highscores;
     
-    void  updateHighscores  ();
+    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, std::string* highscore_who);
     void  resetAllKarts     ();
     void  removeKart        (int kart_number, bool notifyOfElimination=true);
     Controller* 
