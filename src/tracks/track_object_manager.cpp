@@ -34,10 +34,6 @@ TrackObjectManager::TrackObjectManager()
 // ----------------------------------------------------------------------------
 TrackObjectManager::~TrackObjectManager()
 {
-    for(unsigned int i=0; i<m_all_objects.size(); i++)
-    {
-        delete m_all_objects[i];
-    }
 }   // ~TrackObjectManager
 
 // ----------------------------------------------------------------------------
@@ -72,10 +68,10 @@ void TrackObjectManager::add(const XMLNode &xml_node)
  */
 void TrackObjectManager::init()
 {
-    std::vector<TrackObject*>::iterator i;
-    for(i=m_all_objects.begin(); i!=m_all_objects.end(); i++)
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
     {
-        (*i)->init();
+        curr->init();
     }
 }   // reset
 // ----------------------------------------------------------------------------
@@ -83,10 +79,10 @@ void TrackObjectManager::init()
  */
 void TrackObjectManager::reset()
 {
-    std::vector<TrackObject*>::iterator i;
-    for(i=m_all_objects.begin(); i!=m_all_objects.end(); i++)
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
     {
-        (*i)->reset();
+        curr->reset();
     }
 }   // reset
 
@@ -98,12 +94,12 @@ void TrackObjectManager::reset()
  *              more. Otherwise this is NULL.
  */
 
-void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const
+void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *mp)
 {
-    for(std::vector<TrackObject*>::const_iterator i=m_all_objects.begin();
-        i!=m_all_objects.end(); i++)
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
     {
-        (*i)->handleExplosion(pos, mp==(*i));
+        curr->handleExplosion(pos, mp == curr);
     }
 }   // handleExplosion
 
@@ -112,10 +108,10 @@ void TrackObjectManager::update(float dt)
 {
     if ( UserConfigParams::m_graphical_effects )
     {
-        for(std::vector<TrackObject*>::const_iterator i=m_all_objects.begin();
-            i!=m_all_objects.end(); i++)
+        TrackObject* curr;
+        for_in (curr, m_all_objects)
         {
-            (*i)->update(dt);
+            curr->update(dt);
         }
     }
 }   // update
@@ -124,14 +120,14 @@ void TrackObjectManager::update(float dt)
 
 void TrackObjectManager::enableFog(bool enable)
 {
-    const unsigned int count = m_all_objects.size();
-    for(unsigned int i=0; i<count; i++)
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
     {
-        m_all_objects[i]->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
+        curr->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
                 
-        if (m_all_objects[i]->getNode()->getType() == scene::ESNT_LOD_NODE)
+        if (curr->getNode()->getType() == scene::ESNT_LOD_NODE)
         {
-            std::vector<scene::ISceneNode*>& nodes = ((LODNode*)m_all_objects[i]->getNode())->getAllNodes();
+            std::vector<scene::ISceneNode*>& nodes = ((LODNode*)curr->getNode())->getAllNodes();
             for (unsigned int n=0; n<nodes.size(); n++)
             {
                 nodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, enable);

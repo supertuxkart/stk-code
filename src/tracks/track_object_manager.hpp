@@ -20,11 +20,11 @@
 #ifndef HEADER_TRACK_OBJECT_MANAGER_HPP
 #define HEADER_TRACK_OBJECT_MANAGER_HPP
 
-#include <vector>
+#include "tracks/track_object.hpp"
+#include "utils/ptr_vector.hpp"
 
 class PhysicalObject;
 class Track;
-class TrackObject;
 class Vec3;
 class XMLNode;
 
@@ -40,13 +40,14 @@ public:
       * eye candy (to reduce work for physics), ...
       */
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
-    std::vector<TrackObject*> m_all_objects;
+    PtrVector<TrackObject> m_all_objects;
+    
 public:
          TrackObjectManager();
         ~TrackObjectManager();
     void add(const XMLNode &xml_node);
     void update(float dt);
-    void handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+    void handleExplosion(const Vec3 &pos, const PhysicalObject *mp);
     void reset();
     void init();
     
