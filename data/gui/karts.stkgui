@@ -15,7 +15,7 @@
     
     <box proportion="2" width="100%" layout="vertical-row">
         <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
-                     child_width="80" child_height="80" max_rows="3"/>
+                     child_width="90" child_height="90" max_rows="3"/>
     </box>
     
     <!-- Groups will be added dynamically at runtime -->
