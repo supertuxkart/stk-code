@@ -71,6 +71,9 @@ private:
     */
     std::vector<int> m_saved_display_count;
 
+    /** A high priority error message that is shown instead of
+     *  any news message (usually indicating connection problems). */
+    core::stringw    m_error_message;
 
     void          checkRedirect(const XMLNode *xml);
     void          updateNews(const XMLNode *xml,
@@ -87,6 +90,13 @@ public:
                   getNextNewsMessage();
     void          init();
     void          addNewsMessage(const core::stringw &s);
+
+    /** Sets an error message that is displayed instead of any news message. */
+    void          setErrorMessage(const core::stringw &s) { m_error_message=s;}
+    // ------------------------------------------------------------------------
+    /** Clears the error message. */
+    void          clearErrorMessage() {m_error_message=""; }
+    // ------------------------------------------------------------------------
 };   // NewsManager
 
 extern NewsManager *news_manager;

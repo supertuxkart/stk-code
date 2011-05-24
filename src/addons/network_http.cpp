@@ -133,9 +133,7 @@ void *NetworkHttp::mainLoop(void *obj)
 
     me->m_current_request = NULL;
     me->m_all_requests.lock();
-    bool abort = false;
-    while(!abort ||
-          me->m_all_requests.getData().size()           == 0               ||
+    while(me->m_all_requests.getData().size()           == 0               ||
           me->m_all_requests.getData()[0]->getCommand() != Request::HC_QUIT   )
     {
         bool empty = me->m_all_requests.getData().size()==0;
@@ -171,19 +169,21 @@ void *NetworkHttp::mainLoop(void *obj)
         }
         if(me->m_current_request->getCommand()==Request::HC_QUIT)
             break;
+        CURLcode status=CURLE_OK;
         switch(me->m_current_request->getCommand())
         {
-        case Request::HC_QUIT:                break;
-        case Request::HC_INIT: me->init();    break;            
-        case Request::HC_NEWS: assert(false); break;
+        case Request::HC_QUIT: assert(false); break; // quit is checked already
+        case Request::HC_INIT: 
+             status = me->init();    break;
         case Request::HC_DOWNLOAD_FILE:
-             CURLcode status = me->downloadFileInternal(me->m_current_request);
-             if(status==CURLE_ABORTED_BY_CALLBACK)
-                abort = true;
+             status = me->downloadFileInternal(me->m_current_request);
              break;
+        default:
+            assert(false); // All commands should have been handled.
         }   // switch(request->getCommand())
-        if(abort)
+        if(status==CURLE_ABORTED_BY_CALLBACK)
             break;
+
         if(me->m_current_request->manageMemory())
         {
             delete me->m_current_request;
@@ -248,8 +248,10 @@ NetworkHttp::~NetworkHttp()
  *  \return 0 if an error happened and no online connection will be available,
  *          1 otherwise.
  */
-int NetworkHttp::init()
+CURLcode NetworkHttp::init()
 {
+    news_manager->clearErrorMessage();
+    core::stringw error_message("");
     // The news message must be updated if either it has never been updated,
     // or if the time of the last update was more than news_frequency ago.
     bool download = UserConfigParams::m_news_last_updated==0  ||
@@ -281,19 +283,30 @@ int NetworkHttp::init()
         const XMLNode *xml = new XMLNode(xml_file);
         news_manager->init();
 #ifdef ADDONS_MANAGER
-        loadAddonsList(xml, xml_file);
+        status = loadAddonsList(xml, xml_file);
 #endif
-        return 1;
+        if(status==CURLE_OK)
+            return status;
+        else
+            error_message=
+                _("Can't download addons list, check terminal for details.");
+        // Now fall through to error handling.
     }
+    else
+        error_message=
+            _("Can't download news file, check terminal for details.");
 
-    // Abort requested by stk -> display no error message
+    // Abort requested by stk -> display no error message and return
     if(status==CURLE_ABORTED_BY_CALLBACK)
-        return 0;
+        return status;
+
 #ifdef ADDONS_MANAGER
     addons_manager->setErrorState();
+    news_manager->setErrorMessage(error_message);
+
     if(UserConfigParams::logAddons())
-        printf("[addons] Can't download addons list.\n");
-    return 0;
+        printf("[addons] %s\n", core::stringc(error_message).c_str());
+    return status;
 #endif
 }   // init
 
@@ -306,9 +319,10 @@ int NetworkHttp::init()
  *         in case of an error (e.g. it might contain a corrupted
  *         url) - the file will be deleted so that on next start
  *         of stk it will be updated again.
+ *  \return curl error code (esp. CURLE_OK if no error occurred)
  */
-void NetworkHttp::loadAddonsList(const XMLNode *xml,
-                                 const std::string &filename)
+CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
+                                     const std::string &filename)
 {
     std::string    addon_list_url("");
     Time::TimeType mtime(0);
@@ -322,7 +336,8 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
     {
         file_manager->removeFile(filename);
         news_manager->addNewsMessage(_("Can't access stkaddons server..."));
-        return;
+        // Use a curl error code here:
+        return CURLE_COULDNT_CONNECT;
     }
 
     bool download = mtime > UserConfigParams::m_addons_last_updated;
@@ -348,14 +363,15 @@ void NetworkHttp::loadAddonsList(const XMLNode *xml,
         if(UserConfigParams::logAddons())
             printf("[addons] Addons manager list downloaded\n");
 #endif
+        return status;
     }
 
     // Aborted by STK in progress callback, don't display error message
     if(status==CURLE_ABORTED_BY_CALLBACK)
-        return;
+        return status;
     printf("[addons] Error on download addons.xml: %d\n",
         status);
-    return;
+    return status;
 }   // loadAddonsList
 
 // ----------------------------------------------------------------------------

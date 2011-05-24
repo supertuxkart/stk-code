@@ -30,6 +30,7 @@ NewsManager *news_manager=NULL;
 NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
 {
     m_current_news_message = -1;
+    m_error_message        = "";
 }   // NewsManage
 
 // ---------------------------------------------------------------------------
@@ -142,6 +143,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
 #endif
     
 }   // updateNews
+
 // ----------------------------------------------------------------------------
 /** Add a news message. This is used to add error messages, e.g. for problems
  *  when downloading addons.
@@ -162,6 +164,10 @@ void NewsManager::addNewsMessage(const core::stringw &s)
  */
 const core::stringw NewsManager::getNextNewsMessage()
 {
+    // Only display error message in case of a problem.
+    if(m_error_message.size()>0)
+        return m_error_message;
+
     if(m_news.getData().size()==0)
         return "";
 
