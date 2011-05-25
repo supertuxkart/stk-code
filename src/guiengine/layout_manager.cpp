@@ -115,23 +115,41 @@ void LayoutManager::readCoords(Widget* self)
     // ---- try converting to number
     // x coord
     {
-        int abs_x = -1, percent_x = -1;
+        int abs_x = 0x7FFFFFFF, percent_x = 0x7FFFFFFF;
         if (convertToCoord(x, &abs_x, &percent_x ))
         {
-            if      (abs_x >= 0)     self->m_absolute_x = abs_x;
-            else if (abs_x < -1)     self->m_absolute_reverse_x = abs(abs_x);
-            else if (percent_x > -1) self->m_relative_x = (float)percent_x;
+            if      (abs_x >= 0 && abs_x != 0x7FFFFFFF)
+            {
+                self->m_absolute_x = abs_x;
+            }
+            else if (abs_x < 0)
+            {
+                self->m_absolute_reverse_x = abs(abs_x);
+            }
+            else if (percent_x >= 0 && percent_x != 0x7FFFFFFF)
+            {
+                self->m_relative_x = (float)percent_x;
+            }
         }
     }
     
     // y coord
     {
-        int abs_y = -1, percent_y = -1;
+        int abs_y = 0x7FFFFFFF, percent_y = 0x7FFFFFFF;
         if (convertToCoord(y, &abs_y, &percent_y ))
         {
-            if      (abs_y >= 0)     self->m_absolute_y = abs_y;
-            else if (abs_y < -1)     self->m_absolute_reverse_y = abs(abs_y);
-            else if (percent_y > -1) self->m_relative_y = (float)percent_y;
+            if      (abs_y >= 0 && abs_y != 0x7FFFFFFF)
+            {
+                self->m_absolute_y = abs_y;
+            }
+            else if (abs_y < 0)
+            {
+                self->m_absolute_reverse_y = abs(abs_y);
+            }
+            else if (percent_y >= 0 && percent_y != 0x7FFFFFFF)
+            {
+                self->m_relative_y = (float)percent_y;
+            }
         }
     }
     
