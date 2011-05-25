@@ -172,16 +172,20 @@ void *NetworkHttp::mainLoop(void *obj)
         CURLcode status=CURLE_OK;
         switch(me->m_current_request->getCommand())
         {
-        case Request::HC_QUIT: assert(false); break; // quit is checked already
         case Request::HC_INIT: 
-             status = me->init();    break;
+             status = me->init();
+             break;
         case Request::HC_REINIT:
-            status = me->reInit();
+             status = me->reInit();
+             break;
         case Request::HC_DOWNLOAD_FILE:
              status = me->downloadFileInternal(me->m_current_request);
              break;
+        case Request::HC_QUIT: 
+             assert(false);    // quit is checked already
+             break;
         default:
-            assert(false); // All commands should have been handled.
+             assert(false); // All commands should have been handled.
         }   // switch(request->getCommand())
         if(status==CURLE_ABORTED_BY_CALLBACK)
             break;
@@ -334,6 +338,10 @@ void NetworkHttp::insertReInit()
  */
 CURLcode NetworkHttp::reInit()
 {
+    // This also switches the addons_manager to be not ready anymore,
+    // so the main menu will grey out the addon manager icon.
+    addons_manager->reInit();
+
     m_all_requests.lock();
     m_all_requests.getData().clear();
     m_all_requests.unlock();
