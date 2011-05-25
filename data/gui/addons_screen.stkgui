@@ -5,7 +5,7 @@
     <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
         <icon-button id="back"   height="100%" icon="gui/back.png"/>
         <header text_align="center" proportion="1" text="SuperTuxKart Addons" align="center"/>
-        <button      id="reload" text="Reload" />
+        <button      id="reload" I18N="Reload button to reload addon data" text="Reload" />
         <spacer width="15" width="5"/>
     </div>
     
