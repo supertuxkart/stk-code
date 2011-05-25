@@ -338,7 +338,6 @@ CURLcode NetworkHttp::reInit()
     m_all_requests.getData().clear();
     m_all_requests.unlock();
 
-    addons_manager->setErrorState(); FIXME
     std::string news_file = file_manager->getAddonsFile("news.xml");
     file_manager->removeFile(news_file);
     std::string addons_file = file_manager->getAddonsFile("addons.xml");
