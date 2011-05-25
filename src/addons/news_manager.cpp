@@ -87,6 +87,11 @@ void NewsManager::checkRedirect(const XMLNode *xml)
  */
 void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
 {
+    // This function is also called in case of a reinit, so
+    // we have to delete existing news messages here first.
+    m_news.lock();
+    m_news.getData().clear();
+    m_news.unlock();
     bool error = true;
     int frequency=0;
     if(xml->get("frequency", &frequency))

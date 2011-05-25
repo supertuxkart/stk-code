@@ -36,8 +36,8 @@ public:
      */
     enum HttpCommands {HC_QUIT,
                        HC_INIT,
-                       HC_DOWNLOAD_FILE,
-                       HC_NEWS    };
+                       HC_REINIT,
+                       HC_DOWNLOAD_FILE };
 
 private:
     /** The progress indicator. 0 till it is started and the first

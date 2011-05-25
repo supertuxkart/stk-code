@@ -62,6 +62,8 @@ AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
 void AddonsManager::initOnline(const XMLNode *xml)
 {
     m_addons_list.lock();
+    // Clear the list in case that a reinit is being done.
+    m_addons_list.getData().clear();
     loadInstalledAddons();
     m_addons_list.unlock();
 
@@ -134,10 +136,22 @@ void AddonsManager::initOnline(const XMLNode *xml)
 }   // initOnline
 
 // ----------------------------------------------------------------------------
+/** Reinitialises the addon manager, which happens when the user selects
+ *  'reload' in the addon manager.
+ */
+void AddonsManager::reInit()
+{
+    m_addons_list.lock();
+    m_addons_list.getData().clear();
+    m_addons_list.unlock();
+    m_state.setAtomic(STATE_INIT);
+}   // reInit
+
+// ----------------------------------------------------------------------------
 /** Download all necessary icons (i.e. icons that are either missing or have 
  *  been updated since they were downloaded).
  */
-void *AddonsManager::downloadIcons()
+void AddonsManager::downloadIcons()
 {
     for(unsigned int i=0; i<m_addons_list.getData().size(); i++)
     {
@@ -168,7 +182,7 @@ void *AddonsManager::downloadIcons()
             m_addons_list.getData()[i].setIconReady();
     }   // for i<m_addons_list.size()
 
-    return NULL;
+    return;
 }   // downloadIcons
 
 // ----------------------------------------------------------------------------

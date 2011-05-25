@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include "addons/addons_manager.hpp"
+#include "addons/network_http.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/CGUISpriteBank.h"
@@ -164,6 +165,12 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 {
     if (name == "back")
     {
+        StateManager::get()->escapePressed();
+    }
+
+    else if (name == "reload")
+    {
+        network_http->insertReInit();
         StateManager::get()->escapePressed();
     }
 

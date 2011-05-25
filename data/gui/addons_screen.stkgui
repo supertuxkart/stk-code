@@ -1,6 +1,7 @@
 <stkgui>
 
 <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+<button      id="reload" x="-1" y="0" height="5%" text="Reload" />
 
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 

@@ -175,6 +175,8 @@ void *NetworkHttp::mainLoop(void *obj)
         case Request::HC_QUIT: assert(false); break; // quit is checked already
         case Request::HC_INIT: 
              status = me->init();    break;
+        case Request::HC_REINIT:
+            status = me->reInit();
         case Request::HC_DOWNLOAD_FILE:
              status = me->downloadFileInternal(me->m_current_request);
              break;
@@ -309,6 +311,44 @@ CURLcode NetworkHttp::init()
     return status;
 #endif
 }   // init
+
+// ---------------------------------------------------------------------------
+/** Reinitialises the network manager. This is triggered when the users
+ *  selects 'reload' in the addon manager screen. This function inserts
+ *  a high priority reinit request into the request queue.
+ */
+void NetworkHttp::insertReInit()
+{
+    Request *request = new Request(Request::HC_REINIT, 9999, 
+                                   /*manage_memory*/true);
+
+    if(UserConfigParams::logAddons())
+        printf("[addons] Inserting reInit request.\n");
+    insertRequest(request);
+}   // insertReInit
+
+// ----------------------------------------------------------------------------
+/** Reinitialises the addons manager. This function is triggered when a
+ *  reInit request is handled. It removes all queued requests, deletes
+ *  the news.xml and addons.xml files, and trigges a reload of those files.
+ */
+CURLcode NetworkHttp::reInit()
+{
+    m_all_requests.lock();
+    m_all_requests.getData().clear();
+    m_all_requests.unlock();
+
+    addons_manager->setErrorState(); FIXME
+    std::string news_file = file_manager->getAddonsFile("news.xml");
+    file_manager->removeFile(news_file);
+    std::string addons_file = file_manager->getAddonsFile("addons.xml");
+    file_manager->removeFile(addons_file);
+    if(UserConfigParams::logAddons())
+        printf("[addons] Xml files deleted, re-initialising addon manager.\n");
+
+    return init();
+    
+}   // reInit
 
 // ----------------------------------------------------------------------------
 /** Checks the last modified date and if necessary updates the

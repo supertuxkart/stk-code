@@ -73,11 +73,13 @@ private:
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
     void          insertRequest(Request *request);
+    CURLcode      reInit();
 public:
                   NetworkHttp();
                  ~NetworkHttp();
     void          startNetworkThread();
     void          stopNetworkThread();
+    void          insertReInit();
     Request      *downloadFileAsynchron(const std::string &url, 
                                         const std::string &save = "",
                                         int   priority = 1,
