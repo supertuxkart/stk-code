@@ -118,7 +118,7 @@ void LayoutManager::readCoords(Widget* self)
         int abs_x = -1, percent_x = -1;
         if (convertToCoord(x, &abs_x, &percent_x ))
         {
-            if      (abs_x > -1)     self->m_absolute_x = abs_x;
+            if      (abs_x >= 0)     self->m_absolute_x = abs_x;
             else if (abs_x < -1)     self->m_absolute_reverse_x = abs(abs_x);
             else if (percent_x > -1) self->m_relative_x = (float)percent_x;
         }
@@ -129,7 +129,7 @@ void LayoutManager::readCoords(Widget* self)
         int abs_y = -1, percent_y = -1;
         if (convertToCoord(y, &abs_y, &percent_y ))
         {
-            if      (abs_y > -1)     self->m_absolute_y = abs_y;
+            if      (abs_y >= 0)     self->m_absolute_y = abs_y;
             else if (abs_y < -1)     self->m_absolute_reverse_y = abs(abs_y);
             else if (percent_y > -1) self->m_relative_y = (float)percent_y;
         }
@@ -271,7 +271,7 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     }
     
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
-    else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_h - self->m_absolute_reverse_x);
+    else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_w - self->m_absolute_reverse_x);
     else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
     
     if      (self->m_absolute_y > -1)         self->m_y = parent_y + self->m_absolute_y;

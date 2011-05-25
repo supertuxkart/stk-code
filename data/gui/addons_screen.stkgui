@@ -1,11 +1,14 @@
 <stkgui>
 
-<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
-<button      id="reload" x="-1" y="0" height="5%" text="Reload" />
 
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-    <header text_align="center" width="80%" text="SuperTuxKart Addons" align="center"/>
+    <div x="0" y="0" width="100%" height="fit" layout="horizontal-row" height="8%">
+        <icon-button id="back"   height="100%" icon="gui/back.png"/>
+        <header text_align="center" proportion="1" text="SuperTuxKart Addons" align="center"/>
+        <button      id="reload" text="Reload" />
+    </div>
+    
     <spacer height="15" width="10"/>
 
     <tabs id="category" height="10%" max_height="110" width="90%" align="center">
