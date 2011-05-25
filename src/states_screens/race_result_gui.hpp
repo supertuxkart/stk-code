@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "guiengine/screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 namespace irr
 {
@@ -76,6 +77,8 @@ private:
         float            m_y_pos;
         /** True if kart is a player kart. */
         bool             m_is_player_kart;
+        /** Only if m_is_player_kart is true */
+        const StateManager::ActivePlayer* m_player;
         /** The radius to use when sorting the entries. Positive values
             will rotate downwards, negatives are upwards. */
         float            m_radius;
@@ -162,6 +165,18 @@ private:
 
     SFXBase*                   m_finish_sound;
     
+    /** For highscores */
+    std::string m_highscore_who;
+    
+    /** For highscores */
+    StateManager::ActivePlayer* m_highscore_player;
+    
+    /** For highscores */
+    int m_highscore_rank;
+    
+    /** For highscores */
+    int m_highscore_time;
+    
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
     void determineTableLayout();
@@ -217,11 +232,12 @@ public:
     
     /**
       * To call if the user got a new highscore
-      * \param who identity of the kart that made the highscore
+      * \param kart identity of the kart that made the highscore
+      * \param player identity of the player that made the highscore
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(std::string who, int rank, int time);
+    void setHighscore(std::string kart, StateManager::ActivePlayer* player, int rank, int time);
     
 };   // RaceResultGUI
 

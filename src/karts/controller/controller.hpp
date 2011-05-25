@@ -52,6 +52,9 @@ public:
     /** Returns the active player for this controller (NULL 
      *  if this controller does not belong to a player.    */
     StateManager::ActivePlayer *getPlayer () {return m_player;}
+    
+    const StateManager::ActivePlayer *getPlayer () const { return m_player; }
+    
     virtual void  reset              () {};
     virtual void  update             (float dt) {};
     virtual void  handleZipper       (bool play_sound) {};

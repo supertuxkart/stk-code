@@ -244,7 +244,8 @@ void RaceResultGUI::determineTableLayout()
         RowInfo *ri              = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart     = kart->getController()->isPlayerController();
         ri->m_kart_name          = translations->fribidize(kart->getName());
-
+        ri->m_player             = (ri->m_is_player_kart ? kart->getController()->getPlayer() : NULL);
+        
         video::ITexture *icon    = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_icon          = icon;
@@ -547,6 +548,7 @@ void RaceResultGUI::determineGPLayout()
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_name      = translations->fribidize(kart->getName());
         ri->m_is_player_kart = kart->getController()->isPlayerController();
+        ri->m_player         = (ri->m_is_player_kart ? kart->getController()->getPlayer() : NULL);
 
         float time           = race_manager->getOverallTime(kart_id);
         ri->m_finish_time_string
@@ -631,6 +633,14 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
         current_x += m_width_finish_time + m_width_column_space;
     }
+    
+    if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
+    {
+        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
+        m_font->draw(_("New highscore!"), dest_rect, color, false, false, NULL, true /* ignoreRTL */);
+        
+        //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
+    }
 
     // Only display points in GP mode and when the GP results are displayed.
     // =====================================================================
@@ -669,12 +679,18 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
 void RaceResultGUI::clearHighscores()
 {
-    // TODO
+    m_highscore_who = "";
+    m_highscore_player = NULL;
+    m_highscore_rank = 0;
+    m_highscore_time = -1;
 }
 
 //-----------------------------------------------------------------------------
 
-void RaceResultGUI::setHighscore(std::string who, int rank, int time)
+void RaceResultGUI::setHighscore(std::string who, StateManager::ActivePlayer* player, int rank, int time)
 {
-    // TODO
+    m_highscore_who = who;
+    m_highscore_player = player;
+    m_highscore_rank = rank;
+    m_highscore_time = time;
 }
