@@ -134,6 +134,14 @@ void AddonsScreen::loadList()
                                    addon->getDesigner().c_str(),
                                    addon->getDateAsString().c_str());
         w_list->addItem(addon->getId(), s.c_str(), icon);
+
+        // Highlight the entry if it's features for normal users, 
+        // or if it's not approved in artists debug mode.
+        if( (!UserConfigParams::m_artist_debug_mode && 
+                       addon->testStatus(Addon::AS_FEATURED))  ||
+            (UserConfigParams::m_artist_debug_mode && 
+                       !addon->testStatus(Addon::AS_APPROVED)))
+            w_list->markItemRed(addon->getId(), true);
     }
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
