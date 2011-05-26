@@ -591,6 +591,12 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
                                                : video::SColor(255,255,255,255);
 
+    // if we have highscores, move items to the left to have some more room...
+    if (m_highscore_player != NULL)
+    {
+        x -= m_table_width/3.0f;
+    }
+    
 #ifdef USE_PER_LINE_BACKGROUND
     // Draw the background image
     core::rect<s32> dest(x-50, y, 
@@ -636,8 +642,11 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     
     if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
     {
+        current_x += 20;
+        
         core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(_("New highscore!"), dest_rect, color, false, false, NULL, true /* ignoreRTL */);
+        GUIEngine::getSmallFont()->draw(_("New highscore on position %i!", m_highscore_rank), dest_rect, video::SColor(255,255,166,0),
+                     false, false, NULL, true /* ignoreRTL */);
         
         //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
     }
