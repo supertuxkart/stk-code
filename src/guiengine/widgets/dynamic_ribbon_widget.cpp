@@ -242,6 +242,14 @@ void DynamicRibbonWidget::add()
                 // will be penalized. A configuration that makes items much smaller than
                 // requested in the XML file will also be penalized.
                 float ratio = (float)item_height / (float)m_child_height;
+                
+                // huge icons not so good either
+                if (ratio > 1.0f)
+                {
+                    ratio = 1.0 - ratio/5.0f;
+                    if (ratio < 0.0f) ratio = 0.0f;
+                }
+                
                 float total_area = (float)(m_w * m_h);
                 const float score = log(2.0f*visible_items) *
                                       std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
