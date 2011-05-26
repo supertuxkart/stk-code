@@ -645,8 +645,11 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         current_x += 20;
         
         core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        GUIEngine::getSmallFont()->draw(_("New highscore on position %i!", m_highscore_rank), dest_rect, video::SColor(255,255,166,0),
-                     false, false, NULL, true /* ignoreRTL */);
+        
+        core::stringw message = (m_highscore_rank == 1 ? _("You topped the highscore list!") : _("New highscore!"));
+        
+        GUIEngine::getSmallFont()->draw(message.c_str(), dest_rect, video::SColor(255,255,166,0),
+                                        false, false, NULL, true /* ignoreRTL */);
         
         //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
     }
