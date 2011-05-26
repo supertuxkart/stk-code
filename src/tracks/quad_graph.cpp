@@ -587,9 +587,23 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
     int current_sector = 0;
     if(curr_sector != UNKNOWN_SECTOR && !all_sectors)
     {
-        const int LIMIT = 10; //The limit prevents shortcuts
-        count           = 2*LIMIT;
-        current_sector  = curr_sector - LIMIT;
+        // We have to test all nodes here: reason is that on track with
+        // shortcuts the n quads of the main drivelines is followed by
+        // the quads of the shortcuts. So after quad n-1 (the last one
+        // before the lap counting line) quad n will not be 0 (the first
+        // quad after the lap counting line), but one of the quads on a
+        // shortcut. If we only tested a limited number of quads to 
+        // improve the performance the crossing of a lap might not be
+        // detected (because quad 0 is not tested, only quads on the
+        // shortcuts are tested). If this should become a performance
+        // bottleneck, we need to set up a graph of 'next' quads for each
+        // quad (similar to what the AI does), and only test the quads
+        // in this graph.
+        const int LIMIT = getNumNodes();
+        count           = LIMIT;
+        // Start 10 quads before the current quad, so the quads closest
+        // to the current position are tested first.
+        current_sector  = curr_sector -10;
         if(current_sector<0) current_sector += getNumNodes();
     }
 
@@ -601,7 +615,9 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
         if(all_sectors) 
             next_sector = (*all_sectors)[j];
         else
-            next_sector  = current_sector+1 == (int)getNumNodes() ? 0 : current_sector+1;
+            next_sector  = current_sector+1 == (int)getNumNodes() 
+                         ? 0 
+                         : current_sector+1;
 
         // A first simple test uses the 2d distance to the center of the quad.
         float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
