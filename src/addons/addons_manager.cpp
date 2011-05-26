@@ -112,7 +112,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
 
             m_addons_list.lock();
             if(index>=0)
+            {
                 m_addons_list.getData()[index].copyInstallData(addon);
+            }
             else
             {
                 m_addons_list.getData().push_back(addon);

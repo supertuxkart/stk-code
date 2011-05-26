@@ -294,13 +294,23 @@ CURLcode NetworkHttp::init()
         if(status==CURLE_OK)
             return status;
         else
+        {
+            // This message must be translated dynamically in the main menu.
+            // If it would be translated here, it wouldn't be translated
+            // if the language is changed in the menu!
             error_message=
-                _("Can't download addons list, check terminal for details.");
+                N_("Can't download addons list, check terminal for details.");
+        }
         // Now fall through to error handling.
     }
     else
+    {
+        // This message must be translated dynamically in the main menu.
+        // If it would be translated here, it wouldn't be translated
+        // if the language is changed in the menu!
         error_message=
-            _("Can't download news file, check terminal for details.");
+            N_("Can't download news file, check terminal for details.");
+    }
 
     // Abort requested by stk -> display no error message and return
     if(status==CURLE_ABORTED_BY_CALLBACK)

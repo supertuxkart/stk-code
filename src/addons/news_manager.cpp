@@ -171,7 +171,7 @@ const core::stringw NewsManager::getNextNewsMessage()
 {
     // Only display error message in case of a problem.
     if(m_error_message.size()>0)
-        return m_error_message;
+        return _(m_error_message.c_str());
 
     if(m_news.getData().size()==0)
         return "";
@@ -216,7 +216,7 @@ const core::stringw NewsManager::getNextNewsMessage()
         m = m_news.getData()[m_current_news_message].getNews();
     }
     m_news.unlock();
-    return m;
+    return _(m.c_str());
 }   // getNextNewsMessage
 
 // ----------------------------------------------------------------------------
