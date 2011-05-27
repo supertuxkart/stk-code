@@ -830,12 +830,12 @@ void initRest()
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     network_manager         = new NetworkManager       ();
-#ifdef ADDONS_MANAGER
+
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts"));
     track_manager->addTrackSearchDir(
                  file_manager->getAddonsFile("tracks"));
-#endif
+
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
