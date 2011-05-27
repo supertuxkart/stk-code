@@ -356,7 +356,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         if (count > 0 && randomKartQueue.size() == 0)
         {
             randomKartQueue.clear();
-            std::vector<int> kartsInGroup = getKartsInGroup(UserConfigParams::m_kart_group);
+            std::vector<int> kartsInGroup = getKartsInGroup(UserConfigParams::m_last_used_kart_group);
             
             assert(kartsInGroup.size() > 0);
             

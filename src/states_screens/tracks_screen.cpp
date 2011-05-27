@@ -154,11 +154,13 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (name == "trackgroups")
     {
+        RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+        assert( tabs != NULL );
+        UserConfigParams::m_last_used_track_group = tabs->getSelectionIDString(0);
         buildTrackList();
     }
     else if (name == "back")
     {
-printf("back in tracks_screen\n");      
         StateManager::get()->escapePressed();
     }
 }
@@ -270,6 +272,12 @@ void TracksScreen::init()
         }
     }
     gps_widget->updateItemDisplay();
+    
+    
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+    assert( tabs != NULL );
+    tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
+
     
     buildTrackList();
     

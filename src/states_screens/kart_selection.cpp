@@ -931,6 +931,7 @@ void KartSelectionScreen::init()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
+    tabs->select(UserConfigParams::m_last_used_kart_group, PLAYER_ID_GAME_MASTER);
     
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
@@ -1392,6 +1393,8 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
+        UserConfigParams::m_last_used_kart_group = selected_kart_group;
+        
         RandomGenerator random;
         
         const int num_players = m_kart_widgets.size();
@@ -1476,7 +1479,7 @@ void KartSelectionScreen::allPlayersDone()
     
     std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    UserConfigParams::m_kart_group = selected_kart_group;
+    UserConfigParams::m_last_used_kart_group = selected_kart_group;
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
@@ -1741,8 +1744,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     std::string selected_kart_group = 
         tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    UserConfigParams::m_kart_group = selected_kart_group;
-    
+    UserConfigParams::m_last_used_kart_group = selected_kart_group;
+
     // This can happen if addons are removed so that also the previously
     // selected kart group is removed. In this case, select the 
     // 'standard' group

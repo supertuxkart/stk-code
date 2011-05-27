@@ -312,6 +312,8 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode", &m_race_setup_group, "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes") );
     PARAM_PREFIX StringUserConfigParam m_default_kart
             PARAM_DEFAULT( StringUserConfigParam("tux", "kart", "Kart to select by default (the last used kart)") );
+    PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
+            PARAM_DEFAULT( StringUserConfigParam("standard", "last_kart_group", "Last selected kart group") );
     
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
@@ -444,12 +446,10 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );
     
-    PARAM_PREFIX StringUserConfigParam      m_kart_group
-            PARAM_DEFAULT(  StringUserConfigParam(DEFAULT_GROUP_NAME, "kart_group", "Last selected kart group") );
-    PARAM_PREFIX StringUserConfigParam      m_track_group
-            PARAM_DEFAULT(  StringUserConfigParam(DEFAULT_GROUP_NAME, "track_group", "Last selected track group") ); 
     PARAM_PREFIX StringUserConfigParam      m_last_track
             PARAM_DEFAULT(  StringUserConfigParam("olivermath", "last_track", "Name of the last track used.") ); 
+    PARAM_PREFIX StringUserConfigParam m_last_used_track_group
+            PARAM_DEFAULT( StringUserConfigParam("standard", "last_track_group", "Last selected track group") );
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );
