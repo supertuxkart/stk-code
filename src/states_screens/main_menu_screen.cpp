@@ -69,11 +69,6 @@ void MainMenuScreen::loadedFromFile()
 {
     m_lang_popup = NULL;
     
-#ifndef ADDONS_MANAGER
-    RibbonWidget* r = this->getWidget<RibbonWidget>("menu_toprow");
-    if (r != NULL) r->deleteChild("addons");
-#endif
-    
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
 }
@@ -103,14 +98,12 @@ void MainMenuScreen::init()
     // the key bindings for the first player the default again.
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
-#ifdef ADDONS_MANAGER
     if(!addons_manager->onlineReady() ||
         UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
     {
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
     }
-#endif
     
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = news_manager->getNextNewsMessage();
@@ -121,7 +114,6 @@ void MainMenuScreen::init()
 // ------------------------------------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-#ifdef ADDONS_MANAGER
     IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -131,8 +123,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         else
             addons_icon->setActivated();
     }
-
-#endif    
 
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     w->update(delta);
@@ -397,13 +387,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(TutorialScreen::getInstance());
     }
-#ifdef ADDONS_MANAGER
     else if (selection == "addons")
     {
         std::cout << "Addons" << std::endl;
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
-#endif
 }
 
 // ------------------------------------------------------------------------------------------------------

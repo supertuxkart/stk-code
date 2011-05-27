@@ -16,8 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifdef ADDONS_MANAGER
-
 #ifndef HEADER_ADDONS_LOADING_HPP
 #define HEADER_ADDONS_LOADING_HPP
 
@@ -74,5 +72,4 @@ public:
     
 };   // AddonsLoading
 
-#endif
 #endif

@@ -404,11 +404,6 @@ case "${host}" in
 esac
 ENETTREE="src/enet"
 
-# =================
-# Enable addons support (which is now on by default)
-# =================
-AC_DEFINE(ADDONS_MANAGER)
-
 # ==========================================
 # Check for a known compiler bug, details in 
 # src/bullet/src/Makefile.am

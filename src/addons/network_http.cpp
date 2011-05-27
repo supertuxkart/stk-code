@@ -288,9 +288,7 @@ CURLcode NetworkHttp::init()
             UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
         news_manager->init();
-#ifdef ADDONS_MANAGER
         status = loadAddonsList(xml, xml_file);
-#endif
         if(status==CURLE_OK)
             return status;
         else
@@ -316,14 +314,12 @@ CURLcode NetworkHttp::init()
     if(status==CURLE_ABORTED_BY_CALLBACK)
         return status;
 
-#ifdef ADDONS_MANAGER
     addons_manager->setErrorState();
     news_manager->setErrorMessage(error_message);
 
     if(UserConfigParams::logAddons())
         printf("[addons] %s\n", core::stringc(error_message).c_str());
     return status;
-#endif
 }   // init
 
 // ---------------------------------------------------------------------------
@@ -415,11 +411,9 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
         if(download)
             UserConfigParams::m_addons_last_updated=Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
-#ifdef ADDONS_MANAGER
         addons_manager->initOnline(xml);
         if(UserConfigParams::logAddons())
             printf("[addons] Addons manager list downloaded\n");
-#endif
         return status;
     }
 
