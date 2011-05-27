@@ -3146,67 +3146,6 @@
 			};
 			name = Release;
 		};
-		953606C511DCF1B900791F01 /* Debug_with_addons */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
-					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
-				);
-				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../supertuxkart2/src\"";
-				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../supertuxkart2/src/bullet/src\"";
-				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				ZERO_LINK = NO;
-			};
-			name = Debug_with_addons;
-		};
-		953606C611DCF1B900791F01 /* Debug_with_addons */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9551C9F80FC1B87600DB481B /* Config.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = 4.0;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = NO;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/bullet/src\"";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DDEBUG=1",
-					"-DADDONS_MANAGER=1",
-				);
-				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
-				PREBINDING = NO;
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
-				PRODUCT_NAME = SuperTuxKart;
-			};
-			name = Debug_with_addons;
-		};
 		9551C8240FC1B70000DB481B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9551C9F80FC1B87600DB481B /* Config.xcconfig */;
@@ -3301,7 +3240,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
-				953606C511DCF1B900791F01 /* Debug_with_addons */,
 				1DEB923708733DC60010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3311,7 +3249,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9551C8240FC1B70000DB481B /* Debug */,
-				953606C611DCF1B900791F01 /* Debug_with_addons */,
 				9551C8250FC1B70000DB481B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
