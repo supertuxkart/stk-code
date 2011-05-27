@@ -405,14 +405,10 @@ esac
 ENETTREE="src/enet"
 
 # =================
-# Disable/enable addons support
+# Enable addons support (which is now on by default)
 # =================
-AC_ARG_WITH(addons,[AS_HELP_STRING([--with-addons],
-              [This option is used to enable/disable addons support])])
-if test "x$with_addons" == "xyes" ; then
-    SUMMARY="$SUMMARY\nEnabling addons support."
-    AC_DEFINE(ADDONS_MANAGER)
-fi
+AC_DEFINE(ADDONS_MANAGER)
+
 # ==========================================
 # Check for a known compiler bug, details in 
 # src/bullet/src/Makefile.am
