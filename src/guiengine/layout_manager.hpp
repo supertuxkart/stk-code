@@ -19,6 +19,8 @@
 #define __LAYOUT_MANAGER_HPP__
 
 #include <cstring> // for NULL
+#include <string>
+
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
