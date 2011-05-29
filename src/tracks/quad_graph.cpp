@@ -481,7 +481,7 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 {
     if(sector == UNKNOWN_SECTOR )
     {
-        std::cerr << "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n";
+        fprintf(stderr, "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n");
         return;
     }
 

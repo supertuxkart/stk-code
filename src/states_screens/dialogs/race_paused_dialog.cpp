@@ -89,12 +89,6 @@ GUIEngine::EventPropagation
     GUIEngine::RibbonWidget* chocie_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
     
-    if (UserConfigParams::m_verbosity>=5)
-    {
-       std::cout << "RacePausedDialog::processEvent(" 
-                 << eventSource.c_str() << ")\n";
-    }
-    
     if (eventSource == "backbtn")
     {
         // unpausing is done in the destructor so nothing more to do here
@@ -105,10 +99,6 @@ GUIEngine::EventPropagation
     {
         const std::string& selection = 
             chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
-        if(UserConfigParams::m_verbosity>=5)
-            std::cout << "RacePausedDialog::processEvent(" 
-                      << eventSource.c_str() << " : " << selection << ")\n";
 
         if (selection == "exit")
         {

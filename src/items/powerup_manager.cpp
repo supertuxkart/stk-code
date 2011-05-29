@@ -19,10 +19,7 @@
 
 #include "items/powerup_manager.hpp"
 
-#include <iostream>
 #include <stdexcept>
-#include <sstream>
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -149,7 +146,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 #ifdef DEBUG
     if (icon_file.size() == 0)
     {
-        std::cerr << "Cannot load powerup " << type << ", no 'icon' attribute under XML node\n";
+        fprintf(stderr, "Cannot load powerup %i, no 'icon' attribute under XML node\n", type);
         assert(false);
     }
 #endif

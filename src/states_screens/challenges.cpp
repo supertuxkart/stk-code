@@ -32,6 +32,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <iostream>
 #include <fstream>
 
 #include "irrString.h"

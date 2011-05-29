@@ -18,7 +18,7 @@
 #include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
-#include <sstream>
+#include <iostream>
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"

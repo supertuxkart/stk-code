@@ -21,7 +21,7 @@
 #define HEADER_MUSICOGG_HPP
 
 #include <string>
-#include <iostream>
+
 #include <ogg/ogg.h>
 // Disable warning about potential loss of precision in vorbisfile.h
 #if defined(WIN32) && !defined(__CYGWIN__)

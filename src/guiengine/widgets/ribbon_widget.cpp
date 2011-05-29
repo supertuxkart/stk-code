@@ -94,8 +94,7 @@ void RibbonWidget::add()
         
         if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {
-            std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children "
-                      << std::endl;
+            fprintf(stderr, "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children\n");
             continue;
         }
         
@@ -218,7 +217,7 @@ void RibbonWidget::add()
             }
             else
             {
-                std::cerr << "Invalid tab bar contents\n";
+                fprintf(stderr, "Invalid tab bar contents\n");
             }
             
             m_children[i].m_element = subbtn;
@@ -289,7 +288,7 @@ void RibbonWidget::add()
         }
         else
         {
-            std::cerr << "/!\\ Warning /!\\ : Invalid contents type in ribbon" << std::endl;
+            fprintf(stderr, "/!\\ Warning /!\\ : Invalid contents type in ribbon\n");
         }
         
         

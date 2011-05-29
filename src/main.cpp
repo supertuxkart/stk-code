@@ -372,7 +372,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
 #endif
         else if( !strcmp(argv[i], "--renderer") && (i+1 < argc)  )
         {
-            std::cout << "You chose renderer " << atoi(argv[i+1]) << std::endl;
+            printf("You chose renderer %i\n", atoi(argv[i+1]));
             UserConfigParams::m_renderer = atoi(argv[i+1]);
             i++;
         }
@@ -912,8 +912,7 @@ int main(int argc, char *argv[] )
         {
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
-            std::cout << "Error messages and other text output will be logged to " ;
-            std::cout << logoutfile << " and "<<logerrfile<<"\n";
+            printf("Error messages and other text output will be logged to %s and %s\n", logoutfile.c_str(), logerrfile.c_str());
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
                 fprintf(stderr, "Can not open log file '%s'. Writing to stdout instead.\n",

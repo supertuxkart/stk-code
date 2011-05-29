@@ -18,7 +18,7 @@
 #include "tutorial/tutorial_data.hpp"
 
 #include <stdexcept>
-#include <sstream>
+#include <iostream>
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"

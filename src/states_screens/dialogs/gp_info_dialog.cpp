@@ -22,7 +22,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
-#include "network/network_manager.hpp"
+//#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
@@ -32,6 +32,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <iostream>
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
 

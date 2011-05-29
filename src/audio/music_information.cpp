@@ -20,7 +20,7 @@
 #include "audio/music_information.hpp"
 
 #include <stdexcept>
-#include <sstream>
+#include <iostream>
 
 #include "audio/music_ogg.hpp"
 #include "config/user_config.hpp"

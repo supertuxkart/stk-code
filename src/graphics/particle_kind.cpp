@@ -90,7 +90,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     }
     else
     {
-        std::cerr << "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n";
+        fprintf(stderr, "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n");
         m_shape = EMITTER_POINT;
     }
     

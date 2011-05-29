@@ -43,6 +43,7 @@
 #include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
+#include <iostream>
 #include <string>
 #include <IGUIEnvironment.h>
 #include <IGUIImage.h>

@@ -22,7 +22,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
-#include <sstream>
+#include <iostream>
 
 #include <IGUIElement.h>
 

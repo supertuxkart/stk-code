@@ -19,7 +19,7 @@
 
 #include "challenges/challenge.hpp"
 
-#include <iostream>
+#include <fstream>
 
 #include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"

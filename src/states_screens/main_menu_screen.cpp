@@ -19,7 +19,6 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
-#include <iostream>
 #include <string>
 
 #include "addons/network_http.hpp"
@@ -389,7 +388,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
     else if (selection == "addons")
     {
-        std::cout << "Addons" << std::endl;
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
 }

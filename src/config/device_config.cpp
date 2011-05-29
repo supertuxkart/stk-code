@@ -21,6 +21,7 @@
 
 #include "config/device_config.hpp"
 #include <SKeyMap.h>
+using namespace irr;
 
 //==== D E V I C E C O N F I G =================================================
 

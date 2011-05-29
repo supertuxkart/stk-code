@@ -132,7 +132,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
     Kart* pk = player->getKart();
     if (pk == NULL)
     {
-        std::cerr << "Error, trying to reset axis for an unknown player\n";
+        fprintf(stderr, "Error, trying to reset axis for an unknown player\n");
         return;
     }
     

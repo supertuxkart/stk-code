@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <iostream>
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>

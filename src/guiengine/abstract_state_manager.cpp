@@ -19,7 +19,8 @@
 #include "guiengine/abstract_state_manager.hpp"
 
 #include <vector>
- 
+#include <iostream>
+
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"

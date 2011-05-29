@@ -4,7 +4,6 @@
 
 #include "guiengine/scalable_font.hpp"
 
-#include <iostream>
 #include <IGUIEnvironment.h>
 #include <IXMLReader.h>
 #include <IReadFile.h>
@@ -609,7 +608,7 @@ void ScalableFont::draw(const core::stringw& text,
             
             if (texture == NULL)
             {
-                std::cerr << "WARNING: character not found in current font\n";
+                fprintf(stderr, "WARNING: character not found in current font\n");
                 continue; // no such character
             }
         }
@@ -687,7 +686,7 @@ void ScalableFont::lazyLoadTexture(int texID)
     // couldn't load texture, abort.
     if (!SpriteBank->getTexture(texID))
     {
-        std::cerr << "!!!!! Unable to load all textures in the font" << std::endl;
+        fprintf(stderr, "!!!!! Unable to load all textures in the font\n");
         _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
         return;
     }

@@ -17,7 +17,7 @@
 
 #include "guiengine/layout_manager.hpp"
 
-#include <sstream>
+#include <iostream>
 
 #include <IGUIFont.h>
 #include <ITexture.h>

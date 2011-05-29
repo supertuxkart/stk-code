@@ -88,7 +88,7 @@ bool getWideLine(std::ifstream& file, stringw* out)
 {
     if (!file.good())
     {
-        std::cerr << "getWideLine : File is not good!\n";
+        fprintf(stderr, "getWideLine : File is not good!\n");
         return false;
     }
     wchar_t wide_char;

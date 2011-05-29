@@ -234,7 +234,7 @@ Controller* World::loadAIController(Kart *kart)
             controller = new NewAIController(kart);
             break;
         default:
-            std::cerr << "Warning: Unknown robot, using default." << std::endl;
+            fprintf(stderr, "Warning: Unknown robot, using default.\n");
             controller = new DefaultAIController(kart);
             break;
     }

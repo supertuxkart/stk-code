@@ -173,7 +173,7 @@ void ChallengeData::error(const char *id) const
     msg << "Undefined or incorrect value for '" << id 
         << "' in challenge file '" << m_filename << "'.";
     
-    std::cerr << "ChallengeData : " << msg.str() << std::endl;
+    printf("ChallengeData : %s\n", msg.str().c_str());
     
     throw std::runtime_error(msg.str());
 }   // error
@@ -254,8 +254,8 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string &type,
                             const KartProperties* prop = kart_properties_manager->getKart(attrib);
                             if (prop == NULL)
                             {
-                                std::cerr << "Challenge refers to kart " << attrib <<
-                                             ", which is unknown. Ignoring reward.\n";
+                                fprintf(stderr, "Challenge refers to kart %s, which is unknown. Ignoring reward.\n",
+                                        attrib.c_str());
                                 break;
                             }
                             irr::core::stringw user_name = prop->getName();

@@ -24,6 +24,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 
+#include <iostream>
+
 NewsManager *news_manager=NULL;
 
 // ----------------------------------------------------------------------------

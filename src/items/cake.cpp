@@ -22,8 +22,6 @@
 
 #include "items/cake.hpp"
 
-#include <iostream>
-
 #include "io/xml_node.hpp"
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"

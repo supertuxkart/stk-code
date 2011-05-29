@@ -85,7 +85,7 @@ void IrrDriver::initDevice()
     // ---- the first time, get a list of available video modes
     if (firstTime)
     {        
-        std::cout << "[IrrDriver] Creating NULL device\n";
+        printf("[IrrDriver] Creating NULL device\n");
         m_device = createDevice(video::EDT_NULL);
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
@@ -153,7 +153,7 @@ void IrrDriver::initDevice()
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
-            std::cout << "[IrrDriver] Trying to create device with " << bits << " bits\n";
+            printf("[IrrDriver] Trying to create device with %i bits\n", bits);
             /*
             m_device = createDevice(type,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
@@ -299,7 +299,7 @@ video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
     }
 
     // Ouput which render will be tried.
-    std::cout << "[IrrDriver] Trying " << rendererName << " rendering." << std::endl;
+    printf("[IrrDriver] Trying %s rendering.\n", rendererName.c_str());
 
     return type;
 }

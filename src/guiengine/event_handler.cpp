@@ -17,6 +17,8 @@
 
 #include "guiengine/event_handler.hpp"
 
+#include <iostream>
+
 #include <IGUIEnvironment.h>
 #include <IGUIListBox.h>
 

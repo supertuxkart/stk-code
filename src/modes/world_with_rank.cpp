@@ -19,6 +19,8 @@
 
 #include "race/history.hpp"
 
+#include <iostream>
+
 //-----------------------------------------------------------------------------
 void WorldWithRank::init()
 {

@@ -22,11 +22,9 @@
 
 #include "input/binding.hpp"
 #include "input/input.hpp"
-#include "io/xml_node.hpp"
 #include "utils/no_copy.hpp"
 
-#include <fstream>
-#include <iostream>
+#include <iosfwd>
 #include <irrString.h>
 #include <string>
 

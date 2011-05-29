@@ -17,7 +17,7 @@
 
 #include "states_screens/addons_screen.hpp"
 
-#include <sstream>
+#include <iostream>
 
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"

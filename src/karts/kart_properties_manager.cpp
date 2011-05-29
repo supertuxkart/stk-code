@@ -23,6 +23,7 @@
 #include <ctime>
 #include <stdio.h>
 #include <stdexcept>
+#include <iostream>
 
 #include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"

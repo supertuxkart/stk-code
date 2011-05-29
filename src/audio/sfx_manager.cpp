@@ -43,6 +43,7 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 
+#include <iostream>
 
 SFXManager* sfx_manager= NULL;
 std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;

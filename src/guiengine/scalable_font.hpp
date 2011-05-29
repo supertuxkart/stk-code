@@ -14,7 +14,6 @@
 #include "IReadFile.h"
 #include "irrArray.h"
 #include <map>
-#include <iostream>
 
 namespace irr
 {

@@ -23,7 +23,6 @@
 #define HEADER_PtrVector_HPP
 
 #include <vector>
-#include <iostream>
 #include <assert.h>
 
 #include "utils/aligned_array.hpp"

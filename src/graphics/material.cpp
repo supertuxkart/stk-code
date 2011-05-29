@@ -21,6 +21,7 @@
 #include "graphics/material.hpp"
 
 #include <stdexcept>
+#include <iostream>
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"

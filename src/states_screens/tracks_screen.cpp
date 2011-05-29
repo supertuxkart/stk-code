@@ -31,6 +31,8 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+#include <iostream>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;

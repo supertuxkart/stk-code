@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <iostream>
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"

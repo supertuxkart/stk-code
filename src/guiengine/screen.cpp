@@ -16,11 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <iostream>
-#include <sstream>
 #include <assert.h>
 
-#include "input/input.hpp"
 #include "io/file_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
@@ -29,7 +26,6 @@
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
 
 using namespace irr;
 
@@ -174,7 +170,7 @@ void Screen::addWidgets()
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    else std::cerr << "Couldn't select first widget, NULL was returned\n";
+    else           fprintf(stderr, "Couldn't select first widget, NULL was returned\n");
 }   // addWidgets
 
 // -----------------------------------------------------------------------------

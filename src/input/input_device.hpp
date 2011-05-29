@@ -2,13 +2,10 @@
 #define INPUT_DEVICE_HPP
 
 #include <string>
-#include <iostream>
-#include <fstream>
 
 #include "config/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
-#include "io/xml_node.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/no_copy.hpp"
 /**

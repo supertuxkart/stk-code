@@ -25,7 +25,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
-#include "items/item_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
@@ -40,6 +39,8 @@
 #include <ICameraSceneNode.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+
+#include <iostream>
 
 using namespace irr::core;
 using namespace irr::gui;
