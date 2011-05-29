@@ -573,7 +573,7 @@ void FileManager::checkAndCreateAddonsDir()
         }
     }
 
-    m_addons_dir += "/supertuxkart":
+    m_addons_dir += "/supertuxkart";
     if(!checkAndCreateDirectory(m_config_dir))
     {
         // If $HOME/.config can not be created:
