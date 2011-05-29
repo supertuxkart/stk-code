@@ -28,15 +28,19 @@ namespace irr
 }
 using namespace irr;
 
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 
 class XMLNode;
 
 /**
-  * \ingroup tracks
-  */
-class TrackObject : public scene::IAnimationEndCallBack
+ * \ingroup tracks
+ *  This is a base object for any separate object on the track, which
+ *  might also have a skeletal animation. This is used by objects that
+ *  have an IPO animation, as well as physical objects.
+ */
+class TrackObject : public scene::IAnimationEndCallBack, public NoCopy
 {
 //public:
     // The different type of track objects: physical objects, graphical 
@@ -47,9 +51,6 @@ class TrackObject : public scene::IAnimationEndCallBack
 private:
     /** True if the object is currently being displayed. */
     bool                    m_enabled;
-
-    /** >0 if it is active for a timer based object. */
-    float                   m_timer;
 
     /** True if it is a looped animation. */
     bool                    m_is_looped;
