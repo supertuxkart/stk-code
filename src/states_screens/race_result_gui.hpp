@@ -177,6 +177,8 @@ private:
     /** For highscores */
     int m_highscore_time;
     
+    unsigned int m_width_all_points;
+    
     void displayOneEntry(unsigned int x, unsigned int y, 
                          unsigned int n, bool display_points);
     void determineTableLayout();

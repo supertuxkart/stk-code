@@ -307,12 +307,17 @@ void RaceResultGUI::determineTableLayout()
     m_width_column_space  = 20;
 
     // Determine width of new points column
+    
+    m_font->setMonospaceDigits(true);
     core::dimension2du r_new_p = m_font->getDimension(L"+99");
+    
     m_width_new_points         = r_new_p.Width;
 
     // Determine width of overall points column
     core::dimension2du r_all_p    = m_font->getDimension(L"999");
-    unsigned int width_all_points = r_all_p.Width;
+    m_font->setMonospaceDigits(false);
+    
+    m_width_all_points = r_all_p.Width;
 
     m_table_width = m_width_icon + m_width_column_space
                   + m_width_kart_name;
@@ -322,7 +327,7 @@ void RaceResultGUI::determineTableLayout()
 
     // Only in GP mode are the points displayed.
     if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
-        m_table_width += m_width_new_points + width_all_points
+        m_table_width += m_width_new_points + m_width_all_points
                       + 2 * m_width_column_space;
 
     m_leftmost_column = table_area->m_x + (table_area->m_w - m_table_width)/2;
@@ -639,6 +644,39 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
         current_x += m_width_finish_time + m_width_column_space;
     }
+
+    // Only display points in GP mode and when the GP results are displayed.
+    // =====================================================================
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        m_animation_state != RR_RACE_RESULT)
+    {
+        // Draw the new points
+        // -------------------
+        if(ri->m_new_points > 0)
+        {
+            core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
+            core::stringw point_string = core::stringw("+")
+                                       + core::stringw((int)ri->m_new_points);
+            // With mono-space digits space has the same width as each digit, so
+            // we can simply fill up the string with spaces to get the right 
+            // aligned.
+            while(point_string.size()<3)
+                point_string = core::stringw(" ")+point_string;
+            m_font->draw(point_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
+        }
+        current_x += m_width_new_points + m_width_column_space;
+
+        // Draw the old_points plus increase value
+        // ---------------------------------------
+        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
+        core::stringw point_inc_string = 
+            core::stringw((int)(ri->m_current_displayed_points));
+        while(point_inc_string.size()<3)
+            point_inc_string = core::stringw(" ")+point_inc_string;
+        m_font->draw(point_inc_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
+        
+        current_x += m_width_all_points + m_width_column_space;
+    }
     
     if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
     {
@@ -653,38 +691,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         
         //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
     }
-
-    // Only display points in GP mode and when the GP results are displayed.
-    // =====================================================================
-    if(race_manager->getMajorMode()!=RaceManager::MAJOR_MODE_GRAND_PRIX ||
-        m_animation_state == RR_RACE_RESULT)
-        return;
-
-    // Draw the new points
-    // -------------------
-    if(ri->m_new_points>0)
-    {
-        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        core::stringw point_string = core::stringw("+")
-                                   + core::stringw((int)ri->m_new_points);
-        // With mono-space digits space has the same width as each digit, so
-        // we can simply fill up the string with spaces to get the right 
-        // aligned.
-        while(point_string.size()<3)
-            point_string = core::stringw(" ")+point_string;
-        m_font->draw(point_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
-    }
-    current_x += m_width_new_points   +m_width_column_space;
-
-    // Draw the old_points plus increase value
-    // ---------------------------------------
-    core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-    core::stringw point_inc_string = 
-        core::stringw((int)(ri->m_current_displayed_points));
-    while(point_inc_string.size()<3)
-        point_inc_string = core::stringw(" ")+point_inc_string;
-    m_font->draw(point_inc_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
-
+    
 }   // displayOneEntry
 
 //-----------------------------------------------------------------------------
