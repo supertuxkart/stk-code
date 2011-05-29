@@ -19,6 +19,8 @@
 #ifndef HEADER_SKIN_HPP
 #define HEADER_SKIN_HPP
 
+#include <string>
+
 #include <rect.h>
 #include <SColor.h>
 #include <vector2d.h>
@@ -337,7 +339,7 @@ namespace GUIEngine
         
         irr::video::ITexture* getImage(const char* name);
 
-        static irr::video::SColor getColor(const std::string name);
+        static irr::video::SColor getColor(const std::string &name);
 
     };
 }

@@ -700,7 +700,7 @@ void Skin::drawProgress(Widget* w, const core::rect< s32 > &rect, const bool pre
     }
 }
 
-SColor Skin::getColor(const std::string name)
+SColor Skin::getColor(const std::string &name)
 {
     return SkinConfig::m_colors[name];
 }
