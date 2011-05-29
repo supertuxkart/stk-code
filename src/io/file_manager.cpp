@@ -573,10 +573,18 @@ void FileManager::checkAndCreateAddonsDir()
         }
     }
 
-    const std::string CONFIGDIR("supertuxkart");
-
-    m_addons_dir += "/";
-    m_addons_dir += CONFIGDIR;
+    m_addons_dir += "/supertuxkart":
+    if(!checkAndCreateDirectory(m_config_dir))
+    {
+        // If $HOME/.config can not be created:
+        fprintf(stderr, 
+            "Can't create dir '%s', falling back to use '%s'.\n",
+            m_config_dir.c_str(), getenv("HOME"));
+        m_addons_dir = getenv("HOME");
+        m_addons_dir += ".";
+    }
+    m_addons_dir += "/addons";
+    
 #endif
 
     if(!checkAndCreateDirectory(m_addons_dir))
