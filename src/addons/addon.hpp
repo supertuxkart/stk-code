@@ -226,7 +226,7 @@ public:
                 return m_id < a.m_id;
                 break;
             case SO_DATE:
-                return m_date < a.m_date;
+                return m_date > a.m_date;
                 break;
         }   // switch
         // Fix compiler warning.
