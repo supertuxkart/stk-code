@@ -246,7 +246,7 @@ void DynamicRibbonWidget::add()
                 // huge icons not so good either
                 if (ratio > 1.0f)
                 {
-                    ratio = 1.0 - ratio/5.0f;
+                    ratio = 1.0f - ratio/5.0f;
                     if (ratio < 0.0f) ratio = 0.0f;
                 }
                 

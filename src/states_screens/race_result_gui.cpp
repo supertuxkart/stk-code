@@ -594,7 +594,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     // if we have highscores, move items to the left to have some more room...
     if (m_highscore_player != NULL)
     {
-        x -= m_table_width/3.0f;
+        x -= (int)(m_table_width/3.0f);
     }
     
 #ifdef USE_PER_LINE_BACKGROUND
