@@ -374,9 +374,9 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->setListener(this);
         ribbon->m_reserved_id = m_ids[n];
                 
-        ribbon->m_x = m_x + m_arrows_w;
+        ribbon->m_x = m_x + (m_scrolling_enabled ? m_arrows_w : 0);
         ribbon->m_y = m_y + (int)(n*row_height);
-        ribbon->m_w = m_w - m_arrows_w*2;
+        ribbon->m_w = m_w - (m_scrolling_enabled ? m_arrows_w*2 : 0);
         ribbon->m_h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
 
