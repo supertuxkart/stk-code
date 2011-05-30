@@ -46,6 +46,7 @@
 
 RaceGUIBase::RaceGUIBase()
 {
+    m_ignore_unimportant_messages = false;
     m_lightning             = 0.0f;
     m_max_font_height       = GUIEngine::getFontHeight() + 10;
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
@@ -204,9 +205,10 @@ void RaceGUIBase::drawAllMessages(const Kart* kart,
     const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
     const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
     
-    // draw less important first, at the very bottom of the screen
+    // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
-    if (race_manager->getNumLocalPlayers() < 2)
+    if (race_manager->getNumLocalPlayers() < 2 && 
+        !m_ignore_unimportant_messages)
     {
         for (AllMessageType::const_iterator i = m_messages.begin(); 
              i != m_messages.end(); ++i)

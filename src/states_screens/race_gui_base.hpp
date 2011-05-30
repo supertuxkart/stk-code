@@ -68,6 +68,10 @@ private:
     /** Delight in seconds between lightnings. */
     float m_lightning;
 
+    /** True if unimportant messags (like item messages) should not
+     *  be displayed. */
+    bool  m_ignore_unimportant_messages;
+
     class TimedMessage
     {
      public:
@@ -147,6 +151,10 @@ protected:
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
 
+    /** Instructs the base gui to ignore unimportant messages (like
+     *  item messages).
+     */
+    void ignoreUnimportantMessages() { m_ignore_unimportant_messages = true; }
 public:
     
     bool m_enabled;
