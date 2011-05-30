@@ -21,6 +21,11 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#endif
+#include <math.h>
+
 class btCollisionShape;
 class btMotionState;
 class btTypedConstraint;
@@ -253,6 +258,9 @@ public:
 	}
 	void setLinearFactor(const btVector3& linearFactor)
 	{
+        btAssert(!isnan(linearFactor.getX()));
+        btAssert(!isnan(linearFactor.getY()));
+        btAssert(!isnan(linearFactor.getZ()));
 		m_linearFactor = linearFactor;
 		m_invMass = m_linearFactor*m_inverseMass;
 	}
@@ -355,11 +363,17 @@ public:
 
 	inline void setLinearVelocity(const btVector3& lin_vel)
 	{ 
+        btAssert(!isnan(lin_vel.getX()));
+        btAssert(!isnan(lin_vel.getY()));
+        btAssert(!isnan(lin_vel.getZ()));
 		m_linearVelocity = lin_vel; 
 	}
 
 	inline void setAngularVelocity(const btVector3& ang_vel) 
 	{ 
+        btAssert(!isnan(ang_vel.getX()));
+        btAssert(!isnan(ang_vel.getY()));
+        btAssert(!isnan(ang_vel.getZ()));
 		m_angularVelocity = ang_vel; 
 	}
 

@@ -20,6 +20,12 @@
 #ifndef HEADER_KART_MOTION_STATE_HPP
 #define HEADER_KART_MOTION_STATE_HPP
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 #include "LinearMath/btMotionState.h"
 
 /** This is a very simple motion state implementation for bullet, which does
@@ -61,6 +67,13 @@ public:
      */
     virtual void setWorldTransform(const btTransform &new_trans)
     {
+        assert(!isnan(new_trans.getOrigin().getX()));
+        assert(!isnan(new_trans.getOrigin().getY()));
+        assert(!isnan(new_trans.getOrigin().getZ()));
+        assert(!isnan(new_trans.getRotation().getX()));
+        assert(!isnan(new_trans.getRotation().getY()));
+        assert(!isnan(new_trans.getRotation().getZ()));
+        assert(!isnan(new_trans.getRotation().getW()));
         m_center_of_mass = new_trans;
     }   // setWorldTransform
 
