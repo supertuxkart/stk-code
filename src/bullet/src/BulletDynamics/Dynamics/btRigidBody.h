@@ -275,6 +275,9 @@ public:
 
 	void			applyCentralForce(const btVector3& force)
 	{
+        btAssert(!isnan(force.getX()));
+        btAssert(!isnan(force.getY()));
+        btAssert(!isnan(force.getZ()));
 		m_totalForce += force*m_linearFactor;
 	}
 
@@ -311,22 +314,42 @@ public:
 	
 	void	applyForce(const btVector3& force, const btVector3& rel_pos) 
 	{
+        btAssert(!isnan(force.getX()));
+        btAssert(!isnan(force.getY()));
+        btAssert(!isnan(force.getZ()));
+        btAssert(!isnan(rel_pos.getX()));
+        btAssert(!isnan(rel_pos.getY()));
+        btAssert(!isnan(rel_pos.getZ()));
+
 		applyCentralForce(force);
 		applyTorque(rel_pos.cross(force*m_linearFactor));
 	}
 	
 	void applyCentralImpulse(const btVector3& impulse)
 	{
+        btAssert(!isnan(impulse.getX()));
+        btAssert(!isnan(impulse.getY()));
+        btAssert(!isnan(impulse.getZ()));
 		m_linearVelocity += impulse *m_linearFactor * m_inverseMass;
 	}
 	
   	void applyTorqueImpulse(const btVector3& torque)
 	{
+            btAssert(!isnan(torque.getX()));
+            btAssert(!isnan(torque.getY()));
+            btAssert(!isnan(torque.getZ()));
 			m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
 	}
 	
 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos) 
 	{
+        btAssert(!isnan(impulse.getX()));
+        btAssert(!isnan(impulse.getY()));
+        btAssert(!isnan(impulse.getZ()));
+        btAssert(!isnan(rel_pos.getX()));
+        btAssert(!isnan(rel_pos.getY()));
+        btAssert(!isnan(rel_pos.getZ()));
+
 		if (m_inverseMass != btScalar(0.))
 		{
 			applyCentralImpulse(impulse);
