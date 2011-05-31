@@ -281,12 +281,40 @@ CURLcode NetworkHttp::init()
               "news.xml", "news.xml");
     CURLcode status = download ? downloadFileInternal(&r)
                                : CURLE_OK;
+    if(download && 
+        status==CURLE_COULDNT_RESOLVE_HOST)
+    {
+        // Assume that the server address is wrong. And retry
+        // with the default server address again (just in case
+        // that a redirect went wrong, or a wrong/incorrect
+        // address somehow made its way into the config file.
+        UserConfigParams::m_server_addons.revertToDefaults();
+        status = downloadFileInternal(&r);
+    }
+
     if(status==CURLE_OK)
     {
         std::string xml_file = file_manager->getAddonsFile("news.xml");
         if(download)
             UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
+
+        // A proper news file has at least a version number, mtime, and
+        // frequency defined. If this is not the case, assume that
+        // it's an invalid download. Try downloading again after
+        // resetting the news server back to the default.
+        int version=-1;
+        if( !xml->get("version", &version) || version<1 ||
+             !xml->get("mtime", &version)  ||
+             !xml->get("frequency", &version)                )
+        {
+            UserConfigParams::m_server_addons.revertToDefaults();
+            status = downloadFileInternal(&r);
+            if(status==CURLE_OK)
+                UserConfigParams::m_news_last_updated = 
+                    Time::getTimeSinceEpoch();
+            xml = new XMLNode(xml_file);
+        }
         news_manager->init();
         status = loadAddonsList(xml, xml_file);
         if(status==CURLE_OK)
