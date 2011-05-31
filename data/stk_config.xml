@@ -130,7 +130,7 @@
          releasing them on the ground after a rescue. Used to avoid
          resetting karts into the track. Not sure if this is still
          necessary. -->
-    <rescue vert-offset="0.0" time="2" height="2"/>
+    <rescue vert-offset="0.0" time="1.2" height="2"/>
 
     <!-- Nitro: power-boost: increase in engine power, i.e. 1=plus 100%
          consumption: nitro consumption - heavier characters can be set
