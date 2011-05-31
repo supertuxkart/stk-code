@@ -304,7 +304,7 @@ CURLcode NetworkHttp::init()
         // it's an invalid download. Try downloading again after
         // resetting the news server back to the default.
         int version=-1;
-        if( !xml->get("version", &version) || version<1 ||
+        if( !xml->get("version", &version) || version!=1 ||
              !xml->get("mtime", &version)  ||
              !xml->get("frequency", &version)                )
         {
