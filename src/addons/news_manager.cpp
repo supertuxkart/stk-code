@@ -306,10 +306,10 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
             // a kart or a track.
             const std::string dir=file_manager->getAddonsDir();
             if(file_manager->fileExists(dir+"/karts/"+cond[0]))
-                continue;
+                return false;
             if(file_manager->fileExists(dir+"/tracks/"+cond[0]))
-                continue;
-            return false;
+                return false;
+            continue;
         }
         else
         {
