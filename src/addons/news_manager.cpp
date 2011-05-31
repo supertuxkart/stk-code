@@ -270,6 +270,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
                    cond_list[i].c_str());
             continue;
         }
+        // Check for stkversion comparisons
+        // ================================
         if(cond[0]=="stkversion")
         {
             int news_version = versionToInt(cond[2]);
@@ -291,6 +293,23 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
             }
             printf("Invalid comparison in condition '%s' - assumed true.\n",
                    cond_list[i].c_str());
+        }
+        // Check for addons not installed
+        // ==============================
+        else if(cond[1]=="not" && cond[2]=="installed")
+        {
+            // The addons_manager can not be access, since it's
+            // being initialised after the news manager. So a simple
+            // test is made to see if the directory exists. It is
+            // necessary to check for karts and tracks separately,
+            // since it's not possible to know if the addons is
+            // a kart or a track.
+            const std::string dir=file_manager->getAddonsDir();
+            if(file_manager->fileExists(dir+"/karts/"+cond[0]))
+                continue;
+            if(file_manager->fileExists(dir+"/tracks/"+cond[0]))
+                continue;
+            return false;
         }
         else
         {
