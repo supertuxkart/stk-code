@@ -128,7 +128,8 @@ void AddonsScreen::loadList()
         if(addon->getDesigner().size()==0)
             s = (addon->getName()+"\t"+addon->getDateAsString()).c_str();
         else
-            s = _("%s by %s\t%d",  addon->getName().c_str(),
+            //I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
+            s = _("%s by %s\t%s",  addon->getName().c_str(),
                                    addon->getDesigner().c_str(),
                                    addon->getDateAsString().c_str());
         w_list->addItem(addon->getId(), s.c_str(), icon);
