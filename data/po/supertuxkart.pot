@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-31 21:33-0400\n"
+"POT-Creation-Date: 2011-05-31 21:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,9 +107,10 @@ msgstr ""
 msgid "%s by %s"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:131
+#. I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
+#: src/states_screens/addons_screen.cpp:132
 #, c-format
-msgid "%s by %s\t%d"
+msgid "%s by %s\t%s"
 msgstr ""
 
 #: src/items/powerup.cpp:49
