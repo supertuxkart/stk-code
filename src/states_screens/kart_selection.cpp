@@ -884,16 +884,12 @@ void KartSelectionScreen::beforeAddingWidget()
     const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
     const int group_amount = groups.size();
     
-    // add default group first
-    for (int n=0; n<group_amount; n++)
+    // add all group first
+    if (group_amount > 1)
     {
-        if (groups[n] == DEFAULT_GROUP_NAME)
-        {
-            //FIXME: group name not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
-            break;
-        }
-    }   // for n<group_amount
+        //I18N: name of the tab that will show tracks from all groups
+        tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
+    }
     
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
@@ -902,21 +898,14 @@ void KartSelectionScreen::beforeAddingWidget()
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
     
+    
     // add others after
     for (int n=0; n<group_amount; n++)
     {
-        if (groups[n] != DEFAULT_GROUP_NAME)
-        {
-            // try to translate group names
-            tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
-        }
+        // try to translate group names
+        tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
     }   // for n<group_amount
     
-    if (group_amount > 1)
-    {
-        //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
-    }
     
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );

@@ -313,7 +313,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_default_kart
             PARAM_DEFAULT( StringUserConfigParam("tux", "kart", "Kart to select by default (the last used kart)") );
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
-            PARAM_DEFAULT( StringUserConfigParam("standard", "last_kart_group", "Last selected kart group") );
+            PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group", "Last selected kart group") );
     
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
