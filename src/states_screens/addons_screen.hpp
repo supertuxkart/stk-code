@@ -52,8 +52,13 @@ private:
                     *m_icon_bank;
     GUIEngine::LabelWidget
                     *m_update_status;
+
     /** Currently selected type. */
     std::string      m_type;
+
+    /** The currently selected index, used to re-select this item after
+     *  addons_loading is being displayed. */
+    int              m_selected_index;
 
 public:
 
@@ -70,7 +75,7 @@ public:
 
     virtual void init();
 
-    friend void *startInstall(void *);
+    void    setLastSelected();
 
 };
 

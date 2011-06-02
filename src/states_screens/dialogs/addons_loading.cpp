@@ -36,6 +36,8 @@ using namespace GUIEngine;
 using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
+/** Creates a modal dialog with given percentage of screen width and height
+*/
 
 AddonsLoading::AddonsLoading(const float w, const float h,
                              const std::string &id)
@@ -62,6 +64,16 @@ AddonsLoading::AddonsLoading(const float w, const float h,
         else
             getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
     }   // if isInstalled
+}   // AddonsLoading
+
+// ----------------------------------------------------------------------------
+/** Destructor.
+ */
+AddonsLoading::~AddonsLoading()
+{
+    // Select the last selected item in the addons_screen, so that
+    // users can keep on installing from the last selected item.
+    AddonsScreen::getInstance()->setLastSelected();
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------

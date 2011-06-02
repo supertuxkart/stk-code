@@ -35,7 +35,8 @@ DEFINE_SCREEN_SINGLETON( AddonsScreen );
 
 AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 {
-}
+    m_selected_index = -1;
+}   // AddonsScreen
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -166,6 +167,7 @@ void AddonsScreen::onColumnClicked(int column_id)
     }   // switch
     loadList();
 }   // onColumnClicked
+
 // ----------------------------------------------------------------------------
 void AddonsScreen::eventCallback(GUIEngine::Widget* widget, 
                                  const std::string& name, const int playerID)
@@ -189,6 +191,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 
         if (!id.empty())
         {
+            m_selected_index = list->getSelectionID();
             new AddonsLoading(0.8f, 0.8f, id);
         }
     }
@@ -209,5 +212,22 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         }
     }
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+/** Selects the last selected item on the list (which is the item that
+ *  is just being installed) again. This function is used from the
+ *  addons_loading screen: when it is closed, it will reset the
+ *  select item so that people can keep on installing from that
+ *  point on.
+*/
+void AddonsScreen::setLastSelected()
+{
+    if(m_selected_index>-1)
+    {
+        GUIEngine::ListWidget* list = 
+            getWidget<GUIEngine::ListWidget>("list_addons");
+        list->setSelectionID(m_selected_index);
+    }
+}   // setLastSelected
 
 // ----------------------------------------------------------------------------

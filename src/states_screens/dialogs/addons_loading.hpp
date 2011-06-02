@@ -54,12 +54,11 @@ private:
     Request *m_download_request;
 
 public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    AddonsLoading(const float percent_width, const float percent_height,
-                  const std::string &addon_name);
+            AddonsLoading(const float percent_width, 
+                          const float percent_height,
+                          const std::string &addon_name);
     
+           ~AddonsLoading();
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
     
     virtual void beforeAddingWidgets();
