@@ -771,6 +771,12 @@
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
       <Filter>Headerdateien\states_screens</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\addons\news_manager.cpp">
+      <Filter>Quelldateien\addons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\addons\request.cpp">
+      <Filter>Quelldateien\addons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1459,6 +1465,12 @@
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h">
       <Filter>Headerdateien\guiengine\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\addons\news_manager.hpp">
+      <Filter>Headerdateien\addons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\addons\request.hpp">
+      <Filter>Headerdateien\addons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
