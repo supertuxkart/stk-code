@@ -1517,9 +1517,9 @@ void KartSelectionScreen::allPlayersDone()
     const int kart_count = m_kart_widgets.size();
     for (int n = 0; n < kart_count; n++)
     {
-        std::string selected_kart_group = m_kart_widgets[n].m_kartInternalName;
+        std::string selected_kart = m_kart_widgets[n].m_kartInternalName;
         
-        if (selected_kart_group == RANDOM_KART_ID)
+        if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
             int randomID;
@@ -1530,7 +1530,7 @@ void KartSelectionScreen::allPlayersDone()
                 randomID = random.get(item_count);
                 if (items[randomID].m_code_name != ID_DONT_USE && items[randomID].m_code_name != ID_LOCKED)
                 {
-                    selected_kart_group = items[randomID].m_code_name;
+                    selected_kart = items[randomID].m_code_name;
                     done = true;
                 }
                 items[randomID].m_code_name = ID_DONT_USE;
@@ -1552,7 +1552,7 @@ void KartSelectionScreen::allPlayersDone()
         }
         // std::cout << "selection=" << selection.c_str() << std::endl;
         
-        race_manager->setLocalKartInfo(n, selected_kart_group);
+        race_manager->setLocalKartInfo(n, selected_kart);
     }
     
     // ---- Switch to assign mode

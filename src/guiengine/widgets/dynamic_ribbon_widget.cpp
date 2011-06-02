@@ -684,6 +684,13 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
     updateLabel();
     
     DynamicRibbonHoverListener* listener;
+    
+    if (getSelectedRibbon(playerID)->getSelectionIDString(playerID) == "")
+    {
+        //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
+        emitter->setSelection(0, playerID);
+    }
+    
     for_in( listener, m_hover_listeners )
     {
         listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
@@ -714,6 +721,13 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
     updateLabel(emitter);
     
     DynamicRibbonHoverListener* listener;
+    
+    if (emitter->getSelectionIDString(playerID) == "")
+    {
+        //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
+        emitter->setSelection(0, playerID);
+    }
+    
     for_in( listener, m_hover_listeners )
     {
         listener->onSelectionChanged(this, emitter->getSelectionIDString(playerID),
