@@ -449,7 +449,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_last_track
             PARAM_DEFAULT(  StringUserConfigParam("olivermath", "last_track", "Name of the last track used.") ); 
     PARAM_PREFIX StringUserConfigParam m_last_used_track_group
-            PARAM_DEFAULT( StringUserConfigParam("standard", "last_track_group", "Last selected track group") );
+            PARAM_DEFAULT( StringUserConfigParam("all", "last_track_group", "Last selected track group") );
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );

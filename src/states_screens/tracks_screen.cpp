@@ -181,15 +181,10 @@ void TracksScreen::beforeAddingWidget()
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     const int group_amount = groups.size();
     
-    // add standard group first
-    for (int n=0; n<group_amount; n++)
+    if (group_amount > 1)
     {
-        if (groups[n] == DEFAULT_GROUP_NAME)
-        {
-            // FIXME: group name is not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
-            break;
-        }
+        //I18N: name of the tab that will show tracks from all groups
+        tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
     }
     
     // Make group names being picked up by gettext
@@ -202,18 +197,10 @@ void TracksScreen::beforeAddingWidget()
     // add others after
     for (int n=0; n<group_amount; n++)
     {
-        if (groups[n] != DEFAULT_GROUP_NAME)
-        {
-            // try to translate the group name
-            tabs->addTextChild( _(groups[n].c_str()), groups[n] );
-        }
+        // try to translate the group name
+        tabs->addTextChild( _(groups[n].c_str()), groups[n] );
     }
     
-    if (group_amount > 1)
-    {
-        //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
-    }
     
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
