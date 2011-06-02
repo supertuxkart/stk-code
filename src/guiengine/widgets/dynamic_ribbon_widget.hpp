@@ -239,7 +239,7 @@ namespace GUIEngine
         const std::string& getSelectionIDString(const int playerID);
         
         /** Get the user-visible text of the selected item */
-        const irr::core::stringw& getSelectionText(const int playerID);
+        irr::core::stringw getSelectionText(const int playerID);
         
         /** Returns a read-only list of items added to this ribbon */
         const std::vector<ItemDescription>& getItems() const { return m_items; }

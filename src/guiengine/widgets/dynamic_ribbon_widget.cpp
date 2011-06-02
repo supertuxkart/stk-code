@@ -526,7 +526,8 @@ const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
     return nothing;
 }
 // -----------------------------------------------------------------------------
-const irr::core::stringw& DynamicRibbonWidget::getSelectionText(const int playerID)
+
+irr::core::stringw DynamicRibbonWidget::getSelectionText(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
@@ -535,6 +536,7 @@ const irr::core::stringw& DynamicRibbonWidget::getSelectionText(const int player
     static const irr::core::stringw nothing = "";
     return nothing;
 }
+
 // -----------------------------------------------------------------------------
 RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w)
 {
@@ -1009,7 +1011,7 @@ bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id
     int row = -1;
     int id;
     
-    for (int r=0; r<m_row_amount; r++)
+    for (int r=0; r<m_rows.size(); r++)
     {
         id = m_rows[r].findItemNamed(name);
         if (id > -1)
@@ -1032,9 +1034,10 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
     
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
+    if ((unsigned int)item_id >= m_items.size()) return false;
+    
     m_selected_item[playerID] = item_id;
     
-
     const std::string& name = m_items[item_id].m_code_name;
     
     int row;

@@ -115,7 +115,12 @@ namespace GUIEngine
         const std::string& getSelectionIDString(const int playerID);
         
         /** Returns the user-visible text of the selection */
-        const irr::core::stringw& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_text; }
+        irr::core::stringw getSelectionText(const int playerID)
+        {
+            const int selection = m_selection[playerID];
+            if (selection < 0 || selection >= m_children.size()) return "";
+            return m_children[selection].m_text;
+        }
         
         /** Sets the ID of the selected item within the ribbon */
         void setSelection(const int i, const int playerID) { m_selection[playerID] = i; updateSelection(); }
