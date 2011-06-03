@@ -688,7 +688,7 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
     if (getSelectedRibbon(playerID)->getSelectionIDString(playerID) == "")
     {
         //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
-        emitter->setSelection(0, playerID);
+        getSelectedRibbon(playerID)->setSelection(0, playerID);
     }
     
     for_in( listener, m_hover_listeners )
