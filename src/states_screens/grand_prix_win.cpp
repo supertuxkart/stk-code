@@ -68,7 +68,7 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
     }
     catch (std::exception& e)
     {
-        fprintf(stderr, "%s", e.what());
+        fprintf(stderr, "[GrandPrixWin] WARNING: exception caught when trying to load music: %s\n", e.what());
         m_music = NULL;
     }
 }   // GrandPrixWin

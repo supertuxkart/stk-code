@@ -389,7 +389,14 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
     
     if (m_finish_sound != NULL && m_finish_sound->getStatus() != SFXManager::SFX_PLAYING)
     {
-        music_manager->startMusic( music_manager->getMusicInformation("race_summary.music") );
+        try
+        {
+            music_manager->startMusic( music_manager->getMusicInformation("race_summary.music") );
+        }
+        catch (std::exception& e)
+        {
+            fprintf(stderr, "[RaceResultGUI] WARNING: exception caught when trying to load music: %s\n", e.what());
+        }
     }
 }   // onUpdate
 
