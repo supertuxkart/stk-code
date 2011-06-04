@@ -78,9 +78,9 @@ Stars::~Stars()
 
 void Stars::showFor(float time)
 {
-    m_enabled = true;
+    m_enabled        = true;
     m_remaining_time = time;
-    m_fade_in_time = 1.0f;
+    m_fade_in_time   = 1.0f;
     
     const int nodeAmount = m_nodes.size();
     for (int n=0; n<nodeAmount; n++)

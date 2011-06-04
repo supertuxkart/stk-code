@@ -135,6 +135,8 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
 {
     // Avoid doing another explosion while a kart is thrown around in the air.
     if(playingEmergencyAnimation()) return;
+    if(m_kart->isInvulnerable()) 
+        return;
 
     m_xyz   = m_kart->getXYZ();
     // Ignore explosion that are too far away.
@@ -173,6 +175,7 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     if ( UserConfigParams::m_graphical_effects )
     {
         m_stars_effect->showFor(6.0f);
+        m_kart->setInvulnerableTime(6.0f);
     }
     m_kart->getAttachment()->clear();
 }   // handleExplosion

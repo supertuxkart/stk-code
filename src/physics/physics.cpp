@@ -140,8 +140,8 @@ void Physics::update(float dt)
                 // Only explode a bowling ball if the target does not 
                 // the stars shown
                 if(p->a->getPointerFlyable()->getType()
-                    !=PowerupManager::POWERUP_BOWLING                     ||
-                    !p->b->getPointerKart()->getStarEffect()->isEnabled()    )
+                         !=PowerupManager::POWERUP_BOWLING    ||
+                    !p->b->getPointerKart()->isInvulnerable()   )
                 p->a->getPointerFlyable()->hit(p->b->getPointerKart());
             }
             else                                     // projectile hits projectile

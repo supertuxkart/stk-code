@@ -256,7 +256,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         // If a kart has star effect shown, the kart is immune, so
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner || 
-            kart->getStarEffect()->isEnabled()     ||
+            kart->isInvulnerable()                 ||
             kart->playingEmergencyAnimation() ) continue;
         btTransform t=kart->getTrans();
 

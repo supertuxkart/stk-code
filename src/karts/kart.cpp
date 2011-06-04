@@ -96,6 +96,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_finished_race        = false;
     m_wheel_toggle         = 1;
     m_finish_time          = 0.0f;
+    m_invulnerable_time    = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_terrain_particles    = NULL;
@@ -499,6 +500,7 @@ void Kart::reset()
     m_race_position        = m_initial_position;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
+    m_invulnerable_time    = 0.0f;
     m_collected_energy     = 0;
     m_has_started          = false;
     m_wheel_rotation       = 0;
@@ -739,7 +741,7 @@ void Kart::update(float dt)
         getNode()->setVisible(false);
         return;
     }
-    
+
     // Update the position and other data taken from the physics    
     Moveable::update(dt);
 
@@ -747,8 +749,12 @@ void Kart::update(float dt)
         m_controller->update(dt);
     if(m_camera)
         m_camera->update(dt);
+
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
+
+    // Decrease remaining invulnerability time
+    if(m_invulnerable_time>0) m_invulnerable_time-=dt;
 
     m_slipstream->update(dt);
 

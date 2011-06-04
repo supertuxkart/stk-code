@@ -109,10 +109,16 @@ private:
 
     /** For skidding smoke */
     int          m_wheel_toggle;
-    
-    float        m_max_gear_rpm;       /**<Maximum engine rpm's for the current gear*/
-    float        m_bounce_back_time;   /**<A short time after a collision acceleration
-                                        *  is disabled to allow the karts to bounce back*/
+
+    /**<Maximum engine rpm's for the current gear*/
+    float        m_max_gear_rpm;
+
+    /** A short time after a collision acceleration is disabled to allow 
+     *  the karts to bounce back*/
+    float        m_bounce_back_time;   
+
+    /** Time a kart is invulnerable. */
+    float        m_invulnerable_time;
 
     // Bullet physics parameters
     // -------------------------
@@ -406,8 +412,14 @@ public:
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     // ------------------------------------------------------------------------
-    
-    void           setEnergy        (float val) { m_collected_energy = val; }
+    /** Makes a kart invulnerable for a certain amount of time. */
+    void           setInvulnerableTime(float t) { m_invulnerable_time = t; };
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is invulnerable. */
+    bool           isInvulnerable() const { return m_invulnerable_time > 0; }
+    // ------------------------------------------------------------------------
+    /** Sets the energy the kart has collected. */
+    void           setEnergy(float val) { m_collected_energy = val; }
 };
 
 
