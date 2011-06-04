@@ -93,10 +93,9 @@
   <!-- How often bubble gum get driven over before it disappears. --> 
   <bubble-gum disappear-counter="1"/>
 
-  <!-- impulse is the push from explosions when karts aren't hit directly.  
-       explosion-impulse-objects is the impulse for physics objects (smaller
-       ones like the cone, will be pushed way too far with normal impulse). -->
-  <explosion impulse="10000.0" impulse-objects="500.0" />
+  <!-- explosion-impulse-objects is the impulse that pushes physical objects
+       away if there is an explosion. -->
+  <explosion impulse-objects="500.0" />
 
   <!-- Networking - the current networking code is outdated and will not
       work anymore - so for now don't enable this. -->

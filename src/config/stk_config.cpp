@@ -113,7 +113,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubble_gum_counter,        "bubblegum disappear counter");
-    CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -144,10 +143,9 @@ void STKConfig::init_defaults()
         m_parachute_time_other = m_anvil_speed_factor        =
         m_bomb_time            = m_bomb_time_increase        =
         m_anvil_time           = m_music_credit_time         =
-        m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_near_ground          = m_item_switch_time          = 
-        m_penalty_time                                       = UNDEFINED;
+        m_penalty_time         = m_explosion_impulse_objects = UNDEFINED;
     m_bubble_gum_counter       = -100;
     m_max_karts                = -100;
     m_gp_order                 = -100;
@@ -326,7 +324,6 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *explosion_node= root->getNode("explosion"))
     {
-        explosion_node->get("impulse",         &m_explosion_impulse        );
         explosion_node->get("impulse-objects", &m_explosion_impulse_objects);
     }
 

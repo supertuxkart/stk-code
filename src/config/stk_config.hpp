@@ -69,7 +69,6 @@ public:
     float m_item_switch_time;        /**< Time items will be switched.       */
     int   m_bubble_gum_counter;      /**< How many times bananas must be eaten
                                           before they disappear.             */
-    float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                           objects, e.g. road cones, ...      */
     float m_penalty_time;            /**< Penalty time when starting too 
