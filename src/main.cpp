@@ -330,12 +330,6 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
         }
-        else if ( !strcmp(argv[i], "-v") && i+1<argc )
-        {
-            UserConfigParams::m_verbosity = atoi(argv[i+1]);
-            printf("Setting verbosity to %d\n",UserConfigParams::m_verbosity); 
-            i++;
-        }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
             stk_config->load(file_manager->getDataFile(argv[i+1]));
@@ -404,7 +398,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 exit(EXIT_FAILURE);
             }
         }
-        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-V") == 0)
+        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0)
         {
             printf("==============================\n");
             fprintf ( stdout, "SuperTuxKart, %s.\n", STK_VERSION ) ;
@@ -725,7 +719,6 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "-v")          && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--debug=memory")                        ) {}
         else if( !strcmp(argv[i], "--debug=addons")                        ) {}
         else if( !strcmp(argv[i], "--debug=gui"   )                        ) {}
