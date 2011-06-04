@@ -365,16 +365,19 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_race_lap>0)
     {
         setFastestLap(kart, time_per_lap);
-        m_race_gui->addMessage(_("New fastest lap"), NULL,
-            2.0f, 40, video::SColor(255, 100, 210, 100), true);
+        
         std::string s = StringUtils::timeToString(time_per_lap);
-
+        
         irr::core::stringw m_fastest_lap_message;
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
-
+        
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
-            2.0f, 40, video::SColor(255, 100, 210, 100));
+                               3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        
+        m_race_gui->addMessage(_("New fastest lap"), NULL,
+            3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        
     } // end if new fastest lap
 
     kart_info.m_lap_start_time = getTime();
