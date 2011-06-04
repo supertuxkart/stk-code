@@ -41,7 +41,10 @@ public:
     void reset(const Track &track);
     /** Returns the nth. check structure. */
     CheckStructure *getCheckStructure(unsigned int n) 
-                                                { return m_all_checks[n]; }
+    {
+        if (n >= m_all_checks.size()) return NULL;
+        return m_all_checks[n];
+    }
 };   // CheckManager
 
 #endif

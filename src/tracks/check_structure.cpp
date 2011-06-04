@@ -129,6 +129,8 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
     {
         CheckStructure *cs = 
             m_check_manager->getCheckStructure(indices[i]);
+        if (cs == NULL) continue;
+        
         switch(change_state)
         {
         case CS_DEACTIVATE: 
