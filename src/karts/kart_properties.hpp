@@ -137,6 +137,9 @@ private:
     /** How far away from an explosion karts will still be affected. */
     float m_explosion_radius;
 
+    /** How long a kart is invulnerable after it is hit by an explosion. */
+    float m_explosion_invulnerability_time;
+
     /** Duration a zipper is active. */
     float m_zipper_time;
     
@@ -457,6 +460,11 @@ public:
 
     /** Returns the height of the explosion animation. */
     float getExplosionRadius        () const {return m_explosion_radius;      }
+
+    /** Returns how long a kart is invulnerable after being hit by an 
+        explosion. */
+    float getExplosionInvulnerabilityTime() const 
+                                   { return m_explosion_invulnerability_time; }
 
     /** Returns how much a kart can roll/pitch before the upright constraint
      *  counteracts. */

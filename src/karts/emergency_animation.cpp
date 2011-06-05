@@ -172,11 +172,14 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     m_add_rotation.setPitch(   (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
     
+    // Set invulnerable time, and graphical effects
+    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
+    m_kart->setInvulnerableTime(t);
     if ( UserConfigParams::m_graphical_effects )
     {
-        m_stars_effect->showFor(6.0f);
-        m_kart->setInvulnerableTime(6.0f);
+        m_stars_effect->showFor(t);
     }
+
     m_kart->getAttachment()->clear();
 }   // handleExplosion
 

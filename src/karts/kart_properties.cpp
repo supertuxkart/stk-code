@@ -86,7 +86,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_slipstream_min_speed = m_slipstream_max_speed_increase =
         m_slipstream_duration = m_slipstream_fade_out_time =
         m_camera_distance = m_camera_forward_up_angle = 
-        m_camera_backward_up_angle =
+        m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_ai_steering_variation = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -259,6 +259,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         explosion_node->get("time",   &m_explosion_time  );
         explosion_node->get("radius", &m_explosion_radius);
+        explosion_node->get("invulnerability-time", 
+                        &m_explosion_invulnerability_time);
     }
 
     if(const XMLNode *ai_node = root->getNode("ai"))
@@ -596,6 +598,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_rescue_time,                "rescue time"                   );
     CHECK_NEG(m_rescue_vert_offset,         "rescue vert-offset"            );
     CHECK_NEG(m_explosion_time,             "explosion time"                );
+    CHECK_NEG(m_explosion_invulnerability_time, 
+                                            "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
     CHECK_NEG(m_ai_steering_variation,      "ai steering-variation"         );
 

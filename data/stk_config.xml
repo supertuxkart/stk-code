@@ -279,8 +279,12 @@
 
     <!-- Kart-specific explosion parameters. Height: how high this
          this kart is being pushed in the sky by an explosion.
-         Time: how long it takes before the kart can drive again.  -->
-    <explosion time="2" radius="5" />
+         Time: how long it takes before the kart can drive again. 
+         Invulnerability-time: how long a kart will be invulnerable
+         after being hit by an explosion.  -->
+    <explosion time="2" radius="5" 
+         invulnerability-time="6" />
+
     <!-- Kart-specific settings used by the AI.
          steering-variation: make each kart steer towards slightly
          different driveline points, so that AI don't create trains.
