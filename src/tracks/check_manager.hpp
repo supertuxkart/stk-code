@@ -21,6 +21,7 @@
 #define HEADER_CHECK_MANAGER_HPP
 
 #include <vector>
+#include <string>
 
 class XMLNode;
 class CheckStructure;
