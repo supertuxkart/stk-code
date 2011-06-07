@@ -113,6 +113,7 @@ void PowerupManager::loadAllPowerups()
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node=root->getNode(i);
+        if(node->getName()!="item") continue;
         std::string name;
         node->get("name", &name);
         PowerupType type = getPowerupType(name);
