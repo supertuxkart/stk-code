@@ -3119,8 +3119,6 @@
 					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
 				);
-				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../supertuxkart2/src\"";
-				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../supertuxkart2/src/bullet/src\"";
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
@@ -3138,8 +3136,6 @@
 					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
 				);
-				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../supertuxkart2/src\"";
-				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../supertuxkart2/src/bullet/src\"";
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
@@ -3169,6 +3165,8 @@
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS_QUOTED_1 = "";
+				HEADER_SEARCH_PATHS_QUOTED_2 = "";
 				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -3214,6 +3212,8 @@
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS_QUOTED_1 = "";
+				HEADER_SEARCH_PATHS_QUOTED_2 = "";
 				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
