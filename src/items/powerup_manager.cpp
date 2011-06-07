@@ -119,6 +119,12 @@ void PowerupManager::loadAllPowerups()
         // The weight nodes will be also included in this list, so ignore those
         if(type!=POWERUP_NOTHING)
             LoadPowerup(type, *node);
+        else
+        {
+            printf("Can't find item '%s' from powerup.xml, entry %d/\n",
+                    name.c_str(), i+1);
+            exit(-1);
+        }
     }
     loadWeights(*root, "first",   POSITION_FIRST      );
     loadWeights(*root, "top33",   POSITION_TOP33      );
