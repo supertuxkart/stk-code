@@ -97,12 +97,21 @@ void MainMenuScreen::init()
     // the key bindings for the first player the default again.
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
-    if(!addons_manager->onlineReady() ||
-        UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
+    if (UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
     {
         IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
+        w->resetAllBadges();
+        w->setBadge(BAD_BADGE);
     }
+    else if (!addons_manager->onlineReady())
+    {
+        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
+        w->setDeactivated();
+        w->resetAllBadges();
+        w->setBadge(LOADING_BADGE);
+    }
+
     
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = news_manager->getNextNewsMessage();
@@ -116,11 +125,23 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
-        if(!addons_manager->onlineReady() ||
-            UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
+        if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
+        {
             addons_icon->setDeactivated();
+            addons_icon->resetAllBadges();
+            addons_icon->setBadge(BAD_BADGE);
+        }
+        else if (!addons_manager->onlineReady())
+        {
+            addons_icon->setDeactivated();
+            addons_icon->resetAllBadges();
+            addons_icon->setBadge(LOADING_BADGE);
+        }
         else
+        {
             addons_icon->setActivated();
+            addons_icon->resetAllBadges();
+        }
     }
 
     LabelWidget* w = this->getWidget<LabelWidget>("info_addons");

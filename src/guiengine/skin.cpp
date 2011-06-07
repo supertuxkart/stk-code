@@ -1669,6 +1669,12 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
         video::ITexture* texture = irr_driver->getTexture(file_manager->getGUIDir() + "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
+    if (widget->m_badges & LOADING_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getGUIDir() + "hourglass.png");
+        doDrawBadge(texture, rect, max_icon_size, true);
+    }
 }
 // -----------------------------------------------------------------------------
 

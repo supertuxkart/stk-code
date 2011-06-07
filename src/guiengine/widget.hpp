@@ -69,7 +69,9 @@ namespace GUIEngine
         /** A gamepad icon */
         GAMEPAD_BADGE = 16,
         /** A keyboard icon */
-        KEYBOARD_BADGE = 32
+        KEYBOARD_BADGE = 32,
+        /** An hourglass badge to indocate loading */
+        LOADING_BADGE = 64
     };
     
     

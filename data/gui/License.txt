@@ -4,7 +4,8 @@ released under CC-BY-SA 3+
 
 
 Except :
-main_*.png icons, released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
+main_*.png icons, hourglass, back, back_addons, next_addons, package.png
+    released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
 
 mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com
 
