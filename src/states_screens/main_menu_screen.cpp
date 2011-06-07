@@ -131,16 +131,23 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             addons_icon->resetAllBadges();
             addons_icon->setBadge(BAD_BADGE);
         }
-        else if (!addons_manager->onlineReady())
+        else if (addons_manager->wasError())
         {
             addons_icon->setDeactivated();
             addons_icon->resetAllBadges();
-            addons_icon->setBadge(LOADING_BADGE);
+            addons_icon->setBadge(BAD_BADGE);
         }
-        else
+        else if (addons_manager->onlineReady())
         {
             addons_icon->setActivated();
             addons_icon->resetAllBadges();
+        }
+        else 
+        {
+            // Addons manager is still initialising/downloading.
+            addons_icon->setDeactivated();
+            addons_icon->resetAllBadges();
+            addons_icon->setBadge(LOADING_BADGE);
         }
     }
 

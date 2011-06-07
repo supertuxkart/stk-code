@@ -191,16 +191,6 @@ void AddonsManager::downloadIcons()
 }   // downloadIcons
 
 // ----------------------------------------------------------------------------
-/** Returns true if the list of online addons has been downloaded. This is 
- *  used to grey out the 'addons' entry till a network connections could be
- *  established.
- */
-bool AddonsManager::onlineReady()
-{
-    return m_state.getAtomic()==STATE_READY;
-}   // onlineReady
-
-// ----------------------------------------------------------------------------
 /** Loads the installed addons from .../addons/addons_installed.xml.
  */
 void AddonsManager::loadInstalledAddons()

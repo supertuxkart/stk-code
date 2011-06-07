@@ -57,14 +57,21 @@ private:
 public:
                  AddonsManager();
     void         initOnline(const XMLNode *xml);
-    bool         onlineReady();
-    /** Marks addon as not being available. */
-    void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);
     void         reInit();
+    // ------------------------------------------------------------------------
+    /** Returns true if the list of online addons has been downloaded. This is 
+     *  used to grey out the 'addons' entry till a network connections could be
+     *  established. */
+    bool         onlineReady() const {return m_state.getAtomic()==STATE_READY;}
+    // ------------------------------------------------------------------------
+    bool         wasError()  const { return m_state.getAtomic()==STATE_ERROR;}
+    // ------------------------------------------------------------------------
+    /** Marks addon as not being available. */
+    void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
     unsigned int getNumAddons() const { return m_addons_list.getData().size();}
@@ -72,7 +79,7 @@ public:
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}
 
-};
+};   // class AddonsManager
 
 extern AddonsManager *addons_manager;
 #endif
