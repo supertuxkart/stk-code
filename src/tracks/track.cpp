@@ -1281,14 +1281,14 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     }
     
     // Enable for for all track nodes if fog is used
-    if(m_use_fog)
-    {
+    //if(m_use_fog)
+    //{
         const unsigned int count = m_all_nodes.size();
         for(unsigned int i=0; i<count; i++)
         {
             adjustForFog(m_all_nodes[i]);
         }
-    }
+    //}
     m_track_object_manager->enableFog(m_use_fog);
     
     // Sky dome and boxes support
@@ -1377,14 +1377,61 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
  */
 void Track::adjustForFog(scene::ISceneNode *node)
 {
-    node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+    //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
+    
+    if (node->getType() == scene::ESNT_MESH || node->getType() == scene::ESNT_OCTREE)
+    {
+        scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
+        scene::IMesh* mesh = mnode->getMesh();
+        //irr_driver->setAllMaterialFlags(node->getMesh());
+        
+        unsigned int n = mesh->getMeshBufferCount();
+        for (unsigned int i=0; i<n; i++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+            video::SMaterial &irr_material=mb->getMaterial();
+            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t = irr_material.getTexture(j);
+                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
+                
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }  // for i<getMeshBufferCount()
+    }
+    else if (node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
+        scene::IMesh* mesh = mnode->getMesh();
+        //irr_driver->setAllMaterialFlags(node->getMesh());
+        
+        unsigned int n = mesh->getMeshBufferCount();
+        for (unsigned int i=0; i<n; i++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+            video::SMaterial &irr_material=mb->getMaterial();
+            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t = irr_material.getTexture(j);
+                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
+                
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }  // for i<getMeshBufferCount()
+    }
+    else
+    {
+        unsigned int t = node->getType();
+        const char* type = (const char*)&t;
+        printf("Unknown mesh type %c%c%c%c\n", type[0], type[1], type[2], type[3]);
+        node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+    }
     
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
         for (unsigned int n=0; n<subnodes.size(); n++)
         {
-            subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+            adjustForFog(subnodes[n]);
+            //subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
         }
     }
 }   // adjustForFog

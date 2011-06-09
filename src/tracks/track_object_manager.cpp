@@ -23,9 +23,12 @@
 #include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/material_manager.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
+
+#include <IMeshSceneNode.h>
 
 TrackObjectManager::TrackObjectManager()
 {
@@ -116,6 +119,69 @@ void TrackObjectManager::update(float dt)
     }
 }   // update
 
+void adjustForFog(scene::ISceneNode *node, bool enable)
+{
+    //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
+    
+    if (node->getType() == scene::ESNT_MESH || node->getType() == scene::ESNT_OCTREE)
+    {
+        scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
+        scene::IMesh* mesh = mnode->getMesh();
+        //irr_driver->setAllMaterialFlags(node->getMesh());
+        
+        unsigned int n = mesh->getMeshBufferCount();
+        for (unsigned int i=0; i<n; i++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+            video::SMaterial &irr_material=mb->getMaterial();
+            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t = irr_material.getTexture(j);
+                if (t) material_manager->adjustForFog(t, mb, mnode, enable);
+                
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }  // for i<getMeshBufferCount()
+    }
+    else if (node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
+        scene::IMesh* mesh = mnode->getMesh();
+        //irr_driver->setAllMaterialFlags(node->getMesh());
+        
+        unsigned int n = mesh->getMeshBufferCount();
+        for (unsigned int i=0; i<n; i++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+            video::SMaterial &irr_material=mb->getMaterial();
+            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t = irr_material.getTexture(j);
+                if (t) material_manager->adjustForFog(t, mb, mnode, enable);
+                
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }  // for i<getMeshBufferCount()
+    }
+    else
+    {
+        unsigned int t = node->getType();
+        const char* type = (const char*)&t;
+        printf("Unknown mesh type %c%c%c%c\n", type[0], type[1], type[2], type[3]);
+        node->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
+    }
+    
+    if (node->getType() == scene::ESNT_LOD_NODE)
+    {
+        std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
+        for (unsigned int n=0; n<subnodes.size(); n++)
+        {
+            adjustForFog(subnodes[n], enable);
+            //subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+        }
+    }
+}   // adjustForFog
+
+
+
 // ----------------------------------------------------------------------------
 
 void TrackObjectManager::enableFog(bool enable)
@@ -123,15 +189,8 @@ void TrackObjectManager::enableFog(bool enable)
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        curr->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
-                
-        if (curr->getNode()->getType() == scene::ESNT_LOD_NODE)
-        {
-            std::vector<scene::ISceneNode*>& nodes = ((LODNode*)curr->getNode())->getAllNodes();
-            for (unsigned int n=0; n<nodes.size(); n++)
-            {
-                nodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
-            }
-        }
+        //curr->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
+        
+        adjustForFog(curr->getNode(), enable);
     }
 }

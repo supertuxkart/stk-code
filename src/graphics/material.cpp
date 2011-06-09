@@ -90,7 +90,8 @@ Material::Material(const XMLNode *node, int index)
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
-
+    node->get("fog",              &m_fog               );
+    
     node->get("mask",             &m_mask);
     
     if (node->get("normal-map",  &m_normal_map_tex))
@@ -224,6 +225,7 @@ void Material::init(unsigned int index)
     m_crash_reset               = false;
     m_add                       = false;
     m_disable_z_write           = false;
+    m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
@@ -586,5 +588,13 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     if (UserConfigParams::m_fullscreen_antialiasing)
         m->AntiAliasing = video::EAAM_LINE_SMOOTH;
 
-    
-}   // setMaterialProperties
+} // setMaterialProperties
+
+//-----------------------------------------------------------------------------
+
+void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const
+{
+    printf("<%s> Fog enable : %i\n", m_texname.c_str(), m_fog);
+    m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+    parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+} 

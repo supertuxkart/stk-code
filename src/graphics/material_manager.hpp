@@ -25,7 +25,7 @@
 namespace irr
 {
     namespace video { class ITexture;    }
-    namespace scene { class IMeshBuffer; }
+    namespace scene { class IMeshBuffer; class ISceneNode; }
 }
 using namespace irr;
 
@@ -52,6 +52,10 @@ public:
     void      loadMaterial     ();
     void      setAllMaterialFlags(video::ITexture* t, 
                                   scene::IMeshBuffer *mb) const;
+    void      adjustForFog(video::ITexture* t, 
+                           scene::IMeshBuffer *mb,
+                           scene::ISceneNode* parent,
+                           bool use_fog) const;
     
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
 
