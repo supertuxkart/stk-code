@@ -594,7 +594,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
 
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const
 {
-    printf("<%s> Fog enable : %i\n", m_texname.c_str(), m_fog);
+    //printf("<%s> Fog enable : %i\n", m_texname.c_str(), m_fog);
     m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
 } 
