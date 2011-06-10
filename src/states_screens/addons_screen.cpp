@@ -83,7 +83,7 @@ void AddonsScreen::init()
     
     float wanted_icon_height = getHeight()/8.0f;
     m_icon_bank->setScale(wanted_icon_height/128.0f);
-    w_list->setIcons(m_icon_bank, wanted_icon_height);
+    w_list->setIcons(m_icon_bank, (int)(wanted_icon_height));
     
     m_type = "kart";
 
