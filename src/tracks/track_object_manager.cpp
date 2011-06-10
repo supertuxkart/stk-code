@@ -163,9 +163,6 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
     }
     else
     {
-        unsigned int t = node->getType();
-        const char* type = (const char*)&t;
-        printf("Unknown mesh type %c%c%c%c\n", type[0], type[1], type[2], type[3]);
         node->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
     }
     
