@@ -43,7 +43,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::setIcons(STKModifiedSpriteBank* icons)
+void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
 {
     m_use_icons = (icons != NULL);
     m_icons = icons;
@@ -57,12 +57,19 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons)
         
         // determine needed height
         int item_height = 0;
-        const core::array< core::rect<s32> >& rects = m_icons->getPositions();
-        const int count = rects.size();
-        for (int n=0; n<count; n++)
+        if (size > 0)
         {
-            const int h = rects[n].getHeight();
-            if (h > item_height) item_height = h;
+            item_height = size;
+        }
+        else
+        {
+            const core::array< core::rect<s32> >& rects = m_icons->getPositions();
+            const int count = rects.size();
+            for (int n=0; n<count; n++)
+            {
+                const int h = rects[n].getHeight();
+                if (h > item_height) item_height = h;
+            }
         }
         
         if (item_height > 0)

@@ -48,10 +48,16 @@ void AddonsScreen::loadedFromFile()
                                                     + "/no-package.png"      );
     video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir()
                                                     + "/package-update.png"  );
-
+    video::ITexture* icon4 = irr_driver->getTexture( file_manager->getGUIDir()
+                                                    + "/package-featured.png");
+    video::ITexture* icon5 = irr_driver->getTexture( file_manager->getGUIDir()
+                                                    + "/no-package-featured.png");
+    
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
     m_icon_installed     = m_icon_bank->addTextureAsSprite(icon1);
     m_icon_not_installed = m_icon_bank->addTextureAsSprite(icon2);
+    m_icon_bank->addTextureAsSprite(icon4);
+    m_icon_bank->addTextureAsSprite(icon5);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
     
     GUIEngine::ListWidget* w_list = 
@@ -74,7 +80,10 @@ void AddonsScreen::init()
     
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->setIcons(m_icon_bank);
+    
+    float wanted_icon_height = getHeight()/8.0f;
+    m_icon_bank->setScale(wanted_icon_height/128.0f);
+    w_list->setIcons(m_icon_bank, wanted_icon_height);
     
     m_type = "kart";
 
@@ -133,15 +142,19 @@ void AddonsScreen::loadList()
             s = _("%s by %s\t%s",  addon->getName().c_str(),
                                    addon->getDesigner().c_str(),
                                    addon->getDateAsString().c_str());
+        
+        if (addon->testStatus(Addon::AS_FEATURED))
+        {
+            icon += 2;
+        }
+        
         w_list->addItem(addon->getId(), s.c_str(), icon);
 
-        // Highlight the entry if it's features for normal users, 
-        // or if it's not approved in artists debug mode.
-        if( (!UserConfigParams::m_artist_debug_mode && 
-                       addon->testStatus(Addon::AS_FEATURED))  ||
-            (UserConfigParams::m_artist_debug_mode && 
-                       !addon->testStatus(Addon::AS_APPROVED)))
+        // Highlight if it's not approved in artists debug mode.
+        if(UserConfigParams::m_artist_debug_mode && !addon->testStatus(Addon::AS_APPROVED))
+        {
             w_list->markItemRed(addon->getId(), true);
+        }
     }
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();

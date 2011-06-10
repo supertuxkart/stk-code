@@ -94,7 +94,7 @@ namespace GUIEngine
           *        you're done with it (but do not delete it when the list widget is still active)
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void setIcons(irr::gui::STKModifiedSpriteBank* icons);
+        void setIcons(irr::gui::STKModifiedSpriteBank* icons, int size=-1);
         
         
         // ---- contents management
