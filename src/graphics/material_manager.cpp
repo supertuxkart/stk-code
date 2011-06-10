@@ -89,7 +89,28 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     }    
     
 }   // setAllMaterialFlags
+
 //-----------------------------------------------------------------------------
+
+void MaterialManager::adjustForFog(video::ITexture* t, 
+                                   scene::IMeshBuffer *mb,
+                                   scene::ISceneNode* parent,
+                                   bool use_fog) const
+{
+    const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
+    // Search backward so that temporary (track) textures are found first
+    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    {
+        if (m_materials[i]->getTexFname()==image)
+        {
+            m_materials[i]->adjustForFog(parent, &(mb->getMaterial()), use_fog);
+            return;
+        }
+    }   // for i
+}   // adjustForFog
+
+//-----------------------------------------------------------------------------
+
 void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
 {
     for(int i = (int)m_materials.size()-1; i>=0; i-- )

@@ -27,6 +27,7 @@
 namespace irr
 {
     namespace video { class ITexture; class SMaterial; }
+    namespace scene { class ISceneNode; }
 }
 using namespace irr;
 
@@ -83,6 +84,8 @@ private:
      *  plants that a kart can just drive through. */
     bool             m_ignore;
     bool             m_add;
+    
+    bool             m_fog;
     
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
     
@@ -159,6 +162,8 @@ public:
 
     void  setSFXSpeed(SFXBase *sfx, float speed) const;
     void  setMaterialProperties(video::SMaterial *m) const;
+    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
+    
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const   { return m_texture;        }
     bool  isIgnore           () const { return m_ignore;             }
@@ -211,6 +216,8 @@ public:
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &
          getSFXName          () const { return m_sfx_name; }
+    
+    bool isFogEnabled() const { return m_fog; }
     
     /**
       * \brief Get the kind of particles that are to be used on this material, in the given conditions
