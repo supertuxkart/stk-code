@@ -245,12 +245,10 @@ void TrackInfoDialog::updateHighScores()
         
         // Check if this entry is filled or still empty
         if (n < amount)
-        {
-            char buffer[256];
-            
+        {            
             highscores->getEntry(n, kart_name, name, &time);
-            
-            sprintf(buffer, " : %.2f s\n", time);
+                        
+            std::string time_string = StringUtils::timeToString(time);
             
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
@@ -259,7 +257,7 @@ void TrackInfoDialog::updateHighScores()
                 ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
-            line = name + buffer;
+            line = name + "\t" + core::stringw(time_string.c_str());
         }
         else
         {
