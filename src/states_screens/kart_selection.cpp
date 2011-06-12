@@ -236,7 +236,8 @@ public:
     std::string m_kartInternalName;
     
     PlayerKartWidget(KartSelectionScreen* parent, StateManager::ActivePlayer* associatedPlayer,
-                     core::recti area, const int playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
+                     core::recti area, const int playerID, std::string kartGroup,
+                     const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
 #ifdef DEBUG
         assert(associatedPlayer->ok());
@@ -312,13 +313,23 @@ public:
         // Init kart model
         const std::string default_kart = UserConfigParams::m_default_kart;
         const KartProperties* props = kart_properties_manager->getKart(default_kart);
+                
         if(!props)
         {            
             // If the default kart can't be found (e.g. previously a addon 
             // kart was used, but the addon package was removed), use the
             // first kart as a default. This way we don't have to hardcode
             // any kart names.
-            props = kart_properties_manager->getKartById(0);
+            int id = kart_properties_manager->getKartByGroup(kartGroup, 0);
+            if (id == -1)
+            {
+                props = kart_properties_manager->getKartById(0);
+            }
+            else
+            {
+                props = kart_properties_manager->getKartById(id);
+            }
+            
             if(!props)
             {
                 fprintf(stderr, 
@@ -327,6 +338,7 @@ public:
                 exit(-1);
             }
         }
+        m_kartInternalName = props->getIdent();
 
         const KartModel &kart_model = props->getMasterKartModel();
         
@@ -1093,8 +1105,13 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     const int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
     StateManager::ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
     
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert(tabs != NULL);
+    
+    std::string selected_kart_group =  tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    
     // ---- Create player/kart widget
-    PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size());
+    PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size(), selected_kart_group);
 
     manualAddWidget(newPlayerWidget);
     m_kart_widgets.push_back(newPlayerWidget);
