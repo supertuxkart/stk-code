@@ -150,15 +150,20 @@ void OptionsScreenVideo::init()
             char name[32];
             sprintf( name, "%ix%i", w, h );
             
+            core::stringw label;
+            label += w;
+            label += L"\u00D7";
+            label += h;
+            
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
             
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(name, name, "/gui/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(name, name, "/gui/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(name, name, "/gui/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(name, name, "/gui/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(name, name, "/gui/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(name, name, "/gui/screen169.png");
-            else                                          res->addItem(name, name, "/gui/screen_other.png");
+            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(label, name, "/gui/screen54.png");
+            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(label, name, "/gui/screen43.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(label, name, "/gui/screen1610.png");
+            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(label, name, "/gui/screen53.png");
+            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(label, name, "/gui/screen32.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(label, name, "/gui/screen169.png");
+            else                                          res->addItem(label, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
         } // next resolution
         
@@ -198,15 +203,15 @@ void OptionsScreenVideo::init()
         
         if (!found_800_600)
         {
-            res->addItem("800x600", "800x600", "/gui/screen43.png");
+            res->addItem(L"800\u00D7600", "800x600", "/gui/screen43.png");
         }
         if (!found_1024_640)
         {
-            res->addItem("1024x640", "1024x640", "/gui/screen1610.png");
+            res->addItem(L"1024\u00D7640", "1024x640", "/gui/screen1610.png");
         }
         if (!found_1024_768)
         {
-            res->addItem("1024x768", "1024x768", "/gui/screen43.png");
+            res->addItem(L"1024\u00D7768", "1024x768", "/gui/screen43.png");
         }
         
     } // end if not inited
