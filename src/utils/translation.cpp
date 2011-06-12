@@ -169,15 +169,39 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     const char* lang = getenv("LANG");
     const char* language = getenv("LANGUAGE");
 
+    
+    if (language == NULL || strlen(language) == 0) language = lang;
+        
     if (language != NULL && strlen(language) > 0)
     {
-        printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, Language::from_env(language).get_name().c_str());
-        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(language));
-    }
-    else if (lang != NULL && strlen(lang) > 0)
-    {
-        printf("Env var LANG = '%s'\n", lang);
-        m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(lang));
+        printf("Env var LANGUAGE = '%s'\n", language);
+
+        if (std::string(language).find(":") != std::string::npos)
+        {
+            std::vector<std::string> langs = StringUtils::split(std::string(language), ':');
+            Language l;
+            
+            for (unsigned int curr=0; curr<langs.size(); curr++)
+            {
+                l = Language::from_env(langs[curr]);
+                if (l)
+                {
+                    printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, l.get_name().c_str());
+                    m_dictionary = m_dictionary_manager.get_dictionary(l);
+                    break;
+                }
+            }
+            
+            if (!l)
+            {
+                m_dictionary = m_dictionary_manager.get_dictionary();
+            }
+        }
+        else
+        {
+            printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, Language::from_env(language).get_name().c_str());
+            m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(language));
+        }
     }
     else
     {
