@@ -189,15 +189,20 @@ void OptionsScreenVideo::init()
             char name[32];
             sprintf( name, "%ix%i", w, h );
             
+            core::stringw label;
+            label += w;
+            label += L"\u00D7";
+            label += h;
+            
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
             
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(name, name, "/gui/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(name, name, "/gui/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(name, name, "/gui/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(name, name, "/gui/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(name, name, "/gui/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(name, name, "/gui/screen169.png");
-            else                                          res->addItem(name, name, "/gui/screen_other.png");
+            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(label, name, "/gui/screen54.png");
+            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(label, name, "/gui/screen43.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(label, name, "/gui/screen1610.png");
+            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(label, name, "/gui/screen53.png");
+            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(label, name, "/gui/screen32.png");
+            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))  res->addItem(label, name, "/gui/screen169.png");
+            else                                          res->addItem(label, name, "/gui/screen_other.png");
 #undef ABOUT_EQUAL
         }
         
