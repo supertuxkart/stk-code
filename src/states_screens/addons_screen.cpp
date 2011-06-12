@@ -62,8 +62,8 @@ void AddonsScreen::loadedFromFile()
     
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->addColumn( L"Add-on name" );
-    w_list->addColumn( L"Updated date" );
+    w_list->addColumn( _("Add-on name") );
+    w_list->addColumn( _("Updated date") );
     w_list->setColumnListener(this);
 }   // loadedFromFile
 
