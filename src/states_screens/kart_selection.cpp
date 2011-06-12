@@ -1306,6 +1306,12 @@ void KartSelectionScreen::playerConfirm(const int playerID)
     {
         UserConfigParams::m_default_kart = selection;
     }
+
+    if (m_kart_widgets[playerID].getKartInternalName().size() == 0)
+    {
+        sfx_manager->quickSound( "anvil" );
+        return;
+    }
     
     const int amount = m_kart_widgets.size();
 
