@@ -106,6 +106,14 @@ void OptionsScreenVideo::init()
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
     
+    // Enable back widgets if they were visited in-game previously
+    if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
+    {
+        res->setActivated();
+        full->setActivated();
+        applyBtn->setActivated();
+        gfx->setActivated();
+    }
     
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -222,23 +230,7 @@ void OptionsScreenVideo::init()
     } // end if not inited
     
     res->updateItemDisplay();
-        
-    // forbid changing resolution or animation settings from in-game
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        res->setDeactivated();
-        full->setDeactivated();
-        applyBtn->setDeactivated();
-        gfx->setDeactivated();
-    }
-    else
-    {
-        res->setActivated();
-        full->setActivated();
-        applyBtn->setActivated();
-        gfx->setActivated();
-    }
-    
+
     // ---- select current resolution every time
     char searching_for[32];
     snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_width, (int)UserConfigParams::m_height);
@@ -265,6 +257,18 @@ void OptionsScreenVideo::init()
             break;
         }
     }
+    
+    
+    // ---- forbid changing resolution or animation settings from in-game
+    // (we need to disable them last because some items can't be edited when disabled)
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        res->setDeactivated();
+        full->setDeactivated();
+        applyBtn->setDeactivated();
+        gfx->setDeactivated();
+    }
+    
     
     updateTooltip();
 }   // init
