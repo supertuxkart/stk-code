@@ -280,16 +280,19 @@ void MinimalRaceGUI::drawGlobalMiniMap()
     // arenas currently don't have a map.
     if(world->getTrack()->isArena()) return;
 
-    const video::ITexture *mini_map=world->getTrack()->getMiniMap();
+    const video::ITexture *mini_map = world->getTrack()->getMiniMap();
     
-    int upper_y = m_map_bottom-m_map_height;
+    int upper_y = m_map_bottom - m_map_height;
     int lower_y = m_map_bottom;
     
-    core::rect<s32> dest(m_map_left,               upper_y, 
-                         m_map_left + m_map_width, lower_y);
-    core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-    irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
-
+    if (mini_map != NULL)
+    {
+        core::rect<s32> dest(m_map_left,               upper_y, 
+                             m_map_left + m_map_width, lower_y);
+        core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
+        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
+    }
+    
     // In the first iteration, only draw AI karts, then only draw
     // player karts. This guarantees that player kart icons are always
     // on top of AI kart icons.

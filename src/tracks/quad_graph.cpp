@@ -720,7 +720,6 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     {
         fprintf(stderr, "[QuadGraph::makeMiniMap] WARNING: RTT does not appear to work,"
                         "mini-map will not be available\n");
-        texture = irr_driver->getTexture(file_manager->getDataDir() + "/gui/main_help.png");
     }
     
     return texture;
