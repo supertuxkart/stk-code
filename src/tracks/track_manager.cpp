@@ -122,6 +122,7 @@ void TrackManager::loadTrackList()
     m_arena_group_names.clear();
     m_arena_groups.clear();
     m_track_avail.clear();
+    m_tracks.clear();
     
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
