@@ -198,9 +198,10 @@ LanguageSpec languages[] = {
   { "nl", "NL", 0, "Dutch (Netherlands)"         },
   { "nn", 0,    0, "Norwegian Nynorsk"           },
   { "nn", "NO", 0, "Norwegian Nynorsk (Norway)"  },
-  { "no", 0,    0, "Norwegian"                   },
-  { "no", "NO", 0, "Norwegian (Norway)"          },
-  { "no", "NY", 0, "Norwegian (NY)"              },
+  // DEPRECATED
+  //{ "no", 0,    0, "Norwegian"                   },
+  //{ "no", "NO", 0, "Norwegian (Norway)"          },
+  //{ "no", "NY", 0, "Norwegian (NY)"              },
   { "nr", 0,    0, "Ndebele, South"              },
   { "oc", 0,    0, "Occitan post 1500"           },
   { "om", 0,    0, "Oromo"                       },
