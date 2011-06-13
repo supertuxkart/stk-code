@@ -26,4 +26,4 @@ static const char* endianness_test_ptr = (const char*)&endianness_test;
 // in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
 bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
 
-const char* STK_VERSION = "svn";
+const char* STK_VERSION = "0.7.2-rc1";

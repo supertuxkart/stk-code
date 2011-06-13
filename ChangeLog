@@ -1,3 +1,8 @@
+SuperTuxkart 0.7.1b
+~~~~~~~~~~~~~~~~~~~
+* Fix circular dependency in challenges
+* Updated translations
+
 SuperTuxKart 0.7.1
 ~~~~~~~~~~~~~~~~~~
 * Particle  (smoke, splash, fire) and weather effects
