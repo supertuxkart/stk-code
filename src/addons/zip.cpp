@@ -80,8 +80,8 @@ bool extract_zip(const std::string &from, const std::string &to)
         if(current_file[0]=='.') continue;
         const std::string base = StringUtils::getBasename(current_file);
 
-        IReadFile* src_file  = 
-            file_system->createAndOpenFile(current_file.c_str());
+        IReadFile* src_file = 
+            zip_archive->createAndOpenFile(current_file.c_str());
         if(!src_file)
         {
             printf("[addons] Can't read file '%s'.\n", current_file.c_str());
