@@ -1,3 +1,13 @@
+SuperTuxKart 0.7.2
+~~~~~~~~~~~~~~~~~~
+* Added in-game addon manager
+* Fixed major memory leaks
+* New Snow Peak track by Samuncle
+* Improved star track UFO by Rudy
+* Show when you get a highscore
+* Improve gamepad configuration under Windows (add ability to tell gamepads apart)
+* Various other tweaks done and glitches fixed
+
 SuperTuxkart 0.7.1b
 ~~~~~~~~~~~~~~~~~~~
 * Fix circular dependency in challenges
