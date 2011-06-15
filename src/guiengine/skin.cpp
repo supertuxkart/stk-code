@@ -621,6 +621,7 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + (w->m_skin_dest_y2 - w->m_skin
  */
 void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
+    
     // if within an appearing dialog, grow
     if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL && w->m_parent->getType() == gui::EGUIET_WINDOW)
     {
@@ -1268,16 +1269,8 @@ void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool
     ListWidget* list = dynamic_cast<ListWidget*>(widget);
     assert(list != NULL);
     
-    if (focused)
-    {
-        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
-                                      SkinConfig::m_render_params["listitem::focused"], false, clip);
-    }
-    else
-    {
-        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
-                                      SkinConfig::m_render_params["listitem::down"], false, clip);
-    }
+    drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
+                                  SkinConfig::m_render_params["listitem::focused"], false, clip);
 }
 
 void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect, Widget* widget)
