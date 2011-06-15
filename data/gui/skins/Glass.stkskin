@@ -156,11 +156,6 @@ when the border that intersect at this corner are enabled.
 <element type="listitem" state="focused" image="glass/glasssgauge_fill.png"
     left_border="0" right_border="0" top_border="0" bottom_border="0"
     hborder_out_portion="0.0" vborder_out_portion="0.0" />
-    
-<element type="listitem" state="down" image="glass/glassbutton.png"
-    left_border="80" right_border="80" top_border="0" bottom_border="36"
-    hborder_out_portion="1.0" vborder_out_portion="1.0"
-    areas="body" />
 
 <!-- Scrollbars. Background and thumb have no state (always neutral state).
      The buttons are the top and bottom arrows. Image must be top arrow, will
