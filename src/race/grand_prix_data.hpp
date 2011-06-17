@@ -27,15 +27,15 @@
 #include <irrString.h>
 #include <stdexcept>
 
+#include "utils/translation.hpp"
+
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
   * \ingroup race
   */
 class GrandPrixData
 {
-    irr::core::stringw m_name;         //!< The name of the grand prix - might be translated!
-
-    //irr::core::stringw m_description;  //!< Description for this GP
+    irr::core::stringw m_name;         //!< The name of the grand prix
     
     std::string m_id;                  //!< Internal name of the grand prix, not translated
     std::string m_filename;            //!< Original filename, only for error handling needed
@@ -58,8 +58,8 @@ public:
                        GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
     
-    /** @return the (potentially translated) user-visible name of the Grand Prix */
-    const irr::core::stringw& getName ()        const { return m_name;          }
+    /** @return the (potentially translated) user-visible name of the Grand Prix (apply fribidi as needed) */
+    const irr::core::stringw getName ()        const { return _LTR(m_name.c_str());    }
     
     /** @return the (potentially translated) user-visible description of the Grand Prix */
     //const irr::core::stringw& getDescription () const { return m_description;   }
