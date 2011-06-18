@@ -58,6 +58,7 @@ void BubbleWidget::add()
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
+    irrwidget->setTextRestrainedInside(false);
     
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
