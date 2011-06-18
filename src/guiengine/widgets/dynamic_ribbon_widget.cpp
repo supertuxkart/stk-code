@@ -1042,9 +1042,9 @@ bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id
 
 // -----------------------------------------------------------------------------
 
-bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt)
+bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt, bool evenIfDeactivated)
 {
-    if (m_deactivated) return false;
+    if (m_deactivated && !evenIfDeactivated) return false;
     
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
@@ -1098,16 +1098,16 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
     return true;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt)
+bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated)
 {
-    if (m_deactivated) return false;
+    if (m_deactivated && !evenIfDeactivated) return false;
     
     const int item_count = m_items.size();
     for (int n=0; n<item_count; n++)
     {
         if (m_items[n].m_code_name == item_codename)
         {
-            return setSelection(n, playerID, focusIt);
+            return setSelection(n, playerID, focusIt, evenIfDeactivated);
         }
     }
     return false;

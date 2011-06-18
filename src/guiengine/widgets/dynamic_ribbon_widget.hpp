@@ -250,14 +250,14 @@ namespace GUIEngine
           * \param  item_id In range [0 .. number of items added through 'addItem' - 1]
           * \return Whether setting the selection was successful (whether the item exists)
           */
-        bool setSelection(int item_id, const int playerID, const bool focusIt);
+        bool setSelection(int item_id, const int playerID, const bool focusIt, bool evenIfDeactivated=false);
         
         /**
           * \brief Select an item from its codename.
           *
           * \return Whether setting the selection was successful (whether the item exists)
           */
-        bool setSelection(const std::string item_codename, const int playerID, const bool focusIt);
+        bool setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated=false);
         
         /** \brief Callback from parent class Widget. */
         virtual void elementRemoved();
