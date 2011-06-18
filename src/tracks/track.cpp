@@ -407,6 +407,11 @@ void Track::loadQuadGraph(unsigned int mode_id)
     {
         fprintf(stderr, "[Track] WARNING: No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
+        if (race_manager->getNumberOfKarts() > 1)
+        {
+            fprintf(stderr, "[Track] FATAL: I can handle the lack of driveline in single kart mode, but not with AIs\n");
+            exit(-1);
+        }
     }
     else
     {
