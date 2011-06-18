@@ -81,8 +81,18 @@ void QuadGraph::load(const std::string &filename)
             m_all_nodes.push_back(new GraphNode(i));
         // Then set the default loop:
         setDefaultSuccessors();
-        m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
-                     + m_all_nodes[m_all_nodes.size()-1]->getDistanceToSuccessor(0);
+        
+        if (m_all_nodes.size() > 0)
+        {
+            m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
+                         + m_all_nodes[m_all_nodes.size()-1]->getDistanceToSuccessor(0);
+        }
+        else
+        {
+            fprintf(stderr, "[QuadGraph] No node in driveline graph\n");
+            m_lap_length = 10.0f;
+        }
+        
         return;
     }
 
@@ -210,6 +220,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 {
     // Node 0 is always the node on which the start line is.
     int current_node          = getPredecessor(0);
+    
     float distance_from_start = 0.1f+forwards_distance;
 
     // Maximum distance to left (or right) of centre line
@@ -220,41 +231,49 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 
     for(unsigned int i=0; i<(unsigned int)start_transforms->size(); i++)
     {
-        // First find on which segment we have to start
-        while(distance_from_start > getNode(current_node).getNodeLength())
+        if (current_node == -1)
         {
-            distance_from_start -= getNode(current_node).getNodeLength();
-            current_node = getPredecessor(current_node);
-        }
-        const GraphNode &gn   = getNode(current_node);
-        Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
-        center_line.normalize();
-
-        Vec3 horizontal_line = gn[2] - gn[3];
-        horizontal_line.normalize();
-       
-        Vec3 start = gn.getUpperCenter()
-                   + center_line     * distance_from_start 
-                   + horizontal_line * x_pos;
-        // Add a certain epsilon to the height in case that the
-        // drivelines are beneath the track.
-        (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
-        (*start_transforms)[i].setRotation(
-            btQuaternion(btVector3(0, 1, 0), 
-                         gn.getAngleToSuccessor(0)));
-        if(x_pos >= max_x_dist-sidewards_distance*0.5f)
-        {
-            x_pos  = -max_x_dist;
-            // Every 2nd row will be pushed sideways by half the distance 
-            // between karts, so that a kart can drive between the karts in
-            // the row ahead of it.
-            row_number ++;
-            if(row_number % 2 == 0)
-                x_pos += sidewards_distance*0.5f;
+            (*start_transforms)[i].setOrigin(Vec3(0,0,0));
+            (*start_transforms)[i].setRotation(btQuaternion(btVector3(0, 1, 0), 0));
         }
         else
-            x_pos += sidewards_distance;
-        distance_from_start += forwards_distance;
+        {
+            // First find on which segment we have to start
+            while(distance_from_start > getNode(current_node).getNodeLength())
+            {
+                distance_from_start -= getNode(current_node).getNodeLength();
+                current_node = getPredecessor(current_node);
+            }
+            const GraphNode &gn   = getNode(current_node);
+            Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
+            center_line.normalize();
+
+            Vec3 horizontal_line = gn[2] - gn[3];
+            horizontal_line.normalize();
+           
+            Vec3 start = gn.getUpperCenter()
+                       + center_line     * distance_from_start 
+                       + horizontal_line * x_pos;
+            // Add a certain epsilon to the height in case that the
+            // drivelines are beneath the track.
+            (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
+            (*start_transforms)[i].setRotation(
+                btQuaternion(btVector3(0, 1, 0), 
+                             gn.getAngleToSuccessor(0)));
+            if(x_pos >= max_x_dist-sidewards_distance*0.5f)
+            {
+                x_pos  = -max_x_dist;
+                // Every 2nd row will be pushed sideways by half the distance 
+                // between karts, so that a kart can drive between the karts in
+                // the row ahead of it.
+                row_number ++;
+                if(row_number % 2 == 0)
+                    x_pos += sidewards_distance*0.5f;
+            }
+            else
+                x_pos += sidewards_distance;
+            distance_from_start += forwards_distance;
+        }
     }   // for i<stk_config->m_max_karts
 }   // setStartPositions
 

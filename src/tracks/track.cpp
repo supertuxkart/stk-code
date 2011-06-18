@@ -403,13 +403,16 @@ void Track::loadQuadGraph(unsigned int mode_id)
 {
     m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
                                  m_root+"/"+m_all_modes[mode_id].m_graph_name);
-    m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
-                                             "minimap::"+m_ident);
     if(m_quad_graph->getNumNodes()==0)
     {
-        fprintf(stderr, "No graph nodes defined for track '%s'\n",
+        fprintf(stderr, "[Track] WARNING: No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
-        exit(-1);
+    }
+    else
+    {
+        m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
+                                                 "minimap::"+m_ident);
+
     }
 }   // loadQuadGraph
 
