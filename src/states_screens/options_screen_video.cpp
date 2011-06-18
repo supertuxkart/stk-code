@@ -235,7 +235,8 @@ void OptionsScreenVideo::init()
     char searching_for[32];
     snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_width, (int)UserConfigParams::m_height);
     
-    if (res->setSelection(searching_for, PLAYER_ID_GAME_MASTER, false))
+
+    if (res->setSelection(searching_for, PLAYER_ID_GAME_MASTER, false /* focus it */, true /* even if deactivated */))
     {
         // ok found
     }
