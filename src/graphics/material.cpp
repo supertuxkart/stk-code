@@ -324,10 +324,18 @@ void Material::initCustomSFX(const XMLNode *sfx)
     }
     
     m_sfx_name = StringUtils::removeExtension(filename);
-    sfx->get("min-speed", &m_sfx_min_speed);
-    sfx->get("max-speed", &m_sfx_max_speed);
-    sfx->get("min-pitch", &m_sfx_min_pitch);
-    sfx->get("max-pitch", &m_sfx_max_pitch);
+    sfx->get("min-speed", &m_sfx_min_speed); // 2.4 style
+    sfx->get("min_speed", &m_sfx_min_speed); // 2.5 style
+
+    sfx->get("max-speed", &m_sfx_max_speed); // 2.4 style
+    sfx->get("max_speed", &m_sfx_max_speed); // 2.5 style
+
+    sfx->get("min-pitch", &m_sfx_min_pitch); // 2.4 style
+    sfx->get("min_pitch", &m_sfx_min_pitch); // 2.5 style
+
+    sfx->get("max-pitch", &m_sfx_max_pitch); // 2.4 style
+    sfx->get("max_pitch", &m_sfx_max_pitch); // 2.5 style
+
     m_sfx_pitch_per_speed = (m_sfx_max_pitch - m_sfx_min_pitch)
                           / (m_sfx_max_speed - m_sfx_min_speed);
 
