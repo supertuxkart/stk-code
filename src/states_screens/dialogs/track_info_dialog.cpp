@@ -121,7 +121,14 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         m_spinner->setParent(m_irrlicht_window);
         
         m_spinner->m_properties[PROP_ID] = "lapcountspinner";
-        m_spinner->m_properties[PROP_MIN_VALUE] = "1";
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            m_spinner->m_properties[PROP_MIN_VALUE] = "0";
+        }
+        else
+        {
+            m_spinner->m_properties[PROP_MIN_VALUE] = "1";
+        }
         m_spinner->m_properties[PROP_MAX_VALUE] = "99";
         m_spinner->m_properties[PROP_WARP_AROUND] = "true";
         
