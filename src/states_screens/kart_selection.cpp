@@ -343,7 +343,7 @@ public:
         const KartModel &kart_model = props->getMasterKartModel();
         
         m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0), Vec3(35.0f, 35.0f, 35.0f),
-                                (float)kart_model.getBaseFrame() );
+                                kart_model.getBaseFrame() );
         m_model_view->addModel( kart_model.getWheelModel(0), 
                                 kart_model.getWheelGraphicsPosition(0) );
         m_model_view->addModel( kart_model.getWheelModel(1), 
