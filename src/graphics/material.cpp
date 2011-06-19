@@ -150,10 +150,18 @@ Material::Material(const XMLNode *node, int index)
     // as attributes. Can be removed if track version 3 is not
     // supported anymore
     node->get("zipper",                    &m_zipper                   );
-    node->get("zipper-duration",           &m_zipper_duration          );
-    node->get("zipper-fade-out-time",      &m_zipper_fade_out_time     );
-    node->get("zipper-max-speed-increase", &m_zipper_max_speed_increase);
-    node->get("zipper-speed-gain",         &m_zipper_speed_gain        );
+    
+    node->get("zipper-duration",           &m_zipper_duration          ); // 2.4 style
+    node->get("zipper_duration",           &m_zipper_duration          ); // 2.5 style
+
+    node->get("zipper-fade-out-time",      &m_zipper_fade_out_time     ); // 2.4 style
+    node->get("zipper_fade_out_time",      &m_zipper_fade_out_time     ); // 2.5 style
+
+    node->get("zipper-max-speed-increase", &m_zipper_max_speed_increase); // 2.4 style
+    node->get("zipper_max_speed_increase", &m_zipper_max_speed_increase); // 2.5 style
+
+    node->get("zipper-speed-gain",         &m_zipper_speed_gain        ); // 2.4 style
+    node->get("zipper_speed_gain",         &m_zipper_speed_gain        ); // 2.5 style
 
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
