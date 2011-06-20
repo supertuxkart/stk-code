@@ -53,9 +53,13 @@ Material::Material(const XMLNode *node, int index)
     init(index);
 
     bool b = false;
-    node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP;
+    
+    node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; // blender 2.4 style
+    node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; // blender 2.5 style
     b = false;
-    node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP;
+    node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; // blender 2.4 style
+    node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; // blender 2.5 style
+    
     node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
     std::string s;
