@@ -123,6 +123,19 @@ public:
     void           min(const Vec3& a)              {if(a.getX()<m_floats[0]) m_floats[0]=a.getX();
                                                     if(a.getY()<m_floats[1]) m_floats[1]=a.getY();
                                                     if(a.getZ()<m_floats[2]) m_floats[2]=a.getZ();}
+    // ------------------------------------------------------------------------
+    /** Determines which side of a line this point is. This is using
+     *  a 2d projection (into the X-Z plane).
+     *  \param start The start point of the line.
+     *  \param end   The end point of the line.
+     *  \return >0 Point is to the left side; <0 if it's on the right.
+     */
+    float sideOfLine2D(const Vec3& start, const Vec3& end) const
+    {
+        return (end.getX()-start.getX())*(m_floats[2]-start.getZ()) -
+               (end.getZ()-start.getZ())*(m_floats[0]-start.getX());
+
+    }   // sideOfLine2D
 };    // Vec3
 
 

@@ -336,7 +336,7 @@ void PlayerController::update(float dt)
         m_controls->m_rescue=false;
     }
     if (m_kart->playingEmergencyAnimation() && 
-        m_kart->getAttachment()->getType() != ATTACH_TINYTUX)
+        m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();
     }

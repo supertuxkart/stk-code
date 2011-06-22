@@ -145,13 +145,13 @@
     <nitro power-boost="3" consumption="1" small-container="1" big-container="3"
            max-speed-increase="5" duration="1" fade-out-time="2"/>
 
-  <!-- time is the time a zipper is active. force is the additional 
-       zipper force. speed-gain is the one time additional speed.
-       max-speed-increase is the additional speed allowed on top
-       of the kart-specific maximum kart speed. Fade-out time determines
-       how long it takes for a zipper to fade out (after 'time').  -->
-  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-          fade-out-time="1.0"  />
+    <!-- time is the time a zipper is active. force is the additional 
+         zipper force. speed-gain is the one time additional speed.
+         max-speed-increase is the additional speed allowed on top
+         of the kart-specific maximum kart speed. Fade-out time determines
+         how long it takes for a zipper to fade out (after 'time').  -->
+    <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+            fade-out-time="1.0"  />
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.
@@ -175,6 +175,20 @@
     <slipstream length="10" collect-time="2" use-time="5"
                 add-power="3" min-speed="10"
                 max-speed-increase="5" duration="1" fade-out-time="2"/>
+
+    <!-- Kart-specific settings for the swatter:
+         duration: how long can the swatter be readied.
+         count:  how often can it be used.
+         distance: How close a kart must be before it can be hit. 
+         animation-time: How long it takes for the swatter to hit a target.
+         item-animation-time: How long the swatter will swat when a
+                 projectile hits.
+         squash-duration: How long a kart will remain squashed.
+         squash-slowdown: percentage of max speed that a kart is
+                 restricted to.  -->
+    <swatter duration="10" count="2" distance="3" animation-time="0.2"
+             item-animation-time="0.04" squash-duration="5" 
+             squash-slowdown="0.5"/>
 
     <!-- min-speed-radius and max-speed-radius define the smallest turn 
          radius at lowest speed (4.64 m at speed 0) and at high speed

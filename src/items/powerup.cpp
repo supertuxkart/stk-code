@@ -142,6 +142,10 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
     
     switch (m_type)
     {
+        // No sound effect when arming the glove
+        case PowerupManager::POWERUP_SWATTER:
+            break;
+
         case PowerupManager::POWERUP_ZIPPER:
             break ;
             
@@ -193,6 +197,7 @@ void Powerup::use()
 {
     // Play custom kart sound when collectible is used
     if (m_type != PowerupManager::POWERUP_NOTHING && 
+        m_type != PowerupManager::POWERUP_SWATTER &&
         m_type != PowerupManager::POWERUP_ZIPPER) 
         m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
@@ -247,7 +252,11 @@ void Powerup::use()
         m_sound_use->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
-        
+
+    case PowerupManager::POWERUP_SWATTER:
+        m_owner->getAttachment()->set(Attachment::ATTACH_SWATTER,
+                           m_owner->getKartProperties()->getSwatterDuration());
+        break;
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
         Vec3 hit_point;
@@ -302,7 +311,8 @@ void Powerup::use()
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
             {
-                kart->attach(ATTACH_ANVIL, stk_config->m_anvil_time);
+                kart->attach(Attachment::ATTACH_ANVIL, 
+                             stk_config->m_anvil_time);
                 kart->updatedWeight();
                 kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
                 
@@ -338,7 +348,8 @@ void Powerup::use()
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(m_owner->getPosition() > kart->getPosition())
                 {
-                    kart->attach(ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
+                    kart->attach(Attachment::ATTACH_PARACHUTE, 
+                                 stk_config->m_parachute_time_other);
 
                     if(kart->getController()->isPlayerController())
                         player_kart = kart;

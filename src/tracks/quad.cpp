@@ -29,8 +29,8 @@
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
            bool invisible, bool ai_ignore)
  {
-     if(sideOfLine2D(p0, p2, p1)>0 ||
-         sideOfLine2D(p0, p2, p3)<0)
+     if(p1.sideOfLine2D(p0, p2)>0 ||
+         p3.sideOfLine2D(p0, p2)<0)
      {
          printf("Warning: quad has wrong orientation: p0=%f %f %f p1=%f %f %f\n",
                 p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
@@ -85,16 +85,6 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
     v[3].Color  = color;
 }   // setVertices
 
-// -----------------------------------------------------------------------------
-/** Returns wether a point is to the left or to the right of a line.
- *  While all arguments are 3d, only the x and y coordinates are actually used.
-*/
-float Quad::sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const
-{
-    return (l2.getX()-l1.getX())*(p.getZ()-l1.getZ()) -
-           (l2.getZ()-l1.getZ())*(p.getX()-l1.getX());
-}   // sideOfLine
-
 // ----------------------------------------------------------------------------
 bool Quad::pointInQuad(const Vec3& p) const 
 {
@@ -113,12 +103,12 @@ bool Quad::pointInQuad(const Vec3& p) const
     // If a point is exactly on the line of two quads (e.g. between points
     // 0,1 on one quad, and 3,2 of the previous quad), assign this point
     // to be on the 'later' quad, i.e. on the line between points 0 and 1.
-    if(sideOfLine2D(m_p[0], m_p[2], p)<0) {
-        return sideOfLine2D(m_p[0], m_p[1], p) >= 0.0 &&
-               sideOfLine2D(m_p[1], m_p[2], p) >= 0.0;
+    if(p.sideOfLine2D(m_p[0], m_p[2])<0) {
+        return p.sideOfLine2D(m_p[0], m_p[1]) >= 0.0 &&
+               p.sideOfLine2D(m_p[1], m_p[2]) >= 0.0;
     } else {
-        return sideOfLine2D(m_p[2], m_p[3], p) >  0.0 &&
-               sideOfLine2D(m_p[3], m_p[0], p) >= 0.0;
+        return p.sideOfLine2D(m_p[2], m_p[3]) >  0.0 &&
+               p.sideOfLine2D(m_p[3], m_p[0]) >= 0.0;
     }
 }   // pointInQuad
 

@@ -97,6 +97,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_wheel_toggle         = 1;
     m_finish_time          = 0.0f;
     m_invulnerable_time    = 0.0f;
+    m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_terrain_particles    = NULL;
@@ -481,11 +482,12 @@ void Kart::reset()
         m_camera->reset();
         m_camera->setInitialTransform();
     }
-    
-    // Stop any animations currently being played.
-    m_kart_model->setAnimation(KartModel::AF_DEFAULT);
+
+    // Reset squashing and animations
+    m_kart_model->resetWheels();
+
     // If the controller was replaced (e.g. replaced by end controller), 
-    //  restore the original controller. 
+    // restore the original controller. 
     if(m_saved_controller)
     {
         m_controller       = m_saved_controller;
@@ -501,6 +503,8 @@ void Kart::reset()
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_invulnerable_time    = 0.0f;
+    m_squash_time          = 0.0f;
+    m_kart_model->scaleKart(Vec3(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_has_started          = false;
     m_wheel_rotation       = 0;
@@ -742,6 +746,18 @@ void Kart::update(float dt)
         return;
     }
 
+    if(m_squash_time>0)
+    {
+        m_squash_time-=dt;
+        // If squasing time ends, reset the model
+        if(m_squash_time<=0)
+        {
+            m_kart_model->scaleKart(Vec3(1.0f, 1.0f, 1.0f));
+            MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, 
+                                  /*slowdown*/1.0f, /*fade in*/0.0f);
+        }
+    }
+
     // Update the position and other data taken from the physics    
     Moveable::update(dt);
 
@@ -936,6 +952,19 @@ void Kart::update(float dt)
         m_shadow_enabled = true;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Squashes this kart: it will scale the kart in up direction, and causes
+ *  a slowdown while this kart is squashed.
+ *  \param time How long the kart will be squashed.
+ *  \param slowdown Reduction of max speed.
+ */
+void Kart::setSquash(float time, float slowdown)
+{
+    m_kart_model->scaleKart(Vec3(1.0f, 0.5f, 1.0f));
+    MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
+    m_squash_time  = time;
+}   // setSquash
 
 //-----------------------------------------------------------------------------
 /** Plays any terrain specific sound effect.
@@ -1399,7 +1428,8 @@ void Kart::updatePhysics(float dt)
     float engine_power = getActualWheelForce() + handleNitro(dt)
                        + m_slipstream->getSlipstreamPower();
 
-    if(m_attachment->getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
+    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE) 
+        engine_power*=0.2f;
 
     if (m_flying)
     {

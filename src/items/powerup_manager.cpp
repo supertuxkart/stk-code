@@ -93,7 +93,7 @@ PowerupManager::PowerupType
     static std::string powerup_names[] = {
         "",            /* Nothing */ 
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch", 
-        "parachute", "anchor"
+        "swatter", "parachute", "anchor"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)

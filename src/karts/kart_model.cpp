@@ -377,6 +377,18 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 }   // setDefaultPhysicsPosition
 
 // ----------------------------------------------------------------------------
+/** Resets the kart model. It removes any scaling (squashing) and stops
+ *  animation from being played.
+ */
+void KartModel::reset()
+{
+    m_animated_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+
+    // Stop any animations currently being played.
+    setAnimation(KartModel::AF_DEFAULT);
+
+}   // reset
+// ----------------------------------------------------------------------------
 /** Enables- or disables the end animation. 
  *  \param type The type of animation to play.
  */
@@ -529,3 +541,10 @@ void KartModel::resetWheels()
     const float suspension[4]={0,0,0,0};
     update(0, 0.0f, suspension);
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Scales the kart model by a certain amount. */
+void KartModel::scaleKart(const Vec3 &s)
+{
+    m_animated_node->setScale(s.toIrrVector());
+}   // squashKart

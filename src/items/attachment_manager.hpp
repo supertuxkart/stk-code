@@ -33,20 +33,23 @@ namespace irr
 class AttachmentManager: public NoCopy
 {
 private:
-    scene::IAnimatedMesh *m_attachments[ATTACH_MAX];
-    Material             *m_all_icons [ATTACH_MAX];
+    scene::IAnimatedMesh *m_attachments[Attachment::ATTACH_MAX];
+    Material             *m_all_icons [Attachment::ATTACH_MAX];
 public:
                AttachmentManager() {};
               ~AttachmentManager(); 
     void       removeTextures   ();
     void       loadModels       ();
+    // ------------------------------------------------------------------------
     /** Returns the mest for a certain attachment.
      *  \param type Type of the attachment needed. */
-    scene::IAnimatedMesh *getMesh(attachmentType type) const {return m_attachments[type]; }
+    scene::IAnimatedMesh *getMesh(Attachment::AttachmentType type) const 
+        {return m_attachments[type]; }
+    // ------------------------------------------------------------------------
     /** Returns the icon to display in the race gui if a kart 
      *  has an attachment. */
-    const Material* 
-               getIcon          (int type) const {return m_all_icons [type];}
+    const Material* getIcon (int type) const {return m_all_icons [type]; }
+    // ------------------------------------------------------------------------
 };
 
 extern AttachmentManager *attachment_manager;

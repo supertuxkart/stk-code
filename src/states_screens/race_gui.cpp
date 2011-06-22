@@ -556,7 +556,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
             }
         }
         //attachment
-        if (kart->getAttachment()->getType() != ATTACH_NOTHING)
+        if (kart->getAttachment()->getType() != Attachment::ATTACH_NOTHING)
         {
             video::ITexture *icon_attachment = 
                 attachment_manager->getIcon(kart->getAttachment()->getType())

@@ -107,7 +107,7 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
     m_up_velocity = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
-    m_kart->attach(ATTACH_TINYTUX, m_timer);
+    m_kart->attach(Attachment::ATTACH_TINYTUX, m_timer);
 
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll()  );
@@ -137,6 +137,13 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     if(playingEmergencyAnimation()) return;
     if(m_kart->isInvulnerable()) 
         return;
+    Attachment *a=m_kart->getAttachment();
+    if(a->getType()==Attachment::ATTACH_SWATTER &&
+        a->isSwatterReady())
+    {
+        a->swatItem();
+        return;
+    }
 
     m_xyz   = m_kart->getXYZ();
     // Ignore explosion that are too far away.

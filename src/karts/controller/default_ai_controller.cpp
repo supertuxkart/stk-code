@@ -205,7 +205,8 @@ void DefaultAIController::update(float dt)
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
     // of us.
     bool commands_set = false;
-    if(m_handle_bomb && m_kart->getAttachment()->getType()==ATTACH_BOMB && 
+    if(m_handle_bomb && 
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB && 
         m_kart_ahead )
     {
         // Use nitro if the kart is far ahead, or faster than this kart
@@ -559,6 +560,23 @@ void DefaultAIController::handleItems(const float dt)
         }
         break;   // POWERUP_ANVIL
 
+    case PowerupManager::POWERUP_SWATTER:
+        {
+            // Squared distance for which the swatter works
+            float d2 = m_kart->getKartProperties()->getSwatterDistance2();
+            // Fire if the closest kart ahead or to the back is not already 
+            // squashed and close enough.
+            // FIXME: this can be improved on, since more than one kart might 
+            //        be hit, and a kart ahead might not be at an angle at 
+            //        which the glove can be used.
+            if(  ( m_kart_ahead && !m_kart_ahead->isSquashed()             &&
+                    (m_kart_ahead->getXYZ()-m_kart->getXYZ()).length2()<d2 &&
+                    m_kart_ahead->getSpeed() < m_kart->getSpeed()            ) ||
+                 ( m_kart_behind && !m_kart_behind->isSquashed() &&
+                    (m_kart_behind->getXYZ()-m_kart->getXYZ()).length2()<d2) )
+                    m_controls->m_fire = true;
+            break;
+        }
     default:
         printf("Invalid or unhandled powerup '%d' in default AI.\n",
                 m_kart->getPowerup()->getType());
@@ -728,8 +746,8 @@ void DefaultAIController::handleNitroAndZipper()
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment = 
-                    m_kart->getAttachment()->getType()==ATTACH_PARACHUTE ||
-                    m_kart->getAttachment()->getType()==ATTACH_ANVIL;
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
 
     // If the kart is very slow (e.g. after rescue), use nitro

@@ -180,10 +180,10 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
     Attachment *attachmentA=kartA->getAttachment();
     Attachment *attachmentB=kartB->getAttachment();
 
-    if(attachmentA->getType()==ATTACH_BOMB)
+    if(attachmentA->getType()==Attachment::ATTACH_BOMB)
     {
         // If both karts have a bomb, explode them immediately:
-        if(attachmentB->getType()==ATTACH_BOMB)
+        if(attachmentB->getType()==Attachment::ATTACH_BOMB)
         {
             attachmentA->setTimeLeft(0.0f);
             attachmentB->setTimeLeft(0.0f);
@@ -198,7 +198,7 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
             }
         }
     }
-    else if(attachmentB->getType()==ATTACH_BOMB &&
+    else if(attachmentB->getType()==Attachment::ATTACH_BOMB &&
         attachmentB->getPreviousOwner()!=kartA)
     {
         attachmentB->moveBombFromTo(kartB, kartA);

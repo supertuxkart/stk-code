@@ -54,7 +54,6 @@ private:
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
 
-    float sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const;
 public:
          Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
               bool invis=false, bool ai_ignore=false);

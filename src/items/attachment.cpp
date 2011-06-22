@@ -31,6 +31,8 @@
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
+#define SWAT_ANGLE 22.0f
+
 Attachment::Attachment(Kart* kart)
 {
     m_type           = ATTACH_NOTHING;
@@ -40,8 +42,8 @@ Attachment::Attachment(Kart* kart)
 
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
-    m_node           = irr_driver->addAnimatedMesh(
-                            attachment_manager->getMesh(ATTACH_BOMB));
+    m_node = irr_driver->addAnimatedMesh(
+                         attachment_manager->getMesh(Attachment::ATTACH_BOMB));
 #ifdef DEBUG
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
@@ -58,11 +60,10 @@ Attachment::~Attachment()
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
-void Attachment::set(attachmentType type, float time, Kart *current_kart)
+void Attachment::set(AttachmentType type, float time, Kart *current_kart)
 {
     clear();
     
-
     m_node->setMesh(attachment_manager->getMesh(type));
 
     if (!UserConfigParams::m_graphical_effects)
@@ -71,9 +72,18 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
         m_node->setCurrentFrame(0);
     }
     
-    m_type           = type;
-    m_time_left      = time;
-    m_previous_owner = current_kart;
+    m_type             = type;
+    m_time_left        = time;
+    m_previous_owner   = current_kart;
+    m_node->setRotation(core::vector3df(0, 0, 0));
+    m_count            = m_type==ATTACH_SWATTER
+                         ? m_kart->getKartProperties()->getSwatterCount()
+                         : 1;
+    m_animation_timer  = 0.0f;
+    m_animation_phase  = SWATTER_AIMING;
+    m_rot_per_sec      = core::vector3df(0,0,0);
+    m_animation_target = NULL;
+
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
@@ -98,6 +108,7 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
 void Attachment::clear()
 {
     m_type=ATTACH_NOTHING; 
+    
     m_time_left=0.0;
     m_node->setVisible(false);
 
@@ -108,6 +119,12 @@ void Attachment::clear()
 }   // clear
 
 // -----------------------------------------------------------------------------
+/** Randomly selects the new attachment. For a server process, the
+*   attachment can be passed into this function.
+*  \param item The item that was collected.
+*  \param new_attachment Optional: only used on the clients, it
+*                        specifies the new attachment to use
+*/
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
     float leftover_time   = 0.0f;
@@ -228,6 +245,11 @@ void Attachment::update(float dt)
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:
         break;
+    case ATTACH_SWATTER:
+        updateSwatter(dt);
+        // If the swatter is used up, trigger cleaning up
+        if(m_count==0) m_time_left = -1.0f;
+        break;
     case ATTACH_BOMB:
         if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
         {
@@ -249,4 +271,183 @@ void Attachment::update(float dt)
     if ( m_time_left <= 0.0f)
         clear();
 }   // update
+
 //-----------------------------------------------------------------------------
+/** Updates an armed swatter: it checks for any karts that are close enough
+ *  and not invulnerable, it swats the kart. 
+ *  \param dt Time step size.
+ */
+void Attachment::updateSwatter(float dt)
+{
+    core::vector3df r = m_node->getRotation();
+    r += m_rot_per_sec * dt;
+    switch(m_animation_phase)
+    {
+    case SWATTER_AIMING:    
+        aimSwatter(); 
+        break;
+    case SWATTER_TO_KART:
+        if(fabsf(r.Z)>=90)
+        {
+            checkForHitKart(r.Z>0);
+            m_rot_per_sec *= -1.0f;
+            m_animation_phase = SWATTER_BACK_FROM_KART;
+        }
+        break;
+    case SWATTER_BACK_FROM_KART:
+        if (r.Z>0)
+        {
+            r                  = core::vector3df(0,0,0);
+            m_rot_per_sec      = r;
+            m_animation_phase  = SWATTER_AIMING;
+            m_animation_target = NULL;
+        }
+        break;
+    case SWATTER_ITEM_1:  // swatter going to the left
+        if(r.Z>SWAT_ANGLE)
+        {
+            m_animation_phase = SWATTER_ITEM_2;
+            m_rot_per_sec    *= -1.0f;
+        }
+        break;
+    case SWATTER_ITEM_2:  // swatter going all the way to the right
+        if(r.Z<-SWAT_ANGLE)
+        {
+            m_animation_phase = SWATTER_ITEM_3;
+            m_rot_per_sec *= -1.0f;
+        }
+        break;
+    case SWATTER_ITEM_3:  // swatter going back to rest position.
+        if(r.Z>0)
+        {
+            r                 = core::vector3df(0,0,0);
+            m_rot_per_sec     = r;
+            m_animation_phase = SWATTER_AIMING;
+        }
+        break;
+    }   // switch m_animation_phase
+
+    m_node->setRotation(r);
+}   // updateSwatter
+
+//-----------------------------------------------------------------------------
+/** Returns true if the point xyz is to the left of the kart. 
+ *  \param xyz Point to determine the direction 
+ */
+bool Attachment::isLeftSideOfKart(const Vec3 &xyz)
+{
+    Vec3 forw_vec = m_kart->getTrans().getBasis().getColumn(2);
+    const Vec3& k1 = m_kart->getXYZ();
+    const Vec3  k2 = k1+forw_vec;
+    return xyz.sideOfLine2D(k1, k2)>0;
+}   // isLeftSideOfKart
+
+//-----------------------------------------------------------------------------
+/** This function is called when the swatter reaches the hit angle (i.e. it
+ *  is furthest down). Check all karts if any one is hit, i.e. is at the right
+ *  side and at the right angle and distance.
+ *  \param isWattingLeft True if the swatter is aiming to the left side
+ *         of the kart.
+ */
+void Attachment::checkForHitKart(bool isSwattingLeft)
+{
+    // Square of the minimum distance
+    const KartProperties *kp = m_kart->getKartProperties();
+    float min_dist2          = kp->getSwatterDistance2();
+    Kart *hit_kart           = NULL;
+    Vec3 forw_vec            = m_kart->getTrans().getBasis().getColumn(2);
+    const World *world       = World::getWorld();
+
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    {
+        Kart *kart = world->getKart(i);
+        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
+            continue;
+        float f = (kart->getXYZ()-m_kart->getXYZ()).length2();
+
+        // Distance is too great, ignore this kart.
+        if(f>min_dist2) continue;
+
+        // Check if the kart is at the right side.
+        const bool left = isLeftSideOfKart(kart->getXYZ());
+        if(left!=isSwattingLeft)
+        {
+            //printf("%s wrong side: %d %d\n", 
+            //    kart->getIdent().c_str(), left, isSwattingLeft);
+            continue;
+        }
+
+        Vec3 kart_vec    = m_kart->getXYZ()-kart->getXYZ();
+        // cos alpha = a*b/||a||/||b||
+        // Since forw_vec is a unit vector, we only have to divide by
+        // the length of the vector to the kart.
+        float cos_angle = kart_vec.dot(forw_vec)/kart_vec.length();
+        float angle     = acosf(cos_angle)*180/M_PI;
+        if(angle<45 || angle>135)
+        {
+            //printf("%s angle %f\n", kart->getIdent().c_str(), angle);
+            continue;
+        }
+        
+        kart->setSquash(kp->getSquashDuration(), 
+                        kp->getSquashSlowdown());
+        // It is assumed that only one kart is within reach of the swatter,
+        // so we can stop testing karts here.
+        return;
+    }   // for i < num_karts
+
+}   // angleToKart
+
+//-----------------------------------------------------------------------------
+/** Checks for any kart that is not already squashed that is close enough.
+ *  If a kart is found, it changes the state of the swatter to be 
+ *  SWATTER_TARGET and starts the animation.
+ */
+void Attachment::aimSwatter()
+{
+    const World *world = World::getWorld();
+    Kart *min_kart     = NULL;
+    // Square of the minimum distance
+    float min_dist2    = m_kart->getKartProperties()->getSwatterDistance2();
+
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    {
+        Kart *kart = world->getKart(i);
+        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
+            continue;
+        float f = (kart->getXYZ()-m_kart->getXYZ()).length2();
+        if(f<min_dist2)
+        {
+            min_dist2 = f;
+            min_kart = kart;
+        }
+    }
+    // No kart close enough, nothing to do.
+    if(!min_kart) return;
+
+    m_count --;
+    m_animation_phase        = SWATTER_TO_KART;
+    m_animation_target       = min_kart;
+    const KartProperties *kp = m_kart->getKartProperties();
+    m_animation_timer        = kp->getSwatterAnimationTime();
+    const bool left          = isLeftSideOfKart(min_kart->getXYZ());
+    m_rot_per_sec = core::vector3df(0, 0, 
+                                    left ?90.0f:-90.0f) / m_animation_timer;
+
+}   // aimSwatter
+
+//-----------------------------------------------------------------------------
+/** Starts a (smaller) and faster swatting movement to be played
+ *  when the kart is hit by an item.
+ */
+void Attachment::swatItem()
+{
+    assert(m_type==ATTACH_SWATTER);
+    assert(m_animation_target==NULL);
+
+    m_animation_phase  = SWATTER_ITEM_1;
+    m_animation_timer  = 
+        m_kart->getKartProperties()->getSwatterItemAnimationTime();
+    m_count--;
+    m_rot_per_sec = core::vector3df(0, 0, SWAT_ANGLE) / m_animation_timer;
+}   // swatItem

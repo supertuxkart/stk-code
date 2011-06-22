@@ -193,6 +193,21 @@ private:
     /** Duration during which the increased maximum speed 
      *  due to nitro fades out. */
     float       m_nitro_fade_out_time;
+    /** Square of the maximum distance a swatter can operate. */
+    float       m_swatter_distance2;
+    /** How often the swatter can be fired. */
+    int         m_swatter_count;
+    /** How long the swatter lasts. */
+    float       m_swatter_duration;
+    /** How long a kart will remain squashed. */
+    float       m_squash_duration;
+    /** The slowdown to apply while a kart is squashed. The new maxspeed
+     *  is max_speed*m_squash_slowdown. */
+    float       m_squash_slowdown;
+    /** Animation time for the swatter. */
+    float       m_swatter_animation_time;
+    /** How long the item swatting animation will last. */
+    float       m_swatter_item_animation_time;
 
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
@@ -295,7 +310,9 @@ public:
          ~KartProperties    ();
     void  getAllData        (const XMLNode * root);
     void  checkAllSet(const std::string &filename);
+    float getStartupBoost()  const;
 
+    /** Returns the maximum steering angle (depending on speed). */
     float getMaxSteerAngle           (float speed) const;
 
     /** Returns the material for the kart icons. */
@@ -492,23 +509,26 @@ public:
     /** Return the fade out time once a rubber band is removed. */
     float getRubberBandFadeOutTime  () const {return m_rubber_band_fade_out_time;}
 
-
     /** Returns duration of a plunger in your face. */
     float getPlungerInFaceTime      () const 
             {return m_plunger_in_face_duration[race_manager->getDifficulty()];}
+
     /** Returns the time a zipper is active. */
     float getZipperTime             () const {return m_zipper_time;           }
+
     /** Returns the time a zipper is active. */
     float getZipperFadeOutTime     () const {return m_zipper_fade_out_time;   }
+
     /** Returns the additional force added applied to the kart. */
     float getZipperForce            () const { return m_zipper_force;         }
+
     /** Returns the initial zipper speed gain. */
     float getZipperSpeedGain        () const { return m_zipper_speed_gain;    }
+
     /** Returns the increase of the maximum speed of the kart 
      *  if a zipper is active. */
     float getZipperMaxSpeedIncrease () const 
                                          { return m_zipper_max_speed_increase;}
-
 
     /** Returns additional rotation of 3d model when skidding. */
     float getSkidVisual             () const {return m_skid_visual;           }
@@ -585,8 +605,30 @@ public:
 
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                  }
-    float getStartupBoost() const;
-};
+
+    /** Returns the square of the maximum distance at which a swatter 
+     *  can hit karts. */
+    float getSwatterDistance2() const { return m_swatter_distance2; }
+
+    /** Returns how often a swatter can be used. */
+    int   getSwatterCount() const { return m_swatter_count; }
+
+    /** Returns how long a swatter will stay attached/ready to be used. */
+    float getSwatterDuration() const { return m_swatter_duration; }
+
+    /** Returns how long a kart remains squashed. */
+    float getSquashDuration() const {return m_squash_duration; }
+
+    /** Returns the slowdown of a kart that is squashed. */
+    float getSquashSlowdown() const {return m_squash_slowdown; }
+
+    /** Returns how long it takes for the swatter to hit a target. */
+    float getSwatterAnimationTime() const { return m_swatter_animation_time; }
+
+    /** Returns how long it takes for the swatter to swat at an item. */
+    float getSwatterItemAnimationTime() const 
+                                      {return m_swatter_item_animation_time; }
+};   // KartProperties
 
 #endif
 

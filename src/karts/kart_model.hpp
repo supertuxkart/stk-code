@@ -141,6 +141,7 @@ public:
                   KartModel(bool is_master);
                  ~KartModel();
     KartModel*    makeCopy();
+    void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     scene::ISceneNode*
@@ -180,6 +181,7 @@ public:
     void  update(float rotation, float steer, const float suspension[4]);
     void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
+    void  scaleKart(const Vec3 &s);
 
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);

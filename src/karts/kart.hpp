@@ -120,6 +120,10 @@ private:
     /** Time a kart is invulnerable. */
     float        m_invulnerable_time;
 
+    /** How long a kart is being squashed. If this is >0
+     *  the kart is squashed. */
+    float        m_squash_time;
+
     // Bullet physics parameters
     // -------------------------
     btRaycastVehicle::btVehicleTuning 
@@ -225,10 +229,12 @@ public:
     void           adjustSpeed      (float f);
     void           capSpeed         (float max_speed);
     void           updatedWeight    ();
-    virtual void   collectedItem    (Item *item, int random_attachment);
-    virtual void   reset            ();
-    virtual void   handleZipper     (const Material *m=NULL, bool play_sound=false);
-    virtual void   crashed          (Kart *k, const Material *m=NULL);
+    void           collectedItem    (Item *item, int random_attachment);
+    void           reset            ();
+    void           handleZipper     (const Material *m=NULL, bool play_sound=false);
+    void           setSquash        (float time, float slowdown);
+
+    void           crashed          (Kart *k, const Material *m=NULL);
     
     virtual void   update           (float dt);
     virtual void   finishedRace     (float time);
@@ -247,8 +253,8 @@ public:
     void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
     // ------------------------------------------------------------------------
     /** Sets the attachment and time it stays attached. */
-    void attach(attachmentType attachment_, float time) 
-                                     { m_attachment->set(attachment_, time); }
+    void attach(Attachment::AttachmentType attachment, float time) 
+                                     { m_attachment->set(attachment, time); }
     // ------------------------------------------------------------------------
     /** Sets a new powerup. */
     void setPowerup (PowerupManager::PowerupType t, int n)
@@ -420,7 +426,11 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the energy the kart has collected. */
     void           setEnergy(float val) { m_collected_energy = val; }
-};
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is currently being squashed. */
+    bool           isSquashed() const { return m_squash_time >0; }
+    // ------------------------------------------------------------------------
+};   // Kart
 
 
 #endif

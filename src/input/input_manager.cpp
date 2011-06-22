@@ -115,7 +115,8 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
         case KEY_F1:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
@@ -127,42 +128,48 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         case KEY_F2:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
         case KEY_F3:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
             }
             break;
         case KEY_F4:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
             }
             break;
         case KEY_F5:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() ==1 )
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
             }
             break;
         case KEY_F6:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() == 1)
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
             }
             break;
         case KEY_F7:
-            if (UserConfigParams::m_artist_debug_mode && world && race_manager->getNumPlayers() == 1)
+            if (UserConfigParams::m_artist_debug_mode && world && 
+                race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
@@ -180,7 +187,8 @@ void InputManager::handleStaticAction(int key, int value)
                     const int count = World::getWorld()->getNumKarts();
                     for (int n=0; n<count; n++)
                     {
-                        World::getWorld()->getKart(n)->getNode()->setVisible(gui->m_enabled);
+                        World::getWorld()->getKart(n)->getNode()
+                            ->setVisible(gui->m_enabled);
                     }
                 }
                 else
@@ -191,8 +199,17 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             
+        case KEY_F9:
+            if (UserConfigParams::m_artist_debug_mode && world &&
+                race_manager->getNumPlayers() == 1)
+            {
+                Kart* kart = world->getLocalPlayerKart(0);
+                kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+            }
+            
         case KEY_F11:
-            if (UserConfigParams::m_artist_debug_mode && value && control_is_pressed)
+            if (UserConfigParams::m_artist_debug_mode && value && 
+                control_is_pressed)
             {
                 if (world != NULL)
                 {
@@ -203,17 +220,9 @@ void InputManager::handleStaticAction(int key, int value)
 
         case KEY_F12:
             if(value)
-                UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
+                UserConfigParams::m_display_fps = 
+                    !UserConfigParams::m_display_fps;
             break;
-#ifndef WIN32
-            // For now disable F9 toggling fullscreen, since windows requires
-            // to reload all textures, display lists etc. Fullscreen can
-            // be toggled from the main menu (options->display).
-        case KEY_F9:
-            // TODO; toggle fullscreen
-            //irrDriver->toggleFullscreen(false);   // 0: do not reset textures
-            // Fall through to put the game into pause mode.
-#endif
         case KEY_F10:
             if(world) history->Save();
             break;
@@ -227,17 +236,20 @@ void InputManager::handleStaticAction(int key, int value)
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */
-void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
-                                Input::AxisDirection axisDirection, int value)
+void InputManager::inputSensing(Input::InputType type, int deviceID, 
+                                int button, Input::AxisDirection axisDirection,
+                                int value)
 {
 #if INPUT_MODE_DEBUG
     std::cout << "INPUT SENSING... ";
 #endif
         
-    // don't store if we're trying to do something like bindings keyboard keys on a gamepad
+    // don't store if we're trying to do something like bindings keyboard 
+    // keys on a gamepad
     if (m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD)
         return;
-    if (m_mode == INPUT_SENSE_GAMEPAD  && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON)
+    if (m_mode == INPUT_SENSE_GAMEPAD  && type != Input::IT_STICKMOTION && 
+        type != Input::IT_STICKBUTTON)
         return;
 
 #if INPUT_MODE_DEBUG
@@ -282,7 +294,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
     case Input::IT_STICKMOTION:
         {
         std::cout << "%% storing new axis binding, value=" << value <<
-            " deviceID=" << deviceID << " button=" << button << " axisDirection=" <<
+            " deviceID=" << deviceID << " button=" << button << 
+            " axisDirection=" <<
             (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
@@ -343,8 +356,10 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int button,
 //-----------------------------------------------------------------------------
 int InputManager::getPlayerKeyboardID() const
 {
-    // In no-assign mode, just return the GUI player ID (devices not assigned yet)
-    if (m_device_manager->getAssignMode() == NO_ASSIGN) return PLAYER_ID_GAME_MASTER;
+    // In no-assign mode, just return the GUI player ID (devices not 
+    // assigned yet)
+    if (m_device_manager->getAssignMode() == NO_ASSIGN) 
+        return PLAYER_ID_GAME_MASTER;
     
     // Otherwise, after devices are assigned, we can check in more depth
     // Return the first keyboard that is actually being used
@@ -373,7 +388,8 @@ int InputManager::getPlayerKeyboardID() const
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::dispatchInput(Input::InputType type, int deviceID, int button,
+void InputManager::dispatchInput(Input::InputType type, int deviceID, 
+                                 int button, 
                                  Input::AxisDirection axisDirection, int value)
 {
     // Act different in input sensing mode.
@@ -386,21 +402,28 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
     
     StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
-    bool action_found = m_device_manager->translateInput( type, deviceID, button, axisDirection, value,
-                                                          m_mode, &player, &action);
+    bool action_found = m_device_manager->translateInput(type, deviceID, 
+                                                         button, axisDirection,
+                                                         value, m_mode, 
+                                                         &player, &action);
 
-    // if didn't find a _menu_ action, try finding a corresponding game action as fallback
-    // (the GUI can handle them too)
+    // if didn't find a _menu_ action, try finding a corresponding game action
+    // as fallback (the GUI can handle them too)
     if (!action_found && m_mode == MENU)
     {
-        action_found = m_device_manager->translateInput(type, deviceID, button, axisDirection, value,
-                                                        INGAME, &player, &action);
+        action_found = m_device_manager->translateInput(type, deviceID, 
+                                                        button, axisDirection,
+                                                        value, INGAME, &player,
+                                                        &action);
     }
     
-    // in menus, some keyboard keys are standard (before each player selected his device)
-    // So if a key could not be mapped to any known binding, fall back to check the defaults.
-    if (!action_found && StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD &&
-        m_mode == MENU && m_device_manager->getAssignMode() == NO_ASSIGN)
+    // in menus, some keyboard keys are standard (before each player selected 
+    // his device). So if a key could not be mapped to any known binding, 
+    // fall back to check the defaults.
+    if (!action_found && 
+            StateManager::get()->getGameState() != GUIEngine::GAME && 
+            type == Input::IT_KEYBOARD &&
+            m_mode == MENU && m_device_manager->getAssignMode() == NO_ASSIGN)
     {
         action = PA_BEFORE_FIRST;
 
@@ -431,7 +454,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
         if (m_device_manager->getAssignMode() == DETECT_NEW)
         {            
             // Player is unjoining
-            if ((player != NULL) && (action == PA_RESCUE || action == PA_MENU_CANCEL))
+            if ((player != NULL) && (action == PA_RESCUE || 
+                                     action == PA_MENU_CANCEL ) )
             {
                 // returns true if the event was handled
                 if (KartSelectionScreen::getInstance()->playerQuit( player ))
@@ -457,25 +481,30 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
-                        //std::cout << "==== New Player Joining with Key " << button << " ====" << std::endl;
+                        //std::cout << "==== New Player Joining with Key " << 
+                        // button << " ====" << std::endl;
                         device = m_device_manager->getKeyboardFromBtnID(button);
                     }
-                    else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+                    else if (type == Input::IT_STICKBUTTON || 
+                             type == Input::IT_STICKMOTION    )
                     {
                         device = m_device_manager->getGamePadFromIrrID(deviceID);
                     }
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getInstance()->playerJoin( device, false );
+                        KartSelectionScreen::getInstance()->playerJoin(device, 
+                                                                       false );
                     }
                 }
-                return; // we're done here, ignore devices that aren't associated with players
+                return; // we're done here, ignore devices that aren't 
+                        // associated with players
             }
         }
 
         // ... when in-game
-        if (StateManager::get()->getGameState() == GUIEngine::GAME && !GUIEngine::ModalDialog::isADialogActive())
+        if (StateManager::get()->getGameState() == GUIEngine::GAME && 
+             !GUIEngine::ModalDialog::isADialogActive()                  )
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
             Kart* pk;
@@ -490,7 +519,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
 
             if (pk == NULL)
             {
-                std::cerr << "Error, trying to process action for an unknown player\n";
+                std::cerr <<
+                    "Error, trying to process action for an unknown player\n";
                 return;
             }
             
@@ -501,29 +531,31 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
         {
 
             // reset timer when released
-            if (abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON))
+            if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
             {
-                //if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
-                //else std::cout << "resetting for another reason\n";
-
                 m_timer_in_use = false;
                 m_timer = 0;
             }
 
-            // When in master-only mode, we can safely assume that players are set up, contrarly to
-            // early menus where we accept every input because players are not set-up yet
+            // When in master-only mode, we can safely assume that players 
+            // are set up, contrarly to early menus where we accept every 
+            // input because players are not set-up yet
             if (m_master_player_only && player == NULL)
             {
-                if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
+                if (type == Input::IT_STICKMOTION || 
+                    type == Input::IT_STICKBUTTON)
                 {
-                    GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(deviceID);
+                    GamePadDevice* gp = 
+                        getDeviceList()->getGamePadFromIrrID(deviceID);
 
                     if (gp != NULL &&
                         abs(value)>gp->m_deadzone)
                     {
-                        //I18N: message shown when an input device is used but is not associated to any player
-                        GUIEngine::showMessage(_("Ignoring '%s', you needed to join earlier to play!",
-                                                 irr::core::stringw(gp->m_name.c_str()).c_str()));
+                        //I18N: message shown when an input device is used but
+                        // is not associated to any player
+                        GUIEngine::showMessage(
+                            _("Ignoring '%s', you needed to join earlier to play!",
+                            irr::core::stringw(gp->m_name.c_str()).c_str())      );
                     }
                 }
                 return;
@@ -538,27 +570,36 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
                     m_timer = 0.25;
                 }
                                 
-                // player may be NULL in early menus, before player setup has been performed
+                // player may be NULL in early menus, before player setup has 
+                // been performed
                 int playerID = (player == NULL ? 0 : player->getID());
                 
-                // If only the master player can act, and this player is not the master, ignore his input
-                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only &&
+                // If only the master player can act, and this player is not 
+                // the master, ignore his input
+                if (m_device_manager->getAssignMode() == ASSIGN && 
+                    m_master_player_only &&
                     playerID != PLAYER_ID_GAME_MASTER)
                 {
-                    //I18N: message shown when a player that isn't game master tries to modify options that
-                    //I18N: only the game master is allowed to        
-                    GUIEngine::showMessage(_("Only the Game Master may act at this point!"));
+                    //I18N: message shown when a player that isn't game master
+                    //I18N: tries to modify options that only the game master 
+                    //I18N: is allowed to
+                    GUIEngine::showMessage(
+                        _("Only the Game Master may act at this point!"));
                     return;
                 }
                 
-                // all is good, pass the translated input event on to the event handler
-                GUIEngine::EventHandler::get()->processGUIAction(action, deviceID, abs(value), type, playerID);
+                // all is good, pass the translated input event on to the 
+                // event handler
+                GUIEngine::EventHandler::get()
+                    ->processGUIAction(action, deviceID, abs(value), type, 
+                                       playerID);
             }
         }
     }
     else if (type == Input::IT_KEYBOARD)
     {
-        // keyboard press not handled by device manager / bindings. Check static bindings...
+        // keyboard press not handled by device manager / bindings. 
+        // Check static bindings...
         handleStaticAction( button, value );
     }
 }   // input
@@ -568,14 +609,16 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int button
 void InputManager::setMasterPlayerOnly(bool enabled)
 {
 #if INPUT_MODE_DEBUG
-    std::cout << "====== InputManager::setMasterPlayerOnly(" << enabled << ") ======\n";
+    std::cout << 
+        "====== InputManager::setMasterPlayerOnly(" << enabled << ") ======\n";
 #endif
     m_master_player_only = enabled;
 }
 
 //-----------------------------------------------------------------------------
 
-/** Returns whether only the master player should be allowed to perform changes in menus */
+/** Returns whether only the master player should be allowed to perform changes
+ *  in menus */
 bool InputManager::masterPlayerOnly() const
 {
     return m_device_manager->getAssignMode() == ASSIGN && m_master_player_only;
@@ -598,8 +641,10 @@ EventPropagation InputManager::input(const SEvent& event)
 {
     if (event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
-        // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
-        for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
+        // Axes - FIXME, instead of checking all of them, ask the bindings 
+        // which ones to poll
+        for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; 
+              axis_id++)
         {
             int value = event.JoystickEvent.Axis[axis_id];
 
@@ -609,27 +654,32 @@ EventPropagation InputManager::input(const SEvent& event)
                        event.JoystickEvent.Joystick, axis_id, value);
             }
 
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id,
-                          Input::AD_NEUTRAL, value);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, 
+                          axis_id, Input::AD_NEUTRAL, value);
         }
         
         if (event.JoystickEvent.POV == 65535)
         {
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          0);
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          0);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
+                          Input::HAT_H_ID, Input::AD_NEUTRAL, 0);
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
+                          Input::HAT_V_ID, Input::AD_NEUTRAL, 0);
         }
         else
         {
             // *0.017453925f is to convert degrees to radians
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          (int)(cos(event.JoystickEvent.POV*0.017453925f/100.0f)*Input::MAX_VALUE));
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          (int)(sin(event.JoystickEvent.POV*0.017453925f/100.0f)*Input::MAX_VALUE));
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, 
+                          Input::HAT_H_ID, Input::AD_NEUTRAL,
+                          (int)(cos(event.JoystickEvent.POV*0.017453925f/100.0f)
+                                *Input::MAX_VALUE));
+            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
+                          Input::HAT_V_ID, Input::AD_NEUTRAL,
+                          (int)(sin(event.JoystickEvent.POV*0.017453925f/100.0f)
+                                *Input::MAX_VALUE));
         }
         
-        GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
+        GamePadDevice* gp = 
+            getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
 
         if (gp == NULL)
         {
@@ -642,14 +692,17 @@ EventPropagation InputManager::input(const SEvent& event)
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
             
             // Only report button events when the state of the button changes
-            if ((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
+            if ((!gp->isButtonPressed(i) &&  isButtonPressed) || 
+                 (gp->isButtonPressed(i) && !isButtonPressed)    )
             {
                 if (UserConfigParams::m_gamepad_debug)
                 {
                     printf("button %i, status=%i\n", i, isButtonPressed);
                 }
                 
-                dispatchInput(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, Input::AD_POSITIVE,
+                dispatchInput(Input::IT_STICKBUTTON, 
+                              event.JoystickEvent.Joystick, i, 
+                              Input::AD_POSITIVE,
                               isButtonPressed ? Input::MAX_VALUE : 0);
             }
             gp->setButtonPressed(i, isButtonPressed);
@@ -676,9 +729,10 @@ EventPropagation InputManager::input(const SEvent& event)
                 StateManager::get()->escapePressed();
                 return EVENT_BLOCK;
             }
-            // 'backspace' in a text control must never be mapped, since user can be in a text
-            // area trying to erase text (and if it's mapped to rescue that would dismiss the
-            // dialog instead of erasing a single letter). Same for spacebar. Same for letters.
+            // 'backspace' in a text control must never be mapped, since user
+            // can be in a text area trying to erase text (and if it's mapped 
+            // to rescue that would dismiss the dialog instead of erasing a
+            // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
                 if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
@@ -696,7 +750,8 @@ EventPropagation InputManager::input(const SEvent& event)
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
                           Input::AD_POSITIVE, Input::MAX_VALUE);
             
-            // if this action took us into a text box, don't let event continue (FIXME not the cleanest solution)
+            // if this action took us into a text box, don't let event continue
+            // (FIXME not the cleanest solution)
             if (!wasInTextBox && GUIEngine::isWithinATextBox())
             {
                 return EVENT_BLOCK;
@@ -705,9 +760,10 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else
         {
-            // 'backspace' in a text control must never be mapped, since user can be in a text
-            // area trying to erase text (and if it's mapped to rescue that would dismiss the
-            // dialog instead of erasing a single letter). Same for spacebar. Same for letters.
+            // 'backspace' in a text control must never be mapped, since user
+            // can be in a text area trying to erase text (and if it's mapped 
+            // to rescue that would dismiss the dialog instead of erasing a 
+            // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
                 if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
@@ -745,16 +801,21 @@ EventPropagation InputManager::input(const SEvent& event)
         EMIE_RMOUSE_LEFT_UP     Right mouse button was left up.
         EMIE_MMOUSE_LEFT_UP     Middle mouse button was left up.
         EMIE_MOUSE_MOVED    The mouse cursor changed its position.
-        EMIE_MOUSE_WHEEL    The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast.
+        EMIE_MOUSE_WHEEL    The mouse wheel was moved. Use Wheel value in 
+                            event data to find out in what direction and 
+                            how fast.
          */
     }
 #endif
     
-    // block events in all modes but initial menus (except in text boxes to allow typing,
-    // and except in modal dialogs in-game)
-    // FIXME: 1) that's awful logic 2) that's not what the code below does, events are never blocked in menus
-    if (getDeviceList()->getAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
-        (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
+    // block events in all modes but initial menus (except in text boxes to 
+    // allow typing, and except in modal dialogs in-game)
+    // FIXME: 1) that's awful logic 2) that's not what the code below does, 
+    // events are never blocked in menus
+    if (getDeviceList()->getAssignMode() != NO_ASSIGN && 
+        !GUIEngine::isWithinATextBox() &&
+        (!GUIEngine::ModalDialog::isADialogActive() && 
+        StateManager::get()->getGameState() == GUIEngine::GAME))
     {
         return EVENT_BLOCK;
     }
@@ -837,9 +898,9 @@ void InputManager::setMode(InputDriverMode new_mode)
                     m_sensed_input_high_gamepad.clear();
                     m_sensed_input_high_kbd.clear();
 
-                    // The order is deliberate just in case someone starts to make
-                    // STK multithreaded: m_sensed_input must not be 0 when
-                    // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
+                    // The order is deliberate just in case someone starts 
+                    // to make STK multithreaded: m_sensed_input must not be 
+                    // 0 when mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
                     m_mode = MENU;
 
                     break;
@@ -886,8 +947,8 @@ void InputManager::setMode(InputDriverMode new_mode)
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
-            // Reset the helper values for the relative mouse movement supresses to
-            // the notification of them as an input.
+            // Reset the helper values for the relative mouse movement 
+            // supresses to the notification of them as an input.
             m_mouse_val_x = m_mouse_val_y = 0;
             m_mode        = new_mode;
 

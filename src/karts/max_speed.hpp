@@ -41,6 +41,7 @@ public:
     enum {MS_DECREASE_MIN,
           MS_DECREASE_TERRAIN = MS_DECREASE_MIN, 
           MS_DECREASE_AI, 
+          MS_DECREASE_SQUASH,
           MS_DECREASE_MAX};
 
 private:

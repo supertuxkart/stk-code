@@ -974,6 +974,12 @@ int main(int argc, char *argv[] )
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
                         network_http = new NetworkHttp();
+                        // Note that the network thread must be started after 
+                        // the assignment to network_http (since the thread 
+                        // might use network_http, otherwise a race condition 
+                        // can be introduced resulting in a crash).
+                        network_http->startNetworkThread();
+
                     }   // onConfirm
                     // --------------------------------------------------------
                     virtual void onCancel()
@@ -982,6 +988,7 @@ int main(int argc, char *argv[] )
                         UserConfigParams::m_internet_status = NetworkHttp::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
                         network_http = new NetworkHttp();
+                        network_http->startNetworkThread();
                     }   // onCancel
                 };   // ConfirmServer
                 

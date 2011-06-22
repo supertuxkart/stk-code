@@ -148,7 +148,8 @@ void NewAIController::update(float dt)
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
     // of us.
     bool commands_set = false;
-    if(m_handle_bomb && m_kart->getAttachment()->getType()==ATTACH_BOMB && 
+    if(m_handle_bomb && 
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB && 
         m_kart_ahead )
     {
         // Use nitro if the kart is far ahead, or faster than this kart
@@ -442,6 +443,7 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
             m_controls->m_fire = m_time_since_last_shot > 3.0f && 
                                  m_kart->getPosition()>1;
         }
+    case PowerupManager::POWERUP_SWATTER:  // fallthrough
     default:
         m_controls->m_fire = true;
     }
@@ -600,8 +602,8 @@ void NewAIController::handleNitroAndZipper()
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment = 
-                        m_kart->getAttachment()->getType()==ATTACH_PARACHUTE ||
-                        m_kart->getAttachment()->getType()==ATTACH_ANVIL;
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
 
     // If the kart is very slow (e.g. after rescue), use nitro

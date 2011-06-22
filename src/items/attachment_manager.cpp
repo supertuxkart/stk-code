@@ -25,7 +25,9 @@
 
 AttachmentManager *attachment_manager = 0;
 
-struct  initAttachmentType {attachmentType attachment; const char *file; const char *icon_file;};
+struct  initAttachmentType {Attachment::AttachmentType attachment; 
+                            const char *file;
+                            const char *icon_file;};
 
 /* Some explanations to the attachments:
    Parachute: This will increase the air friction, reducing the maximum speed.
@@ -46,17 +48,18 @@ struct  initAttachmentType {attachmentType attachment; const char *file; const c
 
 initAttachmentType iat[]=
 {
-    {ATTACH_PARACHUTE,   "parachute.b3d",   "parachute-attach-icon.png"},
-    {ATTACH_BOMB,        "bomb.b3d",        "bomb-attach-icon.png"     },
-    {ATTACH_ANVIL,       "anchor.b3d",      "anchor-attach-icon.png"   },
-    {ATTACH_TINYTUX,     "reset-button.b3d","reset-attach-icon.png"    },
-    {ATTACH_MAX,         "",                ""                         },
+    {Attachment::ATTACH_PARACHUTE,   "parachute.b3d",   "parachute-attach-icon.png"},
+    {Attachment::ATTACH_BOMB,        "bomb.b3d",        "bomb-attach-icon.png"     },
+    {Attachment::ATTACH_ANVIL,       "anchor.b3d",      "anchor-attach-icon.png"   },
+    {Attachment::ATTACH_SWATTER,     "swatter.b3d",     "swatter-icon.png"         },
+    {Attachment::ATTACH_TINYTUX,     "reset-button.b3d","reset-attach-icon.png"    },
+    {Attachment::ATTACH_MAX,         "",                ""                         },
 };
 
 //-----------------------------------------------------------------------------
 AttachmentManager::~AttachmentManager()
 {
-    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
         scene::IMesh *mesh = m_attachments[iat[i].attachment];
         mesh->drop();
@@ -73,7 +76,7 @@ AttachmentManager::~AttachmentManager()
 //-----------------------------------------------------------------------------
 void AttachmentManager::removeTextures()
 {
-    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
         // FIXME: free attachment textures
     }   // for
@@ -82,7 +85,7 @@ void AttachmentManager::removeTextures()
 //-----------------------------------------------------------------------------
 void AttachmentManager::loadModels()
 {
-    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
         std::string full_path = file_manager->getModelFile(iat[i].file);
         m_attachments[iat[i].attachment]=irr_driver->getAnimatedMesh(full_path);
