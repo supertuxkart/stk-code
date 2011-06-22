@@ -428,6 +428,9 @@ void Attachment::aimSwatter()
     m_count --;
     m_animation_phase        = SWATTER_TO_KART;
     m_animation_target       = min_kart;
+    if(UserConfigParams::logMisc())
+        printf("[swatter] %s aiming at %s.\n", 
+                m_kart->getIdent().c_str(), min_kart->getIdent().c_str());
     const KartProperties *kp = m_kart->getKartProperties();
     m_animation_timer        = kp->getSwatterAnimationTime();
     const bool left          = isLeftSideOfKart(min_kart->getXYZ());
@@ -442,6 +445,9 @@ void Attachment::aimSwatter()
  */
 void Attachment::swatItem()
 {
+    if(UserConfigParams::logMisc())
+        printf("[swatter] %s swatting item.\n",
+               m_kart->getIdent().c_str());
     assert(m_type==ATTACH_SWATTER);
     assert(m_animation_target==NULL);
 
