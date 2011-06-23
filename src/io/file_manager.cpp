@@ -103,6 +103,7 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 }
 #endif
 
+// ============================================================================
 FileManager* file_manager = 0;
 
 /** With irrlicht the constructor creates a NULL device. This is necessary to
@@ -258,6 +259,9 @@ io::path FileManager::createAbsoluteFilename(const std::string &f)
 }   // createAbsoluteFilename
 
 //-----------------------------------------------------------------------------
+/** Adds a model search path to the list of model search paths.
+ *  This path will be searched before any other existing paths.
+ */
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
@@ -282,6 +286,9 @@ void FileManager::pushModelSearchPath(const std::string& path)
 }   // pushModelSearchPath
 
 //-----------------------------------------------------------------------------
+/** Adds a texture search path to the list of texture search paths.
+ *  This path will be searched before any other existing paths.
+ */
 void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
@@ -307,6 +314,8 @@ void FileManager::pushTextureSearchPath(const std::string& path)
 }   // pushTextureSearchPath
 
 //-----------------------------------------------------------------------------
+/** Removes the last added texture search path from the list of paths.
+ */
 void FileManager::popTextureSearchPath()
 {
     std::string dir = m_texture_search_path.back();
@@ -315,6 +324,8 @@ void FileManager::popTextureSearchPath()
 }   // popTextureSearchPath
 
 //-----------------------------------------------------------------------------
+/** Removes the last added model search path from the list of paths.
+ */
 void FileManager::popModelSearchPath()
 {
     std::string dir = m_model_search_path.back();
@@ -323,14 +334,21 @@ void FileManager::popModelSearchPath()
 }   // popModelSearchPath
 
 //-----------------------------------------------------------------------------
+/** Tries to find the specified file in any of the given search paths.
+ *  \param full_path On return contains the full path of the file, or
+ *         "" if the file is not found.
+ *  \param file_name The name of the file to look for.
+ *  \param search_path The list of paths to search for the file.
+ *  \return True if the file is found, false otherwise.
+ */
 bool FileManager::findFile(std::string& full_path,
-                      const std::string& fname,
+                      const std::string& file_name,
                       const std::vector<std::string>& search_path) const
 {
     for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
-        full_path = *i + "/" + fname;
+        full_path = *i + "/" + file_name;
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
     full_path="";
@@ -338,62 +356,87 @@ bool FileManager::findFile(std::string& full_path,
 }   // findFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getTextureFile(const std::string& FNAME) const
+/** Returns the full path of a texture file name by searching for this 
+ *  file in all texture search paths.
+ *  \param file_name Name of the texture file to search.
+ *  \return The full path for the texture, or "" if the texture was not found.
+ */
+std::string FileManager::getTextureFile(const std::string& file_name) const
 {
     std::string path;
-    // FIXME: work around when loading and converting tracks: FNAME
-    //        (which is based on an irrlicht return value) contains the
-    //        full path
-    //if(m_file_system->existFile(FNAME.c_str())) return FNAME;
-    findFile(path, FNAME, m_texture_search_path);
+    findFile(path, file_name, m_texture_search_path);
     return path;
-}   // makeTexturePath
+}   // getTextureFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getModelFile(const std::string& FNAME) const
+/** Returns the full path of a model file name by searching for this 
+ *  file in all model search paths.
+ *  \param file_name Name of the model file to search.
+ *  \return The full path for the model, or "" if the model was not found.
+ */
+std::string FileManager::getModelFile(const std::string& file_name) const
 {
     std::string path;
-    findFile(path, FNAME, m_model_search_path);
+    findFile(path, file_name, m_model_search_path);
     return path;
 }   // getModelFile
 
 //-----------------------------------------------------------------------------
+/** Returns the data directory.
+ */
 std::string FileManager::getDataDir() const
 {
     return m_root_dir+"/data/";
-}
+}   // getDataDir
+
 //-----------------------------------------------------------------------------
+/** Returns the GUI directory.
+ */
 std::string FileManager::getGUIDir() const
 {
     return m_root_dir+"/data/gui/";
-}
+}   // getGUIDir
 
 //-----------------------------------------------------------------------------
+/** Returns the translation directory.
+ */
 std::string FileManager::getTranslationDir() const
 {
     return m_root_dir+"/data/po";
 }   // getTranslationDir
 
 //-----------------------------------------------------------------------------
+/** Returns the list of all directories in which music files are searched.
+ */
 std::vector<std::string> FileManager::getMusicDirs() const
 {
     return m_music_search_path;
 }   // getMusicDirs
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getDataFile(const std::string& fname) const
+/** Returns the full path of a file in the data directory.
+ *  \param file_name The file name (potentially including a path) to
+ *         be used in the data directory.
+ */
+std::string FileManager::getDataFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/"+fname;
+    return m_root_dir+"/data/"+file_name;
 }   // getDataFile
 //-----------------------------------------------------------------------------
-std::string FileManager::getGfxFile(const std::string& fname) const
+/** Returns the full path of graphical effect file
+ *  \param file_name Name of the graphical effect file.
+ */
+std::string FileManager::getGfxFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/gfx/"+fname;
+    return m_root_dir+"/data/gfx/"+file_name;
 }
 //-----------------------------------------------------------------------------
-/** If the directory specified in path does not exist, it is created.
- * \params path Directory to test.
- * \return  True if the directory exists or could be created, false otherwise.
+/** If the directory specified in path does not exist, it is created. This
+ *  function does not support recursive operations, so if a directory "a/b"
+ *  is tested, and "a" does not exist, this function will fail.
+ *  \params path Directory to test.
+ *  \return  True if the directory exists or could be created, 
+ *           false otherwise.
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
@@ -402,7 +445,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
-    std::cout << "creating directory <" << path << ">" << std::endl;
+    std::cout << "{FioleManager] Creating directory \"" << path << "\"\n";
     
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -414,6 +457,11 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 }   // checkAndCreateDirectory
 
 //-----------------------------------------------------------------------------
+/** If the directory specified in path does not exist, it is created 
+ *  recursively (mkdir -p style).
+ *  \params path Directory to test.
+ *  \return  True if the directory exists or could be created, false otherwise.
+ */
 bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 {
     // irrlicht apparently returns true for files and directory
@@ -421,23 +469,20 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
     
-    std::cout << "creating directory(ies) <" << path << "> ..." << std::endl;
+    std::cout << "[FileManager] Creating directory(ies) '" << path << "'.\n";
     
     std::vector<std::string> split = StringUtils::split(path,'/');
     std::string current_path = "";
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        std::cout << "   Checking for: " << current_path << std::endl;
-        if (m_file_system->existFile(io::path(current_path.c_str())))
-        {
-            //std::cout << "The directory exist." << std::endl;
-        }
-        else
+        std::cout << "[FileManager]   Checking for: '"
+                  << current_path << "'.\n";
+        if (!m_file_system->existFile(io::path(current_path.c_str())))
         {
             if (!checkAndCreateDirectory(current_path))
             {
-                fprintf(stderr, "Can't create dir '%s'",
+                fprintf(stderr, "[FileManager] Can't create dir '%s'",
                         current_path.c_str());
                 break;
             }
@@ -447,8 +492,12 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 
     return error;
 }   // checkAndCreateDirectory
+
 //-----------------------------------------------------------------------------
-/** Checks if the config directory exists, and it not, tries to create it. */
+/** Checks if the config directory exists, and it not, tries to create it. 
+ *  It will set m_config_dir to the path to which user-specific config files
+ *  are stored.
+ */
 void FileManager::checkAndCreateConfigDir()
 {
     if(getenv("SUPERTUXKART_SAVEDIR") && 
@@ -466,9 +515,8 @@ void FileManager::checkAndCreateConfigDir()
             m_config_dir  = getenv("APPDATA");
             if(!checkAndCreateDirectory(m_config_dir))
             {
-                fprintf(stderr, 
-                    "Can't create config dir '%s', falling back to '.'.\n",
-                    m_config_dir.c_str());
+                std::cerr << "[FileManager] Can't create config dir '"
+                          << m_config_dir << "', falling back to '.'.\n";
                 m_config_dir = ".";
             }
         }
@@ -485,7 +533,7 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
         {
-            std::cerr << "No home directory, this should NOT happen!\n";
+            std::cerr << "[FileManager] No home directory, this should NOT happen!\n";
             // Fall back to system-wide app data (rather than user-specific data),
             // but should not happen anyway.
             m_config_dir = "";
@@ -501,7 +549,7 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            std::cerr << "No home directory, this should NOT happen "
+            std::cerr << "[FileManager] No home directory, this should NOT happen "
                 << "- trying '.' for config files!\n";
             m_config_dir = ".";
         }
@@ -512,26 +560,21 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_config_dir))
             {
                 // If $HOME/.config can not be created:
-                fprintf(stderr, 
-                    "Can't create dir '%s', falling back to use '%s'.\n",
-                    m_config_dir.c_str(), getenv("HOME"));
+                std::cerr << "[FileManager] Cannot create directory '" 
+                          << m_config_dir <<"', falling back to use '" 
+                          << getenv("HOME")<< "'.\n";
                 m_config_dir = getenv("HOME");
-                m_config_dir += ".";
             }
         }
-        const std::string CONFIGDIR("supertuxkart");
-
-        m_config_dir += "/";
-        m_config_dir += CONFIGDIR;
+        m_config_dir += "/supertuxkart";
 #endif
     }   // if(getenv("SUPERTUXKART_SAVEDIR") && checkAndCreateDirectory(...))
 
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
-        fprintf(stderr, 
-                "Can not  create config dir '%s', falling back to '.'.\n",
-                m_config_dir.c_str());
+        std::cerr << "[FileManager] Can not  create config dir '" 
+                  << m_config_dir << "', falling back to '.'.\n";
         m_config_dir = ".";
     }
     return;
@@ -582,7 +625,7 @@ void FileManager::checkAndCreateAddonsDir()
     }
     if(!dir_ok && getenv("HOME"))
     {
-        // Use ~/.local/share :
+        // Use ~/.stkaddons
         m_addons_dir  = getenv("HOME");
         m_addons_dir += "/.stkaddons";
         dir_ok = checkAndCreateDirectory(m_addons_dir);
@@ -639,69 +682,96 @@ const std::string &FileManager::getAddonsDir() const
 }   // getADdonsDir
 
 //-----------------------------------------------------------------------------
-/** Returns a filename in the addons directory.
+/** Returns the full path of a file in the addons directory.
  *  \param name Name of the file.
  */
 std::string FileManager::getAddonsFile(const std::string &name)
 {
     return getAddonsDir()+"/"+name;
-}
+}   // getAddonsFile
 
 //-----------------------------------------------------------------------------
+/** Returns the full path of the config directory.
+ */
 std::string FileManager::getConfigDir() const
 {
     return m_config_dir;
 }   // getConfigDir
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getLogFile(const std::string& fname) const
+/** Returns the full path of a file in the user config directory which is
+ *  used to store stdout/stderr if it is redirected.
+ *  \param name Name of the file.
+ */
+std::string FileManager::getLogFile(const std::string& file_name) const
 {
-    return getConfigDir()+"/"+fname;
+    return getConfigDir()+"/"+file_name;
 }   // getLogFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getMusicFile(const std::string& fname) const
+/** Returns the full path of a music file by searching all music search paths.
+ *  It throws an exception if the file is not found.
+ *  \param file_name File name to search for.
+ */
+std::string FileManager::getMusicFile(const std::string& file_name) const
 {
     std::string path;
-    const bool success = findFile(path, fname, m_music_search_path);
+    const bool success = findFile(path, file_name, m_music_search_path);
     if (!success)
     {
         throw std::runtime_error(
-            "[FileManager::getMusicFile] Cannot find music file <"+fname+">");
+            "[FileManager::getMusicFile] Cannot find music file '"
+            +file_name+"'.");
     }
     return path;
 }   // getMusicFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getSFXFile(const std::string& fname) const
+/** Returns the full path of a sound effect file.
+ *  \param file_name Name of the sound effect file.
+ */
+std::string FileManager::getSFXFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/sfx/"+fname;
+    return m_root_dir+"/data/sfx/"+file_name;
 }   // getSFXFile
+
 //-----------------------------------------------------------------------------
-std::string FileManager::getFontFile(const std::string& fname) const
+/** Returns the full path of a font file.
+ *  \param file_name Name of the font file.
+ */
+std::string FileManager::getFontFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/fonts/"+fname;
+    return m_root_dir+"/data/fonts/"+file_name;
 }   // getFontFile
+
 //-----------------------------------------------------------------------------
-std::string FileManager::getHighscoreFile(const std::string& fname) const
+/** Returns the full path of a highscore file (which is stored in the user
+ *  specific config directory).
+ *  \param file_name Name of the sound effect file.
+ */
+std::string FileManager::getHighscoreFile(const std::string& file_name) const
 {
-    return getConfigDir()+"/"+fname;
+    return getConfigDir()+"/"+file_name;
 }   // getHighscoreFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of the challenge file. */
-std::string FileManager::getChallengeFile(const std::string &fname) const
+/** Returns the full path of the challenge file (which is stored in a user
+ *  specific config area).
+ *  \param file_name Name of the file.
+ */
+std::string FileManager::getChallengeFile(const std::string &file_name) const
 {
-    return getConfigDir()+"/"+fname;
+    return getConfigDir()+"/"+file_name;
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of the tutorial file. */
-std::string FileManager::getTutorialFile(const std::string &fname) const
+/** Returns the full path of the tutorial file. 
+ *  \param file_name Name of the tutorial file to return.
+ */
+std::string FileManager::getTutorialFile(const std::string &file_name) const
 {
-    return getConfigDir()+"/"+fname;
+    return getConfigDir()+"/"+file_name;
 }   // getTutorialFile
-
 
 //-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.
@@ -716,6 +786,14 @@ bool FileManager::isDirectory(const std::string &path) const
 }   // isDirectory
 
 //-----------------------------------------------------------------------------
+/** Returns a list of files in a given directory.
+ *  \param result A reference to a std::vector<std::string> which will
+ *         hold all files in a directory. The vector will be cleared.
+ *  \param dir The director for which to get the directory listing.
+ *  \param is_full_path True if directory is already a full path,
+ *         otherwise m_root_dir is used.
+ *  \param make_full_path If set to true, all listed files will be full paths.
+ */
 void FileManager::listFiles(std::set<std::string>& result, 
                             const std::string& dir, bool is_full_path, 
                             bool make_full_path) const
@@ -751,7 +829,11 @@ void FileManager::listFiles(std::set<std::string>& result,
 }   // listFiles
 
 //-----------------------------------------------------------------------------
-
+/** Creates a directory for an addon.
+ *  \param addons_name Name of the directory to create.
+ *  \param addons_type The type, which is used as a subdirectory. E.g.:
+ *         'karts' (m_addons_dir/karts/name will be created).
+ */
 void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
                                              std::string addons_type)
 {
