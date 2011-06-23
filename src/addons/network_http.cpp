@@ -480,6 +480,12 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, request);
     FILE * fout = fopen((full_save+".part").c_str(), "wb");
         
+    if(!fout)
+    {
+        printf("[addons] Can't open '%s' for writing, ignored.\n",
+               (full_save+".part").c_str());
+        return CURLE_WRITE_ERROR;
+    }
     //from and out
     curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
     curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
