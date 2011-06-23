@@ -539,6 +539,10 @@ void FileManager::checkAndCreateConfigDir()
 }   // checkAndCreateConfigDir
 
 // ----------------------------------------------------------------------------
+/** Creates the directories for the addons data. This will set m_addons_dir 
+ *  with the appropriate path, and also create the subdirectories in this
+ *  directory.
+ */
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32)
@@ -548,40 +552,60 @@ void FileManager::checkAndCreateAddonsDir()
     m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons";
 #else
     // Remaining unix variants. Use the new standards for config directory
-    // i.e. either XDG_CONFIG_HOME or $HOME/.config
-    if (getenv("XDG_DATA_HOME")!=NULL){
+    // i.e. either XDG_CONFIG_HOME or $HOME/.local/share
+
+    bool dir_ok = false;
+
+    if (getenv("XDG_DATA_HOME")!=NULL)
+    {
         m_addons_dir = getenv("XDG_DATA_HOME");
+        dir_ok = checkAndCreateDirectory(m_addons_dir);
+        if(!dir_ok)
+            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME.\n";
+
+        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
+        // and since dir_ok is set, it would not test any of the other options
+        // like $HOME/.local/share
+        dir_ok = checkAndCreateDirectory(m_addons_dir+"/supertuxkart");
+        if(!dir_ok)
+            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME/supertuxkart.\n";
     }
-    else if (!getenv("HOME"))
+
+    if(!dir_ok && getenv("HOME"))
     {
-        std::cerr << "No home directory, this should NOT happen "
-                  << "- trying '.addons' for addons files!\n";
-        m_addons_dir = "stkaddons";
-    }
-    else
-    {
+        // Use ~/.local/share :
         m_addons_dir  = getenv("HOME");
         m_addons_dir += "/.local/share";
-        if(!checkAndCreateDirectory(m_config_dir))
-        {
-            // If $HOME/.config can not be created:
-            fprintf(stderr, 
-                    "Can't create dir '%s', falling back to use '%s'.\n",
-                    m_config_dir.c_str(), getenv("HOME"));
-            m_addons_dir = getenv("HOME");
-            m_addons_dir += ".";
-        }
+        // This tests for ".local" and then for ".local/share"
+        dir_ok = checkAndCreateDirectoryP(m_addons_dir);
+        if(!dir_ok)
+            std::cerr << "[FileManager] Cannot create $HOME/.local/share.\n";
+    }
+    if(!dir_ok && getenv("HOME"))
+    {
+        // Use ~/.stkaddons :
+        m_addons_dir  = getenv("HOME");
+        m_addons_dir += "/.stkaddons";
+        dir_ok = checkAndCreateDirectory(m_addons_dir);
+        if(!dir_ok)
+            std::cerr << "[FileManager] Cannot create $HOME/.stkaddons.\n";
+    }
+
+    if(!dir_ok)
+    {
+        std::cerr << "[FileManager] Falling back to use '.'.";
+        m_addons_dir = ".";
     }
 
     m_addons_dir += "/supertuxkart";
-    if(!checkAndCreateDirectory(m_config_dir))
+    dir_ok = checkAndCreateDirectory(m_addons_dir);
+    if(!dir_ok)
     {
-        // If $HOME/.config can not be created:
-        fprintf(stderr, 
-            "Can't create dir '%s', falling back to use '%s'.\n",
-            m_config_dir.c_str(), getenv("HOME"));
-        m_addons_dir = getenv("HOME");
-        m_addons_dir += ".";
+        // If the directory can not be created, abort
+        std::cerr << " [FileManager] Cannot create directory '"
+                  << m_addons_dir<<"', falling back to use '.'.\n";
+        m_addons_dir=".";
+
     }
     m_addons_dir += "/addons";
     
@@ -590,19 +614,20 @@ void FileManager::checkAndCreateAddonsDir()
     if(!checkAndCreateDirectory(m_addons_dir))
     {
         fprintf(stderr, 
-                "Can not create add-ons dir '%s', falling back to '.'.\n", 
+                "[FileManager] Can not create add-ons dir '%s', falling back to '.'.\n", 
                 m_addons_dir.c_str());
-        m_config_dir = ".";
+        m_addons_dir = ".";
     }
+    std::cout << "[FileManager] Addons files will be stored in '"<<m_addons_dir<<"'.\n";
 
     if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
     {
-        fprintf(stderr, "Failed to create add-ons icon dir at '%s'\n",
+        fprintf(stderr, "[FileManager] Failed to create add-ons icon dir at '%s'\n",
             (m_addons_dir + "/icons/").c_str());
     }
     if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
     {
-        fprintf(stderr, "Failed to create add-ons tmp dir at '%s'\n",
+        fprintf(stderr, "[FileManager] Failed to create add-ons tmp dir at '%s'\n",
             (m_addons_dir + "/tmp/").c_str());
     }
 }   // checkAndCreateAddonsDir
