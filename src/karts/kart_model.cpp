@@ -546,5 +546,7 @@ void KartModel::resetWheels()
 /** Scales the kart model by a certain amount. */
 void KartModel::scaleKart(const Vec3 &s)
 {
-    m_animated_node->setScale(s.toIrrVector());
-}   // squashKart
+    if (m_animated_node)
+        m_animated_node->setScale(s.toIrrVector());
+}   // scaleKart
+
