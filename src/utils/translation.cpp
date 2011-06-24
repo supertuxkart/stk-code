@@ -35,15 +35,14 @@
 #include <iostream>
 #include <vector>
 
+#if ENABLE_BIDI
+#  include <fribidi/fribidi.h>
+#endif
+
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
-
-//#include "tinygettext/iconv.hpp"
 #include "utils/utf8.h"
 
-#if ENABLE_BIDI
-#include <fribidi/fribidi.h>
-#endif
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
@@ -149,12 +148,13 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     textdomain (PACKAGE);
     */
     
-    m_dictionary_manager.add_directory( file_manager->getTranslationDir().c_str() );
+    m_dictionary_manager.add_directory( file_manager->getTranslationDir());
     
     /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();
     std::cout << "Number of languages: " << languages.size() << std::endl;
-    for (std::set<Language>::const_iterator i = languages.begin(); i != languages.end(); ++i)
+    for (std::set<Language>::const_iterator i = languages.begin(); 
+                                            i != languages.end(); ++i)
     {
         const Language& language = *i;
         std::cout << "Env:       " << language.str()           << std::endl
@@ -165,20 +165,49 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                   << std::endl;
     }
     */
+            
+    const char *p_language = getenv("LANGUAGE");
 
-    const char* lang = getenv("LANG");
-    const char* language = getenv("LANGUAGE");
+    std::string language;
 
-    
-    if (language == NULL || strlen(language) == 0) language = lang;
-        
-    if (language != NULL && strlen(language) > 0)
+    if(p_language)
     {
-        printf("Env var LANGUAGE = '%s'\n", language);
+        language=p_language;
+    }
+    else
+    {
+        const char *p_lang = getenv("LANG");
 
-        if (std::string(language).find(":") != std::string::npos)
+        if(p_lang)
+            language = p_lang;
+        else
         {
-            std::vector<std::string> langs = StringUtils::split(std::string(language), ':');
+#ifdef WIN32
+            // Thanks to the frogatto developer for this code snippet:
+            char c[1024];
+            GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, 
+                           c, 1024);
+            printf("[translate] GetLocaleInfo langname returns '%s'.\n", c);
+            if(c[0])
+            {
+                language = c;
+                GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO3166CTRYNAME, 
+                               c, 1024);
+                printf("[translate] GetLocaleInfo tryname returns '%s'.\n", c);
+                if(c[0]) language += std::string("_")+c;
+            }   // if c[0]
+        }   // neither LANGUAGE nor LANG defined
+#endif
+
+    }
+        
+    if (language != "")
+    {
+        std::cout << "[translate] Env var LANGUAGE = '"<<language<<"'\n";
+
+        if (language.find(":") != std::string::npos)
+        {
+            std::vector<std::string> langs = StringUtils::split(language, ':');
             Language l;
             
             for (unsigned int curr=0; curr<langs.size(); curr++)
@@ -186,7 +215,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 l = Language::from_env(langs[curr]);
                 if (l)
                 {
-                    printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, l.get_name().c_str());
+                    std::cout <<  "[translate] Env var LANGUAGE = '"
+                              << language << "', which corresponds to '"
+                              << l.get_name() << "'\n",
                     m_dictionary = m_dictionary_manager.get_dictionary(l);
                     break;
                 }
@@ -199,8 +230,11 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            printf("Env var LANGUAGE = '%s', which corresponds to %s\n", language, Language::from_env(language).get_name().c_str());
-            m_dictionary = m_dictionary_manager.get_dictionary(Language::from_env(language));
+            std::cout << "[translate] Env var LANGUAGE = '" << language 
+                      << "', which corresponds to '" 
+                      << Language::from_env(language).get_name() << "'\n";
+            m_dictionary = m_dictionary_manager.get_dictionary(
+                                                Language::from_env(language) );
         }
     }
     else
@@ -208,19 +242,20 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
     
-    // This is a silly but working hack I added to determine whether the current language is RTL or
-    // not, since gettext doesn't seem to provide this information
-
-    //std::string test = m_dictionary.translate("Loading");
-    //printf("'%s'\n", test.c_str());
+    // This is a silly but working hack I added to determine whether the 
+    // current language is RTL or not, since gettext doesn't seem to provide 
+    // this information
     
     // This one is just for the xgettext parser to pick up
 #define ignore(X)
 
-    //I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
+    //I18N: Do NOT literally translate this string!! Please enter Y as the 
+    //      translation if your language is a RTL (right-to-left) language, 
+    //      N (or nothing) otherwise
     ignore(_("   Is this a RTL language?"));
 
-    const std::string isRtl = m_dictionary.translate("   Is this a RTL language?");
+    const std::string isRtl = 
+        m_dictionary.translate("   Is this a RTL language?");
     
     m_rtl = false;
     
@@ -254,7 +289,8 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
             
             if (n == FRIBIDI_BUFFER_SIZE-1) // prevent buffeoverflows
             {
-                std::cerr << "WARNING : translated string too long, truncating!\n";
+                std::cerr
+                    << "WARNING : translated string too long, truncating!\n";
                 fribidiInput[n] = 0;
                 break;
             }
@@ -278,10 +314,10 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
                                                  len-1,
                                                  &pbase_dir,
                                                  fribidiOutput,
-                                                 /* gint        *position_L_to_V_list */ NULL,
-                                                 /* gint        *position_V_to_L_list */ NULL,
-                                                 /* gint8       *embedding_level_list */ NULL
-                                                 );
+              /* gint   *position_L_to_V_list */ NULL,
+              /* gint   *position_V_to_L_list */ NULL,
+              /* gint8  *embedding_level_list */ NULL
+                                                               );
         
         if (!result)
         {
@@ -329,7 +365,7 @@ const wchar_t* Translations::w_gettext(const char* original)
         m_converted_string = utf8_to_wide(original);
 
 #if TRANSLATE_VERBOSE
-        std::wcout << L"  translation : " << m_converted_string.c_str() << std::endl;
+        std::wcout << L"  translation : " << m_converted_string << std::endl;
 #endif
         return m_converted_string.c_str();
     }
