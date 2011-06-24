@@ -196,8 +196,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 printf("[translate] GetLocaleInfo tryname returns '%s'.\n", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
-        }   // neither LANGUAGE nor LANG defined
 #endif
+        }   // neither LANGUAGE nor LANG defined
 
     }
         
