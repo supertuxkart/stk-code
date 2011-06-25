@@ -343,6 +343,14 @@ namespace StringUtils
         return parseString(input.c_str(), output);
     }
     
+    /**
+      * \param other string in which to replace stuff
+      * \param from  pattern to remove from the string
+      * \param to    pattern to insert instead
+      * \return      a string with all occurrences of \c from replaced by occurrences of \c to
+      */
+    std::string replace(const std::string& other, const std::string& from, const std::string& to);
+    
 } // namespace StringUtils
 
 #endif

@@ -443,6 +443,37 @@ namespace StringUtils
         return std::string(s);
     }   // timeToString
     
+    // ------------------------------------------------------------------------
+
+    std::string replace(const std::string& other, const std::string& from, const std::string& to)
+    {
+        std::string wip = other;
+        
+        
+        while (true)
+        {
+            const int pos = wip.find(from);
+            if (pos == -1)
+            {
+                return wip;
+            }
+            wip.replace(pos, from.size(), to.c_str(), to.size());
+        }
+        
+        /*
+        // found this on google... looks good but doesn't work, it leaves out some occurrences,
+        // didn't search why
+        std::string::size_type  next;
+        
+        for (next = wip.find(from); next != std::string::npos; next = wip.find(from, next))
+        {
+            wip.replace(next, from.length(), to);
+            next += from.length();
+        }
+        return wip;
+        */
+    }
+    
 } // namespace StringUtils
 
 /* EOF */
