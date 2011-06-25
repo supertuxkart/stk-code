@@ -98,8 +98,8 @@ void AddonsLoading::beforeAddingWidgets()
     {
         // In non artist-debug-mode only approved items will be shown anyway,
         // but give even tester an idea about the status:
-        if(m_addon.testStatus(Addon::AS_APPROVED))
-            l.push_back("approved");
+        if (!m_addon.testStatus(Addon::AS_APPROVED))
+            l.push_back("NOT APPROVED");
 
         // Note that an approved addon should never have alpha, beta, or 
         // RC status - and only one of those should be used
