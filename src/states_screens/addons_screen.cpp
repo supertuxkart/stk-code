@@ -143,7 +143,8 @@ void AddonsScreen::loadList()
                                    addon->getDesigner().c_str(),
                                    addon->getDateAsString().c_str());
         
-        if (addon->testStatus(Addon::AS_FEATURED))
+        // we have no icon for featured+updateme, so if an add-on is updatable forget about the featured icon
+        if (addon->testStatus(Addon::AS_FEATURED) && icon != m_icon_needs_update)
         {
             icon += 2;
         }
