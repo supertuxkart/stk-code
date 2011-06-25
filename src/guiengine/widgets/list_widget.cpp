@@ -97,8 +97,15 @@ void ListWidget::add()
     
     if (m_header.size() > 0)
     {
-        const int col_size = m_w / m_header.size();
+        //const int col_size = m_w / m_header.size();
         
+        int proportion_total = 0;
+        for (unsigned int n=0; n<m_header.size(); n++)
+        {
+            proportion_total += m_header[n].m_proportion;
+        }
+        
+        int x = m_x;
         for (unsigned int n=0; n<m_header.size(); n++)
         {
             std::ostringstream name;
@@ -113,10 +120,12 @@ void ListWidget::add()
             header->m_y = m_y;
             header->m_h = header_height;
             
-            header->m_x = m_x + col_size*n;
-            header->m_w = col_size;
+            header->m_x = x;
+            header->m_w = m_w * float(m_header[n].m_proportion)/float(proportion_total);
             
-            header->setText( m_header[n] );
+            x += header->m_w;
+            
+            header->setText( m_header[n].m_text );
             header->m_properties[PROP_ID] = name.str();
             
             header->add();

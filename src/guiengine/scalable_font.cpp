@@ -32,6 +32,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     m_fallback_kerning_width = 0;
     m_fallback_font_scale    = 1.0f;
     m_scale                  = 1.0f;
+    m_tab_stop               = 0.5f;
     m_is_hollow_copy         = false;
     m_black_border           = false;    
     m_shadow                 = false;
@@ -479,8 +480,8 @@ void ScalableFont::draw(const core::stringw& text,
     {
         const int where = text.findFirst(L'\t');
         core::stringw substr = text.subString(0, where-1);
-        text_dimension = getDimension(text.c_str());
-        offset.X += (position.getWidth()/2 - text_dimension.Width);
+        text_dimension = getDimension(substr.c_str()) + getDimension(L"XX");
+        offset.X += (position.getWidth()*m_tab_stop - text_dimension.Width);
     }
 
     // ---- collect character locations
@@ -493,10 +494,10 @@ void ScalableFont::draw(const core::stringw& text,
     {
         wchar_t c = text[i];
 
-        //hack: one tab character is supported, it moves the cursor to the middle of the area
+        //hack: one tab character is supported, it moves the cursor to the tab stop
         if (c == L'\t')
         {
-            offset.X = position.UpperLeftCorner.X + position.getWidth()/2;
+            offset.X = position.UpperLeftCorner.X + position.getWidth()*m_tab_stop;
             continue;
         }
         

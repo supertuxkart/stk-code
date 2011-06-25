@@ -74,6 +74,7 @@ public:
     virtual void onColumnClicked(int columnId);
 
     virtual void init();
+    virtual void tearDown();
 
     void    setLastSelected();
 

@@ -21,9 +21,10 @@
 
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"
+#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/CGUISpriteBank.h"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/state_manager.hpp"
@@ -62,8 +63,8 @@ void AddonsScreen::loadedFromFile()
     
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->addColumn( _("Add-on name") );
-    w_list->addColumn( _("Updated date") );
+    w_list->addColumn( _("Add-on name"), 2 );
+    w_list->addColumn( _("Updated date"), 1 );
     w_list->setColumnListener(this);
 }   // loadedFromFile
 
@@ -74,6 +75,9 @@ void AddonsScreen::init()
     Screen::init();
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
+    // FIXME: return tab stop to the center when leaving this screen!!
+    GUIEngine::getFont()->setTabStop(0.66f);
+    
     if(UserConfigParams::logAddons())
         std::cout << "[addons] Using directory <" + file_manager->getAddonsDir() 
               << ">\n";
@@ -91,6 +95,13 @@ void AddonsScreen::init()
     Addon::setSortOrder(Addon::SO_DEFAULT);
     loadList();
 }   // init
+
+// ----------------------------------------------------------------------------
+
+void AddonsScreen::tearDown()
+{
+    GUIEngine::getFont()->setTabStop(0.5f);
+}
 
 // ----------------------------------------------------------------------------
 /** Loads the list of all addons of the given type. The gui element will be
