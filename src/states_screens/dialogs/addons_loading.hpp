@@ -63,6 +63,8 @@ public:
     
     virtual void beforeAddingWidgets();
     
+    virtual void init();
+    
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
      *  and do the necessary.

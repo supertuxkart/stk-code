@@ -73,6 +73,8 @@ void ModalDialog::loadFromFile(const char* xmlFile)
     beforeAddingWidgets();
     
     addWidgetsRecursively(m_widgets);
+    
+    init();
 }
 
 // ----------------------------------------------------------------------------
