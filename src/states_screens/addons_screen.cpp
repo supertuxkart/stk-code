@@ -75,7 +75,6 @@ void AddonsScreen::init()
     Screen::init();
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
-    // FIXME: return tab stop to the center when leaving this screen!!
     GUIEngine::getFont()->setTabStop(0.66f);
     
     if(UserConfigParams::logAddons())
@@ -100,6 +99,7 @@ void AddonsScreen::init()
 
 void AddonsScreen::tearDown()
 {
+    // return tab stop to the center when leaving this screen!!
     GUIEngine::getFont()->setTabStop(0.5f);
 }
 
