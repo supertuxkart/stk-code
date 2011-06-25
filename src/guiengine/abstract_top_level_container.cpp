@@ -59,14 +59,17 @@ void AbstractTopLevelContainer::addWidgetsRecursively(PtrVector<Widget>& widgets
             // adjusts to its contents)
             if ((widgets[n].m_w < 1 || widgets[n].m_h < 1) &&
                 widgets[n].getType() != WTYPE_RIBBON &&
-                widgets[n].getType() != WTYPE_ICON_BUTTON)
+                widgets[n].getType() != WTYPE_ICON_BUTTON &&
+                widgets[n].getType() != WTYPE_SPACER)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no dimensions" << std::endl;
+                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str()
+                          << " of type " << widgets[n].getType() << " has no dimensions" << std::endl;
             }
             
             if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str() << " has no position" << std::endl;
+                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str()
+                          << " of type " << widgets[n].getType() << " has no position" << std::endl;
             }
             
             widgets[n].add();
