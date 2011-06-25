@@ -59,6 +59,11 @@ Addon::Addon(const XMLNode &xml)
     xml.get("revision",           &m_revision          );
     xml.get("file",               &m_zip_file          );
     xml.get("description",        &m_description       );
+    
+    // resolve XML entities
+    m_description = StringUtils::replace(m_description, "&#10;", "\n");
+    m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
+
     xml.get("image",              &m_icon_url          );
     // If there is no image, use the icon to display
     if(m_icon_url=="")
