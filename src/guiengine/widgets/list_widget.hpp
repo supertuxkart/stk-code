@@ -66,8 +66,20 @@ namespace GUIEngine
         
         ButtonWidget* m_selected_column;
         
+        struct Column
+        {
+            irr::core::stringw m_text;
+            int m_proportion;
+            
+            Column(irr::core::stringw text, int proportion)
+            {
+                m_text = text;
+                m_proportion = proportion;
+            }
+        };
+        
         /** Leave empty for no header */
-        std::vector< irr::core::stringw > m_header;
+        std::vector< Column > m_header;
         
         IListWidgetHeaderListener* m_listener;
         
@@ -193,8 +205,9 @@ namespace GUIEngine
         }
         
         /** To be called before Widget::add(); columns are persistent across multiple add/remove cycles
+          * \param proportion A column with proportion 2 will be twice as large as a column with proportion 1
           */
-        void addColumn(irr::core::stringw col) { m_header.push_back( col ); }
+        void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
     };
 }
 

@@ -59,6 +59,10 @@ class ScalableFont : public IGUIFontBitmap
     
     bool m_is_hollow_copy;
     bool m_rtl;
+    
+    /** Position in range [0..1] of the single tab stop we support */
+    float m_tab_stop;
+    
 public:
 
     bool m_black_border;
@@ -135,6 +139,9 @@ public:
     float getScale() const { return m_scale; }
     
     void updateRTL();
+    
+    /** \param pos position of the tab stop, in range [0..1] */
+    void setTabStop(float pos) { m_tab_stop = pos; }
     
 private:
 
