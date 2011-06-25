@@ -143,7 +143,7 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 }
                 else if (wcscmp(L"spacer", xml->getNodeName()) == 0)
                 {
-                    append_to.push_back(new Widget(WTYPE_NONE));
+                    append_to.push_back(new Widget(WTYPE_SPACER));
                 }
                 else if (wcscmp(L"ribbon_grid", xml->getNodeName()) == 0)
                 {
