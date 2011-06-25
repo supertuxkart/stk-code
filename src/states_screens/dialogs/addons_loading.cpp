@@ -25,6 +25,7 @@
 #include "addons/request.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -118,7 +119,6 @@ void AddonsLoading::beforeAddingWidgets()
     if(m_addon.testStatus(Addon::AS_FEATURED))
         l.push_back(_("featured"));
 
-    // 
     GUIEngine::LabelWidget *flags = getWidget<LabelWidget>("flags");
     if(flags)
     {
@@ -158,6 +158,15 @@ void AddonsLoading::beforeAddingWidgets()
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
+
+void AddonsLoading::init()
+{
+    GUIEngine::LabelWidget* flags = getWidget<LabelWidget>("flags");
+    if (flags)
+    {
+        flags->getIrrlichtElement<IGUIStaticText>()->setOverrideFont(GUIEngine::getSmallFont());
+    }
+}
 
 // ----------------------------------------------------------------------------
 

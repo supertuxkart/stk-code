@@ -103,6 +103,9 @@ namespace GUIEngine
          */
         virtual void beforeAddingWidgets() {}
         
+        /** \brief Optional callback invoked after widgets have been add()ed */
+        virtual void init() {}
+        
         /**
           * \brief Implementing callback from AbstractTopLevelContainer
           */

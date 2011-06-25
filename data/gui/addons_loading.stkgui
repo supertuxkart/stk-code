@@ -13,6 +13,7 @@
         <label id="name"     width="100%" text_align="left"/>
         <label id="size"     width="100%" text=""/>
         <label id="revision" width="100%" text=""/>
+        <spacer height="10"/>
         <label id="flags"    width="100%" text="" word_wrap="true"/>
     </div>
   </div>
