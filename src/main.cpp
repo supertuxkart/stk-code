@@ -588,6 +588,17 @@ int handleCmdLine(int argc, char **argv)
             {
                 race_manager->setTrack(argv[i+1]);
                 fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+                
+                Track* t = track_manager->getTrack(argv[i+1]);
+                if (t == NULL)
+                {
+                    fprintf(stderr, "Can't find track named <%s>\n", argv[i+1]);
+                    exit(1);
+                }
+                if (t->isArena())
+                {
+                    race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                }
             }
             else
             {

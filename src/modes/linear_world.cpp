@@ -50,6 +50,9 @@ LinearWorld::LinearWorld() : WorldWithRank()
 void LinearWorld::init()
 {
     WorldWithRank::init();
+    
+    assert(!m_track->isArena());
+    
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
     const unsigned int kart_amount  = m_karts.size();
