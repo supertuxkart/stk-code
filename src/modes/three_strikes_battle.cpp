@@ -185,6 +185,12 @@ void ThreeStrikesBattle::updateKartRanks()
  */
 bool ThreeStrikesBattle::isRaceOver()
 {
+    // for tests : never over when we have a single player there :)
+    if (race_manager->getNumPlayers() < 2)
+    {
+        return false;
+    }
+    
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
 
