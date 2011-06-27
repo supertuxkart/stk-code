@@ -36,7 +36,7 @@ public:
                       AS_ALPHA    = 0x0002,
                       AS_BETA     = 0x0004,
                       AS_RC       = 0x0008,
-                      //AS_FAN      = 0x0010,   currently not supported
+                      AS_INVISIBLE= 0x0010,
                       //AS_HQ       = 0x0020,   currently not supported
                       AS_DFSG     = 0x0040,
                       AS_FEATURED = 0x0080,

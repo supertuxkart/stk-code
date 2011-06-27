@@ -117,6 +117,9 @@ void AddonsScreen::loadList()
         const Addon &addon = addons_manager->getAddon(i);
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
+        // Ignore invisible addons
+        if(addon.testStatus(Addon::AS_INVISIBLE))
+            continue;
         if(!UserConfigParams::m_artist_debug_mode &&
             !addon.testStatus(Addon::AS_APPROVED)    )
             continue;
