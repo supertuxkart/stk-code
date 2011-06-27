@@ -20,10 +20,12 @@
 #include "karts/kart_model.hpp"
 
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart.hpp"
@@ -198,24 +200,34 @@ KartModel* KartModel::makeCopy()
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
  */
-scene::ISceneNode* KartModel::attachModel(bool animatedModels)
+scene::ISceneNode* KartModel::attachModel(bool animated_models)
 {
     assert(!m_is_master);
     
     scene::ISceneNode* node;
     
-    if (animatedModels)
+    if (animated_models)
     {
+        LODNode* lod_node = new LODNode(
+                            irr_driver->getSceneManager()->getRootSceneNode(),
+                            irr_driver->getSceneManager()                    );
+
+
         node = irr_driver->addAnimatedMesh(m_mesh);
+        lod_node->add(50, node, true);
+        scene::ISceneNode* static_model = attachModel(false);
+        lod_node->add(500, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
 #ifdef DEBUG
+        std::string debug_name = m_model_filename+" (animated-kart-model)";
+        node->setName(debug_name.c_str());
 #if SKELETON_DEBUG
         irr_driver->debug_meshes.push_back(m_animated_node);
 #endif
-#endif
-        
+#endif        
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
+        node = lod_node;
     }
     else
     {
@@ -229,20 +241,12 @@ scene::ISceneNode* KartModel::attachModel(bool animatedModels)
         main_frame->setHardwareMappingHint(scene::EHM_STATIC);
         
         node = irr_driver->addMesh(main_frame);
-    }
-    
 #ifdef DEBUG
-    if (animatedModels)
-    {
-        std::string debug_name = m_model_filename+" (animated-kart-model)";
-        node->setName(debug_name.c_str());
-    }
-    else
-    {
         std::string debug_name = m_model_filename+" (kart-model)";
         node->setName(debug_name.c_str());
-    }
 #endif
+    }
+    
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -377,17 +381,19 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 }   // setDefaultPhysicsPosition
 
 // ----------------------------------------------------------------------------
-/** Resets the kart model. It removes any scaling (squashing) and stops
- *  animation from being played.
+/** Resets the kart model. It stops animation from being played and resets
+ *  the wheels to the correct position (i.e. no suspension).
  */
 void KartModel::reset()
 {
-    m_animated_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    // Reset the wheels
+    const float suspension[4]={0,0,0,0};
+    update(0, 0.0f, suspension);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
-
 }   // reset
+
 // ----------------------------------------------------------------------------
 /** Enables- or disables the end animation. 
  *  \param type The type of animation to play.
@@ -531,22 +537,4 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
 
     m_animated_node->setCurrentFrame(frame);
 }   // update
-
-// ----------------------------------------------------------------------------
-/** Puts all wheels in the default position. Used when displaying the karts
- *  in the character selection screen.
- */
-void KartModel::resetWheels()
-{
-    const float suspension[4]={0,0,0,0};
-    update(0, 0.0f, suspension);
-}   // reset
-
-// ----------------------------------------------------------------------------
-/** Scales the kart model by a certain amount. */
-void KartModel::scaleKart(const Vec3 &s)
-{
-    if (m_animated_node)
-        m_animated_node->setScale(s.toIrrVector());
-}   // scaleKart
 

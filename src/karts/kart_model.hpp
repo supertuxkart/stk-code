@@ -179,9 +179,7 @@ public:
     float getWidth                  () const {return m_kart_width;               }
     float getHeight                 () const {return m_kart_height;              }
     void  update(float rotation, float steer, const float suspension[4]);
-    void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
-    void  scaleKart(const Vec3 &s);
 
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);

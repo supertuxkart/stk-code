@@ -32,7 +32,6 @@
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -483,8 +482,8 @@ void Kart::reset()
         m_camera->setInitialTransform();
     }
 
-    // Reset squashing and animations
-    m_kart_model->resetWheels();
+    // Reset animations and wheels
+    m_kart_model->reset();
 
     // If the controller was replaced (e.g. replaced by end controller), 
     // restore the original controller. 
@@ -504,7 +503,7 @@ void Kart::reset()
     m_finish_time          = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
-    m_kart_model->scaleKart(Vec3(1.0f, 1.0f, 1.0f));
+    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_has_started          = false;
     m_wheel_rotation       = 0;
@@ -752,7 +751,7 @@ void Kart::update(float dt)
         // If squasing time ends, reset the model
         if(m_squash_time<=0)
         {
-            m_kart_model->scaleKart(Vec3(1.0f, 1.0f, 1.0f));
+            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, 
                                   /*slowdown*/1.0f, /*fade in*/0.0f);
         }
@@ -961,7 +960,7 @@ void Kart::update(float dt)
  */
 void Kart::setSquash(float time, float slowdown)
 {
-    m_kart_model->scaleKart(Vec3(1.0f, 0.5f, 1.0f));
+    m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
     MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
     m_squash_time  = time;
 }   // setSquash
@@ -1728,22 +1727,11 @@ void Kart::updatePhysics(float dt)
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
  */
-void Kart::loadData(RaceManager::KartType type, bool is_first_kart, Track* track, bool animatedModel)
+void Kart::loadData(RaceManager::KartType type, bool is_first_kart, 
+                    Track* track, bool is_animated_model)
 {
-    if (animatedModel)
-    {
-        scene::ISceneNode* staticModel       = m_kart_model->attachModel(false);
-        scene::ISceneNode* animatedModelNode = m_kart_model->attachModel(animatedModel);
-        LODNode* node = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(),
-                                    irr_driver->getSceneManager());
-        node->add(50, animatedModelNode, true);
-        node->add(500, staticModel, true);
-        m_node = node;
-    }
-    else
-    {
-        m_node = m_kart_model->attachModel(animatedModel);
-    }
+
+    m_node = m_kart_model->attachModel(is_animated_model);
     
 #ifdef DEBUG
     m_node->setName( (m_kart_properties->getIdent()+"(lod-node)").c_str() );
