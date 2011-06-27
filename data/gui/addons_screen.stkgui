@@ -16,6 +16,8 @@
                 I18N="Section in the addons menu" text="Karts"/>
         <icon-button id="tab_track" width="128" height="128" icon="gui/mode_normal.png"
                 I18N="Section in the addons menu" text="Tracks"/>
+        <icon-button id="tab_arena" width="128" height="128" icon="gui/mode_normal.png"
+                I18N="Section in the addons menu" text="Arenas"/>
     </tabs>
     <spacer height="5" width="10"/>
     

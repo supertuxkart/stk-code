@@ -193,6 +193,8 @@ public:
             return "karts/";
         else if(m_type=="track")
             return "tracks/";
+        else if(m_type=="arena")  // arenas are installed as tracks
+            return "tracks/";
         // It must be one of the two
         assert(false);
         return "";  // Ignore compiler warning

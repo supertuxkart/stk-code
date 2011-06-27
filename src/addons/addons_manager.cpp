@@ -73,7 +73,8 @@ void AddonsManager::initOnline(const XMLNode *xml)
         const std::string &name = node->getName();
         // Ignore news/redirect, which is handled by network_http
         if(name=="include" || name=="message") continue;
-        if(node->getName()=="track" || node->getName()=="kart")
+        if(node->getName()=="track" || node->getName()=="kart" ||
+            node->getName()=="arena"                                 )
         {
             Addon addon(*node);
             int index = getAddonIndex(addon.getId());
@@ -205,7 +206,7 @@ void AddonsManager::loadInstalledAddons()
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node=xml->getNode(i);
-        if(node->getName()=="kart"   ||
+        if(node->getName()=="kart"   || node->getName()=="arena" ||
             node->getName()=="track"    )
         {
             Addon addon(*node);
@@ -334,7 +335,7 @@ void AddonsManager::saveInstalled(const std::string &type)
     xml_installed.close();
     if(type=="kart")
         kart_properties_manager->reLoadAllKarts();
-    else if(type=="track")
+    else if(type=="track" || type=="arena")
         track_manager->loadTrackList();
 }   // saveInstalled
 

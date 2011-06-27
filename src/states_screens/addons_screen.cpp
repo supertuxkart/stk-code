@@ -238,6 +238,12 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             m_type = "kart";
             loadList();
         }
+        else if (selection == "tab_arena")
+        {
+            m_type = "arena";
+            loadList();
+        }
+
     }
 }   // eventCallback
 

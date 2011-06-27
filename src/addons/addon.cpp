@@ -48,6 +48,13 @@ Addon::Addon(const XMLNode &xml)
     m_icon_ready         = false;
     m_type               = xml.getName();
 
+    // FIXME: temporarily till the web page is updated.
+    if(m_type=="track")
+    {
+        int is_arena=0;
+        xml.get("arena",          &is_arena            );
+        if(is_arena) m_type="arena";
+    }
     xml.get("name",               &m_name              );
     m_id                 = StringUtils::toLowerCase(m_name);
     xml.get("id",                 &m_id                );
@@ -88,6 +95,9 @@ void Addon::copyInstallData(const Addon &addon)
     m_designer      = addon.m_designer;
     m_status        = addon.m_status;
     m_date          = addon.m_date;
+    // Support if the type of an addon changes, e.g. this ie necessary
+    // when we introduce 'arena' as type (formerly arenas had type 'track').
+    m_type          = addon.m_type;
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
