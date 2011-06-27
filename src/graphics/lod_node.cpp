@@ -86,6 +86,7 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     // and the location is disapparition needs to be deterministic
     if (m_detail.size() > 0)
     {
+        assert(m_detail.back()<level*level);
         m_detail[m_detail.size() - 1] += (int)(((rand()%1000)-500)/500.0f*(m_detail[m_detail.size() - 1]*0.2f));
     }
     
