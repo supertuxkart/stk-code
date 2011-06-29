@@ -167,8 +167,8 @@ when the border that intersect at this corner are enabled.
 <element type="scrollbar_button"              image="glass/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="glass/scrollbar_btn_down.png" />
 
-<element type="left_arrow"  state="neutrual" image="glass/left_arrow.png" />
-<element type="right_arrow" state="neutrual" image="glass/right_arrow.png" />
+<element type="left_arrow"  state="neutral"  image="glass/left_arrow.png" />
+<element type="right_arrow" state="neutral"  image="glass/right_arrow.png" />
 <element type="left_arrow"  state="focus"    image="glass/left_arrow_focus.png" />
 <element type="right_arrow" state="focus"    image="glass/right_arrow_focus.png" />
 
