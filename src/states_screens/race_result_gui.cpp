@@ -391,7 +391,10 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
     {
         try
         {
-            music_manager->startMusic( music_manager->getMusicInformation("race_summary.music") );
+            music_manager->startMusic( 
+                music_manager->getMusicInformation(
+                    file_manager->getMusicFile("race_summary.music")) 
+                    );
         }
         catch (std::exception& e)
         {
