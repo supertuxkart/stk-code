@@ -145,6 +145,10 @@ void WorldStatus::update(const float dt)
                 m_phase=SET_PHASE;   
             }
             m_auxiliary_timer += dt;
+            
+            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
+                m_auxiliary_timer += dt*6;
             return;
         case SET_PHASE  :
             if(m_auxiliary_timer>2.0) 
@@ -159,6 +163,10 @@ void WorldStatus::update(const float dt)
                 onGo();
             }
             m_auxiliary_timer += dt;
+            
+            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
+                m_auxiliary_timer += dt*6;
             return;
         case GO_PHASE  :
             
@@ -166,8 +174,13 @@ void WorldStatus::update(const float dt)
                 music_manager->startMusic(music_manager->getCurrentMusic());
             
             if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message  
-                m_phase=MUSIC_PHASE;    
+                m_phase=MUSIC_PHASE;
+            
             m_auxiliary_timer += dt;
+            
+            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
+                m_auxiliary_timer += dt*6;
             break;
         case MUSIC_PHASE:
             // how long to display the 'music' message
