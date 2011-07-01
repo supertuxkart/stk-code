@@ -2021,7 +2021,7 @@ msgstr "remarquable"
 #: src/states_screens/kart_selection.cpp:897
 #: src/states_screens/tracks_screen.cpp:198
 msgid "standard"
-msgstr "Copy text \t standard"
+msgstr "standard"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
