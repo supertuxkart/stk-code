@@ -76,7 +76,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
-    node->get("friction",         &m_friction          );
+    node->get("high-adhesion",    &m_high_tire_adhesion);
     node->get("reset",            &m_drive_reset       );
     node->get("crash-reset",      &m_crash_reset       );
     node->get("below-surface",    &m_below_surface     );
@@ -228,7 +228,7 @@ void Material::init(unsigned int index)
     m_lighting                  = true;
     m_backface_culling          = true;
     m_sphere_map                = false;
-    m_friction                  = 1.0f;
+    m_high_tire_adhesion        = false;
     m_below_surface             = false;
     m_falling_effect            = false;
     m_surface                   = false;

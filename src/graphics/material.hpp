@@ -115,7 +115,7 @@ private:
                      m_adjust_image;
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
-    float            m_friction;
+    bool             m_high_tire_adhesion;
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;
     /** Maximum speed at which no more slow down occurs. */
@@ -176,7 +176,7 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
     bool  isCrashReset       () const { return m_crash_reset;        }
-    float getFriction        () const { return m_friction;           }
+    bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
     const std::string& 
           getTexFname        () const { return m_texname;            }
     int   getIndex           () const { return m_index;              }
