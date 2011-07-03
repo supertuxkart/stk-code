@@ -25,18 +25,18 @@
 #include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "items/swatter.hpp"
 #include "karts/kart.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
-#define SWAT_ANGLE 22.0f
-
 Attachment::Attachment(Kart* kart)
 {
     m_type           = ATTACH_NOTHING;
     m_time_left      = 0.0;
+    m_plugin         = NULL;
     m_kart           = kart;
     m_previous_owner = NULL;
 
@@ -64,6 +64,14 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
 {
     clear();
     
+    // If necessary create the appropriate plugin which encapsulates 
+    switch(type)
+    {
+    case ATTACH_SWATTER : 
+        m_plugin = new Swatter(this, m_kart);
+    default: break;
+    }   // switch(type)
+
     m_node->setMesh(attachment_manager->getMesh(type));
 
     if (!UserConfigParams::m_graphical_effects)
@@ -79,10 +87,6 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     m_count            = m_type==ATTACH_SWATTER
                          ? m_kart->getKartProperties()->getSwatterCount()
                          : 1;
-    m_animation_timer  = 0.0f;
-    m_animation_phase  = SWATTER_AIMING;
-    m_rot_per_sec      = core::vector3df(0,0,0);
-    m_animation_target = NULL;
 
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
@@ -90,11 +94,13 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     if(m_type==ATTACH_PARACHUTE)
     {
         m_initial_speed = m_kart->getSpeed();
-        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
+        // if going very slowly or backwards, braking won't remove parachute
+        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; 
         
         if (UserConfigParams::m_graphical_effects)
         {
-            m_node->setAnimationSpeed(50); // .blend was created @25 (<10 real, slow computer), make it faster
+            // .blend was created @25 (<10 real, slow computer), make it faster
+            m_node->setAnimationSpeed(50);
         }
     }
     m_node->setVisible(true);
@@ -107,6 +113,12 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
  */
 void Attachment::clear()
 {
+    if(m_plugin)
+    {
+        delete m_plugin;
+        m_plugin = NULL;
+    }
+
     m_type=ATTACH_NOTHING; 
     
     m_time_left=0.0;
@@ -143,7 +155,8 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        projectile_manager->newExplosion(m_kart->getXYZ(), "explosion", m_kart->getController()->isPlayerController());
+        projectile_manager->newExplosion(m_kart->getXYZ(), "explosion", 
+                                m_kart->getController()->isPlayerController());
         m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
         clear();
         if(new_attachment==-1) 
@@ -153,7 +166,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // same banana again once the explosion animation is finished, giving 
         // the kart the same penalty twice.
         float f = std::max(item->getDisableTime(), 
-                           m_kart->getKartProperties()->getExplosionTime()+2.0f);
+                         m_kart->getKartProperties()->getExplosionTime()+2.0f);
         item->setDisableTime(f);
         break;
         }
@@ -192,7 +205,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         case 0: 
             set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
             m_initial_speed = m_kart->getSpeed();
-            if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
+
+             // if going very slowly or backwards, braking won't remove parachute
+            if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
@@ -230,13 +245,25 @@ void Attachment::update(float dt)
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
 
+    if(m_plugin)
+    {
+        bool discard = m_plugin->updateAndTestFinished(dt);
+        if(discard)
+        {
+            clear();  // also removes the plugin
+            return;
+        }
+        m_node->setRotation(m_plugin->getRotation());
+    }
+
     switch (m_type)
     {
     case ATTACH_PARACHUTE:
         // Partly handled in Kart::updatePhysics
         // Otherwise: disable if a certain percantage of
         // initial speed was lost
-        if(m_kart->getSpeed() <= m_initial_speed*stk_config->m_parachute_done_fraction)
+        if(m_kart->getSpeed() <= 
+            m_initial_speed*stk_config->m_parachute_done_fraction)
         {
             m_time_left = -1;
         }
@@ -246,24 +273,24 @@ void Attachment::update(float dt)
     case ATTACH_MAX:
         break;
     case ATTACH_SWATTER:
-        updateSwatter(dt);
-        // If the swatter is used up, trigger cleaning up
-        if(m_count==0) m_time_left = -1.0f;
+        // Everything is done in the plugin.
         break;
     case ATTACH_BOMB:
-        if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
+        if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame()-1))
         {
-            m_node->setCurrentFrame(m_node->getEndFrame() - m_node->getStartFrame() - 1 -m_time_left);
+            m_node->setCurrentFrame(m_node->getEndFrame() 
+                                    - m_node->getStartFrame()-1-m_time_left);
         }
         if(m_time_left<=0.0)
         {
-            projectile_manager->newExplosion(m_kart->getXYZ(), "explosion", m_kart->getController()->isPlayerController());
+            projectile_manager->newExplosion(m_kart->getXYZ(), "explosion", 
+                                m_kart->getController()->isPlayerController());
             m_kart->handleExplosion(m_kart->getXYZ(), 
                                     /*direct_hit*/ true);
         }
         break;
     case ATTACH_TINYTUX:
-        // Nothing to do for tiny tux, this is all handled in EmergencyAnimation
+        // Nothing to do for tinytux, this is all handled in EmergencyAnimation
         break;
     }   // switch
 
@@ -272,188 +299,21 @@ void Attachment::update(float dt)
         clear();
 }   // update
 
-//-----------------------------------------------------------------------------
-/** Updates an armed swatter: it checks for any karts that are close enough
- *  and not invulnerable, it swats the kart. 
- *  \param dt Time step size.
- */
-void Attachment::updateSwatter(float dt)
-{
-    core::vector3df r = m_node->getRotation();
-    r += m_rot_per_sec * dt;
-    switch(m_animation_phase)
-    {
-    case SWATTER_AIMING:    
-        aimSwatter(); 
-        break;
-    case SWATTER_TO_KART:
-        if(fabsf(r.Z)>=90)
-        {
-            checkForHitKart(r.Z>0);
-            m_rot_per_sec *= -1.0f;
-            m_animation_phase = SWATTER_BACK_FROM_KART;
-        }
-        break;
-    case SWATTER_BACK_FROM_KART:
-        if (r.Z>0)
-        {
-            r                  = core::vector3df(0,0,0);
-            m_rot_per_sec      = r;
-            m_animation_phase  = SWATTER_AIMING;
-            m_animation_target = NULL;
-        }
-        break;
-    case SWATTER_ITEM_1:  // swatter going to the left
-        if(r.Z>SWAT_ANGLE)
-        {
-            m_animation_phase = SWATTER_ITEM_2;
-            m_rot_per_sec    *= -1.0f;
-        }
-        break;
-    case SWATTER_ITEM_2:  // swatter going all the way to the right
-        if(r.Z<-SWAT_ANGLE)
-        {
-            m_animation_phase = SWATTER_ITEM_3;
-            m_rot_per_sec *= -1.0f;
-        }
-        break;
-    case SWATTER_ITEM_3:  // swatter going back to rest position.
-        if(r.Z>0)
-        {
-            r                 = core::vector3df(0,0,0);
-            m_rot_per_sec     = r;
-            m_animation_phase = SWATTER_AIMING;
-        }
-        break;
-    }   // switch m_animation_phase
-
-    m_node->setRotation(r);
-}   // updateSwatter
-
-//-----------------------------------------------------------------------------
-/** Returns true if the point xyz is to the left of the kart. 
- *  \param xyz Point to determine the direction 
- */
-bool Attachment::isLeftSideOfKart(const Vec3 &xyz)
-{
-    Vec3 forw_vec = m_kart->getTrans().getBasis().getColumn(2);
-    const Vec3& k1 = m_kart->getXYZ();
-    const Vec3  k2 = k1+forw_vec;
-    return xyz.sideOfLine2D(k1, k2)>0;
-}   // isLeftSideOfKart
-
-//-----------------------------------------------------------------------------
-/** This function is called when the swatter reaches the hit angle (i.e. it
- *  is furthest down). Check all karts if any one is hit, i.e. is at the right
- *  side and at the right angle and distance.
- *  \param isWattingLeft True if the swatter is aiming to the left side
- *         of the kart.
- */
-void Attachment::checkForHitKart(bool isSwattingLeft)
-{
-    // Square of the minimum distance
-    const KartProperties *kp = m_kart->getKartProperties();
-    float min_dist2          = kp->getSwatterDistance2();
-    Kart *hit_kart           = NULL;
-    Vec3 forw_vec            = m_kart->getTrans().getBasis().getColumn(2);
-    const World *world       = World::getWorld();
-
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
-    {
-        Kart *kart = world->getKart(i);
-        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
-            continue;
-        float f = (kart->getXYZ()-m_kart->getXYZ()).length2();
-
-        // Distance is too great, ignore this kart.
-        if(f>min_dist2) continue;
-
-        // Check if the kart is at the right side.
-        const bool left = isLeftSideOfKart(kart->getXYZ());
-        if(left!=isSwattingLeft)
-        {
-            //printf("%s wrong side: %d %d\n", 
-            //    kart->getIdent().c_str(), left, isSwattingLeft);
-            continue;
-        }
-
-        Vec3 kart_vec    = m_kart->getXYZ()-kart->getXYZ();
-        // cos alpha = a*b/||a||/||b||
-        // Since forw_vec is a unit vector, we only have to divide by
-        // the length of the vector to the kart.
-        float cos_angle = kart_vec.dot(forw_vec)/kart_vec.length();
-        float angle     = acosf(cos_angle)*180/M_PI;
-        if(angle<45 || angle>135)
-        {
-            //printf("%s angle %f\n", kart->getIdent().c_str(), angle);
-            continue;
-        }
-        
-        kart->setSquash(kp->getSquashDuration(), 
-                        kp->getSquashSlowdown());
-        // It is assumed that only one kart is within reach of the swatter,
-        // so we can stop testing karts here.
-        return;
-    }   // for i < num_karts
-
-}   // angleToKart
-
-//-----------------------------------------------------------------------------
-/** Checks for any kart that is not already squashed that is close enough.
- *  If a kart is found, it changes the state of the swatter to be 
- *  SWATTER_TARGET and starts the animation.
- */
-void Attachment::aimSwatter()
-{
-    const World *world = World::getWorld();
-    Kart *min_kart     = NULL;
-    // Square of the minimum distance
-    float min_dist2    = m_kart->getKartProperties()->getSwatterDistance2();
-
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
-    {
-        Kart *kart = world->getKart(i);
-        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
-            continue;
-        float f = (kart->getXYZ()-m_kart->getXYZ()).length2();
-        if(f<min_dist2)
-        {
-            min_dist2 = f;
-            min_kart = kart;
-        }
-    }
-    // No kart close enough, nothing to do.
-    if(!min_kart) return;
-
-    m_count --;
-    m_animation_phase        = SWATTER_TO_KART;
-    m_animation_target       = min_kart;
-    if(UserConfigParams::logMisc())
-        printf("[swatter] %s aiming at %s.\n", 
-                m_kart->getIdent().c_str(), min_kart->getIdent().c_str());
-    const KartProperties *kp = m_kart->getKartProperties();
-    m_animation_timer        = kp->getSwatterAnimationTime();
-    const bool left          = isLeftSideOfKart(min_kart->getXYZ());
-    m_rot_per_sec = core::vector3df(0, 0, 
-                                    left ?90.0f:-90.0f) / m_animation_timer;
-
-}   // aimSwatter
-
-//-----------------------------------------------------------------------------
-/** Starts a (smaller) and faster swatting movement to be played
- *  when the kart is hit by an item.
+// ----------------------------------------------------------------------------
+/** Uses the swatter to swat at an item. The actual functionality is 
+ *  implemented in the swatter plugin.
+ *  \pre The item must be an attachment (and m_plugin must be a swatter).
  */
 void Attachment::swatItem()
 {
-    if(UserConfigParams::logMisc())
-        printf("[swatter] %s swatting item.\n",
-               m_kart->getIdent().c_str());
     assert(m_type==ATTACH_SWATTER);
-    assert(m_animation_target==NULL);
-
-    m_animation_phase  = SWATTER_ITEM_1;
-    m_animation_timer  = 
-        m_kart->getKartProperties()->getSwatterItemAnimationTime();
-    m_count--;
-    m_rot_per_sec = core::vector3df(0, 0, SWAT_ANGLE) / m_animation_timer;
+    ((Swatter*)m_plugin)->swatItem();
 }   // swatItem
+// ----------------------------------------------------------------------------
+/** Returns if the swatter is currently aiming, i.e. can be used to
+ *  swat an incoming projectile. */
+bool Attachment::isSwatterReady() const 
+{
+    assert(m_type==ATTACH_SWATTER);
+    return ((Swatter*)m_plugin)->isSwatterReady();
+}   // isSwatterReady

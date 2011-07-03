@@ -21,15 +21,26 @@
 #define HEADER_ATTACHMENT_HPP
 
 #include "config/stk_config.hpp"
+#include "items/attachment_plugin.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
 class Item;
 
-/**
-  * \ingroup items
-  */
+/** This objects is permanently available in a kart and stores information 
+ *  about addons. If a kart has no attachment, this object will have the
+ *  attachment type ATTACH_NOTHING. This way other tests for attachment
+ *  in STK do not have to additionally test if there is an attachment, all
+ *  tests for a type will always be valid.
+ *  Certain attachments need additional coding, this is supported by
+ *  a 'plugin' mechanism: This attachment will forward certain calls to 
+ *  (see attachment_pluging abstract class). Compared to normal subclassing
+ *  (i.e. replacing the attachment object each time an attachment changes)
+ *  this has less overhead (since the attachment class always creates
+ *  a scene node).
+ *  \ingroup items
+ */
 class Attachment: public NoCopy
 {
 public:
@@ -72,30 +83,12 @@ private:
     /** Used by bombs so that it's not passed back to previous owner. */
     Kart           *m_previous_owner;
 
-    /** State of a swatter animation. The swatter is either aiming (looking
-     *  for a kart and/or swatting an incoming item), moving towards or back
-     *  from a kart, or swatting left and right to hit an item - which has
-     *  three phases: going left to an angle a (phae 1), then going to -a
-     *  (phase 2), then going back to 0. */
-    enum            {SWATTER_AIMING, SWATTER_TO_KART,
-                     SWATTER_BACK_FROM_KART,
-                     SWATTER_ITEM_1, SWATTER_ITEM_2, SWATTER_ITEM_3,
-                     SWATTER_BACK_FROM_ITEM} m_animation_phase;
+    /** An optional attachment - additional functionality can be implemented
+     *  for certain attachments. */
+    AttachmentPlugin *m_plugin;
 
-    /** Timer for swatter animation. */
-    float           m_animation_timer;
-
-    /** The kart the swatter is aiming at. */
-    Kart           *m_animation_target;
-
-    /** Rotation per second so that the swatter will hit the kart. */
-    core::vector3df m_rot_per_sec;
-
+    /** Pseudo random number generator. */
     RandomGenerator m_random;
-
-    void            aimSwatter();
-    bool            isLeftSideOfKart(const Vec3 &xyz);
-    void            checkForHitKart(bool isSwattingToLeft);
 
 public:
           Attachment(Kart* kart);
@@ -103,9 +96,9 @@ public:
     void  clear ();
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
-    void  updateSwatter(float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
     void  swatItem();
+    bool  isSwatterReady() const;
 
     void  set (AttachmentType type, float time, Kart *previous_kart=NULL);
     // ------------------------------------------------------------------------
@@ -128,13 +121,6 @@ public:
     /** Returns additional weight for the kart. */
     float weightAdjust() const { 
         return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
-    // ------------------------------------------------------------------------
-    /** Returns if the swatter is currently aiming, i.e. can be used to
-     *  swat an incoming projectile. */
-    bool isSwatterReady() const {
-        assert(m_type==ATTACH_SWATTER);
-        return m_animation_phase == SWATTER_AIMING;
-    }   // isSwatterReady
     // ------------------------------------------------------------------------
 };   // Attachment
 

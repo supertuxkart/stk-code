@@ -574,6 +574,10 @@
 					RelativePath="..\..\items\rubber_band.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\items\swatter.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="physics"
@@ -1577,6 +1581,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\attachment_plugin.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\bowling.hpp"
 					>
 				</File>
@@ -1614,6 +1622,10 @@
 				</File>
 				<File
 					RelativePath="..\..\items\rubber_band.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\swatter.hpp"
 					>
 				</File>
 			</Filter>
