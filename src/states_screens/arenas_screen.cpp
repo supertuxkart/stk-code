@@ -55,7 +55,17 @@ void ArenasScreen::loadedFromFile()
 
     tabs->clearAllChildren();
 	DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-	w->setItemCountHint(3);
+
+	int num_of_arenas=0;
+	for (int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
+    {
+            Track* temp = track_manager->getTrack(n);
+            if (temp->isArena()){
+				num_of_arenas++;
+			}
+	}
+
+	w->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
     
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
     const int group_amount = groups.size();
