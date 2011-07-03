@@ -57,7 +57,7 @@ void ArenasScreen::loadedFromFile()
 	DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
 
 	int num_of_arenas=0;
-	for (int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
+	for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
             Track* temp = track_manager->getTrack(n);
             if (temp->isArena()){

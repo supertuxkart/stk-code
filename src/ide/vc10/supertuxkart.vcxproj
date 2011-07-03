@@ -117,6 +117,7 @@
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
+    <ClCompile Include="..\..\items\swatter.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
+    <ClInclude Include="..\..\items\swatter.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp" />

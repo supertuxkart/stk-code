@@ -777,6 +777,9 @@
     <ClCompile Include="..\..\addons\request.cpp">
       <Filter>Quelldateien\addons</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\items\swatter.cpp">
+      <Filter>Quelldateien\items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1471,6 +1474,9 @@
     </ClInclude>
     <ClInclude Include="..\..\addons\request.hpp">
       <Filter>Headerdateien\addons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\items\swatter.hpp">
+      <Filter>Headerdateien\items</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
