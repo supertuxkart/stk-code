@@ -52,8 +52,10 @@ void ArenasScreen::loadedFromFile()
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
-    
+
     tabs->clearAllChildren();
+	DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
+	w->setItemCountHint(3);
     
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
     const int group_amount = groups.size();
@@ -92,9 +94,8 @@ void ArenasScreen::init()
 {
     Screen::init();
     buildTrackList();
-    
-    // select something by default for the game master
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
+    // select something by default for the game master
     assert( w != NULL );
     w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
 }   // init
