@@ -185,8 +185,8 @@ supertuxkart_SOURCES = \
  items/projectile_manager.hpp \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
- items\swatter.cpp \
- items\swatter.hpp \
+ items/swatter.cpp \
+ items/swatter.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
  karts/controller/controller.cpp \
