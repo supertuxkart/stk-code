@@ -26,7 +26,7 @@
 #include <IMeshSceneNode.h>
 #include <SMesh.h>
 
-float SkidMarks::m_avoid_z_fighting  = 0.0f;
+float SkidMarks::m_avoid_z_fighting  = 0.005f;
 const int SkidMarks::m_start_alpha = 128;
 const int SkidMarks::m_start_grey = 32;
 //const int start_premul = SkidMarks::m_start_grey * SkidMarks::m_start_alpha / 256; compiler whines about private later
@@ -163,17 +163,12 @@ void SkidMarks::update(float dt)
     delta.normalize();
     delta *= m_width;
 
-    m_avoid_z_fighting += 0.001f;
-    if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
-
     SkidMarkQuads *smq_left = new SkidMarkQuads(raycast_left.m_contactPointWS,
                                          raycast_left.m_contactPointWS + delta,
                                          m_material, m_avoid_z_fighting);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
-    m_avoid_z_fighting += 0.001f;
-    if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
     SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS
                                                   - delta,
                                                   raycast_right.m_contactPointWS,
