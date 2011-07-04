@@ -276,6 +276,9 @@ void Attachment::update(float dt)
         // Everything is done in the plugin.
         break;
     case ATTACH_BOMB:
+        // Mesh animation frames are 1 to 61 frames (60 steps)
+        // The idea is change second by second, counterclockwise 60 to 0 secs
+        // If longer times needed, it should be a surprise "oh! bomb activated!"
         if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame()-1))
         {
             m_node->setCurrentFrame(m_node->getEndFrame() 
