@@ -78,7 +78,7 @@ void QuadGraph::load(const std::string &filename)
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
         for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
-            m_all_nodes.push_back(new GraphNode(i));
+            m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
         m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
@@ -101,7 +101,7 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to-quad", &to);
             for(unsigned int i=from; i<=to; i++)
             {
-                m_all_nodes.push_back(new GraphNode(i));
+                m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
             }
         }
         else if(xml_node->getName()=="node")
@@ -109,7 +109,7 @@ void QuadGraph::load(const std::string &filename)
             // A single quad is connected to a single graph node.
             unsigned int id;
             xml_node->get("quad", &id);
-            m_all_nodes.push_back(new GraphNode(id));
+            m_all_nodes.push_back(new GraphNode(id, m_all_nodes.size()));
         }
 
         // Then the definition of edges between the graph nodes:

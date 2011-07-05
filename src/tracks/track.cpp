@@ -403,6 +403,20 @@ void Track::loadQuadGraph(unsigned int mode_id)
 {
     m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
                                  m_root+"/"+m_all_modes[mode_id].m_graph_name);
+#ifdef DEBUG
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        if(m_quad_graph->getNode(i).getPredecessor()==-1)
+        {
+            printf("Warning: no predecessor for node %d - can be ignored.\n",
+                   i);
+            // For now just set 0 as the predecessor ... which gives invalid
+            // rescue behaviour, but otherwise does not cause a crash.
+            // On trunk this is actually an assert statement.
+            m_quad_graph->getNode(i).setPredecessor(0);
+        }
+    }
+#endif
     m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
                                              "minimap::"+m_ident);
     if(m_quad_graph->getNumNodes()==0)

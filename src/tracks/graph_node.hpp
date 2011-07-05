@@ -41,11 +41,22 @@ class GraphNode
     /** Index of this node in the set of quads. Several graph nodes can use
      *  the same quad, meaning it is possible to use a quad more than once,
      *  e.g. a figure 8 like track. */
-    unsigned int       m_index;
-    /** The list of successors. */
-    std::vector<int>   m_vertices;
+    unsigned int       m_quad_index;
+
+    /** Index of this graph node. */
+    unsigned int       m_node_index;
+
+    /** The list of successor graph nodes. */
+    std::vector<int>   m_successor_node;
+
+    /** The first predecessor. This is used in moving karts after a rescue.
+     *  For this a node on the main driveline will be used (i.e. the first
+     *  reported node which has this node as a successor). */
+    int                m_predecessor;
+
     /** The distance to each of the successors. */
     std::vector<float> m_distance_to_next;
+
     /** The angle of the line from this node to each neighbour. */
     std::vector<float> m_angle_to_next;
 
@@ -76,6 +87,7 @@ class GraphNode
       *  saves computation, and it is only needed to determine the distance
       *  from the center of the drivelines anyway. */
      core::line2df  m_line;
+
 public:
     /** Keep a shared pointer so that some asserts and tests can be 
     *  done without adding additional parameters. */
@@ -84,32 +96,32 @@ public:
     *  has access to the actual quad to which a node points. */
     static QuadGraph *m_all_nodes;
 
-                 GraphNode(unsigned int index);
+                 GraphNode(unsigned int quad_index, unsigned int node_index);
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
 
-    /** Returns the i-th successor. */
+    /** Returns the i-th successor node. */
     unsigned int getSuccessor(unsigned int i)  const 
-                               { return m_vertices[i];                   }
+                               { return m_successor_node[i];                  }
     // ------------------------------------------------------------------------
     /** Returns the number of successors. */
     unsigned int getNumberOfSuccessors() const 
-                               { return (unsigned int)m_vertices.size(); }
+                              { return (unsigned int)m_successor_node.size(); }
     // ------------------------------------------------------------------------
-    /** Returns the index in the quad_set of this node. */
-    int          getIndex() const { return m_index;                     }
+    /** Returns the quad_index in the quad_set of this node. */
+    int          getIndex() const { return m_quad_index;                }
 
     // ------------------------------------------------------------------------
     /** Returns the quad of this graph node. */
-    const Quad& getQuad() const {return m_all_quads->getQuad(m_index);}
+    const Quad& getQuad() const {return m_all_quads->getQuad(m_quad_index);}
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. ATM this just returns the vertices
      *  from the quads, but if necessary this method will also consider 
      *  rotated quads. So index 0 will always be lower left point, then 
      *  counterclockwise. */
     const Vec3& operator[](int i) const 
-                                    {return m_all_quads->getQuad(m_index)[i];}
+                                {return m_all_quads->getQuad(m_quad_index)[i];}
     // ------------------------------------------------------------------------
     /** Returns the distance to the j-th. successor. */
     float        getDistanceToSuccessor(unsigned int j) const
@@ -142,8 +154,15 @@ public:
      *  \param index Index of the successor. */
     bool        ignoreSuccessorForAI(unsigned int i) const
     {
-        return m_all_quads->getQuad(m_vertices[i]).letAIIgnore();
+        return m_all_quads->getQuad(m_successor_node[i]).letAIIgnore();
     };
+    // ------------------------------------------------------------------------
+    /** Returns a predecessor for this node. */
+    unsigned int getPredecessor() const {return m_predecessor; }
+    // ------------------------------------------------------------------------
+    /** Sets the predecessor of this node. */
+    void setPredecessor(unsigned int p) {m_predecessor = p; }
+    // ------------------------------------------------------------------------
 };   // GraphNode
 
 #endif
