@@ -403,6 +403,13 @@ void Track::loadQuadGraph(unsigned int mode_id)
 {
     m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
                                  m_root+"/"+m_all_modes[mode_id].m_graph_name);
+#ifdef DEBUG
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        assert(m_quad_graph->getNode(i).getPredecessor()!=-1);
+    }
+#endif
+
     if(m_quad_graph->getNumNodes()==0)
     {
         fprintf(stderr, "[Track] WARNING: No graph nodes defined for track '%s'\n",

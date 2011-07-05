@@ -39,12 +39,14 @@ QuadGraph *GraphNode::m_all_nodes=NULL;
 /** Constructor. Saves the quad index which belongs to this graph node.
  *  \param index Index of the quad to use for this node (in m_all_quads).
  */
-GraphNode::GraphNode(unsigned int index) 
+GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
 { 
-    assert(index<m_all_quads->getNumberOfQuads());
-    m_index               = index; 
+    assert(quad_index<m_all_quads->getNumberOfQuads());
+    m_quad_index          = quad_index;
+    m_node_index          = node_index;
+    m_predecessor         = -1;
     m_distance_from_start = 0;
-    const Quad &quad      = m_all_quads->getQuad(m_index);
+    const Quad &quad      = m_all_quads->getQuad(m_quad_index);
     // FIXME: the following values should depend on the actual orientation 
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
     // and 2,3 are the upper end.
@@ -64,15 +66,20 @@ GraphNode::GraphNode(unsigned int index)
 /** Adds a successor to a node. This function will also pre-compute certain
  *  values (like distance from this node to the successor, angle (in world)
  *  between this node and the successor.
- *  \param to The index of the successor.
+ *  \param to The index of the graph node of the successor.
  */
 void GraphNode::addSuccessor(unsigned int to)
 {
-    m_vertices.push_back(to);
-    // m_index is the quad index, so we use m_all_quads
-    const Quad &this_quad = m_all_quads->getQuad(m_index);
+    m_successor_node.push_back(to);
+    // m_quad_index is the quad index, so we use m_all_quads
+    const Quad &this_quad = m_all_quads->getQuad(m_quad_index);
     // to is the graph node, so we have to use m_all_nodes to get the right quad
+    GraphNode &gn = m_all_nodes->getNode(to);
     const Quad &next_quad = m_all_nodes->getQuad(to);
+
+    // Keep the first predecessor, which is usually the most 'natural' one.
+    if(gn.m_predecessor==-1)
+        gn.m_predecessor = m_node_index;
     core::vector2df d2    = m_lower_center_2d
                           - m_all_nodes->getNode(to).m_lower_center_2d;
 
