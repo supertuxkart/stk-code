@@ -32,9 +32,7 @@ using namespace irr;
 
 #include "LinearMath/btTransform.h"
 
-#include "audio/music_information.hpp"
 #include "graphics/material.hpp"
-#include "graphics/particle_emitter.hpp"
 #include "items/item.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
@@ -45,6 +43,8 @@ class AnimationManager;
 class BezierCurve;
 class CheckManager;
 class MovingTexture;
+class MusicInformation;
+class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
 class TrackObjectManager;
