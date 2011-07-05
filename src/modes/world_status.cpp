@@ -33,7 +33,7 @@ WorldStatus::WorldStatus()
     m_clock_mode        = CLOCK_CHRONO;
     m_time              = 0.0f;
     m_auxiliary_timer   = 0.0f;
-    m_phase             = SETUP_PHASE;
+    m_phase             = UserConfigParams::m_race_now ? RACE_PHASE : SETUP_PHASE;
     m_previous_phase    = UNDEFINED_PHASE;  // initialise it just in case
     
     m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
@@ -52,7 +52,7 @@ void WorldStatus::reset()
     m_auxiliary_timer = 0.0f;
     // Using SETUP_PHASE will play the track into sfx first, and has no
     // other side effects.
-    m_phase           = SETUP_PHASE;
+    m_phase          = UserConfigParams::m_race_now ? RACE_PHASE : SETUP_PHASE;
     m_previous_phase  = UNDEFINED_PHASE;
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();

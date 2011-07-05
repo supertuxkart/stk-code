@@ -236,6 +236,7 @@ void cmdLineHelp (char* invocation)
     " the Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a menu.\n"
+    "  -R,  --race-now         Same as -N but also skip the ready-set-go phase and the music.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
     "  --gp name               Start the specified Grand Prix.\n"
     "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
@@ -668,6 +669,12 @@ int handleCmdLine(int argc, char **argv)
         //} else if ( !strcmp(argv[i], "--reverse") ) {
         //fprintf ( stdout, "Enabling reverse mode.\n" ) ;
         //raceSetup.reverse = 1;
+        }
+        else if (    !strcmp(argv[i], "--race-now")
+                     || !strcmp(argv[i], "-R")                )
+        {
+            UserConfigParams::m_no_start_screen = true;
+            UserConfigParams::m_race_now = true;
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {

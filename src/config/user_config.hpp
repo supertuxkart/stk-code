@@ -375,6 +375,8 @@ namespace UserConfigParams
     PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
 
     PARAM_PREFIX bool                       m_no_start_screen   PARAM_DEFAULT( false );
+    
+    PARAM_PREFIX bool                       m_race_now          PARAM_DEFAULT( false );
 
     /** True to test funky ambient/diffuse/specularity in RGB & all anisotropic */
     PARAM_PREFIX bool                       m_rendering_debug   PARAM_DEFAULT( false );
