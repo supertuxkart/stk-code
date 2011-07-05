@@ -481,7 +481,7 @@ void ScalableFont::draw(const core::stringw& text,
         const int where = text.findFirst(L'\t');
         core::stringw substr = text.subString(0, where-1);
         text_dimension = getDimension(substr.c_str()) + getDimension(L"XX");
-        offset.X += (position.getWidth()*m_tab_stop - text_dimension.Width);
+        offset.X += (int)(position.getWidth()*m_tab_stop - text_dimension.Width);
     }
 
     // ---- collect character locations
@@ -497,7 +497,8 @@ void ScalableFont::draw(const core::stringw& text,
         //hack: one tab character is supported, it moves the cursor to the tab stop
         if (c == L'\t')
         {
-            offset.X = position.UpperLeftCorner.X + position.getWidth()*m_tab_stop;
+            offset.X = (int)(position.UpperLeftCorner.X 
+                             + position.getWidth()*m_tab_stop);
             continue;
         }
         

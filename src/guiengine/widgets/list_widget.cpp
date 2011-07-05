@@ -121,7 +121,8 @@ void ListWidget::add()
             header->m_h = header_height;
             
             header->m_x = x;
-            header->m_w = m_w * float(m_header[n].m_proportion)/float(proportion_total);
+            header->m_w = (int)(m_w * float(m_header[n].m_proportion)
+                                    / float(proportion_total));
             
             x += header->m_w;
             
