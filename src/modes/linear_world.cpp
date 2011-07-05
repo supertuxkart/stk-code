@@ -567,12 +567,12 @@ void LinearWorld::moveKartAfterRescue(Kart* kart)
         info.m_track_sector = info.m_last_valid_sector;
     }
 
-    // Removing 1 here makes it less likely to fall in a rescue loop since the
-    // kart moves back on each attempt. This is still a weak hack. Also some 
-    // other code depends on 1 being substracted, like 'forceRescue'
-    if ( info.m_track_sector > 0 ) info.m_track_sector-- ;
-    info.m_last_valid_sector = info.m_track_sector;
-    if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
+    // Using the predecessor has the additional afvantage (besides punishing
+    // the player a bit more) that it makes it less likely to fall in a 
+    // rescue loop since the kart moves back on each attempt. 
+    const QuadGraph &qg     = m_track->getQuadGraph();
+    info.m_track_sector     = qg.getNode(info.m_track_sector).getPredecessor();
+    info.m_last_valid_sector= qg.getNode(info.m_track_sector).getPredecessor();
 
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
 
