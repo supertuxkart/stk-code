@@ -26,6 +26,7 @@
 #include "tracks/graph_node.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/aligned_array.hpp"
+#include "utils/no_copy.hpp"
 
 #include <dimension2d.h>
 namespace irr
@@ -41,7 +42,7 @@ class CheckLine;
   * \brief This class stores a graph of quads.
   * \ingroup tracks
   */
-class QuadGraph
+class QuadGraph : public NoCopy
 {
     
 private:
