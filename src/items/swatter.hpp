@@ -68,11 +68,11 @@ private:
     void            checkForHitKart(bool isSwattingToLeft);
 
 public:
-          Swatter(Attachment *attachment, Kart *kart);
-         ~Swatter();
-    bool  updateAndTestFinished(float dt);
-    void  updateSwatter(float dt);
-    void  swatItem();
+             Swatter(Attachment *attachment, Kart *kart);
+    virtual ~Swatter();
+    bool     updateAndTestFinished(float dt);
+    void     updateSwatter(float dt);
+    void     swatItem();
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to

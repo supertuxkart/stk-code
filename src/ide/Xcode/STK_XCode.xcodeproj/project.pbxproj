@@ -329,6 +329,7 @@
 		9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9592DC6B13021B350039DBC8 /* minimal_race_gui.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
+		959DE0C613C297B90068ED78 /* swatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959DE0C413C297B90068ED78 /* swatter.cpp */; };
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
@@ -1103,6 +1104,8 @@
 		959482D010EBC0790031BADF /* track_object_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object_manager.hpp; path = ../../tracks/track_object_manager.hpp; sourceTree = SOURCE_ROOT; };
 		959482D110EBC0790031BADF /* track_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_object.cpp; path = ../../tracks/track_object.cpp; sourceTree = SOURCE_ROOT; };
 		959482D210EBC0790031BADF /* track_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object.hpp; path = ../../tracks/track_object.hpp; sourceTree = SOURCE_ROOT; };
+		959DE0C413C297B90068ED78 /* swatter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = swatter.cpp; path = ../../items/swatter.cpp; sourceTree = SOURCE_ROOT; };
+		959DE0C513C297B90068ED78 /* swatter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = swatter.hpp; path = ../../items/swatter.hpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -2428,6 +2431,8 @@
 				95C2B10D0F296545000D3E5D /* projectile_manager.hpp */,
 				95C2B10E0F296545000D3E5D /* rubber_band.cpp */,
 				95C2B10F0F296545000D3E5D /* rubber_band.hpp */,
+				959DE0C413C297B90068ED78 /* swatter.cpp */,
+				959DE0C513C297B90068ED78 /* swatter.hpp */,
 			);
 			name = items;
 			path = ../../items;
@@ -3102,6 +3107,7 @@
 				956F557513527E4B005C291D /* race_gui_base.cpp in Sources */,
 				9584B30D137CAC12008565D7 /* news_manager.cpp in Sources */,
 				9584B30E137CAC12008565D7 /* request.cpp in Sources */,
+				959DE0C613C297B90068ED78 /* swatter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
