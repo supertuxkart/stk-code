@@ -106,8 +106,8 @@ Section "Main Section" SecMain
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Run.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
-    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\Run.lnk 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
+    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
@@ -142,7 +142,7 @@ Section "Uninstall"redist
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\Run.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart.lnk"
 
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
