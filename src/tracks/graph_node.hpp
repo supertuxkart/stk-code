@@ -158,7 +158,7 @@ public:
     };
     // ------------------------------------------------------------------------
     /** Returns a predecessor for this node. */
-    unsigned int getPredecessor() const {return m_predecessor; }
+    int getPredecessor() const {return m_predecessor; }
     // ------------------------------------------------------------------------
 };   // GraphNode
 
