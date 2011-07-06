@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7 PL\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-06-04 21:10+0000\n"
+"PO-Revision-Date: 2011-06-25 12:41+0000\n"
 "Last-Translator: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "Language-Team: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-06-13 23:32+0000\n"
-"X-Generator: Launchpad (build 13175)\n"
+"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-Language: Polish\n"
 
@@ -791,6 +791,12 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
+"Po pierwsze, potrzebujesz kilku różnych urządzeń kontrolujących (najlepszym "
+"rozwiązaniem do gry w kilka osób jest posiadanie większej ilości gamepadów "
+"i/lub dżojstików). Idź to konfiguracji sterowania i zmień ustawienia "
+"kontrolerów. Jest tez możliwość grania na klawiaturze/klawiaturach, jednakże "
+"każdy gracz potrzebuje innych klawiszy. Trzeba mieć także na uwadze to, że "
+"większość klawiatur nie obsługuje dużej ilości wciśniętych na raz klawiszy."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:147
@@ -1579,6 +1585,9 @@ msgid ""
 "this feature to be enabled? (To change this setting at a later time, go to "
 "options, select tab 'User Interface', and edit \"Internet STK news\")."
 msgstr ""
+"SuperTuxKart może łączyć się z serwerem wiadomości, by wyświetlać "
+"aktualności. Czy chcesz włączyć tę funkcję? (By później zmienić tę opcję, "
+"pójdź do ustawień interfejsu użytkownika)"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:347
@@ -1926,7 +1935,7 @@ msgstr "Zostałeś wyeliminowany!"
 
 #: src/states_screens/race_result_gui.cpp:687
 msgid "You topped the highscore list!"
-msgstr ""
+msgstr "Znalazłeś się na liście najlepszych!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:341
 #: src/states_screens/grand_prix_win.cpp:124
@@ -1971,7 +1980,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:897
 #: src/states_screens/tracks_screen.cpp:198
 msgid "standard"
-msgstr ""
+msgstr "standardowe"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"

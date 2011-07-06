@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: supertuxkart.pot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-04-13 18:28+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2011-06-14 11:18+0000\n"
+"Last-Translator: WM <Unknown>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-06-13 23:32+0000\n"
-"X-Generator: Launchpad (build 13175)\n"
+"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
 #: src/utils/translation.cpp:197
@@ -45,7 +45,7 @@ msgstr "%1 丟出保齡球打中 %0 了"
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:57
 msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0 覺得 %1 的蛋糕不好吃"
+msgstr "%0 認為 %1 的手藝糟透了"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:59
@@ -95,12 +95,12 @@ msgstr "%i. %s : 存活時間 %s"
 #: src/states_screens/dialogs/addons_loading.cpp:145
 #, c-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
 #: src/states_screens/dialogs/addons_loading.cpp:134
 #, c-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:374
@@ -112,7 +112,7 @@ msgstr "%s，車手 %s"
 #: src/states_screens/addons_screen.cpp:132
 #, c-format
 msgid "%s by %s\t%s"
-msgstr ""
+msgstr "%s 作者： %s\t%s"
 
 #: src/items/powerup.cpp:49
 #, c-format
@@ -448,11 +448,11 @@ msgstr "無法連上遊戲的附加元件伺服器…"
 
 #: src/addons/network_http.cpp:328
 msgid "Can't download addons list, check terminal for details."
-msgstr ""
+msgstr "無法下載附加元件清單，詳情請查看終端機。"
 
 #: src/addons/network_http.cpp:338
 msgid "Can't download news file, check terminal for details."
-msgstr ""
+msgstr "無法下載新聞檔案，詳情請查看終端機。"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -637,7 +637,7 @@ msgstr "下"
 
 #: src/states_screens/dialogs/addons_loading.cpp:200
 msgid "Download failed."
-msgstr ""
+msgstr "下載失敗。"
 
 #. I18N: ./data/karts/elephpant/kart.xml
 #: data/po/gui_strings.h:786
@@ -647,7 +647,7 @@ msgstr "Elephpant"
 #. I18N: ./data/karts/emule/kart.xml
 #: data/po/gui_strings.h:789
 msgid "Emule"
-msgstr ""
+msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:82
@@ -889,7 +889,7 @@ msgstr "大獎賽"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:571
 msgid "Graphical Effects Level"
-msgstr ""
+msgstr "圖像特效等級"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -1018,7 +1018,7 @@ msgstr "載入中"
 
 #: src/states_screens/kart_selection.cpp:803
 msgid "Locked"
-msgstr ""
+msgstr "未解鎖"
 
 #: src/states_screens/arenas_screen.cpp:193
 #: src/states_screens/arenas_screen.cpp:216
@@ -1130,7 +1130,7 @@ msgstr "現在可以執行新的遊戲模式「%s」"
 
 #: src/states_screens/race_result_gui.cpp:687
 msgid "New highscore!"
-msgstr ""
+msgstr "創下新紀錄！"
 
 #: src/challenges/challenge.cpp:74
 #, c-format
@@ -1358,7 +1358,7 @@ msgstr "一般比賽：所有的招數都能使用，把所有武器都撿來並
 #. I18N: Reload button to reload addon data
 #: data/po/gui_strings.h:191
 msgid "Reload"
-msgstr ""
+msgstr "重新載入"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:119
@@ -1454,7 +1454,7 @@ msgstr "陽光邊郊"
 #: src/states_screens/dialogs/addons_loading.cpp:146
 #, c-format
 msgid "Size: %s"
-msgstr ""
+msgstr "檔案大小： %s"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
@@ -1700,7 +1700,7 @@ msgstr "更新"
 #. I18N: In the video settings
 #: data/po/gui_strings.h:579
 msgid "Use Frame Buffer Objects (requires restart)"
-msgstr ""
+msgstr "使用 Frame Buffer Objects (需要重新啟動)"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
@@ -1893,7 +1893,7 @@ msgstr "您已經被淘汰！"
 
 #: src/states_screens/race_result_gui.cpp:687
 msgid "You topped the highscore list!"
-msgstr ""
+msgstr "您刷新了最快紀錄！"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:341
 #: src/states_screens/grand_prix_win.cpp:124
@@ -1932,13 +1932,13 @@ msgstr "作者"
 
 #: src/states_screens/dialogs/addons_loading.cpp:107
 msgid "featured"
-msgstr ""
+msgstr "特色"
 
 #. I18N: kart group name
 #: src/states_screens/kart_selection.cpp:897
 #: src/states_screens/tracks_screen.cpp:198
 msgid "standard"
-msgstr ""
+msgstr "一般"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
