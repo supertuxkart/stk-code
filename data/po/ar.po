@@ -8,81 +8,80 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-04-20 16:58+0000\n"
-"Last-Translator: Launchpad Translations Administrators "
-"<rosetta@launchpad.net>\n"
+"PO-Revision-Date: 2011-06-17 20:54+0000\n"
+"Last-Translator: Majid Al-Dharrab <majid@aldharrab.com>\n"
 "Language-Team: Arabic <ar@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-06-13 23:32+0000\n"
-"X-Generator: Launchpad (build 13175)\n"
+"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
-msgstr ""
+msgstr "   Y"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "ابتلع %0 طُعم %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:55
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 يأكل الكثير من كعك %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "حصل %0 على قناع جميل من %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:79
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "أصاب %1 هدفه %0 بكرته"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:57
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 لا يثق في مهارة %1 في الطبخ"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:59
 msgid "%0 should not play with %1's lunch"
-msgstr ""
+msgstr "يجب أن يكف %0 عن العبث بغداء %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:75
 msgid "%0 will not go bowling with %1 again"
-msgstr ""
+msgstr "لن يلعب %0 البولنج مع %1 مرة أخرى"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 يلتصق ب%0 ليحصل على توصيلة مجانية"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "ألصق %1 وجه %0 بالشفاط"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:77
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 أسقط %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:49
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 يجرب الشعاع اللاقط على %0"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
 #, c-format
 msgid "%i laps"
-msgstr ""
+msgstr "%i دورات"
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -90,52 +89,52 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:172
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : استمر لمدة %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:141
 #: src/states_screens/dialogs/addons_loading.cpp:145
 #, c-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s ك.ب"
 
 #: src/states_screens/dialogs/addons_loading.cpp:134
 #, c-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s م.ب"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:374
 #, c-format
 msgid "%s by %s"
-msgstr ""
+msgstr "%s استغرقها %s"
 
 #. I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
 #: src/states_screens/addons_screen.cpp:132
 #, c-format
 msgid "%s by %s\t%s"
-msgstr ""
+msgstr "%s صممه %s\t%s"
 
 #: src/items/powerup.cpp:49
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s قرصان عظيم!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:95
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr ""
+msgstr "%s يلعب يويو كروية زرقاء كبيرة"
 
 #: src/states_screens/kart_selection.cpp:511
 #, c-format
 msgid "%s is ready"
-msgstr ""
+msgstr "%s مستعد"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:97
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr ""
+msgstr "%s بطل العالم في الكرة الراجعة"
 
 #: src/items/powerup.cpp:48
 #, c-format
@@ -146,28 +145,28 @@ msgstr ""
 #: src/items/flyable.cpp:99
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
-msgstr ""
+msgstr "على %s أن يمارس الرماية بدلًا من البولنج"
 
 #: src/modes/world.cpp:791
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "استُبعد %s"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:267
 msgid "(Empty)"
-msgstr ""
+msgstr "(فارغ)"
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:414
 msgid "(network play is not yet available)"
-msgstr ""
+msgstr "(اللعب على الشبكة غير متوفر بعد)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:303
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "* يمكن مشاهدة إعدادات التحكم الحالية أو تغييرها من قائمة الخيارات"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -178,18 +177,21 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
+"* يمكن لعب أغلب هذه الأطوار بطريقة الكأس، حيث تلعب سباقات كثيرة متتالية "
+"بدلًا من واحد. كلما كانت رتبتك أفضل كلما زادت نقاطك، ويفوز اللاعب الأكثر "
+"نقاطًا بالكأس."
 
 #. I18N: ./data/gui/options_input.stkgui
 #: data/po/gui_strings.h:522
 msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
-msgstr ""
+msgstr "* سيحدََّد الإعداد بناءً على زر الإطلاق المضغوط للاشتراك في اللعبة."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:149
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "قتال بثلاث ضربات"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -198,47 +200,49 @@ msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
+"القتال بثلاث ضربات: في اللعب الجماعي فقط. اضرب الآخرين بالأسلحة حتى يخسروا "
+"كل فرصهم."
 
 #: src/states_screens/dialogs/track_info_dialog.cpp:191
 msgid "= Highscores ="
-msgstr ""
+msgstr "= أعلى النتائج ="
 
 #: src/items/powerup.cpp:82
 msgid "A wizard did it!"
-msgstr ""
+msgstr "هذا عمل ساحر!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:424
 #: src/states_screens/race_result_gui.cpp:101
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "اخرج من الكأس"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:454
 msgid "About"
-msgstr ""
+msgstr "حوْل"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:180
 msgid "Accelerate"
-msgstr ""
+msgstr "الاندفاع"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:65
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "أضف ضبط لوحة مفاتيح"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:537
 msgid "Add Player"
-msgstr ""
+msgstr "أضف لاعبًا"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:519
 msgid "Add a device"
-msgstr ""
+msgstr "أضف جهازًا"
 
 #. I18N: kart group name
 #. I18N: ./data/gui/arenas.stkgui
@@ -252,12 +256,12 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:442
 msgid "Addons"
-msgstr ""
+msgstr "الإضافات"
 
 #. I18N: ./data/karts/adiumy/kart.xml
 #: data/po/gui_strings.h:780
 msgid "Adiumy"
-msgstr ""
+msgstr "آديُمي"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -270,7 +274,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:276
 #: src/states_screens/tracks_screen.cpp:215 data/po/gui_strings.h:215
 msgid "All"
-msgstr ""
+msgstr "الكل"
 
 #. I18N: ./data/grandprix/alltracks.grandprix
 #. I18N: ./data/gui/tracks.stkgui
@@ -279,50 +283,50 @@ msgstr ""
 #: data/po/gui_strings.h:164 data/po/gui_strings.h:659
 #: data/po/gui_strings.h:765
 msgid "All Tracks"
-msgstr ""
+msgstr "كل الميادين"
 
 #: src/states_screens/race_setup_screen.cpp:196
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
+msgstr "مسموح استخدام كل الضربات، فالتقط الأسلحة واستخدمها جيدًا!"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
 msgid "Amazonian Journey"
-msgstr ""
+msgstr "رحلة أمازونية"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:344
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr ""
+msgstr "المرساة - تبطئ العربة الأولى في السباق كثيرًا"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:287
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "الشخصيات متحركة: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:283
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "المناظر متحركة: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:290
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "تنعيم الحواف (يتطلب الإعادة): %s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
 #: data/po/gui_strings.h:591
 msgid "Apply new resolution"
-msgstr ""
+msgstr "طبِّق الميز الجديد"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:441
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr ""
+msgstr "هل أنت متأكد من أنك تود حذف هذه الإعدادات نهائيًا؟"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
@@ -333,19 +337,19 @@ msgstr ""
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:29
 msgid "Around the Lighthouse"
-msgstr ""
+msgstr "حول المنارة"
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr ""
+msgstr "آععع، لقد أنزل ال%s المرساة أيها القبطان!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 #: data/po/gui_strings.h:598
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "اجعله زر الهروب"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:167 data/po/gui_strings.h:768
@@ -360,13 +364,13 @@ msgstr ""
 #: src/states_screens/options_screen_ui.cpp:110
 #: src/states_screens/options_screen_video.cpp:80 data/po/gui_strings.h:465
 msgid "Audio"
-msgstr ""
+msgstr "الصوت"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:287
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "تجنب الموز!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:266
@@ -378,58 +382,58 @@ msgstr ""
 #. I18N: Addons
 #: src/states_screens/dialogs/addons_loading.cpp:205 data/po/gui_strings.h:184
 msgid "Back"
-msgstr ""
+msgstr "الخلف"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: data/po/gui_strings.h:609
 msgid "Back to Race"
-msgstr ""
+msgstr "عُد إلى السباق"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:504
 msgid "Back to device list"
-msgstr ""
+msgstr "عُد إلى قائمة الأجهزة"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:392
 msgid "Back to the main menu"
-msgstr ""
+msgstr "عٌد إلى القائمة الرئيسية"
 
 #: src/states_screens/race_result_gui.cpp:114
 msgid "Back to the menu"
-msgstr ""
+msgstr "عٌد إلى القائمة"
 
 #: src/items/powerup.cpp:83
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "موزة؟ صندوق؟ موزة؟ صندوق؟ موزة؟ صندوق؟"
 
 #. I18N: ./data/karts/beagle/kart.xml
 #: data/po/gui_strings.h:783
 msgid "Beagle"
-msgstr ""
+msgstr "بيغل"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:258
 msgid "Better luck next time!"
-msgstr ""
+msgstr "حظًا أوفر في المرة القادمة!"
 
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
 msgid "Bovine Barnyard"
-msgstr ""
+msgstr "حوش الأبقار"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:338
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
-msgstr ""
+msgstr "كرة البولنج - ترتد عن الجدران. إن كنت تنظر خلفك فستُرمى للخلف."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:183
 msgid "Brake"
-msgstr ""
+msgstr "المكبح"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:329
@@ -1928,4 +1932,5 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Benjamin Kerensa https://launchpad.net/~bkerensa"
+"  Benjamin Kerensa https://launchpad.net/~bkerensa\n"
+"  Majid Al-Dharrab https://launchpad.net/~majid"

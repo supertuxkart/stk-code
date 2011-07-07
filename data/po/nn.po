@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-06-12 12:39+0000\n"
+"PO-Revision-Date: 2011-06-14 11:32+0000\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <i18n-nn@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-06-13 23:32+0000\n"
-"X-Generator: Launchpad (build 13175)\n"
+"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 "Language: nn\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
@@ -67,7 +67,7 @@ msgstr "%1 vart tilhengjar av %0"
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr "%1 sendte ein sugekopp i fjeset på %0"
+msgstr "%1 sende ein sugekopp i fjeset på %0"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:77
@@ -423,7 +423,7 @@ msgstr "Beagle"
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:258
 msgid "Better luck next time!"
-msgstr "Betre lykke neste gang!"
+msgstr "Betre lukke neste gong!"
 
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
@@ -514,7 +514,7 @@ msgstr "Utfordringar"
 #. I18N: Title for challenges screen
 #: data/po/gui_strings.h:219
 msgid "Challenges : Trophy Room"
-msgstr "Utfordringar: troférom"
+msgstr "Utfordringar - troférom"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1098,7 +1098,7 @@ msgstr "La motstandarane bita i graset!"
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:278
 msgid "Me Only"
-msgstr "Bare meg"
+msgstr "Berre meg"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
@@ -2003,13 +2003,13 @@ msgstr "av"
 
 #: src/states_screens/dialogs/addons_loading.cpp:107
 msgid "featured"
-msgstr ""
+msgstr "Anbefalt"
 
 #. I18N: kart group name
 #: src/states_screens/kart_selection.cpp:897
 #: src/states_screens/tracks_screen.cpp:198
 msgid "standard"
-msgstr "standard"
+msgstr "Vanleg"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"

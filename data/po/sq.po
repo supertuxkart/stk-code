@@ -1,16 +1,16 @@
-# Icelandic translation for stk
-# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# Albanian translation for stk
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the stk package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2010-12-13 07:05+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: Icelandic <is@li.org>\n"
+"PO-Revision-Date: 2011-07-04 20:03+0000\n"
+"Last-Translator: Arianit Kukaj <Unknown>\n"
+"Language-Team: Albanian <sq@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,22 +20,22 @@ msgstr ""
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
 #: src/utils/translation.cpp:197
 msgid "   Is this a RTL language?"
-msgstr "   N"
+msgstr "   A është gjuhë RTL?"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%0 bites %1's bait"
-msgstr "%0 bítur á færi %1"
+msgstr "% bites %1 baiti"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:55
 msgid "%0 eats too much of %1's cake"
-msgstr "%0 borðar of mikið af kökum %1"
+msgstr "%0 hengre shume nga %1's tortat"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr "%0 fær fína grímu frá %1"
+msgstr "%0 merr mask zbukurimi nga %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:79
@@ -45,32 +45,32 @@ msgstr ""
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:57
 msgid "%0 is dubious of %1's cooking skills"
-msgstr "%0 er skeptískur á eldamennsku %1"
+msgstr "%0 eshte i dyshimët %1 per aftesit e gatimit"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:59
 msgid "%0 should not play with %1's lunch"
-msgstr "%0 ætti ekki að leika sér að málsverði %1"
+msgstr "%0 s`duhet luajtur me %1 drekën"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:75
 msgid "%0 will not go bowling with %1 again"
-msgstr ""
+msgstr "%0 nuk do te shkoj bouling %1 prapë"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 latches onto %0 for a free ride"
-msgstr "%1 húkkar sér far hjá %0"
+msgstr "%1 vendosie mbi %0 për një udhtim falas"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr "%1 hendir drullusokki framan í %0"
+msgstr "%1 bashkon %0 përball një kumarxhiu"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
 #: src/items/flyable.cpp:77
 msgid "%1 strikes %0"
-msgstr "%1 hittir %0"
+msgstr "%1 goditie %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:49
@@ -81,7 +81,7 @@ msgstr ""
 #: src/states_screens/dialogs/track_info_dialog.cpp:129
 #, c-format
 msgid "%i laps"
-msgstr "%i hringir"
+msgstr ""
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -106,7 +106,7 @@ msgstr ""
 #: src/modes/linear_world.cpp:374
 #, c-format
 msgid "%s by %s"
-msgstr "%s sett af %s"
+msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
 #: src/states_screens/addons_screen.cpp:132
@@ -117,7 +117,7 @@ msgstr ""
 #: src/items/powerup.cpp:49
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr "%s er mikill víkingur!"
+msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:95
@@ -128,7 +128,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:511
 #, c-format
 msgid "%s is ready"
-msgstr "%s er tilbúin/n"
+msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/flyable.cpp:97
@@ -145,7 +145,7 @@ msgstr ""
 #: src/items/flyable.cpp:99
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
-msgstr "%s ætti frekar að spila gúmmí-pílukast frekar en keilu"
+msgstr ""
 
 #: src/modes/world.cpp:791
 #, c-format
@@ -155,12 +155,12 @@ msgstr ""
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:267
 msgid "(Empty)"
-msgstr "(Tómt)"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:414
 msgid "(network play is not yet available)"
-msgstr "(netspil er ekki enn mögulegt)"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -1927,12 +1927,4 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Olafur Skorrdal https://launchpad.net/~skorrdal\n"
-"  STK-team https://launchpad.net/~stk"
-
-#~ msgid "%0 will not play bowling with %1 again"
-#~ msgstr "%0 mun ekki spila keilu með %1 aftur"
-
-#, c-format
-#~ msgid "   Keyboard %i"
-#~ msgstr "   Lyklaborð %i"
+"  Arianit Kukaj https://launchpad.net/~arking"

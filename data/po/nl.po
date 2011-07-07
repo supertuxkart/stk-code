@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-06-02 15:34+0000\n"
-"Last-Translator: Asciimonster <asciimonster@yahoo.co.uk>\n"
+"PO-Revision-Date: 2011-06-22 19:22+0000\n"
+"Last-Translator: Kaj-Ivar <kaj-ivar@vanderwijst.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-06-13 23:32+0000\n"
-"X-Generator: Launchpad (build 13175)\n"
+"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
 #: src/utils/translation.cpp:197
@@ -344,7 +344,7 @@ msgstr "Arena's"
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:29
 msgid "Around the Lighthouse"
-msgstr "Rondon de Vuurtoren"
+msgstr "Rondom de Vuurtoren"
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:47
@@ -1999,7 +1999,7 @@ msgstr "door"
 
 #: src/states_screens/dialogs/addons_loading.cpp:107
 msgid "featured"
-msgstr ""
+msgstr "aanbevolen"
 
 #. I18N: kart group name
 #: src/states_screens/kart_selection.cpp:897
@@ -2014,6 +2014,7 @@ msgstr ""
 "  Amy Smile Kerkhof https://launchpad.net/~amy\n"
 "  Asciimonster https://launchpad.net/~asciimonster-myrealbox\n"
 "  Foppe Benedictus https://launchpad.net/~foppe-benedictus\n"
+"  Kaj-Ivar https://launchpad.net/~kaj-ivar\n"
 "  Koen_VL https://launchpad.net/~koenvl\n"
 "  SIMON SUIJKERBUIJK https://launchpad.net/~sugarbellydj\n"
 "  STK-team https://launchpad.net/~stk\n"
