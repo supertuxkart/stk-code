@@ -103,9 +103,6 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
-// FIXME JH: this is not necessary anymore,
-// since registering the gui with the state manager 
-// does the same.        pause(RESULT_DISPLAY_PHASE);
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
         network_manager->sendRaceResults();
 }   // terminateRace
@@ -130,8 +127,17 @@ void WorldStatus::update(const float dt)
                 m_track_intro_sound->play();
             return;
         case TRACK_INTRO_PHASE:
-            if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING)
+            m_auxiliary_timer += dt;
+            // Work around a bug that occurred on linux once:
+            // the sfx_manager kept on reporting that it is playing,
+            // while it was not - so STK would never reach the ready
+            // ... phase. Since the sound effect is about 3 seconds
+            // long, we use the aux timer to force the next phase
+            // after 3.5 seconds.
+            if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
+	        && m_auxiliary_timer<3.5f)
                 return;
+            m_auxiliary_timer = 0.0f;
             m_prestart_sound->play();
             m_phase = READY_PHASE;
             for(unsigned int i=0; i<World::getWorld()->getNumKarts(); i++)
