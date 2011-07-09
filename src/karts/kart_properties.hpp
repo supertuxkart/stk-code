@@ -334,7 +334,7 @@ public:
       */
     const wchar_t* getName() const {return translations->w_gettext(m_name.c_str()); }
 
-	const std::string getNonTranslatedName() const {return m_name;}
+    const std::string getNonTranslatedName() const {return m_name;}
 
     /** Returns the internal identifier of this kart. */
     const std::string& getIdent      () const {return m_ident;                }
