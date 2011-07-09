@@ -294,6 +294,7 @@
 		95757211134F5B890037747B /* CGUIEditBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9575720F134F5B890037747B /* CGUIEditBox.cpp */; };
 		9576460712BAD1CF00DB80C7 /* tutorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460312BAD1CF00DB80C7 /* tutorial.cpp */; };
 		9576460812BAD1CF00DB80C7 /* tutorial_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */; };
+		957899B813C8E05F007AA5A3 /* profiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957899B613C8E05F007AA5A3 /* profiler.cpp */; };
 		957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957ED47E1163FF18002AB42C /* ai_base_controller.cpp */; };
 		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
 		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
@@ -1032,6 +1033,8 @@
 		9576460412BAD1CF00DB80C7 /* tutorial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial.hpp; path = ../../tutorial/tutorial.hpp; sourceTree = SOURCE_ROOT; };
 		9576460512BAD1CF00DB80C7 /* tutorial_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_manager.cpp; path = ../../tutorial/tutorial_manager.cpp; sourceTree = SOURCE_ROOT; };
 		9576460612BAD1CF00DB80C7 /* tutorial_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_manager.hpp; path = ../../tutorial/tutorial_manager.hpp; sourceTree = SOURCE_ROOT; };
+		957899B613C8E05F007AA5A3 /* profiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = profiler.cpp; path = ../../utils/profiler.cpp; sourceTree = SOURCE_ROOT; };
+		957899B713C8E05F007AA5A3 /* profiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = profiler.hpp; path = ../../utils/profiler.hpp; sourceTree = SOURCE_ROOT; };
 		957BF97811EA96720018118A /* race_gui_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui_base.hpp; path = ../../states_screens/race_gui_base.hpp; sourceTree = SOURCE_ROOT; };
 		957ED47E1163FF18002AB42C /* ai_base_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ai_base_controller.cpp; path = ../../karts/controller/ai_base_controller.cpp; sourceTree = SOURCE_ROOT; };
 		957ED47F1163FF18002AB42C /* ai_base_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ai_base_controller.hpp; path = ../../karts/controller/ai_base_controller.hpp; sourceTree = SOURCE_ROOT; };
@@ -2609,6 +2612,8 @@
 				9553823910FD4FEC00737979 /* constants.cpp */,
 				95C2B1E00F296546000D3E5D /* constants.hpp */,
 				9540E2570FD5F8FD002985B8 /* no_copy.hpp */,
+				957899B613C8E05F007AA5A3 /* profiler.cpp */,
+				957899B713C8E05F007AA5A3 /* profiler.hpp */,
 				9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */,
 				95C2B1E20F296546000D3E5D /* random_generator.cpp */,
 				95C2B1E30F296546000D3E5D /* random_generator.hpp */,
@@ -3108,6 +3113,7 @@
 				9584B30D137CAC12008565D7 /* news_manager.cpp in Sources */,
 				9584B30E137CAC12008565D7 /* request.cpp in Sources */,
 				959DE0C613C297B90068ED78 /* swatter.cpp in Sources */,
+				957899B813C8E05F007AA5A3 /* profiler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
