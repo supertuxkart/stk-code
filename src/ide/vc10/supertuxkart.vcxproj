@@ -165,6 +165,7 @@
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
+    <ClCompile Include="..\..\utils\profiler.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
     <ClCompile Include="..\..\utils\translation.cpp" />
@@ -392,6 +393,7 @@
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
+    <ClInclude Include="..\..\utils\profiler.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />
     <ClInclude Include="..\..\utils\random_generator.hpp" />
     <ClInclude Include="..\..\utils\string_utils.hpp" />

@@ -780,6 +780,9 @@
     <ClCompile Include="..\..\items\swatter.cpp">
       <Filter>Quelldateien\items</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\utils\profiler.cpp">
+      <Filter>Quelldateien\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1477,6 +1480,9 @@
     </ClInclude>
     <ClInclude Include="..\..\items\swatter.hpp">
       <Filter>Headerdateien\items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\profiler.hpp">
+      <Filter>Headerdateien\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
