@@ -304,6 +304,8 @@ private:
 
     void  load              (const std::string &filename,
                              const std::string &node);
+	/** If the kart is supposed to have random wheel rotation at start. */
+	bool m_has_rand_wheels;
 
 public:
           KartProperties    (const std::string &filename="");
@@ -630,6 +632,7 @@ public:
     /** Returns how long it takes for the swatter to swat at an item. */
     float getSwatterItemAnimationTime() const 
                                       {return m_swatter_item_animation_time; }
+	bool hasRandomWheels() const { return m_has_rand_wheels; }
 };   // KartProperties
 
 #endif
