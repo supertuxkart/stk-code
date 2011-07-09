@@ -439,6 +439,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\profiler.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\random_generator.cpp"
 					>
 				</File>
@@ -1442,6 +1446,10 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\no_copy.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\profiler.hpp"
 					>
 				</File>
 				<File
