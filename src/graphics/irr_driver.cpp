@@ -39,6 +39,7 @@
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/profiler.hpp"
 
 #include <irrlicht.h>
 
@@ -1264,6 +1265,10 @@ void IrrDriver::update(float dt)
             // Either render the gui, or the global elements of the race gui.
             GUIEngine::render(dt);
         }
+        
+        // Render the profiler
+        if(UserConfigParams::m_profiler_enabled)
+            profiler.draw();
 
     }   // just to mark the begin/end scene block
     
@@ -1329,18 +1334,18 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
     //      can act upon it
     switch (event.EventType)
     {
-        case irr::EET_LOG_TEXT_EVENT:
+    case irr::EET_LOG_TEXT_EVENT:
+    {
+        // Ignore 'normal' messages
+        if (event.LogEvent.Level > 1)
         {
-            // Ignore 'normal' messages
-            if (event.LogEvent.Level > 1)
-            {
-                printf("[IrrDriver Temp Logger] Level %d: %s\n",
-                       event.LogEvent.Level,event.LogEvent.Text);
-            }
-            return true;
+            printf("[IrrDriver Temp Logger] Level %d: %s\n",
+                   event.LogEvent.Level,event.LogEvent.Text);
         }
-        default:
-            return false;
+        return true;
+    }
+    default:
+        return false;
     }   // switch
     
     return false;

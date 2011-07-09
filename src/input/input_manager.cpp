@@ -198,6 +198,11 @@ void InputManager::handleStaticAction(int key, int value)
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
             }
+            break;
+            
+        case KEY_F10:
+            if(world) history->Save();
+            break;
             
         case KEY_F11:
             if (UserConfigParams::m_artist_debug_mode && value && 
@@ -215,8 +220,10 @@ void InputManager::handleStaticAction(int key, int value)
                 UserConfigParams::m_display_fps = 
                     !UserConfigParams::m_display_fps;
             break;
-        case KEY_F10:
-            if(world) history->Save();
+            
+        case KEY_KEY_P:
+            if (UserConfigParams::m_artist_debug_mode && value && control_is_pressed)
+                UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
             break;
         default:
             break;

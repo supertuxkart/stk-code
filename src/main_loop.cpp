@@ -32,6 +32,7 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/profiler.hpp"
 
 MainLoop* main_loop = 0;
 
@@ -139,9 +140,19 @@ void MainLoop::run()
         // since the GUI engine is no more to be called then.
         if (!m_abort)
         {
+            PROFILER_PUSH_CPU_MARKER("Music manager update", 0x7F, 0x00, 0x00);
             music_manager->update(dt);
+            PROFILER_POP_CPU_MARKER();
+            
+            PROFILER_PUSH_CPU_MARKER("Input manager update", 0x00, 0x7F, 0x00);
             input_manager->update(dt);
+            PROFILER_POP_CPU_MARKER();
+            
+            PROFILER_PUSH_CPU_MARKER("Music manager update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
+            PROFILER_POP_CPU_MARKER();
+            
+            PROFILER_SYNC_FRAME();
         }
     }  // while !m_exit
 

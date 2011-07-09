@@ -40,8 +40,8 @@
 	<File name="../../network/message.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2505" topLine="68" />
 	</File>
-	<File name="../../race/highscores.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="3826" topLine="92" />
+	<File name="../../race/highscores.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="3853" topLine="74" />
 	</File>
 	<File name="../../states_screens/challenges.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="2262" topLine="33" />

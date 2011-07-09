@@ -134,6 +134,10 @@ bool EventHandler::OnEvent (const SEvent &event)
              event.EventType == EET_KEY_INPUT_EVENT   ||
              event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
+        // Remember the mouse position
+        m_mouse_pos.X = event.MouseInput.X;
+        m_mouse_pos.Y = event.MouseInput.Y;
+
         // FIXME? it may be a bit unclean that all input events go trough the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
         return blockPropagation == EVENT_BLOCK;

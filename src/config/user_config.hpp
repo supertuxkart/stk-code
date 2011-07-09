@@ -366,7 +366,7 @@ namespace UserConfigParams
 
     /** True if follow-the-leader debug information should be printed. */
     PARAM_PREFIX bool                       m_ftl_debug    PARAM_DEFAULT( false );
-
+    
     /** True if currently developed tutorial debugging is enabled. */
     PARAM_PREFIX bool                       m_tutorial_debug    PARAM_DEFAULT( false );
 
@@ -380,6 +380,9 @@ namespace UserConfigParams
 
     /** True to test funky ambient/diffuse/specularity in RGB & all anisotropic */
     PARAM_PREFIX bool                       m_rendering_debug   PARAM_DEFAULT( false );
+    
+    /** True if graphical profiler should be displayed */
+    PARAM_PREFIX bool                       m_profiler_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 

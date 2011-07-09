@@ -436,6 +436,8 @@ supertuxkart_SOURCES = \
  utils/constants.hpp \
  utils/constants.cpp \
  utils/no_copy.hpp \
+ utils/profiler.cpp \
+ utils/profiler.hpp \
  utils/ptr_vector.hpp \
  utils/random_generator.cpp \
  utils/random_generator.hpp \

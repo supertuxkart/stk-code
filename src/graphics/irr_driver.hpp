@@ -89,7 +89,7 @@ private:
     video::E_DRIVER_TYPE  getEngineDriverType(int index);
     
     /** Whether the mouse cursor is currently shown */
-    bool m_pointer_shown;
+    bool                  m_pointer_shown;
     
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
@@ -173,6 +173,7 @@ public:
     void                  showPointer();
     void                  hidePointer();
     bool                  isPointerShown() const { return m_pointer_shown; }
+    
     void                  printRenderStats();
     /** Returns the current real time, which might not be 0 at start of the
      *  application. Value in msec.

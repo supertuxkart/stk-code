@@ -18,6 +18,7 @@
 #ifndef HEADER_EVENT_HANDLER_HPP
 #define HEADER_EVENT_HANDLER_HPP
 
+#include <vector2d.h>
 #include <IEventReceiver.h>
 #include "input/input.hpp"
 
@@ -65,6 +66,9 @@ namespace GUIEngine
           */
         void sendEventToUser(Widget* widget, std::string& name, const int playerID);
         
+        /** Last position of the mouse cursor */
+        irr::core::vector2di     m_mouse_pos;
+        
     public:
         EventHandler();
         ~EventHandler();
@@ -82,6 +86,9 @@ namespace GUIEngine
          */
         void processGUIAction(const PlayerAction action, int deviceID, const unsigned int value,
                               Input::InputType type, const int playerID);
+        
+        /** Get the mouse position */
+        const irr::core::vector2di& getMousePos() const { return m_mouse_pos; }
         
         /** singleton access */
         static EventHandler* get();
