@@ -430,6 +430,7 @@ public:
     /** Returns if the kart is currently being squashed. */
     bool           isSquashed() const { return m_squash_time >0; }
     // ------------------------------------------------------------------------
+	bool		   isWheeless() const {return m_kart_model->getWheelModel(0)==NULL;}
 };   // Kart
 
 

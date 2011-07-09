@@ -1744,7 +1744,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     createPhysics();
 
     // Attach Particle System
-    if (UserConfigParams::m_graphical_effects)
+	
+    if (UserConfigParams::m_graphical_effects && !isWheeless())
     {
         try
         {
@@ -1761,6 +1762,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
             std::cerr << "[Kart::loadData] " << e.what() << std::endl;
         }
     }
+	
     
     if (type == RaceManager::KT_PLAYER && UserConfigParams::m_weather_effects &&
         track->getSkyParticles() != NULL)

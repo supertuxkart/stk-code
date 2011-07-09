@@ -80,7 +80,7 @@ void SkidMarks::reset()
 void SkidMarks::update(float dt)
 {
     //if the kart is gnu, then dont skid because he floats!
-    if (m_kart.getKartProperties()->getNonTranslatedName() != "Gnu") {
+    if (m_kart.isWheeless() == false) {
         float f = dt/stk_config->m_skid_fadeout_time*m_start_alpha;
         for(unsigned int i=0; i<m_left.size(); i++)
         {
