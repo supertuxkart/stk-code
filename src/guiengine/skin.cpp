@@ -738,6 +738,12 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     /* tab-bar ribbons */
     if (type == RIBBON_TABS)
     {
+        video::SMaterial& material2D = irr_driver->getVideoDriver()->getMaterial2D();
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = false;
+        }
+        
         const bool mouseIn = rect.isPointInside(irr_driver->getDevice()->getCursorControl()->getPosition());
         
         BoxRenderParams* params;
@@ -766,7 +772,10 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         
         drawBoxFromStretchableTexture(widget, rect2, *params, parentRibbon->m_deactivated || widget->m_deactivated);
         
-        
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = true;
+        }
     }
     /* icon ribbons */
     else
