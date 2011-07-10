@@ -1204,7 +1204,10 @@ void IrrDriver::update(float dt)
                                    true, video::SColor(255,100,101,140));
     }
 
-    {   // Just to mark the begin/end scene block
+    {
+        PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
+        
+        // Just to mark the begin/end scene block
         GUIEngine::GameState state = StateManager::get()->getGameState();
         if (state != GUIEngine::GAME)
         {
@@ -1216,6 +1219,8 @@ void IrrDriver::update(float dt)
                 widget->update(dt);
             }
         }
+        
+        PROFILER_POP_CPU_MARKER();
 
         if (inRace)
         {
@@ -1227,8 +1232,17 @@ void IrrDriver::update(float dt)
                 Kart *kart=world->getKart(i);
                 if(kart->getCamera()) 
                 {
+                    {
+                        char marker_name[100];
+                        sprintf(marker_name, "drawAll() for kart %d", i);
+                        PROFILER_PUSH_CPU_MARKER(marker_name, (i+1)*60, 0x00, 0x00);
+                    }
+                            
                     kart->getCamera()->activate();
                     m_scene_manager->drawAll();
+                    
+                    PROFILER_POP_CPU_MARKER();
+                    
                     // Note that drawAll must be called before rendering
                     // the bullet debug view, since otherwise the camera
                     // is not set up properly. This is only used for 
@@ -1248,7 +1262,17 @@ void IrrDriver::update(float dt)
             {
                 Kart *kart = world->getKart(i);
                 if(kart->getCamera())
+                {
+                    {
+                        char marker_name[100];
+                        sprintf(marker_name, "renderPlayerView() for kart %d", i);
+                        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
+                    }
+                    
                     rg->renderPlayerView(kart);
+                    
+                    PROFILER_POP_CPU_MARKER();
+                }
             }  // for i<getNumKarts
         }
         else

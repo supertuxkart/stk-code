@@ -31,6 +31,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/profiler.hpp"
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -137,6 +138,10 @@ bool EventHandler::OnEvent (const SEvent &event)
         // Remember the mouse position
         m_mouse_pos.X = event.MouseInput.X;
         m_mouse_pos.Y = event.MouseInput.Y;
+        
+        // Notify the profiler
+        if(event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP && UserConfigParams::m_profiler_enabled)
+            profiler.onClick(m_mouse_pos);
 
         // FIXME? it may be a bit unclean that all input events go trough the gui module
         const EventPropagation blockPropagation = input_manager->input(event);

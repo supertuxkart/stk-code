@@ -148,7 +148,7 @@ void MainLoop::run()
             input_manager->update(dt);
             PROFILER_POP_CPU_MARKER();
             
-            PROFILER_PUSH_CPU_MARKER("Music manager update", 0x00, 0x00, 0x7F);
+            PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();
             

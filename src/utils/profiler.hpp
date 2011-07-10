@@ -44,7 +44,7 @@ using namespace irr;
   */
 class Profiler
 {
-public:
+private:
     struct Marker
     {
         double  start;  // Times of start and end, in milliseconds,
@@ -70,15 +70,27 @@ public:
 
     struct ThreadInfo
     {
-        MarkerList	markers_done[2];
-        MarkerStack	markers_stack[2];
+        MarkerList   markers_done[2];
+        MarkerStack  markers_stack[2];
     };
 
     typedef	std::vector<ThreadInfo>	ThreadInfoList;
 
-    ThreadInfoList  thread_infos;
-    int             write_id;
-    double          time_last_sync;
+    ThreadInfoList  m_thread_infos;
+    int             m_write_id;
+    double          m_time_last_sync;
+    double          m_time_between_sync;
+    
+    // Handling freeze/unfreeze by clicking on the display
+    enum FreezeState
+    {
+        UNFROZEN,
+        WAITING_FOR_FREEZE,
+        FROZEN,
+        WAITING_FOR_UNFREEZE,
+    };
+    
+    FreezeState     m_freeze_state;
     
 public:
     Profiler();
@@ -89,10 +101,12 @@ public:
     void    synchronizeFrame();
 
     void    draw();
+    
+    void    onClick(const core::vector2di& mouse_pos);
 
 protected:
     // TODO: detect on which thread this is called to support multithreading
-    ThreadInfo& getThreadInfo() { return thread_infos[0];	}
+    ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
     void        drawBackground();
 };
 
