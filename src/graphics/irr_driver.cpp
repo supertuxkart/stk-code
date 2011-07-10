@@ -1232,11 +1232,13 @@ void IrrDriver::update(float dt)
                 Kart *kart=world->getKart(i);
                 if(kart->getCamera()) 
                 {
+                    #ifdef ENABLE_PROFILER
                     {
                         std::ostringstream oss;
                         oss << "drawAll() for kart " << i << std::flush;
                         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60, 0x00, 0x00);
                     }
+                    #endif
                             
                     kart->getCamera()->activate();
                     m_scene_manager->drawAll();
@@ -1292,7 +1294,9 @@ void IrrDriver::update(float dt)
         
         // Render the profiler
         if(UserConfigParams::m_profiler_enabled)
-            profiler.draw();
+        {
+            PROFILER_DRAW();
+        }
 
     }   // just to mark the begin/end scene block
     

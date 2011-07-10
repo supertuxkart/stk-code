@@ -27,14 +27,26 @@
 class Profiler;
 extern Profiler profiler;
 
-#define PROFILER_PUSH_CPU_MARKER(name, r, g, b)	\
-    profiler.pushCpuMarker(name, video::SColor(0xFF, r, g, b))
+#define ENABLE_PROFILER
 
-#define PROFILER_POP_CPU_MARKER()	\
-    profiler.popCpuMarker()
+#ifdef ENABLE_PROFILER
+    #define PROFILER_PUSH_CPU_MARKER(name, r, g, b) \
+        profiler.pushCpuMarker(name, video::SColor(0xFF, r, g, b))
 
-#define PROFILER_SYNC_FRAME()   \
-    profiler.synchronizeFrame()
+    #define PROFILER_POP_CPU_MARKER()  \
+        profiler.popCpuMarker()
+    
+    #define PROFILER_SYNC_FRAME()   \
+        profiler.synchronizeFrame()
+    
+    #define PROFILER_DRAW() \
+        profiler.draw()
+#else
+    #define PROFILER_PUSH_CPU_MARKER(name, r, g, b)
+    #define PROFILER_POP_CPU_MARKER()
+    #define PROFILER_SYNC_FRAME()
+    #define PROFILER_DRAW()
+#endif
 
 using namespace irr;
 

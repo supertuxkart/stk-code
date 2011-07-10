@@ -53,6 +53,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/profiler.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
@@ -580,6 +581,8 @@ void World::updateWorld(float dt)
  */
 void World::update(float dt)
 {
+    PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
+    
 #if MEASURE_FPS
     static float time = 0.0f;
     time += dt;
@@ -610,6 +613,8 @@ void World::update(float dt)
     }
 
     projectile_manager->update(dt);
+    
+    PROFILER_POP_CPU_MARKER();
 }   // update
 
 // ----------------------------------------------------------------------------
