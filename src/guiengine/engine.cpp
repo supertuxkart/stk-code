@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+namespace GUIEngine
+{
 /**
  
  
@@ -92,9 +94,9 @@
  
  This section describes the widgets you can use in STK's GUI XML files. The 
  upper-case name starting with WTYPE_* is the internal name of the widget  
- (see the GUIEngine::WidgetType enum).
+ (see the WidgetType enum).
  
- 
+ \n
  \subsection widget1 WTYPE_RIBBON
  <em> Names in XML files: </em> \c "ribbon", \c "buttonbar", \c "tabs" 
  
@@ -478,15 +480,32 @@
  from GUIEngine::Screen, passing the name of the XML file to the constructor 
  of the base class. The derived class will most notably be used for event 
  callbacks, to allowcreating interactive menus. The derived class must also 
- implement the GUIEngine::Screen::init and GUIEngine::Screen::tearDown methods,
+ implement the Screen::init and Screen::tearDown methods,
  that will be called, respectively, when a menu is entered/left. For simple 
  menus, it is not unexpected that those methods do nothing. For init and
  tearDown the corresponding function in Screen must be called. Note that init
  is called after the irrlicht elements have been added on screen; if you wish
- to alter elements BEFORE they are actually added, use 'GUIEngine::Screen::loadedFromFile'.
+ to alter elements BEFORE they are actually added, use either
+ Screen::loadedFromFile or Screen::beforeAddingWidget ; the
+ difference is that the first is called once only upon loading, whereas the second
+ is called every time the menu is visited.
  
- GUIEngine::Widget::m_properties contains all the widget properties as loaded
- from the XML file. They are generally only read from the GUIEngine::Widget::add
+ \n
+ Summary of callbacks, in order :
+ 
+ \li (Load the Screen from file : Screen::loadFromFile is called automatically
+      the first time you reference this screen through the StateManager)
+ \li Screen::loadedFromFile is called (implement it if you need it)
+ \li (Ask to visit the screen through the StateManager)
+ \li Screen::beforeAddingWidget (implement it if you need it)
+ \li Widget::add is called automatically on each Widget of the screen
+ \li Screen::init (implement it if you need it)
+ \li (Ask to leave the Screen through the StateManager)
+ \li Screen::tearDown (implement it if you need it)
+ \li Widget::elementRemoved is called automatically on each Widget of the screen
+ 
+ Widget::m_properties contains all the widget properties as loaded
+ from the XML file. They are generally only read from the Widget::add
  method, so if you alter a property after 'add()' was called it will not appear
  on screen.
  
@@ -495,7 +514,7 @@
  the same screen is visited several times.
  
  Note that the same instance of your object may be unloaded then loaded back 
- later. It is thus important to do set-up in the 'GUIEngine::Screen::loadedFromFile'
+ later. It is thus important to do set-up in the Screen::loadedFromFile
  callback rather than in the constructor (after the creation of Screen object, it
  may be unloaded then loaded back at will, this is why it's important to not rely
  on the constructor to perform set-up).
@@ -504,10 +523,10 @@
  a Screen will only result in dangling pointers in the GUIEngine. Instead, let
  the GUIEngine do the cleanup itself on shutdown, or on e.g. resolution change.
  
- You can also explore the various methods in GUIEngine::Screen to discover 
+ You can also explore the various methods in Screen to discover 
  more optional callbacks you can use.
  
- You can also create dialogs by deriving from GUIEngine::ModalDialog in a very
+ You can also create dialogs by deriving from ModalDialog in a very
  similar way.
  
  \n
@@ -582,6 +601,7 @@
  
  
  */
+}
 
 #include "guiengine/engine.hpp"
 
