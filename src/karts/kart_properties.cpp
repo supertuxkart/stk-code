@@ -239,7 +239,7 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("groups",            &m_groups           );
 
-	root->get("RandomWheelRot",    &m_has_rand_wheels   );
+	root->get("random-wheel-rot",    &m_has_rand_wheels   );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
