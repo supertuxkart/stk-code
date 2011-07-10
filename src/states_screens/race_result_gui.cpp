@@ -688,18 +688,22 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         current_x += m_width_all_points + m_width_column_space;
     }
     
-    if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
+    if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+        m_animation_state == RR_RACE_RESULT)
     {
-        current_x += 20;
-        
-        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        
-        core::stringw message = (m_highscore_rank == 1 ? _("You topped the highscore list!") : _("New highscore!"));
-        
-        GUIEngine::getSmallFont()->draw(message.c_str(), dest_rect, video::SColor(255,255,166,0),
-                                        false, false, NULL, true /* ignoreRTL */);
-        
-        //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
+        if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
+        {
+            current_x += 20;
+            
+            core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
+            
+            core::stringw message = (m_highscore_rank == 1 ? _("You topped the highscore list!") : _("New highscore!"));
+            
+            GUIEngine::getSmallFont()->draw(message.c_str(), dest_rect, video::SColor(255,255,166,0),
+                                            false, false, NULL, true /* ignoreRTL */);
+            
+            //printf("==== Highscore by %s ====\n", core::stringc(m_highscore_player->getProfile()->getName().c_str()).c_str());
+        }
     }
     
 }   // displayOneEntry
