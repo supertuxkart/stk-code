@@ -208,6 +208,8 @@ namespace GUIEngine
           * \param proportion A column with proportion 2 will be twice as large as a column with proportion 1
           */
         void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
+        
+        void clearColumns() { m_header.clear(); }
     };
 }
 

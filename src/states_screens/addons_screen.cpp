@@ -61,12 +61,21 @@ void AddonsScreen::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon5);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
     
-    GUIEngine::ListWidget* w_list = 
-        getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->addColumn( _("Add-on name"), 2 );
-    w_list->addColumn( _("Updated date"), 1 );
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
 }   // loadedFromFile
+
+
+// ----------------------------------------------------------------------------
+
+void AddonsScreen::beforeAddingWidget()
+{
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
+    assert(w_list != NULL);
+    w_list->clearColumns();
+    w_list->addColumn( _("Add-on name"), 2 );
+    w_list->addColumn( _("Updated date"), 1 );
+}
 
 // ----------------------------------------------------------------------------
 
