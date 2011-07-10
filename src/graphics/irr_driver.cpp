@@ -1233,9 +1233,9 @@ void IrrDriver::update(float dt)
                 if(kart->getCamera()) 
                 {
                     {
-                        char marker_name[100];
-                        sprintf(marker_name, "drawAll() for kart %d", i);
-                        PROFILER_PUSH_CPU_MARKER(marker_name, (i+1)*60, 0x00, 0x00);
+                        std::ostringstream oss;
+                        oss << "drawAll() for kart " << i << std::flush;
+                        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60, 0x00, 0x00);
                     }
                             
                     kart->getCamera()->activate();

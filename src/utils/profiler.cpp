@@ -22,6 +22,7 @@
 #include "guiengine/scalable_font.hpp"
 #include <assert.h>
 #include <stack>
+#include <sstream>
 
 Profiler profiler;
 
@@ -257,7 +258,9 @@ void Profiler::draw()
         while(!hovered_markers.empty())
         {
             Marker& m = hovered_markers.top();
-            text += std::string(m.name + "\n").c_str();
+            std::ostringstream oss;
+            oss << m.name << " [" << (m.end-m.start) << " ms]" << std::endl;
+            text += oss.str().c_str();
             hovered_markers.pop();
         }
         font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
