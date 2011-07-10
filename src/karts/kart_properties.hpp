@@ -97,6 +97,12 @@ private:
                                        *   character select screen. */
     std::string m_shadow_file;        /**< Filename of the image file that
                                        *   contains the shadow for this kart.*/
+    float m_shadow_scale;             /**< Scale of the shadow plane
+                                       *   for this kart.*/
+    float m_shadow_x_offset;          /**< X offset of the shadow plane
+                                       *   for this kart.*/
+    float m_shadow_y_offset;          /**< Y offset of the shadow plane
+                                       *   for this kart.*/
     video::ITexture *m_shadow_texture;/**< The texture with the shadow. */
     video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
@@ -568,7 +574,19 @@ public:
     /** Returns the maximum factor by which the steering angle
      *  can be increased. */
     float getMaxSkid                () const {return m_skid_max;              }
-
+    
+    /** Returns the scale factor by which the shadow plane
+     *  had to be set. */
+    float getShadowScale            () const {return m_shadow_scale;          }
+    
+    /** Returns the scale factor by which the shadow plane
+     *  had to be set. */
+    float getShadowXOffset          () const {return m_shadow_x_offset;       }
+    
+    /** Returns the scale factor by which the shadow plane
+     *  had to be set. */
+    float getShadowYOffset          () const {return m_shadow_y_offset;       }
+    
     /** Returns the factor by which m_skidding is multiplied when the kart is
      *  skidding to increase it to the maximum. */
     float getSkidIncrease           () const {return m_skid_increase;         }

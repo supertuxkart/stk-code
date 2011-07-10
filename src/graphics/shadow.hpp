@@ -48,7 +48,8 @@ private:
     scene::ISceneNode  *m_parent_kart_node;
 public:
          Shadow(video::ITexture *texture,
-                scene::ISceneNode *node);
+                scene::ISceneNode *node,
+                float scale, float xOffset, float yOffset);
         ~Shadow();
     void enableShadow();
     void disableShadow();

@@ -50,6 +50,9 @@ KartProperties::KartProperties(const std::string &filename)
     m_ident         = "NONAME";
     m_icon_file     = "";
     m_shadow_file   = "";
+    m_shadow_scale    = 1.0f;
+    m_shadow_x_offset = 0.0f;
+    m_shadow_y_offset = 0.0f;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -240,6 +243,10 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("groups",            &m_groups           );
 
 	root->get("random-wheel-rot",    &m_has_rand_wheels   );
+
+    root->get("shadow-scale",      &m_shadow_scale      );
+    root->get("shadow-x-offset",   &m_shadow_x_offset   );
+    root->get("shadow-y-offset",   &m_shadow_y_offset   );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);

@@ -24,7 +24,7 @@
 #include <IMeshSceneNode.h>
 #include <ISceneNode.h>
 
-Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node)
+Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, float scale = 1.0, float xOffset = 0.0, float yOffset = 0.0)
 {
     video::SMaterial m;
     m.setTexture(0, texture);
@@ -33,10 +33,10 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node)
     m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
     scene::IMeshBuffer *buffer = m_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* v=(video::S3DVertex*)buffer->getVertices();
-    v[0].Pos.X = -1.0f; v[0].Pos.Z =  1.0f; v[0].Pos.Y = 0.01f;
-    v[1].Pos.X =  1.0f; v[1].Pos.Z =  1.0f; v[1].Pos.Y = 0.01f;
-    v[2].Pos.X =  1.0f; v[2].Pos.Z = -1.0f; v[2].Pos.Y = 0.01f;
-    v[3].Pos.X = -1.0f; v[3].Pos.Z = -1.0f; v[3].Pos.Y = 0.01f;
+    v[0].Pos.X = -scale+xOffset; v[0].Pos.Z =  scale+yOffset; v[0].Pos.Y = 0.01f;
+    v[1].Pos.X =  scale+xOffset; v[1].Pos.Z =  scale+yOffset; v[1].Pos.Y = 0.01f;
+    v[2].Pos.X =  scale+xOffset; v[2].Pos.Z = -scale+yOffset; v[2].Pos.Y = 0.01f;
+    v[3].Pos.X = -scale+xOffset; v[3].Pos.Z = -scale+yOffset; v[3].Pos.Y = 0.01f;
     v[0].TCoords = core::vector2df(0,0);
     v[1].TCoords = core::vector2df(1,0);
     v[2].TCoords = core::vector2df(1,1);

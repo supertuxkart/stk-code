@@ -1807,7 +1807,10 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     }
     
     m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_node);
+                          m_node,
+                          m_kart_properties->getShadowScale(),
+                          m_kart_properties->getShadowXOffset(),
+                          m_kart_properties->getShadowYOffset());
 }   // loadData
 
 //-----------------------------------------------------------------------------
