@@ -150,8 +150,9 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             
             // Create player and associate player with device (FIXME: ask for player ident)
-            StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
-            
+            int id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+            input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(id) );
+
             // Set up race manager appropriately
             race_manager->setNumLocalPlayers(1);
             race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
