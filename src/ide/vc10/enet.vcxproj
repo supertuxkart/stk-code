@@ -10,6 +10,49 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\enet\include\enet\callbacks.h" />
+    <ClInclude Include="..\..\enet\include\enet\enet.h" />
+    <ClInclude Include="..\..\enet\include\enet\list.h" />
+    <ClInclude Include="..\..\enet\include\enet\protocol.h" />
+    <ClInclude Include="..\..\enet\include\enet\time.h" />
+    <ClInclude Include="..\..\enet\include\enet\types.h" />
+    <ClInclude Include="..\..\enet\include\enet\unix.h" />
+    <ClInclude Include="..\..\enet\include\enet\utility.h" />
+    <ClInclude Include="..\..\enet\include\enet\win32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\enet\aclocal.m4" />
+    <None Include="..\..\enet\ChangeLog" />
+    <None Include="..\..\enet\config.guess" />
+    <None Include="..\..\enet\config.sub" />
+    <None Include="..\..\enet\configure" />
+    <None Include="..\..\enet\configure.ac" />
+    <None Include="..\..\enet\depcomp" />
+    <None Include="..\..\enet\design.txt" />
+    <None Include="..\..\enet\Doxyfile" />
+    <None Include="..\..\enet\enet.dsp" />
+    <None Include="..\..\enet\enet_dll.cbp" />
+    <None Include="..\..\enet\install-sh" />
+    <None Include="..\..\enet\libenet.pc.in" />
+    <None Include="..\..\enet\LICENSE" />
+    <None Include="..\..\enet\ltmain.sh" />
+    <None Include="..\..\enet\Makefile.am" />
+    <None Include="..\..\enet\Makefile.in" />
+    <None Include="..\..\enet\missing" />
+    <None Include="..\..\enet\README" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\enet\callbacks.c" />
+    <ClCompile Include="..\..\enet\compress.c" />
+    <ClCompile Include="..\..\enet\host.c" />
+    <ClCompile Include="..\..\enet\list.c" />
+    <ClCompile Include="..\..\enet\packet.c" />
+    <ClCompile Include="..\..\enet\peer.c" />
+    <ClCompile Include="..\..\enet\protocol.c" />
+    <ClCompile Include="..\..\enet\unix.c" />
+    <ClCompile Include="..\..\enet\win32.c" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}</ProjectGuid>
     <RootNamespace>enet</RootNamespace>
@@ -73,28 +116,6 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\enet\callbacks.c" />
-    <ClCompile Include="..\..\enet\compress.c" />
-    <ClCompile Include="..\..\enet\host.c" />
-    <ClCompile Include="..\..\enet\list.c" />
-    <ClCompile Include="..\..\enet\packet.c" />
-    <ClCompile Include="..\..\enet\peer.c" />
-    <ClCompile Include="..\..\enet\protocol.c" />
-    <ClCompile Include="..\..\enet\unix.c" />
-    <ClCompile Include="..\..\enet\win32.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\enet\callbacks.h" />
-    <ClInclude Include="..\include\enet\enet.h" />
-    <ClInclude Include="..\include\enet\list.h" />
-    <ClInclude Include="..\include\enet\protocol.h" />
-    <ClInclude Include="..\include\enet\time.h" />
-    <ClInclude Include="..\include\enet\types.h" />
-    <ClInclude Include="..\include\enet\unix.h" />
-    <ClInclude Include="..\include\enet\utility.h" />
-    <ClInclude Include="..\include\enet\win32.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
