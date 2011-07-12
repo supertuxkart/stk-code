@@ -1,8 +1,8 @@
-noinst_LIBRARIES = libenet.a
-EXTRA_DIST = ChangeLog configure design.txt Doxyfile LICENSE tutorial.txt
-libenet_a_SOURCES = callbacks.c compress.c host.c list.c  packet.c peer.c \
-        protocol.c unix.c win32.c \
-        include/enet/types.h \
+pkgconfigdir = $(libdir)/pkgconfig
+nodist_pkgconfig_DATA = libenet.pc
+
+enetincludedir=$(includedir)/enet
+enetinclude_HEADERS = \
 	include/enet/callbacks.h \
 	include/enet/enet.h \
 	include/enet/list.h \
@@ -13,4 +13,10 @@ libenet_a_SOURCES = callbacks.c compress.c host.c list.c  packet.c peer.c \
 	include/enet/utility.h \
 	include/enet/win32.h
 
-AM_CPPFLAGS = -I$(srcdir)/include/
+lib_LTLIBRARIES = libenet.la
+libenet_la_SOURCES = callbacks.c compress.c host.c list.c packet.c peer.c protocol.c unix.c win32.c
+# see info '(libtool) Updating version info' before making a release
+libenet_la_LDFLAGS = $(AM_LDFLAGS) -version-info 1:3:0
+INCLUDES = -Iinclude
+
+ACLOCAL_AMFLAGS = -Im4

@@ -1,3 +1,14 @@
+ENet 1.3.3 (June 28, 2011):
+
+* fixed bug with simultaneous disconnects not dispatching events
+
+ENet 1.3.2 (May 31, 2011):
+
+* added support for unreliable packet fragmenting via the packet flag
+ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT
+* fixed regression in unreliable packet queuing
+* added check against received port to limit some forms of IP-spoofing
+
 ENet 1.3.1 (February 10, 2011):
 
 * fixed bug in tracking of reliable data in transit
@@ -20,6 +31,19 @@ field, saving 4 bytes per packet unless the checksum option is used
 Caveats: This version is not protocol compatible with the 1.2 series or 
 earlier. The enet_host_connect and enet_host_create API functions require
 supplying additional parameters.
+
+ENet 1.2.5 (June 28, 2011):
+
+* fixed bug with simultaneous disconnects not dispatching events
+
+ENet 1.2.4 (May 31, 2011):
+
+* fixed regression in unreliable packet queuing
+* added check against received port to limit some forms of IP-spoofing
+
+ENet 1.2.3 (February 10, 2011):
+
+* fixed bug in tracking reliable data in transit
 
 ENet 1.2.2 (June 5, 2010):
 

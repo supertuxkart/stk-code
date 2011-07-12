@@ -210,6 +210,7 @@ enet_host_connect (ENetHost * host, const ENetAddress * address, size_t channelC
         channel -> outgoingReliableSequenceNumber = 0;
         channel -> outgoingUnreliableSequenceNumber = 0;
         channel -> incomingReliableSequenceNumber = 0;
+        channel -> incomingUnreliableSequenceNumber = 0;
 
         enet_list_clear (& channel -> incomingReliableCommands);
         enet_list_clear (& channel -> incomingUnreliableCommands);
