@@ -127,6 +127,13 @@ void MainLoop::run()
 
         network_manager->update(dt);
 
+        printf("Num Clients: %i\n",network_manager->getNumClients());
+		
+		if (network_manager->getNumClients() == 1) {
+            printf("beginRSG in main\n");
+            network_manager->beginReadySetGoBarrier();
+		}
+
         if (World::getWorld())  // race is active if world exists
         {
             // Busy wait if race_manager is active (i.e. creating of world is done)
