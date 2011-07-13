@@ -1,5 +1,5 @@
 pkgconfigdir = $(libdir)/pkgconfig
-nodist_pkgconfig_DATA = libenet.pc
+#nodist_pkgconfig_DATA = libenet.pc
 
 enetincludedir=$(includedir)/enet
 enetinclude_HEADERS = \
