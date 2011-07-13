@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E0B8BE813CD220D00116B18 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E0B8BE413CD220A00116B18 /* fribidi.framework */; };
+		3E0B8BE913CD220D00116B18 /* IrrFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E0B8BE513CD220C00116B18 /* IrrFramework.framework */; };
+		3E0B8BEA13CD220D00116B18 /* Ogg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E0B8BE613CD220C00116B18 /* Ogg.framework */; };
+		3E0B8BEB13CD220D00116B18 /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E0B8BE713CD220D00116B18 /* Vorbis.framework */; };
 		95017B41124698C400C90D56 /* help_screen_4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95017B3F124698C400C90D56 /* help_screen_4.cpp */; };
 		9507E9B70FC1CCE900BD2B92 /* stk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9507E9B60FC1CCE900BD2B92 /* stk.icns */; };
-		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
-		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
 		950D448C118DEE3C006CFC41 /* CGUISpriteBank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950D448A118DEE3C006CFC41 /* CGUISpriteBank.cpp */; };
 		950D45D1118E040E006CFC41 /* options_screen_input2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950D45CF118E040E006CFC41 /* options_screen_input2.cpp */; };
 		9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9516B07C12629C4E005F9493 /* sfx_buffer.cpp */; };
@@ -53,7 +55,6 @@
 		9538A56012CD094200CE3220 /* addon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538A55E12CD094200CE3220 /* addon.cpp */; };
 		9538E2B912C25D6800172896 /* addons_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538E2B512C25D6800172896 /* addons_manager.cpp */; };
 		9538E2BA12C25D6800172896 /* network_http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9538E2B712C25D6800172896 /* network_http.cpp */; };
-		9538E2E912C2682B00172896 /* IrrFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9538E2E812C2682B00172896 /* IrrFramework.framework */; };
 		95395A77129DFE130079BCE7 /* message_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95395A75129DFE130079BCE7 /* message_dialog.cpp */; };
 		953A959D13367D6E00D86B4D /* options_screen_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953A959B13367D6E00D86B4D /* options_screen_ui.cpp */; };
 		953C304E12BEF384005BB4CD /* tutorial_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C304C12BEF384005BB4CD /* tutorial_data.cpp */; };
@@ -62,7 +63,6 @@
 		9542FD4C12D3E0D700C00366 /* particle_kind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FD4A12D3E0D700C00366 /* particle_kind.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
-		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
 		954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */; };
@@ -139,9 +139,7 @@
 		9551C8F90FC1B72500DB481B /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CA59F70F82FCB7003323DB /* physical_object.cpp */; };
 		9551C8FA0FC1B72500DB481B /* quad_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C357E0FC05BF400A48379 /* quad_set.cpp */; };
 		9551C8FB0FC1B72500DB481B /* quad_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C35800FC05BF400A48379 /* quad_graph.cpp */; };
-		9551C9F10FC1B7EE00DB481B /* Ogg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9551C9F20FC1B7EE00DB481B /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
-		9551C9F30FC1B7EE00DB481B /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
 		9551CBD10FC1BB7600DB481B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 950557640F6968BE0056E88C /* IOKit.framework */; };
 		9551CBD20FC1BB7600DB481B /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9505575F0F6968A50056E88C /* QuickTime.framework */; };
 		9551CBD30FC1BB7600DB481B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 950557570F6968860056E88C /* Carbon.framework */; };
@@ -273,7 +271,6 @@
 		9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87C119EF976009C558F /* options_screen_audio.cpp */; };
 		9556A881119EF976009C558F /* options_screen_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9556A87E119EF976009C558F /* options_screen_video.cpp */; };
 		955764E612FB67EF005CE479 /* btKartRaycast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955764E412FB67EF005CE479 /* btKartRaycast.cpp */; };
-		95591C4412A5E91E00FB1E95 /* fribidi.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		9559DE7F12FF777600350DE8 /* rain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9559DE7E12FF777600350DE8 /* rain.cpp */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
@@ -364,9 +361,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				95591C4412A5E91E00FB1E95 /* fribidi.framework in Copy frameworks */,
-				9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */,
-				9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */,
 				9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */,
 			);
 			name = "Copy frameworks";
@@ -375,6 +369,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3E0B8BE413CD220A00116B18 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = fribidi.framework; sourceTree = "<group>"; };
+		3E0B8BE513CD220C00116B18 /* IrrFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IrrFramework.framework; sourceTree = "<group>"; };
+		3E0B8BE613CD220C00116B18 /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Ogg.framework; sourceTree = "<group>"; };
+		3E0B8BE713CD220D00116B18 /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Vorbis.framework; sourceTree = "<group>"; };
 		95017B3F124698C400C90D56 /* help_screen_4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = help_screen_4.cpp; path = ../../states_screens/help_screen_4.cpp; sourceTree = SOURCE_ROOT; };
 		95017B40124698C400C90D56 /* help_screen_4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = help_screen_4.hpp; path = ../../states_screens/help_screen_4.hpp; sourceTree = SOURCE_ROOT; };
 		9505570E0F6963790056E88C /* file_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_manager.cpp; path = ../../io/file_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -470,7 +468,6 @@
 		9538E2B612C25D6800172896 /* addons_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_manager.hpp; path = ../../addons/addons_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9538E2B712C25D6800172896 /* network_http.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network_http.cpp; path = ../../addons/network_http.cpp; sourceTree = SOURCE_ROOT; };
 		9538E2B812C25D6800172896 /* network_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network_http.hpp; path = ../../addons/network_http.hpp; sourceTree = SOURCE_ROOT; };
-		9538E2E812C2682B00172896 /* IrrFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IrrFramework.framework; path = /Library/Frameworks/IrrFramework.framework; sourceTree = "<absolute>"; };
 		95395A75129DFE130079BCE7 /* message_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message_dialog.cpp; path = ../../states_screens/dialogs/message_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		95395A76129DFE130079BCE7 /* message_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = message_dialog.hpp; path = ../../states_screens/dialogs/message_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		953A959B13367D6E00D86B4D /* options_screen_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen_ui.cpp; path = ../../states_screens/options_screen_ui.cpp; sourceTree = SOURCE_ROOT; };
@@ -495,7 +492,6 @@
 		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
 		9545ABC911E3E38300D3C37A /* progress_bar_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = progress_bar_widget.hpp; path = ../../guiengine/widgets/progress_bar_widget.hpp; sourceTree = SOURCE_ROOT; };
-		954E486911B19C4100B1DF63 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = fribidi.framework; path = /Library/Frameworks/fribidi.framework; sourceTree = "<absolute>"; };
 		954E4C250FF98B6E0047FE3E /* animation_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_base.cpp; path = ../../animations/animation_base.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C260FF98B6E0047FE3E /* animation_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = animation_base.hpp; path = ../../animations/animation_base.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = billboard_animation.cpp; path = ../../animations/billboard_animation.cpp; sourceTree = SOURCE_ROOT; };
@@ -506,9 +502,7 @@
 		9551B26E11DC0D4D002DD140 /* addons_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_screen.hpp; path = ../../states_screens/addons_screen.hpp; sourceTree = SOURCE_ROOT; };
 		9551B27811DC0D6A002DD140 /* zip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = zip.cpp; path = ../../addons/zip.cpp; sourceTree = SOURCE_ROOT; };
 		9551B27911DC0D6A002DD140 /* zip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = zip.hpp; path = ../../addons/zip.hpp; sourceTree = SOURCE_ROOT; };
-		9551C7F90FC1B63C00DB481B /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = /Library/Frameworks/Ogg.framework; sourceTree = "<absolute>"; };
 		9551C7FA0FC1B63C00DB481B /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
-		9551C7FB0FC1B63C00DB481B /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		9551C8210FC1B6FF00DB481B /* SuperTuxKart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SuperTuxKart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9551C9F80FC1B87600DB481B /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -1328,11 +1322,11 @@
 				9551CBD50FC1BB7600DB481B /* GLUT.framework in Frameworks */,
 				9551CBD60FC1BB7600DB481B /* Cocoa.framework in Frameworks */,
 				9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */,
-				9551C9F10FC1B7EE00DB481B /* Ogg.framework in Frameworks */,
 				9551C9F20FC1B7EE00DB481B /* OpenAL.framework in Frameworks */,
-				9551C9F30FC1B7EE00DB481B /* Vorbis.framework in Frameworks */,
-				954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */,
-				9538E2E912C2682B00172896 /* IrrFramework.framework in Frameworks */,
+				3E0B8BE813CD220D00116B18 /* fribidi.framework in Frameworks */,
+				3E0B8BE913CD220D00116B18 /* IrrFramework.framework in Frameworks */,
+				3E0B8BEA13CD220D00116B18 /* Ogg.framework in Frameworks */,
+				3E0B8BEB13CD220D00116B18 /* Vorbis.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1365,12 +1359,12 @@
 		9513B40E0F0EDE80005D29F6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9538E2E812C2682B00172896 /* IrrFramework.framework */,
-				954E486911B19C4100B1DF63 /* fribidi.framework */,
+				3E0B8BE413CD220A00116B18 /* fribidi.framework */,
+				3E0B8BE513CD220C00116B18 /* IrrFramework.framework */,
+				3E0B8BE613CD220C00116B18 /* Ogg.framework */,
+				3E0B8BE713CD220D00116B18 /* Vorbis.framework */,
 				9551CBD90FC1BB9200DB481B /* AGL.framework */,
-				9551C7F90FC1B63C00DB481B /* Ogg.framework */,
 				9551C7FA0FC1B63C00DB481B /* OpenAL.framework */,
-				9551C7FB0FC1B63C00DB481B /* Vorbis.framework */,
 				950557640F6968BE0056E88C /* IOKit.framework */,
 				9505575F0F6968A50056E88C /* QuickTime.framework */,
 				950557570F6968860056E88C /* Carbon.framework */,
@@ -3132,7 +3126,7 @@
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
 				);
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -3149,7 +3143,7 @@
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
 				);
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3161,6 +3155,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -3210,6 +3209,11 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_LOCATION = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
 				GCC_DEBUGGING_SYMBOLS = used;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;

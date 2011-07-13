@@ -25,7 +25,7 @@ extern "C"
 
 #define ENET_VERSION_MAJOR 1
 #define ENET_VERSION_MINOR 3
-#define ENET_VERSION_PATCH 1
+#define ENET_VERSION_PATCH 3
 #define ENET_VERSION_CREATE(major, minor, patch) (((major)<<16) | ((minor)<<8) | (patch))
 #define ENET_VERSION ENET_VERSION_CREATE(ENET_VERSION_MAJOR, ENET_VERSION_MINOR, ENET_VERSION_PATCH)
 
@@ -96,7 +96,10 @@ typedef enum _ENetPacketFlag
      */
    ENET_PACKET_FLAG_UNSEQUENCED = (1 << 1),
    /** packet will not allocate data, and user must supply it instead */
-   ENET_PACKET_FLAG_NO_ALLOCATE = (1 << 2)
+   ENET_PACKET_FLAG_NO_ALLOCATE = (1 << 2),
+   /** packet will be fragmented using unreliable (instead of reliable) sends
+     * if it exceeds the MTU */
+   ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT = (1 << 3)
 } ENetPacketFlag;
 
 struct _ENetPacket;
@@ -218,6 +221,7 @@ typedef struct _ENetChannel
    enet_uint16  usedReliableWindows;
    enet_uint16  reliableWindows [ENET_PEER_RELIABLE_WINDOWS];
    enet_uint16  incomingReliableSequenceNumber;
+   enet_uint16  incomingUnreliableSequenceNumber;
    ENetList     incomingReliableCommands;
    ENetList     incomingUnreliableCommands;
 } ENetChannel;
