@@ -27,7 +27,6 @@ CXXFLAGS="$CXXFLAGS -Wall"
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
-AC_PROG_LIBTOOL
 
 # This macro defines WORDS_BIGENDIAN if building for a big endian machine.
 AC_C_BIGENDIAN
