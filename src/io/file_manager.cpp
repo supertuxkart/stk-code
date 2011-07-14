@@ -445,7 +445,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
-    std::cout << "{FioleManager] Creating directory \"" << path << "\"\n";
+    std::cout << "[FileManager] Creating directory \"" << path << "\"\n";
     
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
