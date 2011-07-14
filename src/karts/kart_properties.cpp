@@ -74,8 +74,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_max_speed_reverse_ratio = m_jump_velocity =
         m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
         m_upright_max_force = m_suspension_travel_cm =
-        m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
-        m_max_speed_turn = m_angle_at_max =
+        m_track_connection_accel =
         m_rubber_band_max_length = m_rubber_band_force =
         m_rubber_band_duration = m_rubber_band_speed_increase = 
         m_rubber_band_fade_out_time = m_plunger_in_face_duration[0] =
