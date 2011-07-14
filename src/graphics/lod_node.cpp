@@ -18,6 +18,8 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/hardware_skinning.hpp"   // BOUM
+#include "config/user_config.hpp"   // BOUM
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
@@ -92,11 +94,18 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     
     assert(node != NULL);
     
+    // BOUM Funto: why grab(), then remove(), then drop()...??
     node->grab();
     node->remove();
     m_detail.push_back(level*level);
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
     node->setParent(this);
+    
+    // BEGIN BOUM
+    if(UserConfigParams::m_hw_skinning_enabled && node->getType() == scene::ESNT_ANIMATED_MESH)
+        HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
+    // END BOUM
+    
     node->drop();
 }

@@ -31,6 +31,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/hardware_skinning.hpp"   // BOUM
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/default_ai_controller.hpp"
@@ -148,8 +149,9 @@ void World::init()
         m_karts.push_back(newkart);
         newkart->setWorldKartId(m_karts.size()-1);
         m_track->adjustForFog(newkart->getNode());
+        
     }  // for i
-
+    
     resetAllKarts();
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number

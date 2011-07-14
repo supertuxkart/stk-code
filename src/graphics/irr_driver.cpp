@@ -21,6 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/hardware_skinning.hpp"   // BOUM
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
@@ -257,6 +258,7 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
+    
 }   // initDevice
 
 //-----------------------------------------------------------------------------
@@ -474,7 +476,7 @@ void IrrDriver::printRenderStats()
  */
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
-    scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
+    scene::IAnimatedMesh* m = m_scene_manager->getMesh(filename.c_str());
     if(m) setAllMaterialFlags(m);
     return m;
 }   // getAnimatedMesh
@@ -1241,7 +1243,11 @@ void IrrDriver::update(float dt)
                     #endif
                             
                     kart->getCamera()->activate();
+                    
+                    // BEGIN BOUM
                     m_scene_manager->drawAll();
+                    //m_scene_manager->drawAll();
+                    // END BOUM
                     
                     PROFILER_POP_CPU_MARKER();
                     

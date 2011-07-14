@@ -65,6 +65,8 @@ supertuxkart_SOURCES = \
  graphics/camera.hpp \
  graphics/explosion.cpp \
  graphics/explosion.hpp \
+ graphics/hardware_skinning.cpp \
+ graphics/hardware_skinning.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
  graphics/lod_node.cpp \

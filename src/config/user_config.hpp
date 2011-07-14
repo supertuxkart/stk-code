@@ -383,6 +383,9 @@ namespace UserConfigParams
     
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool                       m_profiler_enabled  PARAM_DEFAULT( false );
+    
+    /** True if hardware skinning should be enabled */
+    PARAM_PREFIX bool                       m_hw_skinning_enabled  PARAM_DEFAULT( true );
 
     // not saved to file
 
