@@ -318,7 +318,7 @@ AC_TRY_RUN(
 if test x$irrlicht_min_version_met = xfalse; then
     AC_MSG_ERROR([Your irrLicht is too old, please update irrLicht. 
 You need irrlicht 1.8.
-While irrlicht 1.8 is not released, we recommend using version 3629 from irrlicht SVN trunk.])
+While irrlicht 1.8 is not released, we recommend using version 3843 from irrlicht SVN trunk.])
 else
     echo "yes"
 fi
