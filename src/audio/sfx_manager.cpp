@@ -197,7 +197,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
         return NULL;
     }
 
-    if (UserConfigParams::m_verbosity>=5) 
+    if (UserConfigParams::logMisc()) 
         printf("Loading SFX %s\n", sfx_file.c_str());
     
     if (buffer->load()) return buffer;

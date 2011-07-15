@@ -121,7 +121,7 @@ void HighscoreManager::loadHighscores()
             m_all_scores.push_back(highscores);
         }   // next entry
         
-        if(UserConfigParams::m_verbosity>=4)
+        if(UserConfigParams::logMisc())
             fprintf(stderr, "Highscores will be saved in '%s'.\n",
                     m_filename.c_str());
     }

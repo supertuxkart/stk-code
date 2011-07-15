@@ -120,7 +120,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (w2 == NULL) return;
 
         const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (UserConfigParams::m_verbosity>=5)
+        if (UserConfigParams::logGUI())
             std::cout << "Clicked on arena " << selection.c_str() << std::endl;
 
         

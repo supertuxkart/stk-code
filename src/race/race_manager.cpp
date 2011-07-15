@@ -156,7 +156,7 @@ void RaceManager::setTrack(const std::string& track)
 void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - m_player_karts.size();
-    if(UserConfigParams::m_verbosity>=5)
+    if(UserConfigParams::logMisc())
         std::cout << "AI karts count = " << n << " for m_num_karts=" 
                   << m_num_karts << " and m_player_karts.size()=" 
                   << m_player_karts.size() << std::endl;
@@ -441,7 +441,7 @@ void RaceManager::exitRace()
         std::vector<std::string> humanLosers; // because we don't care about AIs that lost
         for (unsigned int i=0; i < kartStatusCount; ++i)
         {
-            if(UserConfigParams::m_verbosity >= 5)
+            if(UserConfigParams::logMisc())
             {
                 std::cout << m_kart_status[i].m_ident << " has GP final rank "
                           << m_kart_status[i].m_gp_rank << std::endl;

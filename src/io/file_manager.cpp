@@ -874,7 +874,7 @@ bool FileManager::removeDirectory(const std::string &name) const
     for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
     {
         if((*i)=="." || (*i)=="..") continue;
-        if(UserConfigParams::m_verbosity>=3)
+        if(UserConfigParams::logMisc())
             printf("Deleting directory '%s'.\n", (*i).c_str());
         std::string full_path=name+"/"+*i;
         if(isDirectory(full_path))

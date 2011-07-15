@@ -297,7 +297,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     
     if (keyboard)
     {
-		if (UserConfigParams::m_verbosity>=5)
+		if (UserConfigParams::logMisc())
         {
 			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
                 << " : setting to keyboard key " << sensed_input.m_button_id
@@ -314,7 +314,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     }
     else if (gamepad)
     {
-		if (UserConfigParams::m_verbosity>=5)
+		if (UserConfigParams::logMisc())
         {
 			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
                       << " : setting to gamepad #" 
@@ -404,7 +404,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
             if (KartActionStrings[n] == clicked)
             {                
                 // we found which one. show the "press a key" dialog.
-                if (UserConfigParams::m_verbosity>=5)
+                if (UserConfigParams::logMisc())
                 {
                     std::cout << "\n% Entering sensing mode for " 
                               << m_config->getName().c_str() 

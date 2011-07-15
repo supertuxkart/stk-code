@@ -54,7 +54,7 @@ bool DeviceManager::initialize()
     // Shutdown in case the device manager is being re-initialized
     shutdown();
 
-    if(UserConfigParams::m_verbosity>=5)
+    if(UserConfigParams::logMisc())
     {
         printf("Initializing Device Manager\n");
         printf("---------------------------\n");
@@ -63,10 +63,10 @@ bool DeviceManager::initialize()
     deserialize();
 
     // Assign a configuration to the keyboard, or create one if we haven't yet
-    if(UserConfigParams::m_verbosity>=5) printf("Initializing keyboard support.\n");
+    if(UserConfigParams::logMisc()) printf("Initializing keyboard support.\n");
     if (m_keyboard_configs.size() == 0)
     {
-        if(UserConfigParams::m_verbosity>=5) 
+        if(UserConfigParams::logMisc())
             printf("No keyboard configuration exists, creating one.\n");
         m_keyboard_configs.push_back(new KeyboardConfig());
         created = true;
@@ -78,12 +78,12 @@ bool DeviceManager::initialize()
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
     }
     
-    if(UserConfigParams::m_verbosity>=5) 
+    if(UserConfigParams::logMisc()) 
             printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     numGamepads = m_irrlicht_gamepads.size();    
-    if(UserConfigParams::m_verbosity>=4)
+    if(UserConfigParams::logMisc())
     {
         printf("Irrlicht reports %d gamepads are attached to the system.\n", 
                numGamepads);
@@ -105,20 +105,20 @@ bool DeviceManager::initialize()
             name = name + " " + StringUtils::toString(id).c_str();
         }
         
-        if (UserConfigParams::m_verbosity>=4)
+        if (UserConfigParams::logMisc())
         {
             printf("#%d: %s detected...", id, name.c_str());
         }
         // Returns true if new configuration was created
         if (getConfigForGamepad(id, name, &gamepadConfig) == true)
         {
-            if(UserConfigParams::m_verbosity>=4) 
+            if(UserConfigParams::logMisc()) 
                 printf("creating new configuration.\n");
             created = true;
         }
         else
         {
-            if(UserConfigParams::m_verbosity>=4)
+            if(UserConfigParams::logMisc())
                 printf("using existing configuration.\n");
         }
 
@@ -403,12 +403,12 @@ bool DeviceManager::deserialize()
 {
     static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
     
-    if(UserConfigParams::m_verbosity>=5)
+    if(UserConfigParams::logMisc())
         printf("Deserializing input.xml...\n");
 
     if(!file_manager->fileExists(filepath))
     {
-        if(UserConfigParams::m_verbosity>=4)
+        if(UserConfigParams::logMisc())
             printf("Warning: no configuration file exists.\n");
     }
     else
@@ -496,7 +496,7 @@ bool DeviceManager::deserialize()
             } // end switch
         } // end while
         
-        if(UserConfigParams::m_verbosity>=4)
+        if(UserConfigParams::logMisc())
         {
             printf("Found %d keyboard and %d gamepad configurations.\n", 
                    m_keyboard_configs.size(), m_gamepad_configs.size());
@@ -522,7 +522,7 @@ void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getConfigDir() + "/" 
                                 + INPUT_FILE_NAME;
-    if(UserConfigParams::m_verbosity>=5) printf("Serializing input.xml...\n");
+    if(UserConfigParams::logMisc()) printf("Serializing input.xml...\n");
 
     
     std::ofstream configfile;
@@ -549,7 +549,7 @@ void DeviceManager::serialize()
     
     configfile << "</input>\n";
     configfile.close(); 
-    if(UserConfigParams::m_verbosity>=5) printf("Serialization complete.\n\n");
+    if(UserConfigParams::logMisc()) printf("Serialization complete.\n\n");
 }   // serialize
                     
 // -----------------------------------------------------------------------------

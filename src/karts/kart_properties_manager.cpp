@@ -171,9 +171,6 @@ const int KartPropertiesManager::getKartId(const std::string &ident) const
 {    
     for (int i=0; i<m_karts_properties.size(); i++)
     {
-        if (UserConfigParams::m_verbosity>=5)
-            std::cout << "[KartPropertiesManager] getKartId : " << m_karts_properties[i].getIdent().c_str() << std::endl;
-        
         if (m_karts_properties[i].getIdent() == ident)
             return i;
     }
