@@ -330,6 +330,7 @@
 		9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9592DC6B13021B350039DBC8 /* minimal_race_gui.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
+		9598A5B613CFBA83000B83EA /* hardware_skinning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9598A5B413CFBA83000B83EA /* hardware_skinning.cpp */; };
 		959DE0C613C297B90068ED78 /* swatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959DE0C413C297B90068ED78 /* swatter.cpp */; };
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
@@ -1107,6 +1108,8 @@
 		959482D010EBC0790031BADF /* track_object_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object_manager.hpp; path = ../../tracks/track_object_manager.hpp; sourceTree = SOURCE_ROOT; };
 		959482D110EBC0790031BADF /* track_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_object.cpp; path = ../../tracks/track_object.cpp; sourceTree = SOURCE_ROOT; };
 		959482D210EBC0790031BADF /* track_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object.hpp; path = ../../tracks/track_object.hpp; sourceTree = SOURCE_ROOT; };
+		9598A5B413CFBA83000B83EA /* hardware_skinning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hardware_skinning.cpp; path = ../../graphics/hardware_skinning.cpp; sourceTree = SOURCE_ROOT; };
+		9598A5B513CFBA83000B83EA /* hardware_skinning.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = hardware_skinning.hpp; path = ../../graphics/hardware_skinning.hpp; sourceTree = SOURCE_ROOT; };
 		959DE0C413C297B90068ED78 /* swatter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = swatter.cpp; path = ../../items/swatter.cpp; sourceTree = SOURCE_ROOT; };
 		959DE0C513C297B90068ED78 /* swatter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = swatter.hpp; path = ../../items/swatter.hpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
@@ -1411,6 +1414,8 @@
 				952A152E103F66D600B1895D /* camera.hpp */,
 				952A152F103F66D600B1895D /* explosion.cpp */,
 				952A1530103F66D600B1895D /* explosion.hpp */,
+				9598A5B413CFBA83000B83EA /* hardware_skinning.cpp */,
+				9598A5B513CFBA83000B83EA /* hardware_skinning.hpp */,
 				952A1531103F66D600B1895D /* irr_driver.cpp */,
 				952A1532103F66D600B1895D /* irr_driver.hpp */,
 				95376CAD1320784100C842A4 /* lod_node.cpp */,
@@ -3114,6 +3119,7 @@
 				9584B30E137CAC12008565D7 /* request.cpp in Sources */,
 				959DE0C613C297B90068ED78 /* swatter.cpp in Sources */,
 				957899B813C8E05F007AA5A3 /* profiler.cpp in Sources */,
+				9598A5B613CFBA83000B83EA /* hardware_skinning.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
