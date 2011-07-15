@@ -2,18 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-31 21:56-0400\n"
-"PO-Revision-Date: 2011-06-22 19:22+0000\n"
-"Last-Translator: Kaj-Ivar <kaj-ivar@vanderwijst.com>\n"
+"POT-Creation-Date: 2011-07-09 21:49-0400\n"
+"PO-Revision-Date: 2011-07-10 07:13+0000\n"
+"Last-Translator: Asciimonster <asciimonster@yahoo.co.uk>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-06 01:28+0000\n"
-"X-Generator: Launchpad (build 13333)\n"
+"X-Launchpad-Export-Date: 2011-07-15 00:16+0000\n"
+"X-Generator: Launchpad (build 13405)\n"
 
-#. I18N: Do NOT literally translate this string!! Please enter Y as the translation if your language is a RTL (right-to-left) language, N (or nothing) otherwise
-#: src/utils/translation.cpp:197
+#. I18N: Do NOT literally translate this string!! Please enter Y as the
+#. translation if your language is a RTL (right-to-left) language,
+#. N (or nothing) otherwise
+#: src/utils/translation.cpp:255
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
@@ -91,25 +93,25 @@ msgstr "%i ronden"
 msgid "%i. %s : survived for %s"
 msgstr "%i. %s : overleefde %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:141
-#: src/states_screens/dialogs/addons_loading.cpp:145
+#: src/states_screens/dialogs/addons_loading.cpp:153
+#: src/states_screens/dialogs/addons_loading.cpp:157
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:134
+#: src/states_screens/dialogs/addons_loading.cpp:146
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
-#: src/modes/linear_world.cpp:374
+#: src/modes/linear_world.cpp:376
 #, c-format
 msgid "%s by %s"
 msgstr "%s door %s"
 
 #. I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
-#: src/states_screens/addons_screen.cpp:132
+#: src/states_screens/addons_screen.cpp:165
 #, c-format
 msgid "%s by %s\t%s"
 msgstr "%s door %s\t%s"
@@ -125,7 +127,7 @@ msgstr "%s is een machtige piraat!"
 msgid "%s is practicing with a blue, big, spheric yo-yo"
 msgstr "%s oefent met een grote blauwe jojo"
 
-#: src/states_screens/kart_selection.cpp:511
+#: src/states_screens/kart_selection.cpp:523
 #, c-format
 msgid "%s is ready"
 msgstr "%s is klaar"
@@ -153,7 +155,7 @@ msgid "'%s' has been eliminated."
 msgstr "%s is uitgeschakeld."
 
 #. I18N: for empty highscores entries
-#: src/states_screens/dialogs/track_info_dialog.cpp:267
+#: src/states_screens/dialogs/track_info_dialog.cpp:265
 msgid "(Empty)"
 msgstr "(Leeg)"
 
@@ -254,10 +256,14 @@ msgstr "Apparaat toevoegen"
 #. I18N: kart group name
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/kart_selection.cpp:899
-#: src/states_screens/tracks_screen.cpp:200 data/po/gui_strings.h:211
+#: src/states_screens/kart_selection.cpp:911
+#: src/states_screens/tracks_screen.cpp:195 data/po/gui_strings.h:211
 msgid "Add-Ons"
 msgstr "Extra's"
+
+#: src/states_screens/addons_screen.cpp:76
+msgid "Add-on name"
+msgstr "Add-on naam"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
@@ -277,9 +283,9 @@ msgstr "Adiumy"
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: src/states_screens/arenas_screen.cpp:84
-#: src/states_screens/kart_selection.cpp:891
-#: src/states_screens/options_screen_video.cpp:276
-#: src/states_screens/tracks_screen.cpp:215 data/po/gui_strings.h:215
+#: src/states_screens/kart_selection.cpp:903
+#: src/states_screens/options_screen_video.cpp:291
+#: src/states_screens/tracks_screen.cpp:187 data/po/gui_strings.h:215
 msgid "All"
 msgstr "Alle"
 
@@ -307,19 +313,19 @@ msgid "Anchor - slows down greatly the kart in the first position"
 msgstr "Aambeeld - remt de kart die de leiding heeft af"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:287
+#: src/states_screens/options_screen_video.cpp:302
 #, c-format
 msgid "Animated Characters : %s"
 msgstr "Animaties van karts: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:283
+#: src/states_screens/options_screen_video.cpp:298
 #, c-format
 msgid "Animated Scenery : %s"
 msgstr "Animaties van achtergrond: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:290
+#: src/states_screens/options_screen_video.cpp:305
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
 msgstr "Anti-aliasing (herstart benodigd) : %s"
@@ -387,7 +393,7 @@ msgstr "muis as %d %s"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Addons
-#: src/states_screens/dialogs/addons_loading.cpp:205 data/po/gui_strings.h:184
+#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:184
 msgid "Back"
 msgstr "Terug"
 
@@ -419,6 +425,11 @@ msgstr "Banaan? Doos? Banaan? Doos? Banaan? Doos?"
 #: data/po/gui_strings.h:783
 msgid "Beagle"
 msgstr "Beagle"
+
+#. I18N: ./data/karts/beastie/kart.xml
+#: data/po/gui_strings.h:786
+msgid "Beastie"
+msgstr "Beastie"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:258
@@ -476,7 +487,7 @@ msgstr ""
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/add_device_dialog.cpp:81
-#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:197
 #: src/states_screens/dialogs/player_info_dialog.cpp:100
 #: data/po/gui_strings.h:227 data/po/gui_strings.h:235
 msgid "Cancel"
@@ -628,7 +639,7 @@ msgid "Disable Device"
 msgstr "apparaat uitschakelen"
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
-#: src/states_screens/options_screen_video.cpp:274
+#: src/states_screens/options_screen_video.cpp:289
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
@@ -657,17 +668,17 @@ msgstr "Geen gas geven voor het startsein!"
 msgid "Down"
 msgstr "Omlaag"
 
-#: src/states_screens/dialogs/addons_loading.cpp:200
+#: src/states_screens/dialogs/addons_loading.cpp:221
 msgid "Download failed."
 msgstr "Dowload gefaald"
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:786
+#: data/po/gui_strings.h:789
 msgid "Elephpant"
 msgstr "Elephant"
 
 #. I18N: ./data/karts/emule/kart.xml
-#: data/po/gui_strings.h:789
+#: data/po/gui_strings.h:792
 msgid "Emule"
 msgstr "eMule"
 
@@ -680,7 +691,7 @@ msgstr "apparaat inschakelen"
 #. I18N: in the graphical options tooltip; indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:272 data/po/gui_strings.h:473
+#: src/states_screens/options_screen_video.cpp:287 data/po/gui_strings.h:473
 #: data/po/gui_strings.h:485
 msgid "Enabled"
 msgstr "Ingeschakeld"
@@ -690,7 +701,7 @@ msgid "Energy"
 msgstr "Energie"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:140
+#: src/states_screens/main_menu_screen.cpp:168
 msgid "English"
 msgstr "Dutch"
 
@@ -700,7 +711,7 @@ msgstr "Dutch"
 msgid "Enter the new player's name"
 msgstr "Voer de naam van de speler in"
 
-#: src/states_screens/kart_selection.cpp:1117
+#: src/states_screens/kart_selection.cpp:1134
 msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
@@ -724,7 +735,7 @@ msgstr "Expert"
 msgid "Feature Unlocked"
 msgstr "Nieuwe optie geactiveerd"
 
-#: src/modes/linear_world.cpp:292
+#: src/modes/linear_world.cpp:295
 msgid "Final lap!"
 msgstr "Laaste ronde!"
 
@@ -902,7 +913,7 @@ msgid "Geronimo!!!"
 msgstr "Aanvalluh!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:792
+#: data/po/gui_strings.h:795
 msgid "Gnu"
 msgstr "Gnu"
 
@@ -911,7 +922,7 @@ msgid "Go!"
 msgstr "Start!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:795
+#: data/po/gui_strings.h:798
 msgid "Gooey"
 msgstr "Gooey"
 
@@ -955,7 +966,7 @@ msgid "Help"
 msgstr "Hulp"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:801
 msgid "Hexley"
 msgstr "Hexley"
 
@@ -1027,7 +1038,7 @@ msgid "Keyboard %i"
 msgstr "Toetsenbord %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:804
 msgid "Konqi"
 msgstr "Konqi"
 
@@ -1037,7 +1048,7 @@ msgstr "Konqi"
 msgid "Lap"
 msgstr "Ronde"
 
-#: src/modes/linear_world.cpp:317
+#: src/modes/linear_world.cpp:320
 #, c-format
 msgid "Lap %i"
 msgstr "Ronde %i"
@@ -1055,23 +1066,23 @@ msgstr "Links"
 msgid "Loading"
 msgstr "Laden"
 
-#: src/states_screens/kart_selection.cpp:803
+#: src/states_screens/kart_selection.cpp:815
 msgid "Locked"
 msgstr "Vergrendeld"
 
 #: src/states_screens/arenas_screen.cpp:193
 #: src/states_screens/arenas_screen.cpp:216
 #: src/states_screens/challenges.cpp:97
-#: src/states_screens/kart_selection.cpp:808
-#: src/states_screens/kart_selection.cpp:1763
-#: src/states_screens/kart_selection.cpp:1789
+#: src/states_screens/kart_selection.cpp:820
+#: src/states_screens/kart_selection.cpp:1786
+#: src/states_screens/kart_selection.cpp:1812
 #: src/states_screens/race_setup_screen.cpp:208
-#: src/states_screens/tracks_screen.cpp:323
-#: src/states_screens/tracks_screen.cpp:348
+#: src/states_screens/tracks_screen.cpp:310
+#: src/states_screens/tracks_screen.cpp:335
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Op slot: Te openen door uitdagingen te winnen"
 
-#: src/states_screens/tracks_screen.cpp:266
+#: src/states_screens/tracks_screen.cpp:253
 msgid "Locked!"
 msgstr "Vergrendeld"
 
@@ -1091,7 +1102,7 @@ msgid "Make your rivals bite dust!"
 msgstr "Laat je rivalen stof happen!"
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:278
+#: src/states_screens/options_screen_video.cpp:293
 msgid "Me Only"
 msgstr "Alleen voor mij"
 
@@ -1119,7 +1130,7 @@ msgid "Mouse button %d"
 msgstr "muisknop %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:807
 msgid "Mozilla"
 msgstr "Mozilla"
 
@@ -1158,7 +1169,7 @@ msgstr "Grand Prix '%s' nu beschikbaar"
 msgid "New difficulty '%s' now available"
 msgstr "Nieuwe moeilijkheidsgraad '%s' is nu beschikbaar"
 
-#: src/modes/linear_world.cpp:368
+#: src/modes/linear_world.cpp:381
 msgid "New fastest lap"
 msgstr "Nieuwe snelste ronde"
 
@@ -1167,7 +1178,7 @@ msgstr "Nieuwe snelste ronde"
 msgid "New game mode '%s' now available"
 msgstr "Nieuwe spelmodus '%s' nu beschikbaar"
 
-#: src/states_screens/race_result_gui.cpp:687
+#: src/states_screens/race_result_gui.cpp:697
 msgid "New highscore!"
 msgstr "Nieuwe hoogste score!"
 
@@ -1187,12 +1198,12 @@ msgid "Nitro"
 msgstr "Lachgas"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:810
 msgid "Nolok"
 msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:280
+#: src/states_screens/options_screen_video.cpp:295
 msgid "None"
 msgstr "Geen"
 
@@ -1266,7 +1277,7 @@ msgid "Penguin Playground"
 msgstr "Speeltuin voor pinguïns"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:813
 msgid "Pidgin"
 msgstr "Pidgin"
 
@@ -1324,18 +1335,18 @@ msgstr "Druk enter of dubbel klik op een apparaat om het te configureren"
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr "Druk op Enter of dubbelklik op een speler voor aanpassingen"
 
-#: src/states_screens/dialogs/addons_loading.cpp:249
+#: src/states_screens/dialogs/addons_loading.cpp:270
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Fout bij installeren van addons '%s'."
 
-#: src/states_screens/dialogs/addons_loading.cpp:263
+#: src/states_screens/dialogs/addons_loading.cpp:284
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Fout bij verwijderen van addons '%s'."
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:816
 msgid "Puffy"
 msgstr "Puffy"
 
@@ -1368,12 +1379,12 @@ msgstr "Doe dit parcours opnieuw"
 msgid "Random Arena"
 msgstr "Willekeurige Arena"
 
-#: src/states_screens/kart_selection.cpp:792
-#: src/states_screens/kart_selection.cpp:1806
+#: src/states_screens/kart_selection.cpp:804
+#: src/states_screens/kart_selection.cpp:1829
 msgid "Random Kart"
 msgstr "Willekeurige Kart"
 
-#: src/states_screens/tracks_screen.cpp:362
+#: src/states_screens/tracks_screen.cpp:349
 msgid "Random Track"
 msgstr "Willekeurig circuit"
 
@@ -1493,7 +1504,7 @@ msgstr "Vloek van de Farao"
 msgid "Shiny Suburbs"
 msgstr "Fonkelende Voorstad"
 
-#: src/states_screens/dialogs/addons_loading.cpp:146
+#: src/states_screens/dialogs/addons_loading.cpp:158
 #, c-format
 msgid "Size: %s"
 msgstr "Grootte: %s"
@@ -1591,7 +1602,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr "SuperTuxKart heeft meerdere speltypen"
 
-#: src/main.cpp:995
+#: src/main.cpp:1006
 msgid ""
 "SuperTuxKart may connect to a news server to display updates. Would you like "
 "this feature to be enabled? (To change this setting at a later time, go to "
@@ -1610,7 +1621,7 @@ msgid ""
 msgstr "Wisselaar - Voor een korte tijd worden pakjes bananen en vice versa"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:225
+#: src/states_screens/main_menu_screen.cpp:253
 msgid "System Language"
 msgstr "Taal van Besturingssysteem"
 
@@ -1716,7 +1727,7 @@ msgstr "Parcours door %s"
 msgid "Tracks"
 msgstr "Parcours"
 
-#: src/states_screens/dialogs/addons_loading.cpp:273
+#: src/states_screens/dialogs/addons_loading.cpp:294
 msgid "Try again"
 msgstr "Opnieuw proberen"
 
@@ -1727,7 +1738,7 @@ msgid "Tutorial : Selection Room"
 msgstr "Klaslokaal: Selectie"
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:819
 msgid "Tux"
 msgstr "Tux"
 
@@ -1736,7 +1747,7 @@ msgstr "Tux"
 msgid "Tux Tollway"
 msgstr "De tolweg van Tux"
 
-#: src/states_screens/dialogs/addons_loading.cpp:63
+#: src/states_screens/dialogs/addons_loading.cpp:66
 msgid "Uninstall"
 msgstr "Deïnstalleren"
 
@@ -1745,9 +1756,13 @@ msgstr "Deïnstalleren"
 msgid "Up"
 msgstr "Omhoog"
 
-#: src/states_screens/dialogs/addons_loading.cpp:61
+#: src/states_screens/dialogs/addons_loading.cpp:64
 msgid "Update"
 msgstr "Bijwerken"
+
+#: src/states_screens/addons_screen.cpp:77
+msgid "Updated date"
+msgstr "Bijwerkt op;"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1765,7 +1780,7 @@ msgstr "Gebruik frame buffer (herstart nodig)"
 msgid "User Interface"
 msgstr "Gebruikersinterface"
 
-#: src/states_screens/dialogs/addons_loading.cpp:79
+#: src/states_screens/dialogs/addons_loading.cpp:92
 #, c-format
 msgid "Version: %d"
 msgstr "Versie: %d"
@@ -1784,7 +1799,7 @@ msgstr "Verticale synchronisatie"
 msgid "Volume"
 msgstr "Volume"
 
-#: src/modes/linear_world.cpp:821
+#: src/modes/linear_world.cpp:827
 msgid "WRONG WAY!"
 msgstr "VERKEERDE RICHTING!"
 
@@ -1812,7 +1827,7 @@ msgid "Weapons"
 msgstr "Wapens"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:285
+#: src/states_screens/options_screen_video.cpp:300
 #, c-format
 msgid "Weather Effects : %s"
 msgstr "Weerseffecten: %s"
@@ -1835,7 +1850,7 @@ msgstr ""
 "hiervoor niet gebruikt worden."
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:822
 msgid "Wilber"
 msgstr "Wilber"
 
@@ -1945,7 +1960,7 @@ msgstr "Ja"
 msgid "You completed the Grand Prix!"
 msgstr "Je hebt de Grand Prix voltooid!"
 
-#: src/karts/kart.cpp:601 src/karts/kart.cpp:620
+#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
 msgid "You finished the race!"
 msgstr "Race afgelopen!"
 
@@ -1953,7 +1968,7 @@ msgstr "Race afgelopen!"
 msgid "You have been eliminated!"
 msgstr "Je bent uitgeschakeld!"
 
-#: src/states_screens/race_result_gui.cpp:687
+#: src/states_screens/race_result_gui.cpp:697
 msgid "You topped the highscore list!"
 msgstr "Je hebt de hoogste score behaald!"
 
@@ -1962,7 +1977,7 @@ msgstr "Je hebt de hoogste score behaald!"
 msgid "You unlocked a new feature!"
 msgstr "Je hebt een nieuw item ontgrendeld!"
 
-#: src/karts/kart.cpp:601 src/karts/kart.cpp:620
+#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
 msgid "You won the race!"
 msgstr "Je hebt de race gewonnen!"
 
@@ -1997,13 +2012,13 @@ msgstr "[geen]"
 msgid "by"
 msgstr "door"
 
-#: src/states_screens/dialogs/addons_loading.cpp:107
+#: src/states_screens/dialogs/addons_loading.cpp:120
 msgid "featured"
 msgstr "aanbevolen"
 
 #. I18N: kart group name
-#: src/states_screens/kart_selection.cpp:897
-#: src/states_screens/tracks_screen.cpp:198
+#: src/states_screens/kart_selection.cpp:909
+#: src/states_screens/tracks_screen.cpp:193
 msgid "standard"
 msgstr "Standaard"
 
