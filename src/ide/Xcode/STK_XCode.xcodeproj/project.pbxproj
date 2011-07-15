@@ -35,6 +35,7 @@
 		95263DEF0FD7471900CF5F92 /* highscores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE60FD7471900CF5F92 /* highscores.cpp */; };
 		95263DF00FD7471900CF5F92 /* history.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE80FD7471900CF5F92 /* history.cpp */; };
 		95263DF10FD7471900CF5F92 /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DEA0FD7471900CF5F92 /* race_manager.cpp */; };
+		9527AA4513CFC345009188DB /* IrrFramework.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9538E2E812C2682B00172896 /* IrrFramework.framework */; };
 		9528C71612D69494006E9167 /* particle_kind_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9528C71412D69494006E9167 /* particle_kind_manager.cpp */; };
 		9528CC241291E7A10078A5EF /* binding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9528CC221291E7A10078A5EF /* binding.cpp */; };
 		952A1545103F66D600B1895D /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A152D103F66D600B1895D /* camera.cpp */; };
@@ -369,6 +370,7 @@
 				9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */,
 				9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */,
 				9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */,
+				9527AA4513CFC345009188DB /* IrrFramework.framework in Copy frameworks */,
 			);
 			name = "Copy frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
