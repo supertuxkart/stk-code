@@ -783,6 +783,9 @@
     <ClCompile Include="..\..\utils\profiler.cpp">
       <Filter>Quelldateien\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\graphics\hardware_skinning.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1483,6 +1486,9 @@
     </ClInclude>
     <ClInclude Include="..\..\utils\profiler.hpp">
       <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\hardware_skinning.hpp">
+      <Filter>Quelldateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

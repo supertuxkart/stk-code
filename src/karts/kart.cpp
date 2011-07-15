@@ -292,7 +292,7 @@ void Kart::createPhysics()
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
-        wheel.m_rotation				 = int(m_kart_properties->hasRandomWheels()) * (rand() % 360);
+        wheel.m_rotation				 = btScalar(float(m_kart_properties->hasRandomWheels()) * (rand() % 360));
     }
     // Obviously these allocs have to be properly managed/freed
     btTransform t;

@@ -112,6 +112,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\addons\news_manager.cpp" />
     <ClCompile Include="..\..\addons\request.cpp" />
+    <ClCompile Include="..\..\graphics\hardware_skinning.cpp" />
     <ClCompile Include="..\..\graphics\lod_node.cpp" />
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
@@ -325,6 +326,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\addons\news_manager.hpp" />
     <ClInclude Include="..\..\addons\request.hpp" />
+    <ClInclude Include="..\..\graphics\hardware_skinning.hpp" />
     <ClInclude Include="..\..\graphics\lod_node.hpp" />
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
