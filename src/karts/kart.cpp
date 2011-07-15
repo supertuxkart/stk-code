@@ -119,7 +119,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     // Set position and heading:
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
-	m_wheel_rotation          = 0;
+    m_wheel_rotation          = 0;
 
     m_kart_model->setKart(this);
     
@@ -292,7 +292,7 @@ void Kart::createPhysics()
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
-        wheel.m_rotation				 = btScalar(float(m_kart_properties->hasRandomWheels()) * (rand() % 360));
+        wheel.m_rotation                 = btScalar(float(m_kart_properties->hasRandomWheels()) * (rand() % 360));
     }
     // Obviously these allocs have to be properly managed/freed
     btTransform t;
@@ -1745,7 +1745,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     createPhysics();
 
     // Attach Particle System
-	
+
     if (UserConfigParams::m_graphical_effects && !isWheeless())
     {
         try
@@ -1763,7 +1763,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
             std::cerr << "[Kart::loadData] " << e.what() << std::endl;
         }
     }
-	
+
     
     if (type == RaceManager::KT_PLAYER && UserConfigParams::m_weather_effects &&
         track->getSkyParticles() != NULL)
