@@ -31,7 +31,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/hardware_skinning.hpp"   // BOUM
+#include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/default_ai_controller.hpp"

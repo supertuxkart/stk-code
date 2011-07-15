@@ -21,7 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/hardware_skinning.hpp"   // BOUM
+#include "graphics/hardware_skinning.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
@@ -1244,10 +1244,7 @@ void IrrDriver::update(float dt)
                             
                     kart->getCamera()->activate();
                     
-                    // BEGIN BOUM
                     m_scene_manager->drawAll();
-                    //m_scene_manager->drawAll();
-                    // END BOUM
                     
                     PROFILER_POP_CPU_MARKER();
                     

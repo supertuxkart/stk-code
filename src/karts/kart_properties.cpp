@@ -91,13 +91,11 @@ KartProperties::KartProperties(const std::string &filename)
         m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_ai_steering_variation = 
-        m_swatter_distance2 = m_swatter_duration = m_swatter_animation_time =
-        m_swatter_item_animation_time = m_squash_slowdown = 
+        m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = UNDEFINED;
 
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
-    m_swatter_count          = -1;
     m_version                = 0;
     m_color                  = video::SColor(255, 0, 0, 0);
     m_shape                  = 32;  // close enough to a circle.
@@ -452,10 +450,6 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *swatter_node= root->getNode("swatter"))
     {
         swatter_node->get("duration",        &m_swatter_duration      );
-        swatter_node->get("count",           &m_swatter_count         );
-        swatter_node->get("animation-time",  &m_swatter_animation_time);
-        swatter_node->get("item-animation-time",
-                                        &m_swatter_item_animation_time);
         swatter_node->get("squash-duration", &m_squash_duration       );
         swatter_node->get("squash-slowdown", &m_squash_slowdown       );
         if(swatter_node->get("distance",     &m_swatter_distance2) )
@@ -626,12 +620,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_duration,             "nitro duration"                );
     CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
-    CHECK_NEG(m_swatter_animation_time,     "swatter animation-time"        );
-    CHECK_NEG(m_swatter_item_animation_time,"swatter item-animation-time"   );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
-    CHECK_NEG(m_swatter_count,              "swatter count"                 );
-    CHECK_NEG(m_squash_duration,            "swatter squash-duration"       );
-    CHECK_NEG(m_squash_slowdown,            "swatter squash-slowdown"       );
+    CHECK_NEG(m_squash_duration,            "squash-duration"               );
+    CHECK_NEG(m_squash_slowdown,            "squash-slowdown"               );
 
     CHECK_NEG(m_rescue_height,              "rescue height"                 );
     CHECK_NEG(m_rescue_time,                "rescue time"                   );

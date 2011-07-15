@@ -113,22 +113,17 @@ void MaterialManager::adjustForFog(video::ITexture* t,
 
 void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
 {
-    // BEGIN BOUM
-//    for(int i = (int)m_materials.size()-1; i>=0; i-- )
-//    {
-        irr::video::SMaterial& material = mb->getMaterial();
-        if (material.getTexture(0) == NULL)
-        {
-            //material.AmbientColor = video::SColor(255, 50, 50, 50);
-            //material.DiffuseColor = video::SColor(255, 150, 150, 150);
-            material.EmissiveColor = video::SColor(255, 0, 0, 0);
-            material.SpecularColor = video::SColor(255, 0, 0, 0);
-            //material.Shininess = 0.0f;
-            material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
-            material.MaterialType = irr::video::EMT_SOLID;
-        }
-//    }   // for i
-    // END BOUM
+    irr::video::SMaterial& material = mb->getMaterial();
+    if (material.getTexture(0) == NULL)
+    {
+        //material.AmbientColor = video::SColor(255, 50, 50, 50);
+        //material.DiffuseColor = video::SColor(255, 150, 150, 150);
+        material.EmissiveColor = video::SColor(255, 0, 0, 0);
+        material.SpecularColor = video::SColor(255, 0, 0, 0);
+        //material.Shininess = 0.0f;
+        material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
+        material.MaterialType = irr::video::EMT_SOLID;
+    }
 }
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)

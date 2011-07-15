@@ -201,8 +201,6 @@ private:
     float       m_nitro_fade_out_time;
     /** Square of the maximum distance a swatter can operate. */
     float       m_swatter_distance2;
-    /** How often the swatter can be fired. */
-    int         m_swatter_count;
     /** How long the swatter lasts. */
     float       m_swatter_duration;
     /** How long a kart will remain squashed. */
@@ -210,10 +208,6 @@ private:
     /** The slowdown to apply while a kart is squashed. The new maxspeed
      *  is max_speed*m_squash_slowdown. */
     float       m_squash_slowdown;
-    /** Animation time for the swatter. */
-    float       m_swatter_animation_time;
-    /** How long the item swatting animation will last. */
-    float       m_swatter_item_animation_time;
 
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
@@ -632,9 +626,6 @@ public:
      *  can hit karts. */
     float getSwatterDistance2() const { return m_swatter_distance2; }
 
-    /** Returns how often a swatter can be used. */
-    int   getSwatterCount() const { return m_swatter_count; }
-
     /** Returns how long a swatter will stay attached/ready to be used. */
     float getSwatterDuration() const { return m_swatter_duration; }
 
@@ -644,12 +635,6 @@ public:
     /** Returns the slowdown of a kart that is squashed. */
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
-    /** Returns how long it takes for the swatter to hit a target. */
-    float getSwatterAnimationTime() const { return m_swatter_animation_time; }
-
-    /** Returns how long it takes for the swatter to swat at an item. */
-    float getSwatterItemAnimationTime() const 
-                                      {return m_swatter_item_animation_time; }
 	bool hasRandomWheels() const { return m_has_rand_wheels; }
 };   // KartProperties
 

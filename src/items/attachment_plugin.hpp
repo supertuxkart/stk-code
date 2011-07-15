@@ -38,15 +38,18 @@ class Attachment;
 class AttachmentPlugin
 {
 protected:
-    /** Keeps track of the rotation of an attachment, this base class
-     *  will set it to 0. */
-    core::vector3df   m_rotation;
+    /** Parent Attachment of this plugin */
+    Attachment     *m_attachment;
+    
+    /** Kart the attachment is attached to. */
+    Kart           *m_kart;
 
 public:
     /** Constructor for a plugin. */
     AttachmentPlugin(Attachment *attachment, Kart *kart) 
     {
-        m_rotation = core::vector3df(0,0,0);
+        m_attachment = attachment;
+        m_kart       = kart;
     }
     
     virtual ~AttachmentPlugin() {}
@@ -57,8 +60,8 @@ public:
     virtual bool updateAndTestFinished(float dt) = 0;
     
     // ------------------------------------------------------------------------
-    /** Returns the rotation of the attachment. */
-    virtual const core::vector3df& getRotation() const { return m_rotation; }
+    /** Called when the animation of the Attachment's node is done. */
+    virtual void onAnimationEnd() {}
 };   // AttachmentPlugin
 
 #endif

@@ -41,7 +41,7 @@ class Item;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -65,9 +65,6 @@ private:
 
     /** Kart the attachment is attached to. */
     Kart           *m_kart;
-
-    /** How often an attachment can be used (e.g. swatter). */
-    int             m_count;
 
     /** Time left till attachment expires. */
     float           m_time_left;
@@ -97,8 +94,6 @@ public:
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
-    void  swatItem();
-    bool  isSwatterReady() const;
 
     void  set (AttachmentType type, float time, Kart *previous_kart=NULL);
     // ------------------------------------------------------------------------
@@ -122,6 +117,11 @@ public:
     float weightAdjust() const { 
         return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
     // ------------------------------------------------------------------------
+    /** Return the currently associated scene node (used by e.g the swatter) */
+    scene::IAnimatedMeshSceneNode* getNode() {return m_node;}
+    // ------------------------------------------------------------------------
+    /** Implement IAnimatedMeshSceneNode */
+    virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
 };   // Attachment
 
 #endif

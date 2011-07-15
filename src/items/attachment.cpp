@@ -48,6 +48,7 @@ Attachment::Attachment(Kart* kart)
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
 #endif
+    m_node->setAnimationEndCallback(this);
     m_node->setParent(m_kart->getNode());
     m_node->setVisible(false);
 }   // Attachment
@@ -64,12 +65,14 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
 {
     clear();
     
-    // If necessary create the appropriate plugin which encapsulates 
+    // If necessary create the appropriate plugin which encapsulates the associated behavior
     switch(type)
     {
     case ATTACH_SWATTER : 
         m_plugin = new Swatter(this, m_kart);
-    default: break;
+        break;
+    default:
+        break;
     }   // switch(type)
 
     m_node->setMesh(attachment_manager->getMesh(type));
@@ -84,10 +87,7 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     m_time_left        = time;
     m_previous_owner   = current_kart;
     m_node->setRotation(core::vector3df(0, 0, 0));
-    m_count            = m_type==ATTACH_SWATTER
-                         ? m_kart->getKartProperties()->getSwatterCount()
-                         : 1;
-
+    
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
@@ -123,6 +123,8 @@ void Attachment::clear()
     
     m_time_left=0.0;
     m_node->setVisible(false);
+    m_node->setPosition(core::vector3df());
+    m_node->setRotation(core::vector3df());
 
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to
@@ -253,7 +255,6 @@ void Attachment::update(float dt)
             clear();  // also removes the plugin
             return;
         }
-        m_node->setRotation(m_plugin->getRotation());
     }
 
     switch (m_type)
@@ -303,20 +304,9 @@ void Attachment::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-/** Uses the swatter to swat at an item. The actual functionality is 
- *  implemented in the swatter plugin.
- *  \pre The item must be an attachment (and m_plugin must be a swatter).
- */
-void Attachment::swatItem()
+/** Inform any eventual plugin when an animation is done. */
+void Attachment::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
 {
-    assert(m_type==ATTACH_SWATTER);
-    ((Swatter*)m_plugin)->swatItem();
-}   // swatItem
-// ----------------------------------------------------------------------------
-/** Returns if the swatter is currently aiming, i.e. can be used to
- *  swat an incoming projectile. */
-bool Attachment::isSwatterReady() const 
-{
-    assert(m_type==ATTACH_SWATTER);
-    return ((Swatter*)m_plugin)->isSwatterReady();
-}   // isSwatterReady
+    if(m_plugin)
+        m_plugin->onAnimationEnd();
+}

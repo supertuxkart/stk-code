@@ -153,7 +153,6 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
             
             PROFILER_SYNC_FRAME();
-            //printf("--- end frame ---\n");  // BOUM
         }
     }  // while !m_exit
 

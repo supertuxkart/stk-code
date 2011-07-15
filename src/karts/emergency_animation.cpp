@@ -134,16 +134,21 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
 void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
 {
     // Avoid doing another explosion while a kart is thrown around in the air.
-    if(playingEmergencyAnimation()) return;
-    if(m_kart->isInvulnerable()) 
+    if(playingEmergencyAnimation())
         return;
-    Attachment *a=m_kart->getAttachment();
+    
+    if(m_kart->isInvulnerable())
+        return;
+    
+    // !Funto! TODO: squash items with the swatter...should we do it here or in the Swatter class?
+/*    Attachment *a=m_kart->getAttachment();
     if(a->getType()==Attachment::ATTACH_SWATTER &&
         a->isSwatterReady())
     {
         a->swatItem();
         return;
     }
+*/
 
     m_xyz   = m_kart->getXYZ();
     // Ignore explosion that are too far away.

@@ -26,8 +26,6 @@
 
 void HardwareSkinning::prepareNode(scene::IAnimatedMeshSceneNode *node)
 {
-    return; // BOUM
-    
     scene::IAnimatedMesh* mesh = node->getMesh();
     video::IVideoDriver* driver = irr_driver->getVideoDriver();
     video::IGPUProgrammingServices* gpu = driver->getGPUProgrammingServices();
@@ -56,7 +54,7 @@ void HardwareSkinning::prepareNode(scene::IAnimatedMeshSceneNode *node)
     
     // Use VBOs and avoid streaming the vertex data
     //mesh->setHardwareMappingHint(scene::EHM_STATIC);
-    mesh->setHardwareMappingHint(scene::EHM_DYNAMIC);    // BOUM
+    mesh->setHardwareMappingHint(scene::EHM_DYNAMIC);    // TODO: is it really better?
     
     // Hardware skinning is not implemented in Irrlicht (as of version 1.7.2) so "enabling" it
     // results in the data not being sent and the CPU not computing software skinning.

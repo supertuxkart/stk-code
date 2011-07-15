@@ -177,17 +177,12 @@
                 max-speed-increase="5" duration="1" fade-out-time="2"/>
 
     <!-- Kart-specific settings for the swatter:
-         duration: how long can the swatter be readied.
-         count:  how often can it be used.
-         distance: How close a kart must be before it can be hit. 
-         animation-time: How long it takes for the swatter to hit a target.
-         item-animation-time: How long the swatter will swat when a
-                 projectile hits.
+         duration: how long can the swatter be active.
+         distance: How close a kart or an item must be before it can be hit.
          squash-duration: How long a kart will remain squashed.
          squash-slowdown: percentage of max speed that a kart is
                  restricted to.  -->
-    <swatter duration="10" count="2" distance="3" animation-time="0.2"
-             item-animation-time="0.04" squash-duration="5" 
+    <swatter duration="10" distance="3" squash-duration="5" 
              squash-slowdown="0.5"/>
 
     <!-- min-speed-radius and max-speed-radius define the smallest turn 
