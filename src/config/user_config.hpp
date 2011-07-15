@@ -512,20 +512,23 @@ namespace UserConfigParams
     PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
 
     /** Some constants to bitmask to enable various messages to be printed. */
-    enum { LOG_MEMORY = 0x0001,
-           LOG_GUI    = 0x0002,
-           LOG_ADDONS = 0x0004,
-           LOG_MISC   = 0x0008,
-           LOG_ALL    = 0xffff };
+    enum { LOG_MEMORY     = 0x0001,
+           LOG_GUI        = 0x0002,
+           LOG_NETWORKING = 0x0003,
+           LOG_ADDONS     = 0x0004,
+           LOG_MISC       = 0x0008,
+           LOG_ALL        = 0xffff };
 
     /** Returns true if the user want additional messages for memory usage. */
-    bool   logMemory();
+    bool   logMemory      ();
     /** Returns true if the user want additional messages related to GUI. */
-    bool   logGUI   ();
+    bool   logGUI         ();
     /** Returns true if the user want additional messages related to addons. */
-    bool   logAddons();
+    bool   logAddons      ();
     /** Returns true if the user want additional messages for general items. */
-    bool   logMisc  ();
+    bool   logMisc        ();
+    /** Returns true if the user wants additional messages for networking/ */
+    bool   logNetworking  ();
 
 
 }

@@ -76,7 +76,10 @@ NetworkManager::~NetworkManager()
 // -----------------------------------------------------------------------------
 bool NetworkManager::initServer()
 {
-    printf("initServer\n");
+    if (UserConfigParams::logNetworking())
+    {
+        printf("initServer\n");
+    }
     ENetAddress address;
     address.host = ENET_HOST_ANY;
     address.port = UserConfigParams::m_server_port;
@@ -107,8 +110,11 @@ bool NetworkManager::initServer()
  */
 bool NetworkManager::initClient()
 {
-    printf("initClient\n");
-    printf("Client attempting to connect to: %s:%d\n", UserConfigParams::m_server_address.c_str(), (int)UserConfigParams::m_server_port);
+    if (UserConfigParams::logNetworking())
+    {
+        printf("initClient\n");
+        printf("Client attempting to connect to: %s:%d\n", UserConfigParams::m_server_address.c_str(), (int)UserConfigParams::m_server_port);
+    }
     m_host = enet_host_create (NULL /* create a client host */,
                                1    /* only allow 1 outgoing connection */,
                                0    /* channel limit */,
@@ -154,7 +160,10 @@ bool NetworkManager::initClient()
     }
     m_server = peer;
     return true;
-    printf("Connection succeed!\n");
+    if (UserConfigParams::logNetworking())
+    {
+        printf("Connection succeed!\n");
+    }
 }  // initClient
 
 // ----------------------------------------------------------------------------
@@ -197,7 +206,10 @@ void NetworkManager::disableNetworking()
 // ----------------------------------------------------------------------------
 void NetworkManager::handleNewConnection(ENetEvent *event)
 {
-    printf("New connection! m_state %s connections!\n", (m_state==NS_ACCEPT_CONNECTIONS) ? "accepting" : "not accepting");
+    if (UserConfigParams::logNetworking())
+    {
+        printf("New connection! m_state %s connections!\n", (m_state==NS_ACCEPT_CONNECTIONS) ? "accepting" : "not accepting");
+    }
     // Only accept while waiting for connections
     if(m_state!=NS_ACCEPT_CONNECTIONS) return;
 
@@ -232,11 +244,17 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
     {
     case NS_ACCEPT_CONNECTIONS:
         {
-            printf("NS_ACCEPT_CONNECTIONS (handleMsgAtServer)!\n");
+            if (UserConfigParams::logNetworking())
+            {
+                printf("NS_ACCEPT_CONNECTIONS (handleMsgAtServer)!\n");
+            }
             ConnectMessage m(event->packet);
             m_client_names[(int)(long)event->peer->data] = m.getId();
             m_num_clients++;
-            printf("m_num_clients: %i\n",m_num_clients);
+            if (UserConfigParams::logNetworking())
+            {
+                printf("m_num_clients: %i\n",m_num_clients);
+            }
             return;
         }
     case NS_KART_CONFIRMED:    // Fall through
@@ -283,7 +301,10 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
         }
     case NS_READY_SET_GO_BARRIER:
         {
-            printf("NS_R_S_G_BARRIER (handleMsgAtServer)\n");
+            if (UserConfigParams::logNetworking())
+            {
+                printf("NS_R_S_G_BARRIER (handleMsgAtServer)\n");
+            }
             m_barrier_count ++;
             if(m_barrier_count==(int)m_num_clients)
             {
@@ -320,7 +341,10 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
     {
     case NS_WAIT_FOR_AVAILABLE_CHARACTERS:
         {
-            printf("Waiting for available characters (handleMsgAtClient)\n");
+            if (UserConfigParams::logNetworking())
+            {
+                printf("Waiting for available characters (handleMsgAtClient)\n");
+            }
             CharacterInfoMessage m(event->packet);
             // FIXME: handle list of available characters
             m_state = NS_CHARACTER_SELECT;
@@ -328,7 +352,10 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         }
     case NS_CHARACTER_SELECT:  
         {
-            printf("Character Select (handleMsgAtClient)\n");
+            if (UserConfigParams::logNetworking())
+            {
+                printf("Character Select (handleMsgAtClient)\n");
+            }
             CharacterConfirmMessage m(event->packet);
             kart_properties_manager->selectKartName(m.getKartName());
             // TODO - karts selection screen in networking
@@ -341,7 +368,10 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         }
     case NS_WAIT_FOR_KART_CONFIRMATION:
         {
-            printf("Wait for Kart Conf (handleMsgAtClient)\n");
+            if (UserConfigParams::logNetworking())
+            {
+                printf("Wait for Kart Conf (handleMsgAtClient)\n");
+            }
             CharacterConfirmMessage m(event->packet);
             kart_properties_manager->selectKartName(m.getKartName());
 
@@ -445,7 +475,10 @@ void NetworkManager::update(float dt)
 // ----------------------------------------------------------------------------
 void NetworkManager::broadcastToClients(Message &m)
 {
-    printf("broadcastToClients\n");
+    if (UserConfigParams::logNetworking())
+    {
+        printf("broadcastToClients\n");
+    }
     enet_host_broadcast(m_host, 0, m.getPacket());
     enet_host_flush(m_host); 
 }   // broadcastToClients
@@ -453,7 +486,10 @@ void NetworkManager::broadcastToClients(Message &m)
 // ----------------------------------------------------------------------------
 void NetworkManager::sendToServer(Message &m)
 {
-    printf("sendToServer");
+    if (UserConfigParams::logNetworking())
+    {
+        printf("sendToServer");
+    }
     enet_peer_send(m_server, 0, m.getPacket());
     enet_host_flush(m_host); 
 }   // sendToServer

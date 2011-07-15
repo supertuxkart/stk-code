@@ -327,6 +327,10 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
         }
+        else if ( !strcmp(argv[i], "--debug=network") )
+        {
+            UserConfigParams::m_verbosity |= UserConfigParams::LOG_NETWORKING;
+        }
         else if ( !strcmp(argv[i], "--debug=all") )
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
@@ -737,11 +741,12 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "--debug=memory")                        ) {}
-        else if( !strcmp(argv[i], "--debug=addons")                        ) {}
-        else if( !strcmp(argv[i], "--debug=gui"   )                        ) {}
-        else if( !strcmp(argv[i], "--debug=misc"  )                        ) {}
-        else if( !strcmp(argv[i], "--debug=all"   )                        ) {}
+        else if( !strcmp(argv[i], "--debug=memory"   )                     ) {}
+        else if( !strcmp(argv[i], "--debug=addons"   )                     ) {}
+        else if( !strcmp(argv[i], "--debug=gui"      )                     ) {}
+        else if( !strcmp(argv[i], "--debug=misc"     )                     ) {}
+        else if( !strcmp(argv[i], "--debug=network"  )                     ) {}
+        else if( !strcmp(argv[i], "--debug=all"      )                     ) {}
         else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}

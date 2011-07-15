@@ -670,10 +670,12 @@ void UserConfig::saveConfig()
 
 }   // saveConfig
 
-bool UserConfigParams::logMemory() { return (m_verbosity&LOG_MEMORY) == LOG_MEMORY;}
+bool UserConfigParams::logMemory      () { return (m_verbosity&LOG_MEMORY)       == LOG_MEMORY;}
 
-bool UserConfigParams::logGUI   () { return (m_verbosity&LOG_GUI)    == LOG_GUI;   }
+bool UserConfigParams::logGUI         () { return (m_verbosity&LOG_GUI)          == LOG_GUI;   }
 
-bool UserConfigParams::logAddons() { return (m_verbosity&LOG_ADDONS) == LOG_ADDONS;}
+bool UserConfigParams::logAddons      () { return (m_verbosity&LOG_ADDONS)       == LOG_ADDONS;}
 
-bool UserConfigParams::logMisc  () { return (m_verbosity&LOG_MISC)   == LOG_MISC;  }
+bool UserConfigParams::logMisc        () { return (m_verbosity&LOG_MISC)         == LOG_MISC;  }
+
+bool UserConfigParams::logNetworking  () { return (m_verbosity&LOG_NETWORKING)   == LOG_NETWORKING;  }
