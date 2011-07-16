@@ -64,6 +64,25 @@ void ChallengesScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
 
 // ------------------------------------------------------------------------------------------------------
 
+void ChallengesScreen::beforeAddingWidget()
+{
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
+    assert( w != NULL );
+    
+    const std::vector<const ChallengeData*>& activeChallenges = unlock_manager->getActiveChallenges();
+    const std::vector<const ChallengeData*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
+    const std::vector<const ChallengeData*>& lockedChallenges = unlock_manager->getLockedChallenges();
+    
+    const int activeChallengeAmount = activeChallenges.size();
+    const int solvedChallengeAmount = solvedChallenges.size();
+    const int lockedChallengeAmount = lockedChallenges.size();
+    
+    
+    w->setItemCountHint(activeChallengeAmount + solvedChallengeAmount + lockedChallengeAmount);
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void ChallengesScreen::init()
 {
     Screen::init();
