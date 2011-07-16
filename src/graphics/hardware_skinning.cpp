@@ -72,23 +72,25 @@ void HardwareSkinning::prepareNode(scene::IAnimatedMeshSceneNode *node)
     }
     
     // !FUNTO! set all vertex colors to indexes
-    for(u32 z = 0;z < skin_mesh->getAllJoints().size();++z)
+    const core::array<scene::ISkinnedMesh::SJoint*>& joints = skin_mesh->getAllJoints();
+    for(u32 i = 0;i < joints.size();++i)
     {
-        for(u32 j = 0;j < skin_mesh->getAllJoints()[z]->Weights.size();++j)
+        const core::array<scene::ISkinnedMesh::SWeight>&    weights = joints[i]->Weights;
+        for(u32 j = 0;j < weights.size();++j)
         {
-            int buffId = skin_mesh->getAllJoints()[z]->Weights[j].buffer_id;
+            int buffId = weights[j].buffer_id;
 
-            int vertexId = skin_mesh->getAllJoints()[z]->Weights[j].vertex_id;
+            int vertexId = skin_mesh->getAllJoints()[i]->Weights[j].vertex_id;
             video::SColor* vColor = &skin_mesh->getMeshBuffers()[buffId]->getVertex(vertexId)->Color;
             
             if(vColor->getRed() == 0)
-                vColor->setRed(z + 1);
+                vColor->setRed(i + 1);
             else if(vColor->getGreen() == 0)
-                vColor->setGreen(z + 1);
+                vColor->setGreen(i + 1);
             else if(vColor->getBlue() == 0)
-                vColor->setBlue(z + 1);
+                vColor->setBlue(i + 1);
             else if(vColor->getAlpha() == 0)
-                vColor->setAlpha(z + 1);
+                vColor->setAlpha(i + 1);
         }
     }
 }
@@ -138,24 +140,23 @@ void HWSkinningCallback::OnSetConstants(video::IMaterialRendererServices *servic
     // TODO: cleanup
     // - joints
     scene::ISkinnedMesh* mesh = (scene::ISkinnedMesh*)m_node->getMesh();
-    f32 JointArray[55 * 16];
+    f32 joints_data[55 * 16];
     int copyIncrement = 0;
 
-    for(u32 i = 0;i < mesh->getAllJoints().size();++i)
+    const core::array<scene::ISkinnedMesh::SJoint*> joints = mesh->getAllJoints();
+    for(u32 i = 0;i < joints.size();++i)
     {
-        core::matrix4 JointVertexPull(core::matrix4::EM4CONST_NOTHING);
-        JointVertexPull.setbyproduct(
-        mesh->getAllJoints()[i]->GlobalAnimatedMatrix, 
-        mesh->getAllJoints()[i]->GlobalInversedMatrix);
+        core::matrix4 joint_vertex_pull(core::matrix4::EM4CONST_NOTHING);
+        joint_vertex_pull.setbyproduct(joints[i]->GlobalAnimatedMatrix, joints[i]->GlobalInversedMatrix);
     
-        f32* pointer = JointArray + copyIncrement;
+        f32* pointer = joints_data + copyIncrement;
         for(int i = 0;i < 16;++i)
-            *pointer++ = JointVertexPull[i];
+            *pointer++ = joint_vertex_pull[i];
         
         copyIncrement += 16;
     }
     
-    services->setVertexShaderConstant("JointTransform", JointArray, mesh->getAllJoints().size() * 16);
+    services->setVertexShaderConstant("JointTransform", joints_data, mesh->getAllJoints().size() * 16);
     
     // - mWorldViewProj
     // set clip matrix at register 4

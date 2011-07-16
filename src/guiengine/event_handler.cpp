@@ -139,9 +139,13 @@ bool EventHandler::OnEvent (const SEvent &event)
         m_mouse_pos.X = event.MouseInput.X;
         m_mouse_pos.Y = event.MouseInput.Y;
         
-        // Notify the profiler
-        if(event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP && UserConfigParams::m_profiler_enabled)
+        // Notify the profiler of mouse events
+        if(UserConfigParams::m_profiler_enabled &&
+           event.EventType == EET_MOUSE_INPUT_EVENT &&
+           event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
+        {
             profiler.onClick(m_mouse_pos);
+        }
 
         // FIXME? it may be a bit unclean that all input events go trough the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
