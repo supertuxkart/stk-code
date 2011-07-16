@@ -385,7 +385,7 @@ namespace UserConfigParams
     PARAM_PREFIX bool                       m_profiler_enabled  PARAM_DEFAULT( false );
     
     /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool                       m_hw_skinning_enabled  PARAM_DEFAULT( true );   // BOUM
+    PARAM_PREFIX bool                       m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
