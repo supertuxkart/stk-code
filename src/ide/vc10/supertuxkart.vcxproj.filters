@@ -1488,7 +1488,7 @@
       <Filter>Headerdateien\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hardware_skinning.hpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

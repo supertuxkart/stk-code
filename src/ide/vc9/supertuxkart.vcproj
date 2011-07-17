@@ -691,6 +691,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\hardware_skinning.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.cpp"
 					>
 				</File>
@@ -1754,6 +1758,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\explosion.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hardware_skinning.hpp"
 					>
 				</File>
 				<File
