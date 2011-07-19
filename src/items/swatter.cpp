@@ -17,16 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-// TODO: be able to squash karts
+// done: be able to squash karts
 // TODO: use a proportional corrector for avoiding brutal movements
 // TODO: make the swatter (and other items) appear and disappear progressively
-// TODO: remove the maximum number of squashes
+// done: remove the maximum number of squashes
 // TODO: add a swatter music
 // TODO: be able to squash items
 // TODO: move some constants to KartProperties, use all constants from KartProperties
 
 #include "items/swatter.hpp"
 
+#include "audio/music_manager.hpp"
 #include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
@@ -37,12 +38,19 @@
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
-Swatter::Swatter(Attachment *attachment, Kart *kart) 
+//#define TEMP_TEST_SWATTER_SONG    // uncomment this line to test
+
+Swatter::Swatter(Attachment *attachment, Kart *kart)
        : AttachmentPlugin(attachment, kart)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_target = NULL;
     
+#ifdef TEMP_TEST_SWATTER_SONG
+    sfx_manager->quickSound("swatter");
+    music_manager->setMasterMusicVolume(0.0);
+#endif
+
     // Setup the node
     scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
     node->setPosition(SWAT_POS_OFFSET);
@@ -52,11 +60,14 @@ Swatter::Swatter(Attachment *attachment, Kart *kart)
 //-----------------------------------------------------------------------------
 Swatter::~Swatter()
 {
+#ifdef TEMP_TEST_SWATTER_SONG
+    music_manager->setMasterMusicVolume(1.0);
+#endif
 }   // ~Swatter
 
 //-----------------------------------------------------------------------------
 /** Updates an armed swatter: it checks for any karts that are close enough
- *  and not invulnerable, it swats the kart. 
+ *  and not invulnerable, it swats the kart.
  *  \param dt Time step size.
  *  \return True if the attachment should be discarded.
  */
@@ -68,10 +79,10 @@ bool Swatter::updateAndTestFinished(float dt)
         {
             chooseTarget();
             pointToTarget();
-            
+
             if(!m_target)
                 break;
-            
+
             // Is the target too near?
             float   dist_to_target2 = (m_target->getXYZ() - m_attachment->getNode()->getAbsolutePosition()).length2();
             float   min_dist2       = m_kart->getKartProperties()->getSwatterDistance2();
@@ -79,7 +90,7 @@ bool Swatter::updateAndTestFinished(float dt)
             {
                 // Start squashing
                 m_animation_phase = SWATTER_TO_TARGET;
-    
+
                 // Setup the animation
                 scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
                 node->setCurrentFrame(0.0f);
@@ -91,11 +102,11 @@ bool Swatter::updateAndTestFinished(float dt)
     case SWATTER_TO_TARGET:
         {
             pointToTarget();
-            
+
             scene::IAnimatedMeshSceneNode *node = m_attachment->getNode();
             const float middle_frame    = node->getEndFrame()/2.0f;
             float       current_frame   = node->getFrameNr();
-            
+
             // Did we just finish the first part of the movement?
             if(current_frame >= middle_frame)
             {
@@ -105,11 +116,11 @@ bool Swatter::updateAndTestFinished(float dt)
             }
         }
         break;
-        
+
     case SWATTER_FROM_TARGET:
         break;
     }
-    
+
     // If the swatter is used up, trigger cleaning up
     // TODO: use a timeout
     // TODO: how does it work currently...?
@@ -129,7 +140,7 @@ void Swatter::chooseTarget()
     const World *world         = World::getWorld();
     Kart        *closest_kart  = NULL;
     float       min_dist2      = FLT_MAX;
-    
+
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         Kart *kart = world->getKart(i);
@@ -159,7 +170,7 @@ void Swatter::pointToTarget()
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
         float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx) - m_kart->getHeading()) * 180.0f/M_PI;
-        
+
         m_attachment->getNode()->setRotation(core::vector3df(0.0, angle, 0.0));
     }
 }
@@ -171,13 +182,13 @@ void Swatter::squashThingsAround()
     float                  min_dist2   = kp->getSwatterDistance2();    // Square of the minimum distance
     const World*           world       = World::getWorld();
     scene::IAnimatedMeshSceneNode *node  = m_attachment->getNode();
-    
+
     // Get the node corresponding to the joint at the center of the swatter (by swatter, I mean
     // the thing hold in the hand, not the whole thing)
     scene::ISceneNode* swatter_node = node->getJointNode("Swatter");
     assert(swatter_node);
     Vec3 swatter_pos = swatter_node->getAbsolutePosition();
-    
+
     // Squash karts around
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
@@ -186,13 +197,13 @@ void Swatter::squashThingsAround()
         if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
             continue;
         float dist2 = (kart->getXYZ()-swatter_pos).length2();
-        
+
         if(dist2 < min_dist2)
         {
             kart->setSquash(kp->getSquashDuration(),
                             kp->getSquashSlowdown());
         }
     }
-    
+
     // TODO: squash items
 }
