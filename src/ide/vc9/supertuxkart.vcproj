@@ -575,6 +575,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\rubber_ball.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\rubber_band.cpp"
 					>
 				</File>

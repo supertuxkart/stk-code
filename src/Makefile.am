@@ -185,6 +185,8 @@ supertuxkart_SOURCES = \
  items/powerup_manager.hpp \
  items/projectile_manager.cpp \
  items/projectile_manager.hpp \
+ items/rubber_ball.cpp \
+ items/rubber_ball.hpp \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
  items/swatter.cpp \

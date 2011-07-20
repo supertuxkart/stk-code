@@ -202,7 +202,8 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
-    m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    m_body->setCollisionFlags(m_body->getCollisionFlags() | 
+                              btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 }   // createPhysics
 // -----------------------------------------------------------------------------
@@ -465,6 +466,8 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             break;
             case PowerupManager::POWERUP_PLUNGER: 
                 // Handled by plunger.cpp Plunger::hit
+            break;
+            case PowerupManager::POWERUP_RUBBERBALL: 
             break;
             case PowerupManager::POWERUP_BOWLING:
             {

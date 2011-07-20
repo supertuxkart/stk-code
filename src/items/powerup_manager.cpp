@@ -28,6 +28,7 @@
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
+#include "items/rubber_ball.hpp"
 #include "modes/world.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -93,7 +94,7 @@ PowerupManager::PowerupType
     static std::string powerup_names[] = {
         "",            /* Nothing */ 
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch", 
-        "swatter", "parachute", "anchor"
+        "swatter", "rubber-ball", "parachute", "anchor"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -188,11 +189,13 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     // Load special attributes for certain powerups
     switch (type) {
         case POWERUP_BOWLING:          
-             Bowling::init(node, m_all_meshes[type]); break;
+             Bowling::init(node, m_all_meshes[type]);    break;
         case POWERUP_PLUNGER:          
-             Plunger::init(node, m_all_meshes[type]); break;
+             Plunger::init(node, m_all_meshes[type]);    break;
         case POWERUP_CAKE: 
-             Cake::init(node, m_all_meshes[type]);    break;
+             Cake::init(node, m_all_meshes[type]);       break;
+        case POWERUP_RUBBERBALL:
+             RubberBall::init(node, m_all_meshes[type]); break;
         default:;
     }   // switch
 }   // LoadNode

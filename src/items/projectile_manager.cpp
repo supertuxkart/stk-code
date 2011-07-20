@@ -25,6 +25,7 @@
 #include "items/plunger.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
+#include "items/rubber_ball.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 
@@ -174,9 +175,10 @@ Flyable *ProjectileManager::newProjectile(Kart *kart,
     Flyable *f;
     switch(type) 
     {
-        case PowerupManager::POWERUP_BOWLING: f = new Bowling(kart); break;
-        case PowerupManager::POWERUP_PLUNGER: f = new Plunger(kart); break;
-        case PowerupManager::POWERUP_CAKE:    f = new Cake(kart);  break;
+        case PowerupManager::POWERUP_BOWLING:    f = new Bowling(kart); break;
+        case PowerupManager::POWERUP_PLUNGER:    f = new Plunger(kart); break;
+        case PowerupManager::POWERUP_CAKE:       f = new Cake(kart);    break;
+        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart);break;
         default:              return NULL;
     }
     m_active_projectiles.push_back(f);

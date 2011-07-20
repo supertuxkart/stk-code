@@ -228,6 +228,7 @@ void Powerup::use()
         break;
         }
     case PowerupManager::POWERUP_CAKE:
+    case PowerupManager::POWERUP_RUBBERBALL:
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
         

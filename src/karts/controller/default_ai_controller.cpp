@@ -577,6 +577,12 @@ void DefaultAIController::handleItems(const float dt)
                     m_controls->m_fire = true;
             break;
         }
+    case PowerupManager::POWERUP_RUBBERBALL:
+        // Perhaps some more sophisticated algorithm might be useful.
+        // For now: fire if there is a kart ahead (which means that
+        // this kart is certainly not the first kart)
+        m_controls->m_fire = m_kart_ahead != NULL;
+        break;
     default:
         printf("Invalid or unhandled powerup '%d' in default AI.\n",
                 m_kart->getPowerup()->getType());
@@ -610,7 +616,7 @@ void DefaultAIController::computeNearestKarts()
     for(unsigned int i=0; i<m_world->getNumKarts(); i++)
     {
         Kart *k = m_world->getKart(i);
-        if(k->isEliminated() || k==m_kart) continue;
+        if(k->isEliminated() || k->hasFinishedRace() || k==m_kart) continue;
         if(k->getPosition()==my_position+1) 
         {
             m_kart_behind = k;

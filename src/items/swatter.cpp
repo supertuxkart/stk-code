@@ -32,7 +32,7 @@
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
 
-#define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2, -0.4)
+#define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
 #define SWAT_ANGLE_MIN  45
 #define SWAT_ANGLE_MAX  135
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)

@@ -117,7 +117,8 @@ void Moveable::stopFlying()
  */
 void Moveable::update(float dt)
 {
-    m_motion_state->getWorldTransform(m_transform);
+    if(m_body->getInvMass()!=0)
+        m_motion_state->getWorldTransform(m_transform);
     m_velocityLC  = getVelocity()*m_transform.getBasis();
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
     m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
@@ -145,12 +146,21 @@ void Moveable::createBody(float mass, btTransform& trans,
     m_transform = trans;
     m_motion_state = new KartMotionState(trans);
 
-    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
+    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, 
+                                                  shape, inertia);
     info.m_restitution=0.5f;
 
     // Then create a rigid body
     // ------------------------
     m_body = new btRigidBody(info);
+    if(mass==0)
+    {
+        // Create a kinematic object
+        m_body->setCollisionFlags(m_body->getCollisionFlags() | 
+                                  btCollisionObject::CF_KINEMATIC_OBJECT );
+        m_body->setActivationState(DISABLE_DEACTIVATION);
+    }
+
     // The value of user_pointer must be set from the actual class, otherwise this
     // is only a pointer to moveable, not to (say) kart, and virtual 
     // functions are not called correctly. So only init the pointer to zero.

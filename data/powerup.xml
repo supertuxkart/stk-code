@@ -15,6 +15,9 @@
         model="anchor.b3d"                              />
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
+  <item name="rubber-ball"    icon="rubber_ball-icon.png"
+        model="rubber_ball.b3d" speed="10.0"
+        min-height="0.2"      max-height="1.0"          />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
   <item name="plunger"        icon="plunger-icon.png"
@@ -37,19 +40,19 @@
        be quite rare, since otherwise the item might be used
        too often (compared with many items which will only
        affect a karts or two).                                -->
-  <!--      bubble  cake  bowl  zipper  plunger  switch  glove para  anvil -->
-  <first  w="25       5    15     5      10       10      10     0     0"
-    w-multi=" 0       0     5     0       0        0       5     0     0"    />
-  <top33  w="30      30    30    30      30       10      30    10     0"
-    w-multi=" 0      10    10     0      10        0      10     0     0"    />
-  <mid33  w="30      30    30    30      30       10      30    20     5"
-    w-multi=" 0      20    20    20      20        0       0     5     0"    />
-  <end33  w=" 0      30    30    30      30       10      30    30    30"
-    w-multi=" 0      30    30    30      30        0      30    20     0"    />
-  <last   w=" 0      30    30    60      60        0       0    60    60"
-    w-multi=" 0      30    30    60      60        0       0     0     0"    />
-  <battle w=" 0      30    60     0       0       10      40     0     0"
-    w-multi=" 0       0     5     0       0        0       0     0     0"    />
+  <!--      bubble  cake  bowl  zipper  plunger  switch  glove rubber para  anvil -->
+  <first  w="25       5    15     5      10       10      10     0     0     0"
+    w-multi=" 0       0     5     0       0        0       5     0     0     0"    />
+  <top33  w="30      30    30    30      30       10      30    10    10     0"
+    w-multi=" 0      10    10     0      10        0      10     0     0     0"    />
+  <mid33  w="30      30    30    30      30       10      30    20    20     5"
+    w-multi=" 0      20    20    20      20        0       0     5     5     0"    />
+  <end33  w=" 0      30    30    30      30       10      30    30    30    30"
+    w-multi=" 0      30    30    30      30        0      30    20    20     0"    />
+  <last   w=" 0      30    30    60      60        0       0    60    60    60"
+    w-multi=" 0      30    30    60      60        0       0     0     0     0"    />
+  <battle w=" 0      30    60     0       0       10      40     0     0     0"
+    w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
 
 </powerup>
 
