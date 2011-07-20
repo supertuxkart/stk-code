@@ -65,6 +65,7 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_device              = NULL;
+    m_boost_amount        = 0.0f;
     file_manager->dropFileSystem();
     initDevice();
 }   // IrrDriver
@@ -237,6 +238,7 @@ void IrrDriver::initDevice()
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();        
 
+    // Initialize material2D
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
     material2D.setFlag(video::EMF_ANTI_ALIASING, true);
     for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
@@ -252,6 +254,35 @@ void IrrDriver::initDevice()
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
+    
+    // Initialize post-processing, if possible and asked
+    if(UserConfigParams::m_postprocess_enabled)
+    {
+        if(!m_video_driver->queryFeature(EVDF_RENDER_TO_TARGET))
+            UserConfigParams::m_postprocess_enabled = false;
+        else
+        {
+            // Render target
+            m_postprocess_render_target = m_video_driver->addRenderTargetTexture(m_video_driver->getScreenSize(), "postprocess");
+            if(!m_postprocess_render_target)
+            {
+                fprintf(stderr, "Couldn't create the render target for post-processing, disabling it\n");
+                UserConfigParams::m_postprocess_enabled = false;
+            }
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = m_video_driver->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                        "../data/shaders/motion_blur.vert", "main", video::EVST_VS_2_0,
+                        "../data/shaders/motion_blur.frag", "main", video::EPST_PS_2_0,
+                        this, video::EMT_SOLID);
+            m_postprocess_material.MaterialType = (E_MATERIAL_TYPE)material_type;
+            m_postprocess_material.setTexture(0, m_postprocess_render_target);
+            m_postprocess_material.Wireframe = false;
+            m_postprocess_material.Lighting = false;
+            m_postprocess_material.ZWriteEnable = false;
+        }
+    }
 
     
     // set cursor visible by default (what's the default is not too clearly documented,
@@ -1205,6 +1236,10 @@ void IrrDriver::update(float dt)
         m_video_driver->beginScene(back_buffer_clear,
                                    true, video::SColor(255,100,101,140));
     }
+    
+    // Start the RTT for post-processing
+    if(UserConfigParams::m_postprocess_enabled)
+        m_video_driver->setRenderTarget(m_postprocess_render_target, true, true);
 
     {
         PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
@@ -1346,7 +1381,32 @@ void IrrDriver::update(float dt)
     }
 #endif
     
+    // Draw the fullscreen quad while applying the corresponding post-processing shaders
+    if(UserConfigParams::m_postprocess_enabled)
+    {
+        m_video_driver->setRenderTarget(0, true, true, 0);
+        
+        irr::video::S3DVertex vertices[6];
+        
+        irr::video::SColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        vertices[0] = irr::video::S3DVertex(-1.0f,-1.0f,0.0f,0,0,1, white, 0.0f,1.0f);
+        vertices[1] = irr::video::S3DVertex(-1.0f, 1.0f,0.0f,0,0,1, white, 0.0f,0.0f);
+        vertices[2] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
+        vertices[3] = irr::video::S3DVertex( 1.0f,-1.0f,0.0f,0,0,1, white, 1.0f,1.0f);
+        vertices[4] = irr::video::S3DVertex(-1.0f,-1.0f,0.0f,0,0,1, white, 0.0f,1.0f);
+        vertices[5] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
+        
+        irr::u16 indices[6] = {0, 1, 2, 3, 4, 5};
+        
+        m_video_driver->setMaterial(m_postprocess_material);
+        m_video_driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
+        m_video_driver->setTransform(irr::video::ETS_VIEW, irr::core::matrix4());
+        m_video_driver->setTransform(irr::video::ETS_PROJECTION, irr::core::matrix4());
+        m_video_driver->drawIndexedTriangleList(&vertices[0], 6, &indices[0], 2);
+    }
+    
     m_video_driver->endScene();
+    
     // Enable this next print statement to get render information printed
     // E.g. number of triangles rendered, culled etc. The stats is only
     // printed while the race is running and not while the in-game menu
@@ -1381,6 +1441,15 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
     
     return false;
 }   // OnEvent
+
+// ----------------------------------------------------------------------------
+
+/** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
+void IrrDriver::OnSetConstants(video::IMaterialRendererServices *services, s32 user_data)
+{
+    services->setPixelShaderConstant("boost_amount", &m_boost_amount, 1);
+    //services->setPixelShaderConstant("color_buffer", &m_boost_amount, 1);
+}   // OnSetConstants
 
 // ----------------------------------------------------------------------------
 
