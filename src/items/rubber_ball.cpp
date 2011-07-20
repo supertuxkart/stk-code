@@ -62,7 +62,7 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
 
     // We have to start aiming at the next sector (since it might be possible
     // that the kart is ahead of the center of the current sector).
-    m_current_graph_node   = succ[0];
+    m_aimed_graph_node     = succ[0];
 
     // At the start the ball aims at quads till it gets close enough to the
     // target:
@@ -136,6 +136,13 @@ void RubberBall::update(float dt)
 
     // Determine new distance along track
     Vec3 ball_distance_vec;
+    m_quad_graph->findRoadSector(next_xyz, &m_current_graph_node);
+    if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
+    {
+        m_current_graph_node = 
+            m_quad_graph->findOutOfRoadSector(next_xyz,
+                                              QuadGraph::UNKNOWN_SECTOR );
+    }
     m_quad_graph->spatialToTrack(&ball_distance_vec, getXYZ(), 
                                  m_current_graph_node);
     float old_distance     = m_distance_along_track;
@@ -150,10 +157,23 @@ void RubberBall::update(float dt)
     // FIXME: do we want to test if we have overtaken the target kart?    
 
 #if 0
-    float height = 3*fabsf(sinf(10.0f*logf(target_distance 
-                                            - m_distance_along_track)));
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
 
-    next_xyz.setY(next_xyz.getY()*0.9f+(getHoT() + height)*0.1f);
+    float target_distance = 
+        world->getDistanceDownTrackForKart(m_target->getWorldKartId());
+
+    float x = target_distance - m_distance_along_track;
+    if(x<0)
+        x+=track_length;
+    float height = 0.5f*sqrt(x)*fabsf(sinf(10.0f*log(0.005f*(x+5.0f))));
+    // Stephen_irc:: float height = 0.5*x^0.333*fabsf(sinf(15*log(sqrt(x+5))));
+    static float prev_height = 0;
+    float average_height = 0.5f*prev_height + height1*0.5f;
+    printf("ball z %f dt %f x %f h %f, ah %f\n", 
+        next_xyz.getZ(),dt, 
+        x, height1, average_height);
+    prev_height = height1;
+    next_xyz.setY(getHoT() + average_height);
 #endif
 
     setXYZ(next_xyz);
@@ -180,7 +200,7 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
     // ----------------------
     const Vec3 &ball_xyz = getXYZ();
 
-    GraphNode *gn  = &(m_quad_graph->getNode(m_current_graph_node));
+    GraphNode *gn  = &(m_quad_graph->getNode(m_aimed_graph_node));
     
     // At this stage m_distance_along track is already the new distance (set
     // in the previous time step when aiming). It has to be detected if the
@@ -219,8 +239,8 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
     while(ball_ahead)
     {
         // FIXME: aim better if necessary!
-        m_current_graph_node = gn->getSuccessor(0);
-        gn = &(m_quad_graph->getNode(m_current_graph_node));
+        m_aimed_graph_node = gn->getSuccessor(0);
+        gn = &(m_quad_graph->getNode(m_aimed_graph_node));
 
         // Detect a wrap around of the graph node. We could just test if
         // the index of the new graph node is 0, but since it's possible

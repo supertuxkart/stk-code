@@ -34,8 +34,11 @@ private:
     /** A pointer to the target kart. */
     const Kart  *m_target;
 
-    /** The current quad this ball is aiming at. */
+    /** The current quad this ball is on. */
     int          m_current_graph_node;
+
+    /** The current quad this ball is aiming at. */
+    int          m_aimed_graph_node;
 
     /** The previous distance to the graph node we are aiming
      *  at atm. If the distance increases, we have passed the
