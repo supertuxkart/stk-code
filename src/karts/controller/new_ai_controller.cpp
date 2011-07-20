@@ -443,6 +443,13 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
             m_controls->m_fire = m_time_since_last_shot > 3.0f && 
                                  m_kart->getPosition()>1;
         }
+    case PowerupManager::POWERUP_RUBBERBALL:
+        // Perhaps some more sophisticated algorithm might be useful.
+        // For now: fire if there is a kart ahead (which means that
+        // this kart is certainly not the first kart)
+        m_controls->m_fire = m_kart_ahead != NULL;
+        break;
+
     case PowerupManager::POWERUP_SWATTER:  // fallthrough
     default:
         m_controls->m_fire = true;
