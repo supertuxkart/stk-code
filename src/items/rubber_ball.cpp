@@ -23,6 +23,8 @@
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 
+float RubberBall::m_st_interval;
+
 RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 
                                              0.0f /* mass */)
 {
@@ -70,7 +72,8 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     m_wrapped_around       = false;
     m_previous_height      = 0.0f;
     m_timer                = 0.0f;
-    m_height               = 0.0f;
+    m_interval             = m_st_interval;
+
 }   // RubberBall
 
 // -----------------------------------------------------------------------------
@@ -104,6 +107,9 @@ void RubberBall::computeTarget()
  */
 void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 {
+    m_st_interval = 1.0f;
+    node.get("interval", &m_st_interval);
+
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 

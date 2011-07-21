@@ -79,9 +79,6 @@ protected:
     /** Force pushing the Flyable up. */
     float             m_force_updown;
 
-    /** Interval (used for rubber ball). */
-    float             m_interval;
-
     /** Speed of this Flyable. */
     float             m_speed;
 
@@ -110,9 +107,6 @@ protected:
 
     /** Force pushing up/down. */
     static float      m_st_force_updown[PowerupManager::POWERUP_MAX];
-
-    /** Interval, used for the rubber ball. */
-    static float      m_st_interval[PowerupManager::POWERUP_MAX];
 
     /** Size of the model. */
     static Vec3       m_st_extend[PowerupManager::POWERUP_MAX];

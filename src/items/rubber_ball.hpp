@@ -52,8 +52,15 @@ private:
      *  height newly determined height. */
     float        m_previous_height;
 
-    float        m_height;
+    /** A class variable to store the default interval size. */
+    static float m_st_interval;
 
+
+    /** How long it takes from one bounce of the ball to the next. */
+    float        m_interval;
+
+    /** This timer is used to determine the height depending on the time.
+     *  It is always between 0 and m_interval. */
     float        m_timer;
 
     /** True if the ball just crossed the start line, i.e. its
