@@ -105,7 +105,8 @@ void RubberBall::computeTarget()
 void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 {
     m_st_interval = 1.0f;
-    node.get("interval", &m_st_interval);
+    if(!node.get("interval", &m_st_interval))
+        printf("[powerup] Warning: no interval specific for rubber ball.\n");
 
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
