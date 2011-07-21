@@ -68,7 +68,7 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     // target:
     m_aiming_at_target     = false;
     m_wrapped_around       = false;
-
+    m_previous_height      = 0.0f;
 }   // RubberBall
 
 // -----------------------------------------------------------------------------
@@ -156,7 +156,6 @@ void RubberBall::update(float dt)
 
     // FIXME: do we want to test if we have overtaken the target kart?    
 
-#if 0
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
 
     float target_distance = 
@@ -165,16 +164,19 @@ void RubberBall::update(float dt)
     float x = target_distance - m_distance_along_track;
     if(x<0)
         x+=track_length;
+
+    // A formula to determine height depending on distance to target
     float height = 0.5f*sqrt(x)*fabsf(sinf(10.0f*log(0.005f*(x+5.0f))));
     // Stephen_irc:: float height = 0.5*x^0.333*fabsf(sinf(15*log(sqrt(x+5))));
-    static float prev_height = 0;
-    float average_height = 0.5f*prev_height + height1*0.5f;
+    const float weight   = 0.7f;
+    float average_height = weight*m_previous_height + (1-weight)*height;
+    m_previous_height    = height;
+#if 0
     printf("ball z %f dt %f x %f h %f, ah %f\n", 
         next_xyz.getZ(),dt, 
         x, height1, average_height);
-    prev_height = height1;
-    next_xyz.setY(getHoT() + average_height);
 #endif
+    next_xyz.setY(getHoT() + average_height);
 
     setXYZ(next_xyz);
 }   // update

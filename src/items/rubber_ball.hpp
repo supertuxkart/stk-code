@@ -45,6 +45,13 @@ private:
      *  point we aimed at and have to aim at the next point. */
     float        m_distance_along_track;
 
+    /** Since the distance between target and ball can vary a bit,
+     *  using it to determine height on a formula is not smooth (e.g.
+     *  ball can actually go up a bit during one frame while actually 
+     *  going down). Therefore we use a weighted average of previous
+     *  height newly determined height. */
+    float        m_previous_height;
+
     /** True if the ball just crossed the start line, i.e. its
      *  distance changed from close to length of track in the
      *  previous time step to a bit over zero now. */
