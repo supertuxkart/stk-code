@@ -110,7 +110,6 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
-
 // -----------------------------------------------------------------------------
 /** Updates the rubber ball.
  *  \param dt Time step size.
@@ -118,9 +117,6 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 void RubberBall::update(float dt)
 {
     Flyable::update(dt);
-    m_timer += dt;
-    if(m_timer>m_interval)
-        m_timer -= m_interval;
 
     // Update the target in case that the first kart was overtaken (or has 
     // finished the race).
@@ -152,6 +148,8 @@ void RubberBall::update(float dt)
     }
     m_quad_graph->spatialToTrack(&ball_distance_vec, getXYZ(), 
                                  m_current_graph_node);
+
+    // Detect wrap around, i.e. crossing the start line
     float old_distance     = m_distance_along_track;
     m_distance_along_track = ball_distance_vec[2];
 
@@ -173,6 +171,10 @@ void RubberBall::update(float dt)
     if(x<0)
         x+=track_length;
 
+    m_timer += dt;
+    if(m_timer>m_interval)
+        m_timer -= m_interval;
+
     float height;
     if(x>50)
     {
@@ -183,6 +185,18 @@ void RubberBall::update(float dt)
         // --> scale with m_max_height / -m_interval^2/4
         float f = m_max_height / (-0.25f*m_interval*m_interval);
         height = m_timer * (m_timer-m_interval) * f;
+
+        // If we start the squashing as soon as the height is smaller than
+        // height of the ball, it looks to extreme. So a ratio r of the height
+        // of the ball and the current height of the object is used to tweak 
+        // the look a bit.
+        float r = 2.0f;
+        if(r*height<m_extend.getY())
+            m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
+                                             1.0f));
+        else
+            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+
     }
     else
     {
