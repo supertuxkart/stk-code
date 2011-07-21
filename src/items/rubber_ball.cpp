@@ -69,6 +69,8 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     m_aiming_at_target     = false;
     m_wrapped_around       = false;
     m_previous_height      = 0.0f;
+    m_timer                = 0.0f;
+    m_height               = 0.0f;
 }   // RubberBall
 
 // -----------------------------------------------------------------------------
@@ -113,6 +115,9 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 void RubberBall::update(float dt)
 {
     Flyable::update(dt);
+    m_timer += dt;
+    if(m_timer>m_interval)
+        m_timer -= m_interval;
 
     // Update the target in case that the first kart was overtaken (or has 
     // finished the race).
@@ -132,7 +137,6 @@ void RubberBall::update(float dt)
     // Determine the next point for the ball.
     // FIXME: use interpolation here for smooth curves
     Vec3 next_xyz = getXYZ() + delta * (m_speed * dt / delta.length());
-
 
     // Determine new distance along track
     Vec3 ball_distance_vec;
@@ -161,22 +165,32 @@ void RubberBall::update(float dt)
     float target_distance = 
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
 
+
     float x = target_distance - m_distance_along_track;
     if(x<0)
         x+=track_length;
 
-    // A formula to determine height depending on distance to target
-    float height = 0.5f*sqrt(x)*fabsf(sinf(10.0f*log(0.005f*(x+5.0f))));
-    // Stephen_irc:: float height = 0.5*x^0.333*fabsf(sinf(15*log(sqrt(x+5))));
-    const float weight   = 0.7f;
-    float average_height = weight*m_previous_height + (1-weight)*height;
-    m_previous_height    = height;
+    float height;
+    if(x>50)
+    {
+        // Consider f(x) = x*(x-m_intervall), which is a parabolic function 
+        // with f(0) = 0, f(m_intervall)=0. We then scale this function to
+        // fulfill: f(m_intervall/2) = m_max_height, or:
+        // f(m_interval/2) = -m_interval^2/4 = m_max_height
+        // --> scale with m_max_height / -m_interval^2/4
+        float f = m_max_height / (-0.25f*m_interval*m_interval);
+        height = m_timer * (m_timer-m_interval) * f;
+    }
+    else
+    {
+        height = 0.5f*sqrt(x)*fabsf(sinf(10.0f*log(0.005f*(x+5.0f))));
+    }
 #if 0
     printf("ball z %f dt %f x %f h %f, ah %f\n", 
         next_xyz.getZ(),dt, 
         x, height1, average_height);
 #endif
-    next_xyz.setY(getHoT() + average_height);
+    next_xyz.setY(getHoT() + height);
 
     setXYZ(next_xyz);
 }   // update

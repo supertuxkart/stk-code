@@ -108,6 +108,7 @@ scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
 float         Flyable::m_st_min_height  [PowerupManager::POWERUP_MAX];
 float         Flyable::m_st_max_height  [PowerupManager::POWERUP_MAX];
 float         Flyable::m_st_force_updown[PowerupManager::POWERUP_MAX];
+float         Flyable::m_st_interval    [PowerupManager::POWERUP_MAX];
 Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
@@ -121,6 +122,7 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
     m_min_height                   = m_st_min_height[type];
     m_average_height               = (m_min_height+m_max_height)/2.0f;
     m_force_updown                 = m_st_force_updown[type];
+    m_interval                     = m_st_interval[type];
     m_owner                        = kart;
     m_type                         = type;
     m_has_hit_something            = false;
@@ -214,10 +216,12 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
     m_st_max_height[type]   = 1.0f;
     m_st_min_height[type]   = 3.0f;
     m_st_force_updown[type] = 15.0f;
+    m_st_interval[type]     = 1.0f;
     node.get("speed",           &(m_st_speed[type])       );
     node.get("min-height",      &(m_st_min_height[type])  );
     node.get("max-height",      &(m_st_max_height[type])  );
     node.get("force-updown",    &(m_st_force_updown[type]));
+    node.get("interval",        &(m_st_interval[type])   );
 
     // Store the size of the model
     Vec3 min, max;

@@ -52,6 +52,10 @@ private:
      *  height newly determined height. */
     float        m_previous_height;
 
+    float        m_height;
+
+    float        m_timer;
+
     /** True if the ball just crossed the start line, i.e. its
      *  distance changed from close to length of track in the
      *  previous time step to a bit over zero now. */
