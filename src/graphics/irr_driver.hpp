@@ -32,21 +32,19 @@
 #include <dimension2d.h>
 #include <SColor.h>
 #include <IrrlichtDevice.h>
-#include <IShaderConstantSetCallBack.h>
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
         class IMeshSceneNode; class IParticleSystemSceneNode; class ICameraSceneNode; class ILightSceneNode; }
     namespace gui   { class IGUIEnvironment; class IGUIFont; }
-    namespace video { class ITexture; }
 }
 using namespace irr;
 
+#include "post_processing.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
-
 
 class Camera;
 class Kart;
@@ -62,7 +60,7 @@ struct VideoMode
   *  ways to manage the 3D scene
   * \ingroup graphics
   */
-class IrrDriver : public IEventReceiver, public video::IShaderConstantSetCallBack, public NoCopy
+class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
     /** The irrlicht device. */
@@ -75,13 +73,8 @@ private:
     video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     gui::IGUIFont              *m_race_font;
-    
-    // ------  Post-processing -------
-    video::ITexture            *m_postprocess_render_target;
-    video::SMaterial            m_postprocess_material;
-    
-    /** Boost amount, used to tune the motion blur. Must be in the range 0.0 to 1.0 */
-    float                       m_boost_amount;
+    /** Post-processing */
+    PostProcessing              m_post_processing;
     
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -197,10 +190,7 @@ public:
                         const video::SColor *cb=NULL,
                         const video::SColor *cc=NULL);
     
-    inline void setBoostAmount(float boost_amount)  {m_boost_amount = boost_amount;}
-    
-    /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
-    void OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);
+    inline PostProcessing* getPostProcessing()  {return &m_post_processing;}
     
     // --------------------- RTT --------------------
     /**

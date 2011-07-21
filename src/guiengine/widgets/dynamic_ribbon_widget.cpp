@@ -1023,7 +1023,7 @@ void DynamicRibbonWidget::update(float dt)
 bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id)
 {
     int row = -1;
-    int id;
+    int id = -1;
     
     for (int r=0; r<m_rows.size(); r++)
     {

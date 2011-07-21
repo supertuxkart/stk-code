@@ -87,6 +87,8 @@ supertuxkart_SOURCES = \
  graphics/particle_kind_manager.hpp \
  graphics/per_camera_node.cpp \
  graphics/per_camera_node.hpp \
+ graphics/post_processing.cpp \
+ graphics/post_processing.hpp \
  graphics/rain.cpp \
  graphics/rain.hpp \
  graphics/shadow.cpp \

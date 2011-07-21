@@ -65,7 +65,6 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_device              = NULL;
-    m_boost_amount        = 0.0f;
     file_manager->dropFileSystem();
     initDevice();
 }   // IrrDriver
@@ -74,6 +73,7 @@ IrrDriver::IrrDriver()
 
 IrrDriver::~IrrDriver()
 {
+    m_post_processing.shut();
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
@@ -255,35 +255,8 @@ void IrrDriver::initDevice()
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
     
-    // Initialize post-processing, if possible and asked
-    if(UserConfigParams::m_postprocess_enabled)
-    {
-        if(!m_video_driver->queryFeature(EVDF_RENDER_TO_TARGET))
-            UserConfigParams::m_postprocess_enabled = false;
-        else
-        {
-            // Render target
-            m_postprocess_render_target = m_video_driver->addRenderTargetTexture(m_video_driver->getScreenSize(), "postprocess");
-            if(!m_postprocess_render_target)
-            {
-                fprintf(stderr, "Couldn't create the render target for post-processing, disabling it\n");
-                UserConfigParams::m_postprocess_enabled = false;
-            }
-            
-            // Material and shaders
-            IGPUProgrammingServices* gpu = m_video_driver->getGPUProgrammingServices();
-            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                        "../data/shaders/motion_blur.vert", "main", video::EVST_VS_2_0,
-                        "../data/shaders/motion_blur.frag", "main", video::EPST_PS_2_0,
-                        this, video::EMT_SOLID);
-            m_postprocess_material.MaterialType = (E_MATERIAL_TYPE)material_type;
-            m_postprocess_material.setTexture(0, m_postprocess_render_target);
-            m_postprocess_material.Wireframe = false;
-            m_postprocess_material.Lighting = false;
-            m_postprocess_material.ZWriteEnable = false;
-        }
-    }
-
+    // Initialize post-processing if supported
+    m_post_processing.init(m_video_driver);
     
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
@@ -1238,8 +1211,7 @@ void IrrDriver::update(float dt)
     }
     
     // Start the RTT for post-processing
-    if(UserConfigParams::m_postprocess_enabled)
-        m_video_driver->setRenderTarget(m_postprocess_render_target, true, true);
+    m_post_processing.beginCapture();
 
     {
         PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
@@ -1381,29 +1353,11 @@ void IrrDriver::update(float dt)
     }
 #endif
     
-    // Draw the fullscreen quad while applying the corresponding post-processing shaders
-    if(UserConfigParams::m_postprocess_enabled)
-    {
-        m_video_driver->setRenderTarget(0, true, true, 0);
-        
-        irr::video::S3DVertex vertices[6];
-        
-        irr::video::SColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        vertices[0] = irr::video::S3DVertex(-1.0f,-1.0f,0.0f,0,0,1, white, 0.0f,1.0f);
-        vertices[1] = irr::video::S3DVertex(-1.0f, 1.0f,0.0f,0,0,1, white, 0.0f,0.0f);
-        vertices[2] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
-        vertices[3] = irr::video::S3DVertex( 1.0f,-1.0f,0.0f,0,0,1, white, 1.0f,1.0f);
-        vertices[4] = irr::video::S3DVertex(-1.0f,-1.0f,0.0f,0,0,1, white, 0.0f,1.0f);
-        vertices[5] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
-        
-        irr::u16 indices[6] = {0, 1, 2, 3, 4, 5};
-        
-        m_video_driver->setMaterial(m_postprocess_material);
-        m_video_driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
-        m_video_driver->setTransform(irr::video::ETS_VIEW, irr::core::matrix4());
-        m_video_driver->setTransform(irr::video::ETS_PROJECTION, irr::core::matrix4());
-        m_video_driver->drawIndexedTriangleList(&vertices[0], 6, &indices[0], 2);
-    }
+    // Stop capturing for the post-processing
+    m_post_processing.endCapture();
+    
+    // Render the post-processed scene
+    m_post_processing.render();
     
     m_video_driver->endScene();
     
@@ -1441,15 +1395,6 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
     
     return false;
 }   // OnEvent
-
-// ----------------------------------------------------------------------------
-
-/** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
-void IrrDriver::OnSetConstants(video::IMaterialRendererServices *services, s32 user_data)
-{
-    services->setPixelShaderConstant("boost_amount", &m_boost_amount, 1);
-    //services->setPixelShaderConstant("color_buffer", &m_boost_amount, 1);
-}   // OnSetConstants
 
 // ----------------------------------------------------------------------------
 
