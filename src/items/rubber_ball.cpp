@@ -31,9 +31,6 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
     float min_speed = m_speed*4.0f;
-    m_speed         = kart->getSpeed() + m_speed;
-
-    if(m_speed < min_speed) m_speed = min_speed;
 
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), 

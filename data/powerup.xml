@@ -16,7 +16,7 @@
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
-        model="rubber_ball.b3d" speed="10.0"
+        model="rubber_ball.b3d" speed="30.0"
         interval="1"          max-height="4.0"          />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
