@@ -32,6 +32,7 @@
 TerrainInfo::TerrainInfo()
 {
     m_last_material = NULL;
+    m_material      = NULL;
 }   // TerrainInfo
 
 //-----------------------------------------------------------------------------
