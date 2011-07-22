@@ -27,6 +27,7 @@
 #endif
 #include <math.h>
 
+#include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 
 #include "graphics/irr_driver.hpp"
@@ -218,7 +219,14 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
     node.get("min-height",      &(m_st_min_height[type])  );
     node.get("max-height",      &(m_st_max_height[type])  );
     node.get("force-updown",    &(m_st_force_updown[type]));
-
+    core::vector3df scale(1.0f, 1.0f, 1.0f);
+    if(node.get("scale",        &scale))
+    {
+        irr::scene::IMeshManipulator *mani = 
+            irr_driver->getVideoDriver()->getMeshManipulator();
+        mani->scale(model, scale);
+    }
+    
     // Store the size of the model
     Vec3 min, max;
     MeshTools::minMax3D(model, &min, &max);
