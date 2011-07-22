@@ -786,6 +786,12 @@
     <ClCompile Include="..\..\graphics\hardware_skinning.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\items\rubber_ball.cpp">
+      <Filter>Quelldateien\items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\graphics\post_processing.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1488,6 +1494,12 @@
       <Filter>Headerdateien\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hardware_skinning.hpp">
+      <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\items\rubber_ball.hpp">
+      <Filter>Headerdateien\items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\post_processing.hpp">
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>

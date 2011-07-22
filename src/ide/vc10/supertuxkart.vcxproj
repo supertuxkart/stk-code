@@ -116,8 +116,10 @@
     <ClCompile Include="..\..\graphics\lod_node.cpp" />
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
+    <ClCompile Include="..\..\graphics\post_processing.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
+    <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
@@ -330,8 +332,10 @@
     <ClInclude Include="..\..\graphics\lod_node.hpp" />
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
+    <ClInclude Include="..\..\graphics\post_processing.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
+    <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
