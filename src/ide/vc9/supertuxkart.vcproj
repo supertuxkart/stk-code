@@ -739,6 +739,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\post_processing.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\rain.cpp"
 					>
 				</File>
@@ -1806,6 +1810,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\per_camera_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\post_processing.hpp"
 					>
 				</File>
 				<File
