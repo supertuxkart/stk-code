@@ -67,10 +67,9 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     // target:
     m_aiming_at_target     = false;
     m_wrapped_around       = false;
-    m_previous_height      = 0.0f;
     m_timer                = 0.0f;
     m_interval             = m_st_interval;
-
+    m_height               = m_max_height;
 }   // RubberBall
 
 // -----------------------------------------------------------------------------
@@ -160,55 +159,61 @@ void RubberBall::update(float dt)
     m_wrapped_around = old_distance > 0.9f * track_length && 
                        m_distance_along_track < 10.0f;
 
+
     // FIXME: do we want to test if we have overtaken the target kart?    
 
-    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
 
-    float target_distance = 
-        world->getDistanceDownTrackForKart(m_target->getWorldKartId());
-
-
-    float x = target_distance - m_distance_along_track;
-    if(x<0)
-        x+=track_length;
-
+    // When the ball hits the floor, we adjust maximum height and 
+    // interval so that the ball bounces faster when it is getting
+    // closer to the target.
     m_timer += dt;
     if(m_timer>m_interval)
+    {
         m_timer -= m_interval;
 
-    float height;
-    if(x>50)
-    {
-        // Consider f(x) = x*(x-m_intervall), which is a parabolic function 
-        // with f(0) = 0, f(m_intervall)=0. We then scale this function to
-        // fulfill: f(m_intervall/2) = m_max_height, or:
-        // f(m_interval/2) = -m_interval^2/4 = m_max_height
-        // --> scale with m_max_height / -m_interval^2/4
-        float f = m_max_height / (-0.25f*m_interval*m_interval);
-        height = m_timer * (m_timer-m_interval) * f;
+        LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+        float target_distance = 
+            world->getDistanceDownTrackForKart(m_target->getWorldKartId());
 
-        // If we start the squashing as soon as the height is smaller than
-        // height of the ball, it looks to extreme. So a ratio r of the height
-        // of the ball and the current height of the object is used to tweak 
-        // the look a bit.
-        float r = 2.0f;
-        if(r*height<m_extend.getY())
-            m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
-                                             1.0f));
+        float distance = target_distance - m_distance_along_track;
+        if(distance<0)
+            distance+=track_length;
+        if(distance<50)
+        {
+            // Some experimental formulas
+            m_height   = 0.5f*sqrt(distance);
+            m_interval = m_height / 10.0f;
+        }
         else
-            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+        {
+            // Reset the values in case that the ball was already trying
+            // to get closer to the target, and then the target disappears
+            // (e.g. is eliminated or finishes the race).
+            m_interval = m_st_interval;
+            m_height   = m_max_height;
+        }
 
     }
-    else
-    {
-        height = 0.5f*sqrt(x)*fabsf(sinf(10.0f*log(0.005f*(x+5.0f))));
-    }
-#if 0
-    printf("ball z %f dt %f x %f h %f, ah %f\n", 
-        next_xyz.getZ(),dt, 
-        x, height1, average_height);
-#endif
+
+    // Consider f(x) = x*(x-m_intervall), which is a parabolic function 
+    // with f(0) = 0, f(m_intervall)=0. We then scale this function to
+    // fulfill: f(m_intervall/2) = m_height, or:
+    // f(m_interval/2) = -m_interval^2/4 = m_height
+    // --> scale with m_height / -m_interval^2/4
+    float f      = m_height / (-0.25f*m_interval*m_interval);
+    float height = m_timer * (m_timer-m_interval) * f;
     next_xyz.setY(getHoT() + height);
+
+    // If we start squashing the ball as soon as the height is smaller than
+    // height of the ball, it looks to extreme. So a ratio r of the height
+    // of the ball and the current height of the object is used to tweak 
+    // the look a bit.
+    float r = 2.0f;
+    if(r*height<m_extend.getY())
+        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
+        1.0f));
+    else
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
     setXYZ(next_xyz);
 }   // update

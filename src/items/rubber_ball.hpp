@@ -45,16 +45,8 @@ private:
      *  point we aimed at and have to aim at the next point. */
     float        m_distance_along_track;
 
-    /** Since the distance between target and ball can vary a bit,
-     *  using it to determine height on a formula is not smooth (e.g.
-     *  ball can actually go up a bit during one frame while actually 
-     *  going down). Therefore we use a weighted average of previous
-     *  height newly determined height. */
-    float        m_previous_height;
-
     /** A class variable to store the default interval size. */
     static float m_st_interval;
-
 
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
@@ -62,6 +54,10 @@ private:
     /** This timer is used to determine the height depending on the time.
      *  It is always between 0 and m_interval. */
     float        m_timer;
+
+    /** The maximum height of the ball. This value will be reduced if the
+     *  ball gets closer to the target. */
+    float        m_height;
 
     /** True if the ball just crossed the start line, i.e. its
      *  distance changed from close to length of track in the
