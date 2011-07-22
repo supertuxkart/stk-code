@@ -27,13 +27,13 @@
 Profiler profiler;
 
 // Unit is in pencentage of the screen dimensions
-#define MARGIN_X    0.02    // left and right margin
-#define MARGIN_Y    0.02    // top margin
-#define LINE_HEIGHT 0.015   // height of a line representing a thread
+#define MARGIN_X    0.02f    // left and right margin
+#define MARGIN_Y    0.02f    // top margin
+#define LINE_HEIGHT 0.015f   // height of a line representing a thread
 
 #define MARKERS_NAMES_POS      core::rect<s32>(50,50,150,150)
 
-#define TIME_DRAWN_MS 30.0 // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
+#define TIME_DRAWN_MS 30.0f // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 
 // --- Begin portable precise timer ---
 #ifdef WIN32
@@ -274,10 +274,10 @@ void Profiler::onClick(const core::vector2di& mouse_pos)
     video::IVideoDriver*            driver = irr_driver->getVideoDriver();
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
     
-    core::rect<s32>background_rect( MARGIN_X                        * screen_size.Width,
-                                    MARGIN_Y                        * screen_size.Height,
-                                    (1.0-MARGIN_X)                  * screen_size.Width,
-                                    (MARGIN_Y + 3.0*LINE_HEIGHT)    * screen_size.Height);
+    core::rect<s32>background_rect((int)(MARGIN_X                      * screen_size.Width),
+                                   (int)(MARGIN_Y                      * screen_size.Height),
+                                   (int)((1.0-MARGIN_X)                * screen_size.Width),
+                                   (int)((MARGIN_Y + 3.0f*LINE_HEIGHT) * screen_size.Height));
 
     if(!background_rect.isPointInside(mouse_pos))
         return;
@@ -308,10 +308,10 @@ void Profiler::drawBackground()
     video::IVideoDriver*            driver = irr_driver->getVideoDriver();
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
 
-    core::rect<s32>background_rect( MARGIN_X                        * screen_size.Width,
-                                    MARGIN_Y                        * screen_size.Height,
-                                    (1.0-MARGIN_X)                  * screen_size.Width,
-                                    (MARGIN_Y + 3.0*LINE_HEIGHT)    * screen_size.Height);
+    core::rect<s32>background_rect((int)(MARGIN_X                      * screen_size.Width),
+                                   (int)(MARGIN_Y                      * screen_size.Height),
+                                   (int)((1.0-MARGIN_X)                * screen_size.Width),
+                                   (int)((MARGIN_Y + 3.0f*LINE_HEIGHT) * screen_size.Height));
 
     video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
     driver->draw2DRectangle(color, background_rect);
