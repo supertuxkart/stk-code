@@ -328,6 +328,7 @@
 		9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9586318211B1EC9F00B8B4AF /* grand_prix_win.cpp */; };
 		958BD770117F6AE90095B483 /* music_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958BD76E117F6AE90095B483 /* music_manager.cpp */; };
 		958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D8C53104F523000A81934 /* race_paused_dialog.cpp */; };
+		958D924213DA48A70097BC82 /* post_processing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D924013DA48A70097BC82 /* post_processing.cpp */; };
 		9592DC6D13021B350039DBC8 /* minimal_race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9592DC6B13021B350039DBC8 /* minimal_race_gui.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
@@ -1105,6 +1106,8 @@
 		958BD76F117F6AE90095B483 /* music_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_manager.hpp; path = ../../audio/music_manager.hpp; sourceTree = SOURCE_ROOT; };
 		958D8C52104F523000A81934 /* race_paused_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_paused_dialog.hpp; path = ../../states_screens/dialogs/race_paused_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		958D8C53104F523000A81934 /* race_paused_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_paused_dialog.cpp; path = ../../states_screens/dialogs/race_paused_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		958D924013DA48A70097BC82 /* post_processing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = post_processing.cpp; path = ../../graphics/post_processing.cpp; sourceTree = SOURCE_ROOT; };
+		958D924113DA48A70097BC82 /* post_processing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = post_processing.hpp; path = ../../graphics/post_processing.hpp; sourceTree = SOURCE_ROOT; };
 		9592DC6B13021B350039DBC8 /* minimal_race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = minimal_race_gui.cpp; path = ../../states_screens/minimal_race_gui.cpp; sourceTree = SOURCE_ROOT; };
 		9592DC6C13021B350039DBC8 /* minimal_race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = minimal_race_gui.hpp; path = ../../states_screens/minimal_race_gui.hpp; sourceTree = SOURCE_ROOT; };
 		959482CF10EBC0790031BADF /* track_object_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_object_manager.cpp; path = ../../tracks/track_object_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -1441,6 +1444,8 @@
 				9528C71512D69494006E9167 /* particle_kind_manager.hpp */,
 				95E1FCDD130369EB004D83CC /* per_camera_node.cpp */,
 				95E1FCDE130369EB004D83CC /* per_camera_node.hpp */,
+				958D924013DA48A70097BC82 /* post_processing.cpp */,
+				958D924113DA48A70097BC82 /* post_processing.hpp */,
 				9559DE7E12FF777600350DE8 /* rain.cpp */,
 				95E1FCE0130369F4004D83CC /* rain.hpp */,
 				952A153D103F66D600B1895D /* shadow.cpp */,
@@ -3128,6 +3133,7 @@
 				957899B813C8E05F007AA5A3 /* profiler.cpp in Sources */,
 				9598A5B613CFBA83000B83EA /* hardware_skinning.cpp in Sources */,
 				95D2C43013D6605600E84032 /* rubber_ball.cpp in Sources */,
+				958D924213DA48A70097BC82 /* post_processing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
