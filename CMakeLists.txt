@@ -5,7 +5,6 @@
 # TODO: allow to disable asserts (NDEBUG?)
 
 cmake_minimum_required(VERSION 2.8.1)
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)	# allow endif()
 
 project(SuperTuxKart)
 
@@ -14,7 +13,11 @@ project(SuperTuxKart)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-option(IRRLICHT_DIR "/path/to/irrlicht")
+
+# Tweakable values
+option(DEBUG "Enable debugging and turn assertions on" OFF)
+option(USE_FRIBIDI "Support for right-to-left languages" ON)
+set(IRRLICHT_DIR "/path/to/irrlicht" CACHE STRING "Path to Irrlicht")
 
 # Build the Bullet physics library
 add_subdirectory("${STK_SOURCE_DIR}/bullet")
@@ -22,21 +25,43 @@ add_subdirectory("${STK_SOURCE_DIR}/bullet")
 # Build the ENet UDP network library
 add_subdirectory("${STK_SOURCE_DIR}/enet")
 
-# Set include and lib paths
+# Set include paths
 include_directories("${IRRLICHT_DIR}/include")
 include_directories("${STK_SOURCE_DIR}")
 include_directories("${STK_SOURCE_DIR}/enet/include")
 include_directories("${STK_SOURCE_DIR}/bullet/src")
-link_directories("${IRRLICHT_DIR}/lib/Linux")
+
+# Set lib paths
+if(APPLE)
+	link_directories("${IRRLICHT_DIR}/lib/MacOSX")
+elseif(UNIX)
+	link_directories("${IRRLICHT_DIR}/lib/Linux")
+elseif(MSVC)
+	link_directories("${IRRLICHT_DIR}/lib/Win32-visualstudio")
+else()
+	link_directories("${IRRLICHT_DIR}/lib/Win32-gcc")
+endif()
+
 link_directories("${STK_SOURCE_DIR}/bullet")
 
 # Set some compiler options
 if(UNIX)
-add_definitions(-Wall)
-#add_definitions(-O3)
+	add_definitions(-Wall)
+	
+	if(DEBUG)
+		add_definitions(-g)
+	else()
+		add_definitions(-O3)
+	endif()
 endif()
-add_definitions(-DHAVE_OGGVORBIS)
-add_definitions(-DDEBUG)
+
+add_definitions(-DHAVE_OGGVORBIS)	# TODO: remove this switch
+
+if(DEBUG)
+	add_definitions(-DDEBUG)
+else()
+	add_definitions(-DNDEBUG)
+endif()
 
 # TODO
 # include_directories("/usr/include/freetype2")	
@@ -505,12 +530,23 @@ add_executable(supertuxkart
 
 target_link_libraries(supertuxkart
 	Irrlicht
-	GL
 	bulletdynamics
 	bulletcollision
 	bulletmath
 	enet
-	Xxf86vm
-	openal
 	curl
 	vorbisfile)
+	
+if(USE_FRIBIDI)
+	target_link_libraries(supertuxkart
+		fribidi)
+endif()
+	
+if(UNIX)
+	target_link_libraries(supertuxkart
+		GL
+		openal
+		Xxf86vm)
+elseif(APPLE)
+	# TODO!
+endif()
