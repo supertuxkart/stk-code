@@ -14,7 +14,7 @@ project(SuperTuxKart)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-set(IRRLICHT_DIR "/home/funto/projets/stk/irrlicht-trunk")
+option(IRRLICHT_DIR "/path/to/irrlicht")
 
 # Build the Bullet physics library
 add_subdirectory("${STK_SOURCE_DIR}/bullet")
