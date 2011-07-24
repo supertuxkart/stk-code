@@ -1,5 +1,7 @@
 # CMakeLists.txt for Bullet in STK
 
+include_directories(".")
+
 # libbulletmath
 add_library(bulletmath
 	src/LinearMath/btAabbUtil2.h           src/LinearMath/btMotionState.h
