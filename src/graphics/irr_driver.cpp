@@ -1210,9 +1210,6 @@ void IrrDriver::update(float dt)
                                    true, video::SColor(255,100,101,140));
     }
     
-    // Start the RTT for post-processing
-    m_post_processing.beginCapture();
-
     {
         PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
         
@@ -1233,6 +1230,9 @@ void IrrDriver::update(float dt)
 
         if (inRace)
         {
+            // Start the RTT for post-processing
+            m_post_processing.beginCapture();
+            
             irr_driver->getVideoDriver()->enableMaterial2D();
 
             RaceGUIBase *rg = world->getRaceGUI();
@@ -1264,6 +1264,12 @@ void IrrDriver::update(float dt)
                 }   // if kart->Camera
             }   // for i<world->getNumKarts()
             
+            // Stop capturing for the post-processing
+            m_post_processing.endCapture();
+            
+            // Render the post-processed scene
+            m_post_processing.render();
+            
             // To draw the race gui we set the viewport back to the full
             // screen. 
             m_video_driver->setViewPort(core::recti(0, 0,
@@ -1292,7 +1298,6 @@ void IrrDriver::update(float dt)
             // render 3D stuff in cutscenes too
             m_scene_manager->drawAll();
         }
-        
         
         // The render and displayFPS calls interfere with bullet debug
         // rendering, so they can not be called.
@@ -1352,12 +1357,6 @@ void IrrDriver::update(float dt)
         }
     }
 #endif
-    
-    // Stop capturing for the post-processing
-    m_post_processing.endCapture();
-    
-    // Render the post-processed scene
-    m_post_processing.render();
     
     m_video_driver->endScene();
     
