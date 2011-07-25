@@ -19,6 +19,12 @@
 
 #include "items/rubber_ball.hpp"
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
@@ -30,8 +36,6 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
 {
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
-    float min_speed = m_speed*4.0f;
-
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), 
                   -70.0f /*gravity*/, 
@@ -202,6 +206,12 @@ void RubberBall::update(float dt)
     // --> scale with m_height / -m_interval^2/4
     float f      = m_height / (-0.25f*m_interval*m_interval);
     float height = m_timer * (m_timer-m_interval) * f;
+    if(isnan(getHoT()))
+    {
+        printf("NAN in rubber ball, xyz=%f %f %f\n",
+               getXYZ().getX(), getXYZ().getY(), getXYZ().getZ());
+        printf("Material=%p\n", getMaterial());
+    }
     next_xyz.setY(getHoT() + height);
 
     // If we start squashing the ball as soon as the height is smaller than
@@ -237,8 +247,6 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 
     // Aiming at a graph node
     // ----------------------
-    const Vec3 &ball_xyz = getXYZ();
-
     GraphNode *gn  = &(m_quad_graph->getNode(m_aimed_graph_node));
     
     // At this stage m_distance_along track is already the new distance (set
