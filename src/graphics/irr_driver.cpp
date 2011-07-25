@@ -1199,8 +1199,13 @@ void IrrDriver::update(float dt)
     bool back_buffer_clear = inRace && (world->getPhysics()->isDebug() ||
                                         world->clearBackBuffer()         );
     
-    if (world != NULL)
+    if (inRace)
     {
+        // Start the RTT for post-processing.
+        // We do this before beginScene() because we want to capture the glClear()
+        // because of tracks that do not have skyboxes (generally add-on tracks)
+        m_post_processing.beginCapture();
+        
         m_video_driver->beginScene(back_buffer_clear,
                                                true, world->getClearColor());
     }
@@ -1230,9 +1235,6 @@ void IrrDriver::update(float dt)
 
         if (inRace)
         {
-            // Start the RTT for post-processing
-            m_post_processing.beginCapture();
-            
             irr_driver->getVideoDriver()->enableMaterial2D();
 
             RaceGUIBase *rg = world->getRaceGUI();
