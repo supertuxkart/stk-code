@@ -49,7 +49,7 @@ void main()
 	vec2 blur_texcoords = texcoords + inc_vec;
 	for(int i=1 ; i < NB_SAMPLES ; i++)
 	{
-		color += texture2D(color_buffer, blur_texcoords);
+		color += texture2D(color_buffer, blur_texcoords).rgb;
 		blur_texcoords += inc_vec;
 	}
 	color /= vec3(NB_SAMPLES);
