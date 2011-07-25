@@ -20,6 +20,7 @@
 #include "post_processing.hpp"
 #include "irr_driver.hpp"
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 
 #define MOTION_BLUR_FACTOR (1.0f/15.0f)
 #define MOTION_BLUR_OFFSET 20.0f
@@ -62,8 +63,8 @@ void PostProcessing::init(video::IVideoDriver* video_driver)
         // Material and shaders
         IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
         s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                    "../data/shaders/motion_blur.vert", "main", video::EVST_VS_2_0,
-                    "../data/shaders/motion_blur.frag", "main", video::EPST_PS_2_0,
+                    (file_manager->getDataDir() + "shaders/motion_blur.vert").c_str(), "main", video::EVST_VS_2_0,
+                    (file_manager->getDataDir() + "shaders/motion_blur.frag").c_str(), "main", video::EPST_PS_2_0,
                     this, video::EMT_SOLID);
         m_material.MaterialType = (E_MATERIAL_TYPE)material_type;
         m_material.setTexture(0, m_render_target);
