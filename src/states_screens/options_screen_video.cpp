@@ -44,11 +44,12 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
 // Look-up table for GFX levels
-const bool GFX           [] = {false, true,  true,  true,  true,  true};
-const int  GFX_ANIM_KARTS[] = {0,     0,     1,     2,     2,     2   };
-const bool GFX_WEATHER   [] = {false, false, false, false, true,  true};
-const bool GFX_ANTIALIAS [] = {false, false, false, false, false, true};
-const int  GFX_LEVEL_AMOUNT = 6;
+const bool GFX                [] = {false, true,  true,  true,  true,  true,  true};
+const int  GFX_ANIM_KARTS     [] = {0,     0,     1,     2,     2,     2,     2};
+const bool GFX_WEATHER        [] = {false, false, false, false, true,  true,  true};
+const bool GFX_ANTIALIAS      [] = {false, false, false, false, false, true,  true};
+const bool GFX_POSTPROCESSING [] = {false, false, false, false, false, false, true};
+const int  GFX_LEVEL_AMOUNT = 7;
 
 // -----------------------------------------------------------------------------
 
@@ -252,7 +253,8 @@ void OptionsScreenVideo::init()
         if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l] &&
             UserConfigParams::m_graphical_effects        == GFX[l] &&
             UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
-            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l])
+            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l] &&
+            UserConfigParams::m_postprocess_enabled      == GFX_POSTPROCESSING[l])
         {
             gfx->setValue(l+1);
             break;
@@ -303,6 +305,8 @@ void OptionsScreenVideo::updateTooltip()
                                   (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s", UserConfigParams::m_fullscreen_antialiasing ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Post-processing (motion blur) : %s", UserConfigParams::m_postprocess_enabled ? enabled : disabled);
     gfx->setTooltip(tooltip);
 }
 
@@ -357,6 +361,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name, 
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
         UserConfigParams::m_fullscreen_antialiasing  = GFX_ANTIALIAS[level-1];
+        UserConfigParams::m_postprocess_enabled      = GFX_POSTPROCESSING[level-1];
         
         updateTooltip();
     }

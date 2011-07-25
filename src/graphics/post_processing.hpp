@@ -54,8 +54,8 @@ public:
     /** Is the hardware able to use post-processing? */
     inline bool     isSupported() const                 {return m_supported;}
     
-    /** Boost amount, used to tune the motion blur. Must be in the range 0.0 to 1.0 */
-    inline void     setBoostAmount(float boost_amount)  {m_boost_amount = boost_amount;}
+    /** Set the boost amount according to the speed of the camera */
+    void            setCameraSpeed(float cam_speed);
     
     /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
     virtual void    OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);

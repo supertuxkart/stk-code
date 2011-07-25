@@ -21,13 +21,15 @@
 #include "irr_driver.hpp"
 #include "config/user_config.hpp"
 
+#define MOTION_BLUR_FACTOR (1.0f/15.0f)
+#define MOTION_BLUR_OFFSET 20.0f
+
 using namespace video;
 using namespace scene;
 
 PostProcessing::PostProcessing()
 {
     m_boost_amount = 0.0f;
-    //UserConfigParams::m_postprocess_enabled = true; // BOUM
 }
 
 PostProcessing::~PostProcessing()
@@ -120,6 +122,12 @@ void PostProcessing::render()
     
     video_driver->setMaterial(m_material);
     video_driver->drawIndexedTriangleList(&vertices[0], 6, &indices[0], 2);
+}
+
+/** Set the boost amount according to the speed of the camera */
+void PostProcessing::setCameraSpeed(float cam_speed)
+{
+    m_boost_amount = core::clamp(MOTION_BLUR_FACTOR * (cam_speed - MOTION_BLUR_OFFSET), 0.0f, 1.0f);
 }
 
 /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */

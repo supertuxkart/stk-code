@@ -442,6 +442,10 @@ void Camera::update(float dt)
         m_camera->setTarget(current_target);
         return;
     }
+    
+    // Apply the motion blur according to the speed of the kart
+    if(UserConfigParams::m_postprocess_enabled)
+        irr_driver->getPostProcessing()->setCameraSpeed(m_kart->getCurrentMaxSpeed());
 
     positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
 }   // update

@@ -22,7 +22,7 @@
         <div width="75%" height="50" layout="horizontal-row" >
             <label I18N="In the graphics settings" text="Graphical Effects Level" align="center"/>
             <spacer width="20" height="20"/>
-            <gauge id="gfx_level" min_value="1" max_value="5" width="300" />
+            <gauge id="gfx_level" min_value="1" max_value="7" width="300" />
         </div>
         
         <spacer height="10" width="10"/>

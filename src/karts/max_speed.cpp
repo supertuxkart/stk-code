@@ -159,7 +159,7 @@ float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
 void MaxSpeed::update(float dt)
 {
 
-    // First comput the minimum max-speed fraction, which 
+    // First compute the minimum max-speed fraction, which 
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
     float f = 1.0f;

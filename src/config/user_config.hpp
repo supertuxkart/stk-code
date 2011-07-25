@@ -387,9 +387,6 @@ namespace UserConfigParams
     /** True if hardware skinning should be enabled */
     PARAM_PREFIX bool                       m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
-    /** True if post-processing effects should be enabled */
-    PARAM_PREFIX bool                       m_postprocess_enabled  PARAM_DEFAULT( false );
-
     // not saved to file
 
     // ---- Networking
@@ -437,6 +434,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", &m_graphics_quality,
                                                "Whether vertical sync is enabled") );
+    PARAM_PREFIX BoolUserConfigParam         m_postprocess_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "postprocess_enabled", &m_graphics_quality,
+                                               "Whether post-processing (motion blur...) should be enabled") );
     
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
