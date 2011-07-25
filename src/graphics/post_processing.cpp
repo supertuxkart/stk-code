@@ -134,5 +134,7 @@ void PostProcessing::setCameraSpeed(float cam_speed)
 void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services, s32 user_data)
 {
     services->setPixelShaderConstant("boost_amount", &m_boost_amount, 1);
-    // TODO: texture map
+    const float texunit = 0.0f;
+    services->setPixelShaderConstant("color_buffer", &texunit, 1);  // Irrlicht knows this is actually a GLint and makes
+                                                                   // the conversion
 }
