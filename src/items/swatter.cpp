@@ -38,18 +38,11 @@
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
-//#define TEMP_TEST_SWATTER_SONG    // uncomment this line to test
-
 Swatter::Swatter(Attachment *attachment, Kart *kart)
        : AttachmentPlugin(attachment, kart)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_target = NULL;
-    
-#ifdef TEMP_TEST_SWATTER_SONG
-    sfx_manager->quickSound("swatter");
-    music_manager->setMasterMusicVolume(0.0);
-#endif
 
     // Setup the node
     scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
@@ -60,9 +53,6 @@ Swatter::Swatter(Attachment *attachment, Kart *kart)
 //-----------------------------------------------------------------------------
 Swatter::~Swatter()
 {
-#ifdef TEMP_TEST_SWATTER_SONG
-    music_manager->setMasterMusicVolume(1.0);
-#endif
 }   // ~Swatter
 
 //-----------------------------------------------------------------------------
