@@ -183,7 +183,7 @@ void RubberBall::update(float dt)
             m_interval = m_height / 10.0f;
 	    // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
-                m_inteval = 0.01f;      
+                m_interval = 0.01f;      
         }
         else
         {
