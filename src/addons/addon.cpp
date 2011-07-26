@@ -72,9 +72,6 @@ Addon::Addon(const XMLNode &xml)
     m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
 
     xml.get("image",              &m_icon_url          );
-    // If there is no image, use the icon to display
-    if(m_icon_url=="")
-        xml.get("icon",           &m_icon_url          );
     xml.get("icon-revision",      &m_icon_revision     );
     xml.get("size",               &m_size              );
     m_icon_basename = StringUtils::getBasename(m_icon_url);
