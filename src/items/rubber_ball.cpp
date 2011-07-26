@@ -19,11 +19,14 @@
 
 #include "items/rubber_ball.hpp"
 
+#include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 
 float RubberBall::m_st_interval;
+float RubberBall::m_st_squash_duration;
+float RubberBall::m_st_squash_slowdown;
 
 RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 
                                              0.0f /* mass */)
@@ -101,9 +104,17 @@ void RubberBall::computeTarget()
  */
 void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 {
-    m_st_interval = 1.0f;
+    m_st_interval        = 1.0f;
+    m_st_squash_duration = 3.0f;
+    m_st_squash_slowdown = 0.5f;
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specific for rubber ball.\n");
+    if(!node.get("squash-duration", &m_st_squash_duration))
+        printf(
+        "[powerup] Warning: no squash-duration specific for rubber ball.\n");
+    if(!node.get("squash-slowdown", &m_st_squash_slowdown))
+        printf(
+        "[powerup] Warning: no squash-slowdown specific for rubber ball.\n");
 
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
@@ -131,9 +142,14 @@ void RubberBall::update(float dt)
     determineTargetCoordinates(dt, &aim_xyz);
 
     Vec3 delta = aim_xyz - getXYZ();
+
     // Determine the next point for the ball.
     // FIXME: use interpolation here for smooth curves
     Vec3 next_xyz = getXYZ() + delta * (m_speed * dt / delta.length());
+
+    GraphNode &gn = m_quad_graph->getNode(m_current_graph_node);
+    int indx = gn.getSuccessor(0);
+    GraphNode &gn_next = m_quad_graph->getNode(indx);
 
     // Determine new distance along track
     Vec3 ball_distance_vec;
@@ -320,3 +336,28 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
     *aim_xyz = gn->getQuad().getCenter();
 
 }   // determineTargetCoordinates
+// ----------------------------------------------------------------------------
+/** Callback from the phycis in case that a kart or object is hit. The rubber
+ *  ball will only be removed if it hits it target, all other karts it might
+ *  hit earlier will only be flattened.
+ *  kart The kart hit (NULL if no kart was hit).
+ *  object The object that was hit (NULL if none).
+ */
+void RubberBall::hit(Kart* kart, PhysicalObject* object)
+{
+    if(kart)
+    {
+        // If the object is not the main target, only flatten the kart
+        if(kart!=m_target)
+            kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+        else
+        {
+            // Else trigger the full explosion animation
+            kart->handleExplosion(kart->getXYZ(), /*direct hit*/true);
+            projectile_manager->notifyRemove();
+            setHasHit();
+        }
+        return;
+    }
+    Flyable::hit(kart, object);
+}   // hit

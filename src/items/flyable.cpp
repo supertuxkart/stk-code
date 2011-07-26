@@ -453,6 +453,10 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 }   // isOwnerImmunity
 
 // -----------------------------------------------------------------------------
+/** Callback from the phycis in case that a kart or object is hit. 
+ *  kart The kart hit (NULL if no kart was hit).
+ *  object The object that was hit (NULL if none).
+ */
 void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable

@@ -47,6 +47,12 @@ private:
 
     /** A class variable to store the default interval size. */
     static float m_st_interval;
+    
+    /** A class variable to store the default squash duration. */
+    static float m_st_squash_duration;
+    
+    /** A class variable to store the default squash slowdown. */
+    static float m_st_squash_slowdown;
 
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
@@ -78,8 +84,10 @@ private:
 public:
                  RubberBall  (Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
-
     virtual void update      (float dt);
+    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    virtual bool needsExplosion() const {return false;}
+
 };   // RubberBall
 
 #endif
