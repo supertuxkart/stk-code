@@ -19,12 +19,6 @@
 
 #include "items/rubber_ball.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
@@ -187,6 +181,9 @@ void RubberBall::update(float dt)
             // Some experimental formulas
             m_height   = 0.5f*sqrt(distance);
             m_interval = m_height / 10.0f;
+	    // Avoid too small hops and esp. a division by zero
+            if(m_interval<0.01f)
+                m_inteval = 0.01f;      
         }
         else
         {
@@ -206,12 +203,6 @@ void RubberBall::update(float dt)
     // --> scale with m_height / -m_interval^2/4
     float f      = m_height / (-0.25f*m_interval*m_interval);
     float height = m_timer * (m_timer-m_interval) * f;
-    if(isnan(getHoT()))
-    {
-        printf("NAN in rubber ball, xyz=%f %f %f\n",
-               getXYZ().getX(), getXYZ().getY(), getXYZ().getZ());
-        printf("Material=%p\n", getMaterial());
-    }
     next_xyz.setY(getHoT() + height);
 
     // If we start squashing the ball as soon as the height is smaller than
