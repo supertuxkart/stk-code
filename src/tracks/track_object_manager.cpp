@@ -107,6 +107,9 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
+/** Updates all track objects.
+ *  \param dt Time step size.
+ */
 void TrackObjectManager::update(float dt)
 {
     if ( UserConfigParams::m_graphical_effects )
@@ -119,15 +122,24 @@ void TrackObjectManager::update(float dt)
     }
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Enables or disables fog for a given scene node.
+ *  \param node The node to adjust.
+ *  \param enable True if fog is enabled, otherwise fog is disabled.
+ */
 void adjustForFog(scene::ISceneNode *node, bool enable)
 {
-    //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
-    
-    if (node->getType() == scene::ESNT_MESH || node->getType() == scene::ESNT_OCTREE)
+    if (node->getType() == scene::ESNT_MESH   || 
+        node->getType() == scene::ESNT_OCTREE || 
+        node->getType() == scene::ESNT_ANIMATED_MESH)
     {
-        scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
+        scene::IMesh* mesh;
+        if (node->getType() == scene::ESNT_ANIMATED_MESH) {
+            mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
+        }
+        else {
+            mesh = ((scene::IMeshSceneNode*)node)->getMesh();
+        }
         
         unsigned int n = mesh->getMeshBufferCount();
         for (unsigned int i=0; i<n; i++)
@@ -137,26 +149,7 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
             for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
             {
                 video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, enable);
-                
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
-    }
-    else if (node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
-        
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, enable);
+                if (t) material_manager->adjustForFog(t, mb, node, enable);
                 
             }   // for j<MATERIAL_MAX_TEXTURES
         }  // for i<getMeshBufferCount()
@@ -168,26 +161,24 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
     
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
-        std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
+        std::vector<scene::ISceneNode*>& 
+            subnodes = ((LODNode*)node)->getAllNodes();
         for (unsigned int n=0; n<subnodes.size(); n++)
         {
             adjustForFog(subnodes[n], enable);
-            //subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
         }
     }
 }   // adjustForFog
 
 
-
 // ----------------------------------------------------------------------------
-
+/** Enable or disable fog on objects.
+  */
 void TrackObjectManager::enableFog(bool enable)
 {
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        //curr->getNode()->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
-        
         adjustForFog(curr->getNode(), enable);
     }
-}
+}   // enableFog
