@@ -82,7 +82,8 @@ private:
 
     std::string              m_item_style;
     std::string              m_description;
-    std::string              m_designer;
+    core::stringw            m_designer;
+    
     /** The full filename of the config (xml) file. */
     std::string              m_filename;
 
@@ -302,7 +303,7 @@ public:
     const std::string& getFilename       () const {return m_filename;           }
     // ------------------------------------------------------------------------
     /** Returns the name of the designer. */
-    const std::string& getDesigner       () const {return m_designer;           }
+    const core::stringw& getDesigner     () const {return m_designer;           }
     // ------------------------------------------------------------------------
     /** Returns an absolute path to the screenshot file of this track */
     const std::string& getScreenshotFile () const {return m_screenshot;         }
