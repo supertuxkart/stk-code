@@ -113,7 +113,7 @@ Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
 Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass) 
-       : Moveable()
+       : Moveable(), TerrainInfo()
 {
     // get the appropriate data from the static fields
     m_speed                        = m_st_speed[type];
