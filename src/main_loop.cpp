@@ -138,7 +138,9 @@ void MainLoop::run()
         // We need to check again because update_race may have requested
         // the main loop to abort; and it's not a good idea to continue
         // since the GUI engine is no more to be called then.
-        if (!m_abort)
+        // Also only do music, input, and graphics update if graphics are
+        // enabled.
+        if (!m_abort && !ProfileWorld::isNoGraphics())
         {
             PROFILER_PUSH_CPU_MARKER("Music manager update", 0x7F, 0x00, 0x00);
             music_manager->update(dt);

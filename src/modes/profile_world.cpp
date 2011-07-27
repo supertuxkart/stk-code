@@ -26,8 +26,9 @@
 #include <ISceneManager.h>
 
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
-int   ProfileWorld::m_num_laps = 0;
-float ProfileWorld::m_time   = 0.0f;
+int   ProfileWorld::m_num_laps    = 0;
+float ProfileWorld::m_time        = 0.0f;
+bool  ProfileWorld::m_no_graphics = false;
 
 //-----------------------------------------------------------------------------
 /** The constructor sets the number of (local) players to 0, since only AI
@@ -172,26 +173,26 @@ void ProfileWorld::enterRaceOverState()
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
-    printf("Average # drawn nodes           %f k\n",
-            (float)m_num_triangles/m_frame_count);
-    printf("Average # culled nodes:         %f k\n",
-            (float)m_num_culls/m_frame_count);
-    printf("Average # solid nodes:          %f k\n",
-            (float)m_num_solid/m_frame_count);
-    printf("Average # transparent nodes:    %f\n",
-            (float)m_num_transparent/m_frame_count);
-    printf("Average # transp. effect nodes: %f\n",
-            (float)m_num_trans_effect/m_frame_count);
+    if(!m_no_graphics)
+    {
+        printf("Average # drawn nodes           %f k\n",
+               (float)m_num_triangles/m_frame_count);
+        printf("Average # culled nodes:         %f k\n",
+               (float)m_num_culls/m_frame_count);
+        printf("Average # solid nodes:          %f k\n",
+               (float)m_num_solid/m_frame_count);
+        printf("Average # transparent nodes:    %f\n",
+               (float)m_num_transparent/m_frame_count);
+        printf("Average # transp. effect nodes: %f\n",
+               (float)m_num_trans_effect/m_frame_count);
+    }
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
         max_t = std::max(max_t, m_karts[i]->getFinishTime());
         min_t = std::min(min_t, m_karts[i]->getFinishTime());
-        if(m_profile_mode==PROFILE_TIME)
-            av_t += getTime();
-        else
-            av_t += m_karts[i]->getFinishTime();
+        av_t += m_karts[i]->getFinishTime();
         printf("%ls  start %d  end %d time %f\n",
             m_karts[i]->getName(), 1 + (int)i,
             m_karts[i]->getPosition(),

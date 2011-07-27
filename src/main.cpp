@@ -254,20 +254,19 @@ void cmdLineHelp (char* invocation)
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
-    "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
-    "       --renderer NUM     Choose the renderer. Valid renderers are:"
+    "  --trackdir DIR          A directory from which additional tracks are loaded.\n"
+    "  --renderer NUM          Choose the renderer. Valid renderers are:"
     "                          (Default: 0, OpenGL: 1, Direct3D9: 2, \n"
     "                           Direct3D8: 3, Software: 4, \n"
     "                           Burning's Software: 5, Null device: 6).\n"
-    "       --animations=n     Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
-    "       --gfx=n            Play other graphical effects like impact stars dance,\n"
+    "  --animations=n          Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
+    "  --gfx=n                 Play other graphical effects like impact stars dance,\n"
     "                           water animations or explosions (Enable: 1, Disable: 0).\n"
-    "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
-    "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
-    // should not be used by unaware users:u
-    // "  --profile            Enable automatic driven profile mode for 20 seconds.\n"
-    // "  --profile=n          Enable automatic driven profile mode for n seconds.\n"
-    // "                       if n<0 --> (-n) = number of laps to drive.
+    "  --weather=n             Show weather effects like rain or snow (0 or 1 as --gfx).\n"
+    "  --camera-style=n        Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
+    "  --profile-laps=n        Enable automatic driven profile mode for n laps.\n"
+    "  --profile-time=n        Enable automatic driven profile mode for n seconds.\n"
+    "  --no-graphics           Do not display the actual race."
     // "  --history            Replay history file 'history.dat'.\n"
     // "  --history=n          Replay history file 'history.dat' using mode:\n"
     // "                       n=1: use recorded positions\n"
@@ -690,26 +689,21 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--log=file"))
         {
             UserConfigParams::m_log_errors=true;
-        } else if( sscanf(argv[i], "--profile=%d",  &n)==1)
+        } else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
-            if(n<0)
-            {
-                printf("Profiling %d laps\n",-n);
-                ProfileWorld::setProfileModeLaps(-n);
-                race_manager->setNumLaps(-n);
-            }
-            else
-            {
-                printf("Profiling: %d seconds.\n", n);
-                ProfileWorld::setProfileModeTime((float)n);
-                race_manager->setNumLaps(999999); // profile end depends on time
-            }
+            printf("Profiling %d laps\n",n);
+            ProfileWorld::setProfileModeLaps(n);
+            race_manager->setNumLaps(n);
         }
-        else if( !strcmp(argv[i], "--profile") )
+        else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
         {
             printf("Profiling: %d seconds.\n", n);
-            ProfileWorld::setProfileModeTime(20);
+            ProfileWorld::setProfileModeTime((float)n);
             race_manager->setNumLaps(999999); // profile end depends on time
+        }
+        else if( !strcmp(argv[i], "--no-graphics") )
+        {
+            ProfileWorld::disableGraphics();
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {

@@ -37,6 +37,10 @@ private:
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
 
+    /** If no graphics should be displayed. Useful for batch testing
+     *  of AI changes etc. */
+    static bool  m_no_graphics;
+
     /** In laps based profiling: number of laps to run. */
     static int   m_num_laps;
 
@@ -83,8 +87,15 @@ public:
 
     static   void setProfileModeTime(float time);
     static   void setProfileModeLaps(int laps);
+    // ------------------------------------------------------------------------
     /** Returns true if profile mode was selected. */
     static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
+    // ------------------------------------------------------------------------
+    /** Switches off graphics. */
+    static   void disableGraphics() { m_no_graphics = true; }
+    // ------------------------------------------------------------------------
+    /** Returns true if no graphics should be displayed. */
+    static   bool isNoGraphics()  {return m_no_graphics; }
 };
 
 #endif
