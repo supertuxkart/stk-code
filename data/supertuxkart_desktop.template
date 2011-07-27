@@ -1,17 +1,16 @@
-
 [Desktop Entry]
 Encoding=UTF-8
-Name=Supertuxkart
-Version=0.5
+Name=SuperTuxKart
+Version=VERSION
 Icon=PREFIX/share/pixmaps/supertuxkart_64.xpm
-Comment=A kart racing game
-Comment[fr_FR]=Un jeu de karting
-Comment[ro_RO]=Un joc de curse cu carturi
-Comment[de_DE]=Ein Kart-Rennspiel
+GenericName=A kart racing game
+GenericName[de_DE]=Ein Kart-Rennspiel
+GenericName[fr_FR]=Un jeu de karting
+GenericName[gl]=Xogo de carreiras con karts
+GenericName[ro_RO]=Un joc de curse cu carturi
 Exec=PREFIX/games/supertuxkart --log=file
 Terminal=false
 StartupNotify=false
 Type=Application
 TryExec=PREFIX/games/supertuxkart
 Categories=Game;ArcadeGame;
-GenericName=
