@@ -322,11 +322,10 @@ const std::vector<int> KartPropertiesManager::getKartsInGroup(const std::string&
  *  \param existing_karst List of karts that should not be used. This is the
  *                        list of karts selected by the players.
  */
-std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
-                                           RemoteKartInfoList& existing_karts)
+void  KartPropertiesManager::getRandomKartList(int count,
+                                               RemoteKartInfoList& existing_karts,
+                                               std::vector<std::string> *ai_list)
 {
-    std::vector<std::string> random_karts;
-
     // First: set up flags (based on global kart 
     // index) for which karts are already used
     // -----------------------------------------
@@ -344,7 +343,24 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         catch (std::runtime_error& ex)
         {
             (void)ex;
-            std::cerr << "[KartPropertiesManager] getRandomKartList : WARNING, can't find kart '" << existing_karts[i].getKartName() << "'\n";
+            std::cerr << 
+                "[KartPropertiesManager] getRandomKartList : WARNING, can't find kart '" 
+                << existing_karts[i].getKartName() << "'\n";
+        }
+    }
+    for(unsigned int i=0; i<ai_list->size(); i++)
+    {
+        try
+        {
+            int id=getKartId((*ai_list)[i]);
+            used[id] = true;
+        }
+        catch (std::runtime_error &ex)
+        {
+            (void)ex;
+            std::cerr <<  
+                "[KartPropertiesManager] getRandomKartList : WARNING, can't find kart '" 
+                << (*ai_list)[i] << "'\n";
         }
     }
 
@@ -384,7 +400,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
         
         while (count > 0 && randomKartQueue.size() > 0)
         {
-            random_karts.push_back(randomKartQueue.back());
+            ai_list->push_back(randomKartQueue.back());
             randomKartQueue.pop_back();
             count --;
         }
@@ -393,7 +409,6 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     
     // There should always be enough karts
     assert(count==0);
-    return random_karts;
 }   // getRandomKartList    
 
 /* EOF */

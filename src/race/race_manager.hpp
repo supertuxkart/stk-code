@@ -238,8 +238,20 @@ private:
     std::vector<RemoteKartInfo>      m_local_player_karts;
     std::vector<std::string>         m_tracks;
     std::vector<int>                 m_host_ids;
+
+    /** The number of laps for each track of a GP (only one element
+     *  is used if only a single track is used. */
     std::vector<int>                 m_num_laps;
+
+    /** The points given to a kart on a given position (index is
+     *  0 based, so using race-position - 1. */
     std::vector<int>                 m_score_for_position;
+
+    /** The list of default AI karts to use. This is from the command line. */
+    std::vector<std::string>         m_default_ai_list;
+
+    /** The list of AI karts to use. This is stored here so that the
+     *  same list of AIs is used for all tracks of a GP. */
     std::vector<std::string>         m_ai_kart_list;
     int                              m_track_number;
     GrandPrixData                    m_grand_prix;
@@ -369,10 +381,13 @@ public:
     int          getCoinTarget()          const { return m_coin_target;                  }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
 
+    /** Returns the list of AI karts to use. Used for networking, and for
+     *  the --ai= command line option. */
     const std::vector<std::string>&
                  getAIKartList()          const { return m_ai_kart_list;                  }
-    
-    /** \brief get information about given mode (returns true if 'mode' is of linear races type) */
+    // ------------------------------------------------------------------------
+    /** \brief get information about given mode (returns true if 'mode' is of
+     *  linear races type) */
     bool isLinearRaceMode()
     {
         const int id = (int)m_minor_mode;
@@ -484,15 +499,16 @@ public:
      */
     void         setNumPlayers(int num);
     
-    /** \brief Sets a player kart (local and non-local).
-     *  \param player_id  Id of the player.
-     *  \param ki         Kart info structure for this player.
-     */
-    void         setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki);
-    
-    void         setAIKartList(const std::vector<std::string>& rkl)
-                    { m_ai_kart_list = rkl;                     }
+    void         setPlayerKart(unsigned int player_id, 
+                               const RemoteKartInfo& ki);
+    void         setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void         computeRandomKartList();
+    /** Sets the AI to use. This is used in networking mode to set the karts
+     *  that will be used by the server to the client. It will take precedence
+     *  over the random selection. */
+    void         setAIKartList(const std::vector<std::string>& rkl)
+                    { m_ai_kart_list = rkl; }
+
     /** \} */
     
 };

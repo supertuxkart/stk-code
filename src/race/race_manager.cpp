@@ -55,18 +55,21 @@ RaceManager::RaceManager()
     m_track_number       = 0;
     m_coin_target        = 0;
     setTrack("jungle");
+    m_default_ai_list.clear();
     setNumLocalPlayers(0);
-    //setLocalKartInfo(0, "tux");
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
-
+/** Destructor for the race manager. 
+ */
 RaceManager::~RaceManager()
 {
 }   // ~RaceManager
 
 //-----------------------------------------------------------------------------
-
+/** Resets the race manager in preparation for a new race. It sets the 
+ *  counter of finished karts to zero.
+ */
 void RaceManager::reset()
 {
     m_num_finished_karts   = 0;
@@ -74,15 +77,49 @@ void RaceManager::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
-
+/** \brief Sets a player kart (local and non-local).
+ *  \param player_id  Id of the player.
+ *  \param ki         Kart info structure for this player.
+ */
 void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki)
 {
     m_player_karts[player_id] = ki;
 }   // setPlayerKart
 
 // ----------------------------------------------------------------------------
+/** Sets the default list of AI karts to use.
+ *  \param ai_kart_list List of the identifier of the karts to use.
+ */
+void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
+{
+    for(unsigned int i=0; i<ai_list.size(); i++)
+    {
+        const std::string &name=ai_list[i];
+        const KartProperties *kp = kart_properties_manager->getKart(name);
+        if(!kp)
+        {
+            printf("Kart '%s' is unknown and therefore ignored.\n",
+                   name.c_str());
+            continue;
+        }
+        if(unlock_manager->isLocked(name)) 
+        {
+            printf("Kart '%s' is locked and therefore ignored.\n",
+                   name.c_str());
+            continue;
+        }
+        m_default_ai_list.push_back(name);
+    }
+}   // setAIKartList
 
-void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& kart)
+// ----------------------------------------------------------------------------
+/** Sets information about a kart used by a local player (i.e. on this 
+ *  computer).
+ *  \param player_id  Id of this player.
+ *  \param kart The kart this player uses.
+ */
+void RaceManager::setLocalKartInfo(unsigned int player_id, 
+                                   const std::string& kart)
 {
     assert(kart.size() > 0);
     assert(0<=player_id && player_id <m_local_player_karts.size());
@@ -94,7 +131,9 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
-
+/** Returns a pointer to the kart which has a given GP rank.
+ *  \param n The rank (1 to number of karts) to look for.
+ */
 const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
@@ -104,13 +143,15 @@ const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 }   // getKLartWithGPRank
 
 //-----------------------------------------------------------------------------
-
-int RaceManager::getLocalPlayerGPRank(const int playerID) const
+/** Returns the GP rank (between 1 and number of karts) of a local player.
+ *  \param player_id Local id of the player.
+ */
+int RaceManager::getLocalPlayerGPRank(const int player_id) const
 {
     const int amount = m_kart_status.size();
     for (int n=0; n<amount; n++)
     {
-        if (m_kart_status[n].m_local_player_id == playerID)
+        if (m_kart_status[n].m_local_player_id == player_id)
         {
             return m_kart_status[n].m_gp_rank;
         }
@@ -119,7 +160,10 @@ int RaceManager::getLocalPlayerGPRank(const int playerID) const
 }   // getLocalPlayerGPRank
 
 //-----------------------------------------------------------------------------
-
+/** Sets the number of local players, i.e. the number of players on this
+ *  computer.
+ *  \param n Number of local players.
+ */
 void RaceManager::setNumLocalPlayers(unsigned int n)
 {
     m_local_player_karts.resize(n);
@@ -135,14 +179,18 @@ void RaceManager::setNumPlayers(int num)
 }   // setNumPlayers
 
 //-----------------------------------------------------------------------------
-
+/** Sets the difficulty to use.
+ *  \param diff The difficulty to use.
+ */
 void RaceManager::setDifficulty(Difficulty diff)
 {
     m_difficulty = diff;
 }   // setDifficulty
 
 //-----------------------------------------------------------------------------
-
+/** Sets a single track to be used in the next race.
+ *  \param track The identifier of the track to use.
+ */
 void RaceManager::setTrack(const std::string& track)
 {
     m_tracks.clear();
@@ -152,7 +200,9 @@ void RaceManager::setTrack(const std::string& track)
 }   // setTrack
 
 //-----------------------------------------------------------------------------
-/** \brief Computes the list of random karts to be used for the AI. */
+/** \brief Computes the list of random karts to be used for the AI.
+ *  If a command line option specifies karts, they will be used first
+ */
 void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - m_player_karts.size();
@@ -168,7 +218,19 @@ void RaceManager::computeRandomKartList()
         m_num_karts -= n;
         n = 0;
     }
-    m_ai_kart_list=kart_properties_manager->getRandomKartList(n, m_player_karts);
+
+    m_ai_kart_list.clear();
+    unsigned int m = std::min( (unsigned) n,  m_default_ai_list.size());
+
+    for(unsigned int i=0; i<m; i++)
+    {
+        m_ai_kart_list.push_back(m_default_ai_list[i]);
+        n--;
+    }
+
+    if(n>0)
+        kart_properties_manager->getRandomKartList(n, m_player_karts, 
+                                                   &m_ai_kart_list   );
 
 }   // computeRandomKartList
 

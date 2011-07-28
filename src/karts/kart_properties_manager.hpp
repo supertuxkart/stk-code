@@ -86,7 +86,9 @@ public:
     void                     selectKart(int kartid) {m_selected_karts.push_back(kartid);}
     void                     selectKartName(const std::string &kart_name);
     bool                     testAndSetKart(int kartid);
-    std::vector<std::string> getRandomKartList(int count, RemoteKartInfoList& existing_karts);
+    void                     getRandomKartList(int count, 
+                                               RemoteKartInfoList& existing_karts,
+                                               std::vector<std::string> *ai_list);
     /** Returns all directories from which karts were loaded. */
     const std::vector<std::string>* getAllKartDirs() const 
                                     { return &m_all_kart_dirs; }

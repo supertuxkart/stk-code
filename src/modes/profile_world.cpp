@@ -87,10 +87,15 @@ void ProfileWorld::setProfileModeLaps(int laps)
 Kart *ProfileWorld::createKart(const std::string &kart_ident, int index, 
                                int local_player_id, int global_player_id)
 {
-    // Ignore the kart identifier specified for this kart, instead load
-    // _only_ the kart specified for the player. This allows to measure
-    // the impact different karts have on performance.
-    const std::string prof_kart_id = race_manager->getKartIdent(
+    // Ignore the kart identifier specified for this kart if graphics are
+    // enabled, since it's more useful in this case to be able to use only
+    // a single kart (so that the overall performance impact of a certain
+    // kart can be evaluated). Instead load _only_ the kart specified for 
+    // the player. If no graphics are selected, comparing different karts
+    // for their physics behaviour is more useful.
+    const std::string &prof_kart_id = 
+        m_no_graphics ? kart_ident
+                      : race_manager->getKartIdent(
                                            race_manager->getNumberOfKarts()-1);
     btTransform init_pos   = m_track->getStartTransform(index);
 
@@ -188,15 +193,24 @@ void ProfileWorld::enterRaceOverState()
     }
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
+    printf("Name\tstart\tend\ttime\tav.speed\n");
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
         max_t = std::max(max_t, m_karts[i]->getFinishTime());
         min_t = std::min(min_t, m_karts[i]->getFinishTime());
         av_t += m_karts[i]->getFinishTime();
-        printf("%ls  start %d  end %d time %f\n",
+        printf("%ls\t%d\t%d\t%f",
             m_karts[i]->getName(), 1 + (int)i,
             m_karts[i]->getPosition(),
             m_karts[i]->getFinishTime());
+        if(m_profile_mode==PROFILE_LAPS)
+        {
+            float distance = race_manager->getNumLaps()
+                           * m_track->getTrackLength();
+            printf("\t%f\n",m_karts[i]->getFinishTime()/distance);
+        }
+        else
+            printf("\n");
     }
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
 

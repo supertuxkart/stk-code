@@ -244,6 +244,7 @@ void cmdLineHelp (char* invocation)
     "  -l,  --list-tracks      Show available tracks.\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
     "       --kart NAME        Use kart number NAME (see --list-karts).\n"
+    "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n" 
     "       --list-karts       Show available karts.\n"
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
@@ -426,7 +427,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
 int handleCmdLine(int argc, char **argv)
 {
     int n;
-    char s[80];
+    char s[1024];
 
     for(int i=1; i<argc; i++)
     {
@@ -566,6 +567,14 @@ int handleCmdLine(int argc, char **argv)
                 return 0;
             }
         }
+        else if( sscanf(argv[i], "--ai=%s",  &s)==1)
+        {
+            const std::vector<std::string> l=
+                StringUtils::split(std::string(s),',');
+            race_manager->setDefaultAIKartList(l);
+            // Add 1 for the player kart
+            race_manager->setNumKarts(l.size()+1);
+        }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
         {
             switch (atoi(argv[i+1]))
@@ -692,12 +701,14 @@ int handleCmdLine(int argc, char **argv)
         } else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
             printf("Profiling %d laps\n",n);
+            UserConfigParams::m_no_start_screen = true;
             ProfileWorld::setProfileModeLaps(n);
             race_manager->setNumLaps(n);
         }
         else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
         {
             printf("Profiling: %d seconds.\n", n);
+            UserConfigParams::m_no_start_screen = true;
             ProfileWorld::setProfileModeTime((float)n);
             race_manager->setNumLaps(999999); // profile end depends on time
         }
