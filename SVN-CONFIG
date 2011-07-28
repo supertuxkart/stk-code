@@ -30,5 +30,5 @@ Makefile = svn:eol-style=native;svn:keywords=Author Date Id Revision
 *.css = svn:mime-type=text/css
 *.pdf = svn:mime-type=application/pdf
 SConstruct = svn:eol-style=native;svn:keywords=Author Date Id Revision
-*.xml = svn:eol-style=native;svn:mime-type=text/xml
+*.xml = svn:eol-style=LF;svn:mime-type=text/xml
 *.py = svn:eol-style=native;svn:keywords=Author Date Id Revision
