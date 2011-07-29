@@ -54,47 +54,42 @@ void ArenasScreen::loadedFromFile()
     assert( tabs != NULL );
 
     tabs->clearAllChildren();
-	DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
 
-	int num_of_arenas=0;
-	for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
-    {
-            Track* temp = track_manager->getTrack(n);
-            if (temp->isArena()){
-				num_of_arenas++;
-			}
-	}
-
-	w->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
-    
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
     const int group_amount = groups.size();
-
-    // add standard group first
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] == DEFAULT_GROUP_NAME)
-        {
-            //FIXME: group name not translated
-            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n]);
-            break;
-        }
-    }
-    
-    // add others after
-    for (int n=0; n<group_amount; n++)
-    {
-        if (groups[n] != DEFAULT_GROUP_NAME)
-        {
-            tabs->addTextChild( _( stringw(groups[n].c_str()).c_str() ), groups[n]);
-        }
-    }
     
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show arenas from all groups
-        tabs->addTextChild( _("All") , ALL_ARENA_GROUPS_ID);
+        tabs->addTextChild( _("All"), ALL_ARENA_GROUPS_ID );
     }
+    
+    // Make group names being picked up by gettext
+#define FOR_GETTEXT_ONLY(x)
+    //I18N: arena group name
+    FOR_GETTEXT_ONLY( _("standard") )
+    //I18N: arena group name
+    FOR_GETTEXT_ONLY( _("Add-Ons") )
+    
+    // add others after
+    for (int n=0; n<group_amount; n++)
+    {
+        // try to translate the group name
+        tabs->addTextChild( _(groups[n].c_str()), groups[n] );
+    }
+
+    int num_of_arenas=0;
+    for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
+    {
+            Track* temp = track_manager->getTrack(n);
+            if (temp->isArena()){
+                num_of_arenas++;
+            }
+    }
+
+    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( tracks_widget != NULL );
+    tracks_widget->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
     
 }   // ArenasScreen
 

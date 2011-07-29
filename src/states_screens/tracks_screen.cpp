@@ -184,14 +184,14 @@ void TracksScreen::beforeAddingWidget()
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show tracks from all groups
-        tabs->addTextChild(_("All"), ALL_TRACK_GROUPS_ID );
+        tabs->addTextChild( _("All"), ALL_TRACK_GROUPS_ID );
     }
     
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
-    //I18N: kart group name
+    //I18N: track group name
     FOR_GETTEXT_ONLY( _("standard") )
-    //I18N: kart group name
+    //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
     
     // add others after
@@ -200,7 +200,6 @@ void TracksScreen::beforeAddingWidget()
         // try to translate the group name
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
     }
-    
     
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
