@@ -170,6 +170,13 @@ void IrrDriver::initDevice()
              */
             
             SIrrlichtCreationParameters params;
+            // The debug name is only set if irrlicht is compiled in debug 
+            // mode. So we use this to print a warning to the user.
+            if(m_device->getDebugName())
+            {
+                printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
+                printf("!!!!! This can have a significant performance impact         !!!!!\n");
+            }
             params.DriverType = type;
             params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
                                                        UserConfigParams::m_height);
@@ -1179,7 +1186,7 @@ void IrrDriver::update(float dt)
     {
         applyResolutionSettings();
         if(m_resolution_changing==RES_CHANGE_YES)
-	    new ConfirmResolutionDialog();
+        new ConfirmResolutionDialog();
         m_resolution_changing = RES_CHANGE_NONE;
     }
 
