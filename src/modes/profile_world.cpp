@@ -193,14 +193,16 @@ void ProfileWorld::enterRaceOverState()
     }
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    printf("Name\tstart\tend\ttime\tav.speed\n");
+    printf("Name\t\tstart\tend\ttime\tav.speed\n");
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
         max_t = std::max(max_t, m_karts[i]->getFinishTime());
         min_t = std::min(min_t, m_karts[i]->getFinishTime());
         av_t += m_karts[i]->getFinishTime();
-        printf("%ls\t%d\t%d\t%f",
-            m_karts[i]->getName(), 1 + (int)i,
+        printf("%s\t%s%d\t%d\t%f",
+            m_karts[i]->getIdent().c_str(),
+            m_karts[i]->getIdent().size()<8 ? "\t" : "",
+            1 + (int)i,
             m_karts[i]->getPosition(),
             m_karts[i]->getFinishTime());
         if(m_profile_mode==PROFILE_LAPS)
