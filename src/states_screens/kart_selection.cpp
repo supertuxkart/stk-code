@@ -369,7 +369,7 @@ public:
     // -------------------------------------------------------------------------
     
     ~PlayerKartWidget()
-    {
+    {        
         if (GUIEngine::getFocusForPlayer(m_playerID) == this)
         {
             GUIEngine::focusNothingForPlayer(m_playerID);
@@ -378,10 +378,14 @@ public:
         //if (m_player_ID_label->getIrrlichtElement() != NULL)
         //    m_player_ID_label->getIrrlichtElement()->remove();
         
-        if (m_player_ident_spinner != NULL && m_player_ident_spinner->getIrrlichtElement() != NULL)
+        if (m_player_ident_spinner != NULL)
         {
             m_player_ident_spinner->setListener(NULL);
-            m_player_ident_spinner->getIrrlichtElement()->remove();
+            
+            if (m_player_ident_spinner->getIrrlichtElement() != NULL)
+            {
+                m_player_ident_spinner->getIrrlichtElement()->remove();
+            }
         }
         
         if (m_model_view->getIrrlichtElement() != NULL)
@@ -525,6 +529,7 @@ public:
         m_ready_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER );
                 
         m_children.remove(m_player_ident_spinner);
+        m_player_ident_spinner->setListener(NULL);
         m_player_ident_spinner->getIrrlichtElement()->remove();
         m_player_ident_spinner->elementRemoved();
         m_player_ident_spinner = NULL;
