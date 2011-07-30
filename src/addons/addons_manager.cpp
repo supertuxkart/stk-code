@@ -301,7 +301,7 @@ bool AddonsManager::install(const Addon &addon)
 bool AddonsManager::uninstall(const Addon &addon)
 {
     std::cout << "[Addons] Uninstalling <" 
-              << addon.getName() << ">\n";
+              << core::stringc(addon.getName()).c_str() << ">\n";
 
     // addon is a const reference, and to avoid removing the const, we
     // find the proper index again to modify the installed state

@@ -159,7 +159,7 @@ void AddonsScreen::loadList()
 
         core::stringw s;
         if(addon->getDesigner().size()==0)
-            s = (addon->getName()+"\t"+addon->getDateAsString()).c_str();
+            s = (addon->getName()+L"\t"+core::stringc(addon->getDateAsString().c_str())).c_str();
         else
             //I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
             s = _("%s by %s\t%s",  addon->getName().c_str(),

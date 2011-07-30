@@ -474,6 +474,84 @@ namespace StringUtils
         */
     }
     
+    // ------------------------------------------------------------------------
+    
+    irr::core::stringw removeHtmlEntities(const std::string& input)
+    {
+        irr::core::stringw output;
+        std::string entity;
+        bool isHex = false;
+        
+        enum
+        {
+            NORMAL,
+            ENTITY_PREAMBLE,
+            ENTITY_BODY
+        } state = NORMAL;
+        
+        for (unsigned int n=0; n<input.size(); n++)
+        {
+            switch (state)
+            {
+                case NORMAL:
+                    if (input[n] == '&')
+                    {
+                        state = ENTITY_PREAMBLE;
+                        entity = "";
+                        isHex = false;
+                    }
+                    else
+                    {
+                        output += wchar_t(input[n]);
+                    }
+                    break;
+                
+                case ENTITY_PREAMBLE:
+                    if (input[n] != '#')
+                    {
+                        output += L"&";
+                        output += wchar_t(input[n]);
+                        fprintf(stderr, "[StringUtils] WARNING: Invalid HTML entity in '%s' (we only support &#...; type HTML entities)\n", input.c_str());
+                        state = NORMAL;
+                    }
+                    else
+                    {
+                        state = ENTITY_BODY;
+                    }
+                    break;
+                
+                case ENTITY_BODY:
+                    if (input[n] == 'x' && entity.size() == 0)
+                    {
+                        isHex = true;
+                    }
+                    else if (input[n] == ';')
+                    {
+                        int c;
+                        
+                        const char* format = (isHex ? "%x" : "%i");
+                        if (sscanf(entity.c_str(), format, &c) == 1)
+                        {
+                            output += wchar_t(c);
+                        }
+                        else
+                        {
+                            fprintf(stderr, "[StringUtils] WARNING: non-numeric HTML entity not supported in '%s'\n", input.c_str());
+                        }
+                        state = NORMAL;
+                    }
+                    else
+                    {
+                        entity += wchar_t(input[n]);
+                    }
+                    break;
+            }
+        }
+        
+        return output;
+    }
+    
 } // namespace StringUtils
+
 
 /* EOF */

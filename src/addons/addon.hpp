@@ -52,12 +52,12 @@ public:
 
 private:
     /** The name to be displayed. */
-    std::string m_name;
+    core::stringw m_name;
     /** Internal id for this addon, which is the name in lower case.
      *  This is used to create a subdirectory for this addon. */
     std::string m_id;
     /** The name of the designer of the addon. */
-    std::string m_designer;
+    core::stringw m_designer;
     /** The (highest) revision number available online. */
     int         m_revision;
     /** The currently installed revision. */
@@ -69,7 +69,7 @@ private:
     /** Date when the addon was added. */
     Time::TimeType m_date;
     /** A description of this addon. */
-    std::string m_description;
+    core::stringw m_description;
     /** The URL of the icon (relative to the server) */
     std::string m_icon_url;
     /** Name of the icon to use. */
@@ -102,7 +102,7 @@ public:
     void copyInstallData(const Addon &addon);
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getName() const { return m_name; }
+    const core::stringw& getName() const { return m_name; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }
@@ -117,7 +117,7 @@ public:
     const std::string getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getDescription() const { return m_description; }
+    const core::stringw& getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
     /** Returns the date (in seconds since epoch) when the addon was 
      *  uploaded. */
@@ -141,7 +141,7 @@ public:
     const std::string& getId() const { return m_id; }
     // ------------------------------------------------------------------------
     /** Returns the designer of the addon. */
-    const std::string &getDesigner() const { return m_designer; }
+    const core::stringw& getDesigner() const { return m_designer; }
     // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const

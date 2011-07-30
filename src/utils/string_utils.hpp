@@ -351,6 +351,11 @@ namespace StringUtils
       */
     std::string replace(const std::string& other, const std::string& from, const std::string& to);
     
+    /**
+      * Converts ASCII text with HTML entities (e.g. &xE9;) to unicode string
+      */
+    irr::core::stringw removeHtmlEntities(const std::string& input);
+    
 } // namespace StringUtils
 
 #endif

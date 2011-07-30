@@ -55,21 +55,30 @@ Addon::Addon(const XMLNode &xml)
         xml.get("arena",          &is_arena            );
         if(is_arena) m_type="arena";
     }
-    xml.get("name",               &m_name              );
-    m_id                 = StringUtils::toLowerCase(m_name);
+    
+    std::string name;
+    std::string description;
+    std::string designer;
+
+    xml.get("name",               &name                );    
     xml.get("id",                 &m_id                );
-    xml.get("designer",           &m_designer          );
+    xml.get("designer",           &designer            );
     xml.get("status",             &m_status            );
     xml.get("date",               &m_date              );
     xml.get("installed",          &m_installed         );
     xml.get("installed-revision", &m_installed_revision);
     xml.get("revision",           &m_revision          );
     xml.get("file",               &m_zip_file          );
-    xml.get("description",        &m_description       );
+    xml.get("description",        &description         );
     
+    m_id          = StringUtils::toLowerCase(name);
+    m_name        = StringUtils::removeHtmlEntities(name);
+    m_description = StringUtils::removeHtmlEntities(description);
+    m_designer    = StringUtils::removeHtmlEntities(designer);
+
     // resolve XML entities
-    m_description = StringUtils::replace(m_description, "&#10;", "\n");
-    m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
+    //m_description = StringUtils::replace(m_description, "&#10;", "\n");
+    //m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
 
     xml.get("image",              &m_icon_url          );
     xml.get("icon-revision",      &m_icon_revision     );
@@ -105,9 +114,9 @@ void Addon::copyInstallData(const Addon &addon)
 void Addon::writeXML(std::ofstream *out_stream)
 {
     (*out_stream) << "  <"                       << m_type 
-                  << " name=\""                  << m_name 
+                  << " name=\""                  << core::stringc(m_name).c_str() 
                   << "\" id=\""                  << m_id 
-                  << "\" designer=\""            << m_designer
+                  << "\" designer=\""            << core::stringc(m_designer).c_str() 
                   << "\" status=\""              << m_status
                   << "\" date=\""                << m_date
                   << "\" installed=\""         
