@@ -290,7 +290,7 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator
     }
     
     
-    this->setFocusForPlayer( playerID );
+    if (m_element != NULL) setFocusForPlayer( playerID );
     return EVENT_LET;
 }
 
