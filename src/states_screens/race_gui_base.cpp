@@ -291,14 +291,16 @@ void RaceGUIBase::drawPowerupIcons(const Kart* kart,
                                    const core::recti &viewport, 
                                    const core::vector2df &scaling)
 {
-    // If player doesn't have anything, do nothing.
+    // If player doesn't have any powerups or has completed race, do nothing.
     const Powerup* powerup = kart->getPowerup();
-    if(powerup->getType() == PowerupManager::POWERUP_NOTHING) return;
-    int n  = kart->getNumPowerup() ;
-    if(n<1) return;    // shouldn't happen, but just in case
-    if(n>5) n=5;       // Display at most 5 items
+    if (powerup->getType() == PowerupManager::POWERUP_NOTHING
+        || kart->hasFinishedRace()) return;
 
-    int nSize=(int)(64.0f*std::min(scaling.X, scaling.Y));
+    int n = kart->getNumPowerup() ;
+    if (n<1) return;    // shouldn't happen, but just in case
+    if (n>5) n=5;       // Display at most 5 items
+
+    int nSize = (int)(64.0f*std::min(scaling.X, scaling.Y));
         
     int itemSpacing = (int)(std::min(scaling.X, scaling.Y)*30);
     
@@ -314,7 +316,7 @@ void RaceGUIBase::drawPowerupIcons(const Kart* kart,
     
     for ( int i = 0 ; i < n ; i++ )
     {
-        int x2=(int)(x1+i*itemSpacing);
+        int x2 = (int)(x1+i*itemSpacing);
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, NULL, 
                                                   NULL, true);
