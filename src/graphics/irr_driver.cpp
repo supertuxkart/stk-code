@@ -110,6 +110,15 @@ void IrrDriver::initDevice()
                 m_modes.push_back( mode );
             }
         }
+
+		// The debug name is only set if irrlicht is compiled in debug 
+		// mode. So we use this to print a warning to the user.
+        if(m_device->getDebugName())
+        {
+            printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
+            printf("!!!!! This can have a significant performance impact         !!!!!\n");
+        }
+
         m_device->closeDevice();
         // In some circumstances it would happen that a WM_QUIT message
         // (apparently sent for this NULL device) is later received by
@@ -170,13 +179,6 @@ void IrrDriver::initDevice()
              */
             
             SIrrlichtCreationParameters params;
-            // The debug name is only set if irrlicht is compiled in debug 
-            // mode. So we use this to print a warning to the user.
-            if(m_device->getDebugName())
-            {
-                printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
-                printf("!!!!! This can have a significant performance impact         !!!!!\n");
-            }
             params.DriverType = type;
             params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
                                                        UserConfigParams::m_height);
