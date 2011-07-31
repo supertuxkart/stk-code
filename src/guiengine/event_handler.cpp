@@ -648,8 +648,12 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
-                
-                if (w->m_deactivated) return EVENT_BLOCK;
+                                                
+                if (w->m_deactivated)
+                {
+                    GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
+                    return EVENT_BLOCK;
+                }
                 
                 // These events are only triggered by mouse (or so I hope)
                 // The player that owns the mouser receives "game master" priviledges

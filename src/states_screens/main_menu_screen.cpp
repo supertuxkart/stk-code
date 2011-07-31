@@ -47,6 +47,8 @@
 #include "states_screens/grand_prix_win.hpp"
 #endif
 
+#include "states_screens/dialogs/message_dialog.hpp"
+
 #include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -454,4 +456,25 @@ void MainMenuScreen::closeLangPopup()
     manualRemoveWidget(m_lang_popup);
     delete m_lang_popup;
     m_lang_popup = NULL;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void MainMenuScreen::onDisabledItemClicked(const std::string& item)
+{
+    if (item == "addons")
+    {
+        if (UserConfigParams::m_internet_status != NetworkHttp::IPERM_ALLOWED)
+        {
+            new MessageDialog( _("The add-ons module is currently disabled in the Options screen") );
+        }
+        else if (addons_manager->wasError())
+        {
+            new MessageDialog( _("Sorry, an error occurred while contacting the add-ons website. Make sure you are connected to the Internet and that SuperTuxKart is not blocked by a firewall") );
+        }
+        else if (addons_manager->isLoading())
+        {
+            new MessageDialog( _("Please wait while the add-ons are loading") );
+        }
+    }
 }

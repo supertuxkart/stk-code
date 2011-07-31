@@ -57,6 +57,9 @@ public:
      * \return true if the screen should be closed, false if you handled the press another way
      */
     virtual bool onEscapePressed();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onDisabledItemClicked(const std::string& item);
 };
 
 #endif

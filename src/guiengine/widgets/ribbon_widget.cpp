@@ -569,7 +569,7 @@ void RibbonWidget::updateSelection()
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
-{
+{    
     if (!m_deactivated)
     {
         const int subbuttons_amount = m_children.size();
@@ -591,7 +591,12 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator,
     
     if (m_selection[playerID] != -1)
     {
-        if (m_children[m_selection[playerID]].m_deactivated) return EVENT_BLOCK;
+        if (m_children[m_selection[playerID]].m_deactivated)
+        {
+            GUIEngine::getCurrentScreen()->onDisabledItemClicked(m_children[m_selection[playerID]].m_properties[PROP_ID]);
+
+            return EVENT_BLOCK;
+        }
     }
     
     return EVENT_LET;

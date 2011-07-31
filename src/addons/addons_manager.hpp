@@ -66,9 +66,11 @@ public:
     /** Returns true if the list of online addons has been downloaded. This is 
      *  used to grey out the 'addons' entry till a network connections could be
      *  established. */
-    bool         onlineReady() const {return m_state.getAtomic()==STATE_READY;}
+    bool         onlineReady() const {return m_state.getAtomic()==STATE_READY; }
     // ------------------------------------------------------------------------
-    bool         wasError()  const { return m_state.getAtomic()==STATE_ERROR;}
+    bool         wasError()    const { return m_state.getAtomic()==STATE_ERROR;}
+    // ------------------------------------------------------------------------
+    bool         isLoading()   const { return m_state.getAtomic()==STATE_INIT; }
     // ------------------------------------------------------------------------
     /** Marks addon as not being available. */
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }

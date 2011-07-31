@@ -272,6 +272,11 @@ namespace GUIEngine
         virtual EventPropagation filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                                Input::InputType type, int playerId) { return EVENT_LET; }
         
+        /** Callback you can use if you want to know when the user pressed on a disabled ribbon item
+         * (the main I see for this is to give feedback)
+         */
+        virtual void onDisabledItemClicked(const std::string& item) {}
+        
         /**
          * \brief override this if you need to be notified of raw input in subclasses
          */
