@@ -1016,9 +1016,9 @@ int main(int argc, char *argv[] )
                     }   // onCancel
                 };   // ConfirmServer
                 
-                new MessageDialog(_("SuperTuxKart may connect to a news server "
-                    "to display updates. Would you like this feature to be enabled? "
-                    "(To change this setting at a later time, go to options, select tab "
+                new MessageDialog(_("SuperTuxKart may connect to a server "
+                    "to download add-ons and notify you of updates. Would you like this feature to be "
+                    "enabled? (To change this setting at a later time, go to options, select tab "
                     "'User Interface', and edit \"Internet STK news\")."), new ConfirmServer(), true);
             }
         }

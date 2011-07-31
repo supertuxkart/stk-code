@@ -34,7 +34,7 @@
         <div width="75%" height="fit" layout="horizontal-row" >
             <checkbox id="enable-internet"/>
             <spacer width="20" height="100%" />
-            <label height="100%" I18N="In the ui settings" text="Internet STK news"/>
+            <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
         </div>
 
         <div width="75%" height="fit" layout="horizontal-row" >
