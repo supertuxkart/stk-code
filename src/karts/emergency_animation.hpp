@@ -77,7 +77,7 @@ protected:
           m_kart_mode;
 public:
                  EmergencyAnimation(Kart *kart);
-                ~EmergencyAnimation();
+    virtual     ~EmergencyAnimation();
     void         reset();
     virtual void handleExplosion(const Vec3& pos, bool direct_hit);
     virtual void forceRescue(bool is_auto_rescue=false);
