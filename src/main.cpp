@@ -673,11 +673,6 @@ int handleCmdLine(int argc, char **argv)
                      || !strcmp(argv[i], "-N")                )
         {
             UserConfigParams::m_no_start_screen = true;
-        
-        // TODO: reverse switch
-        //} else if ( !strcmp(argv[i], "--reverse") ) {
-        //fprintf ( stdout, "Enabling reverse mode.\n" ) ;
-        //raceSetup.reverse = 1;
         }
         else if (    !strcmp(argv[i], "--race-now")
                      || !strcmp(argv[i], "-R")                )
