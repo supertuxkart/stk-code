@@ -643,6 +643,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\kart_with_stats.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\max_speed.cpp"
 					>
 				</File>
@@ -1714,6 +1718,10 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\kart_properties_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_with_stats.hpp"
 					>
 				</File>
 				<File

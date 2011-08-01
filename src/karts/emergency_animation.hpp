@@ -76,12 +76,12 @@ protected:
     enum {EA_NONE, EA_RESCUE, EA_EXPLOSION}
           m_kart_mode;
 public:
-          EmergencyAnimation(Kart *kart);
-         ~EmergencyAnimation();
-    void  reset();
-    void  handleExplosion(const Vec3& pos, bool direct_hit);
-    void  forceRescue(bool is_auto_rescue=false);
-    void  update(float dt);
+                 EmergencyAnimation(Kart *kart);
+                ~EmergencyAnimation();
+    void         reset();
+    virtual void handleExplosion(const Vec3& pos, bool direct_hit);
+    virtual void forceRescue(bool is_auto_rescue=false);
+    void         update(float dt);
     // ------------------------------------------------------------------------
     /** Returns true if an emergency animation is being played. */
     bool  playingEmergencyAnimation() const {return m_kart_mode!=EA_NONE; }

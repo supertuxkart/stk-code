@@ -280,6 +280,8 @@ add_executable(supertuxkart
 	src/karts/emergency_animation.hpp
 	src/karts/kart.cpp
 	src/karts/kart.hpp
+	src/karts/kart_with_stats.cpp
+	src/karts/kart_with_stats.hpp
 	src/karts/kart_model.cpp
 	src/karts/kart_model.hpp
 	src/karts/kart_properties.cpp
