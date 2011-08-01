@@ -15,8 +15,14 @@ set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 
 # Tweakable values
-option(DEBUG "Enable debugging and turn assertions on" OFF)
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+	set(DEBUG ON)
+else(CMAKE_BUILD_TYPE MATCHES "Debug")
+	set(DEBUG OFF)
+endif(CMAKE_BUILD_TYPE MATCHES "Debug")
+
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(FONT_TOOL "Compile font tool" OFF)
 set(IRRLICHT_DIR "/path/to/irrlicht" CACHE STRING "Path to Irrlicht")
 
 # Build the Bullet physics library
@@ -26,7 +32,6 @@ add_subdirectory("${STK_SOURCE_DIR}/bullet")
 add_subdirectory("${STK_SOURCE_DIR}/enet")
 
 # Set include paths
-include_directories("${IRRLICHT_DIR}/include")
 include_directories("${STK_SOURCE_DIR}")
 include_directories("${STK_SOURCE_DIR}/enet/include")
 include_directories("${STK_SOURCE_DIR}/bullet/src")
@@ -44,15 +49,61 @@ endif()
 
 link_directories("${STK_SOURCE_DIR}/bullet")
 
+# OpenGL
+find_package(OpenGL)
+
+if(OPENGL_FOUND)
+	message("-- OpenGL found (include dirs: ${OPENGL_INCLUDE_DIR})")
+	include_directories(${OPENGL_INCLUDE_DIR})
+else()
+	message(FATAL_ERROR "OpenGL not found.")
+endif()
+
+if(UNIX)
+	# X11, stk requires xf86vm
+	find_package(X11)
+
+	if(X11_FOUND)
+		message("-- X11 libs found")
+	else()
+		message(FATAL_ERROR "X11 not found.")
+	endif()
+endif()
+
+# OpenAL
+
+find_package(OpenAL)
+
+if(OPENAL_FOUND)
+	message("-- OpenAL found (include dirs: ${OPENAL_INCLUDE_DIR})")
+	include_directories(${OPENAL_INCLUDE_DIR})
+else()
+	message(FATAL_ERROR "OpenAL not found.")
+endif()
+
+
+# Check if we finally got irrlicht
+find_path(HAVE_IRRLICHT irrlicht.h PATHS ${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
+
+if(HAVE_IRRLICHT)
+	message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
+else()
+	message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
+endif()
+
+include_directories(${HAVE_IRRLICHT})
+
+# CURL
+find_package(CURL)
+if(CURL_FOUND)
+	include_directories(${CURL_INCLUDE_DIRS})
+else()
+	message(FATAL_ERROR "-- libcURL not found, please install it.")
+endif()
+
 # Set some compiler options
 if(UNIX)
 	add_definitions(-Wall)
-	
-	if(DEBUG)
-		add_definitions(-g)
-	else()
-		add_definitions(-O3)
-	endif()
 endif()
 
 add_definitions(-DHAVE_OGGVORBIS)	# TODO: remove this switch
@@ -63,12 +114,25 @@ else()
 	add_definitions(-DNDEBUG)
 endif()
 
-# TODO
-# include_directories("/usr/include/freetype2")	
-#~ src/font_tool/CFontTool.cpp
-#~ src/font_tool/CFontTool.h
-#~ src/font_tool/CVectorFontTool.h
-#~ src/font_tool/main.cpp
+find_package(Freetype)
+
+if(FREETYPE_FOUND AND FONT_TOOL)
+	message("-- Freetype found")
+	find_package(X11)
+	include_directories(${FREETYPE_INCLUDE_DIRS})
+	add_executable(font_tool
+		src/font_tool/CFontTool.cpp
+		src/font_tool/CFontTool.h
+		src/font_tool/CVectorFontTool.h
+		src/font_tool/main.cpp
+	)
+	target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
+	target_link_libraries(font_tool ${X11_Xft_LIB})
+	target_link_libraries(font_tool ${OPENGL_LIBRARIES})
+	target_link_libraries(font_tool Irrlicht)
+else()
+	message("-- Font tool deactivated/freetype not found, the font tool won't be built (only useful for developers)")
+endif()
 
 # Build the final executable
 add_executable(supertuxkart
@@ -536,7 +600,9 @@ target_link_libraries(supertuxkart
 	bulletcollision
 	bulletmath
 	enet
-	curl
+	${CURL_LIBRARIES}
+	${OPENGL_LIBRARIES}
+	${OPENAL_LIBRARY}
 	vorbisfile)
 	
 if(USE_FRIBIDI)
@@ -544,11 +610,10 @@ if(USE_FRIBIDI)
 		fribidi)
 endif()
 	
-if(UNIX)
+if(UNIX AND NOT APPLE)
 	target_link_libraries(supertuxkart
-		GL
-		openal
 		Xxf86vm)
 elseif(APPLE)
 	# TODO!
+	# xapantu (1/08/11): all libs are added by cmake, it should work
 endif()

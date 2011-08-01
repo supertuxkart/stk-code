@@ -1,6 +1,6 @@
 # CMakeLists.txt for Bullet in STK
 
-include_directories(".")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 # libbulletmath
 add_library(bulletmath
