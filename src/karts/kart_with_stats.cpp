@@ -68,10 +68,12 @@ void KartWithStats::handleExplosion(const Vec3& pos, bool direct_hit)
 {
     bool is_new_explosion = !playingEmergencyAnimation() && !isInvulnerable();
     Kart::handleExplosion(pos, direct_hit);
-    if(is_new_explosion)
+    // If a kart is too far away from an explosion to be affected, its timer
+    // will be 0, and this should then not be counted as an explosion.
+    if(is_new_explosion && EmergencyAnimation::m_timer>0)
     {
         m_explosion_count ++;
-        m_explosion_time +=EmergencyAnimation::m_timer;
+        m_explosion_time += EmergencyAnimation::m_timer;
     }
 
 }   // handleExplosion

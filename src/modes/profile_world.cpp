@@ -198,10 +198,13 @@ void ProfileWorld::enterRaceOverState()
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
     printf("Name\t\tstart\tend\ttime\t");
     if(m_profile_mode==PROFILE_LAPS)
-        printf("av.speed\t");
+        printf("aver.\t");
     printf("top\tskid\trescue\trescue\t"
            "expl.\texpl.\n");
-    printf("\t\t\t\t\tspeed\ttime\ttime\tcount\ttime\tcount\n");
+    printf("\t\t\t\t\t");
+    if(m_profile_mode==PROFILE_LAPS)
+        printf("speed\t");
+    printf("speed\ttime\ttime\tcount\ttime\tcount\n");
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
         max_t = std::max(max_t, m_karts[i]->getFinishTime());
@@ -211,14 +214,14 @@ void ProfileWorld::enterRaceOverState()
                            m_karts[i]->getIdent().size()<8 ? "\t" : "");
         printf("%d\t%d\t", 1 + (int)i, m_karts[i]->getPosition());
         printf("%4.2f\t",     m_karts[i]->getFinishTime());
-        printf("%3.2f\t",     dynamic_cast<KartWithStats*>
-                               (m_karts[i])->getTopSpeed());
         if(m_profile_mode==PROFILE_LAPS)
         {
             float distance = race_manager->getNumLaps()
                            * m_track->getTrackLength();
-            printf("\t%4.2f\t",m_karts[i]->getFinishTime()/distance);
+            printf("%4.2f\t",distance/m_karts[i]->getFinishTime());
         }
+        printf("%3.2f\t",     dynamic_cast<KartWithStats*>
+                               (m_karts[i])->getTopSpeed());
         printf("%4.2f\t",     dynamic_cast<KartWithStats*>
                                (m_karts[i])->getSkiddingTime());
         printf("%4.2f\t%d\t", dynamic_cast<KartWithStats*>
