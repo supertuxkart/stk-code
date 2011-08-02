@@ -129,6 +129,7 @@ SlipStream::~SlipStream()
 void SlipStream::reset()
 {
     m_slipstream_mode = SS_NONE;
+    m_slipstream_time = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------

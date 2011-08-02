@@ -483,6 +483,8 @@ void Kart::reset()
         m_camera->setInitialTransform();
     }
 
+    m_slipstream->reset();
+    
     // Reset animations and wheels
     m_kart_model->reset();
 
