@@ -57,12 +57,21 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
                                  m_current_graph_node);
     m_distance_along_track = ball_distance_vec[2];
 
-    std::vector<unsigned int> succ;
-    m_quad_graph->getSuccessors(m_current_graph_node, succ, /* ai */ true);
-
     // We have to start aiming at the next sector (since it might be possible
     // that the kart is ahead of the center of the current sector).
-    m_aimed_graph_node     = succ[0];
+    m_aimed_graph_node     = getSuccessorToHitTarget(m_current_graph_node);
+
+    // Get 4 points for the interpolation
+    int pred           = m_quad_graph->getNode(m_current_graph_node)
+                         .getPredecessor();
+    m_aiming_points[0] = m_quad_graph->getQuad(pred).getCenter();
+    m_aiming_points[1] = m_quad_graph->getQuad(m_current_graph_node)
+                            .getCenter();
+    m_aiming_points[2] = m_quad_graph->getQuad(m_aimed_graph_node).getCenter();
+    int succ_succ      = getSuccessorToHitTarget(m_aimed_graph_node);
+    m_aiming_points[3] = m_quad_graph->getQuad(succ_succ).getCenter();
+    m_t = 0;
+    m_t_increase = 1.0f/(m_aiming_points[2]-m_aiming_points[1]).length();
 
     // At the start the ball aims at quads till it gets close enough to the
     // target:
@@ -95,6 +104,20 @@ void RubberBall::computeTarget()
         }
     }
 }   // computeTarget
+
+// -----------------------------------------------------------------------------
+/** Determines the successor of a graph node. For now always a successor on
+ *  the main driveline is returned, but a more sophisticated implementation
+ *  might check if the target kart is on a shortcut, and select the path  so
+ *  that it will get to the target even in this case.
+ *  \param node_index The node for which the successor is searched.
+ *  \return The node index of a successor node.
+ */
+unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index)
+{
+    // For now: always pick a successor on the main driveline.
+    return m_quad_graph->getNode(node_index).getSuccessor(0);
+}   // getSuccessorToHitTarget
 
 // -----------------------------------------------------------------------------
 /** Initialises this object with data from the power.xml file (this is a static
@@ -148,7 +171,7 @@ void RubberBall::update(float dt)
     Vec3 next_xyz = getXYZ() + delta * (m_speed * dt / delta.length());
 
     GraphNode &gn = m_quad_graph->getNode(m_current_graph_node);
-    int indx = gn.getSuccessor(0);
+    int indx = getSuccessorToHitTarget(m_current_graph_node);
     GraphNode &gn_next = m_quad_graph->getNode(indx);
 
     // Determine new distance along track
@@ -232,6 +255,19 @@ void RubberBall::update(float dt)
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
+#if 0
+    m_t += m_t_increase * dt;
+    if(m_t > 1.0f)
+        printf("XX");
+    float s0 = (1.0f+2.0f*m_t)*(1.0f-m_t)*(1.0f-m_t);
+    float s1 = m_t*(1.0f-m_t)*(1.0f-m_t);
+    float s2 = m_t*m_t*(3.0f-2*m_t);
+    float s3 = m_t*m_t*(m_t-1.0f);
+    Vec3  m0 = m_aiming_points[2]-m_aiming_points[0];
+    Vec3  m1 = m_aiming_points[3]-m_aiming_points[1];
+    next_xyz = s0*m_aiming_points[0] + s1*m0 
+             + s2*m_aiming_points[1] + s3*m1;
+#endif
     setXYZ(next_xyz);
 }   // update
 
@@ -292,9 +328,14 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 
     while(ball_ahead)
     {
+        // Move the aiming points one back
+        for(unsigned int i=1; i<4; i++)
+            m_aiming_points[i-1] = m_aiming_points[i];
+
         // FIXME: aim better if necessary!
-        m_aimed_graph_node = gn->getSuccessor(0);
+        m_aimed_graph_node = getSuccessorToHitTarget(m_aimed_graph_node);
         gn = &(m_quad_graph->getNode(m_aimed_graph_node));
+        m_aiming_points[3] = gn->getQuad().getCenter();
 
         // Detect a wrap around of the graph node. We could just test if
         // the index of the new graph node is 0, but since it's possible
@@ -336,6 +377,7 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
     *aim_xyz = gn->getQuad().getCenter();
 
 }   // determineTargetCoordinates
+
 // ----------------------------------------------------------------------------
 /** Callback from the phycis in case that a kart or object is hit. The rubber
  *  ball will only be removed if it hits it target, all other karts it might

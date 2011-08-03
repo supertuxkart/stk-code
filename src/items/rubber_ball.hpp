@@ -31,6 +31,12 @@ class QuadGraph;
 class RubberBall: public Flyable
 {
 private:
+    /** A class variable to store the default interval size. */
+    static float m_st_interval;
+    
+    /** A class variable to store the default squash duration. */
+    static float m_st_squash_duration;
+    
     /** A pointer to the target kart. */
     const Kart  *m_target;
 
@@ -40,17 +46,23 @@ private:
     /** The current quad this ball is aiming at. */
     int          m_aimed_graph_node;
 
+    /** Keep the last two, current, and next aiming points 
+      * for interpolation. */
+    Vec3         m_aiming_points[4];
+
+    /** The parameter for the spline, m_t in [0,1]. */
+    float        m_t;
+
+    /** How much m_tt must increase per second in order to maintain a
+     *  constant speed. */
+    float        m_t_increase;
+
+
     /** The previous distance to the graph node we are aiming
      *  at atm. If the distance increases, we have passed the
      *  point we aimed at and have to aim at the next point. */
     float        m_distance_along_track;
 
-    /** A class variable to store the default interval size. */
-    static float m_st_interval;
-    
-    /** A class variable to store the default squash duration. */
-    static float m_st_squash_duration;
-    
     /** A class variable to store the default squash slowdown. */
     static float m_st_squash_slowdown;
 
@@ -81,11 +93,14 @@ private:
 
     void         computeTarget();
     void         determineTargetCoordinates(float dt, Vec3 *aim_xyz);
+    unsigned int getSuccessorToHitTarget(unsigned int node_index);
 public:
                  RubberBall  (Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual void update      (float dt);
     virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    /** This object does not create an explosion, all affects on
+     *  karts are handled by this hit() function. */
     virtual bool needsExplosion() const {return false;}
 
 };   // RubberBall
