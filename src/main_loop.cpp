@@ -75,7 +75,7 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
         const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
-        if( current_fps > max_fps )
+        if( current_fps > max_fps && !ProfileWorld::isNoGraphics())
         {
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
