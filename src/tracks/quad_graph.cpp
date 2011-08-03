@@ -219,7 +219,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                          float upwards_distance) const
 {
     // Node 0 is always the node on which the start line is.
-    int current_node          = getPredecessor(0);
+    int current_node          = getNode(0).getPredecessor();
     
     float distance_from_start = 0.1f+forwards_distance;
 
@@ -242,7 +242,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
             while(distance_from_start > getNode(current_node).getNodeLength())
             {
                 distance_from_start -= getNode(current_node).getNodeLength();
-                current_node = getPredecessor(current_node);
+                current_node = getNode(current_node).getPredecessor();
             }
             const GraphNode &gn   = getNode(current_node);
             Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
@@ -462,28 +462,6 @@ void QuadGraph::getSuccessors(int node_number,
             succ.push_back(gn->getSuccessor(i));
     }
 }   // getSuccessors
-
-//-----------------------------------------------------------------------------
-/** Returns the first predecessor or a node (i.e. the one usually on the main
- *  driveline).
- *  \param node_number The number of the node.
- *  \return The node number of the first predecessor node, or -1 if no
- *          predecessor was found (and a warning is printed in this case).
- */
-int QuadGraph::getPredecessor(unsigned int target_node) const
-{
-    for(unsigned int node_id=0; node_id<m_all_nodes.size(); node_id++)
-    {
-        const GraphNode *gn=m_all_nodes[node_id];
-        for(unsigned int i=0; i <gn ->getNumberOfSuccessors(); i++)
-        {
-            if(gn->getSuccessor(i)==target_node)
-                return node_id;
-        }   // for i<gn->getNumberOfSuccessors()
-    }   // node_id<m_all_nodes.size()
-    printf("Warning: no predecessor for node '%d' found.\n", target_node);
-    return -1;
-}   // getPredecessor
 
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL

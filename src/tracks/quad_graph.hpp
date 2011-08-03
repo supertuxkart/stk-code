@@ -74,7 +74,6 @@ private:
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
-    int  getPredecessor(unsigned int target_node) const;
 public:
     static const int UNKNOWN_SECTOR;
 
