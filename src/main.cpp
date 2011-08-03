@@ -567,7 +567,7 @@ int handleCmdLine(int argc, char **argv)
                 return 0;
             }
         }
-        else if( sscanf(argv[i], "--ai=%s",  &s)==1)
+        else if( sscanf(argv[i], "--ai=%s",  s)==1)
         {
             const std::vector<std::string> l=
                 StringUtils::split(std::string(s),',');
