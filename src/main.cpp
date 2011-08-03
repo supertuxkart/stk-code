@@ -267,7 +267,7 @@ void cmdLineHelp (char* invocation)
     "  --camera-style=n        Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
     "  --profile-laps=n        Enable automatic driven profile mode for n laps.\n"
     "  --profile-time=n        Enable automatic driven profile mode for n seconds.\n"
-    "  --no-graphics           Do not display the actual race."
+    "  --no-graphics           Do not display the actual race.\n"
     // "  --history            Replay history file 'history.dat'.\n"
     // "  --history=n          Replay history file 'history.dat' using mode:\n"
     // "                       n=1: use recorded positions\n"
