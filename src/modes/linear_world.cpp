@@ -544,6 +544,17 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 
     // Finish time is the time needed for the whole race with
     // the average speed computed above.
+#ifdef DEBUG
+    if(full_distance < distance_covered)
+    {
+        printf("WARNING: full distance < distance covered for kart '%s':\n",
+               kart->getIdent().c_str());
+        printf("%f < %f\n", full_distance, distance_covered);
+    }
+#endif
+    if(full_distance < distance_covered)
+        return getTime() + kart->getInitialPosition();
+    
     return getTime() + (full_distance - distance_covered)  / average_speed;
 
 }   // estimateFinishTimeForKart

@@ -136,6 +136,9 @@ public:
     float        getDistanceFromStart() const  
                                { return m_distance_from_start;           }
     // ------------------------------------------------------------------------
+    /** Sets the distance from start for this node. */
+    void         setDistanceFromStart(float d) {m_distance_from_start = d; }
+    // ------------------------------------------------------------------------
     /** Returns the width of the part for this quad. */
     float        getPathWidth() const  { return m_width;                 }
     // ------------------------------------------------------------------------

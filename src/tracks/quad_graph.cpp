@@ -463,6 +463,34 @@ void QuadGraph::getSuccessors(int node_number,
     }
 }   // getSuccessors
 
+// ----------------------------------------------------------------------------
+/** Increases 
+ */
+void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
+{
+    GraphNode &g=getNode(indx);
+    g.setDistanceFromStart(g.getDistanceFromStart()+delta);
+    for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
+    {
+        GraphNode &g_next = getNode(g.getSuccessor(i));
+        // If we reach the beginning of the graph (usually node with index 0,
+        // but just in case also test for nodes with distance 0), all nodes
+        // are updated, so no need to recurse any further.
+        if(g_next.getIndex()==0 ||
+            g_next.getDistanceFromStart()==0)
+            continue;
+
+        // Only increase the distance from start of a successor node, if 
+        // this successor has a distance from start that is smaller then 
+        // the increased amount.
+        if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
+            g_next.getDistanceFromStart())
+        {
+            updateDistancesForAllSuccessors(g.getSuccessor(i), delta);
+        }
+    }
+}   // updateDistancesForAllSuccessors
+
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL
  *  space) and transforms them into coordinates based on the track. The y-axis
