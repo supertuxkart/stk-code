@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modes/world_with_rank.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/aligned_array.hpp"
 
 class SFXBase;
@@ -33,6 +34,7 @@ class SFXBase;
  */
 class LinearWorld : public WorldWithRank
 {
+private:
     /** Sfx for the final lap. */
     SFXBase     *m_last_lap_sfx;
 
@@ -41,27 +43,48 @@ class LinearWorld : public WorldWithRank
     
     bool         m_last_lap_sfx_playing;
 
-private:
+    // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.
      */
-    struct KartInfo
+    class KartInfo
     {
-        int         m_race_lap;             /**<Number of finished(!) laps. */
-        float       m_time_at_last_lap;     /**<Time at finishing last lap. */
-        float       m_lap_start_time;       /**<Time at start of a new lap. */
-        float       m_estimated_finish;     /**<During last lap only:
-                                            *  estimated finishing time!   */
-        int         m_track_sector;         /**<Index in driveline, special values
-                                            * e.g. UNKNOWN_SECTOR can be negative!*/
+    public:
+        /** Number of finished(!) laps. */
+        int         m_race_lap;
 
-        int         m_last_valid_sector;    /* used when rescusing, e.g. for invalid shortcuts */
+        /** Time at finishing last lap. */
+        float       m_time_at_last_lap;
 
-        Vec3        m_curr_track_coords;
-        /** True if the kart is on top of the road path drawn by the drivelines */
-        bool        m_on_road;
+        /** Time at start of a new lap. */
+        float       m_lap_start_time;
 
+        /** During last lap only: estimated finishing time!   */
+        float       m_estimated_finish;
+
+        /** Stores the current graph node and track coordinates etc. */
+        TrackSector m_current_sector;
+
+        /** Initialises all fields. */
+        KartInfo()  { reset(); }
+        // --------------------------------------------------------------------
+        /** Re-initialises all data. */
+        void reset()
+        {
+            m_race_lap         = -1;
+            m_lap_start_time   = 0;
+            m_time_at_last_lap = 99999.9f;
+            m_estimated_finish = -1.0f;
+            m_current_sector.reset();
+        }
+        // --------------------------------------------------------------------
+        /** Returns a pointer to the current node object. */
+        TrackSector *getSector() {return &m_current_sector; }
+        // --------------------------------------------------------------------
+        /** Returns a pointer to the current node object. */
+        const TrackSector *getSector() const {return &m_current_sector; }
     };
+    // ------------------------------------------------------------------------
 
 protected:
     RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
@@ -101,17 +124,19 @@ public:
                   getKartsDisplayInfo();
     virtual void  moveKartAfterRescue(Kart* kart);
     virtual void  restartRace();
-    
-    virtual bool  raceHasLaps(){ return true; }
     virtual void  newLap(unsigned int kart_index);
-
-    virtual bool  haveBonusBoxes(){ return true; }
     
+    // ------------------------------------------------------------------------    
+    /** Returns if this race mode has laps. */
+    virtual bool  raceHasLaps(){ return true; }
+    // ------------------------------------------------------------------------    
+    /** Returns if this race mode has bonus items. */
+    virtual bool  haveBonusBoxes(){ return true; }
+    // ------------------------------------------------------------------------    
     /** Returns true if the kart is on a valid driveline quad.
-     *  \param kart_index  Index of the kart.
-     */
+     *  \param kart_index  Index of the kart. */
     bool          isOnRoad(unsigned int kart_index) const 
-                 { return m_kart_info[kart_index].m_on_road; }
+                  { return m_kart_info[kart_index].getSector()->isOnRoad(); }
 };   // LinearWorld
 
 #endif

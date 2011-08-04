@@ -21,6 +21,7 @@
 #define HEADER_RUBBER_BALL_HPP
 
 #include "items/flyable.hpp"
+#include "tracks/track_sector.hpp"
 
 class Kart;
 class QuadGraph;
@@ -28,7 +29,7 @@ class QuadGraph;
 /**
   * \ingroup items
   */
-class RubberBall: public Flyable
+class RubberBall: public Flyable, public TrackSector
 {
 private:
     /** A class variable to store the default interval size. */

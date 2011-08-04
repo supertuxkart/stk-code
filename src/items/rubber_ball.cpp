@@ -28,8 +28,9 @@ float RubberBall::m_st_interval;
 float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 
-RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 
-                                             0.0f /* mass */)
+RubberBall::RubberBall(Kart *kart) 
+          : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
+            TrackSector()
 {
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
@@ -62,13 +63,15 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
 
     // Get 4 points for the interpolation
     int pred           = QuadGraph::get()->getNode(m_current_graph_node)
-                         .getPredecessor();
+                                          .getPredecessor();
     m_aiming_points[0] = QuadGraph::get()->getQuadOfNode(pred).getCenter();
     m_aiming_points[1] = QuadGraph::get()->getQuadOfNode(m_current_graph_node)
-                            .getCenter();
-    m_aiming_points[2] = QuadGraph::get()->getQuadOfNode(m_aimed_graph_node).getCenter();
+                                          .getCenter();
+    m_aiming_points[2] = QuadGraph::get()->getQuadOfNode(m_aimed_graph_node)
+                                          .getCenter();
     int succ_succ      = getSuccessorToHitTarget(m_aimed_graph_node);
-    m_aiming_points[3] = QuadGraph::get()->getQuadOfNode(succ_succ).getCenter();
+    m_aiming_points[3] = QuadGraph::get()->getQuadOfNode(succ_succ)
+                                          .getCenter();
     m_t = 0;
     m_t_increase = 1.0f/(m_aiming_points[2]-m_aiming_points[1]).length();
 
@@ -172,16 +175,18 @@ void RubberBall::update(float dt)
     int indx = getSuccessorToHitTarget(m_current_graph_node);
 
     // Determine new distance along track
+    TrackSector::update(next_xyz);
+
     Vec3 ball_distance_vec;
     QuadGraph::get()->findRoadSector(next_xyz, &m_current_graph_node);
     if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
     {
         m_current_graph_node = 
             QuadGraph::get()->findOutOfRoadSector(next_xyz,
-                                              QuadGraph::UNKNOWN_SECTOR );
+                                                  QuadGraph::UNKNOWN_SECTOR );
     }
     QuadGraph::get()->spatialToTrack(&ball_distance_vec, getXYZ(), 
-                                 m_current_graph_node);
+                                     m_current_graph_node);
 
     // Detect wrap around, i.e. crossing the start line
     float old_distance     = m_distance_along_track;

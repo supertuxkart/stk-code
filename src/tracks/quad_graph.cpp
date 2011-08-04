@@ -516,12 +516,9 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 
 //-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position
- *  xyz is. If xyz is not on top of the road, it returns
- *  UNKNOWN_SECTOR.
+ *  xyz is. If xyz is not on top of the road, it sets UNKNOWN_SECTOR as sector.
  *
- *  The 'sector' could be defined as the number of the closest track
- *  segment to XYZ.
- *  \param XYZ Position for which the segment should be determined.
+ *  \param xyz Position for which the segment should be determined.
  *  \param sector Contains the previous sector (as a shortcut, since usually
  *         the sector is the same as the last one), and on return the result
  *  \param all_sectors If this is not NULL, it is a list of all sectors to 
@@ -565,7 +562,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad &q = getQuadOfNode(indx);
         float dist    = xyz.getY() - q.getMinHeight();
-        // While negative distances are unlikely, we allow some small netative
+        // While negative distances are unlikely, we allow some small negative
         // numbers in case that the kart is partly in the track.
         if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
         {

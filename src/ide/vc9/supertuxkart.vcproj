@@ -874,6 +874,10 @@
 					RelativePath="..\..\tracks\track_object_manager.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\tracks\track_sector.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="replay"
@@ -1910,6 +1914,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\track_object_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_sector.hpp"
 					>
 				</File>
 			</Filter>

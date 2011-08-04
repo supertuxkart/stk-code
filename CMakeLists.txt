@@ -566,6 +566,8 @@ add_executable(supertuxkart
 	src/tracks/track_object.hpp
 	src/tracks/track_object_manager.cpp
 	src/tracks/track_object_manager.hpp
+ 	src/tracks/track_sector.cpp
+	src/tracks/track_sector.hpp
 	src/tutorial/tutorial.cpp
 	src/tutorial/tutorial_data.cpp
 	src/tutorial/tutorial_data.hpp
