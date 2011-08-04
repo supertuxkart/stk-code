@@ -32,6 +32,7 @@
 #include "tracks/quad_set.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
+QuadGraph *QuadGraph::m_quad_graph = NULL;
 
 /** Constructor, loads the graph information for a given set of quads
  *  from a graph file.
@@ -533,7 +534,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
 {
     // Most likely the kart will still be on the sector it was before,
     // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getQuad(*sector).pointInQuad(xyz) )
+    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad(xyz) )
     {
         return; 
     }   // if still on same quad
@@ -562,7 +563,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             indx = (*all_sectors)[i];
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
-        const Quad &q = getQuad(indx);
+        const Quad &q = getQuadOfNode(indx);
         float dist    = xyz.getY() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small netative
         // numbers in case that the kart is partly in the track.

@@ -39,7 +39,6 @@ AIBaseController::AIBaseController(Kart *kart,
     {
         m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
         m_track       = m_world->getTrack();
-        m_quad_graph  = &m_track->getQuadGraph();
         computePath();
     }
     else
@@ -48,7 +47,6 @@ AIBaseController::AIBaseController(Kart *kart,
         // a linear world, since it assumes the existance of drivelines)
         m_world           = NULL;
         m_track           = NULL;
-        m_quad_graph      = NULL;
         m_next_node_index.clear();
         m_all_look_aheads.clear();
         m_successor_index.clear();
@@ -73,15 +71,14 @@ void  AIBaseController::newLap(int lap)
  */
 void AIBaseController::computePath()
 {
-
-    m_next_node_index.resize(m_quad_graph->getNumNodes());
-    m_successor_index.resize(m_quad_graph->getNumNodes());
+    m_next_node_index.resize(QuadGraph::get()->getNumNodes());
+    m_successor_index.resize(QuadGraph::get()->getNumNodes());
     std::vector<unsigned int> next;
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
         next.clear();
         // Get all successors the AI is allowed to take.
-        m_quad_graph->getSuccessors(i, next, /*for_ai*/true);
+        QuadGraph::get()->getSuccessors(i, next, /*for_ai*/true);
         // For now pick one part on random, which is not adjusted during the 
         // race. Long term statistics might be gathered to determine the
         // best way, potentially depending on race position etc.
@@ -102,8 +99,8 @@ void AIBaseController::computePath()
     // find too good a driveline. Note that in general this list should
     // be computed recursively, but since the AI for now is using only 
     // (randomly picked) path this is fine
-    m_all_look_aheads.resize(m_quad_graph->getNumNodes());
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    m_all_look_aheads.resize(QuadGraph::get()->getNumNodes());
+    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
         std::vector<int> l;
         int current = i;
@@ -121,20 +118,20 @@ void AIBaseController::update(float dt)
 {
     Controller::update(dt);
 
-    if(m_quad_graph)
+    if(QuadGraph::get())
     {
         // Update the current node:
         int old_node = m_track_node;
         if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
         {
-            m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node, 
+            QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node, 
                 &m_all_look_aheads[m_track_node]);
         }
         // If we can't find a proper place on the track, to a broader search
         // on off-track locations.
         if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
         {
-            m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
         // IF the AI is off track (or on a branch of the track it did not
         // select to be on), keep the old position.
@@ -155,7 +152,7 @@ void AIBaseController::update(float dt)
 unsigned int AIBaseController::getNextSector(unsigned int index)
 {
     std::vector<unsigned int> successors;
-    m_quad_graph->getSuccessors(index, successors);
+    QuadGraph::get()->getSuccessors(index, successors);
     return successors[0];
 }   // getNextSector
 
@@ -167,7 +164,8 @@ unsigned int AIBaseController::getNextSector(unsigned int index)
 float AIBaseController::steerToAngle(const unsigned int sector, 
                                      const float add_angle)
 {
-    float angle = m_quad_graph->getAngleToNext(sector, getNextSector(sector));
+    float angle = QuadGraph::get()->getAngleToNext(sector, 
+                                                   getNextSector(sector));
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_kart->getHeading();

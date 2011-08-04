@@ -56,14 +56,14 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
         {
             // 0 is always a valid successor - so even if the kart should end
             // up by accident on a non-selected path, it will keep on working.
             m_successor_index[i] = 0;
 
             next.clear();
-            m_quad_graph->getSuccessors(i, next);
+            QuadGraph::get()->getSuccessors(i, next);
             m_next_node_index[i] = next[0];
         }
 
@@ -75,7 +75,7 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         // find too good a driveline. Note that in general this list should
         // be computed recursively, but since the AI for now is using only 
         // (randomly picked) path this is fine
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
         {
             std::vector<int> l;
             int current = i;
@@ -88,7 +88,7 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         }
     }   // if not battle mode
 
-    // Reset must be called after m_quad_graph etc. is set up        
+    // Reset must be called after QuadGraph::get() etc. is set up        
     reset();
 
     m_max_handicap_accel = 1.0f;
@@ -122,15 +122,15 @@ void EndController::reset()
 
     m_track_node       = QuadGraph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(m_quad_graph)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
-        m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+        QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
         // Node that this can happen quite easily, e.g. an AI kart is
         // taken over by the end controller while it is off track.
         if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
         {
-            m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
     }
 }   // reset
@@ -187,10 +187,10 @@ void EndController::handleSteering(float dt)
      */
     //Reaction to being outside of the road
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
-       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
+       0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
         const int next = m_next_node_index[m_track_node];
-        target_point = m_quad_graph->getQuad(next).getCenter();
+        target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
 #ifdef AI_DEBUG
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
@@ -251,7 +251,8 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getQuad(target_sector).getCenter() - m_kart->getXYZ();
+        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+                  - m_kart->getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_length );
@@ -268,16 +269,16 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
-            m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
+            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
  
             distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f 
-                 > m_quad_graph->getNode(sector).getPathWidth() )
+                 > QuadGraph::get()->getNode(sector).getPathWidth() )
             {
-                *result = m_quad_graph->getQuad(sector).getCenter();
+                *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
                 return;
             }
         }

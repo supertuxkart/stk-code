@@ -48,13 +48,12 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     computeTarget();
 
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    m_quad_graph         = &(world->getTrack()->getQuadGraph());
     m_current_graph_node = world->getSectorForKart(kart->getWorldKartId());
 
     // Determine distance along track
     Vec3 ball_distance_vec;
-    m_quad_graph->spatialToTrack(&ball_distance_vec, getXYZ(), 
-                                 m_current_graph_node);
+    QuadGraph::get()->spatialToTrack(&ball_distance_vec, getXYZ(), 
+                                     m_current_graph_node);
     m_distance_along_track = ball_distance_vec[2];
 
     // We have to start aiming at the next sector (since it might be possible
@@ -62,14 +61,14 @@ RubberBall::RubberBall(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_RUBBE
     m_aimed_graph_node     = getSuccessorToHitTarget(m_current_graph_node);
 
     // Get 4 points for the interpolation
-    int pred           = m_quad_graph->getNode(m_current_graph_node)
+    int pred           = QuadGraph::get()->getNode(m_current_graph_node)
                          .getPredecessor();
-    m_aiming_points[0] = m_quad_graph->getQuad(pred).getCenter();
-    m_aiming_points[1] = m_quad_graph->getQuad(m_current_graph_node)
+    m_aiming_points[0] = QuadGraph::get()->getQuadOfNode(pred).getCenter();
+    m_aiming_points[1] = QuadGraph::get()->getQuadOfNode(m_current_graph_node)
                             .getCenter();
-    m_aiming_points[2] = m_quad_graph->getQuad(m_aimed_graph_node).getCenter();
+    m_aiming_points[2] = QuadGraph::get()->getQuadOfNode(m_aimed_graph_node).getCenter();
     int succ_succ      = getSuccessorToHitTarget(m_aimed_graph_node);
-    m_aiming_points[3] = m_quad_graph->getQuad(succ_succ).getCenter();
+    m_aiming_points[3] = QuadGraph::get()->getQuadOfNode(succ_succ).getCenter();
     m_t = 0;
     m_t_increase = 1.0f/(m_aiming_points[2]-m_aiming_points[1]).length();
 
@@ -116,7 +115,7 @@ void RubberBall::computeTarget()
 unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index)
 {
     // For now: always pick a successor on the main driveline.
-    return m_quad_graph->getNode(node_index).getSuccessor(0);
+    return QuadGraph::get()->getNode(node_index).getSuccessor(0);
 }   // getSuccessorToHitTarget
 
 // -----------------------------------------------------------------------------
@@ -170,20 +169,18 @@ void RubberBall::update(float dt)
     // FIXME: use interpolation here for smooth curves
     Vec3 next_xyz = getXYZ() + delta * (m_speed * dt / delta.length());
 
-    GraphNode &gn = m_quad_graph->getNode(m_current_graph_node);
     int indx = getSuccessorToHitTarget(m_current_graph_node);
-    GraphNode &gn_next = m_quad_graph->getNode(indx);
 
     // Determine new distance along track
     Vec3 ball_distance_vec;
-    m_quad_graph->findRoadSector(next_xyz, &m_current_graph_node);
+    QuadGraph::get()->findRoadSector(next_xyz, &m_current_graph_node);
     if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
     {
         m_current_graph_node = 
-            m_quad_graph->findOutOfRoadSector(next_xyz,
+            QuadGraph::get()->findOutOfRoadSector(next_xyz,
                                               QuadGraph::UNKNOWN_SECTOR );
     }
-    m_quad_graph->spatialToTrack(&ball_distance_vec, getXYZ(), 
+    QuadGraph::get()->spatialToTrack(&ball_distance_vec, getXYZ(), 
                                  m_current_graph_node);
 
     // Detect wrap around, i.e. crossing the start line
@@ -290,7 +287,7 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 
     // Aiming at a graph node
     // ----------------------
-    GraphNode *gn  = &(m_quad_graph->getNode(m_aimed_graph_node));
+    GraphNode *gn  = &(QuadGraph::get()->getNode(m_aimed_graph_node));
     
     // At this stage m_distance_along track is already the new distance (set
     // in the previous time step when aiming). It has to be detected if the
@@ -334,7 +331,7 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 
         // FIXME: aim better if necessary!
         m_aimed_graph_node = getSuccessorToHitTarget(m_aimed_graph_node);
-        gn = &(m_quad_graph->getNode(m_aimed_graph_node));
+        gn = &(QuadGraph::get()->getNode(m_aimed_graph_node));
         m_aiming_points[3] = gn->getQuad().getCenter();
 
         // Detect a wrap around of the graph node. We could just test if

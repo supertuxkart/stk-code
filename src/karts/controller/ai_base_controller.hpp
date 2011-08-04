@@ -52,9 +52,6 @@ protected:
     /** Keep a pointer to world. */
     LinearWorld *m_world;
 
-    /** The graph of qudas of this track. */
-    const    QuadGraph *m_quad_graph;
-
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not

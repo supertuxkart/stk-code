@@ -75,7 +75,7 @@ void GraphNode::addSuccessor(unsigned int to)
     const Quad &this_quad = m_all_quads->getQuad(m_quad_index);
     // to is the graph node, so we have to use m_all_nodes to get the right quad
     GraphNode &gn = m_all_nodes->getNode(to);
-    const Quad &next_quad = m_all_nodes->getQuad(to);
+    const Quad &next_quad = m_all_nodes->getQuadOfNode(to);
 
     // Keep the first predecessor, which is usually the most 'natural' one.
     if(gn.m_predecessor==-1)

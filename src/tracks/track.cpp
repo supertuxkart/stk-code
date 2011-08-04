@@ -65,7 +65,7 @@ using namespace irr;
 const float Track::NOHIT           = -99999.9f;
 
 // ----------------------------------------------------------------------------
-Track::Track(std::string filename)
+Track::Track(const std::string &filename)
 {
 #ifdef DEBUG
     m_magic_number          = 0x17AC3802;
@@ -83,7 +83,6 @@ Track::Track(std::string filename)
     m_all_cached_meshes.clear();
     m_is_arena              = false;
     m_camera_far            = 1000.0f;
-    m_quad_graph            = NULL;
     m_check_manager         = NULL;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
@@ -121,14 +120,9 @@ void Track::reset()
 /** Removes the physical body from the world.
  *  Called at the end of a race.
  */
-
 void Track::cleanup()
 {
-    if(m_quad_graph)    
-    {
-        delete m_quad_graph;
-        m_quad_graph = NULL;
-    }
+    QuadGraph::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     
@@ -191,7 +185,7 @@ void Track::cleanup()
     }
     m_all_cached_meshes.clear();
 
-    if(m_quad_graph)    delete m_quad_graph;
+    QuadGraph::destroy();
     if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      
     {
@@ -255,12 +249,6 @@ void Track::cleanup()
     }   // if verbose
 
 }   // cleanup
-
-//-----------------------------------------------------------------------------
-const Vec3& Track::trackToSpatial(const int sector) const
-{
-    return m_quad_graph->getQuad(sector).getCenter();
-}   // trackToSpatial
 
 //-----------------------------------------------------------------------------
 void Track::loadTrackInfo()
@@ -388,6 +376,8 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------
+/** Select and set the music for this track (doesn't actually start it yet).
+ */
 void Track::startMusic() const 
 {
     // In case that the music wasn't found (a warning was already printed)
@@ -401,29 +391,34 @@ void Track::startMusic() const
  */
 void Track::loadQuadGraph(unsigned int mode_id)
 {
-    m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
-                                 m_root+"/"+m_all_modes[mode_id].m_graph_name);
+    QuadGraph::create(m_root+"/"+m_all_modes[mode_id].m_quad_name,
+                      m_root+"/"+m_all_modes[mode_id].m_graph_name);
 #ifdef DEBUG
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
-        assert(m_quad_graph->getNode(i).getPredecessor()!=-1);
+        assert(QuadGraph::get()->getNode(i).getPredecessor()!=-1);
     }
 #endif
 
-    if(m_quad_graph->getNumNodes()==0)
+    if(QuadGraph::get()->getNumNodes()==0)
     {
-        fprintf(stderr, "[Track] WARNING: No graph nodes defined for track '%s'\n",
+        fprintf(stderr, 
+                "[Track] WARNING: No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
         if (race_manager->getNumberOfKarts() > 1)
         {
-            fprintf(stderr, "[Track] FATAL: I can handle the lack of driveline in single kart mode, but not with AIs\n");
+            fprintf(stderr, 
+                "[Track] FATAL: I can handle the lack of driveline in single"
+                "kart mode, but not with AIs\n");
             exit(-1);
         }
     }
     else
     {
-        m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
-                                                 "minimap::"+m_ident);
+        m_mini_map=
+            QuadGraph::get()->makeMiniMap(World::getWorld()->getRaceGUI()
+                                          ->getMiniMapSize(), 
+                                          "minimap::"+m_ident);
 
     }
 }   // loadQuadGraph
@@ -1122,11 +1117,11 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     }
     m_start_transforms.resize(race_manager->getNumberOfKarts());
     if(!m_is_arena)
-        m_quad_graph->setDefaultStartPositions(&m_start_transforms,
-                                               karts_per_row,
-                                               forwards_distance,
-                                               sidewards_distance,
-                                               upwards_distance);
+        QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
+                                                   karts_per_row,
+                                                   forwards_distance,
+                                                   sidewards_distance,
+                                                   upwards_distance);
 
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
@@ -1366,7 +1361,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
 
     createPhysicsModel(main_track_count);
-    if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
+    if (UserConfigParams::m_track_debug) QuadGraph::get()->createDebugMesh();
     
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.

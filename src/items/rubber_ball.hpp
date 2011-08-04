@@ -88,9 +88,6 @@ private:
      *  used to keep track of the state of this ball. */
     bool         m_aiming_at_target;
 
-    /** For convenience keep a pointer to the quad graph. */
-    QuadGraph   *m_quad_graph;
-
     void         computeTarget();
     void         determineTargetCoordinates(float dt, Vec3 *aim_xyz);
     unsigned int getSuccessorToHitTarget(unsigned int node_index);

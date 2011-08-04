@@ -49,7 +49,6 @@
 
 DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
 {
-    // Reset must be called after m_quad_graph etc. is set up        
     reset();
 
     switch( race_manager->getDifficulty())
@@ -132,12 +131,14 @@ void DefaultAIController::reset()
 
     AIBaseController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
-    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+    QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
-        fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
+        fprintf(stderr, 
+                "Invalid starting position for '%s' - not on track"
+                " - can be ignored.\n",
                 m_kart->getIdent().c_str());
-        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+        m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
 }   // reset
@@ -287,7 +288,7 @@ void DefaultAIController::handleBraking()
         m_world->isOnRoad(m_kart->getWorldKartId()) )
     {
         float kart_ang_diff = 
-            m_quad_graph->getAngleToNext(m_track_node,
+            QuadGraph::get()->getAngleToNext(m_track_node,
                                          m_successor_index[m_track_node])
           - m_kart->getHeading();
         kart_ang_diff = normalizeAngle(kart_ang_diff);
@@ -307,8 +308,9 @@ void DefaultAIController::handleBraking()
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
             if(!(m_world->getDistanceToCenterForKart(m_kart->getWorldKartId()) 
-                 > m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
+                 > QuadGraph::get()->getNode(m_track_node).getPathWidth() *
+                 -CURVE_INSIDE_PERC || 
+                 m_curve_angle > RAD_TO_DEGREE*m_kart->getMaxSteerAngle()) )
             {
                 m_controls->m_brake = false;
                 return;
@@ -317,8 +319,9 @@ void DefaultAIController::handleBraking()
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
             if(!(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) 
-                < m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
+                < QuadGraph::get()->getNode(m_track_node).getPathWidth() *
+                 CURVE_INSIDE_PERC ||
+                 m_curve_angle < -RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
             {
                 m_controls->m_brake = false;
                 return;
@@ -355,12 +358,14 @@ void DefaultAIController::handleSteering(float dt)
      */
     //Reaction to being outside of the road
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
-       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
+       0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
-        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter());
+        steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
+                                                    .getCenter());
 
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
+        m_debug_sphere->setPosition(QuadGraph::get()->getQuad(next)
+                       .getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
 #endif
@@ -886,7 +891,7 @@ void DefaultAIController::checkCrashes(int steps, const Vec3& pos )
         /*Find if we crash with the drivelines*/
         if(current_node!=QuadGraph::UNKNOWN_SECTOR &&
             m_next_node_index[current_node]!=-1)
-            m_quad_graph->findRoadSector(step_coord, &current_node,
+            QuadGraph::get()->findRoadSector(step_coord, &current_node,
                         /* sectors to test*/ &m_all_look_aheads[current_node]);
 
         if( current_node == QuadGraph::UNKNOWN_SECTOR)
@@ -921,7 +926,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getQuad(target_sector).getCenter() 
+        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length_2d();
@@ -944,22 +949,22 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
-            m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
-                                                   sector );
+            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+                                             sector );
  
             float distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f 
-                 > m_quad_graph->getNode(sector).getPathWidth() )
+                 > QuadGraph::get()->getNode(sector).getPathWidth() )
             {
-                *result = m_quad_graph->getQuad(sector).getCenter();
+                *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
                 return;
             }
         }
         sector = target_sector;
     }   // for i<100
-    *result = m_quad_graph->getQuad(sector).getCenter();
+    *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
@@ -982,7 +987,7 @@ int DefaultAIController::calcSteps()
     if( fabsf(m_controls->m_steer) > 0.95 )
     {
         const int WIDTH_STEPS = 
-            (int)( m_quad_graph->getNode(m_future_sector).getPathWidth()
+            (int)( QuadGraph::get()->getNode(m_future_sector).getPathWidth()
                    /( m_kart_length * 2.0 ) );
 
         steps += WIDTH_STEPS;
@@ -1007,14 +1012,16 @@ void DefaultAIController::findCurve()
     for(i = m_track_node; total_dist < m_kart->getVelocityLC().getZ(); 
         i = m_next_node_index[i])
     {
-        total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);
+        total_dist += QuadGraph::get()->getDistanceToNext(i, 
+                                                         m_successor_index[i]);
     }
 
 
     m_curve_angle = 
-        normalizeAngle(m_quad_graph->getAngleToNext(i, m_successor_index[i])
-                      -m_quad_graph->getAngleToNext(m_track_node, 
-                                                    m_successor_index[m_track_node]) );
+        normalizeAngle(QuadGraph::get()->getAngleToNext(i, 
+                                                        m_successor_index[i])
+                      -QuadGraph::get()->getAngleToNext(m_track_node, 
+                                            m_successor_index[m_track_node]) );
     
     m_curve_target_speed = m_kart->getCurrentMaxSpeed();
 }   // findCurve

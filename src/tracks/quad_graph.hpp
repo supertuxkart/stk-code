@@ -39,13 +39,21 @@ using namespace irr;
 class CheckLine;
 
 /**
-  * \brief This class stores a graph of quads.
-  * \ingroup tracks
+ *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
+ *  design pattern: it has a static create function to create exactly instance,
+ *  a destroy function, and a get function (that does not have the side effect 
+ *  of the 'normal singleton'  design pattern to create an instance). Besides
+ *  saving on the if statement in get(), this is necessary since certain race
+ *  modes might not have a quad graph at all (e.g. battle mode). So get()
+ *  returns NULL in this case, and this is tested where necessary.
+ * \ingroup tracks
   */
 class QuadGraph : public NoCopy
 {
     
 private:
+    static QuadGraph        *m_quad_graph;
+
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
     /** The set of all quads. */
@@ -74,12 +82,12 @@ private:
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
+         QuadGraph     (const std::string &quad_file_name, 
+                        const std::string graph_file_name);
+        ~QuadGraph     ();
 public:
     static const int UNKNOWN_SECTOR;
 
-                 QuadGraph     (const std::string &quad_file_name, 
-                                const std::string graph_file_name);
-                ~QuadGraph     ();
     void         createDebugMesh();
     void         cleanupDebugMesh();
     void         getSuccessors(int node_number, 
@@ -106,7 +114,33 @@ public:
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
 
-
+    // ----------------------------------------------------------------------
+    /** Returns the one instance of this object. It is possible that there
+     *  is no instance created (e.g. in battle mode, since it doesn't have
+     *  a quad graph), so we don't assert that an instance exist, and we
+     *  also don't create one if it doesn't exists. */
+    static QuadGraph  *get() { return m_quad_graph; }
+    // ----------------------------------------------------------------------
+    /** Creates a QuadGraph instance. */
+    static void create(const std::string &quad_file_name, 
+                       const std::string graph_file_name)
+    {
+        assert(m_quad_graph==NULL);
+        m_quad_graph = new QuadGraph(quad_file_name, graph_file_name);
+    }   // create
+    // ----------------------------------------------------------------------
+    /** Cleans up the quad graph. It is possible that this function is called
+     *  even if no instance exists (e.g. in battle mode). So it is not an 
+     *  error if there is no instance. */
+    static void destroy()
+    {
+        if(m_quad_graph)
+        {
+            delete m_quad_graph;
+            m_quad_graph = NULL;
+        }
+    }   // destroy
+    // ----------------------------------------------------------------------
     /** Returns the number of nodes in the graph. */
     unsigned int getNumNodes() const { return m_all_nodes.size();         } 
     // ----------------------------------------------------------------------
@@ -124,7 +158,7 @@ public:
                          { return m_all_nodes[n]->getNumberOfSuccessors();  }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
-    const Quad&  getQuad(unsigned int j) const
+    const Quad&  getQuadOfNode(unsigned int j) const
                  { return m_all_quads->getQuad(m_all_nodes[j]->getIndex()); }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */

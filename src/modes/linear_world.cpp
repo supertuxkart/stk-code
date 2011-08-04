@@ -64,8 +64,8 @@ void LinearWorld::init()
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
         info.m_lap_start_time       = 0;
-        m_track->getQuadGraph().findRoadSector(m_karts[n]->getXYZ(),
-                                               &info.m_track_sector);
+        QuadGraph::get()->findRoadSector(m_karts[n]->getXYZ(),
+                                         &info.m_track_sector);
 
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
@@ -73,13 +73,13 @@ void LinearWorld::init()
         if (!info.m_on_road)
         {
             info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(m_karts[n]->getXYZ(),
-                                                            QuadGraph::UNKNOWN_SECTOR );
+                QuadGraph::get()->findOutOfRoadSector(m_karts[n]->getXYZ(),
+                                                      QuadGraph::UNKNOWN_SECTOR );
         }
 
-        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
-                                               m_karts[n]->getXYZ(),
-                                               info.m_track_sector );
+        QuadGraph::get()->spatialToTrack(&info.m_curr_track_coords,
+                                          m_karts[n]->getXYZ(),
+                                          info.m_track_sector );
 
         info.m_race_lap             = -1;
         info.m_lap_start_time       = 0;
@@ -118,8 +118,8 @@ void LinearWorld::restartRace()
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = 0;
         info.m_lap_start_time       = 0;
-        m_track->getQuadGraph().findRoadSector(m_karts[i]->getXYZ(),
-                                               &info.m_track_sector);
+        QuadGraph::get()->findRoadSector(m_karts[i]->getXYZ(),
+                                         &info.m_track_sector);
 
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
@@ -127,13 +127,13 @@ void LinearWorld::restartRace()
         if (!info.m_on_road)
         {
             info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(m_karts[i]->getXYZ(),
-                                                            QuadGraph::UNKNOWN_SECTOR );
+                QuadGraph::get()->findOutOfRoadSector(m_karts[i]->getXYZ(),
+                                                    QuadGraph::UNKNOWN_SECTOR);
         }
 
-        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
-                                               m_karts[i]->getXYZ(),
-                                               info.m_track_sector );
+        QuadGraph::get()->spatialToTrack(&info.m_curr_track_coords,
+                                         m_karts[i]->getXYZ(),
+                                         info.m_track_sector );
         info.m_race_lap             = -1;
         info.m_lap_start_time       = -0;
         info.m_time_at_last_lap     = 99999.9f;
@@ -197,8 +197,8 @@ void LinearWorld::update(float dt)
 
         // update sector variables
         int prev_sector = kart_info.m_track_sector;
-        m_track->getQuadGraph().findRoadSector(kart->getXYZ(),
-                                               &kart_info.m_track_sector);
+        QuadGraph::get()->findRoadSector(kart->getXYZ(),
+                                         &kart_info.m_track_sector);
 
         kart_info.m_on_road = kart_info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
         if(kart_info.m_on_road)
@@ -209,11 +209,11 @@ void LinearWorld::update(float dt)
         {
             // Kart off road. Find the closest sector instead.
             kart_info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(kart->getXYZ(), prev_sector );
+                QuadGraph::get()->findOutOfRoadSector(kart->getXYZ(), prev_sector );
         }
 
         // Update track coords (=progression)
-        m_track->getQuadGraph().spatialToTrack(&kart_info.m_curr_track_coords,
+        QuadGraph::get()->spatialToTrack(&kart_info.m_curr_track_coords,
                                                kart->getXYZ(),
                                                kart_info.m_track_sector    );
 
@@ -581,11 +581,13 @@ void LinearWorld::moveKartAfterRescue(Kart* kart)
     // Using the predecessor has the additional afvantage (besides punishing
     // the player a bit more) that it makes it less likely to fall in a 
     // rescue loop since the kart moves back on each attempt. 
-    const QuadGraph &qg     = m_track->getQuadGraph();
-    info.m_track_sector     = qg.getNode(info.m_track_sector).getPredecessor();
-    info.m_last_valid_sector= qg.getNode(info.m_track_sector).getPredecessor();
+    info.m_track_sector     = QuadGraph::get()->getNode(info.m_track_sector)
+                                               .getPredecessor();
+    info.m_last_valid_sector= QuadGraph::get()->getNode(info.m_track_sector)
+                                               .getPredecessor();
 
-    kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
+    kart->setXYZ( QuadGraph::get()->getQuadOfNode(info.m_track_sector)
+                                   .getCenter());
 
     btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
                          m_track->getAngle(info.m_track_sector) );
@@ -820,7 +822,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
-    if(m_track->getQuadGraph().getNumberOfSuccessors(m_kart_info[i].m_track_sector)>1)
+    if(QuadGraph::get()->getNumberOfSuccessors(m_kart_info[i].m_track_sector)>1)
         return;
 
     // check if the player is going in the wrong direction

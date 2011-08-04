@@ -136,9 +136,6 @@ private:
     /** Far value for cameras for this track. */
     float                    m_camera_far;
 
-    /** The graph used to connect the quads. */
-    QuadGraph               *m_quad_graph;
-
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
           SKY_DOME, SKY_COLOR}          m_sky_type;
@@ -255,37 +252,9 @@ public:
 
     static const float NOHIT;
 
-                       Track             (std::string filename);
+                       Track             (const std::string &filename);
                       ~Track             ();
-    bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
-    /** Returns the texture with the mini map for this track. */
-    const video::ITexture*getMiniMap     () const { return m_mini_map; }
-    const Vec3&        trackToSpatial    (const int SECTOR) const;
-    void               loadTrackModel    (World* parent, unsigned int mode_id=0);
-    void               addMusic          (MusicInformation* mi)
-                                                  {m_music.push_back(mi);       }
-    float              getGravity        () const {return m_gravity;            }
-
-    /** Returns the version of the .track file. */
-    int                getVersion        () const {return m_version;            }
-
-    /** Returns the length of the main driveline. */
-    float              getTrackLength    () const {return m_quad_graph->getLapLength(); }
-
-    /** Returns a unique identifier for this track (the directory name). */
-    const std::string& getIdent          () const {return m_ident;              }
-
-    /** Returns the name of the track, which is e.g. displayed on the screen.
-        \note this is the LTR name, invoke fribidi as needed
-      */
-    const wchar_t* getName               () const {return translations->w_gettext(m_name.c_str()); }
-
-    /** Returns all groups this track belongs to. */
-    const std::vector<std::string>
-                       getGroups         () const {return m_groups;             }
-
-    /** Select and set the music for this track (doesn't actually start it yet) */
     void               startMusic        () const;
     
     bool               setTerrainHeight(Vec3 *pos) const;
@@ -298,15 +267,48 @@ public:
                                        unsigned int k);
     void               handleExplosion(const Vec3 &pos, 
                                        const PhysicalObject *mp) const;
+    std::vector< std::vector<float> >     
+                       buildHeightMap();
+    // ------------------------------------------------------------------------
+    /** Returns the texture with the mini map for this track. */
+    const video::ITexture*getMiniMap     () const { return m_mini_map; }
+    // ------------------------------------------------------------------------
+    bool               isArena           () const { return m_is_arena; }
+    // ------------------------------------------------------------------------
+    void               loadTrackModel  (World* parent, unsigned int mode_id=0);
+    // ------------------------------------------------------------------------
+    void               addMusic          (MusicInformation* mi)
+                                                  {m_music.push_back(mi);     }
+    // ------------------------------------------------------------------------
+    float              getGravity        () const {return m_gravity;          }
+    // ------------------------------------------------------------------------
+    /** Returns the version of the .track file. */
+    int                getVersion        () const {return m_version;          }
+    // ------------------------------------------------------------------------
+    /** Returns the length of the main driveline. */
+    float              getTrackLength    () const 
+                                     {return QuadGraph::get()->getLapLength();}
+    // ------------------------------------------------------------------------
+    /** Returns a unique identifier for this track (the directory name). */
+    const std::string& getIdent          () const {return m_ident;            }
+    // ------------------------------------------------------------------------
+    /** Returns the name of the track, which is e.g. displayed on the screen.
+        \note this is the LTR name, invoke fribidi as needed. */
+    const wchar_t* getName               () const 
+                             {return translations->w_gettext(m_name.c_str()); }
+    // ------------------------------------------------------------------------
+    /** Returns all groups this track belongs to. */
+    const std::vector<std::string>
+                       getGroups         () const {return m_groups;           }
     // ------------------------------------------------------------------------
     /** Returns the filename of this track. */
-    const std::string& getFilename       () const {return m_filename;           }
+    const std::string& getFilename       () const {return m_filename;         }
     // ------------------------------------------------------------------------
     /** Returns the name of the designer. */
-    const core::stringw& getDesigner     () const {return m_designer;           }
+    const core::stringw& getDesigner     () const {return m_designer;         }
     // ------------------------------------------------------------------------
     /** Returns an absolute path to the screenshot file of this track */
-    const std::string& getScreenshotFile () const {return m_screenshot;         }
+    const std::string& getScreenshotFile () const {return m_screenshot;       }
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
@@ -317,9 +319,6 @@ public:
     void               getAABB(const Vec3 **min, const Vec3 **max) const
                        { *min = &m_aabb_min; *max = &m_aabb_max; }
     // ------------------------------------------------------------------------
-    /** Returns the graph of quads, mainly for the AI. */
-    QuadGraph&         getQuadGraph() const { return *m_quad_graph; }
-    // ------------------------------------------------------------------------
     /** Returns 'a' angle for quad n. This angle is used to position a kart
      *  after a rescue, and to detect wrong directions. This function will
      *  always return the angle towards the first successor, i.e. the angle
@@ -327,7 +326,7 @@ public:
      *  \param n Number of the quad for which the angle is asked. 
      */
     float              getAngle(int n) const 
-                                { return m_quad_graph->getAngleToNext(n, 0);  }
+                            { return QuadGraph::get()->getAngleToNext(n, 0);  }
     // ------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map 
      *  texture.
@@ -336,7 +335,7 @@ public:
      *         only the first two coordinates will be used.
      */
     void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
-                                { m_quad_graph->mapPoint2MiniMap(xyz, draw_at); }
+                          { QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at); }
     // ------------------------------------------------------------------------
     /** Returns the full path of a given file inside this track directory. */
     std::string        getTrackFile(const std::string &s) const 
@@ -347,15 +346,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the i-th. mode. */
     const std::string &getModeName(unsigned int i) const 
-                                                { return m_all_modes[i].m_name;}
+                                              { return m_all_modes[i].m_name; }
     // ------------------------------------------------------------------------
     /** Returns the default ambient color. */
     const video::SColor &getDefaultAmbientColor() const
-                                                { return m_default_ambient_color;}
+                                            { return m_default_ambient_color; }
     // ------------------------------------------------------------------------
     /** Returns the far value for cameras. */
     float  getCameraFar() const { return m_camera_far; }
-
     // ------------------------------------------------------------------------
     /** Returns the triangle mesh for this track. */
     const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
@@ -365,14 +363,13 @@ public:
     // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
-                                           { return m_start_transforms.size(); }    
-    
+                                          { return m_start_transforms.size(); }    
+    // ------------------------------------------------------------------------
     WeatherType   getWeatherType          () const { return m_weather_type; }
+    // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
-    
+    // ------------------------------------------------------------------------
     bool isFogEnabled() const { return m_use_fog; }
-    
-    std::vector< std::vector<float> >     buildHeightMap();
     
 };   // class Track
 

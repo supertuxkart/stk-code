@@ -367,11 +367,10 @@ void World::resetAllKarts()
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         UserConfigParams::m_track_debug)
     {
-        const QuadGraph &qg=m_track->getQuadGraph();
         Vec3 eps = Vec3(0,1.5f*m_karts[0]->getKartHeight(),0);
-        for(unsigned int quad=0; quad<qg.getNumNodes(); quad++)
+        for(unsigned int quad=0; quad<QuadGraph::get()->getNumNodes(); quad++)
         {
-            const Quad &q   = qg.getQuad(quad);
+            const Quad &q   = QuadGraph::get()->getQuadOfNode(quad);
             const Vec3 center = q.getCenter();
             // We have to test for all karts, since the karts have different
             // heights and so things might change from kart to kart.
