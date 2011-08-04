@@ -88,7 +88,6 @@ void IrrDriver::initDevice()
     // ---- the first time, get a list of available video modes
     if (firstTime)
     {        
-        printf("[IrrDriver] Creating NULL device\n");
         m_device = createDevice(video::EDT_NULL);
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
