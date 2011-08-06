@@ -151,6 +151,8 @@ void RaceSetupScreen::onGameModeChanged()
     assert( w2 != NULL );
     
     std::string gamemode_str = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    if (gamemode_str == "locked") return;
+    
     RaceManager::MinorRaceModeType gamemode = 
         RaceManager::getModeIDFromInternalName(gamemode_str);
     
