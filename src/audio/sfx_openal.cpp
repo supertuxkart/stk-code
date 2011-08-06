@@ -225,7 +225,7 @@ void SFXOpenAL::position(const Vec3 &position)
         return;
     if (!m_ok)
     {
-        fprintf(stderr, "WARNING, position called on non-ok SFX\n");
+        fprintf(stderr, "WARNING, position called on non-ok SFX <%s>\n", m_soundBuffer->getFileName().c_str());
         return;
     }
     if (!m_positional)

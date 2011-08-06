@@ -19,6 +19,8 @@
 
 #include "tracks/track_object.hpp"
 
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -40,6 +42,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_init_scale = core::vector3df(1,1,1);
     m_enabled    = true;
     m_is_looped  = false;
+    m_sound      = NULL;
 
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
@@ -48,9 +51,26 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     xml_node.get("looped",  &m_is_looped );
     std::string model_name;
     xml_node.get("model",   &model_name  );
+    std::string sound;
+    xml_node.get("sound",   &sound       );
 
-    // Some animated objects (billboards) don't use this scene node
-    if(model_name=="")
+    if (sound.size() > 0)
+    {
+        m_sound = sfx_manager->createSoundSource(sound);
+        if (m_sound != NULL)
+        {
+            m_sound->position(m_init_xyz);
+            m_sound->setLoop(true);
+            m_sound->play();
+        }
+        else
+        {
+            fprintf(stderr, "[TrackObject] Sound emitter object could not be created\n");
+        }
+    }
+    
+    // Some animated objects (billboards, sound emitters) don't use this scene node
+    if (model_name == "")
     {
         m_node = NULL;
         m_mesh = NULL;
@@ -112,6 +132,12 @@ TrackObject::~TrackObject()
         if(m_mesh->getReferenceCount()==1)
             irr_driver->removeMeshFromCache(m_mesh);
     }
+    
+    if (m_sound)
+    {
+        sfx_manager->deleteSFX(m_sound);
+    }
+    
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

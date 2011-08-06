@@ -33,6 +33,7 @@ using namespace irr;
 
 
 class XMLNode;
+class SFXBase;
 
 /**
  * \ingroup tracks
@@ -79,6 +80,9 @@ protected:
 
     /** The initial scale of the object. */
     core::vector3df                m_init_scale;
+    
+    /** If a sound is attached to this objectt and/or this is a sound emitter object */
+    SFXBase*                       m_sound;
 
 public:
                  TrackObject(const XMLNode &xml_node);

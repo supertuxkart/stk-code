@@ -59,6 +59,10 @@ void TrackObjectManager::add(const XMLNode &xml_node)
     {
         m_all_objects.push_back(new BillboardAnimation(xml_node));
     }
+    else if(type=="sfx-emitter")
+    {
+        m_all_objects.push_back(new TrackObject(xml_node));
+    }
     else
     {
         fprintf(stderr, "Unknown track object: '%s' - ignored.\n", 
@@ -179,6 +183,9 @@ void TrackObjectManager::enableFog(bool enable)
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        adjustForFog(curr->getNode(), enable);
+        if (curr->getNode() != NULL)
+        {
+            adjustForFog(curr->getNode(), enable);
+        }
     }
 }   // enableFog
