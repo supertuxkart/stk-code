@@ -71,8 +71,9 @@ public:
     virtual void                  volume(float gain);
     virtual SFXManager::SFXStatus getStatus();
     virtual void                  onSoundEnabledBack();
-    
-    const SFXBuffer* getBuffer() const { return m_soundBuffer; }
+    virtual void                  setRolloff(float rolloff);
+
+    virtual const SFXBuffer* getBuffer() const { return m_soundBuffer; }
     
 };   // SFXOpenAL
 

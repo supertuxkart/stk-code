@@ -48,16 +48,20 @@ public:
     virtual bool       init() = 0;
     
     virtual void       position(const Vec3 &position) = 0;
-    virtual void       setLoop(bool status) = 0;
-    virtual void       play()               = 0;
-    virtual void       stop()               = 0;
-    virtual void       pause()              = 0;
-    virtual void       resume()             = 0;
-    virtual void       speed(float factor)  = 0;
-    virtual void       volume(float gain)   = 0;
+    virtual void       setLoop(bool status)      = 0;
+    virtual void       play()                    = 0;
+    virtual void       stop()                    = 0;
+    virtual void       pause()                   = 0;
+    virtual void       resume()                  = 0;
+    virtual void       speed(float factor)       = 0;
+    virtual void       volume(float gain)        = 0;
     virtual SFXManager::SFXStatus  
-                       getStatus()          = 0;
-    virtual void       onSoundEnabledBack() = 0;
+                       getStatus()               = 0;
+    virtual void       onSoundEnabledBack()      = 0;
+    virtual void       setRolloff(float rolloff) = 0;
+
+    virtual const SFXBuffer* getBuffer() const = 0;
+
 };   // SfxBase
 
 

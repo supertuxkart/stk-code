@@ -20,6 +20,7 @@
 #include "tracks/track_object.hpp"
 
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_buffer.hpp"
 #include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -56,7 +57,18 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
     if (sound.size() > 0)
     {
-        m_sound = sfx_manager->createSoundSource(sound);
+        float rolloff = 0.5;
+        xml_node.get("rolloff",  &rolloff );
+        float volume = 1.0;
+        xml_node.get("volume",   &volume );
+        
+        SFXBuffer* buffer = new SFXBuffer(file_manager->getModelFile(sound),
+                                          true /* positional */,
+                                          rolloff,
+                                          volume);
+        buffer->load();
+        
+        m_sound = sfx_manager->createSoundSource(buffer);
         if (m_sound != NULL)
         {
             m_sound->position(m_init_xyz);
@@ -135,6 +147,7 @@ TrackObject::~TrackObject()
     
     if (m_sound)
     {
+        delete m_sound->getBuffer();
         sfx_manager->deleteSFX(m_sound);
     }
     

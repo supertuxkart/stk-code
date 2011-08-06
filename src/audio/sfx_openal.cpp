@@ -280,4 +280,11 @@ void SFXOpenAL::onSoundEnabledBack()
     }
 }
 
+//-----------------------------------------------------------------------------
+
+void SFXOpenAL::setRolloff(float rolloff)
+{
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff);
+}
+
 #endif //if HAVE_OGGVORBIS
