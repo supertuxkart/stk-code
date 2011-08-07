@@ -1022,6 +1022,8 @@ void Track::createWater(const XMLNode &node)
     scene_node->setRotation(hpr);
     m_all_nodes.push_back(scene_node);
     handleAnimatedTextures(scene_node, node);
+    
+    scene_node->getMaterial(0).setFlag(video::EMF_GOURAUD_SHADING, true);
 }   // createWater
 
 // ----------------------------------------------------------------------------
