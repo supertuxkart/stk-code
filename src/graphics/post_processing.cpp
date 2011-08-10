@@ -101,6 +101,15 @@ void PostProcessing::endCapture()
     irr_driver->getVideoDriver()->setRenderTarget(0, true, true, 0);
 }
 
+void PostProcessing::update(float dt)
+{
+    if (m_boost_amount > 0.0f)
+    {
+        m_boost_amount -= dt*5.0f;
+        if (m_boost_amount < 0.0f) m_boost_amount = 0.0f;
+    }
+}
+
 /** Render the post-processed scene */
 void PostProcessing::render()
 {
@@ -126,9 +135,11 @@ void PostProcessing::render()
 }
 
 /** Set the boost amount according to the speed of the camera */
-void PostProcessing::setCameraSpeed(float cam_speed)
+void PostProcessing::giveBoost()
 {
-    m_boost_amount = core::clamp(MOTION_BLUR_FACTOR * (cam_speed - MOTION_BLUR_OFFSET), 0.0f, 1.0f);
+    m_boost_amount = 5.0f;
+    //printf("setCameraSpeed(%f)\n", cam_speed);
+    //m_boost_amount = core::clamp(MOTION_BLUR_FACTOR * (cam_speed - MOTION_BLUR_OFFSET), 0.0f, 1.0f);
 }
 
 /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */

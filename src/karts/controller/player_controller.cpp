@@ -387,6 +387,10 @@ void PlayerController::handleZipper(bool play_sound)
     {
         m_wee_sound->play();
     }
+    
+    // Apply the motion blur according to the speed of the kart
+    irr_driver->getPostProcessing()->giveBoost();
+    
 }   // handleZipper
 
 //-----------------------------------------------------------------------------

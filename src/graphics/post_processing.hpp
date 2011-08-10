@@ -48,14 +48,16 @@ public:
     void            beginCapture();
     void            endCapture();
     
+    void            update(float dt);
+
     /** Render the post-processed scene */
     void            render();
     
     /** Is the hardware able to use post-processing? */
     inline bool     isSupported() const                 {return m_supported;}
     
-    /** Set the boost amount according to the speed of the camera */
-    void            setCameraSpeed(float cam_speed);
+    /** Use motion blur for a short time */
+    void            giveBoost();
     
     /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
     virtual void    OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);

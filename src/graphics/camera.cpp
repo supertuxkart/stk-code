@@ -402,9 +402,6 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
-    // Initially, disable motion blur
-    irr_driver->getPostProcessing()->setCameraSpeed(0.0f);
-    
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
     if(UserConfigParams::m_camera_debug)
@@ -447,9 +444,6 @@ void Camera::update(float dt)
         m_camera->setTarget(current_target);
         return;
     }
-    
-    // Apply the motion blur according to the speed of the kart
-    irr_driver->getPostProcessing()->setCameraSpeed(m_kart->getSpeed());
 
     positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
 }   // update
