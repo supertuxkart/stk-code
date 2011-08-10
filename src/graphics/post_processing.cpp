@@ -105,7 +105,7 @@ void PostProcessing::update(float dt)
 {
     if (m_boost_amount > 0.0f)
     {
-        m_boost_amount -= dt*5.0f;
+        m_boost_amount -= dt*3.5f;
         if (m_boost_amount < 0.0f) m_boost_amount = 0.0f;
     }
 }
@@ -137,7 +137,7 @@ void PostProcessing::render()
 /** Set the boost amount according to the speed of the camera */
 void PostProcessing::giveBoost()
 {
-    m_boost_amount = 5.0f;
+    m_boost_amount = 2.5f;
     //printf("setCameraSpeed(%f)\n", cam_speed);
     //m_boost_amount = core::clamp(MOTION_BLUR_FACTOR * (cam_speed - MOTION_BLUR_OFFSET), 0.0f, 1.0f);
 }

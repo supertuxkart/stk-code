@@ -239,6 +239,7 @@ public:
     virtual void   update           (float dt);
     virtual void   finishedRace     (float time);
     void           beep             ();
+    void           showZipperFire   ();
     bool           playCustomSFX    (unsigned int type);
     void           setController(Controller *controller);
     // ------------------------------------------------------------------------

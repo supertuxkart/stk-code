@@ -902,7 +902,10 @@ void Kart::update(float dt)
         if     (material->isDriveReset() && isOnGround())
             forceRescue();
         else if(material->isZipper()     && isOnGround())
+        {
             handleZipper(material);
+            showZipperFire();
+        }
         else
         {
             MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
@@ -952,6 +955,16 @@ void Kart::update(float dt)
         m_shadow_enabled = true;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+
+/**
+  * Show fire to go with a zipper
+  */
+void Kart::showZipperFire()
+{
+    m_nitro->setCreationRate(800.0f);
+}
 
 //-----------------------------------------------------------------------------
 /** Squashes this kart: it will scale the kart in up direction, and causes
