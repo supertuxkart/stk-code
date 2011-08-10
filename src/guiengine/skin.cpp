@@ -343,8 +343,9 @@ void Skin::drawBgImage()
         dest = core::rect<s32>(-clipped_x_space/2, 0, screen_w+clipped_x_space/2, texture_h);
     }
     
-    
+    irr_driver->getVideoDriver()->enableMaterial2D();
     GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area, 0 /* no clipping */, 0, false /* alpha */);
+    irr_driver->getVideoDriver()->enableMaterial2D(false);
 }
 
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest,
