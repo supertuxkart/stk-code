@@ -74,6 +74,7 @@ public:
     virtual     ~ParticleEmitter();
     virtual void update         ();
     void         setCreationRate(float f);
+    int          getCreationRate();
     
     void         setPosition(const Vec3 &pos);
     

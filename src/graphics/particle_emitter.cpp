@@ -259,6 +259,13 @@ void ParticleEmitter::setCreationRate(float f)
 }   // setCreationRate
 
 //-----------------------------------------------------------------------------
+
+int ParticleEmitter::getCreationRate()
+{
+    return m_emitter->getMinParticlesPerSecond();
+}
+
+//-----------------------------------------------------------------------------
 /** Sets the position of the particle emitter.
  *  \param pos The position for the particle emitter.
  */
