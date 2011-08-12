@@ -239,7 +239,7 @@ NetworkHttp::~NetworkHttp()
     if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
         return;
     pthread_join(*m_thread_id.getData(), NULL);
-
+    delete m_thread_id.getAtomic();
     pthread_cond_destroy(&m_cond_request);
 
     curl_easy_cleanup(m_curl_session);
