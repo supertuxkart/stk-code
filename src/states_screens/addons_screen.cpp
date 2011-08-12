@@ -160,12 +160,15 @@ void AddonsScreen::loadList()
         core::stringw s;
         if(addon->getDesigner().size()==0)
             s = (addon->getName()+L"\t"+core::stringc(addon->getDateAsString().c_str())).c_str();
+            if (s.size() > int(AddonsScreen::getWidth()*0.05)-5) {
+                s=s.subString(0, int(AddonsScreen::getWidth()*0.05)-5);
+                s.append("...");
+            }
         else
             //I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
             s = _("%s by %s\t%s",  addon->getName().c_str(),
                                    addon->getDesigner().c_str(),
                                    addon->getDateAsString().c_str());
-        
         // we have no icon for featured+updateme, so if an add-on is updatable forget about the featured icon
         if (addon->testStatus(Addon::AS_FEATURED) && icon != m_icon_needs_update)
         {
