@@ -102,6 +102,8 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_terrain_particles    = NULL;
     m_nitro                = NULL;
     m_nitro_kind           = NULL;
+    m_zipper_fire          = NULL;
+    m_zipper_fire_kind     = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
     m_camera               = NULL;
@@ -387,6 +389,8 @@ Kart::~Kart()
     if(m_terrain_particles)      delete m_terrain_particles;
     if(m_nitro)                  delete m_nitro;
     if(m_nitro_kind)             delete m_nitro_kind;
+    if(m_zipper_fire)            delete m_zipper_fire;
+    if(m_zipper_fire_kind)       delete m_zipper_fire_kind;
     if(m_slipstream)             delete m_slipstream;
     if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -497,6 +501,7 @@ void Kart::reset()
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
     m_nitro->setCreationRate(0.0f);
+    m_zipper_fire->setCreationRate(0.0f);
     m_powerup.reset();
 
     m_race_position        = m_initial_position;
@@ -842,6 +847,7 @@ void Kart::update(float dt)
     }  // UserConfigParams::m_graphical_effects
     
     m_nitro->update();
+    m_zipper_fire->update();
     
     updatePhysics(dt);
 
@@ -963,7 +969,7 @@ void Kart::update(float dt)
   */
 void Kart::showZipperFire()
 {
-    m_nitro->setCreationRate(800.0f);
+    m_zipper_fire->setCreationRate(800.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -1814,6 +1820,16 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
         std::cerr << e.what() << std::endl;
     }
     
+    try
+    {
+        m_zipper_fire_kind = new ParticleKind(file_manager->getGfxFile("zipper_fire.xml"));
+        m_zipper_fire      = new ParticleEmitter(m_zipper_fire_kind, position, getNode());
+    }
+    catch (std::runtime_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    
     m_slipstream = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
@@ -1920,8 +1936,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             float calculated_rate = m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0
                                     ? (min_rate + rate*(max_rate - min_rate)) : 0;
             
-            // the std::max call is there to let nitro fade out smoothly instead of stopping sharply
-            m_nitro->setCreationRate(std::max(calculated_rate, m_nitro->getCreationRate() - dt*800.0f));
+            m_nitro->setCreationRate(calculated_rate);
             
             // the emitter box should spread from last frame's position to the current position
             // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
@@ -1929,6 +1944,18 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }
     }
 
+    if (m_zipper_fire)
+    {
+        // the std::max call is there to let fire fade out smoothly instead of stopping sharply
+        if (m_zipper_fire->getCreationRate() > 0)
+        {
+            m_zipper_fire->setCreationRate(std::max(m_zipper_fire->getCreationRate() - dt*800.0f, 0.0f));
+            
+            // the emitter box should spread from last frame's position to the current position
+            // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
+            m_zipper_fire->resizeBox(std::max(0.25f, getSpeed()*dt));
+        }
+    }
     
     float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()

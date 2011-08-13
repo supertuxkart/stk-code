@@ -157,6 +157,12 @@ private:
     /** The particle kind for the nitro. */
     ParticleKind    *m_nitro_kind;
 
+    /** Graphical effect when using a zipper. */
+    ParticleEmitter *m_zipper_fire;
+    
+    /** The particle kind for the nitro. */
+    ParticleKind    *m_zipper_fire_kind;
+    
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
     

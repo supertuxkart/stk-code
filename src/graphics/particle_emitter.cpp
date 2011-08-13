@@ -246,7 +246,7 @@ void ParticleEmitter::setCreationRate(float f)
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
     //        the node has a method called "clearParticles" that should be cleaner than this
-    if (f == 0.0f)
+    if (f <= 0.0f)
     {
         m_emitter->grab();
         m_node->setEmitter(NULL);
@@ -262,6 +262,7 @@ void ParticleEmitter::setCreationRate(float f)
 
 int ParticleEmitter::getCreationRate()
 {
+    if (m_node->getEmitter() == NULL) return 0;
     return m_emitter->getMinParticlesPerSecond();
 }
 
