@@ -158,22 +158,30 @@ void AddonsScreen::loadList()
         	icon = m_icon_not_installed;
 
         core::stringw s;
-        if(addon->getDesigner().size()==0)
+        if (addon->getDesigner().size()==0)
             s = (addon->getName()+L"\t"+core::stringc(addon->getDateAsString().c_str())).c_str();
-            if (s.size() > int(AddonsScreen::getWidth()*0.018)+20) {
-                s=s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
-                s.append("...");
-            }
+        
+        gui::IGUIFont* font = GUIEngine::getFont();
+        
+        // first column if 0.666% of the list's width
+        if (font->getDimension(s.c_str()).Width > w_list->m_w*0.6666f)
+        {
+            s = s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
+            s.append("...");
+        }
         else
-            //I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
+        {
+            //I18N: as in: The Old Island by Johannes Sjolund
             s = _("%s by %s",addon->getName().c_str(),addon->getDesigner().c_str());
-            if (s.size() > int(AddonsScreen::getWidth()*0.018)+20) {
-                s=s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
+            if (font->getDimension(s.c_str()).Width >  w_list->m_w*0.6666f)
+            {
+                s = s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
                 s.append("...");
             }
             s.append("\t");
             s.append(addon->getDateAsString().c_str());
-                                   
+        }
+        
         // we have no icon for featured+updateme, so if an add-on is updatable forget about the featured icon
         if (addon->testStatus(Addon::AS_FEATURED) && icon != m_icon_needs_update)
         {
