@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
+    <ClCompile Include="..\..\karts\kart_with_stats.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="..\..\tinygettext\po_parser.cpp" />
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
+    <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\profiler.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
@@ -337,6 +339,7 @@
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
+    <ClInclude Include="..\..\karts\kart_with_stats.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp" />
@@ -397,6 +400,7 @@
     <ClInclude Include="..\..\tinygettext\po_parser.hpp" />
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
+    <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\profiler.hpp" />

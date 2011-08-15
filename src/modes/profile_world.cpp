@@ -178,9 +178,12 @@ void ProfileWorld::enterRaceOverState()
         m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
     }
 
+    // Print framerate statistics
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
+
+    // Print geometry statistics if we're not in no-graphics mode
     if(!m_no_graphics)
     {
         printf("Average # drawn nodes           %f k\n",
@@ -195,45 +198,48 @@ void ProfileWorld::enterRaceOverState()
                (float)m_num_trans_effect/m_frame_count);
     }
 
+    // Print race statistics for each individual kart
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    printf("Name\t\tstart\tend\ttime\t");
-    if(m_profile_mode==PROFILE_LAPS)
-        printf("aver.\t");
-    printf("top\tskid\trescue\trescue\t"
-           "expl.\texpl.\n");
-    printf("\t\t\t\t\t");
-    if(m_profile_mode==PROFILE_LAPS)
-        printf("speed\t");
-    printf("speed\ttime\ttime\tcount\ttime\tcount\n");
+    printf("name,start_position,end_position,time,");
+    
+    if (m_profile_mode==PROFILE_LAPS) {
+        printf("average_speed,");
+    }
+
+    printf("top_speed,skid_time,rescue_time,rescue_count,explosion_time,explosion_count,bonus_count,banana_count,small_nitro_count,large_nitro_count,bubblegum_count\n");
+
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
-        max_t = std::max(max_t, m_karts[i]->getFinishTime());
-        min_t = std::min(min_t, m_karts[i]->getFinishTime());
-        av_t += m_karts[i]->getFinishTime();
-        printf("%s\t%s",   m_karts[i]->getIdent().c_str(),
-                           m_karts[i]->getIdent().size()<8 ? "\t" : "");
-        printf("%d\t%d\t", 1 + (int)i, m_karts[i]->getPosition());
-        printf("%4.2f\t",     m_karts[i]->getFinishTime());
+        KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+
+        max_t = std::max(max_t, kart->getFinishTime());
+        min_t = std::min(min_t, kart->getFinishTime());
+        av_t += kart->getFinishTime();
+        printf("%s,", kart->getIdent().c_str());
+        printf("%d,", 1 + (int)i);
+        printf("%d,", kart->getPosition());
+        printf("%4.2f,", kart->getFinishTime());
         if(m_profile_mode==PROFILE_LAPS)
         {
             float distance = race_manager->getNumLaps()
                            * m_track->getTrackLength();
-            printf("%4.2f\t",distance/m_karts[i]->getFinishTime());
+            printf("%4.2f,", distance/kart->getFinishTime());
         }
-        printf("%3.2f\t",     dynamic_cast<KartWithStats*>
-                               (m_karts[i])->getTopSpeed());
-        printf("%4.2f\t",     dynamic_cast<KartWithStats*>
-                               (m_karts[i])->getSkiddingTime());
-        printf("%4.2f\t%d\t", dynamic_cast<KartWithStats*>
-                            (m_karts[i])->getRescueTime(),
-                           dynamic_cast<KartWithStats*>
-                            (m_karts[i])->getRescueCount());
-        printf("%4.2f\t%d\t", dynamic_cast<KartWithStats*>
-                            (m_karts[i])->getExplosionTime(),
-                           dynamic_cast<KartWithStats*>
-                            (m_karts[i])->getExplosionCount() );
+        printf("%3.2f,", kart->getTopSpeed());
+        printf("%4.2f,", kart->getSkiddingTime());
+        printf("%4.2f,%d,", kart->getRescueTime(),
+                            kart->getRescueCount());
+        printf("%4.2f,%d,", kart->getExplosionTime(),
+                            kart->getExplosionCount() );
+        printf("%d,", kart->getBonusCount() );
+        printf("%d,", kart->getBananaCount() );
+        printf("%d,", kart->getSmallNitroCount() );
+        printf("%d,", kart->getLargeNitroCount() );
+        printf("%d", kart->getBubblegumCount() );
         printf("\n");
     }
+
+    // Print group statistics of all karts
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
 
     std::exit(-2);

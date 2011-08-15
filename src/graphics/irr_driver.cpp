@@ -36,6 +36,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -83,139 +84,147 @@ IrrDriver::~IrrDriver()
 
 void IrrDriver::initDevice()
 {
-    static bool firstTime = true;
-
-    // ---- the first time, get a list of available video modes
-    if (firstTime)
-    {        
+    // If --no-graphics option was used, just create a device with NULL renderer
+    if (ProfileWorld::isNoGraphics())
+    {
         m_device = createDevice(video::EDT_NULL);
+    }
+    else
+    {
+        static bool firstTime = true;
+
+        // ---- the first time, get a list of available video modes
+        if (firstTime)
+        {        
+            m_device = createDevice(video::EDT_NULL);
         
-        video::IVideoModeList* modes = m_device->getVideoModeList();
-        const int count = modes->getVideoModeCount();
+            video::IVideoModeList* modes = m_device->getVideoModeList();
+            const int count = modes->getVideoModeCount();
 
-        for(int i=0; i<count; i++)
-        {
-            // only consider 32-bit resolutions for now
-            if (modes->getVideoModeDepth(i) >= 24)
+            for(int i=0; i<count; i++)
             {
-                const int w = modes->getVideoModeResolution(i).Width;
-                const int h = modes->getVideoModeResolution(i).Height;
-                if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) 
-                    continue;
+                // only consider 32-bit resolutions for now
+                if (modes->getVideoModeDepth(i) >= 24)
+                {
+                    const int w = modes->getVideoModeResolution(i).Width;
+                    const int h = modes->getVideoModeResolution(i).Height;
+                    if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) 
+                        continue;
 
-                VideoMode mode;
-                mode.width = w;
-                mode.height = h;
-                m_modes.push_back( mode );
+                    VideoMode mode;
+                    mode.width = w;
+                    mode.height = h;
+                    m_modes.push_back( mode );
+                }
             }
-        }
 
-		// The debug name is only set if irrlicht is compiled in debug 
-		// mode. So we use this to print a warning to the user.
-        if(m_device->getDebugName())
-        {
-            printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
-            printf("!!!!! This can have a significant performance impact         !!!!!\n");
-        }
+		    // The debug name is only set if irrlicht is compiled in debug 
+		    // mode. So we use this to print a warning to the user.
+            if(m_device->getDebugName())
+            {
+                printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
+                printf("!!!!! This can have a significant performance impact         !!!!!\n");
+            }
 
-        m_device->closeDevice();
-        // In some circumstances it would happen that a WM_QUIT message
-        // (apparently sent for this NULL device) is later received by
-        // the actual window, causing it to immediately quit.
-        // Following advise on the irrlicht forums I added the following
-        // two calles - the first one didn't make a difference (but 
-        // certainly can't hurt), but the second one apparenlty solved
-        // the problem for now.
-        m_device->clearSystemMessages();  
-        m_device->run();
+            m_device->closeDevice();
+            // In some circumstances it would happen that a WM_QUIT message
+            // (apparently sent for this NULL device) is later received by
+            // the actual window, causing it to immediately quit.
+            // Following advise on the irrlicht forums I added the following
+            // two calles - the first one didn't make a difference (but 
+            // certainly can't hurt), but the second one apparenlty solved
+            // the problem for now.
+            m_device->clearSystemMessages();  
+            m_device->run();
 
-        firstTime = false;
-    } // end if firstTime
+            firstTime = false;
+        } // end if firstTime
     
 
-    int numDrivers = 5;
+        int numDrivers = 5;
 
-    // Test if user has chosen a driver or if we should try all to find a woring
-    // one.
-    if( UserConfigParams::m_renderer != 0 )
-    {
-        numDrivers = 1;
-    }
-
-    // ---- open device
-    // Try different drivers: start with opengl, then DirectX
-    for(int driver_type=0; driver_type<numDrivers; driver_type++)
-    {
-
-        video::E_DRIVER_TYPE type;
-
-        // Test if user has chosen a driver or if we should try all to find a
-        // woring one.
+        // Test if user has chosen a driver or if we should try all to find a woring
+        // one.
         if( UserConfigParams::m_renderer != 0 )
         {
-            // Get the correct type.
-            type = getEngineDriverType( UserConfigParams::m_renderer );
-        } else
-        {
-            // Get the correct type.
-            type = getEngineDriverType( driver_type );
+            numDrivers = 1;
         }
 
-        // Try 32 and, upon failure, 24 then 16 bit per pixels
-        for (int bits=32; bits>15; bits -=8)
+        // ---- open device
+        // Try different drivers: start with opengl, then DirectX
+        for(int driver_type=0; driver_type<numDrivers; driver_type++)
         {
-            printf("[IrrDriver] Trying to create device with %i bits\n", bits);
-            /*
-            m_device = createDevice(type,
+
+            video::E_DRIVER_TYPE type;
+
+            // Test if user has chosen a driver or if we should try all to find a
+            // woring one.
+            if( UserConfigParams::m_renderer != 0 )
+            {
+                // Get the correct type.
+                type = getEngineDriverType( UserConfigParams::m_renderer );
+            } else
+            {
+                // Get the correct type.
+                type = getEngineDriverType( driver_type );
+            }
+
+            // Try 32 and, upon failure, 24 then 16 bit per pixels
+            for (int bits=32; bits>15; bits -=8)
+            {
+                printf("[IrrDriver] Trying to create device with %i bits\n", bits);
+                /*
+                m_device = createDevice(type,
+                                        core::dimension2d<u32>(UserConfigParams::m_width,
+                                                               UserConfigParams::m_height ),
+                                        bits, //bits per pixel
+                                        UserConfigParams::m_fullscreen,
+                                        false,  // stencil buffers
+                                        false,  // vsync
+                                        this    // event receiver
+                                        );
+                 */
+            
+                SIrrlichtCreationParameters params;
+                params.DriverType = type;
+                params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
+                                                           UserConfigParams::m_height);
+                params.Bits = bits;
+                params.EventReceiver = this;
+                params.Fullscreen = UserConfigParams::m_fullscreen;
+            
+                if (UserConfigParams::m_fullscreen_antialiasing)
+                    params.AntiAlias = 8;
+            
+                params.Vsync = UserConfigParams::m_vsync;
+            
+                m_device = createDeviceEx(params);
+            
+                if(m_device) break;
+            }   // for bits=32, 24, 16
+            if(m_device) break;
+        }   // for edt_types
+    
+        // if still no device, try with a standard 800x600 window size, maybe
+        // size is the problem
+        if(!m_device)
+        {
+            UserConfigParams::m_width = 800;
+            UserConfigParams::m_height = 600;
+        
+            m_device = createDevice(video::EDT_OPENGL,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
-                                    bits, //bits per pixel
+                                    32, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
                                     false,  // vsync
                                     this    // event receiver
                                     );
-             */
-            
-            SIrrlichtCreationParameters params;
-            params.DriverType = type;
-            params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
-                                                       UserConfigParams::m_height);
-            params.Bits = bits;
-            params.EventReceiver = this;
-            params.Fullscreen = UserConfigParams::m_fullscreen;
-            
-            if (UserConfigParams::m_fullscreen_antialiasing)
-                params.AntiAlias = 8;
-            
-            params.Vsync = UserConfigParams::m_vsync;
-            
-            m_device = createDeviceEx(params);
-            
-            if(m_device) break;
-        }   // for bits=32, 24, 16
-        if(m_device) break;
-    }   // for edt_types
-    
-    // if still no device, try with a standard 800x600 window size, maybe
-    // size is the problem
-    if(!m_device)
-    {
-        UserConfigParams::m_width = 800;
-        UserConfigParams::m_height = 600;
-        
-        m_device = createDevice(video::EDT_OPENGL,
-                                core::dimension2d<u32>(UserConfigParams::m_width,
-                                                       UserConfigParams::m_height ),
-                                32, //bits per pixel
-                                UserConfigParams::m_fullscreen,
-                                false,  // stencil buffers
-                                false,  // vsync
-                                this    // event receiver
-                                );
-        if (m_device)
-        {
-            fprintf(stderr, "An invalid resolution was set in the config file, reverting to saner values\n");
+            if (m_device)
+            {
+                fprintf(stderr, "An invalid resolution was set in the config file, reverting to saner values\n");
+            }
         }
     }
     
@@ -225,26 +234,31 @@ void IrrDriver::initDevice()
         exit(-1);
     }
     
-    m_device->setResizable(false);
-    
-    if (!UserConfigParams::m_fbo)
-    {
-        m_device->getVideoDriver()->disableFeature(EVDF_FRAMEBUFFER_OBJECT);
+    m_scene_manager = m_device->getSceneManager();
+    m_gui_env       = m_device->getGUIEnvironment();
+    m_video_driver  = m_device->getVideoDriver();
+
+    // Only change video driver settings if we are showing graphics
+    if (!ProfileWorld::isNoGraphics()) {
+        m_device->setResizable(false);
+        m_device->setWindowCaption(L"SuperTuxKart");
+        m_device->getVideoDriver()
+            ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
+        m_device->getVideoDriver()
+            ->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY, true);
+        if (!UserConfigParams::m_fbo)
+        {
+            m_device->getVideoDriver()->disableFeature(EVDF_FRAMEBUFFER_OBJECT);
+        }
+
+        // Force creation of mipmaps even if the mipmaps flag in a b3d file
+        // does not set the 'enable mipmap' flag.
+        m_scene_manager->getParameters()
+            ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
     }
-    
+
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
-    m_device->setWindowCaption(L"SuperTuxKart");
-    m_scene_manager = m_device->getSceneManager();
-    
-    // Force creation of mipmaps even if the mipmaps flag in a b3d file
-    // does not set the 'enable mipmap' flag.
-    m_scene_manager->getParameters()
-        ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
-    m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
-    m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY,true);
-    m_gui_env       = m_device->getGUIEnvironment();
-    m_video_driver  = m_device->getVideoDriver();        
 
     // Initialize material2D
     video::SMaterial& material2D = m_video_driver->getMaterial2D();

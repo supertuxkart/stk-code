@@ -19,6 +19,8 @@
 
 #include "karts/kart_with_stats.hpp"
 
+#include "items/item.hpp"
+
 KartWithStats::KartWithStats(const std::string& ident, Track* track, 
                              int position,  bool is_first_kart,
                              const btTransform& init_transform, 
@@ -34,12 +36,17 @@ KartWithStats::KartWithStats(const std::string& ident, Track* track,
  */
 void KartWithStats::reset()
 {
-    m_top_speed       = 0.0f; 
-    m_explosion_time  = 0.0f;
-    m_explosion_count = 0;
-    m_skidding_time   = 0.0f;
-    m_rescue_count    = 0;
-    m_rescue_time     = 0.0f;
+    m_top_speed         = 0.0f; 
+    m_explosion_time    = 0.0f;
+    m_explosion_count   = 0;
+    m_skidding_time     = 0.0f;
+    m_rescue_count      = 0;
+    m_rescue_time       = 0.0f;
+    m_bonus_count       = 0;
+    m_banana_count      = 0;
+    m_small_nitro_count = 0;
+    m_large_nitro_count = 0;
+    m_bubblegum_count   = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -97,3 +104,38 @@ void KartWithStats::forceRescue(bool is_auto_rescue)
 }   // forceRescue
 
 // ----------------------------------------------------------------------------
+/** Called when an item is collected. It will increment private variables that
+ *  represent counters for each type of item hit.
+ *  \param item The item that was hit.
+ *  \param add_info Additional info, used in networking games to force
+ *         a specific item to be used (instead of a random item) to keep
+ *         all karts in synch.
+ */
+void KartWithStats::collectedItem(Item *item, int add_info)
+{
+    Kart::collectedItem(item, add_info);
+    const Item::ItemType type = item->getType();
+
+    switch (type)
+    {
+    case Item::ITEM_BANANA:
+        m_banana_count++;
+        break;
+    case Item::ITEM_NITRO_SMALL:
+        m_small_nitro_count++;
+        break;
+    case Item::ITEM_NITRO_BIG:
+        m_large_nitro_count++;
+        break;
+    case Item::ITEM_BONUS_BOX:
+        m_bonus_count++;
+        break;
+    case Item::ITEM_BUBBLEGUM:
+        m_bubblegum_count++;
+        break;
+    default        : break;
+    }   // switch TYPE
+
+}   // collectedItem
+
+//-----------------------------------------------------------------------------

@@ -235,7 +235,7 @@ public:
     void           adjustSpeed      (float f);
     void           capSpeed         (float max_speed);
     void           updatedWeight    ();
-    void           collectedItem    (Item *item, int random_attachment);
+    virtual void   collectedItem    (Item *item, int random_attachment);
     virtual void   reset            ();
     void           handleZipper     (const Material *m=NULL, bool play_sound=false);
     void           setSquash        (float time, float slowdown);

@@ -44,6 +44,21 @@ private:
     /** How often a kart was rescued. */
     unsigned int m_rescue_count;
 
+    /** How many bonuses were taken */
+    unsigned int m_bonus_count;
+
+    /** How many bananas were taken */
+    unsigned int m_banana_count;
+
+    /** How many small nitro tanks were taken */
+    unsigned int m_small_nitro_count;
+
+    /** How many large nitro tanks were taken */
+    unsigned int m_large_nitro_count;
+
+    /** How many bubblegums were taken */
+    unsigned int m_bubblegum_count;
+
     /** How much time was spent in rescue. */
     float        m_rescue_time;
 
@@ -59,6 +74,7 @@ public:
     virtual void reset();
     virtual void handleExplosion(const Vec3& pos, bool direct_hit);
     virtual void forceRescue(bool is_auto_rescue=false);
+    virtual void collectedItem(Item *item, int add_info);
 
     /** Returns the top speed of this kart. */
     float getTopSpeed() const { return m_top_speed; }
@@ -74,6 +90,21 @@ public:
     // ------------------------------------------------------------------------
     /** Returns how often a kart was rescued. */
     unsigned int getRescueCount() const { return m_rescue_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of bonuses that were taken */
+    unsigned int getBonusCount() const { return m_bonus_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of bananas that were taken */
+    unsigned int getBananaCount() const { return m_banana_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of small nitro tanks that were taken */
+    unsigned int getSmallNitroCount() const { return m_small_nitro_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of large nitro tanks that were taken */
+    unsigned int getLargeNitroCount() const { return m_large_nitro_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of bubblegums that were taken */
+    unsigned int getBubblegumCount() const { return m_bubblegum_count; }
     // ------------------------------------------------------------------------
     /** Returns how long a kart was rescued all in all. */
     float getRescueTime() const { return m_rescue_time; }

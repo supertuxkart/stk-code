@@ -239,7 +239,7 @@ void cmdLineHelp (char* invocation)
     "  -N,  --no-start-screen  Immediately start race without showing a menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase and the music.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
-    "  --gp name               Start the specified Grand Prix.\n"
+    "       --gp NAME          Start the specified Grand Prix.\n"
     "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
     "  -l,  --list-tracks      Show available tracks.\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
@@ -249,35 +249,35 @@ void cmdLineHelp (char* invocation)
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
     // TODO: add back "--players" switch
-    //"     --players n             Define number of players to between 1 and 4.\n"
+    // "       --players n        Define number of players to between 1 and 4.\n"
     "       --item STYLE       Use STYLE as your item style.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
-    "  --trackdir DIR          A directory from which additional tracks are loaded.\n"
-    "  --renderer NUM          Choose the renderer. Valid renderers are:"
-    "                          (Default: 0, OpenGL: 1, Direct3D9: 2, \n"
-    "                           Direct3D8: 3, Software: 4, \n"
-    "                           Burning's Software: 5, Null device: 6).\n"
-    "  --animations=n          Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
-    "  --gfx=n                 Play other graphical effects like impact stars dance,\n"
-    "                           water animations or explosions (Enable: 1, Disable: 0).\n"
-    "  --weather=n             Show weather effects like rain or snow (0 or 1 as --gfx).\n"
-    "  --camera-style=n        Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
-    "  --profile-laps=n        Enable automatic driven profile mode for n laps.\n"
-    "  --profile-time=n        Enable automatic driven profile mode for n seconds.\n"
-    "  --no-graphics           Do not display the actual race.\n"
-    // "  --history            Replay history file 'history.dat'.\n"
-    // "  --history=n          Replay history file 'history.dat' using mode:\n"
-    // "                       n=1: use recorded positions\n"
-    // "                       n=2: use recorded key strokes\n"
-    "  --server[=port]         This is the server (running on the specified port).\n"
-    "  --client=ip             This is a client, connect to the specified ip address.\n"
-    "  --port=n                Port number to use.\n"
-    "  --numclients=n          Number of clients to wait for (server only).\n"
-    "  --log=terminal          Write messages to screen.\n"
-    "  --log=file              Write messages/warning to log files stdout.log/stderr.log.\n"
+    "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
+    "       --renderer NUM     Choose the renderer. Valid renderers are:\n"
+    "                            Default: 0, OpenGL: 1, Direct3D9: 2, \n"
+    "                            Direct3D8: 3, Software: 4, \n"
+    "                            Burning's Software: 5, Null device: 6\n"
+    "       --animations=n     Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
+    "       --gfx=n            Play other graphical effects like impact stars dance,\n"
+    "                            water animations or explosions (Enable: 1, Disable: 0).\n"
+    "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
+    "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
+    "       --profile-laps=n   Enable automatic driven profile mode for n laps.\n"
+    "       --profile-time=n   Enable automatic driven profile mode for n seconds.\n"
+    "       --no-graphics      Do not display the actual race.\n"
+    // "       --history          Replay history file 'history.dat'.\n"
+    // "       --history=n        Replay history file 'history.dat' using mode:\n"
+    // "                            n=1: use recorded positions\n"
+    // "                            n=2: use recorded key strokes\n"
+    "       --server[=port]    This is the server (running on the specified port).\n"
+    "       --client=ip        This is a client, connect to the specified ip address.\n"
+    "       --port=n           Port number to use.\n"
+    "       --numclients=n     Number of clients to wait for (server only).\n"
+    "       --log=terminal     Write messages to screen.\n"
+    "       --log=file         Write messages/warning to log files stdout.log/stderr.log.\n"
     "  -h,  --help             Show this help.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
@@ -347,6 +347,10 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             KartPropertiesManager::addKartSearchDir(argv[i+1]);
             i++;
+        }
+        else if( !strcmp(argv[i], "--no-graphics") )
+        {
+            ProfileWorld::disableGraphics();
         }
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
@@ -648,7 +652,7 @@ int handleCmdLine(int argc, char **argv)
                 const Track *track = track_manager->getTrack(i);
                 if (!unlock_manager->isLocked(track->getIdent()))
                 {
-                    fprintf ( stdout, "\t%10s: %ls\n",
+                    fprintf ( stdout, "\t%14s: %ls\n",
                               track->getIdent().c_str(),
                               track->getName());
                 }
@@ -709,7 +713,12 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--no-graphics") )
         {
-            ProfileWorld::disableGraphics();
+            // Set default profile mode of 1 lap if we haven't already set one
+            if (!ProfileWorld::isProfileMode()) {
+                UserConfigParams::m_no_start_screen = true;
+                ProfileWorld::setProfileModeLaps(1);
+                race_manager->setNumLaps(1);
+            }
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
