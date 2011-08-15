@@ -883,7 +883,9 @@ void initRest()
 }   // initRest
 
 //=============================================================================
-void cleanTuxKart()
+/** Frees all manager and their associated memory.
+ */
+void cleanSuperTuxKart()
 {
     if(network_http)
         network_http->stopNetworkThread();
@@ -911,7 +913,7 @@ void cleanTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
-}   // cleanTuxKart
+}   // cleanSuperTuxKart
 
 //=============================================================================
 
@@ -1124,7 +1126,7 @@ int main(int argc, char *argv[] )
         fclose(stdout);
     }
 
-    cleanTuxKart();
+    cleanSuperTuxKart();
 
     return 0 ;
 }
