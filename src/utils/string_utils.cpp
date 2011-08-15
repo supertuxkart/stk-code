@@ -511,7 +511,13 @@ namespace StringUtils
                     {
                         output += L"&";
                         output += wchar_t(input[n]);
-                        fprintf(stderr, "[StringUtils] WARNING: Invalid HTML entity in '%s' (we only support &#...; type HTML entities)\n", input.c_str());
+                        // This is actually an error, but we can't print a
+                        // warning here: irrxml replaces &amp; in (e.g.)
+                        // attribute values with '&' - so we can have a single
+                        // '&' that is correct. On the other hand we have to
+                        // convert esp. &# hex codes, since we use this to
+                        // encode special characters, but irrlicht does not
+                        // decode those.
                         state = NORMAL;
                     }
                     else
