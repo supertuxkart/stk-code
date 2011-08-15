@@ -61,6 +61,8 @@ Addon::Addon(const XMLNode &xml)
     std::string designer;
 
     xml.get("name",               &name                );    
+    m_name = StringUtils::removeHtmlEntities(name);
+    m_id   = StringUtils::toLowerCase(name);
     xml.get("id",                 &m_id                );
     xml.get("designer",           &designer            );
     xml.get("status",             &m_status            );
@@ -71,8 +73,6 @@ Addon::Addon(const XMLNode &xml)
     xml.get("file",               &m_zip_file          );
     xml.get("description",        &description         );
     
-    m_id          = StringUtils::toLowerCase(name);
-    m_name        = StringUtils::removeHtmlEntities(name);
     m_description = StringUtils::removeHtmlEntities(description);
     m_designer    = StringUtils::removeHtmlEntities(designer);
 
