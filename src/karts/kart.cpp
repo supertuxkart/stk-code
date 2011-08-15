@@ -1303,10 +1303,13 @@ float Kart::handleNitro(float dt)
 }   // handleNitro
 
 // -----------------------------------------------------------------------------
-/** Activates a slipstream effect, atm that is display some nitro. */
+/** Activates a slipstream effect */
 void Kart::setSlipstreamEffect(float f)
 {
-    m_nitro->setCreationRate(f);
+    if (m_zipper_fire)
+    {
+        m_zipper_fire->setCreationRate(f);
+    }
 }   // setSlipstreamEffect
 
 // -----------------------------------------------------------------------------
@@ -1918,30 +1921,21 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     
     if (m_nitro)
     {
-        // For testing purposes mis-use the nitro graphical effects to show
-        // then the slipstream becomes usable.
-        if(m_slipstream->isSlipstreamReady())
-        {
-            m_nitro->setCreationRate(200.0f);
-        }
-        else
-        {
-            // fabs(speed) is important, otherwise the negative number will
-            // become a huge unsigned number in the particle scene node!
-            const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
-            const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
-            const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
-            assert(rate >= 0.0f); // allow for rounding errors...
-            //assert(rate <= 2.0f); // max speed is not always respected it seems...
-            float calculated_rate = m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0
-                                    ? (min_rate + rate*(max_rate - min_rate)) : 0;
-            
-            m_nitro->setCreationRate(calculated_rate);
-            
-            // the emitter box should spread from last frame's position to the current position
-            // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
-            m_nitro->resizeBox(std::max(0.25f, getSpeed()*dt));
-        }
+        // fabs(speed) is important, otherwise the negative number will
+        // become a huge unsigned number in the particle scene node!
+        const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
+        const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
+        const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
+        assert(rate >= 0.0f); // allow for rounding errors...
+        //assert(rate <= 2.0f); // max speed is not always respected it seems...
+        float calculated_rate = m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0
+                                ? (min_rate + rate*(max_rate - min_rate)) : 0;
+        
+        m_nitro->setCreationRate(calculated_rate);
+        
+        // the emitter box should spread from last frame's position to the current position
+        // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
+        m_nitro->resizeBox(std::max(0.25f, getSpeed()*dt));
     }
 
     if (m_zipper_fire)

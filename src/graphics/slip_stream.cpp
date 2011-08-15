@@ -476,7 +476,7 @@ void SlipStream::update(float dt)
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
                                                    : m_slipstream_time+dt;
     if(isSlipstreamReady())
-        m_kart->setSlipstreamEffect(3.0f);
+        m_kart->setSlipstreamEffect(9.0f);
     setIntensity(m_slipstream_time, m_target_kart);
 
     m_slipstream_mode = SS_COLLECT;
