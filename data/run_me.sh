@@ -19,5 +19,5 @@ cd $GAMEDIR
 # export game library directory
 test -n "${LIBDIR}" && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GAMEDIR}/${LIBDIR}"
 
-bin/supertuxkart
+bin/supertuxkart $*
 
