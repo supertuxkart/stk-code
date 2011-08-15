@@ -52,8 +52,16 @@ RubberBall::RubberBall(Kart *kart)
     m_control_points[0]     = m_owner->getXYZ();
     m_control_points[1]     = getXYZ();
     m_last_aimed_graph_node = getSuccessorToHitTarget(getCurrentGraphNode());
+    // This call defined m_control_points[3], but also sets a new 
+    // m_last_aimed_graph_node, which is further away from the current point,
+    // which avoids the problem that the ball might go too quickly to the 
+    // left or right when firing the ball off track.
+    static int xx=0;
+    xx++; if(xx>1) xx=0;
+    if(xx) getNextControlPoint();
     m_control_points[2]     = 
         QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+
     // This updates m_last_aimed_graph_node, and sets m_control_points[3]
     getNextControlPoint();
     m_length_cp_1_2 = (m_control_points[2]-m_control_points[1]).length();
