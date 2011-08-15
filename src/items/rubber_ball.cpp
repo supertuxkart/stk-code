@@ -41,39 +41,25 @@ RubberBall::RubberBall(Kart *kart)
 
     // Do not adjust the up velocity 
     setAdjustUpVelocity(false);
+    m_max_lifespan = 9999;
+    m_target       = NULL;
 
-    // should not live forever, auto-destruct after 30 seconds
-    m_max_lifespan = 30;
-
-    m_target = NULL;
     computeTarget();
 
-    const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    m_current_graph_node = world->getSectorForKart(kart->getWorldKartId());
-
-    // Determine distance along track
-    Vec3 ball_distance_vec;
-    QuadGraph::get()->spatialToTrack(&ball_distance_vec, getXYZ(), 
-                                     m_current_graph_node);
-    m_distance_along_track = ball_distance_vec[2];
-
-    // We have to start aiming at the next sector (since it might be possible
-    // that the kart is ahead of the center of the current sector).
-    m_aimed_graph_node     = getSuccessorToHitTarget(m_current_graph_node);
-
     // Get 4 points for the interpolation
-    int pred           = QuadGraph::get()->getNode(m_current_graph_node)
-                                          .getPredecessor();
-    m_aiming_points[0] = QuadGraph::get()->getQuadOfNode(pred).getCenter();
-    m_aiming_points[1] = QuadGraph::get()->getQuadOfNode(m_current_graph_node)
-                                          .getCenter();
-    m_aiming_points[2] = QuadGraph::get()->getQuadOfNode(m_aimed_graph_node)
-                                          .getCenter();
-    int succ_succ      = getSuccessorToHitTarget(m_aimed_graph_node);
-    m_aiming_points[3] = QuadGraph::get()->getQuadOfNode(succ_succ)
-                                          .getCenter();
+    // Determine distance along track
+    TrackSector::update(getXYZ());
+    m_control_points[0]     = m_owner->getXYZ();
+    m_control_points[1]     = getXYZ();
+    m_last_aimed_graph_node = getSuccessorToHitTarget(getCurrentGraphNode());
+    m_control_points[2]     = 
+        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+    // This updates m_last_aimed_graph_node, and sets m_control_points[3]
+    getNextControlPoint();
+    m_length_cp_1_2 = (m_control_points[2]-m_control_points[1]).length();
+
     m_t = 0;
-    m_t_increase = 1.0f/(m_aiming_points[2]-m_aiming_points[1]).length();
+    m_t_increase = m_speed/m_length_cp_1_2;
 
     // At the start the ball aims at quads till it gets close enough to the
     // target:
@@ -81,7 +67,7 @@ RubberBall::RubberBall(Kart *kart)
     m_wrapped_around       = false;
     m_timer                = 0.0f;
     m_interval             = m_st_interval;
-    m_height               = m_max_height;
+    m_current_max_height   = m_max_height;
 }   // RubberBall
 
 // -----------------------------------------------------------------------------
@@ -112,14 +98,52 @@ void RubberBall::computeTarget()
  *  the main driveline is returned, but a more sophisticated implementation
  *  might check if the target kart is on a shortcut, and select the path  so
  *  that it will get to the target even in this case.
- *  \param node_index The node for which the successor is searched.
+ *  \param  node_index The node for which the successor is searched.
+ *  \param  dist If not NULL a pointer to a float. The distance between
+ *          node_index and the selected successor is added to this float.
  *  \return The node index of a successor node.
  */
-unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index)
+unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
+                                                 float *dist)
 {
     // For now: always pick a successor on the main driveline.
-    return QuadGraph::get()->getNode(node_index).getSuccessor(0);
+    int succ = 0;
+    if(dist)
+        *dist += QuadGraph::get()->getNode(node_index)
+                .getDistanceToSuccessor(succ);
+    return QuadGraph::get()->getNode(node_index).getSuccessor(succ);
 }   // getSuccessorToHitTarget
+
+// ----------------------------------------------------------------------------
+/** Determines the next control points to aim at. The control points must not
+ *  be too close to each other (since otherwise  the interpolation is still
+ *  not smooth enough), so keep on picking graph nodes till the distance 
+ *  between the currently aimed at graph node and the next one is above a
+ *  certain threshold. It uses getSuccessorToHitTarget to determine which
+ *  graph node to select.
+ */
+void RubberBall::getNextControlPoint()
+{
+    // Accumulate the distance between the current last graph node point
+    // and the next one. This is used to approximate the length of the
+    // spline between the control points.
+    float dist=0;
+
+    float f = QuadGraph::get()->getDistanceFromStart(m_last_aimed_graph_node);
+
+    int next = getSuccessorToHitTarget(m_last_aimed_graph_node, &dist);
+    float d = QuadGraph::get()->getDistanceFromStart(next)-f;
+    while(d<30 && d>0)
+    {
+        next = getSuccessorToHitTarget(next, &dist);
+        d = QuadGraph::get()->getDistanceFromStart(next)-f;
+    }
+
+    m_last_aimed_graph_node = next;
+    m_length_cp_2_3         = dist;
+    m_control_points[3]     = 
+        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+}   // getNextControlPoint
 
 // -----------------------------------------------------------------------------
 /** Initialises this object with data from the power.xml file (this is a static
@@ -152,60 +176,84 @@ void RubberBall::update(float dt)
 {
     Flyable::update(dt);
 
-    // Update the target in case that the first kart was overtaken (or has 
+    // Update the target in case that the first kart was overtaken (or has
     // finished the race).
     computeTarget();
 
-    if(!m_target)
+    if(!m_target)        // Remove this item from the game
     {
-        // Remove this item from the game
         hit(NULL);
         return;
     }
+    // FIXME: do we want to test if we have overtaken the target kart?    
 
-    Vec3 aim_xyz;
-    determineTargetCoordinates(dt, &aim_xyz);
+    // If we have reached or overshot the next control point, move to the
+    // the next section of the spline
+    m_t += m_t_increase * dt;
+    if(m_t > 1.0f)
+    {
+        // Move the control points and estimated distance forward.
+        for(unsigned int i=1; i<4; i++)
+            m_control_points[i-1] = m_control_points[i];
+        m_length_cp_1_2 = m_length_cp_2_3;
+        int old = m_last_aimed_graph_node;
+        // 
+        // This automatically sets m_control_points[3]
+        getNextControlPoint();
+        //printf("1_2 %f  length %f\n", m_length_cp_1_2, 
+        //    (m_control_points[2]-m_control_points[1]).length());
+        m_t_increase = m_speed/m_length_cp_1_2;
+        m_t -= 1.0f;
+    }
 
-    Vec3 delta = aim_xyz - getXYZ();
+    Vec3 next_xyz = 0.5f * ((-m_control_points[0] + 3*m_control_points[1] -3*m_control_points[2] + m_control_points[3])*m_t*m_t*m_t
+               + (2*m_control_points[0] -5*m_control_points[1] + 4*m_control_points[2] - m_control_points[3])*m_t*m_t
+               + (-m_control_points[0]+m_control_points[2])*m_t
+               + 2*m_control_points[1]);
 
-    // Determine the next point for the ball.
-    // FIXME: use interpolation here for smooth curves
-    Vec3 next_xyz = getXYZ() + delta * (m_speed * dt / delta.length());
-
-    int indx = getSuccessorToHitTarget(m_current_graph_node);
+    float old_distance = getDistanceFromStart();
 
     // Determine new distance along track
     TrackSector::update(next_xyz);
-
-    Vec3 ball_distance_vec;
-    QuadGraph::get()->findRoadSector(next_xyz, &m_current_graph_node);
-    if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
-    {
-        m_current_graph_node = 
-            QuadGraph::get()->findOutOfRoadSector(next_xyz,
-                                                  QuadGraph::UNKNOWN_SECTOR );
-    }
-    QuadGraph::get()->spatialToTrack(&ball_distance_vec, getXYZ(), 
-                                     m_current_graph_node);
-
-    // Detect wrap around, i.e. crossing the start line
-    float old_distance     = m_distance_along_track;
-    m_distance_along_track = ball_distance_vec[2];
 
     float track_length = World::getWorld()->getTrack()->getTrackLength();
 
     // Detect if the ball crossed the start line
     m_wrapped_around = old_distance > 0.9f * track_length && 
-                       m_distance_along_track < 10.0f;
+                       getDistanceFromStart()< 10.0f;
 
+    m_timer += dt;
+    float height = updateHeight();
+    next_xyz.setY(getHoT()+height);
+     
+    // Ball squashing:
+    // ===============
+    // If we start squashing the ball as soon as the height is smaller than
+    // then height of the ball, it looks to extreme. So a ratio r of the 
+    // height of the ball and the current height of the object is used to 
+    // tweak the look a bit.
+    float r = 2.0f;
+    if(r*height<m_extend.getY())
+        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
+        1.0f));
+    else
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
-    // FIXME: do we want to test if we have overtaken the target kart?    
+    setXYZ(next_xyz);
+}   // update
 
-
+// ----------------------------------------------------------------------------
+/** Updates the height of the rubber ball, and if necessary also adjusts the 
+ *  maximum height of the ball depending on distance from the target. The 
+ *  height is decreased when the ball is getting closer to the target so it 
+ *  hops faster and faster. This function modifies m_current_max_height.
+ *  \return Returns the new height of the ball.
+ */
+float RubberBall::updateHeight()
+{
     // When the ball hits the floor, we adjust maximum height and 
     // interval so that the ball bounces faster when it is getting
     // closer to the target.
-    m_timer += dt;
     if(m_timer>m_interval)
     {
         m_timer -= m_interval;
@@ -214,15 +262,16 @@ void RubberBall::update(float dt)
         float target_distance = 
             world->getDistanceDownTrackForKart(m_target->getWorldKartId());
 
-        float distance = target_distance - m_distance_along_track;
+        float distance = target_distance - getDistanceFromStart();
+
         if(distance<0)
-            distance+=track_length;
+            distance+=World::getWorld()->getTrack()->getTrackLength();;
         if(distance<50)
         {
             // Some experimental formulas
-            m_height   = 0.5f*sqrt(distance);
-            m_interval = m_height / 10.0f;
-	    // Avoid too small hops and esp. a division by zero
+            m_current_max_height   = 0.5f*sqrt(distance);
+            m_interval = m_current_max_height / 10.0f;
+	        // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
                 m_interval = 0.01f;      
         }
@@ -231,49 +280,24 @@ void RubberBall::update(float dt)
             // Reset the values in case that the ball was already trying
             // to get closer to the target, and then the target disappears
             // (e.g. is eliminated or finishes the race).
-            m_interval = m_st_interval;
-            m_height   = m_max_height;
+            m_interval           = m_st_interval;
+            m_current_max_height = m_max_height;
         }
+    }   // if m_timer > m_interval
 
-    }
 
-    // Consider f(x) = x*(x-m_intervall), which is a parabolic function 
+    // Determine the height of the ball
+    // ================================
+    // Consider f(x) = s * x*(x-m_intervall), which is a parabolic function
     // with f(0) = 0, f(m_intervall)=0. We then scale this function to
-    // fulfill: f(m_intervall/2) = m_height, or:
-    // f(m_interval/2) = -m_interval^2/4 = m_height
-    // --> scale with m_height / -m_interval^2/4
-    float f      = m_height / (-0.25f*m_interval*m_interval);
-    float height = m_timer * (m_timer-m_interval) * f;
-    next_xyz.setY(getHoT() + height);
+    // fulfill: f(m_intervall/2) = max_height, or:
+    // f(m_interval/2) = s*(-m_interval^2)/4 = max_height
+    // --> s =  max_height / -m_interval^2/4
+    float f = m_current_max_height / (-0.25f*m_interval*m_interval);
+    return m_timer * (m_timer-m_interval) * f;
+}   // updateHeight
 
-    // If we start squashing the ball as soon as the height is smaller than
-    // height of the ball, it looks to extreme. So a ratio r of the height
-    // of the ball and the current height of the object is used to tweak 
-    // the look a bit.
-    float r = 2.0f;
-    if(r*height<m_extend.getY())
-        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
-        1.0f));
-    else
-        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-
-#if 0
-    m_t += m_t_increase * dt;
-    if(m_t > 1.0f)
-        printf("XX");
-    float s0 = (1.0f+2.0f*m_t)*(1.0f-m_t)*(1.0f-m_t);
-    float s1 = m_t*(1.0f-m_t)*(1.0f-m_t);
-    float s2 = m_t*m_t*(3.0f-2*m_t);
-    float s3 = m_t*m_t*(m_t-1.0f);
-    Vec3  m0 = m_aiming_points[2]-m_aiming_points[0];
-    Vec3  m1 = m_aiming_points[3]-m_aiming_points[1];
-    next_xyz = s0*m_aiming_points[0] + s1*m0 
-             + s2*m_aiming_points[1] + s3*m1;
-#endif
-    setXYZ(next_xyz);
-}   // update
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Determines which coordinates the ball should aim at next. If the ball is
  *  still 'far' away from the target (>20), then it will aim at the next
  *  graph node. If it's closer, the ball will aim directly at the kart and
@@ -292,9 +316,9 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 
     // Aiming at a graph node
     // ----------------------
-    GraphNode *gn  = &(QuadGraph::get()->getNode(m_aimed_graph_node));
+    GraphNode *gn  = &(QuadGraph::get()->getNode(m_last_aimed_graph_node));
     
-    // At this stage m_distance_along track is already the new distance (set
+    // At this stage getDistanceFromStart() is already the new distance (set
     // in the previous time step when aiming). It has to be detected if the
     // ball is now ahead of the graph node, and if so, the graph node has to
     // be updated till it is again ahead of the ball. Three distinct cases
@@ -323,22 +347,17 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
     bool  ball_ahead   = m_wrapped_around && gn_distance >0.9f*track_length;
 
     // Test 3: distance of ball greater than distance of graph node
-    if(!ball_ahead && gn_distance < m_distance_along_track)
+    if(!ball_ahead && gn_distance < getDistanceFromStart())
         // The distance test only applies if the graph node hasn't wrapped 
         // around
         ball_ahead = true;
 
     while(ball_ahead)
     {
-        // Move the aiming points one back
-        for(unsigned int i=1; i<4; i++)
-            m_aiming_points[i-1] = m_aiming_points[i];
-
         // FIXME: aim better if necessary!
-        m_aimed_graph_node = getSuccessorToHitTarget(m_aimed_graph_node);
-        gn = &(QuadGraph::get()->getNode(m_aimed_graph_node));
-        m_aiming_points[3] = gn->getQuad().getCenter();
-
+        m_last_aimed_graph_node = getSuccessorToHitTarget(m_last_aimed_graph_node);
+        gn = &(QuadGraph::get()->getNode(m_last_aimed_graph_node));
+     
         // Detect a wrap around of the graph node. We could just test if
         // the index of the new graph node is 0, but since it's possible
         // that we might have tracks with a more complicated structure, e.g
@@ -346,14 +365,14 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
         // If the previous distance was close to the end of the track, and
         // the new distance is close to 0, the graph node wrapped around.
         // This test prevents an infinite loop if the ball is on the last 
-        // quad, in which case no grpah node would fulfill the distance test.
+        // quad, in which case no graph node would fulfill the distance test.
         if(gn_distance > 0.9f*track_length && 
             gn->getDistanceFromStart()<10.0f)
             break;
         gn_distance  = gn->getDistanceFromStart();
         ball_ahead   = m_wrapped_around && gn_distance >0.9f*track_length;
         ball_ahead   = !ball_ahead && 
-                        gn->getDistanceFromStart() < m_distance_along_track;
+                       gn->getDistanceFromStart() < getDistanceFromStart();
     }
 
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
@@ -363,12 +382,12 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
 
     // Handle wrap around of distance if target crosses finishing line
-    if(m_distance_along_track > target_distance)
+    if(getDistanceFromStart() > target_distance)
         target_distance += world->getTrack()->getTrackLength();
 
     // If the ball is close enough, start aiming directly at the target kart
     // ---------------------------------------------------------------------
-    if(target_distance-m_distance_along_track < 20)
+    if(target_distance-getDistanceFromStart()< 20)
     {
         m_aiming_at_target = true;
         *aim_xyz           = m_target->getXYZ();
@@ -381,7 +400,7 @@ void RubberBall::determineTargetCoordinates(float dt, Vec3 *aim_xyz)
 }   // determineTargetCoordinates
 
 // ----------------------------------------------------------------------------
-/** Callback from the phycis in case that a kart or object is hit. The rubber
+/** Callback from the physics in case that a kart or object is hit. The rubber
  *  ball will only be removed if it hits it target, all other karts it might
  *  hit earlier will only be flattened.
  *  kart The kart hit (NULL if no kart was hit).

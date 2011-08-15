@@ -38,34 +38,42 @@ private:
     /** A class variable to store the default squash duration. */
     static float m_st_squash_duration;
     
+    /** A class variable to store the default squash slowdown. */
+    static float m_st_squash_slowdown;
+
     /** A pointer to the target kart. */
     const Kart  *m_target;
 
-    /** The current quad this ball is on. */
-    int          m_current_graph_node;
-
-    /** The current quad this ball is aiming at. */
-    int          m_aimed_graph_node;
+    /** The last graph node who's coordinates are stored in
+     *  m_control_points[3]. */
+    int          m_last_aimed_graph_node;
 
     /** Keep the last two, current, and next aiming points 
       * for interpolation. */
-    Vec3         m_aiming_points[4];
+    Vec3         m_control_points[4];
 
-    /** The parameter for the spline, m_t in [0,1]. */
+    /** Estimated length of the spline between the control points
+     *  1 and 2. */
+    float        m_length_cp_1_2;
+
+    /** Estimated length of the spline between the control points
+     *  2 and 3. */
+    float        m_length_cp_2_3;
+
+    /** The parameter for the spline, m_t in [0,1]. This is not directly
+     *  related to the time, since depending on the distance between 
+     *  the two control points different increments must be used for m_t. 
+     *  For example, if the distance is 10 m, and assuming a speed of
+     *  10 m/s for the ball, then each second must add '1' to m_t. If
+     *  the distance on the other hand is 200 m, then 10/200 = 1/20 per
+     *  second must be added (so that it takes 20 seconds to move from 0
+     *  to 1). */
     float        m_t;
 
     /** How much m_tt must increase per second in order to maintain a
-     *  constant speed. */
+     *  constant speed, i.e. the speed of the ball divided by the
+     *  distance between the control points. See m_t for more details. */
     float        m_t_increase;
-
-
-    /** The previous distance to the graph node we are aiming
-     *  at atm. If the distance increases, we have passed the
-     *  point we aimed at and have to aim at the next point. */
-    float        m_distance_along_track;
-
-    /** A class variable to store the default squash slowdown. */
-    static float m_st_squash_slowdown;
 
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
@@ -74,9 +82,9 @@ private:
      *  It is always between 0 and m_interval. */
     float        m_timer;
 
-    /** The maximum height of the ball. This value will be reduced if the
-     *  ball gets closer to the target. */
-    float        m_height;
+    /** The current maximum height of the ball. This value will be 
+     *  reduced if the ball gets closer to the target. */
+    float        m_current_max_height;
 
     /** True if the ball just crossed the start line, i.e. its
      *  distance changed from close to length of track in the
@@ -91,7 +99,10 @@ private:
 
     void         computeTarget();
     void         determineTargetCoordinates(float dt, Vec3 *aim_xyz);
-    unsigned int getSuccessorToHitTarget(unsigned int node_index);
+    unsigned int getSuccessorToHitTarget(unsigned int node_index, 
+                                         float *f=NULL);
+    void         getNextControlPoint();
+    float        updateHeight();
 public:
                  RubberBall  (Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
