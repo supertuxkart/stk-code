@@ -52,6 +52,15 @@ AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
+/** The destructor saves the installed addons file again. This is necessary
+ *  so that information about downloaded icons is saved for the next run.
+ */
+AddonsManager::~AddonsManager()
+{
+    saveInstalled();
+}   // ~AddonsManager
+
+// ----------------------------------------------------------------------------
 /** This initialises the online portion of the addons manager. It uses the
  *  downloaded list of available addons. This is called by network_http before
  *  it goes into command-receiving mode, so we can't use any asynchronous calls
@@ -316,6 +325,14 @@ bool AddonsManager::uninstall(const Addon &addon)
 }   // uninstall
 
 // ----------------------------------------------------------------------------
+/** Saves the information about installed addons and cached icons to 
+ *  addons_installed.xml. If this is not called, information about downloaded
+ *  icons is lost (and will trigger a complete redownload when STK is started
+ *  next time).
+ *  \param type Specified the type of addon that was modified. This will trigger
+ *         re-initialisation of the kart or track manager. Default is "" (so
+ *         no manager will be re-initialised).
+ */
 void AddonsManager::saveInstalled(const std::string &type)
 {
     //Put the addons in the xml file

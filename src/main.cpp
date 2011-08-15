@@ -894,6 +894,7 @@ void cleanSuperTuxKart()
     if(race_manager)            delete race_manager;
     if(network_http)            delete network_http;
     if(news_manager)            delete news_manager;
+    if(addons_manager)          delete addons_manager;
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
