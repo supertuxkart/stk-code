@@ -61,7 +61,7 @@ Addon::Addon(const XMLNode &xml)
     std::string designer;
 
     xml.get("name",               &name                );    
-    m_name = StringUtils::removeHtmlEntities(name);
+    m_name = StringUtils::decodeFromHtmlEntities(name);
     m_id   = StringUtils::toLowerCase(name);
     xml.get("id",                 &m_id                );
     xml.get("designer",           &designer            );
@@ -73,8 +73,8 @@ Addon::Addon(const XMLNode &xml)
     xml.get("file",               &m_zip_file          );
     xml.get("description",        &description         );
     
-    m_description = StringUtils::removeHtmlEntities(description);
-    m_designer    = StringUtils::removeHtmlEntities(designer);
+    m_description = StringUtils::decodeFromHtmlEntities(description);
+    m_designer    = StringUtils::decodeFromHtmlEntities(designer);
 
     // resolve XML entities
     //m_description = StringUtils::replace(m_description, "&#10;", "\n");
@@ -114,9 +114,11 @@ void Addon::copyInstallData(const Addon &addon)
 void Addon::writeXML(std::ofstream *out_stream)
 {
     (*out_stream) << "  <"                       << m_type 
-                  << " name=\""                  << core::stringc(m_name).c_str() 
+                  << " name=\""
+                  << StringUtils::encodeToHtmlEntities(m_name)
                   << "\" id=\""                  << m_id 
-                  << "\" designer=\""            << core::stringc(m_designer).c_str() 
+                  << "\" designer=\""
+                  << StringUtils::encodeToHtmlEntities(m_designer)
                   << "\" status=\""              << m_status
                   << "\" date=\""                << m_date
                   << "\" installed=\""         
