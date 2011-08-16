@@ -44,7 +44,7 @@ public:
           * \note  The dialog is not closed automatically, close it in the callback if this
           *        behavior is desired.
           */
-        virtual void onConfirm() = 0;
+        virtual void onConfirm() {};
         
         /** \brief Implement to be notified of dialog cancelled.
           * \note  The default implementation is to close the modal dialog, but you may override
