@@ -69,6 +69,7 @@ MinimalRaceGUI::MinimalRaceGUI()
     // splitscreen players:
     switch(race_manager->getNumLocalPlayers())
     {
+    case 0 : // In case of profile mode
     case 1 : // Lower left corner
              m_map_left   = 10;
              m_map_bottom = UserConfigParams::m_height-10;
