@@ -133,6 +133,8 @@ void AddonsManager::initOnline(const XMLNode *xml)
                 m_addons_list.getData().push_back(addon);
                 index = m_addons_list.getData().size()-1;
             }
+            // Mark that this addon still exists on the server
+            m_addons_list.getData()[index].setStillExists();
             m_addons_list.unlock();
         }
         else
@@ -144,6 +146,42 @@ void AddonsManager::initOnline(const XMLNode *xml)
         }
     }   // for i<xml->getNumNodes
     delete xml;
+
+    // Now remove all items from the addons-installed list, that are not
+    // on the server anymore (i.e. not in the addons.xml file), and not
+    // installed. If found, remove the icon cached for this addon.
+    // Note that if (due to a bug) an icon is shared (i.e. same icon on
+    // an addon that's still on the server and an invalid entry in the
+    // addons installed file), it will be re-downloaded later.
+    m_addons_list.lock();
+    unsigned int count = m_addons_list.getData().size();
+
+    for(unsigned int i=0; i<count;)
+    {
+        if(m_addons_list.getData()[i].getStillExists() ||
+            m_addons_list.getData()[i].isInstalled())
+        {
+            i++;
+            continue;
+        }
+        // This addon is not on the server anymore, and not installed. Remove
+        // it from the list. 
+        if(UserConfigParams::logAddons())
+            printf(
+                "[addons] Removing '%s' which is not on the server anymore.\n",
+                m_addons_list.getData()[i].getId().c_str() );
+        std::string icon = m_addons_list.getData()[i].getIconBasename();
+        std::string icon_file =file_manager->getAddonsFile("icons/"+icon);
+        if(file_manager->fileExists(icon_file))
+        {
+            file_manager->removeFile(icon_file);
+            // Ignore errors silently.
+        }
+        m_addons_list.getData()[i] = m_addons_list.getData()[count-1];
+        m_addons_list.getData().pop_back();
+        count--;
+    }
+    m_addons_list.unlock();
 
     m_state.setAtomic(STATE_READY);
 

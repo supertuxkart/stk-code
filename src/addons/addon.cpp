@@ -46,6 +46,7 @@ Addon::Addon(const XMLNode &xml)
     m_size               = 0;
     m_date               = 0;
     m_icon_ready         = false;
+    m_still_exists       = false;
     m_type               = xml.getName();
 
     // FIXME: temporarily till the web page is updated.
@@ -80,10 +81,19 @@ Addon::Addon(const XMLNode &xml)
     //m_description = StringUtils::replace(m_description, "&#10;", "\n");
     //m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
 
-    xml.get("image",              &m_icon_url          );
+    if(!xml.get("image", &m_icon_url))
+    {
+        // If an addon does not exist on the server anymore, it does not
+        // have an image. In this case use the icon information which is
+        // stored in the addons_installed file
+        xml.get("icon-name", &m_icon_basename);
+    }
+    else
+        m_icon_basename = StringUtils::getBasename(m_icon_url);
+
     xml.get("icon-revision",      &m_icon_revision     );
     xml.get("size",               &m_size              );
-    m_icon_basename = StringUtils::getBasename(m_icon_url);
+
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------
@@ -126,6 +136,7 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << "\" installed-revision=\""  << m_installed_revision
                   << "\" size=\""                << m_size
                   << "\" icon-revision=\""       << m_icon_revision 
+                  << "\" icon-name=\"" << m_icon_basename
                   << "\"/>\n";
 }   // writeXML
 

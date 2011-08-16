@@ -66,6 +66,9 @@ private:
     int         m_icon_revision;
     /** The status flags of this addon. */
     int         m_status;
+    /** True if this addon still exists on the server, i.e. is contained
+     *  in the addons.xml file. */
+    bool        m_still_exists;
     /** Date when the addon was added. */
     Time::TimeType m_date;
     /** A description of this addon. */
@@ -142,6 +145,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the designer of the addon. */
     const core::stringw& getDesigner() const { return m_designer; }
+    // ------------------------------------------------------------------------
+    /** Returns if this addon still exists on the server. */
+    bool getStillExists() const { return m_still_exists; }
+    // ------------------------------------------------------------------------
+    /** Marks that this addon still exists on the server. */
+    void setStillExists() { m_still_exists = true; }
     // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
