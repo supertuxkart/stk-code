@@ -22,6 +22,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -34,7 +35,8 @@ namespace GUIEngine { class Widget; }
   */
 class AddonsScreen : public GUIEngine::Screen, 
                      public GUIEngine::ScreenSingleton<AddonsScreen>,
-                     public GUIEngine::IListWidgetHeaderListener
+                     public GUIEngine::IListWidgetHeaderListener,
+                     public MessageDialog::IConfirmDialogListener
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
@@ -78,6 +80,8 @@ public:
 
     virtual void init();
     virtual void tearDown();
+
+    virtual void onCancel();
 
     void    setLastSelected();
 

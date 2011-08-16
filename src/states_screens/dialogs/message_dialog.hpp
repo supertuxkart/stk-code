@@ -52,6 +52,8 @@ public:
           */
         virtual void onCancel();
     };
+
+    enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM };
     
 private:
     
@@ -66,7 +68,7 @@ public:
       * \param If set to true, 'listener' will be owned by this dialog and deleted
       *        along with the dialog.
       */
-    MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener, bool delete_listener);
+    MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool delete_listener);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)

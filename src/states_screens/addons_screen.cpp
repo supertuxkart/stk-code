@@ -233,7 +233,8 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     else if (name == "reload")
     {
         network_http->insertReInit();
-        StateManager::get()->escapePressed();
+        new MessageDialog(_("You will be taken back to the Main Menu while an updated list of Addons are downloaded."),
+            MessageDialog::MESSAGE_DIALOG_OK, this, false);
     }
 
     else if (name == "list_addons")
@@ -268,9 +269,22 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             m_type = "arena";
             loadList();
         }
-
     }
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+/** Callback function for the MessageDialog opened by the "reload" button.
+ *  The network call to reload the addons list will be under way by the time
+ *  function is called, so all it has to do is close two screens (the
+ *  MessageDialog itself and the AddonsScreen), returning the player to the
+ *  main menu to wait for the addons to be reloaded.
+ */
+void AddonsScreen::onCancel() {
+    // Close the MessageDialog
+    MessageDialog::dismiss();
+    // Close the AddonsScreen
+    StateManager::get()->popMenu();
+}
 
 // ----------------------------------------------------------------------------
 /** Selects the last selected item on the list (which is the item that

@@ -438,7 +438,8 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
         {
            // keyboard configs may be deleted 
            //I18N: shown before deleting an input configuration
-            new MessageDialog( _("Are you sure you want to permanently delete this configuration?"), this, false );
+            new MessageDialog( _("Are you sure you want to permanently delete this configuration?"),
+                MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false );
         }
         else
         {

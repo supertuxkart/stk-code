@@ -27,7 +27,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener, bool own_listener) :
+MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {    
     loadFromFile("confirm_dialog.stkgui");
@@ -37,27 +37,25 @@ MessageDialog::MessageDialog(irr::core::stringw msg, IConfirmDialogListener* lis
     
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
+
+    // If the dialog is a simple 'OK' dialog, then hide the "Yes" button and
+    // change "Cancel" to "OK"
+    if (type == MessageDialog::MESSAGE_DIALOG_OK) {
+        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+        yesbtn->setVisible(false);
+
+        ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
+        cancelbtn->setText(_("OK"));
+        cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 }
 
 // ------------------------------------------------------------------------------------------------------
 
 MessageDialog::MessageDialog(irr::core::stringw msg) :
     ModalDialog(0.6f, 0.6f)
-{    
-    loadFromFile("confirm_dialog.stkgui");
-    
-    m_listener = NULL;
-    m_own_listener = false;
-    
-    LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str(), false );
-    
-    ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
-    yesbtn->setVisible(false);
-    
-    ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
-    cancelbtn->setText(_("OK"));
-    cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+{
+    MessageDialog(msg, MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
 }
 
 // ------------------------------------------------------------------------------------------------------
