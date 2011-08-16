@@ -310,9 +310,16 @@ bool AddonsManager::install(const Addon &addon)
     if (!success)
     {
         // TODO: show a message in the interface
-        std::cerr << "[Addons] Failed to unzip '" << from << "' to '" 
+        std::cerr << "[addons] Failed to unzip '" << from << "' to '" 
                   << to << "'\n";
+        std::cerr << "[addons] Zip file will not be removed.\n";
         return false;
+    }
+
+    if(!file_manager->removeFile(from))
+    {
+        std::cerr << "[addons] Problems removing temporary file '"
+                  << from << "'.\n";
     }
 
     int index = getAddonIndex(addon.getId());
@@ -347,7 +354,7 @@ bool AddonsManager::install(const Addon &addon)
  */
 bool AddonsManager::uninstall(const Addon &addon)
 {
-    std::cout << "[Addons] Uninstalling <" 
+    std::cout << "[addons] Uninstalling <" 
               << core::stringc(addon.getName()).c_str() << ">\n";
 
     // addon is a const reference, and to avoid removing the const, we
