@@ -35,7 +35,7 @@ public:
 #ifdef WIN32
     typedef unsigned __int64 TimeType;
 #else
-    typedef uint_least64_t   TimeType;
+    typedef time_t   TimeType;
 #endif
 
     static TimeType getTimeSinceEpoch()
