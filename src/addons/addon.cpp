@@ -132,8 +132,5 @@ void Addon::writeXML(std::ofstream *out_stream)
 // ----------------------------------------------------------------------------
 std::string Addon::getDateAsString() const
 {
-    const struct tm *t = gmtime((time_t*)&m_date);
-    char s[16];
-    strftime(s, 128, "%d.%m.%Y", t);
-    return s;
+    return Time::toString(m_date);
 }   // getDateAsString

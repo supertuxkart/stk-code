@@ -23,27 +23,33 @@
 #ifdef WIN32
 #  define _WINSOCKAPI_
 #  include <windows.h>
+#  include <time.h>
 #else
 #  include <stdint.h>
 #  include <sys/time.h>
 #endif
 
-class Time
+#include <string>
+
+namespace Time
 {
-public:
+    typedef time_t TimeType;
 
-#ifdef WIN32
-    typedef unsigned __int64 TimeType;
-#else
-    typedef time_t   TimeType;
-#endif
-
+    /** Converts the time in this object to a human readable string. */
+    static std::string toString(const TimeType &tt)
+    {
+        const struct tm *t = gmtime(&tt);
+        char s[16];
+        strftime(s, sizeof(s), "%d.%m.%Y", t);
+        return s;
+    }   // toString
+    // ------------------------------------------------------------------------
     static TimeType getTimeSinceEpoch()
     {
 #ifdef WIN32
         FILETIME ft;
         GetSystemTimeAsFileTime(&ft);
-        TimeType t = ft.dwHighDateTime;
+        __int64 t = ft.dwHighDateTime;
         t <<= 32;
         t /= 10;
         // The Unix epoch starts on Jan 1 1970.  Need to subtract 
@@ -66,6 +72,6 @@ public:
 #endif
     };   // getTimeSinceEpoch
 
-};   // class time
+};   // namespace time
 #endif
 
