@@ -1956,6 +1956,32 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                          * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(offset_heading, 0, 0));
+    
+    /*
+    // cheap wheelie effect
+    if (m_zipper_fire && m_zipper_fire->getCreationRate() > 0.0f)
+    {
+        m_node->updateAbsolutePosition();
+        m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
+        float wheel_y = m_kart_model->getWheelNodes()[0]->getAbsolutePosition().Y;
+
+        core::vector3df rot = m_node->getRotation();
+        
+        float ratio = float(m_zipper_fire->getCreationRate())/float(m_zipper_fire->getParticlesInfo()->getMaxRate());
+        
+        const float a = (13.4f - ratio*13.0f);
+        float dst = -45.0f*sin((a*a)/180.f*M_PI);
+        
+        rot.X = dst;
+        m_node->setRotation(rot);
+        
+        m_node->updateAbsolutePosition();
+        m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
+        float wheel_y_after = m_kart_model->getWheelNodes()[0]->getAbsolutePosition().Y;
+        
+        m_node->setPosition(m_node->getPosition() + core::vector3df(0,wheel_y_after - wheel_y,0));
+    }
+     */
 }   // updateGraphics
 
 /* EOF */

@@ -186,5 +186,8 @@ public:
     
     /** Sets the kart this model is currently used for */
     void  setKart(Kart* k) { m_kart = k; }
+    
+    scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
+    
 };   // KartModel
 #endif
