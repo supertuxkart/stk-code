@@ -212,12 +212,55 @@ void FileManager::setDevice(IrrlichtDevice *device)
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
+    // Clean up left-over files in addons/tmp that are older than 24h
+    // ==============================================================
+    // (The 24h delay is useful when debugging a problem with a zip file)
+    std::set<std::string> allfiles;
+    std::string tmp=getAddonsFile("tmp");
+    listFiles(allfiles, tmp, /*fullpath*/true);
+    for(std::set<std::string>::iterator i=allfiles.begin(); 
+        i!=allfiles.end(); i++)
+    {
+        if((*i)=="." || (*i)=="..") continue;
+        // For now there should be only zip files in tmp
+        std::string full_path=tmp+"/"+*i;
+        if(StringUtils::getExtension(*i)!="zip") 
+        {
+            printf("[addons] Warning: unexpected tmp file '%s' found.\n",
+                   full_path.c_str());
+            continue;
+        }
+        if(isDirectory(full_path))
+        {
+            // Gee, a .zip file which is a directory - stay away from it
+            printf("[addons] '%s' is a directory and will not be deleted.\n",
+                    full_path.c_str());
+            continue;
+        }
+        struct stat mystat;
+        stat(full_path.c_str(), &mystat);
+        Time::TimeType current = Time::getTimeSinceEpoch();
+        if(current - mystat.st_ctime <24*3600)
+        {
+            if(UserConfigParams::logAddons())
+                printf("[addons] '%s' is less than 24h old "
+                       "and will not be deleted.\n",
+                        full_path.c_str());
+            continue;
+        }
+        if(UserConfigParams::logAddons())
+            printf("[addons] Deleting tmp file'%s'.\n",full_path.c_str());
+        removeFile(full_path);
+
+    }   // for i in all files in tmp
+
+    // Clean up rest of file manager
+    // =============================
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
     // m_file_system is ref-counted, so no delete/drop necessary.
     m_file_system = NULL;
-    //std::cout << "^^^^^^^^ Dropping m_device (FileManager) ^^^^^^^^\n";
     m_device->drop();
 }   // ~FileManager
 
@@ -345,7 +388,8 @@ bool FileManager::findFile(std::string& full_path,
                       const std::string& file_name,
                       const std::vector<std::string>& search_path) const
 {
-    for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
+    for(std::vector<std::string>::const_reverse_iterator 
+        i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
         full_path = *i + "/" + file_name;
@@ -533,9 +577,10 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
         {
-            std::cerr << "[FileManager] No home directory, this should NOT happen!\n";
-            // Fall back to system-wide app data (rather than user-specific data),
-            // but should not happen anyway.
+            std::cerr << 
+                "[FileManager] No home directory, this should NOT happen!\n";
+            // Fall back to system-wide app data (rather than 
+            // user-specific data), but should not happen anyway.
             m_config_dir = "";
         }
         m_config_dir += "/Library/Application Support/";
@@ -549,7 +594,8 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            std::cerr << "[FileManager] No home directory, this should NOT happen "
+            std::cerr 
+                << "[FileManager] No home directory, this should NOT happen "
                 << "- trying '.' for config files!\n";
             m_config_dir = ".";
         }
@@ -610,7 +656,8 @@ void FileManager::checkAndCreateAddonsDir()
         // like $HOME/.local/share
         dir_ok = checkAndCreateDirectory(m_addons_dir+"/supertuxkart");
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME/supertuxkart.\n";
+            std::cerr 
+               << "[FileManager] Cannot create $XDG_DATA_HOME/supertuxkart.\n";
     }
 
     if(!dir_ok && getenv("HOME"))
@@ -656,21 +703,24 @@ void FileManager::checkAndCreateAddonsDir()
     if(!checkAndCreateDirectory(m_addons_dir))
     {
         fprintf(stderr, 
-                "[FileManager] Can not create add-ons dir '%s', falling back to '.'.\n", 
-                m_addons_dir.c_str());
+                "[FileManager] Can not create add-ons dir '%s', "
+                "falling back to '.'.\n", m_addons_dir.c_str());
         m_addons_dir = ".";
     }
-    std::cout << "[FileManager] Addons files will be stored in '"<<m_addons_dir<<"'.\n";
+    std::cout << "[FileManager] Addons files will be stored in '"
+              << m_addons_dir << "'.\n";
 
     if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
     {
-        fprintf(stderr, "[FileManager] Failed to create add-ons icon dir at '%s'\n",
-            (m_addons_dir + "/icons/").c_str());
+        fprintf(stderr, 
+                "[FileManager] Failed to create add-ons icon dir at '%s'\n",
+                (m_addons_dir + "/icons/").c_str());
     }
     if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
     {
-        fprintf(stderr, "[FileManager] Failed to create add-ons tmp dir at '%s'\n",
-            (m_addons_dir + "/tmp/").c_str());
+        fprintf(stderr, 
+                "[FileManager] Failed to create add-ons tmp dir at '%s'\n",
+                (m_addons_dir + "/tmp/").c_str());
     }
 }   // checkAndCreateAddonsDir
 
