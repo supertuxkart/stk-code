@@ -22,9 +22,10 @@
 /** \defgroup states_screens */
 
 #include <string>
+
+#include "config/player.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
-#include "config/player.hpp"
 
 struct Input;
 class InputDevice;
@@ -140,7 +141,7 @@ public:
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE); 
 #endif
-			assert(m_kart != NULL); return m_kart; }
+            return m_kart; }
     };
 
 
