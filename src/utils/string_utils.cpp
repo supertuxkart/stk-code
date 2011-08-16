@@ -581,7 +581,7 @@ namespace StringUtils
                 }
                 else
                 {
-                    output <<"&#" << std::hex <<std::uppercase<< s[i]<<";";
+                    output <<"&#x" << std::hex <<std::uppercase<< s[i]<<";";
                 }
             }
         }
