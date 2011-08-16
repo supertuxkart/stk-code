@@ -27,6 +27,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
@@ -164,7 +165,8 @@ void StateManager::escapePressed()
     // In-game
     else if(m_game_mode == GAME)
     {
-        if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE)
+        if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE
+            && !ProfileWorld::isProfileMode())
             new RacePausedDialog(0.8f, 0.6f);
     }
     // In menus
