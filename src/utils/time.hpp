@@ -31,8 +31,9 @@
 
 #include <string>
 
-namespace Time
+class Time
 {
+public:
     typedef time_t TimeType;
 
     /** Converts the time in this object to a human readable string. */
