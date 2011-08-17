@@ -49,8 +49,13 @@ private:
     int          m_last_aimed_graph_node;
 
     /** Keep the last two, current, and next aiming points 
-      * for interpolation. */
+     *  for interpolation. */
     Vec3         m_control_points[4];
+
+    /** Saves the previous location of the ball. This is needed if a ball
+     *  should lose it target, and has to reinitialise the control points
+     *  for the interpolation. */
+    Vec3         m_previous_xyz;
 
     /** Estimated length of the spline between the control points
      *  1 and 2. */
@@ -86,11 +91,6 @@ private:
      *  reduced if the ball gets closer to the target. */
     float        m_current_max_height;
 
-    /** True if the ball just crossed the start line, i.e. its
-     *  distance changed from close to length of track in the
-     *  previous time step to a bit over zero now. */
-    bool         m_wrapped_around;
-
     /** Once the ball is close enough, it will aim for the kart. If the
      *  kart should be able to then increase the distance to the ball,
      *  the ball will be removed and the kart escapes. This boolean is
@@ -98,11 +98,13 @@ private:
     bool         m_aiming_at_target;
 
     void         computeTarget();
-    void         determineTargetCoordinates(float dt, Vec3 *aim_xyz);
+    void         checkDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index, 
                                          float *f=NULL);
     void         getNextControlPoint();
     float        updateHeight();
+    void         interpolate(Vec3 *next_xyz, float dt);
+    void         initializeControlPoints(const Vec3 &xyz);
 public:
                  RubberBall  (Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
