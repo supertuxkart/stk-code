@@ -44,13 +44,13 @@ public:
           * \note  The dialog is not closed automatically, close it in the callback if this
           *        behavior is desired.
           */
-        virtual void onConfirm() {};
+        virtual void onConfirm() { ModalDialog::dismiss(); };
         
         /** \brief Implement to be notified of dialog cancelled.
           * \note  The default implementation is to close the modal dialog, but you may override
           *        this method to change the behavior.
           */
-        virtual void onCancel();
+        virtual void onCancel() { ModalDialog::dismiss(); };
     };
 
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM };

@@ -100,8 +100,3 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
 }
 
 // ------------------------------------------------------------------------------------------------------
-
-void MessageDialog::IConfirmDialogListener::onCancel()
-{
-    ModalDialog::dismiss();
-}
