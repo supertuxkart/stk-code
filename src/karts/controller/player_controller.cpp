@@ -93,11 +93,20 @@ void PlayerController::reset()
  */
 void PlayerController::resetInputState()
 {
-    m_steer_val_l  = 0;
-    m_steer_val_r  = 0;
-    m_steer_val    = 0;
-    m_prev_brake   = 0;
-    m_prev_accel   = 0;
+    m_steer_val_l           = 0;
+    m_steer_val_r           = 0;
+    m_steer_val             = 0;
+    m_prev_brake            = 0;
+    m_prev_accel            = 0;
+    m_controls->m_accel     = 0.0f;
+    m_controls->m_brake     = false;
+    m_controls->m_drift     = false;
+    m_controls->m_fire      = false;
+    m_controls->m_look_back = false;
+    m_controls->m_nitro     = false;
+    m_controls->m_rescue    = false;
+    m_controls->m_steer     = 0.0f;
+
 }   // resetKeyState
 
 // ----------------------------------------------------------------------------
