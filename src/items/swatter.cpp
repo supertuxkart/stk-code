@@ -57,6 +57,10 @@ Swatter::Swatter(Attachment *attachment, Kart *kart)
 //-----------------------------------------------------------------------------
 Swatter::~Swatter()
 {
+    if (m_swat_sound)
+    {
+        sfx_manager->deleteSFX(m_swat_sound);
+    }
 }   // ~Swatter
 
 //-----------------------------------------------------------------------------
