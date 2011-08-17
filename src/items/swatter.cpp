@@ -28,6 +28,8 @@
 #include "items/swatter.hpp"
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
@@ -48,6 +50,8 @@ Swatter::Swatter(Attachment *attachment, Kart *kart)
     scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
     node->setPosition(SWAT_POS_OFFSET);
     node->setAnimationSpeed(0);
+    
+    m_swat_sound = sfx_manager->createSoundSource("swatter");
 }   // Swatter
 
 //-----------------------------------------------------------------------------
@@ -179,6 +183,9 @@ void Swatter::squashThingsAround()
     assert(swatter_node);
     Vec3 swatter_pos = swatter_node->getAbsolutePosition();
 
+    m_swat_sound->position(swatter_pos);
+    m_swat_sound->play();
+    
     // Squash karts around
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {

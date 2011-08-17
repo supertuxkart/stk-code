@@ -31,6 +31,7 @@
 class Kart;
 class Item;
 class Attachment;
+class SFXBase;
 
 /**
   * \ingroup items
@@ -50,6 +51,8 @@ private:
     /** The kart the swatter is aiming at. */
     Moveable        *m_target;
 
+    SFXBase         *m_swat_sound;
+    
 public:
              Swatter(Attachment *attachment, Kart *kart);
     virtual ~Swatter();
