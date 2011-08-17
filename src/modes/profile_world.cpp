@@ -88,19 +88,9 @@ void ProfileWorld::setProfileModeLaps(int laps)
 Kart *ProfileWorld::createKart(const std::string &kart_ident, int index, 
                                int local_player_id, int global_player_id)
 {
-    // Ignore the kart identifier specified for this kart if graphics are
-    // enabled, since it's more useful in this case to be able to use only
-    // a single kart (so that the overall performance impact of a certain
-    // kart can be evaluated). Instead load _only_ the kart specified for 
-    // the player. If no graphics are selected, comparing different karts
-    // for their physics behaviour is more useful.
-    const std::string &prof_kart_id = 
-        m_no_graphics ? kart_ident
-                      : race_manager->getKartIdent(
-                                           race_manager->getNumberOfKarts()-1);
     btTransform init_pos   = m_track->getStartTransform(index);
 
-    Kart *new_kart         = new KartWithStats(prof_kart_id, m_track, index+1,
+    Kart *new_kart         = new KartWithStats(kart_ident, m_track, index+1,
                                                false, init_pos, 
                                                RaceManager::KT_AI);
 
