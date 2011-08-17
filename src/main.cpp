@@ -626,6 +626,13 @@ int handleCmdLine(int argc, char **argv)
         {
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
             const GrandPrixData *gp = grand_prix_manager->getGrandPrix(argv[i+1]);
+            
+            if (gp == NULL)
+            {
+                fprintf(stderr, "There is no GP named '%s'\n", argv[i+1]);
+                return 0;
+            }
+            
             race_manager->setGrandPrix(*gp);
             i++;
         }
