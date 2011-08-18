@@ -7,83 +7,83 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-07-09 21:49-0400\n"
-"PO-Revision-Date: 2011-04-04 18:44+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"POT-Creation-Date: 2011-07-31 14:24-0400\n"
+"PO-Revision-Date: 2011-08-18 05:36+0000\n"
+"Last-Translator: Võ Xuân Tiến <Unknown>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-15 00:16+0000\n"
-"X-Generator: Launchpad (build 13405)\n"
+"X-Launchpad-Export-Date: 2011-08-18 08:56+0000\n"
+"X-Generator: Launchpad (build 13697)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
 #: src/utils/translation.cpp:255
 msgid "   Is this a RTL language?"
-msgstr ""
+msgstr "   N"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:45
 msgid "%0 bites %1's bait"
-msgstr ""
+msgstr "%0 mắc câu của %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:55
+#: src/items/flyable.cpp:56
 msgid "%0 eats too much of %1's cake"
-msgstr ""
+msgstr "%0 ăn quá nhiều bánh của %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:47
 msgid "%0 gets a fancy mask from %1"
-msgstr ""
+msgstr "%0 bị %1 cho chơi bịt mắt bắt dê"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:79
+#: src/items/flyable.cpp:80
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%0 bị quả banh bowling của %1 lăn qua"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:57
+#: src/items/flyable.cpp:58
 msgid "%0 is dubious of %1's cooking skills"
-msgstr ""
+msgstr "%0 sợ tài nấu ăn của %1 rồi"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:59
+#: src/items/flyable.cpp:60
 msgid "%0 should not play with %1's lunch"
-msgstr ""
+msgstr "%0 không nên ăn trưa với %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:75
+#: src/items/flyable.cpp:76
 msgid "%0 will not go bowling with %1 again"
-msgstr ""
+msgstr "%0 sẽ không đi chơi bowling với %1 nữa"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%1 latches onto %0 for a free ride"
-msgstr ""
+msgstr "%1 được %0 kéo đi miễn phí"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:49
 msgid "%1 merges %0's face with a plunger"
-msgstr ""
+msgstr "%1 lấy giác mút ấn vào mặt của %0"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:77
+#: src/items/flyable.cpp:78
 msgid "%1 strikes %0"
-msgstr ""
+msgstr "%1 đánh bay %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:49
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 thử nghiệm máy kéo mới toanh tên là %0"
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
-#: src/states_screens/dialogs/track_info_dialog.cpp:129
+#: src/states_screens/dialogs/track_info_dialog.cpp:136
 #, c-format
 msgid "%i laps"
-msgstr ""
+msgstr "%i vòng"
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -91,88 +91,88 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:172
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : sống sót trong %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:153
 #: src/states_screens/dialogs/addons_loading.cpp:157
 #, c-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
 #: src/states_screens/dialogs/addons_loading.cpp:146
 #, c-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:376
 #, c-format
 msgid "%s by %s"
-msgstr ""
+msgstr "%s về đích trong %s"
 
 #. I18N: as in: The Old Island by Johannes Sjolund\t27.04.2011
 #: src/states_screens/addons_screen.cpp:165
 #, c-format
 msgid "%s by %s\t%s"
-msgstr ""
+msgstr "%s về đích trong %s\t%s"
 
 #: src/items/powerup.cpp:49
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr ""
+msgstr "%s là một tên cướp biển vĩ đại!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:95
+#: src/items/flyable.cpp:96
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr ""
+msgstr "%s đang chơi với cái yôyô xanh, tròn và to"
 
-#: src/states_screens/kart_selection.cpp:523
+#: src/states_screens/kart_selection.cpp:527
 #, c-format
 msgid "%s is ready"
-msgstr ""
+msgstr "%s đã sẵn sàng"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:97
+#: src/items/flyable.cpp:98
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr ""
+msgstr "%s là bậc thầy của thế giới về chơi bowling kết hợp boomerang"
 
 #: src/items/powerup.cpp:48
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s trả tiền cho hàng loạt chai rượu nặng!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:99
+#: src/items/flyable.cpp:100
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
-msgstr ""
+msgstr "%s nên chuyển nghề khác thay vì chơi bowling"
 
-#: src/modes/world.cpp:791
+#: src/modes/world.cpp:798
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' đã bị loại."
 
 #. I18N: for empty highscores entries
-#: src/states_screens/dialogs/track_info_dialog.cpp:265
+#: src/states_screens/dialogs/track_info_dialog.cpp:272
 msgid "(Empty)"
-msgstr ""
+msgstr "(Trống)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:414
+#: data/po/gui_strings.h:421
 msgid "(network play is not yet available)"
-msgstr ""
+msgstr "Chức năng chơi qua mạng chưa sẵn sàng"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:303
+#: data/po/gui_strings.h:310
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "* Danh sách phím bấm có thể thấy/thay đổi trong phần Tùy chọn"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:389
+#: data/po/gui_strings.h:396
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
@@ -185,32 +185,36 @@ msgstr ""
 "người chơi cao điểm nhất sẽ thắng giải đấu."
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:522
+#: data/po/gui_strings.h:529
 msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
 msgstr ""
+"Cấu hình được sử dụng tùy theo bạn nhấn phím \"bắn\" nào để tham gia trò "
+"chơi."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:149
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "Trận chiến 3 lần tấn công"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:385
+#: data/po/gui_strings.h:392
 msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
+"Trận chiến 3 lần tấn công: chỉ có trong phần chơi mạng. Tấn công người chơi "
+"khác bằng vũ khí đến khi họ mất hết mạng."
 
-#: src/states_screens/dialogs/track_info_dialog.cpp:191
+#: src/states_screens/dialogs/track_info_dialog.cpp:198
 msgid "= Highscores ="
-msgstr ""
+msgstr "= Danh sách điểm cao ="
 
 #: src/items/powerup.cpp:82
 msgid "A wizard did it!"
-msgstr ""
+msgstr "Một pháp sư gây ra đấy!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:424
 #: src/states_screens/race_result_gui.cpp:101
@@ -219,54 +223,57 @@ msgstr "Ngừng giải Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:454
+#: data/po/gui_strings.h:461
 msgid "About"
-msgstr ""
+msgstr "Giới thiệu"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:180
 msgid "Accelerate"
-msgstr ""
+msgstr "Tăng tốc"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:65
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Thêm thiết lập bàn phím"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:537
+#: data/po/gui_strings.h:544
 msgid "Add Player"
-msgstr ""
+msgstr "Thêm người chơi"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:519
+#: data/po/gui_strings.h:526
 msgid "Add a device"
-msgstr ""
+msgstr "Thêm một thiết bị"
 
+#. I18N: arena group name
 #. I18N: kart group name
+#. I18N: track group name
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/kart_selection.cpp:911
-#: src/states_screens/tracks_screen.cpp:195 data/po/gui_strings.h:211
+#: src/states_screens/arenas_screen.cpp:72
+#: src/states_screens/kart_selection.cpp:916
+#: src/states_screens/tracks_screen.cpp:195 data/po/gui_strings.h:218
 msgid "Add-Ons"
-msgstr ""
+msgstr "Tiện Ích"
 
 #: src/states_screens/addons_screen.cpp:76
 msgid "Add-on name"
-msgstr ""
+msgstr "Tên Tiện Ích"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:442
+#: data/po/gui_strings.h:449
 msgid "Addons"
-msgstr ""
+msgstr "Những Tiện Ích"
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:780
+#: data/po/gui_strings.h:787
 msgid "Adiumy"
-msgstr ""
+msgstr "Adiumy"
 
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
@@ -274,92 +281,102 @@ msgstr ""
 #. I18N: name of the tab that will show tracks from all groups
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/arenas_screen.cpp:84
-#: src/states_screens/kart_selection.cpp:903
-#: src/states_screens/options_screen_video.cpp:291
-#: src/states_screens/tracks_screen.cpp:187 data/po/gui_strings.h:215
+#: src/states_screens/arenas_screen.cpp:64
+#: src/states_screens/kart_selection.cpp:908
+#: src/states_screens/options_screen_video.cpp:293
+#: src/states_screens/tracks_screen.cpp:187 data/po/gui_strings.h:222
 msgid "All"
-msgstr ""
+msgstr "Tất cả"
 
 #. I18N: ./data/grandprix/alltracks.grandprix
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164 data/po/gui_strings.h:659
-#: data/po/gui_strings.h:765
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:666
+#: data/po/gui_strings.h:772
 msgid "All Tracks"
-msgstr ""
+msgstr "Tất cả vòng đua"
 
 #: src/states_screens/race_setup_screen.cpp:196
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
+"Tất cả các chiêu đòn đều được cho phép dùng, vậy hãy nhặt vũ khí và dùng "
+"chúng cẩn thận!"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+#: data/po/gui_strings.h:563
+msgid "Allow STK to connect to the Internet"
+msgstr "Cho phép trò chơi được kết nối tới mạng internet"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
 msgid "Amazonian Journey"
-msgstr ""
+msgstr "Chuyến đi của người Amazon"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:344
+#: data/po/gui_strings.h:351
 msgid "Anchor - slows down greatly the kart in the first position"
-msgstr ""
+msgstr "Neo - làm chậm xe đua ở vị trí dẫn đầu"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:302
+#: src/states_screens/options_screen_video.cpp:304
 #, c-format
 msgid "Animated Characters : %s"
-msgstr ""
+msgstr "Nhân vật có thể cử động : %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:298
+#: src/states_screens/options_screen_video.cpp:300
 #, c-format
 msgid "Animated Scenery : %s"
-msgstr ""
+msgstr "Cảnh vật có thể chuyển động : %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:305
+#: src/states_screens/options_screen_video.cpp:307
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
-msgstr ""
+msgstr "Khử răng cưa (yêu cầu khởi động lại game) : %s"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
-#: data/po/gui_strings.h:591
+#: data/po/gui_strings.h:598
 msgid "Apply new resolution"
-msgstr ""
+msgstr "Áp dụng độ phân giải mới"
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options_screen_input2.cpp:441
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr ""
+msgstr "Bạn có chắc bạn muốn xóa hoàn toàn thiết lập này?"
 
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: Section in the addons menu
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
-#: data/po/gui_strings.h:203
+#: data/po/gui_strings.h:206 data/po/gui_strings.h:210
 msgid "Arenas"
-msgstr ""
+msgstr "Đấu trường"
 
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:29
 msgid "Around the Lighthouse"
-msgstr ""
+msgstr "Vòng quanh ngọn hải đăng"
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:47
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr ""
+msgstr "Aaaa, %s làm rơi mỏ neo, Đội trưởng!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:598
+#: data/po/gui_strings.h:605
 msgid "Assign to ESC key"
-msgstr ""
+msgstr "Đặt cho phím ESC"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:768
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:775
 msgid "At World's End"
-msgstr ""
+msgstr "Nơi tận cùng của thế giới"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -367,106 +384,114 @@ msgstr ""
 #: src/states_screens/options_screen_input2.cpp:71
 #: src/states_screens/options_screen_players.cpp:68
 #: src/states_screens/options_screen_ui.cpp:110
-#: src/states_screens/options_screen_video.cpp:80 data/po/gui_strings.h:465
+#: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:472
 msgid "Audio"
 msgstr "Âm thanh"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:287
+#: data/po/gui_strings.h:294
 msgid "Avoid bananas!"
-msgstr ""
+msgstr "Tránh những quả chuối!"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:266
 #, c-format
 msgid "Axis %d %s"
-msgstr ""
+msgstr "Gamepad axe %d %s"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Addons
-#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:184
+#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:187
 msgid "Back"
-msgstr ""
+msgstr "Quay về"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:609
+#: data/po/gui_strings.h:616
 msgid "Back to Race"
-msgstr ""
+msgstr "Quay về vòng đua"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:504
+#: data/po/gui_strings.h:511
 msgid "Back to device list"
-msgstr ""
+msgstr "Quay về danh sách thiết bị"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:392
 msgid "Back to the main menu"
-msgstr ""
+msgstr "Quay về trình đơn chính"
 
 #: src/states_screens/race_result_gui.cpp:114
 msgid "Back to the menu"
-msgstr ""
+msgstr "Quay về trình đơn chính"
 
 #: src/items/powerup.cpp:83
 msgid "Banana? Box? Banana? Box? Banana? Box?"
-msgstr ""
+msgstr "Chuối? Hộp? Chuối? Hộp? Chuối? Hộp?"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:783
+#: data/po/gui_strings.h:790
 msgid "Beagle"
-msgstr ""
+msgstr "Beagle"
 
 #. I18N: ./data/karts/beastie/kart.xml
-#: data/po/gui_strings.h:786
+#: data/po/gui_strings.h:793
 msgid "Beastie"
-msgstr ""
+msgstr "Beastie"
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:258
 msgid "Better luck next time!"
-msgstr ""
+msgstr "Chúc may mắn lần sau!"
 
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:14
 msgid "Bovine Barnyard"
-msgstr ""
+msgstr "Nông trại"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:338
+#: data/po/gui_strings.h:345
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
 msgstr ""
+"Banh bowling - bật ra khi đụng tường. Nếu bạn đang nhìn lại phía sau, trái "
+"banh sẽ được ném ra phía sau."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:183
 msgid "Brake"
-msgstr ""
+msgstr "Thắng"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:329
+#: data/po/gui_strings.h:336
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr ""
+msgstr "Kẹo cao su - để lại một lớp kẹo cao su hồng rất dính phía sau bạn"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:332
+#: data/po/gui_strings.h:339
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
+"Bánh - ném vào đối thủ gần nhất, hiệu quả nhất ở cự ly gần và theo đường "
+"thẳng"
 
 #: src/addons/network_http.cpp:419 src/addons/news_manager.cpp:142
 msgid "Can't access stkaddons server..."
-msgstr ""
+msgstr "Không thể kết nối tới server chứa phần mở rộng"
 
 #: src/addons/network_http.cpp:328
 msgid "Can't download addons list, check terminal for details."
 msgstr ""
+"Không thể tải về danh sách phần mở rộng, kiểm tra chương trình dòng lệnh "
+"(cmd, terminal..) để biết thêm chi tiết"
 
 #: src/addons/network_http.cpp:338
 msgid "Can't download news file, check terminal for details."
 msgstr ""
+"Không thể tải về tin tức mới, kiểm tra chương trình dòng lệnh (cmd, "
+"terminal..) để biết thêm chi tiết"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -475,73 +500,73 @@ msgstr ""
 #: src/states_screens/dialogs/add_device_dialog.cpp:81
 #: src/states_screens/dialogs/addons_loading.cpp:197
 #: src/states_screens/dialogs/player_info_dialog.cpp:100
-#: data/po/gui_strings.h:227 data/po/gui_strings.h:235
+#: data/po/gui_strings.h:234 data/po/gui_strings.h:242
 msgid "Cancel"
-msgstr ""
+msgstr "Huỷ bỏ"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:185
 msgid "Cancel Remove"
-msgstr ""
+msgstr "Hủy bỏ xóa"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:219
 msgid "Cancel/Back"
-msgstr ""
+msgstr "Hủy bỏ/Quay lại"
 
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:119
 #: src/states_screens/dialogs/enter_player_name_dialog.cpp:134
 msgid "Cannot add a player with this name."
-msgstr ""
+msgstr "Không thể thêm người chơi mới với tên này"
 
 #. I18N: ./data/tracks/cave/track.xml
 #: data/po/gui_strings.h:5
 msgid "Cave X"
-msgstr ""
+msgstr "Hang X"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:438
+#: data/po/gui_strings.h:445
 msgid "Challenges"
-msgstr ""
+msgstr "Thử thách"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
-#: data/po/gui_strings.h:219
+#: data/po/gui_strings.h:226
 msgid "Challenges : Trophy Room"
-msgstr ""
+msgstr "Thử thách: Phòng vật phẩm"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:426
+#: data/po/gui_strings.h:433
 msgid "Choose a Kart"
-msgstr ""
+msgstr "Chọn nhân vật"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:687
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:694
 msgid "Collect Nitro in Math Class"
-msgstr ""
+msgstr "Thu thập Hộp Tăng Tốc trong vòng đua Lớp Toán"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:283
+#: data/po/gui_strings.h:290
 msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr ""
 "Nhặt các hộp màu xanh: chúng sẽ cho bạn vũ khi hay các khả năng đặc biệt khác"
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:729
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:736
 msgid "Collect fuel for your rocket"
 msgstr "Thu thập nhiên liệu cho tên lửa của bạn"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152 data/po/gui_strings.h:753
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:760
 msgid "Collect the Pharaohs Treasure"
 msgstr "Thu thập Kho báu của Pha-ra-ông"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:291
+#: data/po/gui_strings.h:298
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the "
@@ -552,7 +577,7 @@ msgstr ""
 "hình khi đang chơi."
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71 data/po/gui_strings.h:672
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:679
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
 "Về đích ở giải Grand Prix Tận thế với 3 xe đua do AI điều khiển ở mức Thành "
@@ -578,8 +603,8 @@ msgstr ""
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
-#: src/states_screens/race_result_gui.cpp:98 data/po/gui_strings.h:250
-#: data/po/gui_strings.h:253 data/po/gui_strings.h:256
+#: src/states_screens/race_result_gui.cpp:98 data/po/gui_strings.h:257
+#: data/po/gui_strings.h:260 data/po/gui_strings.h:263
 msgid "Continue"
 msgstr "Tiếp tục"
 
@@ -594,198 +619,209 @@ msgstr "Tiếp tục giải Grand Prix"
 #: src/states_screens/options_screen_audio.cpp:66
 #: src/states_screens/options_screen_players.cpp:70
 #: src/states_screens/options_screen_ui.cpp:112
-#: src/states_screens/options_screen_video.cpp:83 data/po/gui_strings.h:496
-#: data/po/gui_strings.h:511
+#: src/states_screens/options_screen_video.cpp:84 data/po/gui_strings.h:503
+#: data/po/gui_strings.h:518
 msgid "Controls"
 msgstr "Điều khiển"
 
 #. I18N: ./data/tracks/canyon/track.xml
 #: data/po/gui_strings.h:2
 msgid "Coyote Canyon"
-msgstr ""
+msgstr "Hẽm núi"
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:239
+#: data/po/gui_strings.h:246
 msgid "Credits"
 msgstr "Các đóng góp"
 
 #. I18N: ./data/tracks/crescentcrossing/track.xml
 #: data/po/gui_strings.h:11
 msgid "Crescent Crossing"
-msgstr ""
+msgstr "Nghĩa trang"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: To delete a keyboard configuration
-#: src/states_screens/options_screen_input2.cpp:93 data/po/gui_strings.h:500
+#: src/states_screens/options_screen_input2.cpp:93 data/po/gui_strings.h:507
 msgid "Delete Configuration"
-msgstr ""
+msgstr "Xóa Thiết Lập"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:80
 #: src/states_screens/options_screen_input2.cpp:451
 msgid "Disable Device"
-msgstr ""
+msgstr "Vô Hiệu Thiết Bị"
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
-#: src/states_screens/options_screen_video.cpp:289
+#: src/states_screens/options_screen_video.cpp:291
 msgid "Disabled"
-msgstr ""
+msgstr "Tắt"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:552
+#: data/po/gui_strings.h:559
 msgid "Display FPS"
-msgstr ""
+msgstr "Hiển thị FPS (số khung hình trên 1 giây)"
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:150
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr ""
+msgstr "Bạn có thực sự muốn xóa người chơi '%s'?"
 
 #: src/items/powerup.cpp:66
 msgid "Do you want to fly kites?"
-msgstr ""
+msgstr "Bạn có muốn thả diều không?"
 
 #: src/karts/controller/player_controller.cpp:282
 msgid "Don't accelerate before go"
-msgstr ""
+msgstr "Đừng tăng tốc trước lệnh xuất phát"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:207
 msgid "Down"
-msgstr ""
+msgstr "Xuống"
 
 #: src/states_screens/dialogs/addons_loading.cpp:221
 msgid "Download failed."
-msgstr ""
+msgstr "Tải xuống không hoàn thành."
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:789
+#: data/po/gui_strings.h:796
 msgid "Elephpant"
-msgstr ""
+msgstr "Elephpant"
 
 #. I18N: ./data/karts/emule/kart.xml
-#: data/po/gui_strings.h:792
+#: data/po/gui_strings.h:799
 msgid "Emule"
-msgstr ""
+msgstr "Emule"
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:82
 #: src/states_screens/options_screen_input2.cpp:452
 msgid "Enable Device"
-msgstr ""
+msgstr "Bật thiết bị"
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:287 data/po/gui_strings.h:473
-#: data/po/gui_strings.h:485
+#: src/states_screens/options_screen_video.cpp:289 data/po/gui_strings.h:480
+#: data/po/gui_strings.h:492
 msgid "Enabled"
-msgstr ""
+msgstr "Bật"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:682
 msgid "Energy"
-msgstr ""
+msgstr "Năng lượng"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:168
+#: src/states_screens/main_menu_screen.cpp:170
 msgid "English"
-msgstr ""
+msgstr "Tiếng Anh"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:243
+#: data/po/gui_strings.h:250
 msgid "Enter the new player's name"
-msgstr ""
+msgstr "Nhập vào tên của người chơi"
 
-#: src/states_screens/kart_selection.cpp:1134
+#: src/states_screens/kart_selection.cpp:1139
 msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
 msgstr ""
+"Mọi người\n"
+"Nhấn nút \"Bắn\" ngay bây giờ để tham gia cuộc đua!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:629
+#: data/po/gui_strings.h:636
 msgid "Exit Race"
-msgstr ""
+msgstr "Thoát vòng đua"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:648
+#: data/po/gui_strings.h:655
 msgid "Expert"
-msgstr ""
+msgstr "Khó"
 
 #: src/states_screens/feature_unlocked.cpp:476
 msgid "Feature Unlocked"
-msgstr ""
+msgstr "Tính năng đã được mở khóa"
 
 #: src/modes/linear_world.cpp:295
 msgid "Final lap!"
-msgstr ""
+msgstr "Vòng cuối"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:714
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:721
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr ""
+"Hoàn thành 3 chặng đua trong bản đồ Nông Trại với 3 AI (nhân vật máy tính "
+"điều khiển) dễ dưới 2:30 phút"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149 data/po/gui_strings.h:750
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:757
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
+"Hoàn thành 3 chặng đua trong bản đồ Ngọn Hải Đăng với 3 AI (nhân vật máy "
+"tính điều khiển) khó dưới 1:30 phút."
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101 data/po/gui_strings.h:702
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:709
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
+"Hoàn thành 3 chặng đua trong bản đồ Khu Mỏ với 3 AI (nhân vật máy tính điều "
+"khiển) khó dưới 3:00 phút."
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:711
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:718
 msgid "Finish Farm in 2:30"
-msgstr ""
+msgstr "Hoàn thành bản đồ Nông Trại trong vòng 2:30 phút"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146 data/po/gui_strings.h:747
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:754
 msgid "Finish Lighthouse in 1:30"
-msgstr ""
+msgstr "Hoàn thành bản đồ Ngọn Hải Đăng trong vòng 2:30 phút"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:699
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:706
 msgid "Finish Mines in 3:00"
-msgstr ""
+msgstr "Hoàn thành bản đồ Nông Trại trong vòng 3:00 phút"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89 data/po/gui_strings.h:690
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:697
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
 msgstr ""
+"Hoàn thành ít nhất 10 Hộp Tăng Tốc trong 3 vòng đua Lớp Toán dưới 55 giây."
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155 data/po/gui_strings.h:756
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:763
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr ""
+"Hoàn thành ít nhất 12 Hộp Tăng Tốc trong 3 vòng đua Sa Mạc dưới 2:20 phút."
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131 data/po/gui_strings.h:732
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:739
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
 msgstr ""
+"Hoàn thành ít nhất 16 Hộp Tăng Tốc trong 2 vòng đua XR591 dưới 2:20 phút."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:186
 msgid "Fire"
-msgstr ""
+msgstr "Bắn"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:418
+#: data/po/gui_strings.h:425
 msgid ""
 "First, you will need several input devices (having multiple gamepads or "
 "joysticks is the best way to play with several people). Go in the input "
@@ -794,51 +830,60 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
+"Đầu tiên, bạn sẽ cần một vài thiết bị (nhiều gamepad hay joystick là cách "
+"tốt nhất để chơi nhiều người). Tới màn hình chỉnh thiết bị và tùy chỉnh "
+"gamepad. Bạn có thể chơi trên 1 hay nhiều bàn phím, tuy nhiên, mỗi người "
+"chơi cần có một thiết lập bàn phím riêng, và nên nhớ rằng hầu hết bàn phím "
+"không thích hợp để chơi chế độ nhiều người, bởi vì chúng không hỗ trợ nhiều "
+"phím nhấn một lúc."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:147
 msgid "Follow the Leader"
-msgstr ""
+msgstr "Theo sau người dẫn đầu"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122 data/po/gui_strings.h:723
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:730
 msgid "Follow the Leader around the Solar System"
-msgstr ""
+msgstr "Theo sau người dẫn đầu trong bản đồ Hệ Mặt Trời"
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:675
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:682
 msgid "Follow the Leader on a Desert Island"
-msgstr ""
+msgstr "Theo sau người dẫn đầu trong bản đồ Sa Mạc"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:381
+#: data/po/gui_strings.h:388
 msgid ""
 "Follow the leader: run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
 msgstr ""
+"Theo sau người dẫn đầu: chạy ở vị trí thứ 2, người chơi ở vị trí cuối sẽ bị "
+"loại khi đồng hồ đếm ngược tới không. Cẩn thận: đi trước người dẫn đầu cũng "
+"sẽ bị loại!"
 
 #. I18N: ./data/tracks/fortmagma/track.xml
 #: data/po/gui_strings.h:17
 msgid "Fort Magma"
-msgstr ""
+msgstr "Lâu Đài Cổ"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:587
+#: data/po/gui_strings.h:594
 msgid "Fullscreen"
-msgstr ""
+msgstr "Toàn màn hình"
 
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:258
 msgid "GP scores :"
-msgstr ""
+msgstr "Điểm GP :"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:124
 msgid "Game Keys"
-msgstr ""
+msgstr "Phím trò chơi"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -848,22 +893,22 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:271 data/po/gui_strings.h:318
-#: data/po/gui_strings.h:362 data/po/gui_strings.h:404
+#: data/po/gui_strings.h:278 data/po/gui_strings.h:325
+#: data/po/gui_strings.h:369 data/po/gui_strings.h:411
 msgid "Game Modes"
-msgstr ""
+msgstr "Chế độ trò chơi"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:271
 #, c-format
 msgid "Gamepad button %d"
-msgstr ""
+msgstr "Nút gamepad %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:256 src/input/binding.cpp:261
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Gamepad hat %d"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -873,40 +918,40 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:263 data/po/gui_strings.h:310
-#: data/po/gui_strings.h:354 data/po/gui_strings.h:396
+#: data/po/gui_strings.h:270 data/po/gui_strings.h:317
+#: data/po/gui_strings.h:361 data/po/gui_strings.h:403
 msgid "General"
-msgstr ""
+msgstr "Tổng quát"
 
 #: src/items/powerup.cpp:64
 msgid "Geronimo!!!"
-msgstr ""
+msgstr "Geronimo!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:795
+#: data/po/gui_strings.h:802
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #: src/states_screens/race_gui_base.cpp:56
 msgid "Go!"
-msgstr ""
+msgstr "Xuất phát!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:805
 msgid "Gooey"
-msgstr ""
+msgstr "Gooey"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:655
+#: data/po/gui_strings.h:662
 msgid "Grand Prix"
-msgstr ""
+msgstr "Grand Prix"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:571
+#: data/po/gui_strings.h:578
 msgid "Graphical Effects Level"
-msgstr ""
+msgstr "Mức hiệu ứng đồ họa"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -914,198 +959,195 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:129
 #: src/states_screens/options_screen_input2.cpp:70
 #: src/states_screens/options_screen_players.cpp:67
-#: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:567
+#: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:574
 msgid "Graphics"
-msgstr ""
+msgstr "Đồ hoạ"
 
 #: src/config/user_config.cpp:542
 msgid "Guest"
-msgstr ""
+msgstr "Khách"
 
 #. I18N: ./data/tracks/hacienda/track.xml
 #: data/po/gui_strings.h:20
 msgid "Hacienda"
-msgstr ""
+msgstr "Miền Viễn Tây"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:450 data/po/gui_strings.h:625
+#: data/po/gui_strings.h:457 data/po/gui_strings.h:632
 msgid "Help"
-msgstr ""
+msgstr "Hướng dẫn"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:808
 msgid "Hexley"
-msgstr ""
+msgstr "Hexley"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:219
 msgid "Highscores"
-msgstr ""
+msgstr "Kỷ lục"
 
 #: src/states_screens/race_setup_screen.cpp:225
 msgid ""
 "Hit others with weapons until they lose all their lives. (Only in "
 "multiplayer games)"
 msgstr ""
+"Tấn công những người chơi khác bằng vũ khí cho đến khi họ mất hết mạng . "
+"(Chỉ trong phần chơi nhiều người)"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:295
+#: data/po/gui_strings.h:302
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
 msgstr ""
+"Nếu bạn thấy một nút với chiếc chìa khóa như thế này, bạn cần hoàn tất một "
+"thử thách để mở khóa nó."
 
-#. I18N: message shown when an input device is used but is not associated to any player
-#: src/input/input_manager.cpp:525
+#: src/input/input_manager.cpp:560
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
-msgstr ""
+msgstr "Đang từ chối '%s', bạn cần tham gia sớm hơn để chơi!"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Addons
-#: data/po/gui_strings.h:180
+#: data/po/gui_strings.h:183
 msgid "Install"
-msgstr ""
+msgstr "Cài đặt"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:644
+#: data/po/gui_strings.h:651
 msgid "Intermediate"
-msgstr ""
-
-#. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the ui settings
-#: data/po/gui_strings.h:556
-msgid "Internet STK news"
-msgstr ""
+msgstr "Vừa phải"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
-#: data/po/gui_strings.h:195
+#: data/po/gui_strings.h:198
 msgid "Karts"
-msgstr ""
+msgstr "Nhân vật"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:231
+#: data/po/gui_strings.h:238
 msgid "Keep this resolution"
-msgstr ""
+msgstr "Giữ độ phân giải này"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:216
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr ""
+msgstr "Bắt kịp người dẫn đầu nhưng không vượt qua!"
 
 #: src/states_screens/options_screen_input.cpp:95
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Bàn phím %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:811
 msgid "Konqi"
-msgstr ""
+msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/minimal_race_gui.cpp:104
 #: src/states_screens/race_gui.cpp:88
 msgid "Lap"
-msgstr ""
+msgstr "Số vòng"
 
 #: src/modes/linear_world.cpp:320
 #, c-format
 msgid "Lap %i"
-msgstr ""
+msgstr "Vòng thứ %i"
 
 #: src/modes/follow_the_leader.cpp:201 src/modes/tutorial_race.cpp:192
 msgid "Leader"
-msgstr ""
+msgstr "Người dẫn đầu"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:210
 msgid "Left"
-msgstr ""
+msgstr "Phím Trái"
 
-#: src/guiengine/engine.cpp:1115
+#: src/guiengine/engine.cpp:1135
 msgid "Loading"
-msgstr ""
+msgstr "Đang tải"
 
-#: src/states_screens/kart_selection.cpp:815
-msgid "Locked"
-msgstr ""
-
-#: src/states_screens/arenas_screen.cpp:193
-#: src/states_screens/arenas_screen.cpp:216
-#: src/states_screens/challenges.cpp:97
 #: src/states_screens/kart_selection.cpp:820
-#: src/states_screens/kart_selection.cpp:1786
-#: src/states_screens/kart_selection.cpp:1812
-#: src/states_screens/race_setup_screen.cpp:208
-#: src/states_screens/tracks_screen.cpp:310
-#: src/states_screens/tracks_screen.cpp:335
-msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
+msgid "Locked"
+msgstr "Bị khóa"
 
-#: src/states_screens/tracks_screen.cpp:253
+#: src/states_screens/arenas_screen.cpp:199
+#: src/states_screens/arenas_screen.cpp:222
+#: src/states_screens/challenges.cpp:116
+#: src/states_screens/kart_selection.cpp:825
+#: src/states_screens/kart_selection.cpp:1791
+#: src/states_screens/kart_selection.cpp:1817
+#: src/states_screens/race_setup_screen.cpp:208
+#: src/states_screens/tracks_screen.cpp:309
+#: src/states_screens/tracks_screen.cpp:334
+msgid "Locked : solve active challenges to gain access to more!"
+msgstr "Bị khóa: hoàn thành thử thách để tham gia được nhiều vòng đua hơn!"
+
+#: src/states_screens/tracks_screen.cpp:252
 msgid "Locked!"
-msgstr ""
+msgstr "Bị khóa"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:195
 msgid "Look Back"
-msgstr ""
+msgstr "Nhìn sau"
 
 #: src/items/powerup.cpp:81
 msgid "Magic, son. Nothing else in the world smells like that."
-msgstr ""
+msgstr "Tuyệt vời. Không gì khác trên thế giới được như  thế này."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:279
+#: data/po/gui_strings.h:286
 msgid "Make your rivals bite dust!"
-msgstr ""
+msgstr "Hãy cho đối thủ hít bụi của bạn!"
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:293
+#: src/states_screens/options_screen_video.cpp:295
 msgid "Me Only"
-msgstr ""
+msgstr "Chỉ mình tôi"
 
 #. I18N: Key binding section
 #: src/states_screens/options_screen_input2.cpp:137
 msgid "Menu Keys"
-msgstr ""
+msgstr "Phím Trình Đơn"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:560
+#: data/po/gui_strings.h:567
 msgid "Minimal Race GUI"
-msgstr ""
+msgstr "Giao diện tối thiểu"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:278
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr ""
+msgstr "Mouse axis %d %s"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:274
 #, c-format
 msgid "Mouse button %d"
-msgstr ""
+msgstr "Nút chuột %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:814
 msgid "Mozilla"
-msgstr ""
+msgstr "Mozilla"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:434
+#: data/po/gui_strings.h:441
 msgid "Multiplayer Race"
-msgstr ""
+msgstr "Chơi Mạng"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1115,143 +1157,141 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:275 data/po/gui_strings.h:322
-#: data/po/gui_strings.h:366 data/po/gui_strings.h:408
+#: data/po/gui_strings.h:282 data/po/gui_strings.h:329
+#: data/po/gui_strings.h:373 data/po/gui_strings.h:415
 msgid "Multi­player"
-msgstr ""
+msgstr "Nhiều người chơi"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
-#: data/po/gui_strings.h:469
+#: data/po/gui_strings.h:476
 msgid "Music"
-msgstr ""
+msgstr "Âm nhạc"
 
 #: src/challenges/challenge.cpp:60
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr ""
+msgstr "Chế độ Grand Prix mới '%s' đã có hiệu lực"
 
 #: src/challenges/challenge.cpp:64
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr ""
+msgstr "Độ khó mới '%s' đã có hiệu lực"
 
 #: src/modes/linear_world.cpp:381
 msgid "New fastest lap"
-msgstr ""
+msgstr "Vòng đua mới nhanh nhất"
 
 #: src/challenges/challenge.cpp:50
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr ""
+msgstr "Chế độ chơi mới '%s' đã có hiệu lực"
 
-#: src/states_screens/race_result_gui.cpp:697
+#: src/states_screens/race_result_gui.cpp:700
 msgid "New highscore!"
-msgstr ""
+msgstr "Kỷ lục mới!"
 
 #: src/challenges/challenge.cpp:74
 #, c-format
 msgid "New kart '%s' now available"
-msgstr ""
+msgstr "Nhân vật mới '%s' đã có hiệu lực"
 
 #: src/challenges/challenge.cpp:45
 #, c-format
 msgid "New track '%s' now available"
-msgstr ""
+msgstr "Vòng đua mới '%s' đã có hiệu lực"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:189
 msgid "Nitro"
-msgstr ""
+msgstr "Hộp tăng tốc"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:817
 msgid "Nolok"
-msgstr ""
+msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:295
+#: src/states_screens/options_screen_video.cpp:297
 msgid "None"
-msgstr ""
+msgstr "Không"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:143
 msgid "Normal Race"
-msgstr ""
+msgstr "Chế Độ Thường"
 
 #. I18N: ./data/tracks/snowmountain/track.xml
 #: data/po/gui_strings.h:50
 msgid "Northern Resort"
-msgstr ""
+msgstr "Núi Tuyết"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:640
+#: data/po/gui_strings.h:647
 msgid "Novice"
-msgstr ""
+msgstr "Dễ"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: In race setup menu
-#: data/po/gui_strings.h:636
+#: data/po/gui_strings.h:643
 msgid "Number of AI karts"
-msgstr ""
+msgstr "Số nhân vật AI"
 
 #: src/states_screens/dialogs/message_dialog.cpp:59
 msgid "OK"
-msgstr ""
+msgstr "Đồng ý"
 
 #. I18N: ./data/tracks/mines/track.xml
 #: data/po/gui_strings.h:32
 msgid "Old Mine"
-msgstr ""
+msgstr "Hầm mỏ"
 
 #. I18N: ./data/tracks/olivermath/track.xml
 #: data/po/gui_strings.h:35
 msgid "Oliver's Math Class"
-msgstr ""
+msgstr "Lớp Toán của Oliver"
 
-#. I18N: message shown when a player that isn't game master tries to modify options that
-#. I18N: only the game master is allowed to
-#: src/input/input_manager.cpp:550
+#: src/input/input_manager.cpp:590
 msgid "Only the Game Master may act at this point!"
-msgstr ""
+msgstr "Chỉ người chơi tốt mới làm được!"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:446 data/po/gui_strings.h:621
+#: data/po/gui_strings.h:453 data/po/gui_strings.h:628
 msgid "Options"
-msgstr ""
+msgstr "Tùy chọn"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:341
+#: data/po/gui_strings.h:348
 msgid "Parachute - slows down all karts in a better position!"
-msgstr ""
+msgstr "Dù - làm chậm tất cả người chơi ở vị trí tốt hơn!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
-#: data/po/gui_strings.h:605
+#: data/po/gui_strings.h:612
 msgid "Paused"
-msgstr ""
+msgstr "Tạm dừng"
 
 #: src/karts/controller/player_controller.cpp:281
 msgid "Penalty time!!"
-msgstr ""
+msgstr "Thời gian phạm luật!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170 data/po/gui_strings.h:771
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:778
 msgid "Penguin Playground"
-msgstr ""
+msgstr "Sân Chơi Chim Cánh Cụt"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:820
 msgid "Pidgin"
-msgstr ""
+msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:666
+#: data/po/gui_strings.h:673
 msgid "Play all"
-msgstr ""
+msgstr "Chơi tất cả"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -1259,289 +1299,307 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:132
 #: src/states_screens/options_screen_input2.cpp:73
 #: src/states_screens/options_screen_ui.cpp:111
-#: src/states_screens/options_screen_video.cpp:82 data/po/gui_strings.h:529
+#: src/states_screens/options_screen_video.cpp:83 data/po/gui_strings.h:536
 msgid "Players"
-msgstr ""
+msgstr "Người chơi"
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:444
 msgid "Please re-configure your key bindings."
-msgstr ""
+msgstr "Xin hãy chỉnh lại phím."
+
+#: src/states_screens/main_menu_screen.cpp:477
+msgid "Please wait while the add-ons are loading"
+msgstr "Xin chờ trong khi phần mở rộng đang được tải"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:335
+#: data/po/gui_strings.h:342
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight!"
 msgstr ""
+"Giác Mút - ném về phía trước để kéo một đối thủ lại, hay ném khi nhìn về "
+"phía sau để làm đối thủ mất tầm nhìn!"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: When configuring input
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:247 data/po/gui_strings.h:602
+#: data/po/gui_strings.h:254 data/po/gui_strings.h:609
 msgid "Press ESC to cancel"
-msgstr ""
+msgstr "Nhấn ESC để thoát!"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:594
+#: data/po/gui_strings.h:601
 msgid "Press a key"
-msgstr ""
+msgstr "Ấn một phím"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In key bindings configuration menu
-#: data/po/gui_strings.h:515
+#: data/po/gui_strings.h:522
 msgid "Press enter or double-click on a device to configure it"
-msgstr ""
+msgstr "Nhấn phím enter hay click đôi chuột vào một thiết bị để cấu hình"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:533
+#: data/po/gui_strings.h:540
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr ""
+"Nhấn phím enter hay click đôi chuột vào một người chơi để sửa đổi thông tin"
 
 #: src/states_screens/dialogs/addons_loading.cpp:270
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr ""
+msgstr "Có lỗi khi cài đặt phần mở rộng '%s'"
 
 #: src/states_screens/dialogs/addons_loading.cpp:284
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr ""
+msgstr "Có lỗi khi gỡ bỏ phần mở rộng '%s'"
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:823
 msgid "Puffy"
-msgstr ""
+msgstr "Puffy"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:458
+#: data/po/gui_strings.h:465
 msgid "Quit"
-msgstr ""
+msgstr "Thoát"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:430
+#: data/po/gui_strings.h:437
 msgid "Race"
-msgstr ""
+msgstr "Chơi Đơn"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:107
 msgid "Race Results"
-msgstr ""
+msgstr "Kết quả vòng đua"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:632
+#: data/po/gui_strings.h:639
 msgid "Race Setup"
-msgstr ""
+msgstr "Cài đặt vòng đua"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:380
 msgid "Race in this track again"
-msgstr ""
+msgstr "Chơi lại vòng đua này lần nữa"
 
-#: src/states_screens/arenas_screen.cpp:226
+#: src/states_screens/arenas_screen.cpp:232
 msgid "Random Arena"
-msgstr ""
+msgstr "Đấu trường ngẫu nhiên"
 
-#: src/states_screens/kart_selection.cpp:804
-#: src/states_screens/kart_selection.cpp:1829
+#: src/states_screens/kart_selection.cpp:809
+#: src/states_screens/kart_selection.cpp:1834
 msgid "Random Kart"
-msgstr ""
+msgstr "Nhân vật ngẫu nhiên"
 
-#: src/states_screens/tracks_screen.cpp:349
+#: src/states_screens/tracks_screen.cpp:348
 msgid "Random Track"
-msgstr ""
+msgstr "Vòng đua ngẫu nhiên"
 
 #: src/states_screens/minimal_race_gui.cpp:105
 #: src/states_screens/race_gui.cpp:89
 msgid "Rank"
-msgstr ""
+msgstr "Xếp hạng"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:54
 msgid "Ready!"
-msgstr ""
+msgstr "Sẵn sàng!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:373
+#: data/po/gui_strings.h:380
 msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
 msgstr ""
+"Đua bình thường: tất cả vật dụng đều được phép, vì thế nhặt chúng lên và sử "
+"dụng chúng khéo léo!"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Reload button to reload addon data
-#: data/po/gui_strings.h:191
+#: data/po/gui_strings.h:194
 msgid "Reload"
-msgstr ""
+msgstr "Tải lại"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:119
 msgid "Remove"
-msgstr ""
+msgstr "Xóa bỏ"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:85
 msgid "Rename"
-msgstr ""
+msgstr "Đổi tên"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:198
 msgid "Rescue"
-msgstr ""
+msgstr "Trợ giúp"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:583
+#: data/po/gui_strings.h:590
 msgid "Resolution"
-msgstr ""
+msgstr "Độ phân giải"
 
 #: src/states_screens/race_result_gui.cpp:111
 msgid "Restart"
-msgstr ""
+msgstr "Khởi động lại"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:617
+#: data/po/gui_strings.h:624
 msgid "Restart Race"
-msgstr ""
+msgstr "Đua lại"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:213
 msgid "Right"
-msgstr ""
+msgstr "Rẽ Phải"
 
 #. I18N: ./data/tracks/scotland/track.xml
 #: data/po/gui_strings.h:41
 msgid "Scotland"
-msgstr ""
+msgstr "Đất nước Scotland"
 
 #. I18N: ./data/tracks/secretgarden/track.xml
 #: data/po/gui_strings.h:44
 msgid "Secret Garden"
-msgstr ""
+msgstr "Khu vườn bí ẩn"
 
 #: src/states_screens/race_result_gui.cpp:88
 msgid "See unlocked feature"
-msgstr ""
+msgstr "Xem tính năng đã được mở khóa"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:353
 #: src/states_screens/race_result_gui.cpp:89
 msgid "See unlocked features"
-msgstr ""
+msgstr "Xem những tính năng đã được mở khóa"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:216
 msgid "Select"
-msgstr ""
+msgstr "Chọn"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:651
+#: data/po/gui_strings.h:658
 msgid "Select a game mode"
-msgstr ""
+msgstr "Chọn chế độ chơi"
 
 #: src/states_screens/race_gui_base.cpp:55
 msgid "Set!"
-msgstr ""
+msgstr "Đặt"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_over_dialog.cpp:369
-#: src/states_screens/race_result_gui.cpp:108 data/po/gui_strings.h:613
+#: src/states_screens/race_result_gui.cpp:108 data/po/gui_strings.h:620
 msgid "Setup New Race"
-msgstr ""
+msgstr "Vòng Đua Mới"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:192
 msgid "Sharp Turn"
-msgstr ""
+msgstr "Quay Ngoặt"
 
 #. I18N: ./data/tracks/sandtrack/track.xml
 #: data/po/gui_strings.h:38
 msgid "Shifting Sands"
-msgstr ""
+msgstr "Sa Mạc"
 
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:8
 msgid "Shiny Suburbs"
-msgstr ""
+msgstr "Thành Phố"
 
 #: src/states_screens/dialogs/addons_loading.cpp:158
 #, c-format
 msgid "Size: %s"
-msgstr ""
+msgstr "Kích thước: %s"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:548
+#: data/po/gui_strings.h:555
 msgid "Skin"
-msgstr ""
+msgstr "Giao Diện"
 
 #. I18N: ./data/tracks/skyline/track.xml
 #: data/po/gui_strings.h:47
 msgid "Skyline"
-msgstr ""
+msgstr "Đường Chân Trời"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173 data/po/gui_strings.h:774
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:781
 msgid "Snag Drive"
-msgstr ""
+msgstr "Khó Khăn Bất Ngờ"
 
 #. I18N: ./data/tracks/snowtuxpeak/track.xml
 #: data/po/gui_strings.h:53
 msgid "Snow Peak"
+msgstr "Đỉnh Núi Tuyết"
+
+#: src/states_screens/main_menu_screen.cpp:473
+msgid ""
+"Sorry, an error occurred while contacting the add-ons website. Make sure you "
+"are connected to the Internet and that SuperTuxKart is not blocked by a "
+"firewall"
 msgstr ""
+"Xin lỗi, có lỗi khi đang liên lạc với trang web chứa phần mở rộng. Bạn phải "
+"chắc là đã kết nối Internet và SuperTuxKart không bị khóa bởi tường lửa."
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
-#: data/po/gui_strings.h:481
+#: data/po/gui_strings.h:488
 msgid "Sound Effects"
-msgstr ""
+msgstr "Hiệu ứng Âm thanh"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: data/po/gui_strings.h:207
+#: data/po/gui_strings.h:214
 msgid "Standard"
-msgstr ""
+msgstr "Chuẩn"
 
 #. I18N: ./data/tracks/startrack/track.xml
 #: data/po/gui_strings.h:59
 msgid "Star Track"
-msgstr ""
+msgstr "Đường Đua Thiên Hà"
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:145
 msgid "Start Grand Prix"
-msgstr ""
+msgstr "Bắt đầu Grand Prix"
 
-#: src/states_screens/dialogs/track_info_dialog.cpp:145
+#: src/states_screens/dialogs/track_info_dialog.cpp:152
 msgid "Start Race"
-msgstr ""
+msgstr "Bắt Đầu Cuộc Đua"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:174
 msgid "Steer Left"
-msgstr ""
+msgstr "Rẽ Trái"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:177
 msgid "Steer Right"
-msgstr ""
+msgstr "Rẽ Phải"
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#: data/po/gui_strings.h:187
+#: data/po/gui_strings.h:190
 msgid "SuperTuxKart Addons"
-msgstr ""
+msgstr "Phần Mở Rộng SuperTuxKart"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:259 data/po/gui_strings.h:306
-#: data/po/gui_strings.h:350 data/po/gui_strings.h:392
+#: data/po/gui_strings.h:266 data/po/gui_strings.h:313
+#: data/po/gui_strings.h:357 data/po/gui_strings.h:399
 msgid "SuperTuxKart Help"
-msgstr ""
+msgstr "Giúp Đỡ"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
@@ -1549,87 +1607,106 @@ msgstr ""
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_video.stkgui
-#: data/po/gui_strings.h:461 data/po/gui_strings.h:492
-#: data/po/gui_strings.h:507 data/po/gui_strings.h:525
-#: data/po/gui_strings.h:540 data/po/gui_strings.h:563
+#: data/po/gui_strings.h:468 data/po/gui_strings.h:499
+#: data/po/gui_strings.h:514 data/po/gui_strings.h:532
+#: data/po/gui_strings.h:547 data/po/gui_strings.h:570
 msgid "SuperTuxKart Options"
-msgstr ""
+msgstr "Tùy Chỉnh SuperTuxKart"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:411
+#: data/po/gui_strings.h:418
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr ""
+msgstr "SuperTuxKart không thể chơi ở chế độ mạng trên cùng một máy tính"
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:369
+#: data/po/gui_strings.h:376
 msgid "SuperTuxKart features several game modes"
-msgstr ""
+msgstr "SupertuxKart có nhiều chế độ chơi khác nhau"
 
-#: src/main.cpp:1006
+#: src/main.cpp:1019
 msgid ""
-"SuperTuxKart may connect to a news server to display updates. Would you like "
-"this feature to be enabled? (To change this setting at a later time, go to "
-"options, select tab 'User Interface', and edit \"Internet STK news\")."
+"SuperTuxKart may connect to a server to download add-ons and notify you of "
+"updates. Would you like this feature to be enabled? (To change this setting "
+"at a later time, go to options, select tab 'User Interface', and edit "
+"\"Internet STK news\")."
 msgstr ""
+"SuperTuxKart có thể kết nối với một máy chủ để tải về tiện ích và thông báo "
+"cho bạn về những thông tin cập nhật. Bạn có muốn tính năng này được kích "
+"hoạt? (Để thay đổi cài đặt này, đi đến lựa chọn, chọn trang 'giao diện người "
+"dùng', và chỉnh sửa \"Tin tức STK\")."
+
+#. I18N: ./data/karts/suzanne/kart.xml
+#: data/po/gui_strings.h:826
+msgid "Suzanne"
+msgstr "Suzanne"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:347
+#: data/po/gui_strings.h:354
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
 msgstr ""
+"Hộp Chuyển Đổi - chuyển hộp quà thành chuối và ngược lại trong thời gian ngắn"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:253
+#: src/states_screens/main_menu_screen.cpp:255
 msgid "System Language"
-msgstr ""
+msgstr "Ngôn Ngữ Của Hệ Thống"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:299
+#: data/po/gui_strings.h:306
 msgid ""
 "The 'sharp turn' key allows you to do sharp turns and have better control in "
 "tight curves"
-msgstr ""
+msgstr "Phím 'Rẽ Ngặt' cho phép bạn rẽ và làm chủ tốt hơn những vòng cua."
 
 #. I18N: ./data/tracks/islandtrack/track.xml
 #: data/po/gui_strings.h:23
 msgid "The Island"
-msgstr ""
+msgstr "Hòn Đảo"
 
 #: src/items/powerup.cpp:65
 msgid "The Space Shuttle has landed!"
-msgstr ""
+msgstr "Tàu Con Thoi đã hạ cánh!"
 
 #. I18N: ./data/tracks/stadium/track.xml
 #: data/po/gui_strings.h:56
 msgid "The Stadium"
-msgstr ""
+msgstr "Viện Bảo Tàng"
+
+#: src/states_screens/main_menu_screen.cpp:469
+msgid "The add-ons module is currently disabled in the Options screen"
+msgstr "Phần Tiện Ích đã bị vô hiệu hóa trong màn hình Tùy Chỉnh"
 
 #: src/race/highscore_manager.cpp:98
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr ""
+"Tập tin Kỷ Lục đã quá cũ,\n"
+"tất cả các kỷ lục đã bị xóa."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:150
 msgid "This Grand Prix is broken!"
-msgstr ""
+msgstr "Grand Prix này đã bị hỏng!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:677
 msgid "Time"
-msgstr ""
+msgstr "Thời gian"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:145
 msgid "Time Trial"
-msgstr ""
+msgstr "Đua Thời Gian"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:377
+#: data/po/gui_strings.h:384
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
+"Đua Thời Gian: không có vật phẩm, do đó hãy sử dụng kỹ năng đua của bạn tốt "
+"nhất!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:52
 msgid ""
@@ -1642,78 +1719,87 @@ msgid ""
 "connect multiple keyboards to the computer. Remember that everyone still "
 "needs different keybindings in this case.)"
 msgstr ""
+"Để thêm mới một thiết bị Gamepad/Joystick, đơn giản là khởi động "
+"SuperTuxKart khi thiết bị đã được cắm vào và nó sẽ xuất hiện trong danh "
+"sách\n"
+"\n"
+"Để thêm một cấu hình bàn phím, bạn có thể ấn nút bên dưới, TUY NHIÊN lưu ý "
+"là hầu hết bàn phím giới hạn số lượng phím ấn cùng lúc và do đó không phù "
+"hợp với chế độ chơi nhiều người. (Tuy nhiên, bạn có thê kết nối nhiều bàn "
+"phím tới máy tính. Nên nhớ rằng mỗi người cũng phải có một cấu hình bàn phím "
+"khác nhau trong trường hợp này.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:326
+#: data/po/gui_strings.h:333
 msgid "To help you win, there are some powerups you can collect :"
-msgstr ""
+msgstr "Để chiến thắng, có các vật phẩm sau bạn có thể thu thập :"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:176 data/po/gui_strings.h:777
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:784
 msgid "To the Moon and Back"
-msgstr ""
+msgstr "Tới Mặt Trăng và Quay Trở Về"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui.cpp:92
 #, c-format
 msgid "Top %i"
-msgstr ""
+msgstr "Đứng trong %i người dẫn đầu"
 
 #. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
 #: src/states_screens/dialogs/track_info_dialog.cpp:78
 #, c-format
 msgid "Track by %s"
-msgstr ""
+msgstr "Vòng đua được tạo bởi %s"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
-#: data/po/gui_strings.h:199
+#: data/po/gui_strings.h:202
 msgid "Tracks"
-msgstr ""
+msgstr "Những vòng đua"
 
 #: src/states_screens/dialogs/addons_loading.cpp:294
 msgid "Try again"
-msgstr ""
+msgstr "Thử lại"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:663
+#: data/po/gui_strings.h:670
 msgid "Tutorial : Selection Room"
-msgstr ""
+msgstr "Hướng dẫn chơi : Chọn Phòng"
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:829
 msgid "Tux"
-msgstr ""
+msgstr "Tux"
 
 #. I18N: ./data/tracks/tuxtollway/track.xml
 #: data/po/gui_strings.h:62
 msgid "Tux Tollway"
-msgstr ""
+msgstr "Vùng Ngoại Ô"
 
 #: src/states_screens/dialogs/addons_loading.cpp:66
 msgid "Uninstall"
-msgstr ""
+msgstr "Gỡ cài đặt"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:204
 msgid "Up"
-msgstr ""
+msgstr "Lên"
 
 #: src/states_screens/dialogs/addons_loading.cpp:64
 msgid "Update"
-msgstr ""
+msgstr "Cập nhật"
 
 #: src/states_screens/addons_screen.cpp:77
 msgid "Updated date"
-msgstr ""
+msgstr "Ngày cập nhật"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:579
+#: data/po/gui_strings.h:586
 msgid "Use Frame Buffer Objects (requires restart)"
-msgstr ""
+msgstr "Sử dụng Frame Buffer Objects (yêu cầu khởi động lại)"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
@@ -1721,32 +1807,32 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:131
 #: src/states_screens/options_screen_input2.cpp:72
 #: src/states_screens/options_screen_players.cpp:69
-#: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:544
+#: src/states_screens/options_screen_video.cpp:82 data/po/gui_strings.h:551
 msgid "User Interface"
-msgstr ""
+msgstr "Giao diện người dùng"
 
 #: src/states_screens/dialogs/addons_loading.cpp:92
 #, c-format
 msgid "Version: %d"
-msgstr ""
+msgstr "Phiên bản: %d"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:575
+#: data/po/gui_strings.h:582
 msgid "Vertical Sync (requires restart)"
-msgstr ""
+msgstr "Vertical Sync (yêu cầu khởi động lại)"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Music volume in options
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Sound volume in options
-#: data/po/gui_strings.h:477 data/po/gui_strings.h:489
+#: data/po/gui_strings.h:484 data/po/gui_strings.h:496
 msgid "Volume"
-msgstr ""
+msgstr "Âm lượng"
 
 #: src/modes/linear_world.cpp:827
 msgid "WRONG WAY!"
-msgstr ""
+msgstr "SAI ĐƯỜNG"
 
 #: src/states_screens/options_screen_input2.cpp:359
 msgid ""
@@ -1754,6 +1840,8 @@ msgid ""
 "keys that contain a character that is different in upper-case will stop "
 "working."
 msgstr ""
+"Cảnh báo, phím 'Shift' không phải là phím được đề nghị : khi phím shift được "
+"nhấn, tất cả các phím có kí tự in hoa khác in thường sẽ không hoạt động."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -1763,20 +1851,20 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:267 data/po/gui_strings.h:314
-#: data/po/gui_strings.h:358 data/po/gui_strings.h:400
+#: data/po/gui_strings.h:274 data/po/gui_strings.h:321
+#: data/po/gui_strings.h:365 data/po/gui_strings.h:407
 msgid "Weapons"
-msgstr ""
+msgstr "Vũ khí"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:300
+#: src/states_screens/options_screen_video.cpp:302
 #, c-format
 msgid "Weather Effects : %s"
-msgstr ""
+msgstr "Hiệu Ứng Thời Tiết: %s"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:422
+#: data/po/gui_strings.h:429
 msgid ""
 "When input devices are configured, you are ready to play. Select the "
 "'multiplayer race' icon in the main menu. When it is time to choose a kart, "
@@ -1785,174 +1873,199 @@ msgid ""
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
 msgstr ""
+"Khi các thiết bị được cấu hình, bạn đã sẵn sàng để chơi. Chọn biểu tượng "
+"\"Chơi Nhiều Người\" trong trình đơn chính. Khi lựa chọn một nhân vật, mỗi "
+"người chơi có thể nhấn vào phím 'Bắn' của gamepad hoặc bàn phím để tham gia "
+"trò chơi. Mỗi người chơi có thể sử dụng thiết bị của họ để chọn nhân vật của "
+"họ. Trò chơi tiếp tục khi tất cả mọi người đã lựa chọn xong nhân vật. Lưu ý "
+"rằng chuột không sử dụng được trong chức năng này."
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:822
+#: data/po/gui_strings.h:832
 msgid "Wilber"
-msgstr ""
+msgstr "Wilber"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:693
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:700
 msgid "Win Penguin Playground Grand Prix"
-msgstr ""
+msgstr "Thắng Grand Prix tên là 'Sân Chơi Chim Cánh Cụt'"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95 data/po/gui_strings.h:696
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:703
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
-msgstr ""
+msgstr "Thắng Grand Prix tên là 'Sân Chơi Chim Cánh Cụt' với 3 AI khó"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140 data/po/gui_strings.h:741
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:748
 msgid "Win To the Moon and Back Grand Prix"
-msgstr ""
+msgstr "Thắng Grand Prix 'Tới Mặt Trăng và Quay Trở Lại'"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137 data/po/gui_strings.h:738
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:745
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
-msgstr ""
+msgstr "Thắng 1 vòng đua trong bản đồ Vườn Bí Mật với 1 AI dễ."
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161 data/po/gui_strings.h:762
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:769
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
-msgstr ""
+msgstr "Thắng 3 vòng đua trong bản đồ Hẽm Núi với 4 AI khó."
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:708
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:715
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
-msgstr ""
+msgstr "Thắng 3 vòng đua trong bản đồ Lâu Đài Cổ với 3 AI khó."
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119 data/po/gui_strings.h:720
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:727
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
+"Thắng 3 vòng đua trong bản đồ Núi Tuyết dưới 3:05 phút với 3 AI trung bình."
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83 data/po/gui_strings.h:684
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:691
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
-msgstr ""
+msgstr "Thắng 3 vòng đua trong bản đồ Vùng Ngoại Ô với 4 AI khó."
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77 data/po/gui_strings.h:678
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:685
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr ""
+"Thắng vòng đua trong chế độ Theo Sau Người Dẫn Đầu với 3 AI trong bản đồ Sa "
+"Mạc."
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125 data/po/gui_strings.h:726
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:733
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
 msgstr ""
+"Thắng vòng đua trong chế độ Theo Sau Người Dẫn Đầu với 5 AI trong bản đồ "
+"Đường Đua Thiên Hà."
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134 data/po/gui_strings.h:735
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:742
 msgid "Win a Head to Head in the Secret Garden"
-msgstr ""
+msgstr "Thắng trong bản đồ Vườn Bí Mật với 1 AI."
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158 data/po/gui_strings.h:759
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:766
 msgid "Win a race on Canyon"
-msgstr ""
+msgstr "Thắng 1 cuộc đua trong bản đồ Hẽm Núi"
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:705
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:712
 msgid "Win a race on Fort Magma"
-msgstr ""
+msgstr "Thắng 1 cuộc đua trong bản đồ Lâu Đài Cổ"
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:717
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:724
 msgid "Win a race on Snow Mountain"
-msgstr ""
+msgstr "Thắng 1 cuộc đua trong bản đồ Núi Tuyết"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:681
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:688
 msgid "Win a race on Tux Tollway"
-msgstr ""
+msgstr "Thắng 1 cuộc đua trong bản đồ Vùng Ngoại Ô"
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:669
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:676
 msgid "Win the At World's End Grand Prix"
-msgstr ""
+msgstr "Thắng trong Grand Prix tên 'Nơi Tận Cùng Thế Giới'"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143 data/po/gui_strings.h:744
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:751
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
-msgstr ""
+msgstr "Thắng trong Grand Prix tên 'Tới Mặt Trăng và Quay Về' với 3 AI khó."
 
 #. I18N: ./data/tracks/xr591/track.xml
 #: data/po/gui_strings.h:65
 msgid "XR591"
-msgstr ""
+msgstr "XR591"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: data/po/gui_strings.h:223
+#: data/po/gui_strings.h:230
 msgid "Yes"
-msgstr ""
+msgstr "Đồng ý"
 
 #: src/states_screens/grand_prix_win.cpp:388
 msgid "You completed the Grand Prix!"
-msgstr ""
+msgstr "Bạn đã hoàn thành Grand Prix!"
 
-#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
+#: src/karts/kart.cpp:607 src/karts/kart.cpp:626
 msgid "You finished the race!"
-msgstr ""
+msgstr "Bạn đã hoàn thành cuộc đua!"
 
-#: src/modes/world.cpp:787
+#: src/modes/world.cpp:794
 msgid "You have been eliminated!"
-msgstr ""
+msgstr "Bạn đã bị loại bỏ!"
 
-#: src/states_screens/race_result_gui.cpp:697
+#: src/states_screens/race_result_gui.cpp:700
 msgid "You topped the highscore list!"
-msgstr ""
+msgstr "Bạn nằm cao nhất trên danh sách kỷ lục!"
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:341
 #: src/states_screens/grand_prix_win.cpp:124
 msgid "You unlocked a new feature!"
-msgstr ""
+msgstr "Bạn đã mở khóa được chức năng mới!"
 
-#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
+#: src/karts/kart.cpp:607 src/karts/kart.cpp:626
 msgid "You won the race!"
-msgstr ""
+msgstr "Bạn đã chiến thắng cuộc đua!"
 
 #: src/config/user_config.cpp:585
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Tập tin cấu hình của bạn đã bị thay đổi, do đó, nó đã bị xóa và một cái mới "
+"sẽ được tạo ra."
 
 #: src/config/user_config.cpp:595
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr ""
+"Tập tin cấu hình của bạn đã quá cũ, do đó, nó đã bị xóa và một cái mới sẽ "
+"được tạo ra."
 
 #: src/input/device_manager.cpp:446
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
+"Tập tin cấu hình của bạn không tương thích với phiên bản STK hiện tại."
+
+#. I18N: ./data/tracks/zengarden/track.xml
+#: data/po/gui_strings.h:68
+msgid "Zen Garden"
+msgstr "Vườn Hoa Anh Đào"
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:87
 msgid "[none]"
-msgstr ""
+msgstr "[không có]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:457
+#: src/states_screens/race_gui_base.cpp:459
 msgid "by"
-msgstr ""
+msgstr "bởi"
 
 #: src/states_screens/dialogs/addons_loading.cpp:120
 msgid "featured"
-msgstr ""
+msgstr "Tính Năng"
 
+#. I18N: arena group name
 #. I18N: kart group name
-#: src/states_screens/kart_selection.cpp:909
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:70
+#: src/states_screens/kart_selection.cpp:914
 #: src/states_screens/tracks_screen.cpp:193
 msgid "standard"
-msgstr ""
+msgstr "chuẩn"
 
 #: src/states_screens/credits.cpp:228
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Huynh Yen Loc https://launchpad.net/~nightgaunt13\n"
-"  STK-team https://launchpad.net/~stk"
+"  STK-team https://launchpad.net/~stk\n"
+"  Võ Xuân Tiến https://launchpad.net/~vo-ngan-90"

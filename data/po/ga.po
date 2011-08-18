@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-09 21:49-0400\n"
+"POT-Creation-Date: 2011-07-31 14:24-0400\n"
 "PO-Revision-Date: 2011-06-02 06:14+0000\n"
 "Last-Translator: Aaron Kearns <ajkearns6@gmail.com>\n"
 "Language-Team: Aaron Kearns <ajkearns6@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-15 00:16+0000\n"
-"X-Generator: Launchpad (build 13405)\n"
+"X-Launchpad-Export-Date: 2011-08-18 08:56+0000\n"
+"X-Generator: Launchpad (build 13697)\n"
 "X-Poedit-Language: Irish\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -26,7 +26,7 @@ msgid "%0 bites %1's bait"
 msgstr ""
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:55
+#: src/items/flyable.cpp:56
 msgid "%0 eats too much of %1's cake"
 msgstr ""
 
@@ -36,22 +36,22 @@ msgid "%0 gets a fancy mask from %1"
 msgstr ""
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:79
+#: src/items/flyable.cpp:80
 msgid "%0 is bowled over by %1"
 msgstr ""
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:57
+#: src/items/flyable.cpp:58
 msgid "%0 is dubious of %1's cooking skills"
 msgstr ""
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:59
+#: src/items/flyable.cpp:60
 msgid "%0 should not play with %1's lunch"
 msgstr ""
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:75
+#: src/items/flyable.cpp:76
 msgid "%0 will not go bowling with %1 again"
 msgstr ""
 
@@ -66,7 +66,7 @@ msgid "%1 merges %0's face with a plunger"
 msgstr ""
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/flyable.cpp:77
+#: src/items/flyable.cpp:78
 msgid "%1 strikes %0"
 msgstr ""
 
@@ -76,7 +76,7 @@ msgid "%1 tests a tractor beam on %0"
 msgstr ""
 
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
-#: src/states_screens/dialogs/track_info_dialog.cpp:129
+#: src/states_screens/dialogs/track_info_dialog.cpp:136
 #, c-format
 msgid "%i laps"
 msgstr "%i cuairteanna"
@@ -118,18 +118,18 @@ msgid "%s is a mighty pirate!"
 msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:95
+#: src/items/flyable.cpp:96
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:523
+#: src/states_screens/kart_selection.cpp:527
 #, c-format
 msgid "%s is ready"
 msgstr "Tá %s réidh"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:97
+#: src/items/flyable.cpp:98
 #, c-format
 msgid "%s is the world master of the boomerang ball"
 msgstr ""
@@ -140,35 +140,35 @@ msgid "%s pays the next round of grog!"
 msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
-#: src/items/flyable.cpp:99
+#: src/items/flyable.cpp:100
 #, c-format
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr ""
 
-#: src/modes/world.cpp:791
+#: src/modes/world.cpp:798
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "Bhí '%s' eisiamh."
 
 #. I18N: for empty highscores entries
-#: src/states_screens/dialogs/track_info_dialog.cpp:265
+#: src/states_screens/dialogs/track_info_dialog.cpp:272
 msgid "(Empty)"
 msgstr "(Folamh)"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:414
+#: data/po/gui_strings.h:421
 msgid "(network play is not yet available)"
 msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
-#: data/po/gui_strings.h:303
+#: data/po/gui_strings.h:310
 msgid "* Current key bindings can be seen/changed in menu Options"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:389
+#: data/po/gui_strings.h:396
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
-#: data/po/gui_strings.h:522
+#: data/po/gui_strings.h:529
 msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
@@ -190,13 +190,13 @@ msgstr "Trí Bhuillí Cath"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:385
+#: data/po/gui_strings.h:392
 msgid ""
 "3 Strikes Battle: only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
 msgstr ""
 
-#: src/states_screens/dialogs/track_info_dialog.cpp:191
+#: src/states_screens/dialogs/track_info_dialog.cpp:198
 msgid "= Highscores ="
 msgstr "= Scóir Ard ="
 
@@ -211,7 +211,7 @@ msgstr "Tobscoir Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:454
+#: data/po/gui_strings.h:461
 msgid "About"
 msgstr "Maidir Leis"
 
@@ -227,21 +227,24 @@ msgstr "Cuir Cumraíocht Mhéarchlár"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:537
+#: data/po/gui_strings.h:544
 msgid "Add Player"
 msgstr "Cuir Imreoir Leis"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:519
+#: data/po/gui_strings.h:526
 msgid "Add a device"
 msgstr "Cuir Gléas Leis"
 
+#. I18N: arena group name
 #. I18N: kart group name
+#. I18N: track group name
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/kart_selection.cpp:911
-#: src/states_screens/tracks_screen.cpp:195 data/po/gui_strings.h:211
+#: src/states_screens/arenas_screen.cpp:72
+#: src/states_screens/kart_selection.cpp:916
+#: src/states_screens/tracks_screen.cpp:195 data/po/gui_strings.h:218
 msgid "Add-Ons"
 msgstr "Forlíontáin"
 
@@ -251,12 +254,12 @@ msgstr ""
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:442
+#: data/po/gui_strings.h:449
 msgid "Addons"
 msgstr ""
 
 #. I18N: ./data/karts/adiumy/kart.xml
-#: data/po/gui_strings.h:780
+#: data/po/gui_strings.h:787
 msgid "Adiumy"
 msgstr "Adiumy"
 
@@ -266,10 +269,10 @@ msgstr "Adiumy"
 #. I18N: name of the tab that will show tracks from all groups
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: src/states_screens/arenas_screen.cpp:84
-#: src/states_screens/kart_selection.cpp:903
-#: src/states_screens/options_screen_video.cpp:291
-#: src/states_screens/tracks_screen.cpp:187 data/po/gui_strings.h:215
+#: src/states_screens/arenas_screen.cpp:64
+#: src/states_screens/kart_selection.cpp:908
+#: src/states_screens/options_screen_video.cpp:293
+#: src/states_screens/tracks_screen.cpp:187 data/po/gui_strings.h:222
 msgid "All"
 msgstr "Uile"
 
@@ -277,14 +280,20 @@ msgstr "Uile"
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #. I18N: ./data/grandprix/alltracks.grandprix
-#: data/po/gui_strings.h:164 data/po/gui_strings.h:659
-#: data/po/gui_strings.h:765
+#: data/po/gui_strings.h:167 data/po/gui_strings.h:666
+#: data/po/gui_strings.h:772
 msgid "All Tracks"
 msgstr "Gach Ráschúrsaí"
 
 #: src/states_screens/race_setup_screen.cpp:196
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "Rás Normálta"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+#: data/po/gui_strings.h:563
+msgid "Allow STK to connect to the Internet"
+msgstr ""
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:26
@@ -293,31 +302,31 @@ msgstr "Turas Amazon"
 
 # anchor?
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:344
+#: data/po/gui_strings.h:351
 msgid "Anchor - slows down greatly the kart in the first position"
 msgstr "Ancaire - moilligh an chéad kart"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:302
+#: src/states_screens/options_screen_video.cpp:304
 #, c-format
 msgid "Animated Characters : %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:298
+#: src/states_screens/options_screen_video.cpp:300
 #, c-format
 msgid "Animated Scenery : %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:305
+#: src/states_screens/options_screen_video.cpp:307
 #, c-format
 msgid "Anti-aliasing (requires restart) : %s"
 msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings menu
-#: data/po/gui_strings.h:591
+#: data/po/gui_strings.h:598
 msgid "Apply new resolution"
 msgstr "Cuir taifeach nua i bhfeidhm"
 
@@ -326,9 +335,11 @@ msgstr "Cuir taifeach nua i bhfeidhm"
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr ""
 
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: Section in the addons menu
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
-#: data/po/gui_strings.h:203
+#: data/po/gui_strings.h:206 data/po/gui_strings.h:210
 msgid "Arenas"
 msgstr "Airéiní"
 
@@ -345,12 +356,12 @@ msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:598
+#: data/po/gui_strings.h:605
 msgid "Assign to ESC key"
 msgstr ""
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
-#: data/po/gui_strings.h:167 data/po/gui_strings.h:768
+#: data/po/gui_strings.h:170 data/po/gui_strings.h:775
 msgid "At World's End"
 msgstr "Ag Deireadh an Domhain"
 
@@ -360,13 +371,13 @@ msgstr "Ag Deireadh an Domhain"
 #: src/states_screens/options_screen_input2.cpp:71
 #: src/states_screens/options_screen_players.cpp:68
 #: src/states_screens/options_screen_ui.cpp:110
-#: src/states_screens/options_screen_video.cpp:80 data/po/gui_strings.h:465
+#: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:472
 msgid "Audio"
 msgstr "Fuaim"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:287
+#: data/po/gui_strings.h:294
 msgid "Avoid bananas!"
 msgstr "Seachain bananaí!"
 
@@ -378,19 +389,19 @@ msgstr "Ais %d %s"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Addons
-#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:184
+#: src/states_screens/dialogs/addons_loading.cpp:226 data/po/gui_strings.h:187
 msgid "Back"
 msgstr "Ar Ais"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:609
+#: data/po/gui_strings.h:616
 msgid "Back to Race"
 msgstr "Téigh ar ais go rás"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: data/po/gui_strings.h:504
+#: data/po/gui_strings.h:511
 msgid "Back to device list"
 msgstr "Ar ais go liosta feiste"
 
@@ -407,12 +418,12 @@ msgid "Banana? Box? Banana? Box? Banana? Box?"
 msgstr "Banana? Bosca? Banana? Bosca? Banana? Bosca?"
 
 #. I18N: ./data/karts/beagle/kart.xml
-#: data/po/gui_strings.h:783
+#: data/po/gui_strings.h:790
 msgid "Beagle"
 msgstr "Pocadán Beag"
 
 #. I18N: ./data/karts/beastie/kart.xml
-#: data/po/gui_strings.h:786
+#: data/po/gui_strings.h:793
 msgid "Beastie"
 msgstr ""
 
@@ -427,7 +438,7 @@ msgid "Bovine Barnyard"
 msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:338
+#: data/po/gui_strings.h:345
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
@@ -441,12 +452,12 @@ msgid "Brake"
 msgstr "Coscán"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:329
+#: data/po/gui_strings.h:336
 msgid "BubbleGum - leave a sticky pink puddle behind you"
 msgstr "Guma Coganta - Fág i do dhiaidh"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:332
+#: data/po/gui_strings.h:339
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr "Císte - Caith ag kart eile, is fearr ag raon cóngarach"
@@ -470,7 +481,7 @@ msgstr ""
 #: src/states_screens/dialogs/add_device_dialog.cpp:81
 #: src/states_screens/dialogs/addons_loading.cpp:197
 #: src/states_screens/dialogs/player_info_dialog.cpp:100
-#: data/po/gui_strings.h:227 data/po/gui_strings.h:235
+#: data/po/gui_strings.h:234 data/po/gui_strings.h:242
 msgid "Cancel"
 msgstr "Cealaigh"
 
@@ -496,7 +507,7 @@ msgstr "Pluais X"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:438
+#: data/po/gui_strings.h:445
 msgid "Challenges"
 msgstr "Dúshláin"
 
@@ -504,40 +515,40 @@ msgstr "Dúshláin"
 # comh - m
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
-#: data/po/gui_strings.h:219
+#: data/po/gui_strings.h:226
 msgid "Challenges : Trophy Room"
 msgstr "Dúshláin : Seomra Comhramh"
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#: data/po/gui_strings.h:426
+#: data/po/gui_strings.h:433
 msgid "Choose a Kart"
 msgstr "Roghnaigh Kart"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:86 data/po/gui_strings.h:687
+#: data/po/gui_strings.h:89 data/po/gui_strings.h:694
 msgid "Collect Nitro in Math Class"
 msgstr "Bailigh nítro i Rang matamaitic"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:283
+#: data/po/gui_strings.h:290
 msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr ""
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:128 data/po/gui_strings.h:729
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:736
 msgid "Collect fuel for your rocket"
 msgstr "Bailigh breosla"
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:152 data/po/gui_strings.h:753
+#: data/po/gui_strings.h:155 data/po/gui_strings.h:760
 msgid "Collect the Pharaohs Treasure"
 msgstr "Bailigh Stór na Pharaohs"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:291
+#: data/po/gui_strings.h:298
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the "
@@ -545,7 +556,7 @@ msgid ""
 msgstr ""
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:71 data/po/gui_strings.h:672
+#: data/po/gui_strings.h:74 data/po/gui_strings.h:679
 msgid "Come first in the At World's End Grand Prix with 3 Expert AI karts."
 msgstr ""
 
@@ -567,8 +578,8 @@ msgstr "Rás Am"
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
-#: src/states_screens/race_result_gui.cpp:98 data/po/gui_strings.h:250
-#: data/po/gui_strings.h:253 data/po/gui_strings.h:256
+#: src/states_screens/race_result_gui.cpp:98 data/po/gui_strings.h:257
+#: data/po/gui_strings.h:260 data/po/gui_strings.h:263
 msgid "Continue"
 msgstr "Lean ar aghaidh"
 
@@ -583,8 +594,8 @@ msgstr "lean ar aghaidh Grand Prix"
 #: src/states_screens/options_screen_audio.cpp:66
 #: src/states_screens/options_screen_players.cpp:70
 #: src/states_screens/options_screen_ui.cpp:112
-#: src/states_screens/options_screen_video.cpp:83 data/po/gui_strings.h:496
-#: data/po/gui_strings.h:511
+#: src/states_screens/options_screen_video.cpp:84 data/po/gui_strings.h:503
+#: data/po/gui_strings.h:518
 msgid "Controls"
 msgstr "Rialtáin"
 
@@ -595,7 +606,7 @@ msgstr ""
 
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
-#: data/po/gui_strings.h:239
+#: data/po/gui_strings.h:246
 msgid "Credits"
 msgstr "Buíochas le"
 
@@ -606,7 +617,7 @@ msgstr "Crosbhealach na Crescent"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: To delete a keyboard configuration
-#: src/states_screens/options_screen_input2.cpp:93 data/po/gui_strings.h:500
+#: src/states_screens/options_screen_input2.cpp:93 data/po/gui_strings.h:507
 msgid "Delete Configuration"
 msgstr "Scrios Cumraíocht"
 
@@ -617,13 +628,13 @@ msgid "Disable Device"
 msgstr ""
 
 #. I18N: in the graphical options tooltip; indicates a graphical feature is disabled
-#: src/states_screens/options_screen_video.cpp:289
+#: src/states_screens/options_screen_video.cpp:291
 msgid "Disabled"
 msgstr "Díchumasaithe"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:552
+#: data/po/gui_strings.h:559
 msgid "Display FPS"
 msgstr "Taispeáin FPS"
 
@@ -651,12 +662,12 @@ msgid "Download failed."
 msgstr "Theip ar íoslódáil."
 
 #. I18N: ./data/karts/elephpant/kart.xml
-#: data/po/gui_strings.h:789
+#: data/po/gui_strings.h:796
 msgid "Elephpant"
 msgstr "Eilifint"
 
 #. I18N: ./data/karts/emule/kart.xml
-#: data/po/gui_strings.h:792
+#: data/po/gui_strings.h:799
 msgid "Emule"
 msgstr "Emule"
 
@@ -669,8 +680,8 @@ msgstr "Cumasaigh Gléas"
 #. I18N: in the graphical options tooltip; indicates a graphical feature is enabled
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Next to checkbox in settings menu
-#: src/states_screens/options_screen_video.cpp:287 data/po/gui_strings.h:473
-#: data/po/gui_strings.h:485
+#: src/states_screens/options_screen_video.cpp:289 data/po/gui_strings.h:480
+#: data/po/gui_strings.h:492
 msgid "Enabled"
 msgstr "cumasaithe"
 
@@ -679,18 +690,18 @@ msgid "Energy"
 msgstr "Fuinneamh"
 
 #. I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-#: src/states_screens/main_menu_screen.cpp:168
+#: src/states_screens/main_menu_screen.cpp:170
 msgid "English"
 msgstr "Béarla"
 
 # lenition
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
-#: data/po/gui_strings.h:243
+#: data/po/gui_strings.h:250
 msgid "Enter the new player's name"
 msgstr "Iontráil ainm an imreoir nua"
 
-#: src/states_screens/kart_selection.cpp:1134
+#: src/states_screens/kart_selection.cpp:1139
 msgid ""
 "Everyone:\n"
 "Press 'Fire' now to join the game!"
@@ -698,13 +709,13 @@ msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:629
+#: data/po/gui_strings.h:636
 msgid "Exit Race"
 msgstr "Scortha Rás"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:648
+#: data/po/gui_strings.h:655
 msgid "Expert"
 msgstr "Saineolaí"
 
@@ -717,52 +728,52 @@ msgid "Final lap!"
 msgstr "Cuaird leiridh!"
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:113 data/po/gui_strings.h:714
+#: data/po/gui_strings.h:116 data/po/gui_strings.h:721
 msgid "Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
 msgstr ""
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:149 data/po/gui_strings.h:750
+#: data/po/gui_strings.h:152 data/po/gui_strings.h:757
 msgid ""
 "Finish 3 laps in Lighthouse with 3 Expert AI karts in under 1:30 minutes."
 msgstr ""
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:101 data/po/gui_strings.h:702
+#: data/po/gui_strings.h:104 data/po/gui_strings.h:709
 msgid "Finish 3 laps in mines with 3 expert AI karts in under 3:00 minutes."
 msgstr ""
 
 #. I18N: ./data/challenges/hacienda.challenge
-#: data/po/gui_strings.h:110 data/po/gui_strings.h:711
+#: data/po/gui_strings.h:113 data/po/gui_strings.h:718
 msgid "Finish Farm in 2:30"
 msgstr "Críochnaigh Feirm faoi bhun 2:30"
 
 #. I18N: ./data/challenges/tollway.challenge
-#: data/po/gui_strings.h:146 data/po/gui_strings.h:747
+#: data/po/gui_strings.h:149 data/po/gui_strings.h:754
 msgid "Finish Lighthouse in 1:30"
 msgstr "Críochnaigh Teacht Solais faoi bhun 1:30"
 
 #. I18N: ./data/challenges/fortmagma.challenge
-#: data/po/gui_strings.h:98 data/po/gui_strings.h:699
+#: data/po/gui_strings.h:101 data/po/gui_strings.h:706
 msgid "Finish Mines in 3:00"
 msgstr "Críochnaigh An Mianach faoi bhun 3:00"
 
 #. I18N: ./data/challenges/crescentcrossing.challenge
-#: data/po/gui_strings.h:89 data/po/gui_strings.h:690
+#: data/po/gui_strings.h:92 data/po/gui_strings.h:697
 msgid ""
 "Finish with at least 10 points of nitro on three laps of Oliver's Math Class "
 "in under 55 seconds."
 msgstr ""
 
 #. I18N: ./data/challenges/tothemoonandback.challenge
-#: data/po/gui_strings.h:155 data/po/gui_strings.h:756
+#: data/po/gui_strings.h:158 data/po/gui_strings.h:763
 msgid ""
 "Finish with at least 12 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
 msgstr ""
 
 #. I18N: ./data/challenges/mines.challenge
-#: data/po/gui_strings.h:131 data/po/gui_strings.h:732
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:739
 msgid ""
 "Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 "
 "minutes."
@@ -775,7 +786,7 @@ msgstr "Scaoil"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:418
+#: data/po/gui_strings.h:425
 msgid ""
 "First, you will need several input devices (having multiple gamepads or "
 "joysticks is the best way to play with several people). Go in the input "
@@ -791,12 +802,12 @@ msgid "Follow the Leader"
 msgstr "Leantar an Tosaí"
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:122 data/po/gui_strings.h:723
+#: data/po/gui_strings.h:125 data/po/gui_strings.h:730
 msgid "Follow the Leader around the Solar System"
 msgstr ""
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:74 data/po/gui_strings.h:675
+#: data/po/gui_strings.h:77 data/po/gui_strings.h:682
 msgid "Follow the Leader on a Desert Island"
 msgstr ""
 "Lean an Tosaí ar\n"
@@ -804,7 +815,7 @@ msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:381
+#: data/po/gui_strings.h:388
 msgid ""
 "Follow the leader: run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
@@ -818,7 +829,7 @@ msgstr "Dún Magma"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:587
+#: data/po/gui_strings.h:594
 msgid "Fullscreen"
 msgstr "Lánscáileán"
 
@@ -841,8 +852,8 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:271 data/po/gui_strings.h:318
-#: data/po/gui_strings.h:362 data/po/gui_strings.h:404
+#: data/po/gui_strings.h:278 data/po/gui_strings.h:325
+#: data/po/gui_strings.h:369 data/po/gui_strings.h:411
 msgid "Game Modes"
 msgstr "Modhanna Cluiche"
 
@@ -867,8 +878,8 @@ msgstr "Rialaitheoir cluichíochta \"hat\"%d"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:263 data/po/gui_strings.h:310
-#: data/po/gui_strings.h:354 data/po/gui_strings.h:396
+#: data/po/gui_strings.h:270 data/po/gui_strings.h:317
+#: data/po/gui_strings.h:361 data/po/gui_strings.h:403
 msgid "General"
 msgstr "Coiteann"
 
@@ -877,7 +888,7 @@ msgid "Geronimo!!!"
 msgstr "Geronimo!!!"
 
 #. I18N: ./data/karts/gnu/kart.xml
-#: data/po/gui_strings.h:795
+#: data/po/gui_strings.h:802
 msgid "Gnu"
 msgstr "Gnu"
 
@@ -886,19 +897,19 @@ msgid "Go!"
 msgstr "Téigh!"
 
 #. I18N: ./data/karts/gooey/kart.xml
-#: data/po/gui_strings.h:798
+#: data/po/gui_strings.h:805
 msgid "Gooey"
 msgstr "Gooey"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
-#: data/po/gui_strings.h:655
+#: data/po/gui_strings.h:662
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:571
+#: data/po/gui_strings.h:578
 msgid "Graphical Effects Level"
 msgstr ""
 
@@ -908,7 +919,7 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:129
 #: src/states_screens/options_screen_input2.cpp:70
 #: src/states_screens/options_screen_players.cpp:67
-#: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:567
+#: src/states_screens/options_screen_ui.cpp:109 data/po/gui_strings.h:574
 msgid "Graphics"
 msgstr "Grafaicí"
 
@@ -925,12 +936,12 @@ msgstr "Hacienda"
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:450 data/po/gui_strings.h:625
+#: data/po/gui_strings.h:457 data/po/gui_strings.h:632
 msgid "Help"
 msgstr "Cabhair"
 
 #. I18N: ./data/karts/hexley/kart.xml
-#: data/po/gui_strings.h:801
+#: data/po/gui_strings.h:808
 msgid "Hexley"
 msgstr "Hexley"
 
@@ -946,45 +957,38 @@ msgstr "Trí Bhuillí Cath. Buail an cairtíní eile."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:295
+#: data/po/gui_strings.h:302
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
 msgstr ""
 
-#. I18N: message shown when an input device is used but is not associated to any player
-#: src/input/input_manager.cpp:525
+#: src/input/input_manager.cpp:560
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Addons
-#: data/po/gui_strings.h:180
+#: data/po/gui_strings.h:183
 msgid "Install"
 msgstr "Suiteáil"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:644
+#: data/po/gui_strings.h:651
 msgid "Intermediate"
 msgstr "Idirmheánach"
 
-#. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the ui settings
-#: data/po/gui_strings.h:556
-msgid "Internet STK news"
-msgstr ""
-
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
-#: data/po/gui_strings.h:195
+#: data/po/gui_strings.h:198
 msgid "Karts"
 msgstr "Cairtíní"
 
 #. I18N: ./data/gui/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: data/po/gui_strings.h:231
+#: data/po/gui_strings.h:238
 msgid "Keep this resolution"
 msgstr "coinnigh an taifeach seo"
 
@@ -999,7 +1003,7 @@ msgid "Keyboard %i"
 msgstr "Méarchlár %i"
 
 #. I18N: ./data/karts/konqi/kart.xml
-#: data/po/gui_strings.h:804
+#: data/po/gui_strings.h:811
 msgid "Konqi"
 msgstr "Konqi"
 
@@ -1023,27 +1027,27 @@ msgstr "Tosaí"
 msgid "Left"
 msgstr "Clé"
 
-#: src/guiengine/engine.cpp:1115
+#: src/guiengine/engine.cpp:1135
 msgid "Loading"
 msgstr "Lódáil"
 
-#: src/states_screens/kart_selection.cpp:815
+#: src/states_screens/kart_selection.cpp:820
 msgid "Locked"
 msgstr ""
 
-#: src/states_screens/arenas_screen.cpp:193
-#: src/states_screens/arenas_screen.cpp:216
-#: src/states_screens/challenges.cpp:97
-#: src/states_screens/kart_selection.cpp:820
-#: src/states_screens/kart_selection.cpp:1786
-#: src/states_screens/kart_selection.cpp:1812
+#: src/states_screens/arenas_screen.cpp:199
+#: src/states_screens/arenas_screen.cpp:222
+#: src/states_screens/challenges.cpp:116
+#: src/states_screens/kart_selection.cpp:825
+#: src/states_screens/kart_selection.cpp:1791
+#: src/states_screens/kart_selection.cpp:1817
 #: src/states_screens/race_setup_screen.cpp:208
-#: src/states_screens/tracks_screen.cpp:310
-#: src/states_screens/tracks_screen.cpp:335
+#: src/states_screens/tracks_screen.cpp:309
+#: src/states_screens/tracks_screen.cpp:334
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Glasáilte : Buaigh dúshláin a dhíghlasáil!"
 
-#: src/states_screens/tracks_screen.cpp:253
+#: src/states_screens/tracks_screen.cpp:252
 msgid "Locked!"
 msgstr "Glasáilte!"
 
@@ -1058,12 +1062,12 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:279
+#: data/po/gui_strings.h:286
 msgid "Make your rivals bite dust!"
 msgstr ""
 
 #. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:293
+#: src/states_screens/options_screen_video.cpp:295
 msgid "Me Only"
 msgstr ""
 
@@ -1074,7 +1078,7 @@ msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-#: data/po/gui_strings.h:560
+#: data/po/gui_strings.h:567
 msgid "Minimal Race GUI"
 msgstr ""
 
@@ -1091,13 +1095,13 @@ msgid "Mouse button %d"
 msgstr "Cnaipe luiche %d"
 
 #. I18N: ./data/karts/mozilla/kart.xml
-#: data/po/gui_strings.h:807
+#: data/po/gui_strings.h:814
 msgid "Mozilla"
 msgstr "Mozilla"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:434
+#: data/po/gui_strings.h:441
 msgid "Multiplayer Race"
 msgstr ""
 
@@ -1109,14 +1113,14 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:275 data/po/gui_strings.h:322
-#: data/po/gui_strings.h:366 data/po/gui_strings.h:408
+#: data/po/gui_strings.h:282 data/po/gui_strings.h:329
+#: data/po/gui_strings.h:373 data/po/gui_strings.h:415
 msgid "Multi­player"
 msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the audio/video settings submenu
-#: data/po/gui_strings.h:469
+#: data/po/gui_strings.h:476
 msgid "Music"
 msgstr "Ceol"
 
@@ -1139,7 +1143,7 @@ msgstr "Cuairt is tapaidh nua"
 msgid "New game mode '%s' now available"
 msgstr "Mód cluiche nua '%s' ar fáil anois"
 
-#: src/states_screens/race_result_gui.cpp:697
+#: src/states_screens/race_result_gui.cpp:700
 msgid "New highscore!"
 msgstr ""
 
@@ -1159,12 +1163,12 @@ msgid "Nitro"
 msgstr "Nítro"
 
 #. I18N: ./data/karts/nolok/kart.xml
-#: data/po/gui_strings.h:810
+#: data/po/gui_strings.h:817
 msgid "Nolok"
 msgstr "Nolok"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:295
+#: src/states_screens/options_screen_video.cpp:297
 msgid "None"
 msgstr ""
 
@@ -1180,13 +1184,13 @@ msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
-#: data/po/gui_strings.h:640
+#: data/po/gui_strings.h:647
 msgid "Novice"
 msgstr "Nóibhíseach"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: In race setup menu
-#: data/po/gui_strings.h:636
+#: data/po/gui_strings.h:643
 msgid "Number of AI karts"
 msgstr "Líon na gCairteacha"
 
@@ -1204,9 +1208,7 @@ msgstr ""
 msgid "Oliver's Math Class"
 msgstr "Rang matamaitic Oliver"
 
-#. I18N: message shown when a player that isn't game master tries to modify options that
-#. I18N: only the game master is allowed to
-#: src/input/input_manager.cpp:550
+#: src/input/input_manager.cpp:590
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -1214,17 +1216,17 @@ msgstr ""
 #. I18N: Main menu button
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:446 data/po/gui_strings.h:621
+#: data/po/gui_strings.h:453 data/po/gui_strings.h:628
 msgid "Options"
 msgstr "Roghanna"
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:341
+#: data/po/gui_strings.h:348
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Parasiút - moillighs an karts romhat!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
-#: data/po/gui_strings.h:605
+#: data/po/gui_strings.h:612
 msgid "Paused"
 msgstr "Moillithe"
 
@@ -1233,17 +1235,17 @@ msgid "Penalty time!!"
 msgstr "Am píonóis!!"
 
 #. I18N: ./data/grandprix/penguinplayground.grandprix
-#: data/po/gui_strings.h:170 data/po/gui_strings.h:771
+#: data/po/gui_strings.h:173 data/po/gui_strings.h:778
 msgid "Penguin Playground"
 msgstr "Áit Shúgartha na Phiongáin"
 
 #. I18N: ./data/karts/pidgin/kart.xml
-#: data/po/gui_strings.h:813
+#: data/po/gui_strings.h:820
 msgid "Pidgin"
 msgstr "Pidgin"
 
 #. I18N: ./data/gui/tutorial.stkgui
-#: data/po/gui_strings.h:666
+#: data/po/gui_strings.h:673
 msgid "Play all"
 msgstr ""
 
@@ -1253,7 +1255,7 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:132
 #: src/states_screens/options_screen_input2.cpp:73
 #: src/states_screens/options_screen_ui.cpp:111
-#: src/states_screens/options_screen_video.cpp:82 data/po/gui_strings.h:529
+#: src/states_screens/options_screen_video.cpp:83 data/po/gui_strings.h:536
 msgid "Players"
 msgstr "Imreoirí"
 
@@ -1262,8 +1264,12 @@ msgstr "Imreoirí"
 msgid "Please re-configure your key bindings."
 msgstr ""
 
+#: src/states_screens/main_menu_screen.cpp:477
+msgid "Please wait while the add-ons are loading"
+msgstr ""
+
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:335
+#: data/po/gui_strings.h:342
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight!"
@@ -1273,24 +1279,24 @@ msgstr ""
 #. I18N: When configuring input
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
-#: data/po/gui_strings.h:247 data/po/gui_strings.h:602
+#: data/po/gui_strings.h:254 data/po/gui_strings.h:609
 msgid "Press ESC to cancel"
 msgstr "Brúigh ESC a Chealú"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-#: data/po/gui_strings.h:594
+#: data/po/gui_strings.h:601
 msgid "Press a key"
 msgstr "Brúigh eochair"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In key bindings configuration menu
-#: data/po/gui_strings.h:515
+#: data/po/gui_strings.h:522
 msgid "Press enter or double-click on a device to configure it"
 msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
-#: data/po/gui_strings.h:533
+#: data/po/gui_strings.h:540
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr ""
 
@@ -1305,19 +1311,19 @@ msgid "Problems removing the addon '%s'."
 msgstr ""
 
 #. I18N: ./data/karts/puffy/kart.xml
-#: data/po/gui_strings.h:816
+#: data/po/gui_strings.h:823
 msgid "Puffy"
 msgstr "Puffy"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:458
+#: data/po/gui_strings.h:465
 msgid "Quit"
 msgstr "Scoir"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
-#: data/po/gui_strings.h:430
+#: data/po/gui_strings.h:437
 msgid "Race"
 msgstr "Rás"
 
@@ -1326,7 +1332,7 @@ msgid "Race Results"
 msgstr "Torthaí Rása"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:632
+#: data/po/gui_strings.h:639
 msgid "Race Setup"
 msgstr "Cumraigh Rás"
 
@@ -1335,18 +1341,18 @@ msgid "Race in this track again"
 msgstr "Téigh i raon seo arís"
 
 # gender kart is m
-#: src/states_screens/arenas_screen.cpp:226
+#: src/states_screens/arenas_screen.cpp:232
 msgid "Random Arena"
 msgstr "Airéine Randamach"
 
 # gender kart is m
-#: src/states_screens/kart_selection.cpp:804
-#: src/states_screens/kart_selection.cpp:1829
+#: src/states_screens/kart_selection.cpp:809
+#: src/states_screens/kart_selection.cpp:1834
 msgid "Random Kart"
 msgstr "Cairtín Randamach"
 
 # gender kart is m
-#: src/states_screens/tracks_screen.cpp:349
+#: src/states_screens/tracks_screen.cpp:348
 msgid "Random Track"
 msgstr "Cairtín Raon"
 
@@ -1362,7 +1368,7 @@ msgstr "Ullmhaigh!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:373
+#: data/po/gui_strings.h:380
 msgid ""
 "Regular Race: all blows allowed, so catch weapons and make clever use of "
 "them!"
@@ -1370,7 +1376,7 @@ msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Reload button to reload addon data
-#: data/po/gui_strings.h:191
+#: data/po/gui_strings.h:194
 msgid "Reload"
 msgstr ""
 
@@ -1391,7 +1397,7 @@ msgstr "Tarrtháil"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:583
+#: data/po/gui_strings.h:590
 msgid "Resolution"
 msgstr "Taifeach"
 
@@ -1401,7 +1407,7 @@ msgstr "Atosaigh"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: data/po/gui_strings.h:617
+#: data/po/gui_strings.h:624
 msgid "Restart Race"
 msgstr "Tosaigh Rás"
 
@@ -1435,7 +1441,7 @@ msgid "Select"
 msgstr "Roghnaigh"
 
 #. I18N: ./data/gui/racesetup.stkgui
-#: data/po/gui_strings.h:651
+#: data/po/gui_strings.h:658
 msgid "Select a game mode"
 msgstr "Roghnaigh mód cluichí"
 
@@ -1446,7 +1452,7 @@ msgstr "Ullmhaigh!"
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_over_dialog.cpp:369
-#: src/states_screens/race_result_gui.cpp:108 data/po/gui_strings.h:613
+#: src/states_screens/race_result_gui.cpp:108 data/po/gui_strings.h:620
 msgid "Setup New Race"
 msgstr "Buanaigh Rás Nua"
 
@@ -1472,7 +1478,7 @@ msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
-#: data/po/gui_strings.h:548
+#: data/po/gui_strings.h:555
 msgid "Skin"
 msgstr "Craiceann"
 
@@ -1482,7 +1488,7 @@ msgid "Skyline"
 msgstr "Spéirlíne"
 
 #. I18N: ./data/grandprix/snagdrive.grandprix
-#: data/po/gui_strings.h:173 data/po/gui_strings.h:774
+#: data/po/gui_strings.h:176 data/po/gui_strings.h:781
 msgid "Snag Drive"
 msgstr "Snag Drive"
 
@@ -1491,15 +1497,22 @@ msgstr "Snag Drive"
 msgid "Snow Peak"
 msgstr ""
 
+#: src/states_screens/main_menu_screen.cpp:473
+msgid ""
+"Sorry, an error occurred while contacting the add-ons website. Make sure you "
+"are connected to the Internet and that SuperTuxKart is not blocked by a "
+"firewall"
+msgstr ""
+
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in audio/video settings submenu
-#: data/po/gui_strings.h:481
+#: data/po/gui_strings.h:488
 msgid "Sound Effects"
 msgstr "Maisíochtaí Fuaime"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
-#: data/po/gui_strings.h:207
+#: data/po/gui_strings.h:214
 msgid "Standard"
 msgstr "Caighdeán"
 
@@ -1512,7 +1525,7 @@ msgstr "Raon na Réalta"
 msgid "Start Grand Prix"
 msgstr "Tosaigh Grand Prix"
 
-#: src/states_screens/dialogs/track_info_dialog.cpp:145
+#: src/states_screens/dialogs/track_info_dialog.cpp:152
 msgid "Start Race"
 msgstr "Tosaigh Rás"
 
@@ -1527,7 +1540,7 @@ msgid "Steer Right"
 msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
-#: data/po/gui_strings.h:187
+#: data/po/gui_strings.h:190
 msgid "SuperTuxKart Addons"
 msgstr ""
 
@@ -1535,8 +1548,8 @@ msgstr ""
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:259 data/po/gui_strings.h:306
-#: data/po/gui_strings.h:350 data/po/gui_strings.h:392
+#: data/po/gui_strings.h:266 data/po/gui_strings.h:313
+#: data/po/gui_strings.h:357 data/po/gui_strings.h:399
 msgid "SuperTuxKart Help"
 msgstr "Cabhair SuperTuxKart"
 
@@ -1546,45 +1559,51 @@ msgstr "Cabhair SuperTuxKart"
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_video.stkgui
-#: data/po/gui_strings.h:461 data/po/gui_strings.h:492
-#: data/po/gui_strings.h:507 data/po/gui_strings.h:525
-#: data/po/gui_strings.h:540 data/po/gui_strings.h:563
+#: data/po/gui_strings.h:468 data/po/gui_strings.h:499
+#: data/po/gui_strings.h:514 data/po/gui_strings.h:532
+#: data/po/gui_strings.h:547 data/po/gui_strings.h:570
 msgid "SuperTuxKart Options"
 msgstr "Roghanna SuperTuxKart"
 
 #. I18N: ./data/gui/help4.stkgui
-#: data/po/gui_strings.h:411
+#: data/po/gui_strings.h:418
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
-#: data/po/gui_strings.h:369
+#: data/po/gui_strings.h:376
 msgid "SuperTuxKart features several game modes"
 msgstr ""
 
-#: src/main.cpp:1006
+#: src/main.cpp:1019
 msgid ""
-"SuperTuxKart may connect to a news server to display updates. Would you like "
-"this feature to be enabled? (To change this setting at a later time, go to "
-"options, select tab 'User Interface', and edit \"Internet STK news\")."
+"SuperTuxKart may connect to a server to download add-ons and notify you of "
+"updates. Would you like this feature to be enabled? (To change this setting "
+"at a later time, go to options, select tab 'User Interface', and edit "
+"\"Internet STK news\")."
+msgstr ""
+
+#. I18N: ./data/karts/suzanne/kart.xml
+#: data/po/gui_strings.h:826
+msgid "Suzanne"
 msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-#: data/po/gui_strings.h:347
+#: data/po/gui_strings.h:354
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time"
 msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/main_menu_screen.cpp:253
+#: src/states_screens/main_menu_screen.cpp:255
 msgid "System Language"
 msgstr ""
 
 # "casadh géar"
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
-#: data/po/gui_strings.h:299
+#: data/po/gui_strings.h:306
 msgid ""
 "The 'sharp turn' key allows you to do sharp turns and have better control in "
 "tight curves"
@@ -1602,6 +1621,10 @@ msgstr ""
 #. I18N: ./data/tracks/stadium/track.xml
 #: data/po/gui_strings.h:56
 msgid "The Stadium"
+msgstr ""
+
+#: src/states_screens/main_menu_screen.cpp:469
+msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
 #: src/race/highscore_manager.cpp:98
@@ -1627,7 +1650,7 @@ msgstr "Rás Am"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:377
+#: data/po/gui_strings.h:384
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr "Rás Am"
 
@@ -1653,12 +1676,12 @@ msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:326
+#: data/po/gui_strings.h:333
 msgid "To help you win, there are some powerups you can collect :"
 msgstr "Tá rudaí go bhfuil féidir leat a fáil cuidiú leat buaigh:"
 
 #. I18N: ./data/grandprix/tothemoonandback.grandprix
-#: data/po/gui_strings.h:176 data/po/gui_strings.h:777
+#: data/po/gui_strings.h:179 data/po/gui_strings.h:784
 msgid "To the Moon and Back"
 msgstr "Chun an Gealach agus Ar Ais"
 
@@ -1676,7 +1699,7 @@ msgstr "Raon le %s"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
-#: data/po/gui_strings.h:199
+#: data/po/gui_strings.h:202
 msgid "Tracks"
 msgstr "Raonta"
 
@@ -1686,12 +1709,12 @@ msgstr ""
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
-#: data/po/gui_strings.h:663
+#: data/po/gui_strings.h:670
 msgid "Tutorial : Selection Room"
 msgstr ""
 
 #. I18N: ./data/karts/tux/kart.xml
-#: data/po/gui_strings.h:819
+#: data/po/gui_strings.h:829
 msgid "Tux"
 msgstr "Tux"
 
@@ -1719,7 +1742,7 @@ msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:579
+#: data/po/gui_strings.h:586
 msgid "Use Frame Buffer Objects (requires restart)"
 msgstr ""
 
@@ -1729,7 +1752,7 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:131
 #: src/states_screens/options_screen_input2.cpp:72
 #: src/states_screens/options_screen_players.cpp:69
-#: src/states_screens/options_screen_video.cpp:81 data/po/gui_strings.h:544
+#: src/states_screens/options_screen_video.cpp:82 data/po/gui_strings.h:551
 msgid "User Interface"
 msgstr ""
 
@@ -1740,7 +1763,7 @@ msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
-#: data/po/gui_strings.h:575
+#: data/po/gui_strings.h:582
 msgid "Vertical Sync (requires restart)"
 msgstr ""
 
@@ -1748,7 +1771,7 @@ msgstr ""
 #. I18N: Music volume in options
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Sound volume in options
-#: data/po/gui_strings.h:477 data/po/gui_strings.h:489
+#: data/po/gui_strings.h:484 data/po/gui_strings.h:496
 msgid "Volume"
 msgstr "Airde"
 
@@ -1771,20 +1794,20 @@ msgstr ""
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-#: data/po/gui_strings.h:267 data/po/gui_strings.h:314
-#: data/po/gui_strings.h:358 data/po/gui_strings.h:400
+#: data/po/gui_strings.h:274 data/po/gui_strings.h:321
+#: data/po/gui_strings.h:365 data/po/gui_strings.h:407
 msgid "Weapons"
 msgstr "Airm"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:300
+#: src/states_screens/options_screen_video.cpp:302
 #, c-format
 msgid "Weather Effects : %s"
 msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-#: data/po/gui_strings.h:422
+#: data/po/gui_strings.h:429
 msgid ""
 "When input devices are configured, you are ready to play. Select the "
 "'multiplayer race' icon in the main menu. When it is time to choose a kart, "
@@ -1795,58 +1818,58 @@ msgid ""
 msgstr ""
 
 #. I18N: ./data/karts/wilber/kart.xml
-#: data/po/gui_strings.h:822
+#: data/po/gui_strings.h:832
 msgid "Wilber"
 msgstr "Wilber"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:92 data/po/gui_strings.h:693
+#: data/po/gui_strings.h:95 data/po/gui_strings.h:700
 msgid "Win Penguin Playground Grand Prix"
 msgstr ""
 "Buaigh Áit Shúgartha na Phiongáin\n"
 "Grand Prix"
 
 #. I18N: ./data/challenges/followtheleader.challenge
-#: data/po/gui_strings.h:95 data/po/gui_strings.h:696
+#: data/po/gui_strings.h:98 data/po/gui_strings.h:703
 msgid "Win Penguin Playground Grand Prix with 3 Expert Level AI karts."
 msgstr ""
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:140 data/po/gui_strings.h:741
+#: data/po/gui_strings.h:143 data/po/gui_strings.h:748
 msgid "Win To the Moon and Back Grand Prix"
 msgstr ""
 "Buaigh Chun an Gealach agus Ar Ais\n"
 "Grand Prix"
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:137 data/po/gui_strings.h:738
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:745
 msgid ""
 "Win a 1 lap Head to Head in the Secret Garden against 1 easy level AI kart."
 msgstr ""
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:161 data/po/gui_strings.h:762
+#: data/po/gui_strings.h:164 data/po/gui_strings.h:769
 msgid "Win a 3 lap race on Canyon against 4 Expert level AI karts."
 msgstr ""
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:107 data/po/gui_strings.h:708
+#: data/po/gui_strings.h:110 data/po/gui_strings.h:715
 msgid "Win a 3 lap race on Fort Magma against 3 Expert level AI karts."
 msgstr ""
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:119 data/po/gui_strings.h:720
+#: data/po/gui_strings.h:122 data/po/gui_strings.h:727
 msgid ""
 "Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
 msgstr ""
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:83 data/po/gui_strings.h:684
+#: data/po/gui_strings.h:86 data/po/gui_strings.h:691
 msgid "Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
 msgstr ""
 
 #. I18N: ./data/challenges/atworldsend.challenge
-#: data/po/gui_strings.h:77 data/po/gui_strings.h:678
+#: data/po/gui_strings.h:80 data/po/gui_strings.h:685
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr ""
 "Buaigh Rás Lean an tosaí\n"
@@ -1854,44 +1877,44 @@ msgstr ""
 "ar oileán fásaigh."
 
 #. I18N: ./data/challenges/lighthouse.challenge
-#: data/po/gui_strings.h:125 data/po/gui_strings.h:726
+#: data/po/gui_strings.h:128 data/po/gui_strings.h:733
 msgid "Win a Follow the Leader race with 5 AI karts on Star track"
 msgstr "Buaigh Rás Lean an tosaí in aghaidh 5 Karts ar Star Track."
 
 #. I18N: ./data/challenges/skyline.challenge
-#: data/po/gui_strings.h:134 data/po/gui_strings.h:735
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:742
 msgid "Win a Head to Head in the Secret Garden"
 msgstr ""
 
 #. I18N: ./data/challenges/xr591.challenge
-#: data/po/gui_strings.h:158 data/po/gui_strings.h:759
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:766
 msgid "Win a race on Canyon"
 msgstr "Buaigh rás ar Canyon."
 
 #. I18N: ./data/challenges/gnu.challenge
-#: data/po/gui_strings.h:104 data/po/gui_strings.h:705
+#: data/po/gui_strings.h:107 data/po/gui_strings.h:712
 msgid "Win a race on Fort Magma"
 msgstr "Buaigh rás ar Dhún Magma."
 
 #. I18N: ./data/challenges/island.challenge
-#: data/po/gui_strings.h:116 data/po/gui_strings.h:717
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:724
 msgid "Win a race on Snow Mountain"
 msgstr "Buaigh Rás ar Shliabh Sneachta"
 
 #. I18N: ./data/challenges/canyon.challenge
-#: data/po/gui_strings.h:80 data/po/gui_strings.h:681
+#: data/po/gui_strings.h:83 data/po/gui_strings.h:688
 msgid "Win a race on Tux Tollway"
 msgstr "Buaigh Rás ar an nDolabóthar Tux."
 
 #. I18N: ./data/challenges/alltracks.challenge
-#: data/po/gui_strings.h:68 data/po/gui_strings.h:669
+#: data/po/gui_strings.h:71 data/po/gui_strings.h:676
 msgid "Win the At World's End Grand Prix"
 msgstr ""
 "Buaigh an Ag Deireadh na Dhomhan\n"
 "Grand Prix"
 
 #. I18N: ./data/challenges/snagdrive.challenge
-#: data/po/gui_strings.h:143 data/po/gui_strings.h:744
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:751
 msgid "Win the To the Moon and Back Grand Prix with 3 Expert Level AI karts."
 msgstr ""
 
@@ -1902,7 +1925,7 @@ msgstr "XR591"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: data/po/gui_strings.h:223
+#: data/po/gui_strings.h:230
 msgid "Yes"
 msgstr "Tá"
 
@@ -1910,15 +1933,15 @@ msgstr "Tá"
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
+#: src/karts/kart.cpp:607 src/karts/kart.cpp:626
 msgid "You finished the race!"
 msgstr "Chríochnaigh tú an rás!"
 
-#: src/modes/world.cpp:787
+#: src/modes/world.cpp:794
 msgid "You have been eliminated!"
 msgstr "Bhí tú eisiamh!"
 
-#: src/states_screens/race_result_gui.cpp:697
+#: src/states_screens/race_result_gui.cpp:700
 msgid "You topped the highscore list!"
 msgstr ""
 
@@ -1927,7 +1950,7 @@ msgstr ""
 msgid "You unlocked a new feature!"
 msgstr ""
 
-#: src/karts/kart.cpp:603 src/karts/kart.cpp:622
+#: src/karts/kart.cpp:607 src/karts/kart.cpp:626
 msgid "You won the race!"
 msgstr "Bhuaigh tú an rás!"
 
@@ -1947,13 +1970,18 @@ msgstr ""
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 
+#. I18N: ./data/tracks/zengarden/track.xml
+#: data/po/gui_strings.h:68
+msgid "Zen Garden"
+msgstr ""
+
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:87
 msgid "[none]"
 msgstr "[neamhní]"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:457
+#: src/states_screens/race_gui_base.cpp:459
 msgid "by"
 msgstr "le"
 
@@ -1961,8 +1989,11 @@ msgstr "le"
 msgid "featured"
 msgstr ""
 
+#. I18N: arena group name
 #. I18N: kart group name
-#: src/states_screens/kart_selection.cpp:909
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:70
+#: src/states_screens/kart_selection.cpp:914
 #: src/states_screens/tracks_screen.cpp:193
 msgid "standard"
 msgstr "caighdeánach"
@@ -1972,649 +2003,3 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Aaron Kearns https://launchpad.net/~ajkearns6"
-
-#~ msgid "%dx%d Blacklisted"
-#~ msgstr "%dx%d dubhliosta"
-
-#~ msgid ""
-#~ "'%s' has\n"
-#~ "been eliminated."
-#~ msgstr ""
-#~ "Bhí %s\n"
-#~ "eisiamh!"
-
-#~ msgid "< Back"
-#~ msgstr "< Ar Ais"
-
-#~ msgid "Active Challenges"
-#~ msgstr "Dúshláin Gníomhach"
-
-#~ msgid "All tracks"
-#~ msgstr "Iomlán na ráschúrsaí"
-
-#~ msgid "All tracks included in SuperTuxKart"
-#~ msgstr "Iomlán na ráschúrsaí"
-
-#~ msgid "Anvil - slows down greatly the kart in the first position"
-#~ msgstr "Inneoin - moilligh an chéad kart"
-
-#~ msgid "Apply "
-#~ msgstr "Cuir i bhfeidhm "
-
-#~ msgid "Apply %dx%d"
-#~ msgstr "Cuir i bhfeidhm %dx%d"
-
-#~ msgid "At world's end"
-#~ msgstr "Ag Deireadh an Domhain"
-
-#~ msgid "Avoid bananas"
-#~ msgstr "Seachain bananaí"
-
-#~ msgid "Become server"
-#~ msgstr "Bíonn freastalaí"
-
-#~ msgid "Can't connect to server"
-#~ msgstr "Ní féidir le ceangail le freastalaí"
-
-#~ msgid "Canyon"
-#~ msgstr "Cainneon"
-
-#~ msgid "Choose your controls, %s"
-#~ msgstr "Togair do rialtán, %s"
-
-#~ msgid "City"
-#~ msgstr "Cathair"
-
-#~ msgid "Clear from Blacklist"
-#~ msgstr "Glan ó Dubhliosta"
-
-#~ msgid ""
-#~ "Come first in the At World's End\n"
-#~ "Grand Prix with 3 'Racer'\n"
-#~ "Level AI karts."
-#~ msgstr ""
-#~ "Buaigh sa Ag Deireadh na Dhomhan\n"
-#~ "Grand Prix in aghaidh\n"
-#~ "3 Karts Karts leibhéal  'racer'."
-
-#~ msgid "Confirm Resolution"
-#~ msgstr "Deimhnigh Taifeach"
-
-#~ msgid "Confirm Resolution Within %d Seconds"
-#~ msgstr "Deimhnigh Taifeach taobh istigh de %d soicindí"
-
-#~ msgid "Confirm Resolution Within 5 Seconds"
-#~ msgstr "Deimhnigh Taifeach taobh istigh de 5 soicindí"
-
-#~ msgid "Connect to server"
-#~ msgstr "Ceangail le freastalaí"
-
-#~ msgid "Connected:"
-#~ msgstr "Ceangailte:"
-
-#~ msgid ""
-#~ "Created by Ingo Ruhnke,\n"
-#~ "modified by M. Gagnon"
-#~ msgstr ""
-#~ "Le Ingo Ruhnke,\n"
-#~ "maolaíodh le M. Gagnon"
-
-#~ msgid ""
-#~ "Created by Oliver & Steve Baker\n"
-#~ "modified by Marianne Gagnon"
-#~ msgstr ""
-#~ "Le Oliver & Steve Baker\n"
-#~ "maolaíodh le Marianne Gagnon"
-
-#~ msgid "Current: %dx%d"
-#~ msgstr "Reatha: %dx%d"
-
-#~ msgid "Decrease Resolution"
-#~ msgstr "Laghdófar Taifeach"
-
-#~ msgid "Difficulty"
-#~ msgstr "Deacracht"
-
-#~ msgid "Display"
-#~ msgstr "Taispeáint"
-
-#~ msgid "Display Settings"
-#~ msgstr "Leaganacha Taispeáint"
-
-#~ msgid "Driver"
-#~ msgstr "Tiománaí"
-
-#~ msgid "Edit controls for who?"
-#~ msgstr "Cuir in eagar rialtáin do cé?"
-
-#~ msgid ""
-#~ "Finish 3 laps in Racetrack\n"
-#~ "with 3 easy AI karts\n"
-#~ "in under 2:40 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Raon Rás\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 2:40."
-
-#~ msgid ""
-#~ "Finish 3 laps on the City track\n"
-#~ "with 3 AI karts\n"
-#~ "in under 4:20 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Raon Cathair\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 4:20."
-
-#~ msgid ""
-#~ "Finish 3 laps on the Tux Tollway\n"
-#~ "track with 3 AI karts\n"
-#~ "in under 3:35 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Dolabóthar Tux\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 3:35."
-
-#~ msgid "Finish Race track in 2:40"
-#~ msgstr "Críochnaigh Raon Rásaí i 2:40"
-
-#~ msgid "Finish Tux Tollway track in 3:35"
-#~ msgstr "Críochnaigh Dolabóthar Tux i 3:35"
-
-#~ msgid "Finish the City track in 4:20"
-#~ msgstr "Críochnaigh Raon Cathair i 4:20"
-
-#~ msgid ""
-#~ "Finish with at least 9 nitro \n"
-#~ "points on 3 laps of Shifting Sands\n"
-#~ "in under 2:20 minutes."
-#~ msgstr ""
-#~ "Bailigh ar a laghad 9 boinn nitro\n"
-#~ "istigh 3 cuairteanna ar Shifting Sands\n"
-#~ "lasitigh de 2:20."
-
-#~ msgid "Finished"
-#~ msgstr "Críochnaithe"
-
-#~ msgid ""
-#~ "Finsih with at least 6 points\n"
-#~ " of intro on three laps of\n"
-#~ "Oliver's Math Class\n"
-#~ "in under 52 seconds."
-#~ msgstr ""
-#~ "Bailigh ar a laghad 6 boinn nitro\n"
-#~ "istigh 3 cuairteanna\n"
-#~ "ar Rang matamaitic Oliver\n"
-#~ "lasitigh de 0:52."
-
-#~ msgid "First grand prix, easy to get started"
-#~ msgstr "Grand Prix céad, furasta a tionscain"
-
-#~ msgid "Follow the Leader in the Jungle"
-#~ msgstr "Leantar an Tosaí sa Mothar"
-
-#~ msgid ""
-#~ "Follow the Leader on a\n"
-#~ "Desert Island"
-#~ msgstr ""
-#~ "Lean an Tosaí ar\n"
-#~ "an t-Oileán Fásaigh"
-
-#~ msgid "Force your rivals bite *your* dust!"
-#~ msgstr "Force your rivals to eat *your* dust!"
-
-#~ msgid "Four Players"
-#~ msgstr "Ceithre Imreoirí"
-
-#~ msgid "Fullscreen mode"
-#~ msgstr "Mód lánscáileán"
-
-#~ msgid "Game mode help"
-#~ msgstr "Mód cluiche cabhrach"
-
-#~ msgid "Game modes"
-#~ msgstr "móideanna cluiche"
-
-#~ msgid "Go back to the main menu"
-#~ msgstr "Téigh ar ais go príomh-roghchlár"
-
-#~ msgid "Grab blue boxes and nitro"
-#~ msgstr "Glám boscaí gorme agus nítro"
-
-#~ msgid ""
-#~ "Grand Prix: Win victory points \n"
-#~ "by racing through a group of tracks,  \n"
-#~ "most points wins (shortest time in case of a tie!)          "
-#~ msgstr "Grand Prix: Buaigh          "
-
-#~ msgid "Increase Resolution"
-#~ msgstr "Méadaigh Taifeach"
-
-#~ msgid "Invalid"
-#~ msgstr "Neamhbhailí"
-
-#~ msgid "Invalid short-cut!!"
-#~ msgstr "Aicearra neamhbhailí!!"
-
-#~ msgid "King Weird's Castle"
-#~ msgstr "Dún Aisteach"
-
-#~ msgid "Last grand prix, longer and harder"
-#~ msgstr "Deiridh grand prix, níos faide agus níos crua"
-
-#~ msgid "Loading race..."
-#~ msgstr "Lódála rás..."
-
-#~ msgid "Look back"
-#~ msgstr "Féachtar siar"
-
-#~ msgid "Networking"
-#~ msgstr "Líonrú"
-
-#~ msgid "New Feature Unlocked"
-#~ msgstr "Gné Glasáladh Nua"
-
-#~ msgid ""
-#~ "New Grand Prix '%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Grand Prix nua '%s'\n"
-#~ "ar fáil anois"
-
-#~ msgid ""
-#~ "New difficulty\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Deacracht nua '%s'\n"
-#~ "ar fáil anois"
-
-#~ msgid ""
-#~ "New game mode\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Mód cluiche nua '%s'\n"
-#~ "ar fáil anois"
-
-#~ msgid ""
-#~ "New kart\n"
-#~ "'%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Kart nua\n"
-#~ "'%s'\n"
-#~ "ar fáil anois"
-
-#~ msgid ""
-#~ "New track '%s'\n"
-#~ "now available"
-#~ msgstr ""
-#~ "Raon nua '%s'\n"
-#~ "ar fáil anois"
-
-#~ msgid "Next >"
-#~ msgstr "Ar Aghaidh >"
-
-#~ msgid "Next background"
-#~ msgstr "Cúlra eile"
-
-#~ msgid "No Grand Prix selected"
-#~ msgstr "Níl Grand Prix ag togradh"
-
-#~ msgid "Number of karts"
-#~ msgstr "Líon na cairteacha"
-
-#~ msgid "Number of laps"
-#~ msgstr "Líon na cuairteanna"
-
-#~ msgid "Old config file found, check your key bindings!"
-#~ msgstr "Bunófar comhaid cumraíochta sean, seiceáil do ceangail eochair."
-
-#~ msgid "On the Beach"
-#~ msgstr "Ar an Trá"
-
-#~ msgid "Player "
-#~ msgstr "Imreoir "
-
-#~ msgid "Player %d, choose a driver"
-#~ msgstr "A imreoir %d, roghnaigh tiománaí"
-
-#~ msgid "Player 1"
-#~ msgstr "Imreoir 1"
-
-#~ msgid "Player 2"
-#~ msgstr "Imreoir 2"
-
-#~ msgid "Player 3"
-#~ msgstr "Imreoir 3"
-
-#~ msgid "Player 4"
-#~ msgstr "Imreoir 4"
-
-#~ msgid "Player Config"
-#~ msgstr "Cumraíocht Imreoir"
-
-#~ msgid "Player name"
-#~ msgstr "Ainm an imreora"
-
-#~ msgid "Prehistoric Island"
-#~ msgstr "Oileán Réamhstairiúil"
-
-#~ msgid "Press <ESC> to Cancel"
-#~ msgstr "Brúigh <ESC> a Chealú"
-
-#~ msgid "Press <ESC> to go back"
-#~ msgstr "Brúigh <ESC> a dhul ar ais"
-
-#~ msgid "Press key"
-#~ msgstr "Brúigh eochair"
-
-#~ msgid "Quick Race"
-#~ msgstr "Rás Tapa"
-
-#~ msgid "Quick race: Pick a single track, shortest time wins.         "
-#~ msgstr "Rás tapa: Togair raon, buaigh is am tapa.         "
-
-#~ msgid "REV"
-#~ msgstr "Cúl"
-
-#~ msgid "Race results"
-#~ msgstr "Torthaí Rás"
-
-#~ msgid "Racer"
-#~ msgstr "Tiománaí rása"
-
-#~ msgid "Racetrack"
-#~ msgstr "Raon Rásaí"
-
-#~ msgid "Return To Race"
-#~ msgstr "Téigh ar ais go Rás"
-
-#~ msgid "Second grand prix"
-#~ msgstr "An dóú grand prix"
-
-#~ msgid "Select network mode"
-#~ msgstr "Togair mód líonra"
-
-#~ msgid "Single Player"
-#~ msgstr "Aon Imreoir Amháin"
-
-#~ msgid "Single Race"
-#~ msgstr "Aon Rás Amháin"
-
-#~ msgid "Snow Mountain"
-#~ msgstr "Sliabh Sneachta"
-
-#~ msgid "SnowTux Peak"
-#~ msgstr "Sliabh SneachtaTux"
-
-#~ msgid "Sound"
-#~ msgstr "Fuaim"
-
-#~ msgid "Sound Settings"
-#~ msgstr "Socrú Fuaim"
-
-#~ msgid "Splitscreen"
-#~ msgstr "Scáileán roinnte"
-
-#~ msgid "Start race"
-#~ msgstr "Tosaigh rás"
-
-#~ msgid "Synchronising network..."
-#~ msgstr "Ag sioncronú líonra..."
-
-#~ msgid "Synchronising."
-#~ msgstr "Ag sioncronú."
-
-#~ msgid ""
-#~ "The current key bindings can be seen/changed in the\n"
-#~ "Options->Player Config menu."
-#~ msgstr ""
-#~ "Is féidir leat na ceangail eochair a fheiceáil agus ag\n"
-#~ "Roghanna->Cumraíocht Imreoir."
-
-#~ msgid "The old mine"
-#~ msgstr "An Sean-Mianach"
-
-#~ msgid "The winner is %s!"
-#~ msgstr "Tá %s an buaiteoir!"
-
-#~ msgid "Third grand prix"
-#~ msgstr "Tríú grand prix"
-
-#~ msgid "Three Players"
-#~ msgstr "Triúr Imreoir"
-
-#~ msgid "Turn off sound effects"
-#~ msgstr "Múch maisíocht fuaime"
-
-#~ msgid "Turn on music"
-#~ msgstr "Cuir ar siúl ceol."
-
-#~ msgid "Turn on sound effects"
-#~ msgstr "Cuir ar siúl maisíocht fuaime"
-
-#~ msgid "Two Players"
-#~ msgstr "Beirt Imreoirí"
-
-#~ msgid "Waiting for clients"
-#~ msgstr "Ag fanacht le cliant"
-
-#~ msgid "Waiting for server"
-#~ msgstr "Ag fanacht le freastalaí"
-
-#~ msgid ""
-#~ "Win Penguin Playground Grand\n"
-#~ "Prix"
-#~ msgstr ""
-#~ "Buaigh Áit Shúgartha na Phiongáin\n"
-#~ "Grand Prix"
-
-#~ msgid ""
-#~ "Win Penguin Playground Grand\n"
-#~ "Prix with 3 'Racer' Level AI karts."
-#~ msgstr ""
-#~ "Buaigh Áit Shúgartha na Phiongáin\n"
-#~ "Grand Prix le 3 Karts leibhéal  'racer'"
-
-#~ msgid ""
-#~ "Win To the Moon and Back\n"
-#~ "Grand Prix"
-#~ msgstr ""
-#~ "Buaigh Chun an Gealach agus Ar Ais\n"
-#~ "Grand Prix"
-
-#~ msgid ""
-#~ "Win a 1 lap Head to Head\n"
-#~ "on Tux Tollway against 1 'Racer'\n"
-#~ "level AI kart."
-#~ msgstr "Buaigh in aghaidh aon kart amháin ar an nDolabóthar Tux."
-
-#~ msgid ""
-#~ "Win a Follow the Leader race\n"
-#~ "with 3 AI karts\n"
-#~ "in the Amazonian Jungle."
-#~ msgstr ""
-#~ "Buaigh Rás Lean an tosaí\n"
-#~ "in aghaidh 3 Karts\n"
-#~ "sa Turas Amazon."
-
-#~ msgid ""
-#~ "Win a Follow the Leader race\n"
-#~ "with 3 AI karts\n"
-#~ "on a Desert Island."
-#~ msgstr ""
-#~ "Buaigh Rás Lean an tosaí\n"
-#~ "in aghaidh 3 Karts\n"
-#~ "ar oileán fásaigh."
-
-#~ msgid ""
-#~ "Win a Head to Head on\n"
-#~ "Tux Tollway"
-#~ msgstr ""
-#~ "Buaigh Head to Head ar\n"
-#~ "Tux Tollway"
-
-#~ msgid ""
-#~ "Win the At World's End\n"
-#~ "Grand Prix"
-#~ msgstr ""
-#~ "Buaigh an Ag Deireadh na Dhomhan\n"
-#~ "Grand Prix"
-
-#~ msgid ""
-#~ "Win the To the Moon and Back\n"
-#~ "Grand Prix with 3 'Racer'\n"
-#~ "Level AI karts."
-#~ msgstr ""
-#~ "Buaigh an Chun an Gealach agus Ar Ais\n"
-#~ "Grand Prix le 3 AI Karts leibhéal 'racer'"
-
-#~ msgid "Window mode"
-#~ msgstr "Mód Fuinneog"
-
-#~ msgid ""
-#~ "You have been\n"
-#~ "eliminated!"
-#~ msgstr ""
-#~ "Bhí tú\n"
-#~ "eisiamh!"
-
-#~ msgid "Zipper - speed boost"
-#~ msgstr "Zipper - méadú luas"
-
-#~ msgid "joy %d axis %d  %c"
-#~ msgstr "Luamhán stiúrtha %d ais %d %c"
-
-#~ msgid "joy %d btn %d"
-#~ msgstr "luamhán stiúrtha %d cnaip %d"
-
-#~ msgid "joy %d hat %d"
-#~ msgstr "luamhán stiúrtha %d hat %d"
-
-#~ msgid "mouse axis %d %c"
-#~ msgstr "ais na luiche %d %c"
-
-#~ msgid "mouse btn %d"
-#~ msgstr "cnaip na luiche %d"
-
-#~ msgid "not set"
-#~ msgstr "ní réidh"
-
-#~ msgid "Race Track"
-#~ msgstr "Raon Rásaí"
-
-#, c-format
-#~ msgid "   Keyboard %i"
-#~ msgstr "   Méarchlár %i"
-
-#~ msgid ""
-#~ "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
-#~ "they lose all their lives."
-#~ msgstr "Trí Bhuillí Cath. Buail an cairtíní eile."
-
-#~ msgid "Apply video changes"
-#~ msgstr "Cuir athruithe físe"
-
-#~ msgid "Back to main menu"
-#~ msgstr "Téigh ar ais go príomh-roghchlár"
-
-#~ msgid ""
-#~ "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Raon Rás\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 2:40."
-
-#~ msgid ""
-#~ "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Raon Cathair\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 4:20."
-
-#~ msgid ""
-#~ "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
-#~ msgstr ""
-#~ "Críochnaigh 3 cuairteanna sa Dolabóthar Tux\n"
-#~ "le 3 Karts\n"
-#~ "lasitigh de 3:35."
-
-#~ msgid ""
-#~ "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under "
-#~ "2:20 minutes."
-#~ msgstr ""
-#~ "Bailigh ar a laghad 9 boinn nitro\n"
-#~ "istigh 3 cuairteanna ar Shifting Sands\n"
-#~ "lasitigh de 2:20."
-
-#~ msgid "Grand Prix Results"
-#~ msgstr "Torthaí Grand Prix"
-
-#, c-format
-#~ msgid "Player %i (%s)"
-#~ msgstr "Imreoir %i (%s)"
-
-#~ msgid ""
-#~ "Regular Race - all blows allowed, so catch weapons and make clever use of "
-#~ "them!"
-#~ msgstr "Rás Normálta"
-
-#~ msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
-#~ msgstr ""
-#~ "Buaigh Áit Shúgartha na Phiongáin\n"
-#~ "Grand Prix le 3 Karts leibhéal  'Racer'"
-
-#~ msgid ""
-#~ "Win a 1 lap Head to Head on Tux Tollway against 1 'Racer' level AI kart."
-#~ msgstr "Buaigh in aghaidh aon kart 'Racer' amháin ar an nDolabóthar Tux."
-
-#~ msgid "Win a Follow the Leader race with 3 AI karts in the Amazonian Jungle."
-#~ msgstr ""
-#~ "Buaigh Rás Lean an tosaí\n"
-#~ "in aghaidh 3 Karts\n"
-#~ "sa Turas Amazon."
-
-#~ msgid ""
-#~ "Win the To the Moon and Back Grand Prix with 3 'Racer' Level AI karts."
-#~ msgstr ""
-#~ "Buaigh an Chun an Gealach agus Ar Ais\n"
-#~ "Grand Prix le 3 AI Karts leibhéal 'Racer'"
-
-#~ msgid "Video"
-#~ msgstr "Fís"
-
-#~ msgid "Special"
-#~ msgstr "Speisialta"
-
-#~ msgid "Industry"
-#~ msgstr "Tionscal"
-
-#~ msgid "Mystery Island"
-#~ msgstr "An Oileán"
-
-#~ msgid "sj04736"
-#~ msgstr "sj04736"
-
-#~ msgid "Turn off music"
-#~ msgstr "Múch ceol"
-
-#~ msgid "Name:"
-#~ msgstr "Ainm:"
-
-#, c-format
-#~ msgid "Name: %i"
-#~ msgstr "Ainm: %i"
-
-#~ msgid "Test"
-#~ msgstr "Tástáil"
-
-#~ msgid "Version:"
-#~ msgstr "Leagan:"
-
-#, c-format
-#~ msgid "Version: %i"
-#~ msgstr "Leagan: %i"
-
-#~ msgid "Updating the list..."
-#~ msgstr "Nuashonrú an liosta..."
