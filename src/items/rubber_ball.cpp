@@ -34,6 +34,10 @@ RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
+    // The rubber ball often misses the terrain on steep uphill slopes, e.g.
+    // the ramp in sand track. Add an Y offset so that the terrain raycast
+    // will always be done from a position high enough to avoid this.
+    setPositionOffset(Vec3(0, 1.0f, 0));
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),

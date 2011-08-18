@@ -51,10 +51,17 @@ private:
      *  It can happen that more than one collision between a rocket and
      *  a track or kart is reported by the physics.                        */
     bool              m_exploded;
+
     /** If this flag is set, the up velocity of the kart will not be
      *  adjusted in case that the objects is too high or too low above the
      *  terrain. Otherwise gravity will not work correctly on this object. */
     bool              m_adjust_up_velocity;
+
+    /** An offset that is added when doing the raycast for terrain. This
+     *  is useful in case that the position of the object is just under
+     *  the terrain (perhaps due to floating point errors), and would 
+     *  otherwise result in an invalid terrain. */
+    Vec3              m_position_offset;
 
 protected:
     /** Kart which shot this flyable. */
@@ -144,27 +151,50 @@ public:
                  Flyable     (Kart* kart, PowerupManager::PowerupType type, 
                               float mass=1.0f);
     virtual     ~Flyable     ();
-    /** Enables/disables adjusting ov velocity depending on height above
-     *  terrain. Missiles can 'follow the terrain' with this adjustment,
-     *  but gravity will basically be disabled.                          */
-    void         setAdjustUpVelocity(bool f) { m_adjust_up_velocity = f; }
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);
+    bool         isOwnerImmunity(const Kart *kart_hit) const;
 
+    // ------------------------------------------------------------------------
+    /** If true the up velocity of the flyable will be adjust so that the 
+     *  flyable stays at a height close to the average height.
+     *  \param f True if the up velocity should be adjusted. */
+    void         setAdjustUpVelocity(bool f) { m_adjust_up_velocity = f; }
+    // ------------------------------------------------------------------------
+    /** Sets the offset to be used when determining the terrain under the
+     *  flyable. This needs to be used in case that an object might be just
+     *  under the actual terrain (e.g. rubber ball on a steep uphill slope). */
+    void         setPositionOffset(const Vec3 &o) {m_position_offset = o; }
+    // ------------------------------------------------------------------------
+    /** Called when this flyable hits the track. */
     virtual void hitTrack    () {};
+    // ------------------------------------------------------------------------
+    /** Called when this flyable hit a kart or physical object. 
+     *  \param kart Pointer to the kart hit (NULL if no kart was hit).
+     *  \param obj  Pointer to the object hit (NULL if no object was hit). */
     virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    // ------------------------------------------------------------------------
+    /** Enables/disables adjusting ov velocity depending on height above
+     *  terrain. Missiles can 'follow the terrain' with this adjustment,
+     *  but gravity will basically be disabled.                          */
     bool         hasHit      () { return m_has_hit_something; }
+    // ------------------------------------------------------------------------
     /** Indicates that something was hit and that this object must
      *  be removed. */
     void         setHasHit   () { m_has_hit_something = true; }
+    // ------------------------------------------------------------------------
+    /** Resets this flyable. */
     void         reset       () { Moveable::reset();          }
-    bool         isOwnerImmunity(const Kart *kart_hit) const;
+    // ------------------------------------------------------------------------
     /** Returns the type of flyable. */
     PowerupManager::PowerupType
                   getType() const {return m_type;}
+    // ------------------------------------------------------------------------
+    /** Returns the sfx that should be played in case of an explosion. */
     virtual const char*  getExplosionSound() const { return "explosion"; }
+    // ------------------------------------------------------------------------
     /** Indicates if an explosion needs to be added if this flyable
       * is removed. */
     virtual bool needsExplosion() const {return true;}

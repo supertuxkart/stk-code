@@ -130,6 +130,7 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
     m_mass                         = mass;
     m_adjust_up_velocity           = true;
     m_time_since_thrown            = 0;
+    m_position_offset              = Vec3(0,0,0);
     m_owner_has_temporary_immunity = true;
     m_max_lifespan = -1;
 
@@ -397,7 +398,10 @@ void Flyable::update(float dt)
         return;
     }
 
-    TerrainInfo::update(xyz);
+    // Add the position offset so that the flyable can adjust its position 
+    // (usually to do the raycast from a slightly higher position to avoid
+    // problems finding the terrain in steep uphill sections).
+    TerrainInfo::update(xyz+m_position_offset);
 
     if(m_adjust_up_velocity)
     {
