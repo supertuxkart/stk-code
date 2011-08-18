@@ -25,8 +25,10 @@
 #include "tracks/track.hpp"
 
 float RubberBall::m_st_interval;
+float RubberBall::m_st_min_interpolation_distance;
 float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
+float RubberBall::m_st_target_distance;
 
 RubberBall::RubberBall(Kart *kart) 
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
@@ -48,7 +50,7 @@ RubberBall::RubberBall(Kart *kart)
 
     computeTarget();
 
-    // Initialises the current graph node
+    // initialises the current graph node
     TrackSector::update(getXYZ());
     initializeControlPoints(m_owner->getXYZ());
 
@@ -152,7 +154,7 @@ void RubberBall::getNextControlPoint()
 
     int next = getSuccessorToHitTarget(m_last_aimed_graph_node, &dist);
     float d = QuadGraph::get()->getDistanceFromStart(next)-f;
-    while(d<30 && d>0)
+    while(d<m_st_min_interpolation_distance && d>0)
     {
         next = getSuccessorToHitTarget(next, &dist);
         d = QuadGraph::get()->getDistanceFromStart(next)-f;
@@ -172,17 +174,27 @@ void RubberBall::getNextControlPoint()
  */
 void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 {
-    m_st_interval        = 1.0f;
-    m_st_squash_duration = 3.0f;
-    m_st_squash_slowdown = 0.5f;
+    m_st_interval                   = 1.0f;
+    m_st_squash_duration            = 3.0f;
+    m_st_squash_slowdown            = 0.5f;
+    m_st_target_distance            = 50.0f;
+    m_st_min_interpolation_distance = 30.0f;
     if(!node.get("interval", &m_st_interval))
-        printf("[powerup] Warning: no interval specific for rubber ball.\n");
+        printf("[powerup] Warning: no interval specified for rubber ball.\n");
     if(!node.get("squash-duration", &m_st_squash_duration))
         printf(
-        "[powerup] Warning: no squash-duration specific for rubber ball.\n");
+        "[powerup] Warning: no squash-duration specified for rubber ball.\n");
     if(!node.get("squash-slowdown", &m_st_squash_slowdown))
         printf(
-        "[powerup] Warning: no squash-slowdown specific for rubber ball.\n");
+        "[powerup] Warning: no squash-slowdown specified for rubber ball.\n");
+    if(!node.get("target-distance", &m_st_target_distance))
+        printf(
+        "[powerup] Warning: no target-distance specified for rubber ball.\n");
+    if(!node.get("min-interpolation-distance", 
+                 &m_st_min_interpolation_distance))
+        printf(
+               "[powerup] Warning: no min-interpolation-distance specified "
+               "for rubber ball.\n");
 
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
@@ -302,7 +314,7 @@ float RubberBall::updateHeight()
 
         if(distance<0)
             distance+=World::getWorld()->getTrack()->getTrackLength();;
-        if(distance<50)
+        if(distance<m_st_target_distance)
         {
             // Some experimental formulas
             m_current_max_height   = 0.5f*sqrt(distance);
@@ -353,7 +365,7 @@ void RubberBall::checkDistanceToTarget()
         diff += world->getTrack()->getTrackLength();
     }
 
-    if(diff < 50)
+    if(diff < m_st_target_distance)
     {
         m_aiming_at_target = true;
         return;

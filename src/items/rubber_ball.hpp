@@ -41,6 +41,15 @@ private:
     /** A class variable to store the default squash slowdown. */
     static float m_st_squash_slowdown;
 
+    /** If the ball is closer than this distance to the target, it will
+     *  start to aim directly at the target (and not interpolate anymore). */
+    static float m_st_target_distance;
+
+    /** Each control point chosen must be at least this far away from
+     *  the previous one. This gives smooth 'overall' interpolation
+     *  even if the quads should be close to each other. */
+    static float m_st_min_interpolation_distance;
+
     /** A pointer to the target kart. */
     const Kart  *m_target;
 
