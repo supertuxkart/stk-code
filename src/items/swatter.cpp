@@ -203,6 +203,7 @@ void Swatter::squashThingsAround()
         {
             kart->setSquash(kp->getSquashDuration(),
                             kp->getSquashSlowdown());
+            World::getWorld()->kartHit(kart->getWorldKartId());
         }
     }
 
