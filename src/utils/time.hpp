@@ -41,7 +41,7 @@ public:
     {
         const struct tm *t = gmtime(&tt);
         char s[16];
-        strftime(s, sizeof(s), "%d.%m.%Y", t);
+        strftime(s, 16, "%d.%m.%Y", t);
         return s;
     }   // toString
     // ------------------------------------------------------------------------
