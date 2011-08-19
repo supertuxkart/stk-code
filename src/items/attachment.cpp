@@ -20,6 +20,7 @@
 #include "items/attachment.hpp"
 
 #include <algorithm>
+#include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -39,6 +40,7 @@ Attachment::Attachment(Kart* kart)
     m_plugin         = NULL;
     m_kart           = kart;
     m_previous_owner = NULL;
+    m_bomb_sound     = NULL;
 
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
@@ -58,6 +60,12 @@ Attachment::~Attachment()
 {
     if(m_node)
         irr_driver->removeNode(m_node);
+    
+    if (m_bomb_sound)
+    {
+        sfx_manager->deleteSFX(m_bomb_sound);
+        m_bomb_sound = NULL;
+    }
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
@@ -70,6 +78,13 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     {
     case ATTACH_SWATTER : 
         m_plugin = new Swatter(this, m_kart);
+        break;
+    case ATTACH_BOMB:
+        if (m_bomb_sound) sfx_manager->deleteSFX(m_bomb_sound);
+        m_bomb_sound = sfx_manager->createSoundSource("clock");
+        m_bomb_sound->setLoop(true);
+        m_bomb_sound->position(m_kart->getXYZ());
+        m_bomb_sound->play();
         break;
     default:
         break;
@@ -119,6 +134,13 @@ void Attachment::clear()
         m_plugin = NULL;
     }
 
+    if (m_bomb_sound)
+    {
+        m_bomb_sound->stop();
+        sfx_manager->deleteSFX(m_bomb_sound);
+        m_bomb_sound = NULL;
+    }
+    
     m_type=ATTACH_NOTHING; 
     
     m_time_left=0.0;
@@ -215,6 +237,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             break ;
         case 1:
             set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
+                
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
@@ -277,6 +300,9 @@ void Attachment::update(float dt)
         // Everything is done in the plugin.
         break;
     case ATTACH_BOMB:
+            
+        if (m_bomb_sound) m_bomb_sound->position(m_kart->getXYZ());
+
         // Mesh animation frames are 1 to 61 frames (60 steps)
         // The idea is change second by second, counterclockwise 60 to 0 secs
         // If longer times needed, it should be a surprise "oh! bomb activated!"
@@ -291,6 +317,13 @@ void Attachment::update(float dt)
                                 m_kart->getController()->isPlayerController());
             m_kart->handleExplosion(m_kart->getXYZ(), 
                                     /*direct_hit*/ true);
+            
+            if (m_bomb_sound)
+            {
+                m_bomb_sound->stop();
+                sfx_manager->deleteSFX(m_bomb_sound);
+                m_bomb_sound = NULL;
+            }
         }
         break;
     case ATTACH_TINYTUX:

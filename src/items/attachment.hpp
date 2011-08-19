@@ -27,6 +27,7 @@
 
 class Kart;
 class Item;
+class SFXBase;
 
 /** This objects is permanently available in a kart and stores information 
  *  about addons. If a kart has no attachment, this object will have the
@@ -85,7 +86,10 @@ private:
     AttachmentPlugin *m_plugin;
 
     /** Pseudo random number generator. */
-    RandomGenerator m_random;
+    RandomGenerator   m_random;
+    
+    /** Ticking sound for the bomb */
+    SFXBase          *m_bomb_sound;
 
 public:
           Attachment(Kart* kart);
