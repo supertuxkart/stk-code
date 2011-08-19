@@ -183,6 +183,9 @@ void PlayerController::action(PlayerAction action, int value)
     case PA_DRIFT:
         m_controls->m_drift = (value!=0);
         break;
+    case PA_PAUSE_RACE:
+        if (value != 0) StateManager::get()->escapePressed();
+        break;
     default: 
        break;
     }

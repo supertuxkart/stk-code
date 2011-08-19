@@ -257,7 +257,7 @@ void KeyboardConfig::setDefaultBinds()
     setBinding(PA_RESCUE,      Input::IT_KEYBOARD, KEY_BACK);
     setBinding(PA_FIRE,        Input::IT_KEYBOARD, KEY_SPACE);
     setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, KEY_KEY_B);
-    
+    setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, KEY_ESCAPE);
     
     setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, KEY_UP);
     setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, KEY_DOWN);
@@ -299,7 +299,8 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
     setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
     setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
-    
+    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
+
     setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
     setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
     setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);

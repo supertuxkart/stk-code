@@ -131,7 +131,8 @@ void OptionsScreenInput2::init()
     actions->addItem(KartActionStrings[PA_DRIFT],       L"" );
     actions->addItem(KartActionStrings[PA_LOOK_BACK],   L"" );
     actions->addItem(KartActionStrings[PA_RESCUE],      L"" );
-    
+    actions->addItem(KartActionStrings[PA_PAUSE_RACE],  L"" );
+
 
     //I18N: Key binding section
     actions->addItem("menu_keys_section", _("Menu Keys") );
@@ -168,55 +169,58 @@ void OptionsScreenInput2::updateInputButtons()
     GUIEngine::ListWidget* actions = this->getWidget<GUIEngine::ListWidget>("actions");
     assert( actions != NULL );
     
-    // item 0 is a section header
+    int i = 0;
+    i++; // section header
     
     //I18N: Key binding name
-    actions->renameItem(1, makeLabel( _("Steer Left"), PA_STEER_LEFT) );
+    actions->renameItem(i++, makeLabel( _("Steer Left"), PA_STEER_LEFT) );
     
     //I18N: Key binding name
-    actions->renameItem(2, makeLabel( _("Steer Right"), PA_STEER_RIGHT) );
+    actions->renameItem(i++, makeLabel( _("Steer Right"), PA_STEER_RIGHT) );
     
     //I18N: Key binding name
-    actions->renameItem(3, makeLabel( _("Accelerate"), PA_ACCEL) );
+    actions->renameItem(i++, makeLabel( _("Accelerate"), PA_ACCEL) );
     
     //I18N: Key binding name
-    actions->renameItem(4, makeLabel( _("Brake"), PA_BRAKE) );
+    actions->renameItem(i++, makeLabel( _("Brake"), PA_BRAKE) );
     
     //I18N: Key binding name
-    actions->renameItem(5, makeLabel( _("Fire"), PA_FIRE) );
+    actions->renameItem(i++, makeLabel( _("Fire"), PA_FIRE) );
     
     //I18N: Key binding name
-    actions->renameItem(6, makeLabel( _("Nitro"), PA_NITRO) );
+    actions->renameItem(i++, makeLabel( _("Nitro"), PA_NITRO) );
     
     //I18N: Key binding name
-    actions->renameItem(7, makeLabel( _("Sharp Turn"), PA_DRIFT) );
+    actions->renameItem(i++, makeLabel( _("Sharp Turn"), PA_DRIFT) );
     
     //I18N: Key binding name
-    actions->renameItem(8, makeLabel( _("Look Back"), PA_LOOK_BACK) );
+    actions->renameItem(i++, makeLabel( _("Look Back"), PA_LOOK_BACK) );
     
     //I18N: Key binding name
-    actions->renameItem(9, makeLabel( _("Rescue"), PA_RESCUE) );
-    
-    
-    // item 10 is a section header
+    actions->renameItem(i++, makeLabel( _("Rescue"), PA_RESCUE) );
     
     //I18N: Key binding name
-    actions->renameItem(11, makeLabel( _("Up"), PA_MENU_UP) );
+    actions->renameItem(i++, makeLabel( _("Pause Game"), PA_PAUSE_RACE) );
+    
+    i++; // section header
     
     //I18N: Key binding name
-    actions->renameItem(12, makeLabel( _("Down"), PA_MENU_DOWN) );
+    actions->renameItem(i++, makeLabel( _("Up"), PA_MENU_UP) );
     
     //I18N: Key binding name
-    actions->renameItem(13, makeLabel( _("Left"), PA_MENU_LEFT) );
+    actions->renameItem(i++, makeLabel( _("Down"), PA_MENU_DOWN) );
     
     //I18N: Key binding name
-    actions->renameItem(14, makeLabel( _("Right"), PA_MENU_RIGHT) );
+    actions->renameItem(i++, makeLabel( _("Left"), PA_MENU_LEFT) );
     
     //I18N: Key binding name
-    actions->renameItem(15, makeLabel( _("Select"), PA_MENU_SELECT) );
+    actions->renameItem(i++, makeLabel( _("Right"), PA_MENU_RIGHT) );
     
     //I18N: Key binding name
-    actions->renameItem(16, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
+    actions->renameItem(i++, makeLabel( _("Select"), PA_MENU_SELECT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(i++, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
     
     
     // ---- make sure there are no binding conflicts (same key used for two actions)
@@ -231,7 +235,7 @@ void OptionsScreenInput2::updateInputButtons()
             currentlyUsedKeys.insert( item );
         }
         else
-        {            
+        {
             // binding conflict!
             actions->markItemRed( KartActionStrings[action] );
             
