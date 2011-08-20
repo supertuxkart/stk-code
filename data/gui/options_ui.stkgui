@@ -16,14 +16,16 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
         
-        <spacer height="20" width="10"/>
+        <spacer height="18" width="10"/>
 
         <!-- ************ SKIN CHOICE ************ -->
-        <label I18N="In the graphics settings" text="Skin"/>
+        <div layout="horizontal-row" width="100%" height="fit">
+            <label I18N="In the graphics settings" text="Skin" align="center"/>
+            <spacer width="20" height="20"/>
+            <spinner id="skinchoice" width="30%"/>
+        </div>
         
-        <spinner id="skinchoice" width="30%"/>
-        
-        <spacer width="20" height="40" />
+        <spacer width="20" height="18" />
         
         <div width="75%" height="fit" layout="horizontal-row" >
             <checkbox id="showfps"/>
@@ -43,8 +45,14 @@
             <label height="100%" I18N="In the ui settings" text="Minimal Race GUI"/>
         </div>
 
-        <spacer height="4" width="4"/>
+        <spacer height="18" width="4"/>
         
+        <!-- ************ LANGUAGE CHOICE ************ -->
+        
+        <list id="language" proportion="1" width="75%" align="center"/>
+        
+        <spacer height="18" width="4"/>
+
     </box>
 </div>
 

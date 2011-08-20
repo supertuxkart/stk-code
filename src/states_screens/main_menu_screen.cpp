@@ -160,60 +160,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         const core::stringw &news_text = news_manager->getNextNewsMessage();
         w->setText(news_text, true);
     }
-    
-    IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-    if (lang_combo != NULL)
-    {
-        irr::gui::ScalableFont* font = GUIEngine::getFont();
-        
-        // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-        core::stringw language_name = _("English");
-        
-        const int LEFT_MARGIN = 5;
-        const int arrow_width = (int)(lang_combo->m_h*0.6f); // the arrow is about half wide as the combo is high
-
-        // Below is a not-too-pretty hack. When language name is too long to fit the space allocated by the STK
-        // widget, resize the irrlicht element (but don't resize the STK widget on top of it, because we don't
-        // want the change of size to be permanent - if we switch back to another language the combo needs
-        // to shrink back)
-        int element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
-        const int text_w = (int)font->getDimension(language_name.c_str()).Width;
-        const int needed_additional_space = text_w - (element_width - arrow_width - LEFT_MARGIN);
-        if (needed_additional_space > 0)
-        {
-            // language name too long to fit
-            gui::IGUIElement* el = lang_combo->getIrrlichtElement();
-            core::recti pos = el->getRelativePosition();
-            pos.UpperLeftCorner.X -= needed_additional_space;
-            el->setRelativePosition( pos );
-        }
-        
-        element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
-        
-        const int elem_x = lang_combo->getIrrlichtElement()->getRelativePosition().UpperLeftCorner.X;
-        font->draw(language_name,
-                   core::rect<s32>(elem_x + LEFT_MARGIN,
-                                   lang_combo->m_y,
-                                   // don't go over combo arrow
-                                   (int)(elem_x + LEFT_MARGIN + (element_width - arrow_width)),
-                                   lang_combo->m_y + lang_combo->m_h),
-                   // center horizontally only if there is enough room, irrlicht's centering algorithm
-                   // seems to give weird results when space is too tight
-                   video::SColor(255,0,0,0), (element_width - text_w > 5) /* hcenter */, true /* vcenter */);
-        
-        // Close popup when focus lost
-        if (m_lang_popup != NULL)
-        {
-            Widget* focus = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            const core::position2d<s32> mouse = irr_driver->getDevice()->getCursorControl()->getPosition();
-            if (mouse.X < m_lang_popup->m_x - 50 || mouse.X > m_lang_popup->m_x + m_lang_popup->m_w + 50 ||
-                mouse.Y < m_lang_popup->m_y - 50  || // we don't check if mouse Y is too large because the mouse will come from the bottom
-                (focus != NULL && focus->getType() == WTYPE_RIBBON))
-            {
-                closeLangPopup();
-            }
-        }
-    }
 }
 // ------------------------------------------------------------------------------------------------------
 
@@ -221,109 +167,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 {
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL)
-    {
-        // Language selection combo
-        if (name == "lang_combo")
-        {
-            if (m_lang_popup == NULL)
-            {
-                // When the combo is clicked, show a pop-up list with the choices
-                IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-                
-                m_lang_popup = new ListWidget();
-                m_lang_popup->m_properties[PROP_ID] = "lang_popup";
-                const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
-                
-                const int width = (int)(frame_size.Width*0.4f);
-                
-                const int MARGIN_ABOVE_POPUP = 50;
-                const int CLEAR_BOTTOM = 15;
-
-                const int height = lang_combo->m_y - MARGIN_ABOVE_POPUP - CLEAR_BOTTOM;
-                
-                m_lang_popup->m_x = lang_combo->m_x;
-                m_lang_popup->m_y = lang_combo->m_y - height - CLEAR_BOTTOM;
-                m_lang_popup->m_w = width;
-                m_lang_popup->m_h = height;
-                
-                m_lang_popup->add();
-
-                m_lang_popup->m_properties[PROP_ID] = "language_popup";
-                
-                // I18N: in the language choice, to select the same language as the OS
-                m_lang_popup->addItem("system", _("System Language"));
-
-                const std::vector<std::string>* lang_list = translations->getLanguageList();
-                const int amount = lang_list->size();
-                for (int n=0; n<amount; n++)
-                {
-                    std::string code_name = (*lang_list)[n];
-                    std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
-                    m_lang_popup->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
-                                                     nice_name.c_str() + ")");
-                }
-
-                manualAddWidget(m_lang_popup);
-                
-                m_lang_popup->setSelectionID( m_lang_popup->getItemID(UserConfigParams::m_language) );
-                m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            }
-            else
-            {
-                closeLangPopup();
-            }
-        }
-        else if (name == "language_popup")
-        {
-            std::string selection = m_lang_popup->getSelectionInternalName();
-
-            closeLangPopup();
-            
-            delete translations;
-            
-            if (selection == "system")
-            {
-#ifdef WIN32
-                _putenv("LANGUAGE=");
-#else
-                setenv( "LANGUAGE", "", 1);
-#endif
-            }
-            else
-            {
-#ifdef WIN32
-                std::string s=std::string("LANGUAGE=")+selection.c_str();
-                _putenv(s.c_str());
-#else
-                setenv("LANGUAGE", selection.c_str(), 1);
-#endif
-            }
-            
-            translations = new Translations();
-            GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-            
-            GUIEngine::getFont()->updateRTL();
-            GUIEngine::getTitleFont()->updateRTL();
-            GUIEngine::getSmallFont()->updateRTL();
-            
-            UserConfigParams::m_language = selection.c_str();
-            user_config->saveConfig();
-        }
-        
-        return;
-    }
     
-    // When the lang popup is shown, ignore all other widgets
-    // FIXME: for some reasons, irrlicht widgets appear to be click-through, this is why
-    //        this hack is needed
-    if (m_lang_popup != NULL)
-    {
-        return;
-    }
+    if (ribbon == NULL) return; // what's that event??
     
     // ---- A ribbon icon was clicked
-    
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
 #if DEBUG_MENU_ITEM

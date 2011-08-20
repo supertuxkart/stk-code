@@ -32,10 +32,7 @@
         <spacer width="10" proportion="1"/>
         
         <bottombar width="100%" height="10%" layout="horizontal-row">
-            <div proportion="1" height="100%" layout="horizontal-row">
-                <icon-button id="lang_combo" icon="gui/dropdown.png" height="100%" align="center"/>
-            </div>
-            
+
             <spacer width="10" height="10" />
             
             <label proportion="3" height="100%" id="info_addons"
@@ -45,8 +42,6 @@
                
             <spacer width="10" height="10" />
             
-            <placeholder id="empty_for_now" proportion="1">
-            </placeholder>
         </bottombar>
         
     </div>

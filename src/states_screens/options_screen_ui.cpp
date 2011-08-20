@@ -22,13 +22,16 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_players.hpp"
@@ -152,6 +155,25 @@ void OptionsScreenUI::init()
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }
+    
+    // --- language
+    ListWidget* list_widget = getWidget<ListWidget>("language");
+    
+    // I18N: in the language choice, to select the same language as the OS
+    list_widget->addItem("system", _("System Language"));
+    
+    const std::vector<std::string>* lang_list = translations->getLanguageList();
+    const int amount = lang_list->size();
+    for (int n=0; n<amount; n++)
+    {
+        std::string code_name = (*lang_list)[n];
+        std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
+        list_widget->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
+                             nice_name.c_str() + ")");
+    }
+        
+    list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
+    
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -210,6 +232,41 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( min_gui != NULL );
         UserConfigParams::m_minimal_race_gui = 
             !UserConfigParams::m_minimal_race_gui;
+    }
+    else if (name == "language")
+    {
+        ListWidget* list_widget = getWidget<ListWidget>("language");
+        std::string selection = list_widget->getSelectionInternalName();
+        
+        delete translations;
+        
+        if (selection == "system")
+        {
+#ifdef WIN32
+            _putenv("LANGUAGE=");
+#else
+            setenv( "LANGUAGE", "", 1);
+#endif
+        }
+        else
+        {
+#ifdef WIN32
+            std::string s=std::string("LANGUAGE=")+selection.c_str();
+            _putenv(s.c_str());
+#else
+            setenv("LANGUAGE", selection.c_str(), 1);
+#endif
+        }
+        
+        translations = new Translations();
+        GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
+        
+        GUIEngine::getFont()->updateRTL();
+        GUIEngine::getTitleFont()->updateRTL();
+        GUIEngine::getSmallFont()->updateRTL();
+        
+        UserConfigParams::m_language = selection.c_str();
+        user_config->saveConfig();
     }
     
 }   // eventCallback

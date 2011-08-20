@@ -19,7 +19,7 @@
         <spacer height="20" width="10"/>
 
         <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
-        <div width="75%" height="50" layout="horizontal-row" >
+        <div width="75%" height="fit" layout="horizontal-row" >
             <label I18N="In the graphics settings" text="Graphical Effects Level" align="center"/>
             <spacer width="20" height="20"/>
             <gauge id="gfx_level" min_value="1" max_value="7" width="300" />
