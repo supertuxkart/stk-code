@@ -419,8 +419,14 @@ void PlayerController::handleZipper(bool play_sound)
  */
 void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
 {
-    if(old_energy < MAX_NITRO &&
-       m_kart->getEnergy() == MAX_NITRO)
+    if (old_energy < MAX_NITRO &&
+        m_kart->getEnergy() == MAX_NITRO)
+    {
+        m_full_sound->play();
+    }
+    else if (race_manager->getCoinTarget() > 0 &&
+             old_energy < race_manager->getCoinTarget() &&
+             m_kart->getEnergy() == race_manager->getCoinTarget())
     {
         m_full_sound->play();
     }
