@@ -93,26 +93,6 @@ void GrandPrixWin::loadedFromFile()
 
 // -------------------------------------------------------------------------------------
 
-void traverse(scene::ISceneNode* curr, int level=0)
-{
-    for (int n=0; n<level; n++) std::cout << "|    ";
-    
-    unsigned int type = curr->getType();
-    const char* ptr = (const char*)&type;
-    
-    std::cout << "+ " << curr->getName() << " ("
-              << char(ptr[0]) << char(ptr[1])
-              << char(ptr[2]) << char(ptr[3]) << std::endl;
-    
-    const core::list<  scene::ISceneNode  * >& children = curr->getChildren();
-    for (core::list<scene::ISceneNode*>::ConstIterator it=children.begin(); it != children.end(); it++)
-    {
-        traverse(*it, level+1);
-    }
-}   // traverse
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixWin::init()
 {
     Screen::init();
