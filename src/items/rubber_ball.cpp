@@ -19,6 +19,8 @@
 
 #include "items/rubber_ball.hpp"
 
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
@@ -64,7 +66,16 @@ RubberBall::RubberBall(Kart *kart)
     m_timer                = 0.0f;
     m_interval             = m_st_interval;
     m_current_max_height   = m_max_height;
+    m_ping_sfx             = sfx_manager->createSoundSource("ball_bounce");
 }   // RubberBall
+
+// -----------------------------------------------------------------------------
+RubberBall::~RubberBall()
+{
+    if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
+        m_ping_sfx->stop();
+    sfx_manager->deleteSFX(m_ping_sfx);
+}   // ~RubberBall
 
 // -----------------------------------------------------------------------------
 /** Sets up the control points for the interpolation. The parameter contains
@@ -309,6 +320,11 @@ float RubberBall::updateHeight()
     if(m_timer>m_interval)
     {
         m_timer -= m_interval;
+        if(m_ping_sfx->getStatus()!=SFXManager::SFX_PLAYING)
+        {
+            m_ping_sfx->position(getXYZ());
+            m_ping_sfx->play();
+        }
 
         LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
         float target_distance = 

@@ -25,6 +25,7 @@
 
 class Kart;
 class QuadGraph;
+class SFXBase;
 
 /**
   * \ingroup items
@@ -106,6 +107,12 @@ private:
      *  used to keep track of the state of this ball. */
     bool         m_aiming_at_target;
 
+    /** A 'ping' sound effect to be played when the ball hits the ground. */
+    SFXBase     *m_ping_sfx;
+
+    /** Sound effect to be played when a ball hits a kart. */
+    SFXBase     *m_hit_sfx;
+
     void         computeTarget();
     void         checkDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index, 
@@ -116,6 +123,7 @@ private:
     void         initializeControlPoints(const Vec3 &xyz);
 public:
                  RubberBall  (Kart* kart);
+    virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual void update      (float dt);
     virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
