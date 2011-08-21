@@ -62,6 +62,7 @@ Ipo::Ipo(const XMLNode &curve, float fps)
         node->get("c", &xy);
         // Convert blender's frame number (1 ...) into time (0 ...)
         float t = (xy.X-1)/fps;
+                
         if(t<m_min_time) m_min_time = t;
         if(t>m_max_time) m_max_time = t;
         xy.X = t;
@@ -180,4 +181,33 @@ float Ipo::get() const
     // Keep the compiler happy:
     return 0;
 }   // get
+
 // ----------------------------------------------------------------------------
+
+/** Extends the IPO to end at the given x time coordinate */
+void Ipo::extendTo(float x)
+{
+    switch (m_interpolation)
+    {
+        case IP_CONST:
+        {
+            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            break;
+        }
+        case IP_LINEAR:
+        {
+            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            break;
+        }
+        case IP_BEZIER:
+        {
+            // FIXME: I'm somewhat dubious this is the correct way to extend handles
+            m_handle1.push_back( m_handle1[m_handle1.size() - 1] + core::vector2df(x - m_points[m_points.size()-1].X ,0) );
+            m_handle2.push_back( m_handle2[m_handle2.size() - 1] + core::vector2df(x - m_points[m_points.size()-1].X ,0) );
+            
+            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            break;
+        }            
+    }
+    m_max_time = x;
+}

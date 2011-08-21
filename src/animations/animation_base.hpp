@@ -30,6 +30,7 @@
 using namespace irr;
 
 #include "tracks/track_object.hpp"
+#include "utils/ptr_vector.hpp"
 
 class XMLNode;
 class Ipo;
@@ -64,7 +65,7 @@ private:
     core::vector3df m_initial_hpr;
 protected:
     /** All IPOs for this animation. */
-    std::vector<Ipo*> m_all_ipos;
+    PtrVector<Ipo>  m_all_ipos;
 
 public:
                  AnimationBase(const XMLNode &node);

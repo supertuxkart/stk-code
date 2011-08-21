@@ -82,6 +82,12 @@ public:
       void  setInitialTransform(const core::vector3df &xyz, 
                                 const core::vector3df &hpr);
       void  reset();
+    
+      void  extendTo(float x);
+    
+    const std::vector<core::vector2df>& getPoints() const { return m_points; }
+
+    
 };   // Ipo
 
 #endif

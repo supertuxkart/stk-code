@@ -24,6 +24,8 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 
+#include <algorithm>
+
 AnimationBase::AnimationBase(const XMLNode &node)
              : TrackObject(node)
 {
@@ -33,19 +35,38 @@ AnimationBase::AnimationBase(const XMLNode &node)
     {
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
-    }   // for i<getNumNodes()
+    }
+    
+    
+    // extend all IPOs to add at the same point
+    float last_x = -1;
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
+    {
+        const std::vector<core::vector2df>& points = curr->getPoints();
+        last_x = std::max(last_x, points[points.size() - 1].X);
+    }
+    
+    if (last_x > -1)
+    {
+        for_in (curr, m_all_ipos)
+        {
+            const std::vector<core::vector2df>& points = curr->getPoints();
+            if (points[points.size() - 1].X < last_x)
+            {
+                curr->extendTo(last_x);
+            }
+        }
+    }
+    
+    
     m_playing = true;
 
 }   // AnimationBase
 // ----------------------------------------------------------------------------
-/** Removes all IPOs.
- */
+
 AnimationBase::~AnimationBase()
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
-        delete *i;
-    m_all_ipos.clear();
 }   // ~AnimationBase
 
 // ----------------------------------------------------------------------------
@@ -57,11 +78,11 @@ AnimationBase::~AnimationBase()
 void AnimationBase::setInitialTransform(const core::vector3df &xyz, 
                                         const core::vector3df &hpr)
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        (*i)->setInitialTransform(xyz, hpr);
-    }   // for i in m_all_ipos
+        curr->setInitialTransform(xyz, hpr);
+    }
 }   // setTransform
 
 // ----------------------------------------------------------------------------
@@ -69,11 +90,11 @@ void AnimationBase::setInitialTransform(const core::vector3df &xyz,
  */
 void AnimationBase::reset()
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        (*i)->reset();
-    }   // for i in m_all_ipos
+        curr->reset();
+    }
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -85,10 +106,9 @@ void AnimationBase::reset()
 void AnimationBase::update(float dt, core::vector3df *xyz, 
                            core::vector3df *hpr, core::vector3df *scale)
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        (*i)->update(dt, xyz, hpr, scale);
-    }   // for i in m_all_ipos
-
+        curr->update(dt, xyz, hpr, scale);
+    }
 }   // float dt
