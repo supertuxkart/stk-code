@@ -47,7 +47,6 @@ private:
 public:
          Explosion(const Vec3& coord, const char* explosion_sound, bool player_hit);
         ~Explosion();
-    void init     (const Vec3& coord);
     void update   (float delta_t);
     int  inUse    ();
     bool hasEnded () { return  m_remaining_time <= -explosion_time;  }

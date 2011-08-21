@@ -32,10 +32,13 @@
 
 const float burst_time = 0.1f;
 
-Explosion::Explosion(const Vec3& coord, const char* explosion_sound, bool player_kart_hit)
+/** Creates an explosion effect. */
+Explosion::Explosion(const Vec3& coord, const char* explosion_sound, 
+                     bool player_kart_hit)
 {    
-    m_remaining_time = burst_time; // short emision time, explosion, not constant flame
-    m_node = irr_driver->addParticleNode();
+    // short emision time, explosion, not constant flame
+    m_remaining_time  = burst_time; 
+    m_node            = irr_driver->addParticleNode();
     m_player_kart_hit = player_kart_hit;
     
 #ifdef DEBUG
@@ -47,40 +50,44 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, bool player
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
 
-    scene::IParticleEmitter* em = m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f), 0.5f,
-                                                              core::vector3df(0.0f,0.005f,0.0f), // velocity in m/ms
-                                                              600, 900, // min max particles per sec
-                                                              video::SColor(0, 0, 0, 0), video::SColor(0, 0, 0, 0), // min max colour
-                                                              (int)((burst_time + explosion_time)*1000.0f),
-                                                              (int)((burst_time + explosion_time)*1000.0f), // min max life ms
-                                                              90, // max angle
-                                                              core::dimension2df(0.3f, 0.3f), core::dimension2df(0.75f, 0.75f) // min max start size
-                                                              );
+    scene::IParticleEmitter* em = 
+        m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f), 0.5f,
+              /* velocity in m/ms */core::vector3df(0.0f,0.005f,0.0f), 
+                                     600, 900, // min max particles per sec
+                                     video::SColor(0, 0, 0, 0), // min colour
+                                     video::SColor(0, 0, 0, 0), // max colour
+                                     (int)((burst_time + explosion_time)
+                                             *1000.0f), // min life ms
+                                     (int)((burst_time + explosion_time)
+                                             *1000.0f), // max max life ms
+                                     90, // max angle
+                                     // min and max start size
+                                     core::dimension2df(0.3f, 0.3f), 
+                                     core::dimension2df(0.75f, 0.75f)
+                                     );
     m_node->setEmitter(em); // this grabs the emitter
     em->drop(); // so we can drop it here without deleting it
 
-    /*
-     // doesn't work; instead we'll be doing it by hand below
-    scene::IParticleAffector* fade_out_affector = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0), 10000);
-    m_node->addAffector(fade_out_affector); // same goes for the affector
-    fade_out_affector->drop();
-    */
-
-    scene::IParticleAffector* scale_affector = m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
+    scene::IParticleAffector* scale_affector = 
+        m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
     m_node->addAffector(scale_affector); // same goes for the affector
     scale_affector->drop();
 
-    //scene::IParticleAffector *paf = 
-    //    m_node->createGravityAffector(Vec3(0, 0, -5).toIrrVector());
-    //m_node->addAffector(paf);
-    //paf->drop();
-
-
     m_explode_sound = sfx_manager->createSoundSource( explosion_sound );
-    init(coord);
+    m_explode_sound->position(coord);
+    
+    // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
+    // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
+    if (race_manager->getNumLocalPlayers() > 1)
+        m_explode_sound->volume(m_player_kart_hit ? 1.0f : 0.5f);
+    else
+        m_explode_sound->volume(1.0f);
+    m_explode_sound->play();
 }   // Explosion
 
 //-----------------------------------------------------------------------------
+/** Destructor stops the explosion sfx from being played and frees its memory.
+ */
 Explosion::~Explosion()
 {
     if (m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
@@ -89,26 +96,12 @@ Explosion::~Explosion()
     }
         
     sfx_manager->deleteSFX(m_explode_sound);
-}
-//-----------------------------------------------------------------------------
-void Explosion::init(const Vec3& coord)
-{
-    m_explode_sound->position(coord);
-    
-    // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
-    // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
-    if (race_manager->getNumLocalPlayers() > 1)
-    {
-        m_explode_sound->volume(m_player_kart_hit ? 1.0f : 0.5f);
-    }
-    else
-    {
-        m_explode_sound->volume(1.0f);
-    }
-    m_explode_sound->play();
-}   // init
+}   // ~Explosion
 
 //-----------------------------------------------------------------------------
+/** Updates the explosion, called one per time step.
+ *  \param dt Time step size.
+ */
 void Explosion::update(float dt)
 {
     m_remaining_time -= dt;
@@ -157,4 +150,4 @@ void Explosion::update(float dt)
         projectile_manager->FinishedExplosion();
         return;
     }
-}
+}   // update
