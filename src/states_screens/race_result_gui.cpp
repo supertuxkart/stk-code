@@ -88,6 +88,7 @@ void RaceResultGUI::enableAllButtons()
         top->setText(n==1 ? _("See unlocked feature") 
                           : _("See unlocked features"));
         top->setVisible(true);
+        top->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -100,6 +101,8 @@ void RaceResultGUI::enableAllButtons()
 
         bottom->setText( _("Abort Grand Prix") );
         bottom->setVisible(true);
+        
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else
     {
@@ -113,14 +116,9 @@ void RaceResultGUI::enableAllButtons()
 
         bottom->setText( _("Back to the menu") );
         bottom->setVisible(true);
+        
+        bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
-
-    // Make sure that when 'fire' is pressed accidentally (e.g. pressing fire
-    // very often to skip all results) that a good default is chosen (to
-    // avoid aborting a GP by accident).
-    for(int i=0; i<MAX_PLAYER_COUNT; i++)
-        top->setFocusForPlayer(i);
-
 }   // enableAllButtons
 
 //-----------------------------------------------------------------------------
