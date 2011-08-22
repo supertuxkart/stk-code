@@ -137,8 +137,8 @@ void Physics::update(float dt)
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
-                // Only explode a bowling ball if the target does not 
-                // the stars shown
+                // Only explode a bowling ball if the target is
+                // not invulnerable
                 if(p->a->getPointerFlyable()->getType()
                          !=PowerupManager::POWERUP_BOWLING    ||
                     !p->b->getPointerKart()->isInvulnerable()   )
