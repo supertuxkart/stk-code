@@ -75,7 +75,10 @@ void LODNode::OnRegisterSceneNode()
         if (m_nodes_set.find(*it) == m_nodes_set.end())
         {
             assert(*it != NULL);
-            (*it)->OnRegisterSceneNode();
+            if ((*it)->isVisible())
+            {
+                (*it)->OnRegisterSceneNode();
+            }
         }
     }
 }

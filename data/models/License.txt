@@ -18,6 +18,16 @@
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
 
+* gplose
+    released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
+    Tires by Thomas Oppl, released under CC-BY-SA 3.0
+    scene and finishing touches by Marianne Gagnon
+
+* tire
+    based on work by Thomas Oppl, released under CC-BY-SA 3.0
+    with modifications by Marianne Gagnon
+
 * village
     released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
     oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
@@ -32,5 +42,8 @@
 
 * zipper_collect
     by Dakal, released under CC-BY-SA 3.0
+
+* swatter
+    by Funto
 
 Others are GPL, by the original (super)TuxKart team

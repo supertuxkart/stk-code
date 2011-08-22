@@ -25,6 +25,7 @@
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
  * \ingroup modes
@@ -42,6 +43,8 @@ private:
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
     std::vector<BattleInfo> m_kart_info;
+    
+    irr::scene::IMesh* m_tire;
     
 public:
     
@@ -74,7 +77,11 @@ public:
     virtual std::string getIdent() const;
     
     virtual void kartHit(const int kart_id);
-    virtual void update(float dt);            
+    virtual void update(float dt);
+    
+    virtual void kartAdded(Kart* kart, scene::ISceneNode* node);
+
+    
     void updateKartRanks();
 };   // ThreeStrikesBattles
 

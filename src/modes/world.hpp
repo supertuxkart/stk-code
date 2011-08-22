@@ -217,6 +217,11 @@ public:
     bool shouldDrawTimer() const    { return isRacePhase() &&
                                              getClockMode() != CLOCK_NONE; }
     
+    /**
+      * If you want to do something to karts or their graphics at the start of the race, override this
+      */
+    virtual void kartAdded(Kart* kart, scene::ISceneNode* node) {}
+    
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const      { return m_use_highscores; }
         
@@ -242,6 +247,7 @@ public:
     /** Called when a kart was hit by a projectile
      */
     virtual void kartHit(const int kart_id) {};
+    
     
     bool         clearBackBuffer() const { return m_clear_back_buffer; }
     

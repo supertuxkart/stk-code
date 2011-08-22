@@ -1846,6 +1846,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
                           m_kart_properties->getShadowScale(),
                           m_kart_properties->getShadowXOffset(),
                           m_kart_properties->getShadowYOffset());
+    
+    World::getWorld()->kartAdded(this, m_node);
 }   // loadData
 
 //-----------------------------------------------------------------------------

@@ -18,9 +18,11 @@
 #include "modes/three_strikes_battle.hpp"
 
 #include <string>
+#include <IMeshSceneNode.h>
 
-#include "states_screens/race_gui_base.hpp"
 #include "audio/music_manager.hpp"
+#include "io/file_manager.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
@@ -29,6 +31,8 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
+    
+    m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -71,7 +75,36 @@ void ThreeStrikesBattle::init()
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     delete[] m_kart_display_info;
+    // TODO: need to drop the mesh? I got a crash when I added this line so
+    //       not sure this is right
+    //m_tire->drop();
 }   // ~ThreeStrikesBattle
+
+//-----------------------------------------------------------------------------
+
+void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
+{
+    //int coord = node->getBoundingBox().MinEdge.Z;
+    float coord = -kart->getKartLength()*0.5f;
+    
+    scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, node);
+    tire_node->setPosition(core::vector3df(0.0f, 0.55f, coord - 0.2f));
+    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
+    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
+    tire_node->setName("tire1");
+    
+    tire_node = irr_driver->addMesh(m_tire, node);
+    tire_node->setPosition(core::vector3df(-0.2f, 0.3f, coord - 0.25f));
+    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
+    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
+    tire_node->setName("tire2");
+
+    tire_node = irr_driver->addMesh(m_tire, node);
+    tire_node->setPosition(core::vector3df(0.2f, 0.3f, coord - 0.25f));
+    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
+    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
+    tire_node->setName("tire3");
+}
 
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::kartHit(const int kart_id)
@@ -110,6 +143,28 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     {
         music_manager->switchToFastMusic();
         m_faster_music_active = true;
+    }
+    
+    scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
+    
+    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
+    core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+    for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
+    {
+        scene::ISceneNode* curr = *it;
+
+        if (core::stringc(curr->getName()) == "tire1")
+        {
+            curr->setVisible(m_kart_info[kart_id].m_lives >= 1);
+        }
+        else if (core::stringc(curr->getName()) == "tire2")
+        {
+            curr->setVisible(m_kart_info[kart_id].m_lives >= 2);
+        }
+        else if (core::stringc(curr->getName()) == "tire3")
+        {
+            curr->setVisible(m_kart_info[kart_id].m_lives >= 3);
+        }
     }
 }   // kartHit
 
