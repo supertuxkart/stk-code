@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,41 +17,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_EXPLOSION_HPP
-#define HEADER_EXPLOSION_HPP
+#ifndef HEADER_HIT_EFFECT_HPP
+#define HEADER_HIT_EFFECT_HPP
 
-#include "graphics/hit_effect.hpp"
 #include "utils/no_copy.hpp"
 
-namespace irr
-{
-    namespace scene { class IParticleSystemSceneNode;  }
-}
-using namespace irr;
-
 class Vec3;
-class SFXBase;
-
-const float explosion_time = 1.5f;
 
 /**
-  * \ingroup graphics
-  */
-class Explosion : public HitEffect
+ *  \ingroup graphics
+ *  A small interface for effects to be used when  a kart is hit. That
+ *  includes a sound effect only, or a graphical effect (like an 
+ *  explosion).
+ */
+class HitEffect: public NoCopy
 {
-private:
-    SFXBase*       m_explode_sound;
-    float          m_remaining_time;
-    bool           m_player_kart_hit;
-    scene::IParticleSystemSceneNode   *m_node;
-    
 public:
-         Explosion(const Vec3& coord, const char* explosion_sound, bool player_hit);
-        ~Explosion();
-    bool update   (float delta_t);
-    bool hasEnded () { return  m_remaining_time <= -explosion_time;  }
-
-} ;
+         /** Constructor for a hit effect. */
+                 HitEffect(const Vec3& coord, const char* explosion_sound,
+                           bool player_hit) {};
+    virtual     ~HitEffect() {};
+    /** Updates a hit effect. Called once per frame.
+     *  \param dt Time step size.
+     *  \return True if the hit effect is finished and can be removed. */
+    virtual bool update   (float dt) = 0;
+};   // HitEffect
 
 #endif
 

@@ -203,6 +203,7 @@ add_executable(supertuxkart
 	src/graphics/explosion.hpp
 	src/graphics/hardware_skinning.cpp
 	src/graphics/hardware_skinning.hpp
+	src/graphics/hit_effect.hpp
 	src/graphics/irr_driver.cpp
 	src/graphics/irr_driver.hpp
 	src/graphics/lod_node.cpp

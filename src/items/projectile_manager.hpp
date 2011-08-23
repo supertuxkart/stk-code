@@ -33,7 +33,7 @@ namespace irr
 
 class Vec3;
 class Kart;
-class Explosion;
+class HitEffect;
 class Flyable;
 
 /**
@@ -43,19 +43,19 @@ class ProjectileManager : public NoCopy
 {
 private:
     typedef std::vector<Flyable*>   Projectiles;
-    typedef std::vector<Explosion*> Explosions;
+    typedef std::vector<HitEffect*> HitEffects;
 
-    // The list of all active projectiles, i.e. projectiles
-    // which are currently moving on the track
+    /** The list of all active projectiles, i.e. projectiles which are 
+     *  currently moving on the track. */
     Projectiles      m_active_projectiles;
 
-    // All active explosions, i.e. explosions which are currently
-    // being shown
-    Explosions       m_active_explosions;
+    /** All active hit effects, i.e. hit effects which are currently
+     *  being shown or have a sfx playing. */
+    HitEffects       m_active_hit_effects;
 
     scene::IMesh    *m_explosion_model;
+
     bool             m_something_was_hit;
-    bool             m_explosion_ended;
     void             updateClient(float dt);
     void             updateServer(float dt);
 public:
@@ -63,19 +63,16 @@ public:
                     ~ProjectileManager() {}
     /** Notifies the projectile manager that something needs to be removed. */
     void             notifyRemove     () {m_something_was_hit=true; }
-    void             FinishedExplosion() {m_explosion_ended =true;  }
-    scene::IMesh*     getExplosionModel()
+    scene::IMesh    *getExplosionModel()
     {
         return m_explosion_model;
     }
-    unsigned int     getNumProjectiles() const {return m_active_explosions.size();}
-    int              getProjectileId  (const std::string ident);
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
     Flyable*         newProjectile    (Kart *kart, 
                                        PowerupManager::PowerupType type);
-    Explosion*       newExplosion     (const Vec3& coord, 
+    HitEffect*       newHitEffect     (const Vec3& coord, 
                                        const char* explosion_sound="explosion",
                                        bool is_player_kart_hit = false);
     void             Deactivate       (Flyable *p) {}

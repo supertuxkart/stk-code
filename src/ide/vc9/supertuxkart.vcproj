@@ -1785,6 +1785,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\hit_effect.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.hpp"
 					>
 				</File>

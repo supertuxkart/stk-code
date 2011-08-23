@@ -20,6 +20,7 @@
 #include "items/projectile_manager.hpp"
 
 #include "graphics/explosion.hpp"
+#include "graphics/hit_effect.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
@@ -28,8 +29,6 @@
 #include "items/rubber_ball.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
-
-//static ssgSelector *find_selector ( ssgBranch *b );
 
 ProjectileManager *projectile_manager=0;
 
@@ -55,13 +54,13 @@ void ProjectileManager::cleanup()
     }
     
     m_active_projectiles.clear();
-    for(Explosions::iterator i  = m_active_explosions.begin();
-        i != m_active_explosions.end(); ++i)
+    for(HitEffects::iterator i  = m_active_hit_effects.begin();
+        i != m_active_hit_effects.end(); ++i)
     {
         delete *i;
     }
 
-    m_active_explosions.clear();
+    m_active_hit_effects.clear();
 }   // cleanup
 
 // -----------------------------------------------------------------------------
@@ -86,7 +85,8 @@ void ProjectileManager::update(float dt)
             if(! (*p)->hasHit()) { p++; continue; }
             if((*p)->needsExplosion())
             {
-                newExplosion((*p)->getXYZ(), (*p)->getExplosionSound(), false );
+                newHitEffect((*p)->getXYZ(), (*p)->getExplosionSound(),
+                             /*player_kart_hit*/ false );
             }
             Flyable *f=*p;
             Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
@@ -95,27 +95,19 @@ void ProjectileManager::update(float dt)
         }   // while p!=m_active_projectiles.end()
     }
 
-    m_explosion_ended=false;
-    for(Explosions::iterator i  = m_active_explosions.begin();
-        i != m_active_explosions.end(); ++i)
+    HitEffects::iterator he = m_active_hit_effects.begin();
+    while(he!=m_active_hit_effects.end())
     {
-        (*i)->update(dt);
-    }
-    if(m_explosion_ended)
-    {
-        Explosions::iterator e;
-        e = m_active_explosions.begin();
-        while(e!=m_active_explosions.end())
+        // Update this hit effect. If it can be removed, remove it.
+        if((*he)->update(dt))
         {
-            if(!(*e)->hasEnded()) { e++; continue;}
-
-            delete *e;
-            
-            Explosions::iterator eNext = m_active_explosions.erase(e);
-            e = eNext;
-        }   // while e!=m_active_explosions.end()
-    }   // if m_explosion_ended
-    m_something_was_hit=false;
+            delete *he;
+            HitEffects::iterator next = m_active_hit_effects.erase(he);
+            he = next;
+        }   // if hit effect finished
+        else  // hit effect not finished, go to next one.
+            he++;
+    }   // while hit effect != end
 }   // update
 
 // -----------------------------------------------------------------------------
@@ -143,9 +135,9 @@ void ProjectileManager::updateServer(float dt)
 }   // updateServer
 
 // -----------------------------------------------------------------------------
-/** Updates all rockets and explosions on the client.
+/** Updates all rockets and hit effects on the client.
  *  updateClient takes the information in race_state and updates all rockets
- *  (i.e. position, explosion etc)                                            */
+ *  (i.e. position, hit effects etc)                                            */
 void ProjectileManager::updateClient(float dt)
 {
     m_something_was_hit = false;
@@ -186,16 +178,20 @@ Flyable *ProjectileManager::newProjectile(Kart *kart,
 }   // newProjectile
 
 // -----------------------------------------------------------------------------
-/** See if there is an old, unused explosion object available. If so,
- *  reuse this object, otherwise create a new one. */
-Explosion* ProjectileManager::newExplosion(const Vec3& coord, 
-                                           const char* explosion_sound,
+/** Creates a new hit effect.
+ *  \param coord The coordinates where the hit effect (i.e. sound, graphics)
+ *         should be placed).
+ *  \param sfx The name of the sound effect to be played.
+ *  \param player_kart_hit True of a player kart was hit.
+ */
+HitEffect* ProjectileManager::newHitEffect(const Vec3& coord, 
+                                           const char *sfx,
                                            bool player_kart_hit)
 {
-    Explosion *e = new Explosion(coord, explosion_sound, player_kart_hit);
-    m_active_explosions.push_back(e);
-    return e;
-}   // newExplosion
+    HitEffect *he = new Explosion(coord, sfx, player_kart_hit);
+    m_active_hit_effects.push_back(he);
+    return he;
+}   // newHitEffect
 
 // =============================================================================
 /** A general function which is only needed here, but

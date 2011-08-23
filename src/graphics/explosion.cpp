@@ -35,6 +35,7 @@ const float burst_time = 0.1f;
 /** Creates an explosion effect. */
 Explosion::Explosion(const Vec3& coord, const char* explosion_sound, 
                      bool player_kart_hit)
+                     : HitEffect(coord, explosion_sound, player_kart_hit)
 {    
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time; 
@@ -101,8 +102,9 @@ Explosion::~Explosion()
 //-----------------------------------------------------------------------------
 /** Updates the explosion, called one per time step.
  *  \param dt Time step size.
+ *  \return true If the explosion is finished.
  */
-void Explosion::update(float dt)
+bool Explosion::update(float dt)
 {
     m_remaining_time -= dt;
     
@@ -126,7 +128,7 @@ void Explosion::update(float dt)
     
     
     // Do nothing more if the animation is still playing
-    if (m_remaining_time>0) return;
+    if (m_remaining_time>0) return false;
 
     // Otherwise check that the sfx has finished, otherwise the
     // sfx will get aborted 'in the middle' when this explosion
@@ -147,7 +149,8 @@ void Explosion::update(float dt)
         // Sound and animation finished --> remove node
         irr_driver->removeNode(m_node);
         m_node = NULL;
-        projectile_manager->FinishedExplosion();
-        return;
+        return true;   // finished
     }
+
+    return false;  // not finished
 }   // update
