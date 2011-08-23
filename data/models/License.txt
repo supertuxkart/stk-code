@@ -24,6 +24,10 @@
     Tires by Thomas Oppl, released under CC-BY-SA 3.0
     scene and finishing touches by Marianne Gagnon
 
+* swatter
+    released under CC-BY-SA 3.0
+    by Funto
+
 * tire
     based on work by Thomas Oppl, released under CC-BY-SA 3.0
     with modifications by Marianne Gagnon
