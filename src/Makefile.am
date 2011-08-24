@@ -68,6 +68,8 @@ supertuxkart_SOURCES = \
  graphics/hardware_skinning.cpp \
  graphics/hardware_skinning.hpp \
  graphics/hit_effect.hpp \
+ graphics/hit_sfx.cpp \
+ graphics/hit_sfx.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
  graphics/lod_node.cpp \

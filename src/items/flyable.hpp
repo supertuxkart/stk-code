@@ -35,6 +35,7 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class FlyableInfo;
+class HitEffect;
 class Kart;
 class PhysicalObject;
 class XMLNode;
@@ -155,6 +156,7 @@ public:
                               PowerupManager::PowerupType type);
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);
+    HitEffect   *getHitEffect() const;
     bool         isOwnerImmunity(const Kart *kart_hit) const;
 
     // ------------------------------------------------------------------------

@@ -703,6 +703,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\hit_sfx.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.cpp"
 					>
 				</File>
@@ -1786,6 +1790,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\hit_effect.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hit_sfx.hpp"
 					>
 				</File>
 				<File

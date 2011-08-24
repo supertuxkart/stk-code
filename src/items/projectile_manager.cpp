@@ -85,8 +85,8 @@ void ProjectileManager::update(float dt)
             if(! (*p)->hasHit()) { p++; continue; }
             if((*p)->needsExplosion())
             {
-                newHitEffect((*p)->getXYZ(), (*p)->getExplosionSound(),
-                             /*player_kart_hit*/ false );
+                HitEffect *he = (*p)->getHitEffect();
+                addHitEffect(he);
             }
             Flyable *f=*p;
             Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
@@ -176,47 +176,3 @@ Flyable *ProjectileManager::newProjectile(Kart *kart,
     m_active_projectiles.push_back(f);
     return f;
 }   // newProjectile
-
-// -----------------------------------------------------------------------------
-/** Creates a new hit effect.
- *  \param coord The coordinates where the hit effect (i.e. sound, graphics)
- *         should be placed).
- *  \param sfx The name of the sound effect to be played.
- *  \param player_kart_hit True of a player kart was hit.
- */
-HitEffect* ProjectileManager::newHitEffect(const Vec3& coord, 
-                                           const char *sfx,
-                                           bool player_kart_hit)
-{
-    HitEffect *he = new Explosion(coord, sfx, player_kart_hit);
-    m_active_hit_effects.push_back(he);
-    return he;
-}   // newHitEffect
-
-// =============================================================================
-/** A general function which is only needed here, but
- *  it's not really a method, so I'll leave it here.
- */
-/*
-static ssgSelector *find_selector ( ssgBranch *b )
-{
-    if ( b == NULL )
-        return NULL ;
-
-    if ( ! b -> isAKindOf ( ssgTypeBranch () ) )
-        return NULL ;
-
-    if ( b -> isAKindOf ( ssgTypeSelector () ) )
-        return (ssgSelector *) b ;
-
-    for ( int i = 0 ; i < b -> getNumKids() ; i++ )
-    {
-        ssgSelector *res = find_selector ( (ssgBranch *)(b ->getKid(i)) ) ;
-
-        if ( res != NULL )
-            return res ;
-    }
-
-    return NULL ;
-}   // find_selector
-*/

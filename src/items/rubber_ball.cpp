@@ -423,7 +423,9 @@ void RubberBall::hit(Kart* kart, PhysicalObject* object)
     {
         // If the object is not the main target, only flatten the kart
         if(kart!=m_target)
+        {
             kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+        }
         else
         {
             // Else trigger the full explosion animation

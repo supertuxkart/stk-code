@@ -33,14 +33,12 @@
 const float burst_time = 0.1f;
 
 /** Creates an explosion effect. */
-Explosion::Explosion(const Vec3& coord, const char* explosion_sound, 
-                     bool player_kart_hit)
-                     : HitEffect(coord, explosion_sound, player_kart_hit)
-{    
+Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
+                     : HitSFX(coord, explosion_sound)
+{
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time; 
     m_node            = irr_driver->addParticleNode();
-    m_player_kart_hit = player_kart_hit;
     
 #ifdef DEBUG
     m_node->setName("explosion");
@@ -73,17 +71,6 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound,
         m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
     m_node->addAffector(scale_affector); // same goes for the affector
     scale_affector->drop();
-
-    m_explode_sound = sfx_manager->createSoundSource( explosion_sound );
-    m_explode_sound->position(coord);
-    
-    // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
-    // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
-    if (race_manager->getNumLocalPlayers() > 1)
-        m_explode_sound->volume(m_player_kart_hit ? 1.0f : 0.5f);
-    else
-        m_explode_sound->volume(1.0f);
-    m_explode_sound->play();
 }   // Explosion
 
 //-----------------------------------------------------------------------------
@@ -91,12 +78,6 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound,
  */
 Explosion::~Explosion()
 {
-    if (m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
-    {
-        m_explode_sound->stop();
-    }
-        
-    sfx_manager->deleteSFX(m_explode_sound);
 }   // ~Explosion
 
 //-----------------------------------------------------------------------------
@@ -106,6 +87,10 @@ Explosion::~Explosion()
  */
 bool Explosion::update(float dt)
 {
+    // The explosion sfx is shorter than the particle effect,
+    // so no need to save the result of the update call.
+    HitSFX::update(dt);
+
     m_remaining_time -= dt;
     
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
@@ -133,11 +118,6 @@ bool Explosion::update(float dt)
     // Otherwise check that the sfx has finished, otherwise the
     // sfx will get aborted 'in the middle' when this explosion
     // object is removed.
-    //if (m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
-    //{
-    //    m_remaining_time = 0;
-    //}
-    //else
     if (m_remaining_time > -explosion_time)
     {
         // Stop the emitter and wait a little while for all particles to have time to fade out

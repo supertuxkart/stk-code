@@ -53,8 +53,6 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    scene::IMesh    *m_explosion_model;
-
     bool             m_something_was_hit;
     void             updateClient(float dt);
     void             updateServer(float dt);
@@ -63,20 +61,18 @@ public:
                     ~ProjectileManager() {}
     /** Notifies the projectile manager that something needs to be removed. */
     void             notifyRemove     () {m_something_was_hit=true; }
-    scene::IMesh    *getExplosionModel()
-    {
-        return m_explosion_model;
-    }
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
     Flyable*         newProjectile    (Kart *kart, 
                                        PowerupManager::PowerupType type);
-    HitEffect*       newHitEffect     (const Vec3& coord, 
-                                       const char* explosion_sound="explosion",
-                                       bool is_player_kart_hit = false);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
+    // ------------------------------------------------------------------------
+    /** Adds a special hit effect to be shown. 
+     *  \param hit_effect The hit effect to be added. */
+    void             addHitEffect(HitEffect *hit_effect) 
+                                { m_active_hit_effects.push_back(hit_effect); }
 };
 
 extern ProjectileManager *projectile_manager;

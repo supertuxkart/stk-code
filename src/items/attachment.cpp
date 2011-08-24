@@ -23,6 +23,7 @@
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -179,8 +180,11 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        projectile_manager->newHitEffect(m_kart->getXYZ(), "explosion", 
-                                m_kart->getController()->isPlayerController());
+        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+        if(m_kart->getController()->isPlayerController())
+            he->setPlayerKartHit();
+        projectile_manager->addHitEffect(he);
+
         m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
         clear();
         if(new_attachment==-1) 
@@ -313,8 +317,10 @@ void Attachment::update(float dt)
         }
         if(m_time_left<=0.0)
         {
-            projectile_manager->newHitEffect(m_kart->getXYZ(), "explosion", 
-                                m_kart->getController()->isPlayerController());
+            HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+            if(m_kart->getController()->isPlayerController())
+                he->setPlayerKartHit();
+            projectile_manager->addHitEffect(he);
             m_kart->handleExplosion(m_kart->getXYZ(), 
                                     /*direct_hit*/ true);
             

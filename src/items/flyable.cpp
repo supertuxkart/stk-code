@@ -30,6 +30,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 
+#include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stars.hpp"
@@ -539,5 +540,13 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     }
     world->getTrack()->handleExplosion(getXYZ(), object);
 }   // hit
+// ----------------------------------------------------------------------------
+/** Returns the hit effect object to use when this objects hits something.
+ *  \returns The hit effect object, or NULL if no hit effect should be played.
+ */
+HitEffect* Flyable::getHitEffect() const
+{
+    return new Explosion(getXYZ(), "explosion");
+}   // getHitEffect
 
 /* EOF */
