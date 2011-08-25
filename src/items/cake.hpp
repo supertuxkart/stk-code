@@ -48,13 +48,20 @@ private:
 public:
     Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual void update   (float dt);
+    // ------------------------------------------------------------------------
     virtual void hitTrack ()                      { hit(NULL);               }
-    // Kinematic objects are not allowed to have a velocity (assertion in 
-    // bullet), so we have to do our own velocity handling here
+    // ------------------------------------------------------------------------
+    /** Kinematic objects are not allowed to have a velocity (assertion in 
+     *  bullet), so we have to do our own velocity handling here. This 
+     *  function returns the velocity of this object. */
     virtual const btVector3 &getVelocity() const  {return m_initial_velocity;}
+    // ------------------------------------------------------------------------
+    /** Kinematic objects are not allowed to have a velocity (assertion in 
+     *  bullet), so we have to do our own velocity handling here. This 
+     *  function sets the velocity of this object.
+     *  \param v Linear velocity of this object.
+     */
     virtual void  setVelocity(const btVector3& v) {m_initial_velocity=v;     }
-
 };   // Cake
 
 #endif

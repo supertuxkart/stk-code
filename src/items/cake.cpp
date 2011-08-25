@@ -133,36 +133,3 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
     node.get("max-distance",    &m_st_max_distance  );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
 }   // init
-
-// -----------------------------------------------------------------------------
-void Cake::update(float dt)
-{
-    //The following commented out code adds a lock on to the cake. It is kept
-    //because it shows how to lock on to a moving target precisely with the
-    //intersection algorithm and may be one day useful for something else.
-
-    /*
-    if(m_target != NULL)
-    {
-        // correct direction to go towards aimed kart
-        btTransform my_trans = getTrans();
-
-        float fire_angle     = 0.0f;
-        float time_estimated = 0.0f;
-        float up_velocity    = 0.0f;
-
-        Vec3 origin = my_trans.getOrigin() - m_target->getNormal() * 0.5 * m_target->getKartHeight();
-
-        getLinearKartItemIntersection (origin, m_target,
-                                       m_speed, m_gravity, 0,
-                                       &fire_angle, &up_velocity, &time_estimated);
-
-        m_body->setLinearVelocity( btVector3(-m_speed * sinf (fire_angle),
-                                             m_speed * cosf (fire_angle),
-                                             up_velocity) );
-    }
-    */
-
-    Flyable::update(dt);
-}   // update
-
