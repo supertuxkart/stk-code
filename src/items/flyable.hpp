@@ -193,9 +193,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the sfx that should be played in case of an explosion. */
     virtual const char*  getExplosionSound() const { return "explosion"; }
-    // ------------------------------------------------------------------------
-    /** Default is that each flyable needs an explosion effect. */
-    virtual bool needsExplosion() const { return true; }
 };   // Flyable
 
 #endif

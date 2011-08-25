@@ -390,7 +390,7 @@ bool Flyable::updateAndDelete(float dt)
     Moveable::update(dt);
 
     return false;
-}   // updateAmdDelete
+}   // updateAndDelete
 
 // ----------------------------------------------------------------------------
 /** Updates the position of a projectile based on information received frmo the
@@ -419,7 +419,7 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 }   // isOwnerImmunity
 
 // ----------------------------------------------------------------------------
-/** Callback from the phycis in case that a kart or physical object is hit. 
+/** Callback from the physics in case that a kart or physical object is hit. 
  *  kart The kart hit (NULL if no kart was hit).
  *  object The object that was hit (NULL if none).
  */
@@ -442,13 +442,8 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     }
 
     m_has_hit_something=true;
-    // Notify the projectile manager that this rocket has hit something.
-    // The manager will create the appropriate explosion object.
 
     m_exploded=true;
-
-    if(needsExplosion()) 
-        explode(kart_hit, object);
     
     return;
 

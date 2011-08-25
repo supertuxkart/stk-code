@@ -134,9 +134,6 @@ public:
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
     virtual HitEffect *getHitEffect() const {return NULL; }
-    // ------------------------------------------------------------------------
-    /** Plunger does not need an explosion effect. */
-    virtual bool needsExplosion() const { return false; }
 
 };   // RubberBall
 

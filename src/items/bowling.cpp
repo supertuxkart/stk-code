@@ -198,3 +198,13 @@ bool Bowling::updateAndDelete(float dt)
     return false;
 }   // updateAndDelete
 // -----------------------------------------------------------------------------
+/** Callback from the physics in case that a kart or physical object is hit. 
+ *  The bowling ball triggers an explosion when hit.
+ *  \param kart The kart hit (NULL if no kart was hit).
+ *  \param object The object that was hit (NULL if none).
+ */
+void Bowling::hit(Kart* kart, PhysicalObject* obj)
+{
+    Flyable::hit(kart, obj);
+    explode(kart, obj);
+}   // hit

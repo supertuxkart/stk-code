@@ -64,8 +64,6 @@ public:
     /** No hit effect when it ends. */
     virtual HitEffect *getHitEffect() const {return NULL; }
     // ------------------------------------------------------------------------
-    /** Plunger does not need an explosion effect. */
-    virtual bool needsExplosion() const { return false; }
 };   // Plunger
 
 #endif

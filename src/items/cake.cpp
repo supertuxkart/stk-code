@@ -154,3 +154,15 @@ const core::stringw Cake::getHitString(const Kart *kart) const
         default: assert(false); return L"";   // avoid compiler warning
     }
 }   // getHitString
+// ----------------------------------------------------------------------------
+/** Callback from the physics in case that a kart or physical object is hit. 
+ *  The cake triggers an explosion when hit.
+ *  \param kart The kart hit (NULL if no kart was hit).
+ *  \param object The object that was hit (NULL if none).
+ */
+void Cake::hit(Kart* kart, PhysicalObject* obj)
+{
+    Flyable::hit(kart, obj);
+    explode(kart, obj);
+}   // hit
+
