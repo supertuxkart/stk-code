@@ -484,7 +484,8 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         }
         
         // Fixes crash bug, why are certain icons not showing up?
-        if ((icon != NULL) && (!kart->playingEmergencyAnimation()))
+        if ((icon != NULL) && (!kart->playingEmergencyAnimation()) && 
+            (!kart->isSquashed())                                     )
         {
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                 icon->getOriginalSize());
@@ -504,6 +505,18 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
                 (int)(x+w-t_anim), y+w);
             irr_driver->getVideoDriver()->draw2DImage(icon, pos1, rect1, 
                 NULL, NULL, true);
+        }
+
+        if ((icon != NULL) && (kart->isSquashed()))
+        {
+            //syncs icon squash with kart squash
+            const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
+                                           core::position2d<s32>(x+w,y+w*3/4));
+            const core::rect<s32> sourceRect(core::position2d<s32>(0,0), 
+                icon->getOriginalSize());
+            irr_driver->getVideoDriver()->draw2DImage(icon, destRect, 
+                                                      sourceRect, NULL, NULL, 
+                                                      true);
         }
 
         if ((icon != NULL) && (kart->playingExplosionAnimation()))
