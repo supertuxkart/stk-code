@@ -20,6 +20,8 @@
 #ifndef HEADER_RUBBER_BALL_HPP
 #define HEADER_RUBBER_BALL_HPP
 
+#include <irrString.h>
+
 #include "items/flyable.hpp"
 #include "tracks/track_sector.hpp"
 
@@ -126,7 +128,8 @@ public:
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
+    virtual const core::stringw getHitString(const Kart *kart) const;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */

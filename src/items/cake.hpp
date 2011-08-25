@@ -27,6 +27,7 @@ namespace irr
 {
     namespace scene { class IMesh; }
 }
+#include <irrString.h>
 
 #include "items/flyable.hpp"
 
@@ -46,8 +47,9 @@ private:
     Kart*        m_target;            // which kart is targeted by this
                                       // projectile (NULL if none)
 public:
-    Cake (Kart *kart);
+                 Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
+    virtual const core::stringw getHitString(const Kart *kart) const;
     // ------------------------------------------------------------------------
     virtual void hitTrack ()                      { hit(NULL);               }
     // ------------------------------------------------------------------------

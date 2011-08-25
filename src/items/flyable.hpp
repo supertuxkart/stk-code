@@ -27,9 +27,9 @@ namespace irr
 {
     namespace scene { class IMesh; }
 }
+#include <irrString.h>
 using namespace irr;
 
-#include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "tracks/terrain_info.hpp"
@@ -154,11 +154,12 @@ public:
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
-    virtual bool updateAndDelete(float);
-    virtual HitEffect *getHitEffect() const;
+    virtual bool           updateAndDelete(float);
+    virtual const core::stringw getHitString(const Kart *kart) const = 0;
+    virtual HitEffect*     getHitEffect() const;
     void         updateFromServer(const FlyableInfo &f, float dt);
     bool         isOwnerImmunity(const Kart *kart_hit) const;
-    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
     void         explode(Kart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the 

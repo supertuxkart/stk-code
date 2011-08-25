@@ -24,6 +24,7 @@ namespace irr
 {
     namespace scene { class IMesh; }
 }
+#include <irrString.h>
 using namespace irr;
 
 #include "items/flyable.hpp"
@@ -44,7 +45,9 @@ public:
     Bowling(Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    
+    virtual const core::stringw getHitString(const Kart *kart) const;
+
+    /** Returns the sfx to use when the bowling ball explodes. */
     const char* getExplosionSound() const { return "strike"; }
     
 };   // Bowling

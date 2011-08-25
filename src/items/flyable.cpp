@@ -43,67 +43,6 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-
-const wchar_t* getCakeString()
-{
-    const int CAKE_STRINGS_AMOUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(CAKE_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 0: return _LTR("%0 eats too much of %1's cake");
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 1: return _LTR("%0 is dubious of %1's cooking skills");
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 2: return _LTR("%0 should not play with %1's lunch");
-        default: assert(false); return L"";   // avoid compiler warning
-    }
-}
-
-
-const wchar_t* getBowlingString()
-{
-    const int BOWLING_STRINGS_AMOUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(BOWLING_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 0 : return _LTR("%0 will not go bowling with %1 again");
-        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 1 : return _LTR("%1 strikes %0");
-        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-        case 2 : return _LTR("%0 is bowled over by %1");
-        default: assert(false); return L"";  //  avoid compiler warning
-    }
-}
-
-
-const wchar_t* getSelfBowlingString()
-{
-    const int SELFBOWLING_STRINGS_AMOUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(SELFBOWLING_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 0 : return _LTR("%s is practicing with a blue, big, spheric yo-yo");
-        //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 1 : return _LTR("%s is the world master of the boomerang ball");
-        //I18N: shown when hit by own bowling ball. %s is the kart.
-        case 2 : return _LTR("%s should play (rubber) darts instead of bowling");
-        default: assert(false); return L"";  //  avoid compiler warning
-    }
-}
-
-
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
 scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
@@ -492,48 +431,14 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     if (kart_hit != NULL)
     {
         RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-        irr::core::stringw hit_message;
-        switch(m_type)
-        {
-            case PowerupManager::POWERUP_CAKE:
-            {
-                hit_message = 
-                    StringUtils::insertValues(getCakeString(),
-                                          core::stringw(kart_hit->getName()),
-                                          core::stringw(m_owner->getName())
-                                                                     ).c_str();
-            }
-            break;
-            case PowerupManager::POWERUP_PLUNGER: 
-                // Handled by plunger.cpp Plunger::hit
-            break;
-            case PowerupManager::POWERUP_RUBBERBALL: 
-            break;
-            case PowerupManager::POWERUP_BOWLING:
-            {
-                if (kart_hit == m_owner)
-                {
-                    hit_message = 
-                        StringUtils::insertValues(getSelfBowlingString(),
-                                            core::stringw(m_owner->getName())
-                                                                     ).c_str();
-                }
-                else
-                {
-                    hit_message = 
-                        StringUtils::insertValues(getBowlingString(),
-                                            core::stringw(kart_hit->getName()),
-                                            core::stringw(m_owner->getName())
-                                                                     ).c_str();
-                }
-            }
-            break;
-            default:
-                printf("Failed message for %i\n", m_type);
-                assert(false);
-        }
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, 
-                        video::SColor(255, 255, 255, 255), false);
+        irr::core::stringw hit_message =
+            StringUtils::insertValues(getHitString(kart_hit),
+                                      core::stringw(kart_hit->getName()),
+                                      core::stringw(m_owner ->getName())
+                                                                         );
+        if(hit_message.size()>0)
+            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                            40, video::SColor(255, 255, 255, 255), false);
     }
 
     m_has_hit_something=true;

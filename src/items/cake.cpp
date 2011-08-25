@@ -133,3 +133,24 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
     node.get("max-distance",    &m_st_max_distance  );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
 }   // init
+
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a cake.
+ *  \param The kart that was hit (ignored here).
+ *  \returns The string to display.
+ */
+const core::stringw Cake::getHitString(const Kart *kart) const
+{
+    const int CAKE_STRINGS_AMOUNT = 3;
+    RandomGenerator r;
+    switch (r.get(CAKE_STRINGS_AMOUNT))
+    {
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 0: return _LTR("%0 eats too much of %1's cake");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 1: return _LTR("%0 is dubious of %1's cooking skills");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 2: return _LTR("%0 should not play with %1's lunch");
+        default: assert(false); return L"";   // avoid compiler warning
+    }
+}   // getHitString

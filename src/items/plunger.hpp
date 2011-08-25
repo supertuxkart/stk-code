@@ -23,6 +23,9 @@
 #ifndef HEADER_MISSILE_HPP
 #define HEADER_MISSILE_HPP
 
+#include <irrString.h>
+using namespace irr;
+
 #include "items/flyable.hpp"
 
 class Kart;
@@ -49,6 +52,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh* missile);
     virtual bool updateAndDelete(float dt);
     virtual void hitTrack ();
+    virtual const core::stringw getHitString(const Kart *kart) const;
     virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
 
     // ------------------------------------------------------------------------

@@ -213,6 +213,24 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by the 
+ *  rubber ball.
+ *  \param The kart that was hit (ignored here).
+ *  \returns The string to display.
+ */
+const core::stringw RubberBall::getHitString(const Kart *kart) const
+{
+    const int COUNT = 1;
+    RandomGenerator r;
+    switch (r.get(COUNT))
+    {
+        //I18N: shown when a player is hit by a rubber ball. %1 is the 
+        // attacker, %0 is the victim.
+        case 0: return _LTR("%s is being bounced around.");
+        default:assert(false); return L"";   // avoid compiler warning
+    }
+}   // getHitString
 
 // ----------------------------------------------------------------------------
 /** Updates the rubber ball. 

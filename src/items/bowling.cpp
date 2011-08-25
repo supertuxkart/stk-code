@@ -89,7 +89,52 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
     node.get("force-to-target", &m_st_force_to_target);
 }   // init
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a bowling 
+ *  ball. This function picks a different message if a kart hit itself.
+ *  \param kart The kart that was hit.
+ *  \returns The string to display.
+ */
+const core::stringw Bowling::getHitString(const Kart *kart) const
+{
+    RandomGenerator r;
+
+    if(kart!=m_owner)
+    {
+        const int BOWLING_STRINGS_AMOUNT = 3;
+        switch (r.get(BOWLING_STRINGS_AMOUNT))
+        {
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 0 : return _LTR("%0 will not go bowling with %1 again");
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 1 : return _LTR("%1 strikes %0");
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 2 : return _LTR("%0 is bowled over by %1");
+        default: assert(false); return L"";  //  avoid compiler warning
+        }
+    }
+    else
+    {
+        const int SELFBOWLING_STRINGS_AMOUNT = 3;
+        switch (r.get(SELFBOWLING_STRINGS_AMOUNT))
+        {
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 0 : return _LTR("%s is practicing with a blue, big, spheric yo-yo");
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 1 : return _LTR("%s is the world master of the boomerang ball");
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 2 : return _LTR("%s should play (rubber) darts instead of bowling");
+        default: assert(false); return L"";  //  avoid compiler warning
+        }   // switch
+    }   // if kart_hit==owner
+
+
+}   // getHitString
+
+// ----------------------------------------------------------------------------
 /** Updates the bowling ball ineach frame. If this function returns true, the
  *  object will be removed by the projectile manager.
  *  \param dt Time step size.

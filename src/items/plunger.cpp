@@ -34,23 +34,6 @@
 #include "utils/string_utils.hpp"
 
 
-const wchar_t* getPlungerInFaceString()
-{
-    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
-
-    RandomGenerator r;
-    const int id = r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when a player receives a plunger in his face
-        case 0: return _LTR("%0 gets a fancy mask from %1");
-        //I18N: shown when a player receives a plunger in his face
-        case 1: return _LTR("%1 merges %0's face with a plunger");
-        default:assert(false); return L"";   // avoid compiler warning
-    }
-}
-
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
@@ -132,6 +115,30 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 }   // init
 
 // ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a plunger.
+ *  \param The kart that was hit (ignored here).
+ *  \returns The string to display.
+ */
+const core::stringw Plunger::getHitString(const Kart *kart) const
+{
+    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
+    RandomGenerator r;
+    switch (r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT))
+    {
+        //I18N: shown when a player receives a plunger in his face
+        case 0: return _LTR("%0 gets a fancy mask from %1");
+        //I18N: shown when a player receives a plunger in his face
+        case 1: return _LTR("%1 merges %0's face with a plunger");
+        default:assert(false); return L"";   // avoid compiler warning
+    }
+}   // getHitString
+
+// ----------------------------------------------------------------------------
+/** Updates the bowling ball ineach frame. If this function returns true, the
+ *  object will be removed by the projectile manager.
+ *  \param dt Time step size.
+ *  \returns True of this object should be removed.
+ */
 bool Plunger::updateAndDelete(float dt)
 {
     // In keep-alive mode, just update the rubber band
@@ -178,7 +185,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         {
             kart->blockViewWithPlunger();
 
-            hit_message += StringUtils::insertValues(getPlungerInFaceString(),
+            hit_message += StringUtils::insertValues(getHitString(kart),
                                                      core::stringw(kart->getName()),
                                                      core::stringw(m_owner->getName())
                                                     ).c_str();
