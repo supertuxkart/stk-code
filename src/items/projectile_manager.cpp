@@ -76,30 +76,11 @@ void ProjectileManager::update(float dt)
         updateServer(dt);
     }
 
-    // Then check if any projectile hit something
-    if(m_something_was_hit)
-    {
-        Projectiles::iterator p = m_active_projectiles.begin();
-        while(p!=m_active_projectiles.end())
-        {
-            if(! (*p)->hasHit()) { p++; continue; }
-            if((*p)->needsExplosion())
-            {
-                HitEffect *he = (*p)->getHitEffect();
-                addHitEffect(he);
-            }
-            Flyable *f=*p;
-            Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
-            delete f;
-            p=pNext;
-        }   // while p!=m_active_projectiles.end()
-    }
-
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
     {
         // Update this hit effect. If it can be removed, remove it.
-        if((*he)->update(dt))
+        if((*he)->updateAndDelete(dt))
         {
             delete *he;
             HitEffects::iterator next = m_active_hit_effects.erase(he);
@@ -119,19 +100,31 @@ void ProjectileManager::updateServer(float dt)
     {
         race_state->setNumFlyables(m_active_projectiles.size());
     }
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-                              i != m_active_projectiles.end();   ++i)
+
+    Projectiles::iterator p = m_active_projectiles.begin();
+    while(p!=m_active_projectiles.end())
     {
-        (*i)->update(dt);
-        // Store the state information on the server
+        bool can_be_deleted = (*p)->updateAndDelete(dt);
         if(network_manager->getMode()!=NetworkManager::NW_NONE)
         {
-            race_state->setFlyableInfo(i-m_active_projectiles.begin(),
-                                       FlyableInfo((*i)->getXYZ(), 
-                                                   (*i)->getRotation(),
-                                                   (*i)->hasHit())      );
+            race_state->setFlyableInfo(p-m_active_projectiles.begin(),
+                                       FlyableInfo((*p)->getXYZ(), 
+                                                   (*p)->getRotation(),
+                                                   can_be_deleted)     );
         }
-    }
+        if(can_be_deleted)
+        {
+            HitEffect *he = (*p)->getHitEffect();
+            if(he)
+                addHitEffect(he);
+            Flyable *f=*p;
+            Projectiles::iterator p_next=m_active_projectiles.erase(p);
+            delete f;
+            p=p_next;
+        }
+        else
+            p++;
+    }   // while p!=m_active_projectiles.end()
 }   // updateServer
 
 // -----------------------------------------------------------------------------
@@ -140,7 +133,6 @@ void ProjectileManager::updateServer(float dt)
  *  (i.e. position, hit effects etc)                                            */
 void ProjectileManager::updateClient(float dt)
 {
-    m_something_was_hit = false;
     unsigned int num_projectiles = race_state->getNumFlyables();
     if(num_projectiles != m_active_projectiles.size())
         fprintf(stderr, "Warning: num_projectiles %d active %d\n",num_projectiles,
@@ -154,7 +146,6 @@ void ProjectileManager::updateClient(float dt)
         (*i)->updateFromServer(f, dt);
         if(f.m_exploded) 
         {
-            m_something_was_hit = true;
             (*i)->hit(NULL);
         }
     }   // for i in m_active_projectiles

@@ -154,11 +154,12 @@ public:
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
-    virtual void update      (float);
+    virtual bool updateAndDelete(float);
+    virtual HitEffect *getHitEffect() const;
     void         updateFromServer(const FlyableInfo &f, float dt);
-    HitEffect   *getHitEffect() const;
     bool         isOwnerImmunity(const Kart *kart_hit) const;
-
+    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    void         explode(Kart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the 
      *  flyable stays at a height close to the average height.
@@ -172,11 +173,6 @@ public:
     // ------------------------------------------------------------------------
     /** Called when this flyable hits the track. */
     virtual void hitTrack    () {};
-    // ------------------------------------------------------------------------
-    /** Called when this flyable hit a kart or physical object. 
-     *  \param kart Pointer to the kart hit (NULL if no kart was hit).
-     *  \param obj  Pointer to the object hit (NULL if no object was hit). */
-    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     /** Enables/disables adjusting ov velocity depending on height above
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
@@ -197,9 +193,8 @@ public:
     /** Returns the sfx that should be played in case of an explosion. */
     virtual const char*  getExplosionSound() const { return "explosion"; }
     // ------------------------------------------------------------------------
-    /** Indicates if an explosion needs to be added if this flyable
-      * is removed. */
-    virtual bool needsExplosion() const {return true;}
+    /** Default is that each flyable needs an explosion effect. */
+    virtual bool needsExplosion() const { return true; }
 };   // Flyable
 
 #endif

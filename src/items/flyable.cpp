@@ -254,8 +254,8 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
                              Vec3 *minDelta, const Kart* inFrontOf, 
                              const bool backwards) const
 {
-    btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() 
-                                                 : getTrans());
+    btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
+                                                      : getTrans());
 
     *minDistSquared = 999999.9f;
     *minKart = NULL;
@@ -271,9 +271,11 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
             kart->playingEmergencyAnimation() ) continue;
         btTransform t=kart->getTrans();
 
-        Vec3 delta      = t.getOrigin()-tProjectile.getOrigin();
-        // the Y distance is added again because karts above or below should not be prioritized when aiming
-        float distance2 = delta.length2() + abs(t.getOrigin().getY() - tProjectile.getOrigin().getY())*2;
+        Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
+        // the Y distance is added again because karts above or below should//
+        // not be prioritized when aiming
+        float distance2 = delta.length2() + abs(t.getOrigin().getY() 
+                        - trans_projectile.getOrigin().getY())*2;
 
         if(inFrontOf != NULL)
         {
@@ -338,19 +340,25 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     float gy = target_direction.getY();
 
     //Projected onto X-Z plane
-    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed();
+    float target_kart_speed = target_direction.length_2d() 
+                            * target_kart->getSpeed();
 
     float target_kart_heading = target_kart->getHeading();
 
-    float dist = -(target_kart_speed / item_XZ_speed) * (dx * cosf(target_kart_heading) -
-                                                         dz * sinf(target_kart_heading));
+    float dist = -(target_kart_speed / item_XZ_speed) 
+               * (dx * cosf(target_kart_heading) -
+                  dz * sinf(target_kart_heading)   );
 
-    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist)) / (dx*dx + dz*dz);
-    fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th): acosf(fire_th));
+    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist))
+                  / (dx*dx + dz*dz);
+    fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th)
+                                              :  acosf(fire_th));
 
     float time = 0.0f;
-    float a = item_XZ_speed * sinf (fire_th) + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XZ_speed * cosf (fire_th) + target_kart_speed * cosf (target_kart_heading);
+    float a = item_XZ_speed     * sinf (fire_th) 
+            + target_kart_speed * sinf (target_kart_heading);
+    float b = item_XZ_speed     * cosf (fire_th) 
+            + target_kart_speed * cosf (target_kart_heading);
 
     if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
     else if (b != 0.0f)      time = fabsf(dz / b);
@@ -364,16 +372,23 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     time -= forw_offset / sqrt(a*a+b*b);
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dy / time) + (gy * target_kart->getSpeed());
+    *up_velocity = (0.5f * time * gravity) + (dy / time) 
+                 + (gy * target_kart->getSpeed());
 }   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
-void Flyable::update(float dt)
+/** Updates this flyable. It calls Moveable::update. If this function returns
+ *  true, the flyable will be deleted by the projectile manager.
+ *  \param dt Time step size.
+ *  \returns True if this object can be deleted.
+ */
+bool Flyable::updateAndDelete(float dt)
 {
     m_time_since_thrown += dt;
-    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);
+    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) 
+        hit(NULL);
 
-    if(m_exploded) return;
+    if(m_exploded) return true;
 
     Vec3 xyz=getBody()->getWorldTransform().getOrigin();
     // Check if the flyable is outside of the track. If so, explode it.
@@ -396,13 +411,17 @@ void Flyable::update(float dt)
        xyz[0]>(*max)[0]-eps || xyz[2]>(*max)[2]-eps || xyz[1]>(*max)[1]-eps   )
     {
         hit(NULL);    // flyable out of track boundary
-        return;
+        return true;
     }
 
     // Add the position offset so that the flyable can adjust its position 
     // (usually to do the raycast from a slightly higher position to avoid
     // problems finding the terrain in steep uphill sections).
     TerrainInfo::update(xyz+m_position_offset);
+
+    // Remove flyable if its
+    if(TerrainInfo::getMaterial()==NULL)
+        return true;
 
     if(m_adjust_up_velocity)
     {
@@ -412,7 +431,8 @@ void Flyable::update(float dt)
         // HAT is clamped by min/max height. This might be somewhat
         // unphysical, but feels right in the game.
 
-        float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
+        float delta = m_average_height - std::max(std::min(hat, m_max_height),
+                                                  m_min_height);
         Vec3 v = getVelocity();
         assert(!isnan(v.getX()));
         assert(!isnan(v.getX()));
@@ -429,9 +449,11 @@ void Flyable::update(float dt)
     }   // if m_adjust_up_velocity
 
     Moveable::update(dt);
-}   // update
 
-// -----------------------------------------------------------------------------
+    return false;
+}   // updateAmdDelete
+
+// ----------------------------------------------------------------------------
 /** Updates the position of a projectile based on information received frmo the
  *  server.
  */
@@ -445,7 +467,7 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
     Moveable::update(dt);
 }   // updateFromServer
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns true if the item hit the kart who shot it (to avoid that an item
  *  that's too close to the shoter hits the shoter).
  *  \param kart Kart who was hit.
@@ -457,8 +479,8 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
            m_time_since_thrown < 2.0f;
 }   // isOwnerImmunity
 
-// -----------------------------------------------------------------------------
-/** Callback from the phycis in case that a kart or object is hit. 
+// ----------------------------------------------------------------------------
+/** Callback from the phycis in case that a kart or physical object is hit. 
  *  kart The kart hit (NULL if no kart was hit).
  *  object The object that was hit (NULL if none).
  */
@@ -475,10 +497,11 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
         {
             case PowerupManager::POWERUP_CAKE:
             {
-                hit_message += StringUtils::insertValues(getCakeString(),
-                                                         core::stringw(kart_hit->getName()),
-                                                         core::stringw(m_owner->getName())
-                                                        ).c_str();
+                hit_message = 
+                    StringUtils::insertValues(getCakeString(),
+                                          core::stringw(kart_hit->getName()),
+                                          core::stringw(m_owner->getName())
+                                                                     ).c_str();
             }
             break;
             case PowerupManager::POWERUP_PLUNGER: 
@@ -490,16 +513,18 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             {
                 if (kart_hit == m_owner)
                 {
-                    hit_message += StringUtils::insertValues(getSelfBowlingString(),
-                                                             core::stringw(m_owner->getName())
-                                                            ).c_str();
+                    hit_message = 
+                        StringUtils::insertValues(getSelfBowlingString(),
+                                            core::stringw(m_owner->getName())
+                                                                     ).c_str();
                 }
                 else
                 {
-                    hit_message += StringUtils::insertValues(getBowlingString(),
-                                                             core::stringw(kart_hit->getName()),
-                                                             core::stringw(m_owner->getName())
-                                                            ).c_str();
+                    hit_message = 
+                        StringUtils::insertValues(getBowlingString(),
+                                            core::stringw(kart_hit->getName()),
+                                            core::stringw(m_owner->getName())
+                                                                     ).c_str();
                 }
             }
             break;
@@ -507,18 +532,29 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                 printf("Failed message for %i\n", m_type);
                 assert(false);
         }
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, 
+                        video::SColor(255, 255, 255, 255), false);
     }
 
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.
-    projectile_manager->notifyRemove();
 
     m_exploded=true;
 
-    if(!needsExplosion()) return;
+    if(needsExplosion()) 
+        explode(kart_hit, object);
+    
+    return;
 
+}   // hit
+
+// ----------------------------------------------------------------------------
+/** Creates the explosion physical effect, i.e. pushes the karts and ph
+ *  appropriately. The corresponding visual/sfx needs to be added manually!
+ */
+void Flyable::explode(Kart *kart_hit, PhysicalObject *object)
+{
     // Apply explosion effect
     // ----------------------
     World *world = World::getWorld();

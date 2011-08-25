@@ -61,11 +61,12 @@ void HitSFX::setPlayerKartHit()
 }   // setPlayerKartHit
 
 //-----------------------------------------------------------------------------
-/** Updates the hit sfx, called one per time step.
+/** Updates the hit sfx, called one per time step. If this function returns
+ *  true, the effect will be deleted.
  *  \param dt Time step size.
  *  \return true If the explosion is finished.
  */
-bool HitSFX::update(float dt)
+bool HitSFX::updateAndDelete(float dt)
 {
     return m_sfx->getStatus() != SFXManager::SFX_PLAYING;
-}   // update
+}   // updateAndDelete

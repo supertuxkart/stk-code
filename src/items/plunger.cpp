@@ -118,21 +118,21 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     m_keep_alive = -1;
 }   // Plunger
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 Plunger::~Plunger()
 {
     if(m_rubber_band)
         delete m_rubber_band;
 }   // ~Plunger
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 {
     Flyable::init(node, plunger_model, PowerupManager::POWERUP_PLUNGER);
 }   // init
 
-// -----------------------------------------------------------------------------
-void Plunger::update(float dt)
+// ----------------------------------------------------------------------------
+bool Plunger::updateAndDelete(float dt)
 {
     // In keep-alive mode, just update the rubber band
     if(m_keep_alive >= 0)
@@ -141,18 +141,19 @@ void Plunger::update(float dt)
         if(m_keep_alive<=0)
         {
             setHasHit();
-            projectile_manager->notifyRemove();
+            return true;
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
-        return;
+        return false;
     }
 
     // Else: update the flyable and rubber band
-    Flyable::update(dt);
+    bool ret = Flyable::updateAndDelete(dt);
     if(m_rubber_band != NULL) m_rubber_band->update(dt);
 
-    if(getHoT()==Track::NOHIT) return;
-}   // update
+    return ret;
+
+}   // updateAndDelete
 
 // -----------------------------------------------------------------------------
 /** Virtual function called when the plunger hits something.

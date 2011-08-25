@@ -44,7 +44,7 @@ public:
     /** Updates a hit effect. Called once per frame.
      *  \param dt Time step size.
      *  \return True if the hit effect is finished and can be removed. */
-    virtual bool update   (float dt) = 0;
+    virtual bool updateAndDelete(float dt) = 0;
 
     // ------------------------------------------------------------------------
     /** Sets that this SFX affects a player kart, which can be used to

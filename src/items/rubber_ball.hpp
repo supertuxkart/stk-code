@@ -125,11 +125,15 @@ public:
                  RubberBall  (Kart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
-    virtual void update      (float dt);
+    virtual bool updateAndDelete(float dt);
     virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
+    // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
-    virtual bool needsExplosion() const {return false;}
+    virtual HitEffect *getHitEffect() const {return NULL; }
+    // ------------------------------------------------------------------------
+    /** Plunger does not need an explosion effect. */
+    virtual bool needsExplosion() const { return false; }
 
 };   // RubberBall
 

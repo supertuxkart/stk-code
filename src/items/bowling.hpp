@@ -43,7 +43,7 @@ private:
 public:
     Bowling(Kart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
-    virtual void update(float dt);
+    virtual bool updateAndDelete(float dt);
     
     const char* getExplosionSound() const { return "strike"; }
     

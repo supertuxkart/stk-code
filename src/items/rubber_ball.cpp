@@ -214,13 +214,15 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
-// -----------------------------------------------------------------------------
-/** Updates the rubber ball.
+// ----------------------------------------------------------------------------
+/** Updates the rubber ball. 
  *  \param dt Time step size.
+ *  \returns True if the rubber ball should be removed.
  */
-void RubberBall::update(float dt)
+bool RubberBall::updateAndDelete(float dt)
 {
-    Flyable::update(dt);
+    if(Flyable::updateAndDelete(dt))
+        return true;
 
     // Update the target in case that the first kart was overtaken (or has
     // finished the race).
@@ -229,7 +231,7 @@ void RubberBall::update(float dt)
     if(!m_target)        // Remove this item from the game
     {
         hit(NULL);
-        return;
+        return true;
     }
 
     checkDistanceToTarget();
@@ -271,7 +273,9 @@ void RubberBall::update(float dt)
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
     setXYZ(next_xyz);
-}   // update
+
+    return false;
+}   // updateAndDelete
 
 // ----------------------------------------------------------------------------
 /** Uses Hermite splines (Catmull-Rom) to interpolate the position of the
@@ -430,7 +434,6 @@ void RubberBall::hit(Kart* kart, PhysicalObject* object)
         {
             // Else trigger the full explosion animation
             kart->handleExplosion(kart->getXYZ(), /*direct hit*/true);
-            projectile_manager->notifyRemove();
             setHasHit();
         }
         return;

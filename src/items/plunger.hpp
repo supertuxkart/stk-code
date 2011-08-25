@@ -47,16 +47,21 @@ public:
                  Plunger(Kart *kart);
                 ~Plunger();
     static  void init(const XMLNode &node, scene::IMesh* missile);
+    virtual bool updateAndDelete(float dt);
+    virtual void hitTrack ();
+    virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
+
+    // ------------------------------------------------------------------------
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps. 
      */
     void         setKeepAlive(float t) {m_keep_alive = t;}
-    virtual void update   (float dt);
-    virtual void hitTrack ();
-    virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
-
-    /** A plunger does not explode if it is removed. */
-    virtual bool needsExplosion() const {return false;}
+    // ------------------------------------------------------------------------
+    /** No hit effect when it ends. */
+    virtual HitEffect *getHitEffect() const {return NULL; }
+    // ------------------------------------------------------------------------
+    /** Plunger does not need an explosion effect. */
+    virtual bool needsExplosion() const { return false; }
 };   // Plunger
 
 #endif

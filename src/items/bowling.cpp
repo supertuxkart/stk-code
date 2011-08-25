@@ -90,9 +90,17 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
 }   // init
 
 // -----------------------------------------------------------------------------
-void Bowling::update(float dt)
+/** Updates the bowling ball ineach frame. If this function returns true, the
+ *  object will be removed by the projectile manager.
+ *  \param dt Time step size.
+ *  \returns True of this object should be removed.
+ */
+bool Bowling::updateAndDelete(float dt)
 {
-    Flyable::update(dt);
+    bool can_be_deleted = Flyable::updateAndDelete(dt);
+    if(can_be_deleted)
+        return true;
+
     const Kart *kart=0;
     Vec3        direction;
     float       minDistance;
@@ -121,7 +129,7 @@ void Bowling::update(float dt)
         if(!material || material->isDriveReset())
         {
             hit(NULL);
-            return;
+            return true;
         }
     }
     btVector3 v       = m_body->getLinearVelocity();
@@ -131,13 +139,17 @@ void Bowling::update(float dt)
         if(vlen<0.8*m_speed*m_speed)
         {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
             if(vlen==0.0f) {
-                v    = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
+                v = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
             }
             m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
         }   // vlen < 0.8*m_speed*m_speed
     }   // hat< m_max_height  
     
     if(vlen<0.1)
+    {
         hit(NULL);
-}   // update
+        return true;
+    }
+    return false;
+}   // updateAndDelete
 // -----------------------------------------------------------------------------

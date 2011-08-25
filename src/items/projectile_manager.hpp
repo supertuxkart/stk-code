@@ -53,14 +53,11 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    bool             m_something_was_hit;
     void             updateClient(float dt);
     void             updateServer(float dt);
 public:
-                     ProjectileManager() {m_something_was_hit=false;}
+                     ProjectileManager() {}
                     ~ProjectileManager() {}
-    /** Notifies the projectile manager that something needs to be removed. */
-    void             notifyRemove     () {m_something_was_hit=true; }
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);

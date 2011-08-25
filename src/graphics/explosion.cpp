@@ -85,11 +85,11 @@ Explosion::~Explosion()
  *  \param dt Time step size.
  *  \return true If the explosion is finished.
  */
-bool Explosion::update(float dt)
+bool Explosion::updateAndDelete(float dt)
 {
     // The explosion sfx is shorter than the particle effect,
     // so no need to save the result of the update call.
-    HitSFX::update(dt);
+    HitSFX::updateAndDelete(dt);
 
     m_remaining_time -= dt;
     
@@ -133,4 +133,4 @@ bool Explosion::update(float dt)
     }
 
     return false;  // not finished
-}   // update
+}   // updateAndDelete
