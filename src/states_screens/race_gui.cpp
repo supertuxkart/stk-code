@@ -507,7 +507,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
                 NULL, NULL, true);
         }
 
-        if ((icon != NULL) && (kart->isSquashed()))
+         if ((icon != NULL) && (!kart->playingEmergencyAnimation()) && (kart->isSquashed()))
         {
             //syncs icon squash with kart squash
             const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
