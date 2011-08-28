@@ -187,6 +187,8 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_node = NULL;
     m_particle_type = NULL;
     m_parent = parent;
+    m_emission_decay_rate = 0;
+    
     setParticleType(type);
     assert(m_node != NULL);
     
@@ -205,7 +207,8 @@ ParticleEmitter::~ParticleEmitter()
 }   // ~ParticleEmitter
 
 //-----------------------------------------------------------------------------
-void ParticleEmitter::update()
+
+void ParticleEmitter::update(float dt)
 {
     assert(m_magic_number == 0x58781325);
     
@@ -221,6 +224,12 @@ void ParticleEmitter::update()
     
     transform.rotateVect(velocity);
     m_emitter->setDirection(velocity);
+    
+    if (m_emission_decay_rate > 0)
+    {
+        m_max_rate = m_min_rate = std::max(0.0f, (m_min_rate - m_emission_decay_rate*dt));
+        setCreationRate(m_min_rate);
+    }
     
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
@@ -242,6 +251,9 @@ void ParticleEmitter::setCreationRate(float f)
 {
     m_emitter->setMinParticlesPerSecond(int(f));
     m_emitter->setMaxParticlesPerSecond(int(f));
+    
+    m_min_rate = f;
+    m_max_rate = f;
     
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
@@ -280,32 +292,35 @@ void ParticleEmitter::setPosition(const Vec3 &pos)
 void ParticleEmitter::setParticleType(const ParticleKind* type)
 {   
     assert(m_magic_number == 0x58781325);
-    if (m_particle_type == type) return; // already the right type
-    
-    if (m_node != NULL)
+    bool isNewType = (m_particle_type != type);
+    if (isNewType)
     {
-        m_node->removeAll();
-        m_node->removeAllAffectors();
-    }
-    else
-    {
-        m_node = irr_driver->addParticleNode();
+        if (m_node != NULL)
+        {
+            m_node->removeAll();
+            m_node->removeAllAffectors();
+        }
+        else
+        {
+            m_node = irr_driver->addParticleNode();
+        }
+        
+        if (m_parent != NULL)
+        {
+            m_node->setParent(m_parent);
+        }
+        
+        m_particle_type = type;
     }
     
-    if (m_parent != NULL)
-    {
-        m_node->setParent(m_parent);
-    }
-    
-    
-    m_particle_type = type;
+    m_emission_decay_rate = type->getEmissionDecayRate();
     
     Material* material    = type->getMaterial();
     const float minSize   = type->getMinSize();
     const float maxSize   = type->getMaxSize();
     const int lifeTimeMin = type->getMinLifetime();
     const int lifeTimeMax = type->getMaxLifetime();
-    
+        
     assert(maxSize >= minSize);
     assert(lifeTimeMax >= lifeTimeMin);
     
@@ -321,109 +336,124 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         m_node->setName(debug_name.c_str());
     }
 #endif
+    m_min_rate = type->getMinRate();
+    m_max_rate = type->getMaxRate();
     
-    video::SMaterial& mat0 = m_node->getMaterial(0);
-    
-    m_node->setPosition(m_position.toIrrVector());
-    
-    if (material != NULL)
+    if (isNewType)
     {
-        assert(material->getTexture() != NULL);
-        material->setMaterialProperties(&mat0);
-        m_node->setMaterialTexture(0, material->getTexture());
-    
-        mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
-    }
-    else
-    {
-        m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str()));
-    }
-    
-    switch (type->getShape())
-    {
-        case EMITTER_POINT:
+        video::SMaterial& mat0 = m_node->getMaterial(0);
+        
+        m_node->setPosition(m_position.toIrrVector());
+        
+        if (material != NULL)
         {
-            m_emitter = m_node->createPointEmitter(core::vector3df(m_particle_type->getVelocityX(),
-                                                                   m_particle_type->getVelocityY(),
-                                                                   m_particle_type->getVelocityZ()),   // velocity in m/ms
-                                                   type->getMinRate(),  type->getMaxRate(),
-                                                   type->getMinColor(), type->getMaxColor(),
-                                                   lifeTimeMin, lifeTimeMax,
-                                                   m_particle_type->getAngleSpread() /* angle */
-                                                   );
-            break;
+            assert(material->getTexture() != NULL);
+            material->setMaterialProperties(&mat0);
+            m_node->setMaterialTexture(0, material->getTexture());
+        
+            mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
+        }
+        else
+        {
+            m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str()));
         }
         
-        case EMITTER_BOX:
+
+        switch (type->getShape())
         {
-            const float box_size_x = type->getBoxSizeX()/2.0f;
-            const float box_size_y = type->getBoxSizeY()/2.0f;
-            
-            m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -0.6f,
-                                                                 box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
-                                                 core::vector3df(m_particle_type->getVelocityX(),
-                                                                 m_particle_type->getVelocityY(),
-                                                                 m_particle_type->getVelocityZ()),   // velocity in m/ms
-                                                 type->getMinRate(),  type->getMaxRate(),
-                                                 type->getMinColor(), type->getMaxColor(),
-                                                 lifeTimeMin, lifeTimeMax,
-                                                 m_particle_type->getAngleSpread() /* angle */
-                                                 );
-            
-#if VISUALIZE_BOX_EMITTER
-            if (m_parent != NULL)
+            case EMITTER_POINT:
             {
-                for (int x=0; x<2; x++)
+                m_emitter = m_node->createPointEmitter(core::vector3df(m_particle_type->getVelocityX(),
+                                                                       m_particle_type->getVelocityY(),
+                                                                       m_particle_type->getVelocityZ()),   // velocity in m/ms
+                                                       type->getMinRate(),  type->getMaxRate(),
+                                                       type->getMinColor(), type->getMaxColor(),
+                                                       lifeTimeMin, lifeTimeMax,
+                                                       m_particle_type->getAngleSpread() /* angle */
+                                                       );
+                break;
+            }
+            
+            case EMITTER_BOX:
+            {
+                const float box_size_x = type->getBoxSizeX()/2.0f;
+                const float box_size_y = type->getBoxSizeY()/2.0f;
+                
+                m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -0.6f,
+                                                                     box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
+                                                     core::vector3df(m_particle_type->getVelocityX(),
+                                                                     m_particle_type->getVelocityY(),
+                                                                     m_particle_type->getVelocityZ()),   // velocity in m/ms
+                                                     type->getMinRate(),  type->getMaxRate(),
+                                                     type->getMinColor(), type->getMaxColor(),
+                                                     lifeTimeMin, lifeTimeMax,
+                                                     m_particle_type->getAngleSpread() /* angle */
+                                                     );
+                
+    #if VISUALIZE_BOX_EMITTER
+                if (m_parent != NULL)
                 {
-                    for (int y=0; y<2; y++)
+                    for (int x=0; x<2; x++)
                     {
-                        for (int z=0; z<2; z++)
+                        for (int y=0; y<2; y++)
                         {
-                            m_visualisation.push_back(
-                            irr_driver->getSceneManager()->addSphereSceneNode(0.05f, 16, m_parent, -1,
-                                                                               core::vector3df((x ? box_size_x : -box_size_x),
-                                                                                               (y ? box_size_y : -box_size_y),
-                                                                                               -0.6 - (z ? 0 : type->getBoxSizeZ())))
-                                                      );
+                            for (int z=0; z<2; z++)
+                            {
+                                m_visualisation.push_back(
+                                irr_driver->getSceneManager()->addSphereSceneNode(0.05f, 16, m_parent, -1,
+                                                                                   core::vector3df((x ? box_size_x : -box_size_x),
+                                                                                                   (y ? box_size_y : -box_size_y),
+                                                                                                   -0.6 - (z ? 0 : type->getBoxSizeZ())))
+                                                          );
+                            }
                         }
                     }
                 }
+    #endif
+                break;
             }
-#endif
-            break;
+            default:
+            {
+                fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
+                return;
+            }
         }
-        default:
-        {
-            fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
-            return;
-        }
+    }
+    else
+    {
+        m_emitter->setMinParticlesPerSecond(int(m_min_rate));
+        m_emitter->setMaxParticlesPerSecond(int(m_max_rate));
     }
     
     m_emitter->setMinStartSize(core::dimension2df(minSize, minSize));
     m_emitter->setMaxStartSize(core::dimension2df(maxSize, maxSize));
-    m_node->setEmitter(m_emitter); // this grabs the emitter
-    m_emitter->drop();             // so we can drop our references
     
-    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 255, 255),
-                                                                                type->getFadeoutTime());
-    m_node->addAffector(af);
-    af->drop();
-    
-    if (type->getGravityStrength() != 0)
+    if (isNewType)
     {
-        scene::IParticleGravityAffector *gaf = m_node->createGravityAffector(core::vector3df(00.0f, type->getGravityStrength(), 0.0f),
-                                                                             type->getForceLostToGravityTime());
-        m_node->addAffector(gaf);
-        gaf->drop();
-    }
-    
-    const float fas = type->getFadeAwayStart();
-    const float fae = type->getFadeAwayEnd();
-    if (fas > 0.0f && fae > 0.0f)
-    {
-        FadeAwayAffector* faa = new FadeAwayAffector(fas*fas, fae*fae);
-        m_node->addAffector(faa);
-        faa->drop();
+        m_node->setEmitter(m_emitter); // this grabs the emitter
+        m_emitter->drop();             // so we can drop our references
+        
+        scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 255, 255),
+                                                                                    type->getFadeoutTime());
+        m_node->addAffector(af);
+        af->drop();
+        
+        if (type->getGravityStrength() != 0)
+        {
+            scene::IParticleGravityAffector *gaf = m_node->createGravityAffector(core::vector3df(00.0f, type->getGravityStrength(), 0.0f),
+                                                                                 type->getForceLostToGravityTime());
+            m_node->addAffector(gaf);
+            gaf->drop();
+        }
+        
+        const float fas = type->getFadeAwayStart();
+        const float fae = type->getFadeAwayEnd();
+        if (fas > 0.0f && fae > 0.0f)
+        {
+            FadeAwayAffector* faa = new FadeAwayAffector(fas*fas, fae*fae);
+            m_node->addAffector(faa);
+            faa->drop();
+        }
     }
 }   // setParticleType
 
@@ -435,6 +465,8 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
     m_node->addAffector(hmca);
     hmca->drop();
 }
+
+//-----------------------------------------------------------------------------
 
 void ParticleEmitter::resizeBox(float size)
 {

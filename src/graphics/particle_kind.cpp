@@ -51,6 +51,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_start  = -1.0f;
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
+    m_emission_decay_rate = 0;
     
     
     // ----- Read XML file
@@ -131,6 +132,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     {
         rate->get("min", &m_min_rate);
         rate->get("max", &m_max_rate);
+        rate->get("decay_rate", &m_emission_decay_rate);
     }
     
     //std::cout << "m_min_rate = " << m_min_rate << "\n";

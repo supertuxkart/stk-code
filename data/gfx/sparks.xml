@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<particles emitter="box" box_x="0.5" box_y="0.5" box_z="0.2">
+
+    <spreading angle="180"        />
+    
+    <velocity  x="0.000"
+               y="0.004"
+               z="0.000"         />
+    
+    <material  file="flaring-star.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="200"
+               max="200"
+               decay_rate="200"  />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="500"
+               max="600"         />
+    
+    <!-- Size of the particles -->
+    <size      min="0.1"
+               max="0.2"         />
+
+    <color     min="255 255 255"
+               max="255 255 255" />
+
+    <!-- How much time in milliseconds before the particle is fully faded out  -->
+    <fadeout   time="500"        />
+
+</particles>

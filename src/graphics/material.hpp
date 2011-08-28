@@ -80,6 +80,10 @@ private:
     bool             m_drive_reset;
     /** If a kart is rescued when crashing into this surface. */
     bool             m_crash_reset;
+    
+    /** Particles to show on crash-reset */
+    std::string      m_crash_reset_particles;
+    
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
@@ -176,6 +180,9 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
     bool  isCrashReset       () const { return m_crash_reset;        }
+    
+    std::string getCrashResetParticles() const { return m_crash_reset_particles; }
+    
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
     const std::string& 
           getTexFname        () const { return m_texname;            }

@@ -104,6 +104,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_nitro_kind           = NULL;
     m_zipper_fire          = NULL;
     m_zipper_fire_kind     = NULL;
+    m_collision_particles  = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
     m_camera               = NULL;
@@ -390,6 +391,7 @@ Kart::~Kart()
     if(m_nitro)                  delete m_nitro;
     if(m_nitro_kind)             delete m_nitro_kind;
     if(m_zipper_fire)            delete m_zipper_fire;
+    if(m_collision_particles)    delete m_collision_particles;
     if(m_zipper_fire_kind)       delete m_zipper_fire_kind;
     if(m_slipstream)             delete m_slipstream;
     if(m_rain)                   delete m_rain;
@@ -502,6 +504,7 @@ void Kart::reset()
     m_attachment->clear();
     m_nitro->setCreationRate(0.0f);
     m_zipper_fire->setCreationRate(0.0f);
+    if (m_collision_particles) m_collision_particles->setCreationRate(0.0f);
     m_powerup.reset();
 
     m_race_position        = m_initial_position;
@@ -838,7 +841,7 @@ void Kart::update(float dt)
     //smoke drawing control point
     if (UserConfigParams::m_graphical_effects)
     {
-        if (m_terrain_particles)   m_terrain_particles->update();
+        if (m_terrain_particles)   m_terrain_particles->update(dt);
         if (m_rain)
         {
             m_rain->setPosition( getCamera()->getCameraSceneNode()->getPosition() );
@@ -846,8 +849,9 @@ void Kart::update(float dt)
         }
     }  // UserConfigParams::m_graphical_effects
     
-    m_nitro->update();
-    m_zipper_fire->update();
+    m_nitro->update(dt);
+    m_zipper_fire->update(dt);
+    if (m_collision_particles) m_collision_particles->update(dt);
     
     updatePhysics(dt);
 
@@ -1337,7 +1341,31 @@ void Kart::crashed(Kart *k, const Material *m)
      *  for 0.5 seconds after a crash.
      */
     if(m && m->isCrashReset() && !playingEmergencyAnimation())
+    {
+        std::string particles = m->getCrashResetParticles();
+        if (particles.size() > 0)
+        {
+            ParticleKind* kind = ParticleKindManager::get()->getParticles(particles);
+            if (kind != NULL)
+            {
+                if (m_collision_particles == NULL)
+                {
+                    Vec3 position(-getKartWidth()*0.35f, 0.06f, getKartLength()*0.5f);
+                    m_collision_particles  = new ParticleEmitter(kind, position, getNode());
+                }
+                else
+                {
+                    m_collision_particles->setParticleType(kind);
+                }
+            }
+            else
+            {
+                fprintf(stderr, "Unknown particles kind <%s> in material crash-reset properties\n", particles.c_str());
+            }
+        }
+        
         forceRescue();
+    }
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
     m_time_last_crash = World::getWorld()->getTime();
@@ -1942,11 +1970,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     if (m_zipper_fire)
     {
-        // the std::max call is there to let fire fade out smoothly instead of stopping sharply
         if (m_zipper_fire->getCreationRate() > 0)
         {
-            m_zipper_fire->setCreationRate(std::max(m_zipper_fire->getCreationRate() - dt*800.0f, 0.0f));
-            
             // the emitter box should spread from last frame's position to the current position
             // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
             m_zipper_fire->resizeBox(std::max(0.25f, getSpeed()*dt));

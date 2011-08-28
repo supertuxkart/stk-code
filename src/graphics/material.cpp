@@ -98,6 +98,11 @@ Material::Material(const XMLNode *node, int index)
     
     node->get("mask",             &m_mask);
     
+    if (m_crash_reset)
+    {
+        node->get("crash-reset-particles", &m_crash_reset_particles);
+    }
+    
     if (node->get("normal-map",  &m_normal_map_tex))
     {
         m_normal_map = true;

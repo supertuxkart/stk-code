@@ -163,6 +163,9 @@ private:
     /** The particle kind for the nitro. */
     ParticleKind    *m_zipper_fire_kind;
     
+    /** For collisions */
+    ParticleEmitter *m_collision_particles;
+
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
     

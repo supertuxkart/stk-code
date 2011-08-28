@@ -66,13 +66,20 @@ private:
     
     unsigned int m_magic_number;
     
+    /** Decay of emission rate, in particles per second */
+    int m_emission_decay_rate;
+    
+    /** The irrlicht emitter contains this info, but as an int. We want it as a float */
+    float m_min_rate, m_max_rate;
+    
+    
 public:
     
     ParticleEmitter             (const ParticleKind* type, 
                                  const Vec3 &position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
-    virtual void update         ();
+    virtual void update         (float dt);
     void         setCreationRate(float f);
     int          getCreationRate();
     
