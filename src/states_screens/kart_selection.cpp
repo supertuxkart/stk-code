@@ -1391,7 +1391,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
         }
     }
     
-    if (allPlayersReady) allPlayersDone();
+    if (allPlayersReady && (!m_multiplayer || amount > 1)) allPlayersDone();
 }
 
 // -----------------------------------------------------------------------------
