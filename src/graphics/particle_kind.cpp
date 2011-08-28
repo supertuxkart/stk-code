@@ -35,7 +35,6 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_max_size       = 0.5f;
     m_min_size       = 0.5f;
     m_shape          = EMITTER_POINT;
-    m_material       = NULL;
     m_min_rate       = 10;
     m_max_rate       = 10;
     m_lifetime_min   = 400;
@@ -117,27 +116,12 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         throw std::runtime_error("[ParticleKind] No <material> node in " + file);
     }
     
-    std::string materialFile;
-    material->get("file", &materialFile);
+    material->get("file", &m_material_file);
     
-    if (materialFile.size() == 0)
+    if (m_material_file.size() == 0)
     {
         delete xml;
         throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
-    }
-    
-    if (material_manager->hasMaterial(materialFile))
-    {
-        m_material = material_manager->getMaterial(materialFile);
-        if (m_material->getTexture() == NULL)
-        {
-            throw std::runtime_error("[ParticleKind] Cannot locate file " + materialFile);
-        }
-    }
-    else
-    {
-        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of "
-                        "currently known materials\n", materialFile.c_str());
     }
     
     // ------------------------------------------------------------------------
@@ -217,4 +201,25 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     // ------------------------------------------------------------------------
     
     delete xml;
+}
+
+// ----------------------------------------------------------------------------
+
+Material* ParticleKind::getMaterial() const
+{
+    if (material_manager->hasMaterial(m_material_file))
+    {
+        Material* material = material_manager->getMaterial(m_material_file);
+        if (material->getTexture() == NULL)
+        {
+            throw std::runtime_error("[ParticleKind] Cannot locate file " + m_material_file);
+        }
+        return material;
+    }
+    else
+    {
+        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of "
+                "currently known materials\n", m_material_file.c_str());
+        return NULL;
+    }
 }

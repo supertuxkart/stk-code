@@ -54,9 +54,7 @@ private:
     float     m_velocity_z;
     
     EmitterShape m_shape;
-    
-    Material* m_material;
-    
+        
     /** Minimal emission rate in particles per second */
     int       m_min_rate;
     
@@ -85,6 +83,8 @@ private:
     
     std::string m_name;
     
+    std::string m_material_file;
+    
 public:
     
     /**
@@ -104,7 +104,7 @@ public:
     
     EmitterShape getShape    () const { return m_shape;           }
     
-    Material* getMaterial    () const { return m_material;        }
+    Material* getMaterial    () const;
 
     int       getMaxLifetime () const { return m_lifetime_max;    }
     int       getMinLifetime () const { return m_lifetime_min;    }
