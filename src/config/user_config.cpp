@@ -309,7 +309,7 @@ WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_valu
     m_value         = default_value;
     m_default_value = default_value;
     
-    param_name = param_name;
+    m_param_name = param_name;
     all_params.push_back(this);
     if(comment != NULL) m_comment = comment;
 }   // WStringUserConfigParam
