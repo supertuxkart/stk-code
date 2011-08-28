@@ -55,7 +55,7 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     /** Stores whether any player confirmed their choice; then, some things are "frozen", for instance
       * the selected kart group tab
       */
-    bool m_player_confirmed;
+    bool m_game_master_confirmed;
     
     PlayerKartWidget* m_removed_widget;
     

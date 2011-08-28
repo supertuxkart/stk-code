@@ -878,7 +878,7 @@ void KartSelectionScreen::loadedFromFile()
 {
     g_dispatcher          = new FocusDispatcher(this);
     m_first_widget        = g_dispatcher;
-    m_player_confirmed    = false;
+    m_game_master_confirmed    = false;
     m_multiplayer_message = NULL;
     // Dynamically add tabs
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
@@ -955,7 +955,7 @@ void KartSelectionScreen::init()
         g_dispatcher->add();
     }
     
-    m_player_confirmed = false;
+    m_game_master_confirmed = false;
     
     tabs->setActivated();
     
@@ -1368,11 +1368,14 @@ void KartSelectionScreen::playerConfirm(const int playerID)
     
     // Mark this player as ready to start
     m_kart_widgets[playerID].markAsReady();
-    m_player_confirmed = true;
     
-    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
-    assert( tabs != NULL );
-    tabs->setDeactivated();
+    if (playerID == PLAYER_ID_GAME_MASTER)
+    {
+        m_game_master_confirmed = true;
+        RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+        assert( tabs != NULL );
+        tabs->setDeactivated();
+    }
     
     // validate choices to notify player of duplicates
     const bool names_ok = validateIdentChoices();
@@ -1400,7 +1403,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
  */
 void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "kartgroups" && !m_player_confirmed) // don't allow changing group after someone confirmed
+    if (name == "kartgroups" && !m_game_master_confirmed) // don't allow changing group after someone confirmed
     {
         RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
         assert(tabs != NULL);
@@ -1422,30 +1425,33 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             // for others, remove focus from kart that might no more exist in this tab.
             if (n != PLAYER_ID_GAME_MASTER) GUIEngine::focusNothingForPlayer(n);
             
-            // try to preserve the same kart for each player (except for game master, since it's the one 
-            // that can change the groups, so focus for this player must remain on the tabs)
-            const std::string& selected_kart = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selected_kart, n, n != PLAYER_ID_GAME_MASTER))
+            if (!m_kart_widgets[n].isReady())
             {
-                // if we get here, it means one player "lost" his kart in the tab switch
-                if (UserConfigParams::logGUI())
-                    std::cout << "[KartSelectionScreen] Player " << n << " lost their selection when switching tabs!!!\n";
-                
-                // Select a random kart in this case
-                const int count = w->getItems().size();
-                if (count > 0)
+                // try to preserve the same kart for each player (except for game master, since it's the one 
+                // that can change the groups, so focus for this player must remain on the tabs)
+                const std::string& selected_kart = m_kart_widgets[n].getKartInternalName();
+                if (!w->setSelection( selected_kart, n, n != PLAYER_ID_GAME_MASTER))
                 {
-                    // FIXME: two players may be given the same kart by the use of random
-                    const int randomID = random.get( count );
+                    // if we get here, it means one player "lost" his kart in the tab switch
+                    if (UserConfigParams::logGUI())
+                        std::cout << "[KartSelectionScreen] Player " << n << " lost their selection when switching tabs!!!\n";
                     
-                    // select kart for players > 0 (player 0 is the one that can change the groups,
-                    // so focus for player 0 must remain on the tabs)
-                    const bool success = w->setSelection( randomID, n, n != PLAYER_ID_GAME_MASTER );
-                    if (!success) std::cerr << "[KartSelectionScreen] WARNING: setting kart of player " << n << " failed :(\n";
-                }
-                else
-                {
-                    std::cerr << "[KartSelectionScreen] WARNING : 0 items in the ribbon\n";
+                    // Select a random kart in this case
+                    const int count = w->getItems().size();
+                    if (count > 0)
+                    {
+                        // FIXME: two players may be given the same kart by the use of random
+                        const int randomID = random.get( count );
+                        
+                        // select kart for players > 0 (player 0 is the one that can change the groups,
+                        // so focus for player 0 must remain on the tabs)
+                        const bool success = w->setSelection( randomID, n, n != PLAYER_ID_GAME_MASTER );
+                        if (!success) std::cerr << "[KartSelectionScreen] WARNING: setting kart of player " << n << " failed :(\n";
+                    }
+                    else
+                    {
+                        std::cerr << "[KartSelectionScreen] WARNING : 0 items in the ribbon\n";
+                    }
                 }
             }
         } // end for
