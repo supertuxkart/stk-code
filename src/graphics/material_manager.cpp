@@ -88,6 +88,11 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mb->getMaterial().setFlag(video::EMF_TRILINEAR_FILTER, true);
     }    
     
+    mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    
+    if (UserConfigParams::m_fullscreen_antialiasing)
+        mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
+    
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
