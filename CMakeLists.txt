@@ -36,9 +36,30 @@ include_directories("${STK_SOURCE_DIR}")
 include_directories("${STK_SOURCE_DIR}/enet/include")
 include_directories("${STK_SOURCE_DIR}/bullet/src")
 
+if(APPLE)
+	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	include_directories("/Library/Frameworks/IrrFramework.framework/Versions/A/Headers/")
+	include_directories("/Library/Frameworks/fribidi.framework/Headers")
+	include_directories("/Library/Frameworks/Ogg.framework/Headers")
+	include_directories("/Library/Frameworks/Vorbis.framework/Headers")
+	include_directories("/usr/local/include")
+	include_directories("/usr/include")
+	find_library(Ogg /Library/Frameworks/Ogg.framework)
+	find_library(Vorbis /Library/Frameworks/Vorbis.framework)
+	#find_library(supertuxkart -framework IOKit)
+	#find_library(supertuxkart -framework QuickTime)
+	#find_library(supertuxkart -framework Carbon)
+	#find_library(supertuxkart -framework AudioUnit)
+	#find_library(supertuxkart -framework GLUT)
+	#find_library(find_librarysupertuxkart -framework Cocoa)
+	#find_library(supertuxkart -framework OpenGL)
+	#find_library(supertuxkart -framework AGL)
+
+endif()
+
 # Set lib paths
 if(APPLE)
-	link_directories("${IRRLICHT_DIR}/lib/MacOSX")
+	# nothing to add
 elseif(UNIX)
 	link_directories("${IRRLICHT_DIR}/lib/Linux")
 elseif(MSVC)
@@ -50,45 +71,55 @@ endif()
 link_directories("${STK_SOURCE_DIR}/bullet")
 
 # OpenGL
-find_package(OpenGL)
-
-if(OPENGL_FOUND)
-	message("-- OpenGL found (include dirs: ${OPENGL_INCLUDE_DIR})")
-	include_directories(${OPENGL_INCLUDE_DIR})
+if(APPLE)
+    find_library(OpenGL /System/Library/Frameworks/OpenGL.framework /System/Library/Frameworks/AGL.framework)
 else()
-	message(FATAL_ERROR "OpenGL not found.")
-endif()
-
-if(UNIX)
-	# X11, stk requires xf86vm
-	find_package(X11)
-
-	if(X11_FOUND)
-		message("-- X11 libs found")
-	else()
-		message(FATAL_ERROR "X11 not found.")
-	endif()
+    find_package(OpenGL)
+    
+    if(OPENGL_FOUND)
+	    message("-- OpenGL found (include dirs: ${OPENGL_INCLUDE_DIR})")
+	    include_directories(${OPENGL_INCLUDE_DIR})
+    else()
+	    message(FATAL_ERROR "OpenGL not found.")
+    endif()
+    
+    if(UNIX)
+	    # X11, stk requires xf86vm
+	    find_package(X11)
+    
+	    if(X11_FOUND)
+		    message("-- X11 libs found")
+	    else()
+		    message(FATAL_ERROR "X11 not found.")
+	    endif()
+    endif()
 endif()
 
 # OpenAL
-
-find_package(OpenAL)
-
-if(OPENAL_FOUND)
-	message("-- OpenAL found (include dirs: ${OPENAL_INCLUDE_DIR})")
-	include_directories(${OPENAL_INCLUDE_DIR})
+if(APPLE)
+    find_library(OpenAL /Library/Frameworks/OpenAL.framework)
 else()
-	message(FATAL_ERROR "OpenAL not found.")
+    find_package(OpenAL)
+    
+    if(OPENAL_FOUND)
+	    message("-- OpenAL found (include dirs: ${OPENAL_INCLUDE_DIR})")
+	    include_directories(${OPENAL_INCLUDE_DIR})
+    else()
+	    message(FATAL_ERROR "OpenAL not found.")
+    endif()
 endif()
 
-
 # Check if we finally got irrlicht
-find_path(HAVE_IRRLICHT irrlicht.h PATHS ${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
-
-if(HAVE_IRRLICHT)
-	message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
+if(APPLE)
+    find_library(Irrlicht /Library/Frameworks/IrrFramework.framework)
 else()
-	message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
+    find_path(HAVE_IRRLICHT irrlicht.h PATHS ${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
+    
+    if(HAVE_IRRLICHT)
+	    message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
+    else()
+	    message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
+    endif()
 endif()
 
 include_directories(${HAVE_IRRLICHT})
@@ -134,9 +165,7 @@ else()
 	message("-- Font tool deactivated/freetype not found, the font tool won't be built (only useful for developers)")
 endif()
 
-# Build the final executable
-add_executable(supertuxkart
-	src/main.cpp
+set( SRCS ${SRCS} src/main.cpp
 	src/main_loop.cpp
 	src/main_loop.hpp
 	src/addons/addon.cpp
@@ -596,29 +625,86 @@ add_executable(supertuxkart
 	src/utils/utf8.h
 	src/utils/utf8/unchecked.h
 	src/utils/vec3.cpp
-	src/utils/vec3.hpp
-)
+	src/utils/vec3.hpp)
 
-target_link_libraries(supertuxkart
-	Irrlicht
-	bulletdynamics
-	bulletcollision
-	bulletmath
-	enet
-	${CURL_LIBRARIES}
-	${OPENGL_LIBRARIES}
-	${OPENAL_LIBRARY}
-	vorbisfile)
-	
+if (APPLE)		
+    # icon files to copy in the bundle
+    set( OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/src/ide/Xcode/stk.icns)
+    set_source_files_properties( ${OSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set( SRCS ${SRCS} ${OSX_ICON_FILES} )
+    
+    # build the executable and create an app bundle
+    add_executable(supertuxkart MACOSX_BUNDLE ${SRCS} )
+    
+    target_link_libraries(supertuxkart
+	    bulletdynamics
+	    bulletcollision
+	    bulletmath
+	    enet
+	    ${CURL_LIBRARIES}
+	    # We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	    /Library/Frameworks/IrrFramework.framework
+	    /Library/Frameworks/Ogg.framework
+	    /Library/Frameworks/OpenAL.framework
+	    /Library/Frameworks/Vorbis.framework
+	    # TODO: allow linking against frameworks from a SDK. I (Auria) just am not familiar enough with CMake to do this
+	    /System/Library/Frameworks/AGL.framework
+	    /System/Library/Frameworks/IOKit.framework
+	    /System/Library/Frameworks/QuickTime.framework
+	    /System/Library/Frameworks/Carbon.framework
+	    /System/Library/Frameworks/AudioUnit.framework
+	    /System/Library/Frameworks/Cocoa.framework
+	    /System/Library/Frameworks/OpenGL.framework)
+	    
+    # configure CMake to use a custom Info.plist
+    set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
+  
+    install(CODE "
+    EXECUTE_PROCESS(COMMAND ln -sf
+       ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources
+       )
+    ")
+
+else()
+    # Build the final executable
+    add_executable(supertuxkart ${SRCS})
+
+    target_link_libraries(supertuxkart
+	    Irrlicht
+	    bulletdynamics
+	    bulletcollision
+	    bulletmath
+	    enet
+	    ${CURL_LIBRARIES}
+	    ${OPENGL_LIBRARIES}
+	    ${OPENAL_LIBRARY}
+	    vorbisfile)
+endif()
+
 if(USE_FRIBIDI)
-	target_link_libraries(supertuxkart
-		fribidi)
+    if(APPLE)
+	target_link_libraries(supertuxkart /Library/Frameworks/fribidi.framework)
+    else()
+        target_link_libraries(supertuxkart fribidi)
+    endif()
 endif()
 	
 if(UNIX AND NOT APPLE)
 	target_link_libraries(supertuxkart
 		Xxf86vm)
 elseif(APPLE)
-	# TODO!
-	# xapantu (1/08/11): all libs are added by cmake, it should work
+	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	target_link_libraries(supertuxkart /Library/Frameworks/IrrFramework.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/Ogg.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/OpenAL.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/Vorbis.framework)
+
+	# TODO: allow linking against frameworks from a SDK. I (Auria) just am not familiar enough with CMake to do this
+	target_link_libraries(supertuxkart /System/Library/Frameworks/AGL.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/IOKit.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/QuickTime.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/Carbon.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/AudioUnit.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/Cocoa.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/OpenGL.framework)
 endif()
