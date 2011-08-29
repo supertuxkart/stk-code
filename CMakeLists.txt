@@ -659,11 +659,7 @@ if (APPLE)
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
   
-    install(CODE "
-    EXECUTE_PROCESS(COMMAND ln -sf
-       ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources
-       )
-    ")
+    add_definitions(`ln -sf ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources`)
 
 else()
     # Build the final executable
