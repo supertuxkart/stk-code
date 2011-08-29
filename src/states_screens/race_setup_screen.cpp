@@ -219,7 +219,7 @@ void RaceSetupScreen::init()
         w2->addItem(name3, FTL_IDENT, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
     
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
     {
         irr::core::stringw name4 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
