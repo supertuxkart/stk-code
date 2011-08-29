@@ -338,6 +338,27 @@ void ListWidget::markItemRed(const int id, bool red)
 
 // -----------------------------------------------------------------------------
 
+void ListWidget::markItemBlue(const int id, bool blue)
+{
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+    
+    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    
+    if (blue)
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,255) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,0,0,255) );
+    }
+    else
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,0) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+    }
+}
+
+// -----------------------------------------------------------------------------
+
 EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)

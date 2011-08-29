@@ -371,3 +371,14 @@ bool DeviceConfig::hasBindingFor(const int button_id) const
     }
     return false;
 }
+
+//------------------------------------------------------------------------------
+
+bool DeviceConfig::hasBindingFor(const int button_id, PlayerAction from, PlayerAction to) const
+{
+    for (int n=from; n<=to; n++)
+    {
+        if (m_bindings[n].getId() == button_id) return true;
+    }
+    return false;
+}

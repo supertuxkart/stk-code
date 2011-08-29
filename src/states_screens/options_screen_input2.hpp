@@ -45,6 +45,8 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
     
     void updateInputButtons();
 
+    bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from, PlayerAction to);
+
     DeviceConfig* m_config;
     
     irr::core::stringw makeLabel(const irr::core::stringw translatedName, PlayerAction action) const;

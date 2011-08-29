@@ -125,6 +125,7 @@ public:
     Binding&    getBinding          (int i) {return m_bindings[i];}
     
     bool hasBindingFor(const int buttonID) const;
+    bool hasBindingFor(const int buttonID, PlayerAction from, PlayerAction to) const;
     
     /** At this time only relevant for gamepads, keyboards are always enabled */
     bool isEnabled() const { return m_enabled; }

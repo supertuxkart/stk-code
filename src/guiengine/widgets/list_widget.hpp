@@ -183,6 +183,7 @@ namespace GUIEngine
           * \pre may only be called after the widget has been added to the screen with add()
           */
         void markItemRed(const int id, bool red=true);
+        void markItemBlue(const int id, bool blue=true);
         
         /**
           * \brief Make an item red to mark an error, for instance
@@ -193,6 +194,13 @@ namespace GUIEngine
             const int id = getItemID(internalName);
             assert(id != -1);
             markItemRed( id, red );
+        }
+
+        void markItemBlue(const std::string internalName, bool blue=true)
+        {
+            const int id = getItemID(internalName);
+            assert(id != -1);
+            markItemBlue( id, blue );
         }
 
         /** Override callback from Widget */

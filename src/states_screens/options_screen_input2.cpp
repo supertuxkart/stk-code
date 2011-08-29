@@ -223,6 +223,8 @@ void OptionsScreenInput2::updateInputButtons()
     actions->renameItem(i++, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
     
     
+
+    bool conflicts = false;
     // ---- make sure there are no binding conflicts (same key used for two actions)
     std::set<irr::core::stringw> currentlyUsedKeys;
     for (PlayerAction action = PA_FIRST_GAME_ACTION;
@@ -233,6 +235,12 @@ void OptionsScreenInput2::updateInputButtons()
         if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
         {
             currentlyUsedKeys.insert( item );
+            if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD 
+                && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION, PA_LAST_GAME_ACTION))
+            {
+                conflicts = true;
+                actions->markItemBlue (KartActionStrings[action]);
+            }
         }
         else
         {
@@ -264,6 +272,12 @@ void OptionsScreenInput2::updateInputButtons()
         if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
         {
             currentlyUsedKeys.insert( item );
+            if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD 
+                && conflictsBetweenKbdConfig(action, PA_FIRST_MENU_ACTION, PA_LAST_MENU_ACTION))
+            {
+                conflicts = true;
+                actions->markItemBlue (KartActionStrings[action]);
+            }
         }
         else
         {            
@@ -284,6 +298,13 @@ void OptionsScreenInput2::updateInputButtons()
             //actions->renameItem( KartActionStrings[action], _("Binding Conflict!") ); 
         }
     }
+
+    GUIEngine::Widget* conflict_label = this->getWidget<GUIEngine::LabelWidget>("conflict");
+    if (conflicts) 
+        conflict_label->setText( _("* A blue item means a conflict with another configuration") );
+    else
+        conflict_label->setText("");
+
 }   // updateInputButtons
 
 // -----------------------------------------------------------------------------
@@ -301,9 +322,9 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     
     if (keyboard)
     {
-		if (UserConfigParams::logMisc())
+        if (UserConfigParams::logMisc())
         {
-			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
+            std::cout << "% Binding " << KartActionStrings[binding_to_set] 
                 << " : setting to keyboard key " << sensed_input.m_button_id
                 << " \n\n";
         }
@@ -318,9 +339,9 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
     }
     else if (gamepad)
     {
-		if (UserConfigParams::logMisc())
+        if (UserConfigParams::logMisc())
         {
-			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
+            std::cout << "% Binding " << KartActionStrings[binding_to_set] 
                       << " : setting to gamepad #" 
                       << sensed_input.m_device_id<< " : ";
         
@@ -491,3 +512,20 @@ void OptionsScreenInput2::onConfirm()
 }
 
 // -----------------------------------------------------------------------------
+
+
+bool OptionsScreenInput2::conflictsBetweenKbdConfig(PlayerAction action,
+        PlayerAction from, PlayerAction to)
+{
+    KeyboardConfig* other_kbd_config;
+    int id = m_config->getBinding(action).getId();
+    for (int i=0; i < input_manager->getDeviceList()->getKeyboardAmount(); i++) {
+        other_kbd_config = input_manager->getDeviceList()->getKeyboardConfig(i);
+
+        if (m_config != other_kbd_config  && other_kbd_config->hasBindingFor(id, from, to)
+            && (other_kbd_config->getBinding(action).getId() != id || action == PA_FIRE)) {
+            return true;
+        }
+    }
+    return false;
+}

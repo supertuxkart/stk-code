@@ -22,16 +22,23 @@
         <spacer height="16" width="10"/>
         
         <!-- List of key bindings -->
-        <list id="actions" proportion="5" width="75%" align="center"/>
+        <list id="actions" proportion="8" width="75%" align="center"/>
          
          <!-- Bottom buttons -->
+
         <spacer width="50" height="20" /> 
-        <button id="delete"
-                I18N="To delete a keyboard configuration"  text="Delete Configuration"/>
-        <spacer width="50" height="10" /> 
-        <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
-        
-        <spacer width="50" height="10" /> 
+        <div proportion="2" width="100%"  layout="horizontal-row">
+            <div height="100%" width="fit" layout="vertical-row">
+                <button id="delete"
+                        I18N="To delete a keyboard configuration"  text="Delete Configuration"/>
+                <spacer width="50" height="10" /> 
+                <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
+                
+                <spacer width="50" height="10" /> 
+            </div>
+            <spacer width="20" height="10" />
+            <label id="conflict" proportion="1" text="" word_wrap="true" align="center"/>
+        </div>
     </box>
 </div>
 
