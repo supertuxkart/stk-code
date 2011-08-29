@@ -613,8 +613,8 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
 #endif
     
-    if (UserConfigParams::m_fullscreen_antialiasing)
-        m->AntiAliasing = video::EAAM_LINE_SMOOTH;
+    //if (UserConfigParams::m_fullscreen_antialiasing)
+    //    m->AntiAliasing = video::EAAM_LINE_SMOOTH;
 
 } // setMaterialProperties
 

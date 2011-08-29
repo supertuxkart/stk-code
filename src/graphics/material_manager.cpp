@@ -90,8 +90,8 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     
     mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
     
-    if (UserConfigParams::m_fullscreen_antialiasing)
-        mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
+    //if (UserConfigParams::m_fullscreen_antialiasing)
+    //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
     
 }   // setAllMaterialFlags
 
