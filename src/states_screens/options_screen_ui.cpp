@@ -245,7 +245,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 #ifdef WIN32
             _putenv("LANGUAGE=");
 #else
-            setenv( "LANGUAGE", "", 1);
+            unsetenv("LANGUAGE");
 #endif
         }
         else
