@@ -675,30 +675,14 @@ bool Track::loadMainTrack(const XMLNode &root)
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
         
+        float lod_distance = -1.0f;
+        n->get("lod_distance", &lod_distance);
+        
+        bool lod_instance = false;
+        n->get("lod_instance", &lod_instance);
+        
         std::string lodgroup;
-        int detail = -1;
-        bool is_instance = false;
-        
-        size_t loc = model_name.find("_LOD");
-        if (loc != std::string::npos)
-        {
-            lodgroup = model_name.substr(0, loc);
-            
-            std::string detail_str = StringUtils::removeExtension(model_name.substr(loc+4));
-            
-            if (detail_str == "x")
-            {
-                is_instance = true;
-            }
-            else if (!StringUtils::parseString(detail_str, &detail))
-            {
-                lodgroup = "";
-                fprintf(stderr, "WARNING : invalid level-of-detail model name '%s'\n", model_name.c_str());
-            }
-            // else printf("'%s' has lod group '%s' and detail '%i'\n", model_name.c_str(), lodgroup.c_str(), detail);
-        }
-        
-
+        n->get("lod_group", &lodgroup);
         
         if (tangent)
         {
@@ -736,14 +720,14 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (!lodgroup.empty())
         {
-            if (is_instance)
+            if (lod_instance)
             {
                 lod_instances[lodgroup].push_back(n);
                 //printf("LOD instance : '%s' @ (%.2f, %.2f, %.2f)\n", lodgroup.c_str(), xyz.X, xyz.Y, xyz.Z);
             }
             else
             {
-                lod_groups[lodgroup][detail] = model_name;
+                lod_groups[lodgroup][lod_distance] = model_name;
                 //printf("LOD Model Definition : group='%s', detail='%i', model='%s'\n", lodgroup.c_str(), detail, model_name.c_str());
             }
         }
@@ -813,6 +797,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
     
     // 2. Read the XML nodes and instanciate LOD scene nodes where relevant
+    std::string groupname;
     std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
     for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
     {
@@ -830,8 +815,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                 continue;
             }
 
-            model_name = "";
-            node->get("model", &model_name);
+            groupname = "";
+            node->get("lod_group", &groupname);
             //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
                 
             core::vector3df xyz(0,0,0);
@@ -841,40 +826,46 @@ bool Track::loadMainTrack(const XMLNode &root)
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             node->get("scale", &scale);
             
-            LODNode* lod_node = new LODNode(sroot, sm);
-            for (unsigned int m=0; m<group.size(); m++)
+            if (group.size() > 0)
             {
-                full_path = m_root + "/" + group[m].second;
-                
-                // TODO: check whether the mesh contains animations or not, and use a static
-                //       mesh when there are no animations?
-                scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
-                if(!a_mesh)
+                LODNode* lod_node = new LODNode(sroot, sm);
+                for (unsigned int m=0; m<group.size(); m++)
                 {
-                    fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                            full_path.c_str());
-                    continue;
+                    full_path = m_root + "/" + group[m].second;
+                    
+                    // TODO: check whether the mesh contains animations or not, and use a static
+                    //       mesh when there are no animations?
+                    scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+                    if(!a_mesh)
+                    {
+                        fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
+                                full_path.c_str());
+                        continue;
+                    }
+                    a_mesh->grab();  // see above for usage in m_all_cached_meshes
+                    m_all_cached_meshes.push_back(a_mesh);
+                    irr_driver->grabAllTextures(a_mesh);
+                    scene::IAnimatedMeshSceneNode* scene_node = 
+                        irr_driver->addAnimatedMesh(a_mesh);
+                    scene_node->setPosition(xyz);
+                    scene_node->setRotation(hpr);
+                    scene_node->setScale(scale);
+                    
+                    lod_node->add( group[m].first, scene_node, true );
                 }
-                a_mesh->grab();  // see above for usage in m_all_cached_meshes
-                m_all_cached_meshes.push_back(a_mesh);
-                irr_driver->grabAllTextures(a_mesh);
-                scene::IAnimatedMeshSceneNode* scene_node = 
-                    irr_driver->addAnimatedMesh(a_mesh);
-                scene_node->setPosition(xyz);
-                scene_node->setRotation(hpr);
-                scene_node->setScale(scale);
                 
-                lod_node->add( group[m].first, scene_node, true );
-                
-            }
-            
 #ifdef DEBUG
-            std::string debug_name = model_name+" (LOD track-object)";
-            lod_node->setName(debug_name.c_str());
+                std::string debug_name = groupname+" (LOD track-object)";
+                lod_node->setName(debug_name.c_str());
 #endif
-            
-            handleAnimatedTextures(lod_node, *node);
-            m_all_nodes.push_back( lod_node );
+                
+                handleAnimatedTextures(lod_node, *node);
+                m_all_nodes.push_back( lod_node );
+            }
+            else
+            {
+                fprintf(stderr, "[Track] WARNING, LOD group '%s' is empty\n", groupname.c_str());
+            }
         }
     }
     // =================================================
