@@ -187,8 +187,6 @@ void *NetworkHttp::mainLoop(void *obj)
         default:
              assert(false); // All commands should have been handled.
         }   // switch(request->getCommand())
-        if(status==CURLE_ABORTED_BY_CALLBACK)
-            break;
 
         if(me->m_current_request->manageMemory())
         {
