@@ -3225,7 +3225,6 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/bullet/src\"";
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DDEBUG=1",
@@ -3272,7 +3271,7 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/bullet/src\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "";
 				OTHER_CFLAGS = (
 					"-DNDEBUG=1",
 					"$(inherited)",
