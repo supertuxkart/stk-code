@@ -93,7 +93,7 @@ public:
     void setProgress(float f) { m_progress.setAtomic(f); }
     // --------------------------------------------------------------------
     /** Used in sorting requests by priority. */
-    bool operator<(const Request &r) { return r.m_priority < m_priority;}
+    bool operator<(const Request &r) { return m_priority < r.m_priority;}
     // --------------------------------------------------------------------
     /** Signals that this request should be cancelled. */
     void cancel() { m_cancel = true; }

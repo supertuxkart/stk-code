@@ -586,7 +586,7 @@ void NetworkHttp::insertRequest(Request *request)
     {
         m_all_requests.getData().push_back(request);
         unsigned int i=m_all_requests.getData().size()-1;
-        while(i>0 && *(m_all_requests.getData()[i])<*request)
+        while(i>0 && *(m_all_requests.getData()[i-1])<*request)
         {
                 m_all_requests.getData()[i] = m_all_requests.getData()[i-1];
                 i--;
