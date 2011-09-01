@@ -59,6 +59,8 @@ public:
                                  const core::vector3df& hpr,
                                  const core::vector3df& pos,
                                  const core::vector3df& scale);
+    
+    void removeObject(PhysicalObject* who);
 };   // class TrackObjectManager
 
 #endif

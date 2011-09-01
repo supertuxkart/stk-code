@@ -76,6 +76,13 @@ void ThreeStrikesBattle::init()
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
+    PhysicalObject* obj;
+    for_in(obj, m_tires)
+    {
+        m_track->getTrackObjectManager()->removeObject(obj);
+    }
+    m_tires.clearWithoutDeleting();
+    
     delete[] m_kart_display_info;
     // TODO: need to drop the mesh? I got a crash when I added this line so
     //       not sure this is right
@@ -210,6 +217,8 @@ void ThreeStrikesBattle::update(float dt)
         // FIXME: orient the force relative to kart orientation
         obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
         m_insert_tire = false;
+        
+        m_tires.push_back(obj);
     }
 }   // update
 

@@ -52,6 +52,8 @@ private:
     /** for tires that are blown away */
     core::vector3df m_tire_position;
     
+    PtrVector<PhysicalObject, REF> m_tires;
+    
 public:
     
     /** Used to show a nice graph when battle is over */

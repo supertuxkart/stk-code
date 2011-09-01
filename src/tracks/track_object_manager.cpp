@@ -204,4 +204,13 @@ PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
     return object;
 }
 
+// ----------------------------------------------------------------------------
+
+void TrackObjectManager::removeObject(PhysicalObject* who)
+{
+    m_all_objects.remove(who);
+    
+    // FIXME: need to do memory management
+    //delete who;
+}
 
