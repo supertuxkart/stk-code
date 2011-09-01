@@ -336,8 +336,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         m_node->setName(debug_name.c_str());
     }
 #endif
-    m_min_rate = type->getMinRate();
-    m_max_rate = type->getMaxRate();
+    m_min_rate = (float)type->getMinRate();
+    m_max_rate = (float)type->getMaxRate();
     
     if (isNewType)
     {
