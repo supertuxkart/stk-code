@@ -189,3 +189,19 @@ void TrackObjectManager::enableFog(bool enable)
         }
     }
 }   // enableFog
+
+// ----------------------------------------------------------------------------
+
+PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
+                                                 PhysicalObject::bodyTypes shape, int mass, int radius,
+                                                 const core::vector3df& hpr,
+                                                 const core::vector3df& pos,
+                                                 const core::vector3df& scale)
+{
+    PhysicalObject* object = new PhysicalObject(model, shape, mass, radius, hpr, pos, scale);
+    object->init();
+    m_all_objects.push_back(object);
+    return object;
+}
+
+

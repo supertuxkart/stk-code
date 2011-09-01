@@ -46,6 +46,12 @@ private:
     
     irr::scene::IMesh* m_tire;
     
+    /** for tires that are blown away */
+    bool m_insert_tire;
+    
+    /** for tires that are blown away */
+    core::vector3df m_tire_position;
+    
 public:
     
     /** Used to show a nice graph when battle is over */

@@ -20,10 +20,10 @@
 #ifndef HEADER_TRACK_OBJECT_MANAGER_HPP
 #define HEADER_TRACK_OBJECT_MANAGER_HPP
 
+#include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
 
-class PhysicalObject;
 class Track;
 class Vec3;
 class XMLNode;
@@ -54,6 +54,11 @@ public:
     /** Enable or disable fog on objects */
     void enableFog(bool enable);
 
+    PhysicalObject* insertObject(const std::string& model,
+                                 PhysicalObject::bodyTypes shape, int mass, int radius,
+                                 const core::vector3df& hpr,
+                                 const core::vector3df& pos,
+                                 const core::vector3df& scale);
 };   // class TrackObjectManager
 
 #endif

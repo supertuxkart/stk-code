@@ -68,6 +68,13 @@ protected:
     float                 m_radius;
 public:
                  PhysicalObject (const XMLNode &node);
+    
+                 PhysicalObject(const std::string& model,
+                                bodyTypes shape, int mass, int radius,
+                                const core::vector3df& hpr,
+                                const core::vector3df& pos,
+                                const core::vector3df& scale);
+    
     virtual     ~PhysicalObject (); 
     void         update         (float dt);
     void         init           ();

@@ -371,6 +371,8 @@ public:
     // ------------------------------------------------------------------------
     bool isFogEnabled() const { return m_use_fog; }
     
+    TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
+    
 };   // class Track
 
 #endif

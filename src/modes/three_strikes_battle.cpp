@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
+    m_insert_tire = false;
     
     m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
 }   // ThreeStrikesBattle
@@ -166,6 +168,12 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
             curr->setVisible(m_kart_info[kart_id].m_lives >= 3);
         }
     }
+    
+    // schedule a tire to be thrown away (but can't do it in this callback
+    // because the caller is currently iterating the list of track objects)
+    m_insert_tire = true;
+    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 0.0f, 0.0f);
+    m_tire_position = kart_node->getPosition() + wheel_pos;
 }   // kartHit
 
 //-----------------------------------------------------------------------------
@@ -184,6 +192,25 @@ void ThreeStrikesBattle::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
+    
+    // insert blown away tire now if was requested
+    if (m_insert_tire)
+    {        
+        TrackObjectManager* tom = m_track->getTrackObjectManager();
+        
+        PhysicalObject* obj = 
+            tom->insertObject(file_manager->getModelFile("tire.b3d"),
+                              PhysicalObject::MP_CYLINDER_Y,
+                              15 /* mass */,
+                              0.5f /* radius */,
+                              core::vector3df(800.0f,0,0) /* rotation */,
+                              m_tire_position,
+                              core::vector3df(0.5f, 0.5f, 0.5f) /* scale */);
+        
+        // FIXME: orient the force relative to kart orientation
+        obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
+        m_insert_tire = false;
+    }
 }   // update
 
 //-----------------------------------------------------------------------------

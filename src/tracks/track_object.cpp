@@ -135,6 +135,59 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
+
+TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
+                         const core::vector3df& scale, const std::string& model_name)
+{
+    m_init_xyz   = pos;
+    m_init_hpr   = hpr;
+    m_init_scale = scale;
+    m_enabled    = true;
+    m_is_looped  = false;
+    m_sound      = NULL;
+    
+    // Some animated objects (billboards, sound emitters) don't use this scene node
+    if (model_name == "")
+    {
+        m_node = NULL;
+        m_mesh = NULL;
+    }
+    else
+    {
+        if(file_manager->fileExists(model_name))
+        {
+            m_mesh = irr_driver->getAnimatedMesh(model_name);
+        }
+        if(!m_mesh)
+        {
+            fprintf(stderr, "Warning: '%s' not found and is ignored.\n",
+                    model_name.c_str());
+            return;
+        }
+        
+        m_mesh->grab();
+        irr_driver->grabAllTextures(m_mesh);
+        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
+        m_node = node;
+#ifdef DEBUG
+        std::string debug_name = model_name+" (track-object)";
+        m_node->setName(debug_name.c_str());
+#endif
+        m_frame_start = node->getStartFrame();
+        m_frame_end = node->getEndFrame();
+        
+        if(!m_enabled)
+            m_node->setVisible(false);
+        
+        m_node->setPosition(m_init_xyz);
+        m_node->setRotation(m_init_hpr);
+        m_node->setScale(m_init_scale);
+    }
+    reset();
+}   // TrackObject
+
+// ----------------------------------------------------------------------------
+
 TrackObject::~TrackObject()
 {
     if(m_node)

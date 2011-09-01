@@ -40,7 +40,6 @@ using namespace irr;
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
               : TrackObject(xml_node)
 {
-
     m_shape        = NULL;
     m_body         = NULL;
     m_motion_state = NULL;
@@ -77,6 +76,26 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
 
 }   // PhysicalObject
 
+// -----------------------------------------------------------------------------
+
+PhysicalObject::PhysicalObject(const std::string& model,
+                               bodyTypes shape, int mass, int radius,
+                               const core::vector3df& hpr,
+                               const core::vector3df& pos,
+                               const core::vector3df& scale)
+        : TrackObject(pos, hpr, scale, model)
+{
+    m_body_type = shape;
+    m_mass = mass;
+    m_radius = radius;
+    
+    m_init_pos.setIdentity();
+    btQuaternion q;
+    q.setEuler(hpr.Y, hpr.X, hpr.Z);
+    m_init_pos.setRotation(q);
+    m_init_pos.setOrigin(btVector3(pos.X, pos.Y, pos.Z));
+}
+                               
 // -----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {

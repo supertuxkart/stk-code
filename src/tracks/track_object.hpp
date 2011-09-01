@@ -30,7 +30,7 @@ using namespace irr;
 
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
-
+#include <string>
 
 class XMLNode;
 class SFXBase;
@@ -86,6 +86,8 @@ protected:
 
 public:
                  TrackObject(const XMLNode &xml_node);
+                 TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
+                             const core::vector3df& scale, const std::string& model);
                 ~TrackObject();
     virtual void update(float dt);
     virtual void reset();
