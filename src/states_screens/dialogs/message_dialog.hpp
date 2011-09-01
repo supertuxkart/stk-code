@@ -59,7 +59,8 @@ private:
     
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
-    
+    void doInit(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener);
+
 public:
 
     /**

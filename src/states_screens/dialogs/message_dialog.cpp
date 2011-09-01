@@ -30,6 +30,21 @@ using namespace GUIEngine;
 MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {    
+    doInit(msg, type, listener, own_listener);
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+MessageDialog::MessageDialog(irr::core::stringw msg) :
+    ModalDialog(0.6f, 0.6f)
+{
+    doInit(msg, MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener)
+{
     loadFromFile("confirm_dialog.stkgui");
 
     m_listener = listener;
@@ -50,13 +65,6 @@ MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, ICo
     }
 }
 
-// ------------------------------------------------------------------------------------------------------
-
-MessageDialog::MessageDialog(irr::core::stringw msg) :
-    ModalDialog(0.6f, 0.6f)
-{
-    MessageDialog(msg, MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-}
 
 // ------------------------------------------------------------------------------------------------------
 
