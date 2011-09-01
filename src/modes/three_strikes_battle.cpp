@@ -164,7 +164,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
 
         if (core::stringc(curr->getName()) == "tire1")
         {
-            curr->setVisible(m_kart_info[kart_id].m_lives >= 1);
+            curr->setVisible(m_kart_info[kart_id].m_lives >= 3);
         }
         else if (core::stringc(curr->getName()) == "tire2")
         {
@@ -172,7 +172,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         }
         else if (core::stringc(curr->getName()) == "tire3")
         {
-            curr->setVisible(m_kart_info[kart_id].m_lives >= 3);
+            curr->setVisible(m_kart_info[kart_id].m_lives >= 1);
         }
     }
     
