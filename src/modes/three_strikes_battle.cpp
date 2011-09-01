@@ -309,6 +309,29 @@ void ThreeStrikesBattle::restartRace()
         
         // no positions in this mode
         m_karts[n]->setPosition(-1);
+        
+        scene::ISceneNode* kart_node = m_karts[n]->getNode();
+        
+        // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
+        core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+        for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
+        {
+            scene::ISceneNode* curr = *it;
+            
+            if (core::stringc(curr->getName()) == "tire1")
+            {
+                curr->setVisible(true);
+            }
+            else if (core::stringc(curr->getName()) == "tire2")
+            {
+                curr->setVisible(true);
+            }
+            else if (core::stringc(curr->getName()) == "tire3")
+            {
+                curr->setVisible(true);
+            }
+        }
+        
     }// next kart
     
     // remove old battle events
