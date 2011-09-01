@@ -798,6 +798,9 @@
     <ClCompile Include="..\..\tracks\track_sector.cpp">
       <Filter>Quelldateien\tracks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\graphics\hit_sfx.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1513,6 +1516,12 @@
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_sector.hpp">
       <Filter>Headerdateien\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\hit_effect.hpp">
+      <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\hit_sfx.hpp">
+      <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
