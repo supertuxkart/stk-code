@@ -727,7 +727,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             }
             else
             {
-                lod_groups[lodgroup][lod_distance] = model_name;
+                lod_groups[lodgroup][(int)lod_distance] = model_name;
                 //printf("LOD Model Definition : group='%s', detail='%i', model='%s'\n", lodgroup.c_str(), detail, model_name.c_str());
             }
         }
