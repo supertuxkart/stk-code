@@ -62,7 +62,9 @@ NetworkHttp *network_http=NULL;
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : m_all_requests(std::vector<Request*>()),
+NetworkHttp::NetworkHttp() : m_all_requests(std::priority_queue<Request*, 
+                                                         std::vector<Request*>,
+                                                         Request::Compare>()),
                              m_current_request(NULL),
                              m_abort(false),
                              m_thread_id(NULL)
@@ -81,7 +83,7 @@ NetworkHttp::NetworkHttp() : m_all_requests(std::vector<Request*>()),
 
     Request *request = new Request(Request::HC_INIT, 9999);
     m_all_requests.lock();
-    m_all_requests.getData().push_back(request);
+    m_all_requests.getData().push(request);
     m_all_requests.unlock();    
 }   // NetworkHttp
 
@@ -133,8 +135,8 @@ void *NetworkHttp::mainLoop(void *obj)
 
     me->m_current_request = NULL;
     me->m_all_requests.lock();
-    while(me->m_all_requests.getData().size()           == 0               ||
-          me->m_all_requests.getData()[0]->getCommand() != Request::HC_QUIT   )
+    while(me->m_all_requests.getData().size()              == 0              ||
+          me->m_all_requests.getData().top()->getCommand() != Request::HC_QUIT)
     {
         bool empty = me->m_all_requests.getData().size()==0;
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
@@ -152,8 +154,8 @@ void *NetworkHttp::mainLoop(void *obj)
         // Get the first (=highest priority) request and remove it from the 
         // queue. Only this code actually removes requests from the queue,
         // so it is certain that even 
-        me->m_current_request = me->m_all_requests.getData()[0];
-        me->m_all_requests.getData().erase(me->m_all_requests.getData().begin());
+        me->m_current_request = me->m_all_requests.getData().top();
+        me->m_all_requests.getData().pop();
         me->m_all_requests.unlock();
         if(UserConfigParams::logAddons())
         {
@@ -375,7 +377,9 @@ CURLcode NetworkHttp::reInit()
     addons_manager->reInit();
 
     m_all_requests.lock();
-    m_all_requests.getData().clear();
+    // There is no clear for a priority queue
+    while(!m_all_requests.getData().empty())
+        m_all_requests.getData().pop();
     m_all_requests.unlock();
 
     std::string news_file = file_manager->getAddonsFile("news.xml");
@@ -579,17 +583,10 @@ Request *NetworkHttp::downloadFileAsynchron(const std::string &url,
  */
 void NetworkHttp::insertRequest(Request *request)
 {
-    // Wake up the network http thread
     m_all_requests.lock();
     {
-        m_all_requests.getData().push_back(request);
-        unsigned int i=m_all_requests.getData().size()-1;
-        while(i>0 && *(m_all_requests.getData()[i-1])<*request)
-        {
-                m_all_requests.getData()[i] = m_all_requests.getData()[i-1];
-                i--;
-        }
-        m_all_requests.getData()[i] = request;
+        m_all_requests.getData().push(request);
+        // Wake up the network http thread
         pthread_cond_signal(&m_cond_request);
     }
     m_all_requests.unlock();

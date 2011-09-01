@@ -19,6 +19,7 @@
 #ifndef HEADER_NETWORK_HTTP_HPP
 #define HEADER_NETWORK_HTTP_HPP
 
+#include <queue>
 #include <pthread.h>
 #include <string>
 #include <vector>
@@ -28,9 +29,9 @@
 #endif
 #include <curl/curl.h>
 
+#include "addons/request.hpp"
 #include "utils/synchronised.hpp"
 
-class Request;
 class XMLNode;
 
 class NetworkHttp
@@ -48,7 +49,9 @@ public:
 private:
 
     /** The list of pointes to all requests. */
-    Synchronised< std::vector<Request*> >  m_all_requests;
+    Synchronised< std::priority_queue<Request*, 
+                                      std::vector<Request*>, 
+                                      Request::Compare >     >  m_all_requests;
 
     /** The current requested being worked on. */
     Request                  *m_current_request;

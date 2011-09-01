@@ -73,38 +73,45 @@ public:
                   const std::string &url, const std::string &save);
     void  setAddonIconNotification(Addon *a);
     void  notifyAddon();
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the URL to download from. */
     const std::string &getURL() const {return m_url;}
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the full save file name. */
     const std::string &getSavePath() const {return m_full_path;}
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the command to do for this request. */
     HttpCommands       getCommand() const { return m_command; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the priority of this request. */
     int                getPriority() const { return m_priority; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the current progress. */
     float getProgress() const { return m_progress.getAtomic(); }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Sets the current progress. */
     void setProgress(float f) { m_progress.setAtomic(f); }
-    // --------------------------------------------------------------------
-    /** Used in sorting requests by priority. */
-    bool operator<(const Request &r) { return m_priority < r.m_priority;}
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Signals that this request should be cancelled. */
     void cancel() { m_cancel = true; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if this request is to be cancelled. */
     bool isCancelled() const { return m_cancel; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if the memory for this object should be managed by
     *  by network_http (i.e. freed once the request is handled). */
     bool manageMemory() const { return m_manage_memory; }
-    // --------------------------------------------------------------------
+    // ========================================================================
+    /** This class is used by the priority queue to sort requests by priority.
+     */
+    class Compare
+    {
+    public:
+        /** Compares two requests, returns if the first request has a lower
+         *  priority than the second one. */
+        bool operator() (const Request *a, const Request *b) const
+        { return a->getPriority() < b->getPriority(); }
+    };   // Compare
 };   // Request
 
 #endif
