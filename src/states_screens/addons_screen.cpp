@@ -164,7 +164,7 @@ void AddonsScreen::loadList()
         gui::IGUIFont* font = GUIEngine::getFont();
         
         // first column is 0.666% of the list's width. and icon width == icon height.
-        const unsigned int available_width = w_list->m_w*0.6666f - m_icon_height;
+        const unsigned int available_width = (int)(w_list->m_w*0.6666f - m_icon_height);
         if (font->getDimension(s.c_str()).Width > available_width)
         {
             s = s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
