@@ -55,7 +55,8 @@ public:
     void enableFog(bool enable);
 
     PhysicalObject* insertObject(const std::string& model,
-                                 PhysicalObject::bodyTypes shape, int mass, int radius,
+                                 PhysicalObject::bodyTypes shape, 
+                                 float mass, float radius,
                                  const core::vector3df& hpr,
                                  const core::vector3df& pos,
                                  const core::vector3df& scale);

@@ -70,7 +70,7 @@ public:
                  PhysicalObject (const XMLNode &node);
     
                  PhysicalObject(const std::string& model,
-                                bodyTypes shape, int mass, int radius,
+                                bodyTypes shape, float mass, float radius,
                                 const core::vector3df& hpr,
                                 const core::vector3df& pos,
                                 const core::vector3df& scale);
