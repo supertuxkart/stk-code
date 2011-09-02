@@ -65,7 +65,6 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
     m_owner                        = kart;
     m_type                         = type;
     m_has_hit_something            = false;
-    m_exploded                     = false;
     m_shape                        = NULL;
     m_mass                         = mass;
     m_adjust_up_velocity           = true;
@@ -327,7 +326,7 @@ bool Flyable::updateAndDelete(float dt)
     if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) 
         hit(NULL);
 
-    if(m_exploded) return true;
+    if(m_has_hit_something) return true;
 
     Vec3 xyz=getBody()->getWorldTransform().getOrigin();
     // Check if the flyable is outside of the track. If so, explode it.
@@ -400,8 +399,7 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 {
     setXYZ(f.m_xyz);
     setRotation(f.m_rotation);
-    // m_exploded is not set here, since otherwise when explode() is called,
-    // the rocket is considered to be already exploded.
+
     // Update the graphical position
     Moveable::update(dt);
 }   // updateFromServer
@@ -420,13 +418,15 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 
 // ----------------------------------------------------------------------------
 /** Callback from the physics in case that a kart or physical object is hit. 
- *  kart The kart hit (NULL if no kart was hit).
- *  object The object that was hit (NULL if none).
+ *  \param kart The kart hit (NULL if no kart was hit).
+ *  \param object The object that was hit (NULL if none).
+ *  \return True if there was actually a hit (i.e. not owner, and target is 
+ *          not immune), false otherwise.
  */
-void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
+bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable
-    if(m_exploded || isOwnerImmunity(kart_hit)) return;
+    if(isOwnerImmunity(kart_hit)) return false;
 
     if (kart_hit != NULL)
     {
@@ -442,10 +442,8 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     }
 
     m_has_hit_something=true;
-
-    m_exploded=true;
     
-    return;
+    return true;
 
 }   // hit
 

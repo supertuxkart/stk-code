@@ -202,9 +202,13 @@ bool Bowling::updateAndDelete(float dt)
  *  The bowling ball triggers an explosion when hit.
  *  \param kart The kart hit (NULL if no kart was hit).
  *  \param object The object that was hit (NULL if none).
+ *  \returns True if there was actually a hit (i.e. not owner, and target is 
+ *           not immune), false otherwise.
  */
-void Bowling::hit(Kart* kart, PhysicalObject* obj)
+bool Bowling::hit(Kart* kart, PhysicalObject* obj)
 {
-    Flyable::hit(kart, obj);
-    explode(kart, obj);
+    bool was_real_hit = Flyable::hit(kart, obj);
+    if(was_real_hit)
+        explode(kart, obj);
+    return was_real_hit;
 }   // hit

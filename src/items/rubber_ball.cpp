@@ -465,10 +465,11 @@ float RubberBall::getMaxTerrainHeight() const
 /** Callback from the physics in case that a kart or object is hit. The rubber
  *  ball will only be removed if it hits it target, all other karts it might
  *  hit earlier will only be flattened.
- *  kart The kart hit (NULL if no kart was hit).
- *  object The object that was hit (NULL if none).
+ *  \params kart The kart hit (NULL if no kart was hit).
+ *  \params object The object that was hit (NULL if none).
+ *  \returns True if 
  */
-void RubberBall::hit(Kart* kart, PhysicalObject* object)
+bool RubberBall::hit(Kart* kart, PhysicalObject* object)
 {
     if(kart)
     {
@@ -476,14 +477,15 @@ void RubberBall::hit(Kart* kart, PhysicalObject* object)
         if(kart!=m_target)
         {
             kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+            return false;
         }
         else
         {
             // Else trigger the full explosion animation
             kart->handleExplosion(kart->getXYZ(), /*direct hit*/true);
             setHasHit();
+            return true;
         }
-        return;
     }
-    Flyable::hit(kart, object);
+    return Flyable::hit(kart, object);
 }   // hit

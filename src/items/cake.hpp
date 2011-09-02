@@ -49,8 +49,9 @@ private:
 public:
                  Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual const core::stringw getHitString(const Kart *kart) const;
-    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
+    virtual const core::stringw 
+                 getHitString(const Kart *kart) const;
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     virtual void hitTrack ()                      { hit(NULL);               }
     // ------------------------------------------------------------------------

@@ -169,10 +169,12 @@ bool Plunger::updateAndDelete(float dt)
  *  till the rubber band expires.
  *  \param kart Pointer to the kart hit (NULL if not a kart).
  *  \param obj  Pointer to PhysicalObject object if hit (NULL otherwise).
+ *  \returns True if there was actually a hit (i.e. not owner, and target is 
+ *           not immune), false otherwise.
  */
-void Plunger::hit(Kart *kart, PhysicalObject *obj)
+bool Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
-    if(isOwnerImmunity(kart)) return;
+    if(isOwnerImmunity(kart)) return false;
 
     RaceGUIBase* gui = World::getWorld()->getRaceGUI();
     irr::core::stringw hit_message;
@@ -193,9 +195,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         }
 
         m_keep_alive = 0;
-        // Make this object invisible by placing it faaar down. Note that if this
-        // objects is simply removed from the scene graph, it might be auto-deleted
-        // because the ref count reaches zero.
+        // Make this object invisible.
         getNode()->setVisible(false);
         World::getWorld()->getPhysics()->removeBody(getBody());
     }
@@ -216,7 +216,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         if(kart)
         {
             m_rubber_band->hit(kart);
-            return;
+            return false;
         }
         else if(obj)
         {
@@ -228,6 +228,9 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             m_rubber_band->hit(NULL, &(getXYZ()));
         }
     }
+
+    // Rubber band attached. 
+    return false;
 }   // hit
 
 // -----------------------------------------------------------------------------

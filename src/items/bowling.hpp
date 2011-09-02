@@ -46,7 +46,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
     virtual const core::stringw getHitString(const Kart *kart) const;
-    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL);
 
     /** Returns the sfx to use when the bowling ball explodes. */
     const char* getExplosionSound() const { return "strike"; }

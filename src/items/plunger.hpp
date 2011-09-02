@@ -53,7 +53,7 @@ public:
     virtual bool updateAndDelete(float dt);
     virtual void hitTrack ();
     virtual const core::stringw getHitString(const Kart *kart) const;
-    virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
+    virtual bool hit      (Kart *kart, PhysicalObject *obj=NULL);
 
     // ------------------------------------------------------------------------
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger

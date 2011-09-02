@@ -119,19 +119,22 @@ protected:
     /** Size of the model. */
     static Vec3       m_st_extend[PowerupManager::POWERUP_MAX];
 
-    /** time since thrown. used so a kart can't hit himself when trying something,
-        and also to put some time limit to some collectibles */
+    /** Time since thrown. used so a kart can't hit himself when trying 
+     *  something, and also to put some time limit to some collectibles */
     float             m_time_since_thrown;
 
-    /** set to something > -1 if this flyable should auto-destrcut after a while */
+    /** Set to something > -1 if this flyable should auto-destrcut after 
+     *  a while. */
     float             m_max_lifespan;
 
-    /** if set to true, the kart that throwns this flyable can't collide with it
-        for a short time */
+    /** If set to true, the kart that throwns this flyable can't collide 
+     *  with it for a short time. */
     bool              m_owner_has_temporary_immunity;
 
-    void              getClosestKart(const Kart **minKart, float *minDistSquared,
-                                     Vec3 *minDelta, const Kart* inFrontOf=NULL,
+    void              getClosestKart(const Kart **minKart, 
+                                     float *minDistSquared,
+                                     Vec3 *minDelta, 
+                                     const Kart* inFrontOf=NULL,
                                      const bool backwards=false) const;
 
     void getLinearKartItemIntersection(const Vec3 &origin, 
@@ -144,8 +147,10 @@ protected:
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset,
                                     const Vec3 &velocity,
-                                    btCollisionShape *shape, const float gravity=0.0f,
-                                    const bool rotates=false, const bool turn_around=false,
+                                    btCollisionShape *shape, 
+                                    const float gravity=0.0f,
+                                    const bool rotates=false, 
+                                    const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
 public:
 
@@ -154,13 +159,13 @@ public:
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
-    virtual bool           updateAndDelete(float);
+    virtual bool              updateAndDelete(float);
     virtual const core::stringw getHitString(const Kart *kart) const = 0;
-    virtual HitEffect*     getHitEffect() const;
-    void         updateFromServer(const FlyableInfo &f, float dt);
-    bool         isOwnerImmunity(const Kart *kart_hit) const;
-    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
-    void         explode(Kart* kart, PhysicalObject* obj=NULL);
+    virtual HitEffect*        getHitEffect() const;
+    void                      updateFromServer(const FlyableInfo &f, float dt);
+    bool                      isOwnerImmunity(const Kart *kart_hit) const;
+    virtual bool              hit(Kart* kart, PhysicalObject* obj=NULL);
+    void                      explode(Kart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the 
      *  flyable stays at a height close to the average height.

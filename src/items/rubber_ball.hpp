@@ -129,7 +129,7 @@ public:
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    virtual void hit(Kart* kart, PhysicalObject* obj=NULL);
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL);
     virtual const core::stringw getHitString(const Kart *kart) const;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
