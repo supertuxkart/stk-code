@@ -123,6 +123,7 @@ private:
     float        updateHeight();
     void         interpolate(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
+	float        getMaxTerrainHeight() const;
 public:
                  RubberBall  (Kart* kart);
     virtual     ~RubberBall();
