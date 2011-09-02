@@ -24,6 +24,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
 float RubberBall::m_st_interval;
@@ -272,7 +273,15 @@ bool RubberBall::updateAndDelete(float dt)
     }
     m_timer += dt;
     float height = updateHeight();
-    next_xyz.setY(getHoT()+height);
+    float new_y = getHoT()+height;
+    // No need to check for terrain height if the ball is low to the ground
+    if(height > 0.5f)  
+    {
+        float terrain_height = getMaxTerrainHeight()-m_extend.getY();
+        if(new_y>terrain_height)
+            new_y = terrain_height;
+    }
+    next_xyz.setY(new_y);
 
     // Determine new distance along track
     TrackSector::update(next_xyz);
@@ -388,7 +397,27 @@ float RubberBall::updateHeight()
 }   // updateHeight
 
 // ----------------------------------------------------------------------------
-void RubberBall::checkDistanceToTarget()
+/** Returns the maximum height of the terrain at the current point. While 
+ *  generall the height is arbitrary (a skybox is not part of the physics and
+ *  will therefore not be detected), it is important that a rubber ball does 
+ *  not end up on top of a tunnel.
+ *  \returns The height (Y coordinate) of the next terrain element found by
+ *           a raycast up. If no terrain is found, it returns 99990
+ */
+float RubberBall::getMaxTerrainHeight() const
+{
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    Vec3 to(getXYZ());
+    to.setY(10000.0f);
+    Vec3 hit_point;
+    const Material *material;
+    tm.castRay(getXYZ(), to, &hit_point, &material);
+
+    return (material) ? hit_point.getY() : 99999.f;
+}   // getMaxTerrainHeight
+
+// ----------------------------------------------------------------------------
+    void RubberBall::checkDistanceToTarget()
 {
     // If aiming at target phase, keep on aiming at target.
     // ----------------------------------------------------
