@@ -93,9 +93,9 @@ void AddonsScreen::init()
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
     
-    float wanted_icon_height = getHeight()/8.0f;
-    m_icon_bank->setScale(wanted_icon_height/128.0f);
-    w_list->setIcons(m_icon_bank, (int)(wanted_icon_height));
+    m_icon_height = getHeight()/8.0f;
+    m_icon_bank->setScale(m_icon_height/128.0f); // 128 is the height of the image file
+    w_list->setIcons(m_icon_bank, (int)(m_icon_height));
     
     m_type = "kart";
 
@@ -163,20 +163,59 @@ void AddonsScreen::loadList()
         
         gui::IGUIFont* font = GUIEngine::getFont();
         
-        // first column if 0.666% of the list's width
-        if (font->getDimension(s.c_str()).Width > w_list->m_w*0.6666f)
+        // first column is 0.666% of the list's width. and icon width == icon height.
+        const unsigned int available_width = w_list->m_w*0.6666f - m_icon_height;
+        if (font->getDimension(s.c_str()).Width > available_width)
         {
             s = s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
             s.append("...");
         }
         else
         {
-            //I18N: as in: The Old Island by Johannes Sjolund
-            s = _("%s by %s",addon->getName().c_str(),addon->getDesigner().c_str());
-            if (font->getDimension(s.c_str()).Width >  w_list->m_w*0.6666f)
+            if (addon->getDesigner().size() == 0)
             {
-                s = s.subString(0, int(AddonsScreen::getWidth()*0.018)+20);
-                s.append("...");
+                s = addon->getName();
+            }
+            else
+            {
+                //I18N: as in: The Old Island by Johannes Sjolund
+                s = _("%s by %s",addon->getName().c_str(),addon->getDesigner().c_str());
+            }
+            
+            // check if text is too long to fit
+            if (font->getDimension(s.c_str()).Width >  available_width)
+            {
+                // start by splitting on 2 lines
+                
+                //I18N: as in: The Old Island by Johannes Sjolund
+                s = _("%s\nby %s",addon->getName().c_str(),addon->getDesigner().c_str());
+                
+                core::stringw final_string;
+                
+                // then check if each line is now short enough.
+                std::vector<irr::core::stringw> lines = StringUtils::split(s, '\n');
+                for (unsigned int n=0; n<lines.size(); n++)
+                {
+                    if (font->getDimension(lines[n].c_str()).Width > available_width)
+                    {
+                        // arg, still too long! cut the text so that it fits.
+                        core::stringw line = lines[n];
+                        
+                        // leave a margin of 14 pixels to account for the "..." that will be appended
+                        int split_at = font->getCharacterFromPos(line.c_str(), available_width - 14);
+                        line = line.subString(0, split_at);
+                        line.append("...");
+                        if (final_string.size() > 0) final_string.append("\n");
+                        final_string.append(line);
+                    }
+                    else
+                    {
+                        if (final_string.size() > 0) final_string.append("\n");
+                        final_string.append(lines[n]);
+                    }
+                }
+                
+                s = final_string;
             }
             s.append("\t");
             s.append(addon->getDateAsString().c_str());

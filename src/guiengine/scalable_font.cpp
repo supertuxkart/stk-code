@@ -737,10 +737,11 @@ s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
 
     while (text[idx])
     {
-        const SFontArea& a = Areas[getAreaIDFromCharacter(text[idx], NULL)];
-
-        x += a.width + a.overhang + a.underhang + GlobalKerningWidth;
-
+        bool use_fallback_font = false;
+        const SFontArea &a  = getAreaFromCharacter(text[idx], &use_fallback_font);
+        
+        x += getCharWidth(a, use_fallback_font) + a.overhang + a.underhang + GlobalKerningWidth;
+        
         if (x >= pixel_x)
             return idx;
 

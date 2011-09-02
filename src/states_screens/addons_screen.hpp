@@ -62,6 +62,7 @@ private:
      *  addons_loading is being displayed. */
     int              m_selected_index;
 
+    float            m_icon_height;
 public:
 
     /** Load the addons into the main list.*/
