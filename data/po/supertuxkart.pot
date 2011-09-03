@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-02 19:31-0400\n"
+"POT-Creation-Date: 2011-09-02 20:31-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,7 +96,7 @@ msgid "%i. %s : survived for %s"
 msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:191
+#: src/states_screens/addons_screen.cpp:192
 #, c-format
 msgid ""
 "%s\n"
@@ -116,7 +116,7 @@ msgstr ""
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/modes/linear_world.cpp:309 src/states_screens/addons_screen.cpp:182
+#: src/modes/linear_world.cpp:309 src/states_screens/addons_screen.cpp:183
 #, c-format
 msgid "%s by %s"
 msgstr ""
@@ -268,7 +268,7 @@ msgstr ""
 msgid "Add-Ons"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:76
+#: src/states_screens/addons_screen.cpp:77
 msgid "Add-on name"
 msgstr ""
 
@@ -1274,6 +1274,12 @@ msgstr ""
 msgid "Please re-configure your key bindings."
 msgstr ""
 
+#: src/states_screens/addons_screen.cpp:276
+msgid ""
+"Please wait while addons are updated, or click the button below to reload in "
+"the background."
+msgstr ""
+
 #: src/states_screens/main_menu_screen.cpp:324
 msgid "Please wait while the add-ons are loading"
 msgstr ""
@@ -1517,6 +1523,7 @@ msgstr ""
 msgid "Snow Peak"
 msgstr ""
 
+#: src/states_screens/addons_screen.cpp:360
 #: src/states_screens/main_menu_screen.cpp:320
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
@@ -1750,7 +1757,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:77
+#: src/states_screens/addons_screen.cpp:78
 msgid "Updated date"
 msgstr ""
 
@@ -1952,12 +1959,6 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:341
 #: src/states_screens/grand_prix_win.cpp:104
 msgid "You unlocked a new feature!"
-msgstr ""
-
-#: src/states_screens/addons_screen.cpp:275
-msgid ""
-"You will be taken back to the Main Menu while an updated list of Addons are "
-"downloaded."
 msgstr ""
 
 #: src/karts/kart.cpp:615 src/karts/kart.cpp:634
