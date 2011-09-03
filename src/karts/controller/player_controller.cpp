@@ -438,8 +438,9 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
             m_ugh_sound->play();
             break;
         case Item::ITEM_BUBBLEGUM:
-            //The skid sound is played by the kart class. Do nothing here.
+            //More sounds are played by the kart class
             //See Kart::collectedItem()
+            m_ugh_sound->play();
             break;
         default:
             m_grab_sound->play();
