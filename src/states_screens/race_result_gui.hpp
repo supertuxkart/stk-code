@@ -219,7 +219,7 @@ public:
      *  than one lap). So do nothing in this case.
     */
     virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
-                            float time, int fonst_size, 
+                            float time, 
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true) { }

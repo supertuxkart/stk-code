@@ -438,7 +438,7 @@ bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                                                                          );
         if(hit_message.size()>0)
             gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                            40, video::SColor(255, 255, 255, 255), false);
+                            video::SColor(255, 255, 255, 255), false);
     }
 
     m_has_hit_something=true;

@@ -226,7 +226,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     if(kart_info.m_race_lap+1 == lap_count)
     {
         m_race_gui->addMessage(_("Final lap!"), kart,
-                               3.0f, 40, video::SColor(255, 210, 100, 50), true);
+                               3.0f, video::SColor(255, 210, 100, 50), true);
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
             if (UserConfigParams::m_music)
@@ -251,7 +251,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     else if (kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
-                               kart, 3.0f, 40, video::SColor(255, 210, 100, 50), true);
+                               kart, 3.0f, video::SColor(255, 210, 100, 50), true);
     }
 
     // The race positions must be updated here: consider the situation where 
@@ -309,10 +309,10 @@ void LinearWorld::newLap(unsigned int kart_index)
         m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
         
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                               3.0f, 40, video::SColor(255, 255, 255, 255), false);
+                               3.0f, video::SColor(255, 255, 255, 255), false);
         
         m_race_gui->addMessage(_("New fastest lap"), NULL,
-            3.0f, 40, video::SColor(255, 255, 255, 255), false);
+                               3.0f, video::SColor(255, 255, 255, 255), false);
         
     } // end if new fastest lap
 
@@ -753,7 +753,9 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
         kart->getVelocityLC().getY() > 0.0f        &&
         !kart->hasFinishedRace() )
     {
-        m_race_gui->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
+        m_race_gui->addMessage(_("WRONG WAY!"), kart, -1.0f /* time */,
+                               video::SColor(255,255,255,255), true /* important */,
+                               true /* big font */);
     }  // if angle is too big
 }   // checkForWrongDirection
 

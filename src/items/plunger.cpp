@@ -191,7 +191,8 @@ bool Plunger::hit(Kart *kart, PhysicalObject *obj)
                                                      core::stringw(kart->getName()),
                                                      core::stringw(m_owner->getName())
                                                     ).c_str();
-            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                            video::SColor(255, 255, 255, 255), false);
         }
 
         m_keep_alive = 0;

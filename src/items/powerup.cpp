@@ -223,7 +223,7 @@ void Powerup::use()
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
 
-        gui->addMessage(getSwapperString(), NULL, 3.0f, 40,
+        gui->addMessage(getSwapperString(), NULL, 3.0f,
                         video::SColor(255, 255, 255, 255), false);
         break;
         }
@@ -330,7 +330,8 @@ void Powerup::use()
 
                 irr::core::stringw anchor_message;
                 anchor_message += StringUtils::insertValues(getAnchorString(), core::stringw(kart->getName()));
-                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f,
+                                video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }
@@ -367,7 +368,8 @@ void Powerup::use()
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
 
-            gui->addMessage(getParachuteString(), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(getParachuteString(), NULL, 3.0f,
+                            video::SColor(255, 255, 255, 255), false);
         }
         break;
 

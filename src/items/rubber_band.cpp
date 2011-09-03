@@ -248,7 +248,8 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
                                                  core::stringw(kart_hit->getName()),
                                                  core::stringw(m_owner->getName())
                                                 ).c_str();
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                        video::SColor(255, 255, 255, 255), false);
         return;
     }
 

@@ -232,6 +232,8 @@ void RaceGUIBase::drawAllMessages(const Kart* kart,
     y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
 
     gui::ScalableFont* font = GUIEngine::getFont();
+    gui::ScalableFont* big_font = GUIEngine::getTitleFont();
+
     int font_height = m_max_font_height;
     if (race_manager->getNumLocalPlayers() > 2)
     {
@@ -257,11 +259,20 @@ void RaceGUIBase::drawAllMessages(const Kart* kart,
 
         core::rect<s32> pos(x - w/2, y, x + w/2, y + font_height);
         
-        font->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                   pos, msg.m_color, true /* hcenter */, 
-                   true /* vcenter */);
-        
-        y += font_height;
+        if (msg.m_big_font)
+        {
+            big_font->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                           pos, msg.m_color, true /* hcenter */, 
+                           true /* vcenter */);
+            y += GUIEngine::getTitleFontHeight();
+        }
+        else
+        {
+            font->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                       pos, msg.m_color, true /* hcenter */, 
+                       true /* vcenter */);
+            y += font_height;
+        }
     }   // for i in all messages
 }   // drawAllMessages
 
@@ -398,11 +409,10 @@ void RaceGUIBase::renderPlayerView(const Kart *kart)
  *  once).
  **/
 void RaceGUIBase::addMessage(const core::stringw &msg, const Kart *kart, 
-                             float time, int font_size, 
-                             const video::SColor &color, bool important)
+                             float time, const video::SColor &color,
+                             bool important, bool big_font)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color,
-                                      important));
+    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font));
 }   // addMessage
 
 //-----------------------------------------------------------------------------

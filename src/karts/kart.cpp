@@ -615,7 +615,7 @@ void Kart::finishedRace(float time)
         if(m)
         {
             m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f, 60);
+                          this, 2.0f);
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -634,7 +634,7 @@ void Kart::finishedRace(float time)
         if(m)
         {
             m->addMessage((getPosition() == 2 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f, 60);
+                          this, 2.0f);
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)

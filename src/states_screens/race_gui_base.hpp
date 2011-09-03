@@ -78,23 +78,25 @@ private:
         irr::core::stringw m_message;            //!< message to display
         float              m_remaining_time;     //!< time remaining before removing this message from screen
         video::SColor      m_color;              //!< color of message
-        int                m_font_size;          //!< size
         const Kart        *m_kart;
         bool               m_important;          //!< Important msgs are displayed in the middle of the screen
+        bool               m_big_font;
+        
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
         TimedMessage(const irr::core::stringw &message, 
-                     const Kart *kart, float time, int size, 
-                     const video::SColor &color, const bool important)
+                     const Kart *kart, float time,
+                     const video::SColor &color, const bool important,
+                     bool big_font)
         {
             m_message        = message; 
-            m_font_size      = size;
             m_kart           = kart;
             m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
             m_color          = color;
             m_important      = important;
+            m_big_font       = big_font;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards
@@ -164,10 +166,11 @@ public:
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Kart *kart);
     virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
-                            float time, int fonst_size, 
+                            float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true);
+                            bool important=true,
+                            bool big_font=false);
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du 
                   getMiniMapSize() const = 0;

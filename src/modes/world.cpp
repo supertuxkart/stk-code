@@ -790,12 +790,12 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
             if(!(*i)->getCamera()) continue;
             if(*i==kart)
             {
-                m_race_gui->addMessage(_("You have been eliminated!"), *i, 2.0f, 60);
+                m_race_gui->addMessage(_("You have been eliminated!"), *i, 2.0f);
             }
             else
             {
-                m_race_gui->addMessage(_("'%s' has been eliminated.", core::stringw(kart->getName())),
-                                       *i, 2.0f, 60);
+                m_race_gui->addMessage(_("'%s' has been eliminated.",
+                                       core::stringw(kart->getName())), *i, 2.0f);
             }
         }   // for i in kart
     }
