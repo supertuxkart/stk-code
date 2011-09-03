@@ -77,10 +77,11 @@ void SkidMarks::reset()
  *  starts a new skid mark quad.
  *  \param dt Time step.
  */
-void SkidMarks::update(float dt)
+void SkidMarks::update(float dt, bool force_skid_marks, video::SColor* custom_color)
 {
     //if the kart is gnu, then dont skid because he floats!
-    if (m_kart.isWheeless() == false) {
+    if (m_kart.isWheeless() == false)
+    {
         float f = dt/stk_config->m_skid_fadeout_time*m_start_alpha;
         for(unsigned int i=0; i<m_left.size(); i++)
         {
@@ -106,18 +107,21 @@ void SkidMarks::update(float dt)
             // delta is 0, and the behaviour is undefined. In this case
             // just stop doing skid marks as well.
             // ---------------------------------------------------------
-            if(!raycast_right.m_isInContact || !m_kart.getControls().m_drift ||
-                fabsf(m_kart.getControls().m_steer) < 0.001f                 ||
-                delta.length2()<0.0001)
+            if (!force_skid_marks)
             {
-                m_skid_marking = false;
-                // The vertices and indices will not change anymore (till these
-                // skid mark quads are deleted)
-                m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
-                m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
-                return;
+                if(!raycast_right.m_isInContact || !m_kart.getControls().m_drift ||
+                    fabsf(m_kart.getControls().m_steer) < 0.001f                 ||
+                    delta.length2()<0.0001)
+                {
+                    m_skid_marking = false;
+                    // The vertices and indices will not change anymore (till these
+                    // skid mark quads are deleted)
+                    m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
+                    m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
+                    return;
+                }
             }
-
+            
             // We are still skid marking, so add the latest quad
             // -------------------------------------------------
 
@@ -139,14 +143,17 @@ void SkidMarks::update(float dt)
 
         // Currently no skid marking
         // -------------------------
-        if((!m_kart.getControls().m_drift) ||
-            (fabsf(m_kart.getControls().m_steer) < 0.001f)) return;   // no skidmarking
-
-        // not turning enough, don't draw skidmarks if kart is going straight ahead
-        // this is even stricter for Ai karts, since they tend to use LOTS of skidding
-        const float min_skid_angle = m_kart.getController()->isPlayerController() ? 0.55f : 0.95f;
-        if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
-
+        if (!force_skid_marks)
+        {
+            if((!m_kart.getControls().m_drift) ||
+                (fabsf(m_kart.getControls().m_steer) < 0.001f)) return;   // not skidmarking
+            
+            // not turning enough, don't draw skidmarks if kart is going straight ahead
+            // this is even stricter for Ai karts, since they tend to use LOTS of skidding
+            const float min_skid_angle = m_kart.getController()->isPlayerController() ? 0.55f : 0.95f;
+            if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
+        }
+        
         // Start new skid marks
         // --------------------
         const btWheelInfo::RaycastInfo &raycast_right =
@@ -166,16 +173,17 @@ void SkidMarks::update(float dt)
         delta *= m_width;
 
         SkidMarkQuads *smq_left = new SkidMarkQuads(raycast_left.m_contactPointWS,
-                                             raycast_left.m_contactPointWS + delta,
-                                             m_material, m_avoid_z_fighting);
+                                                    raycast_left.m_contactPointWS + delta,
+                                                    m_material, m_avoid_z_fighting,
+                                                    custom_color);
         scene::SMesh *new_mesh = new scene::SMesh();
         new_mesh->addMeshBuffer(smq_left);
 
-        SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS
-                                                      - delta,
-                                                      raycast_right.m_contactPointWS,
-                                                      m_material,
-                                                      m_avoid_z_fighting);
+        SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
+                                                     raycast_right.m_contactPointWS,
+                                                     m_material,
+                                                     m_avoid_z_fighting,
+                                                     custom_color);
         new_mesh->addMeshBuffer(smq_right);
         scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
     #ifdef DEBUG
@@ -218,29 +226,40 @@ void SkidMarks::update(float dt)
 }   // update
 
 //=============================================================================
-SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
+SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
+                                        const Vec3 &right,
                                         video::SMaterial *material, 
-                                        float z_offset)
+                                        float z_offset,
+                                        video::SColor* custom_color)
                          : scene::SMeshBuffer()
 {
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
 
+    m_start_color = (custom_color != NULL ? *custom_color :
+                     video::SColor(255,
+                                   SkidMarks::m_start_grey,
+                                   SkidMarks::m_start_grey,
+                                   SkidMarks::m_start_grey));
+    
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
     add(left, right);
+    
 
 }   // SkidMarkQuads
 
 //-----------------------------------------------------------------------------
-void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
+
+void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
+                                   const Vec3 &right)
 {
     // The skid marks must be raised slightly higher, otherwise it blends
     // too much with the track.
     int n = Vertices.size();
 
     video::S3DVertex v;
-    v.Color = Material.DiffuseColor;
+    v.Color = m_start_color;
     v.Color.setAlpha(m_start_alpha);
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
@@ -280,14 +299,14 @@ void SkidMarks::SkidMarkQuads::fade(float f)
     // about 10 times till 0 is reached.
     if(m_fade_out*10>SkidMarks::m_start_alpha)
     {
-        video::SColor &c=Material.DiffuseColor;
-        int a=c.getAlpha();
-        a -= a<m_fade_out ? a : (int)m_fade_out;
-        int premul_grey = a * SkidMarks::m_start_grey / 255;
-        c.set(a, premul_grey, premul_grey, premul_grey);
+        video::SColor &c = Material.DiffuseColor;
+        int a = c.getAlpha();
+        a -= (a < m_fade_out ? a : (int)m_fade_out);
+
+        c.setAlpha(a);
         for(unsigned int i=0; i<Vertices.size(); i++)
         {
-            Vertices[i].Color.set(a, premul_grey, premul_grey, premul_grey);
+            Vertices[i].Color.setAlpha(a);
         }
         m_fade_out = 0.0f;
     }

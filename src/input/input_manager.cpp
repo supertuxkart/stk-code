@@ -158,7 +158,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
             }
             break;
         case KEY_F7:

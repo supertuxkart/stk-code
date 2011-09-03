@@ -123,6 +123,9 @@ private:
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
     float        m_squash_time;
+    
+    /** If > 0 then bubble gum effect is on */
+    float        m_bubblegum_time;
 
     // Bullet physics parameters
     // -------------------------

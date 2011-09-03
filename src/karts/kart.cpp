@@ -95,6 +95,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_finished_race        = false;
     m_wheel_toggle         = 1;
     m_finish_time          = 0.0f;
+    m_bubblegum_time       = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
@@ -510,6 +511,7 @@ void Kart::reset()
     m_race_position        = m_initial_position;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
+    m_bubblegum_time       = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -673,7 +675,9 @@ void Kart::collectedItem(Item *item, int add_info)
         }
     case Item::ITEM_BUBBLEGUM:
         // slow down
-        m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
+        //m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
+        m_bubblegum_time = 1.0f;
+        m_body->setDamping(0.8f, 0.8f);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
@@ -765,7 +769,18 @@ void Kart::update(float dt)
                                   /*slowdown*/1.0f, /*fade in*/0.0f);
         }
     }
-
+    
+    if (m_bubblegum_time > 0.0f)
+    {
+        m_bubblegum_time -= dt;
+        if (m_bubblegum_time <= 0.0f)
+        {
+            // undo bubblegum effect
+            m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                               m_kart_properties->getChassisAngularDamping() );
+        }
+    }
+    
     // Update the position and other data taken from the physics    
     Moveable::update(dt);
 
@@ -935,9 +950,17 @@ void Kart::update(float dt)
 
     // Check if any item was hit.
     item_manager->checkItemHit(this);
+    
+    static video::SColor pink(255, 255, 133, 253);
+    
+    // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
     if(m_kart_properties->hasSkidmarks())
-        m_skidmarks->update(dt);
-
+    {
+        m_skidmarks->update(dt,
+                            m_bubblegum_time > 0,
+                            (m_bubblegum_time > 0 ? &pink : NULL) );
+    }
+    
     const bool emergency = playingEmergencyAnimation();
     
     if (emergency)
@@ -1481,9 +1504,19 @@ void Kart::updatePhysics(float dt)
     float engine_power = getActualWheelForce() + handleNitro(dt)
                        + m_slipstream->getSlipstreamPower();
 
+    // apply parachute physics if relevant
     if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE) 
         engine_power*=0.2f;
 
+    // apply bubblegum physics if relevant
+    if (m_bubblegum_time > 0.0f)
+    {
+        engine_power = 0.0f;
+        m_body->applyTorque(btVector3(0.0, 500.0f, 0.0));
+        m_skidding *= 1.08f; //skid a little when hitting a bubblegum (just enough to make the skiding sound)
+    }
+    
+    // apply flying physics if relevant
     if (m_flying)
     {
         if (m_controls.m_accel)
@@ -1609,7 +1642,8 @@ void Kart::updatePhysics(float dt)
 
     }
 #endif
-    if (isOnGround()){
+    if (isOnGround())
+    {
         if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
         {
             m_skidding +=  m_kart_properties->getSkidIncrease()
