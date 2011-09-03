@@ -1190,6 +1190,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 node->get("kind", &path);
                 node->getXYZ(&emitter_origin);
 
+                int clip_distance = -1;
+                node->get("clip_distance", &clip_distance);
+
                 try
                 {
                     ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
@@ -1198,7 +1201,20 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                         throw std::runtime_error(path + " could not be loaded");
                     }
                     ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
-                    m_all_emitters.push_back(emitter);
+                    
+                    if (clip_distance > 0)
+                    {
+                        scene::ISceneManager* sm = irr_driver->getSceneManager();
+                        scene::ISceneNode* sroot = sm->getRootSceneNode();
+                        LODNode* lod = new LODNode(sroot, sm);
+                        lod->add(clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
+                        //m_all_emitters.push_back(emitter);
+                        m_all_nodes.push_back( lod );
+                    }
+                    else
+                    {
+                        m_all_emitters.push_back(emitter);
+                    }
                 }
                 catch (std::runtime_error& e)
                 {
