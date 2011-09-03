@@ -108,3 +108,8 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
 }
 
 // ------------------------------------------------------------------------------------------------------
+
+void MessageDialog::onUpdate(float dt)
+{
+    if (m_listener != NULL) m_listener->onDialogUpdate(dt);
+}

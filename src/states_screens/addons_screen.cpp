@@ -22,6 +22,7 @@
 #include "addons/addons_manager.hpp"
 #include "addons/network_http.hpp"
 #include "guiengine/CGUISpriteBank.h"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -272,7 +273,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     else if (name == "reload")
     {
         network_http->insertReInit();
-        new MessageDialog(_("You will be taken back to the Main Menu while an updated list of Addons are downloaded."),
+        new MessageDialog(_("Please wait while addons are updated, or click the button below to reload in the background."),
             MessageDialog::MESSAGE_DIALOG_OK, this, false);
     }
 
@@ -343,3 +344,28 @@ void AddonsScreen::setLastSelected()
 }   // setLastSelected
 
 // ----------------------------------------------------------------------------
+
+void AddonsScreen::onDialogUpdate(float delta)
+{
+    if (GUIEngine::ModalDialog::isADialogActive())
+    {
+        if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+        {
+            // not allowed to access the net. how did you get to this menu in the first place??
+            GUIEngine::ModalDialog::dismiss();
+        }
+        else if (addons_manager->wasError())
+        {
+            GUIEngine::ModalDialog::dismiss();
+            new MessageDialog( _("Sorry, an error occurred while contacting the add-ons website. Make sure you are connected to the Internet and that SuperTuxKart is not blocked by a firewall") );
+        }
+        else if (addons_manager->onlineReady())
+        {
+            GUIEngine::ModalDialog::dismiss();
+        }
+        else 
+        {
+            // Addons manager is still initialising/downloading.
+        }
+    }
+}

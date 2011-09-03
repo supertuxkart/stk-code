@@ -83,6 +83,9 @@ public:
     virtual void tearDown();
 
     virtual void onCancel();
+    
+    /** \brief callback from IConfirmDialogListener */
+    virtual void onDialogUpdate(float dt);
 
     void    setLastSelected();
 

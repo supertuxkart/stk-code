@@ -51,6 +51,11 @@ public:
           *        this method to change the behavior.
           */
         virtual void onCancel() { ModalDialog::dismiss(); };
+        
+        /**
+          * \brief Optional callback
+          */
+        virtual void onDialogUpdate(float dt) {}
     };
 
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM };
@@ -81,7 +86,8 @@ public:
     ~MessageDialog() { if (m_own_listener) delete m_listener; m_listener = NULL; }
     
     virtual void onEnterPressedInternal();
-    
+    virtual void onUpdate(float dt);
+
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 
