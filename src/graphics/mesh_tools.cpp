@@ -28,21 +28,38 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
     *max = Vec3(-999999.9f);
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-        if(mb->getVertexType()!=video::EVT_STANDARD) {
-            fprintf(stderr, "Tools::minMax3D: Ignoring type '%d'!", 
-                    mb->getVertexType());
-            continue;
+
+        if (mb->getVertexType() == video::EVT_STANDARD)
+        {
+            u16 *mbIndices = mb->getIndices();
+            video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
+                int indx=mbIndices[j];
+                Vec3 c(mbVertices[indx].Pos.X,
+                       mbVertices[indx].Pos.Y,
+                       mbVertices[indx].Pos.Z  );
+                min->min(c);
+                max->max(c);
+            }   // for j
         }
-        u16 *mbIndices = mb->getIndices();
-        video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
-        for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
-            int indx=mbIndices[j];
-            Vec3 c(mbVertices[indx].Pos.X,
-                   mbVertices[indx].Pos.Y,
-                   mbVertices[indx].Pos.Z  );
-            min->min(c);
-            max->max(c);
-        }   // for j
+        else if (mb->getVertexType() == video::EVT_2TCOORDS)
+        {
+            u16 *mbIndices = mb->getIndices();
+            video::S3DVertex2TCoords* mbVertices=(irr::video::S3DVertex2TCoords*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
+                int indx=mbIndices[j];
+                Vec3 c(mbVertices[indx].Pos.X,
+                       mbVertices[indx].Pos.Y,
+                       mbVertices[indx].Pos.Z  );
+                min->min(c);
+                max->max(c);
+            }   // for j
+        }
+        else
+        {
+            fprintf(stderr, "Tools::minMax3D: Ignoring type '%d'!\n", 
+                    mb->getVertexType());
+        }
     }  // for i<getMeshBufferCount
 }   // minMax3D
 
