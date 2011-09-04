@@ -340,6 +340,7 @@
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
+		95C6BB931414413B00990FF9 /* world_timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C6BB911414413B00990FF9 /* world_timer.cpp */; };
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
 		95C77D66106958A50080838E /* check_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D65106958A50080838E /* check_line.cpp */; };
 		95C77D6F106958E10080838E /* check_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D6D106958E10080838E /* check_sphere.cpp */; };
@@ -1277,6 +1278,8 @@
 		95C2B1E90F296546000D3E5D /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../utils/vec3.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D760F532F7D00BE7BA7 /* xml_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_node.cpp; path = ../../io/xml_node.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D770F532F7D00BE7BA7 /* xml_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_node.hpp; path = ../../io/xml_node.hpp; sourceTree = SOURCE_ROOT; };
+		95C6BB911414413B00990FF9 /* world_timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_timer.cpp; path = ../../modes/world_timer.cpp; sourceTree = SOURCE_ROOT; };
+		95C6BB921414413B00990FF9 /* world_timer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_timer.hpp; path = ../../modes/world_timer.hpp; sourceTree = SOURCE_ROOT; };
 		95C77D611069589B0080838E /* ambient_light_sphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ambient_light_sphere.hpp; path = ../../tracks/ambient_light_sphere.hpp; sourceTree = SOURCE_ROOT; };
 		95C77D621069589B0080838E /* ambient_light_sphere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ambient_light_sphere.cpp; path = ../../tracks/ambient_light_sphere.cpp; sourceTree = SOURCE_ROOT; };
 		95C77D64106958A50080838E /* check_line.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_line.hpp; path = ../../tracks/check_line.hpp; sourceTree = SOURCE_ROOT; };
@@ -2511,6 +2514,8 @@
 				95C2B1510F296545000D3E5D /* three_strikes_battle.hpp */,
 				9574F17A11206881008D202E /* world_status.cpp */,
 				9574F17B11206881008D202E /* world_status.hpp */,
+				95C6BB911414413B00990FF9 /* world_timer.cpp */,
+				95C6BB921414413B00990FF9 /* world_timer.hpp */,
 				9552C1F91231249000347B6C /* world_with_rank.cpp */,
 				9552C1FA1231249000347B6C /* world_with_rank.hpp */,
 				95C2B1520F296545000D3E5D /* world.cpp */,
@@ -3154,6 +3159,7 @@
 				95A0BA2413E63F6700620EA6 /* kart_with_stats.cpp in Sources */,
 				958806E913EB675F005F90FE /* track_sector.cpp in Sources */,
 				957A2D291405E21D00F45B22 /* hit_sfx.cpp in Sources */,
+				95C6BB931414413B00990FF9 /* world_timer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

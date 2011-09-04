@@ -241,6 +241,8 @@ supertuxkart_SOURCES = \
  modes/world.hpp \
  modes/world_status.cpp \
  modes/world_status.hpp \
+ modes/world_timer.cpp \
+ modes/world_timer.hpp \
  modes/world_with_rank.cpp \
  modes/world_with_rank.hpp \
  network/character_confirm_message.hpp \

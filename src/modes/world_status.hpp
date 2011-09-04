@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 class SFXBase;
+class WorldTimer;
 
 /**
  * \brief A class that manages the clock (countdown, chrono, etc.)
@@ -104,6 +105,11 @@ protected:
      * This timer basically kicks in when we need to calculate non-race time like labels.
      */
     float           m_auxiliary_timer;
+
+	/**
+	 * Freeze-Unfreeze timer of the game
+	 */
+	WorldTimer		*m_world_timer;
 
 public:
              WorldStatus();

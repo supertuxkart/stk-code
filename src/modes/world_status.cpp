@@ -26,6 +26,7 @@
 #include "tracks/track.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "world_timer.hpp"
 
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
@@ -39,6 +40,8 @@ WorldStatus::WorldStatus()
     m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
     m_start_sound       = sfx_manager->createSoundSource("start_race");
     m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
+
+	m_world_timer		= new WorldTimer();
 
     music_manager->stopMusic();
 }   // WorldStatus
@@ -66,6 +69,8 @@ WorldStatus::~WorldStatus()
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
     sfx_manager->deleteSFX(m_track_intro_sound);
+
+	delete m_world_timer;
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -272,6 +277,8 @@ void WorldStatus::pause(Phase phase)
     assert(m_previous_phase==UNDEFINED_PHASE);
     m_previous_phase = m_phase;
     m_phase          = phase;
+
+	m_world_timer->freezeTimer();
 }   // pause
 
 //-----------------------------------------------------------------------------
@@ -283,4 +290,6 @@ void WorldStatus::unpause()
     // Set m_previous_phase so that we can use an assert
     // in pause to detect incorrect pause/unpause sequences.
     m_previous_phase = UNDEFINED_PHASE;
+
+	m_world_timer->unfreezeTimer();
 }   // unpause
