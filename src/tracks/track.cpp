@@ -1138,14 +1138,16 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    m_start_transforms.resize(race_manager->getNumberOfKarts());
     if(!m_is_arena)
+    {
+        m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
                                                    sidewards_distance,
                                                    upwards_distance);
-
+    }
+    
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
     unsigned int start_position_counter = 0;
@@ -1193,15 +1195,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             node->getXYZ(&xyz);
             float h=0;
             node->get("h", &h);
-            // It is possible that there are more start positions defined
-            // than there are karts (and therefore that there are values
-            // allocated in m_start_transforms. Ignore those:
-            if(position <(unsigned int)m_start_transforms.size())
+
+            if (position >= m_start_transforms.size())
             {
-                m_start_transforms[position].setOrigin(xyz);
-                m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),h ) );
+                m_start_transforms.resize(position + 1);
             }
+
+            m_start_transforms[position].setOrigin(xyz);
+            m_start_transforms[position].setRotation(
+                                           btQuaternion(btVector3(0,1,0),h ) );
         }
         else if(name=="camera")
         {
