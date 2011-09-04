@@ -293,7 +293,6 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     {
         std::string selection = ((GUIEngine::RibbonWidget*)widget)
                          ->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        std::cout << selection << std::endl;
         if (selection == "tab_track")
         {
             m_type = "track";
