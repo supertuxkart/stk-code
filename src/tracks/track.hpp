@@ -313,7 +313,14 @@ public:
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
     btTransform        getStartTransform (unsigned int index) const     
-                                            {return m_start_transforms[index];}
+    {
+        if (index >= m_start_transforms.size())
+        {
+            fprintf(stderr, "No start position for kart %i\n", index);
+            abort();
+        }
+        return m_start_transforms[index];
+    }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const
