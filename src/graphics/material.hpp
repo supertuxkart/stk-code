@@ -24,6 +24,9 @@
 
 #include <string>
 
+#define LIGHTMAP_VISUALISATION 0
+
+
 namespace irr
 {
     namespace video { class ITexture; class SMaterial; }

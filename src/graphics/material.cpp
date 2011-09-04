@@ -488,11 +488,13 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->MaterialType = video::EMT_SPHERE_MAP;
         modes++;
     }
+#if !LIGHTMAP_VISUALISATION
     if (m_lightmap)
     {
         m->MaterialType = video::EMT_LIGHTMAP;
         modes++;
     }
+#endif
     if (m_add)
     {
         //m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
