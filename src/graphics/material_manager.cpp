@@ -32,6 +32,8 @@
 #include <SMaterial.h>
 #include <IMeshBuffer.h>
 
+const bool LIGHTMAP_VISUALISATION = false;
+
 MaterialManager *material_manager=0;
 
 MaterialManager::MaterialManager()
@@ -74,6 +76,24 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         if (m_materials[i]->getTexFname()==image)
         {
             m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
+            
+            // ---- lightmap debug
+            if (LIGHTMAP_VISUALISATION && mb->getVertexType() == video::EVT_2TCOORDS)
+            {
+                video::S3DVertex2TCoords* coords = (video::S3DVertex2TCoords*)mb->getVertices();
+                for (unsigned int v=0; v<mb->getVertexCount(); v++)
+                {
+                    core::vector2d<f32> tmp = coords[v].TCoords2;
+                    coords[v].TCoords2 = coords[v].TCoords;
+                    coords[v].TCoords = tmp;
+                }
+                
+                video::ITexture* tmp = mb->getMaterial().getTexture(0);
+                mb->getMaterial().setTexture(0, mb->getMaterial().getTexture(1));
+                mb->getMaterial().setTexture(1, tmp);
+            }
+            // --------------------
+            
             return;
         }
     }   // for i
