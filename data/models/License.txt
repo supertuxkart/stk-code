@@ -50,4 +50,7 @@
 * swatter
     by Funto
 
+* rubber_ball and jump-bomb.jpg
+    by Samuncle, released under CC-BY-SA
+
 Others are GPL, by the original (super)TuxKart team
