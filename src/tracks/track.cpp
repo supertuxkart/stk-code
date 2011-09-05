@@ -498,7 +498,10 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
             return;
             break;
         default:
-            printf("Unknown scene node type.\n");
+            int type_as_int = node->getType();
+            char* type = (char*)&type_as_int;
+            printf("[Track::convertTrackToBullet] Unknown scene node type : %c%c%c%c.\n",
+                   type[0], type[1], type[2], type[3]);
             return;
     }   // switch node->getType()
 
