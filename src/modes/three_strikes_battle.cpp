@@ -97,22 +97,16 @@ void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
     float coord = -kart->getKartLength()*0.5f;
     
     scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, node);
-    tire_node->setPosition(core::vector3df(0.0f, 0.55f, coord - 0.25f));
+    tire_node->setPosition(core::vector3df(-0.15f, 0.3f, coord - 0.21f));
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
     tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
     tire_node->setName("tire1");
-    
+
     tire_node = irr_driver->addMesh(m_tire, node);
-    tire_node->setPosition(core::vector3df(-0.2f, 0.3f, coord - 0.3f));
+    tire_node->setPosition(core::vector3df(0.15f, 0.3f, coord - 0.21f));
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
     tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
     tire_node->setName("tire2");
-
-    tire_node = irr_driver->addMesh(m_tire, node);
-    tire_node->setPosition(core::vector3df(0.2f, 0.3f, coord - 0.3f));
-    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
-    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
-    tire_node->setName("tire3");
 }
 
 //-----------------------------------------------------------------------------
@@ -136,7 +130,12 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     if (m_kart_info[kart_id].m_lives < 1)
     {
         m_karts[kart_id]->finishedRace(WorldStatus::getTime());
-        removeKart(kart_id);
+        scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()->getWheelNodes();
+        wheels[0]->setVisible(false);
+        wheels[1]->setVisible(false);
+        wheels[2]->setVisible(false);
+        wheels[3]->setVisible(false);
+        eliminateKart(kart_id, true, false);
     }
     
     const unsigned int NUM_KARTS = getNumKarts();
@@ -169,10 +168,6 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         else if (core::stringc(curr->getName()) == "tire2")
         {
             curr->setVisible(m_kart_info[kart_id].m_lives >= 2);
-        }
-        else if (core::stringc(curr->getName()) == "tire3")
-        {
-            curr->setVisible(m_kart_info[kart_id].m_lives >= 1);
         }
     }
     
@@ -323,10 +318,6 @@ void ThreeStrikesBattle::restartRace()
                 curr->setVisible(true);
             }
             else if (core::stringc(curr->getName()) == "tire2")
-            {
-                curr->setVisible(true);
-            }
-            else if (core::stringc(curr->getName()) == "tire3")
             {
                 curr->setVisible(true);
             }

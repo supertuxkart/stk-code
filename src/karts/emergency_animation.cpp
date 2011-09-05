@@ -81,16 +81,26 @@ void EmergencyAnimation::reset()
 /** Eliminates a kart from the race. It removes the kart from the physics
  *  world, and makes the scene node invisible.
  */
-void EmergencyAnimation::eliminate()
+void EmergencyAnimation::eliminate(bool remove)
 {
-    if (!playingEmergencyAnimation())
+    if (!playingEmergencyAnimation() && remove)
     {
         World::getWorld()->getPhysics()->removeKart(m_kart);
     }
+    
+    if (m_stars_effect)
+    {
+        m_stars_effect->reset();
+        m_stars_effect->update(1);
+    }
+    
     m_eliminated = true;
     m_kart_mode = EA_NONE;
     
-    m_kart->getNode()->setVisible(false);
+    if (remove)
+    {
+         m_kart->getNode()->setVisible(false);
+    }
 }   // eliminate
 
 //-----------------------------------------------------------------------------

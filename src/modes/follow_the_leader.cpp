@@ -91,7 +91,7 @@ void FollowTheLeaderRace::countdownReachedZero()
             printf("[ftl] Eliminiating kart '%s' at position %d.\n",
                 kart->getIdent().c_str(), position_to_remove);
         }
-        removeKart(kart->getWorldKartId());
+        eliminateKart(kart->getWorldKartId());
 
         // In case that the kart on position 1 was removed, we have 
         // to set the correct position (which equals the remaining 

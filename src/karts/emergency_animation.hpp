@@ -98,7 +98,7 @@ public:
     bool        isEliminated     () const {return m_eliminated;}
     /** Returns a pointer to the stars effect. */
     const Stars *getStarEffect   () const {return m_stars_effect; }
-    void        eliminate        ();
+    void        eliminate        (bool remove);
 
 };   // EmergencyAnimation
 #endif

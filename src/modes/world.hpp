@@ -86,7 +86,7 @@ protected:
     void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, std::string* highscore_who,
                              StateManager::ActivePlayer** best_player);
     void  resetAllKarts     ();
-    void  removeKart        (int kart_number, bool notifyOfElimination=true);
+    void  eliminateKart     (int kart_number, bool notifyOfElimination=true, bool remove=true);
     Controller* 
           loadAIController  (Kart *kart);
 

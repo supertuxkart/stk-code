@@ -577,6 +577,13 @@ void Kart::reset()
     if(m_controller)
         m_controller->reset();
 
+    // 3 strikes mode can hide the wheels
+    scene::ISceneNode** wheels = getKartModel()->getWheelNodes();
+    wheels[0]->setVisible(true);
+    wheels[1]->setVisible(true);
+    wheels[2]->setVisible(true);
+    wheels[3]->setVisible(true);
+    
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -757,7 +764,8 @@ void Kart::update(float dt)
 {
     if (m_eliminated)
     {
-        getNode()->setVisible(false);
+        printf("a\n");
+        EmergencyAnimation::update(dt);
         return;
     }
 
