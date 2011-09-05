@@ -208,13 +208,16 @@ void Kart::setController(Controller *controller)
  *  and the pitch will be set appropriately. A custom pitch value can be 
  *  specified in order to overwrite the terrain pitch (which would be used
  *  otherwise).
- *  \param customPitch Pitch value to overwrite the terrain pitch.
+ *  \param custom_pitch Pitch value to overwrite the terrain pitch. A value of
+ *         -1 indicates that the custom_pitch value should not be used, instead
+ *         the actual pitch of the terrain is to be used.
  */
-btTransform Kart::getAlignedTransform(const float customPitch)
+btTransform Kart::getAlignedTransform(const float custom_pitch)
 {
     btTransform trans = getTrans();
 
-    float pitch = (customPitch == -1 ? getTerrainPitch(getHeading()) : customPitch);
+    float pitch = (custom_pitch == -1 ? getTerrainPitch(getHeading()) 
+                                      : custom_pitch);
 
     btMatrix3x3 m;
     m.setEulerZYX(pitch, getHeading(), 0.0f);
