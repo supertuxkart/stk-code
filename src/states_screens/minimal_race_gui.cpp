@@ -183,6 +183,13 @@ void MinimalRaceGUI::renderGlobal(float dt)
     }
 
     drawGlobalMiniMap();
+    
+    // in 3 strikes mode we need to see the lives
+    if (world->getIdent() == STRIKES_IDENT)
+    {
+        KartIconDisplayInfo* info = world->getKartsDisplayInfo();
+        drawGlobalPlayerIcons(info, m_map_height);
+    }
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------

@@ -52,9 +52,6 @@ private:
     /** Translated string 'rank' displayed every frame. */
     core::stringw    m_string_rank;
 
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
-    
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */
@@ -93,12 +90,6 @@ private:
     /** Maximum string length for the timer */
     int              m_timer_width;
     
-    /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
-    float            m_dist_show_overlap;///can be zero
-    float            m_icons_inertia;///can be zero
-    
-    /** previous position of icons */
-    std::vector< core::vector2d<s32> > m_previous_icons_position;
     
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const Kart *kart,
@@ -108,7 +99,7 @@ private:
                                 const core::vector2df &scaling);
     void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
                                 const core::recti &viewport);
-    void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
+
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();

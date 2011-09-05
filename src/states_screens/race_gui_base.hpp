@@ -121,6 +121,10 @@ private:
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go;
 
+    /** Translated string 'Top %d' displayed every frame. */
+    core::stringw    m_string_top;
+    
+    
 protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
@@ -157,6 +161,14 @@ protected:
      *  item messages).
      */
     void ignoreUnimportantMessages() { m_ignore_unimportant_messages = true; }
+    
+    /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
+    float            m_dist_show_overlap;///can be zero
+    float            m_icons_inertia;///can be zero
+    
+    /** previous position of icons */
+    std::vector< core::vector2d<s32> > m_previous_icons_position;
+    
 public:
     
     bool m_enabled;
@@ -178,6 +190,9 @@ public:
 
     /** Set the flag that a lightning should be shown. */
     void doLightning() { m_lightning = 1.0f; }
+
+    void drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
+                               int bottom_margin);
 
 };   // RaceGUIBase
 
