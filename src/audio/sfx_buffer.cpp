@@ -132,14 +132,14 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     
     if(!file)
     {
-        printf("LoadVorbisBuffer() - couldn't open file!");
+        fprintf(stderr, "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
         return false;
     }
     
     if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
     {
         fclose(file);
-        printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
+        fprintf(stderr, "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
         return false;
     }
     
@@ -151,7 +151,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     if(!data)
     {
         ov_clear(&oggFile);
-        printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
+        fprintf(stderr, "[SFXBuffer] loadVorbisBuffer() - Error : LoadVorbisBuffer() - couldn't allocate decode buffer\n");
         return false;
     }
     
