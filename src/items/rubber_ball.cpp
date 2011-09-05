@@ -32,15 +32,22 @@ float RubberBall::m_st_min_interpolation_distance;
 float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
+#ifdef DEBUG
+int   RubberBall::m_next_id = 0;
+#endif
 
 RubberBall::RubberBall(Kart *kart) 
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
+#ifdef DEBUG
+    m_next_id++;
+    m_id = m_next_id;
+#endif
     // The rubber ball often misses the terrain on steep uphill slopes, e.g.
     // the ramp in sand track. Add an Y offset so that the terrain raycast
     // will always be done from a position high enough to avoid this.
-    setPositionOffset(Vec3(0, 1.0f, 0));
+    setPositionOffset(Vec3(0, 0.5f, 0));
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
@@ -240,6 +247,19 @@ const core::stringw RubberBall::getHitString(const Kart *kart) const
  */
 bool RubberBall::updateAndDelete(float dt)
 {
+    // We have to adjust the offset used in the height of terrain computation:
+    // If the ball is close to the ground, we have to start the raycast
+    // slightly higher (to avoid that the ball tunnels through the floor).
+    // But if the ball is close to the ceiling of a tunnel and we would
+    // start the raycast slightly higher, the ball might end up on top
+    // of the ceiling.
+    // The ball is considered close to the ground if the height above the
+    // terrain is less than half the current maximum height.
+    bool close_to_ground = 2.0*(getXYZ().getY() - getHoT()) 
+                         < m_current_max_height;
+    Vec3 offset(0, close_to_ground ? 1.0f : 0.0f, 0);
+    Flyable::setPositionOffset(offset);
+
     if(Flyable::updateAndDelete(dt))
         return true;
 
@@ -274,6 +294,11 @@ bool RubberBall::updateAndDelete(float dt)
     m_timer += dt;
     float height = updateHeight();
     float new_y = getHoT()+height;
+#ifdef DEBUG
+    if(UserConfigParams::logFlyable())
+        printf("ball %d: height %f new_y %f gethot %f ",
+                m_id, height, new_y, getHoT());
+#endif
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)  
     {
@@ -281,6 +306,11 @@ bool RubberBall::updateAndDelete(float dt)
         if(new_y>terrain_height)
             new_y = terrain_height;
     }
+#ifdef DEBUG
+    if(UserConfigParams::logFlyable())
+        printf("newy2 %f gmth %f\n", new_y,getMaxTerrainHeight());
+#endif
+
     next_xyz.setY(new_y);
 
     // Determine new distance along track
@@ -391,9 +421,9 @@ float RubberBall::updateHeight()
     // with f(0) = 0, f(m_intervall)=0. We then scale this function to
     // fulfill: f(m_intervall/2) = max_height, or:
     // f(m_interval/2) = s*(-m_interval^2)/4 = max_height
-    // --> s =  max_height / -m_interval^2/4
-    float f = m_current_max_height / (-0.25f*m_interval*m_interval);
-    return m_timer * (m_timer-m_interval) * f;
+    // --> s =  4*max_height / -m_interval^2
+    float s = 4.0f * m_current_max_height / (-m_interval*m_interval);
+    return m_timer * (m_timer-m_interval) * s;
 }   // updateHeight
 
 // ----------------------------------------------------------------------------

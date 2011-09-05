@@ -35,6 +35,14 @@ class SFXBase;
 class RubberBall: public Flyable, public TrackSector
 {
 private:
+#ifdef DEBUG
+    /** Used in case of flyable debugging so that each output line gets
+     *  a unique number for each ball. */
+    int m_id;
+
+    /** A class variable which stores the next id number to use. */
+    static int m_next_id;
+#endif
     /** A class variable to store the default interval size. */
     static float m_st_interval;
     
@@ -87,7 +95,7 @@ private:
      *  to 1). */
     float        m_t;
 
-    /** How much m_tt must increase per second in order to maintain a
+    /** How much m_t must increase per second in order to maintain a
      *  constant speed, i.e. the speed of the ball divided by the
      *  distance between the control points. See m_t for more details. */
     float        m_t_increase;

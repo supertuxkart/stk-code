@@ -147,7 +147,14 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                               btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 }   // createPhysics
+
 // -----------------------------------------------------------------------------
+/** Initialises the static members of this class for a certain type with 
+ *  default values and with settings from powerup.xml.
+ *  \param The xml node containing settings.
+ *  \param model The mesh to use.
+ *  \param type The type of flyable. 
+ */
 void Flyable::init(const XMLNode &node, scene::IMesh *model,
                    PowerupManager::PowerupType type)
 {
