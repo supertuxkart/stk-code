@@ -494,7 +494,8 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
              break;
         case scene::ESNT_SKY_BOX :
         case scene::ESNT_SKY_DOME:
-            // Don't add sky box/dome to the physics model.
+        case scene::ESNT_PARTICLE_SYSTEM :
+            // These are non-physical
             return;
             break;
         default:
@@ -645,6 +646,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
+    adjustForFog(merged_mesh, NULL);
+    
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
     //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
@@ -1151,10 +1154,31 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                                                    upwards_distance);
     }
     
-    loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
     unsigned int start_position_counter = 0;
 
+    // we need to check for fog before loading the main track model
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        const std::string name = node->getName();
+        
+        if(name=="sun")
+        {
+            node->get("xyz",           &m_sun_position );
+            node->get("ambient",       &m_default_ambient_color);
+            node->get("sun-specular",  &m_sun_specular_color);
+            node->get("sun-diffuse",   &m_sun_diffuse_color);
+            node->get("fog",           &m_use_fog);
+            node->get("fog-color",     &m_fog_color);
+            node->get("fog-density",   &m_fog_density);
+            node->get("fog-start",     &m_fog_start);
+            node->get("fog-end",       &m_fog_end);
+        }
+    }
+    
+    loadMainTrack(*root);
+    
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -1257,18 +1281,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 }
             }
         }
-        else if(name=="sun")
-        {
-            node->get("xyz",           &m_sun_position );
-            node->get("ambient",       &m_default_ambient_color);
-            node->get("sun-specular",  &m_sun_specular_color);
-            node->get("sun-diffuse",   &m_sun_diffuse_color);
-            node->get("fog",           &m_use_fog);
-            node->get("fog-color",     &m_fog_color);
-            node->get("fog-density",   &m_fog_density);
-            node->get("fog-start",     &m_fog_start);
-            node->get("fog-end",       &m_fog_end);
-        }
         else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
         {
             handleSky(*node, path);
@@ -1306,6 +1318,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                         "[Track] ERROR: Warning: bad weather node found - ignored.\n");
                 continue;
             }
+        }
+        else if (name == "sun")
+        {
+            // handled above
         }
         else
         {
@@ -1425,6 +1441,27 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
+/** Changes all materials of the given mesh to use the current fog
+ *  setting (true/false).
+ *  \param node Scene node for which fog should be en/dis-abled.
+ */
+void Track::adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node)
+{
+    unsigned int n = mesh->getMeshBufferCount();
+    for (unsigned int i=0; i<n; i++)
+    {
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        video::SMaterial &irr_material=mb->getMaterial();
+        for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+        {
+            video::ITexture* t = irr_material.getTexture(j);
+            if (t) material_manager->adjustForFog(t, mb, parent_scene_node, m_use_fog);
+            
+        }   // for j<MATERIAL_MAX_TEXTURES
+    }  // for i<getMeshBufferCount()
+}
+
+//-----------------------------------------------------------------------------
 /** Changes all materials of the given scene node to use the current fog
  *  setting (true/false).
  *  \param node Scene node for which fog should be en/dis-abled.
@@ -1433,43 +1470,22 @@ void Track::adjustForFog(scene::ISceneNode *node)
 {
     //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
     
-    if (node->getType() == scene::ESNT_MESH || node->getType() == scene::ESNT_OCTREE)
+    
+    if (node->getType() == scene::ESNT_OCTREE)
+    {
+        // do nothing
+    }
+    else if (node->getType() == scene::ESNT_MESH)
     {
         scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
         scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
-        
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
-                
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
+        adjustForFog(mesh, mnode);
     }
     else if (node->getType() == scene::ESNT_ANIMATED_MESH)
     {
         scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
         scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
-        
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
-                
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
+        adjustForFog(mesh, mnode);
     }
     else
     {

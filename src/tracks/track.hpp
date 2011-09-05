@@ -262,6 +262,8 @@ public:
     void               update(float dt);
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
+    void               adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node);
+    
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,
                                        unsigned int k);
