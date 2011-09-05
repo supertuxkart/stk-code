@@ -135,10 +135,10 @@ void *NetworkHttp::mainLoop(void *obj)
 
     me->m_current_request = NULL;
     me->m_all_requests.lock();
-    while(me->m_all_requests.getData().size()              == 0              ||
+    while(me->m_all_requests.getData().empty()                              ||
           me->m_all_requests.getData().top()->getCommand() != Request::HC_QUIT)
     {
-        bool empty = me->m_all_requests.getData().size()==0;
+        bool empty = me->m_all_requests.getData().empty();
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
         // since "spurious wakeups from the pthread_cond_wait ... may occur"
         // (pthread_cond_wait man page)!
@@ -149,7 +149,7 @@ void *NetworkHttp::mainLoop(void *obj)
 
             pthread_cond_wait(&me->m_cond_request, 
                               me->m_all_requests.getMutex());
-            empty = me->m_all_requests.getData().size()==0;
+            empty = me->m_all_requests.getData().empty();
         }
         // Get the first (=highest priority) request and remove it from the 
         // queue. Only this code actually removes requests from the queue,
@@ -584,11 +584,11 @@ Request *NetworkHttp::downloadFileAsynchron(const std::string &url,
 void NetworkHttp::insertRequest(Request *request)
 {
     m_all_requests.lock();
-    {
-        m_all_requests.getData().push(request);
-        // Wake up the network http thread
-        pthread_cond_signal(&m_cond_request);
-    }
+
+    m_all_requests.getData().push(request);
+    // Wake up the network http thread
+    pthread_cond_signal(&m_cond_request);
+
     m_all_requests.unlock();
 }   // insertRequest
 
