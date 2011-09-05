@@ -122,6 +122,8 @@ void MainLoop::run()
     m_curr_time = device->getTimer()->getRealTime();
     while(!m_abort)
     {
+        PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
+        
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
@@ -156,6 +158,8 @@ void MainLoop::run()
             
             PROFILER_SYNC_FRAME();
         }
+        
+        PROFILER_POP_CPU_MARKER();
     }  // while !m_exit
 
 }   // run
