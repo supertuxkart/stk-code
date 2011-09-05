@@ -1213,7 +1213,12 @@ void IrrDriver::update(float dt)
     {
         main_loop->abort();
     }
-
+    if (UserConfigParams::m_gamepad_debug)
+    {
+        // Print a dividing line so that it's easier to see which events
+        // get received in which order in the one frame.
+        printf("-------------------------------------\n");
+    }
     
     World *world = World::getWorld();
     
