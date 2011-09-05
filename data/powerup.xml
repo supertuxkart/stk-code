@@ -17,7 +17,7 @@
   <item name="swatter"        icon="swatter-icon.png"   />
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
         model="rubber_ball.b3d" speed="35.0" scale="1 1 1"
-        interval="1"          max-height="4.0"
+        interval="1"          max-height="4.0" min-height="0"
         target-distance="50"  min-interpolation-distance="30"
         squash-slowdown="0.5" squash-duration="3"       />
   <item name="parachute"      icon="parachute-icon.png"
