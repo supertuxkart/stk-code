@@ -237,6 +237,8 @@ supertuxkart_SOURCES = \
  modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \
  modes/three_strikes_battle.hpp \
+ modes/tutorial_race.cpp \
+ modes/tutorial_race.hpp \
  modes/world.cpp \
  modes/world.hpp \
  modes/world_status.cpp \
