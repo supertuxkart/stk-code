@@ -35,14 +35,13 @@ class SFXBase;
 class RubberBall: public Flyable, public TrackSector
 {
 private:
-#ifdef DEBUG
     /** Used in case of flyable debugging so that each output line gets
      *  a unique number for each ball. */
     int m_id;
 
     /** A class variable which stores the next id number to use. */
     static int m_next_id;
-#endif
+
     /** A class variable to store the default interval size. */
     static float m_st_interval;
     

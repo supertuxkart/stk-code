@@ -32,18 +32,18 @@ float RubberBall::m_st_min_interpolation_distance;
 float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
-#ifdef DEBUG
 int   RubberBall::m_next_id = 0;
-#endif
 
 RubberBall::RubberBall(Kart *kart) 
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
-#ifdef DEBUG
+    // For debugging purpose: pre-fix each debugging line with the id of 
+    // the ball so that it's easy to collect all debug output for one
+    // particular ball only. 
     m_next_id++;
     m_id = m_next_id;
-#endif
+
     // The rubber ball often misses the terrain on steep uphill slopes, e.g.
     // the ramp in sand track. Add an Y offset so that the terrain raycast
     // will always be done from a position high enough to avoid this.
@@ -294,11 +294,11 @@ bool RubberBall::updateAndDelete(float dt)
     m_timer += dt;
     float height = updateHeight();
     float new_y = getHoT()+height;
-#ifdef DEBUG
+
     if(UserConfigParams::logFlyable())
         printf("ball %d: height %f new_y %f gethot %f ",
                 m_id, height, new_y, getHoT());
-#endif
+
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)  
     {
@@ -306,10 +306,9 @@ bool RubberBall::updateAndDelete(float dt)
         if(new_y>terrain_height)
             new_y = terrain_height;
     }
-#ifdef DEBUG
+
     if(UserConfigParams::logFlyable())
         printf("newy2 %f gmth %f\n", new_y,getMaxTerrainHeight());
-#endif
 
     next_xyz.setY(new_y);
 
