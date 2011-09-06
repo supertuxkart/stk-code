@@ -13,6 +13,7 @@ project(SuperTuxKart)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
+set(PROJECT_VERSION "0.7.3")
 
 # Tweakable values
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -147,22 +148,26 @@ endif()
 
 find_package(Freetype)
 
-if(FREETYPE_FOUND AND FONT_TOOL)
-	message("-- Freetype found")
-	find_package(X11)
-	include_directories(${FREETYPE_INCLUDE_DIRS})
-	add_executable(font_tool
-		src/font_tool/CFontTool.cpp
-		src/font_tool/CFontTool.h
-		src/font_tool/CVectorFontTool.h
-		src/font_tool/main.cpp
-	)
-	target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
-	target_link_libraries(font_tool ${X11_Xft_LIB})
-	target_link_libraries(font_tool ${OPENGL_LIBRARIES})
-	target_link_libraries(font_tool Irrlicht)
+if(FONT_TOOL)
+    if(FREETYPE_FOUND)
+	    message("-- Freetype found")
+	    find_package(X11)
+	    include_directories(${FREETYPE_INCLUDE_DIRS})
+	    add_executable(font_tool
+		    src/font_tool/CFontTool.cpp
+		    src/font_tool/CFontTool.h
+		    src/font_tool/CVectorFontTool.h
+		    src/font_tool/main.cpp
+	    )
+	    target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
+	    target_link_libraries(font_tool ${X11_Xft_LIB})
+	    target_link_libraries(font_tool ${OPENGL_LIBRARIES})
+	    target_link_libraries(font_tool Irrlicht)
+    else()
+	    message("-- Freetype was not found, the font tool won't be built (only useful for developers)")
+    endif()
 else()
-	message("-- Font tool deactivated/freetype not found, the font tool won't be built (only useful for developers)")
+    message("-- Font tool deactivated, the font tool won't be built (only useful for developers)")
 endif()
 
 set( SRCS ${SRCS} src/main.cpp
@@ -704,3 +709,16 @@ elseif(APPLE)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/Cocoa.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/OpenGL.framework)
 endif()
+
+# Make dist target
+add_custom_target(dist
+    COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
+            && echo "Exporting..."
+            && svn export ${PROJECT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
+            && echo "Compressing..."
+            && cd ${CMAKE_BINARY_DIR}
+            && tar -cjf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2 ./SuperTuxKart-${PROJECT_VERSION}
+            && echo "Done, cleaning up"
+            && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
