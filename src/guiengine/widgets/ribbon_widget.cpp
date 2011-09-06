@@ -166,6 +166,13 @@ void RibbonWidget::add()
                 subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, getNewNoFocusID(), message.c_str(), L"");
                 subbtn->setTabStop(false);
                 subbtn->setTabGroup(false);
+                
+                if ((int)GUIEngine::getFont()->getDimension(message.c_str()).Width > subsize.getWidth() &&
+                    message.findFirst(L' ') == -1 && message.findFirst(L'\u00AD') == -1)
+                {
+                    // if message too long and contains no space and no soft hyphen, make the font smaller
+                    subbtn->setOverrideFont(GUIEngine::getSmallFont());
+                }
             }
             else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
             {
@@ -207,6 +214,13 @@ void RibbonWidget::add()
                                                                               false /* border */,
                                                                               true /* word wrap */,
                                                                               subbtn, same_id);
+                
+                if ((int)GUIEngine::getFont()->getDimension(message.c_str()).Width > label_part.getWidth() &&
+                    message.findFirst(L' ') == -1 && message.findFirst(L'\u00AD') == -1)
+                {
+                    // if message too long and contains no space and no soft hyphen, make the font smaller
+                    label->setOverrideFont(GUIEngine::getSmallFont());
+                }
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
