@@ -579,10 +579,10 @@ void Kart::reset()
 
     // 3 strikes mode can hide the wheels
     scene::ISceneNode** wheels = getKartModel()->getWheelNodes();
-    wheels[0]->setVisible(true);
-    wheels[1]->setVisible(true);
-    wheels[2]->setVisible(true);
-    wheels[3]->setVisible(true);
+    if(wheels[0]) wheels[0]->setVisible(true);
+    if(wheels[1]) wheels[1]->setVisible(true);
+    if(wheels[2]) wheels[2]->setVisible(true);
+    if(wheels[3]) wheels[3]->setVisible(true);
     
 }   // reset
 
