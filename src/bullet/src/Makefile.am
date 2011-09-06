@@ -264,6 +264,8 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h		 \
 	BulletDynamics/ConstraintSolver/btSolverBody.h				 \
 	BulletDynamics/ConstraintSolver/btSolverConstraint.h			 \
+        BulletDynamics/ConstraintSolver/btSorLcp.cpp                             \
+        BulletDynamics/ConstraintSolver/btSorLcp.h                               \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.h			 \
         BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.cpp        \

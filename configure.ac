@@ -445,15 +445,18 @@ AC_CONFIG_FILES([                   \
  data/models/Makefile               \
  data/music/Makefile                \
  data/po/Makefile                   \
+ data/shaders/Makefile              \
  data/sfx/Makefile                  \
  data/textures/Makefile             \
  data/tracks/Makefile               \
+ data/tutorials/Makefile            \
  doc/Makefile                       \
  src/Makefile                       \
  src/ide/Makefile                   \
  src/bullet/Makefile                \
  src/bullet/src/Makefile            \
  src/enet/Makefile                  \
+ tools/Makefile                 
 ])
 AC_OUTPUT
 echo -e $SUMMARY

@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libenet.a
-EXTRA_DIST = ChangeLog configure design.txt Doxyfile LICENSE tutorial.txt
+EXTRA_DIST = ChangeLog configure design.txt Doxyfile LICENSE tutorial.txt \
+             $(shell find $(srcdir) -maxdepth 2 -name "*.dox")
 libenet_a_SOURCES = callbacks.c compress.c host.c list.c  packet.c peer.c \
         protocol.c unix.c win32.c \
 	include/enet/callbacks.h \

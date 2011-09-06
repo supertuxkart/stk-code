@@ -1,17 +1,14 @@
 # data/
 
-SUBDIRS    = challenges fonts gfx gui karts models music po sfx textures tracks grandprix
+SUBDIRS    = challenges fonts gfx gui karts models music po sfx textures tracks \
+             grandprix tutorials shaders
+
 pkgdatadir = $(datadir)/games/$(PACKAGE)/data
 
 dist_pkgdata_DATA = \
- $(shell find $(srcdir) -name "*.data")                  \
- $(shell find $(srcdir) -name "*.items")                 \
- $(shell find $(srcdir) -name "*.projectile")            \
- $(shell find $(srcdir) -name "*.cup")                   \
  $(shell find $(srcdir) -maxdepth 1 -name "*.challenge") \
- $(shell find $(srcdir) -name "*.collectable")           \
  stk_config.xml  powerup.xml  items.xml                  \
- CREDITS
+ CREDITS run_me.sh 
 
 desktopdir = $(prefix)/share/applications
 desktop_DATA = supertuxkart.desktop
