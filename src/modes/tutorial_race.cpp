@@ -87,7 +87,7 @@ void TutorialRace::countdownReachedZero()
     }  // 
     else
     {
-        removeKart(kart->getWorldKartId());
+        eliminateKart(kart->getWorldKartId());
 
         // In case that the kart on position 1 was removed, we have 
         // to set the correct position (which equals the remaining 
