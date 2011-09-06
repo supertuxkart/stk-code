@@ -166,6 +166,7 @@ void QuadGraph::load(const std::string &filename)
     }
     delete xml;
 
+    // Define the track length
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         if(m_all_nodes[i]->getSuccessor(0)==0)
@@ -176,7 +177,30 @@ void QuadGraph::load(const std::string &filename)
         }
     }
     setDefaultSuccessors();
+
 }   // load
+
+// ----------------------------------------------------------------------------
+/** This function defines the "path-to-nodes" for each graph node that has 
+ *  more than one successor. The path-to-nodes indicates which successor to
+ *  use to reach a certain node. This is e.g. used for the rubber ball to 
+ *  determine which path it is going to use to reach its target (this allows
+ *  the ball to hit a target that is on a shortcut). The algorithm for the
+ *  path computation favours the use of successor 0, i.e. it will if possible
+ *  only use main driveline paths, not a shortcut (even though a shortcut 
+ *  could result in a faster way to the target) - but since shotcuts can 
+ *  potentially be hidden they should not be used (unless necessary).
+ *  Only graph nodes with more than one successor have this data structure
+ *  (since on other graph nodes only one path can be used anyway, this 
+ *  saves some memory).
+ */
+void QuadGraph::setupPaths()
+{
+    for(unsigned int i=0; i<getNumNodes(); i++)
+    {
+        m_all_nodes[i]->setupPathsToNode();
+    }
+}   // setupPaths
 
 // -----------------------------------------------------------------------------
 /** This function sets a default successor for all graph nodes that currently

@@ -150,8 +150,15 @@ void RubberBall::computeTarget()
 unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
                                                  float *dist)
 {
-    // For now: always pick a successor on the main driveline.
     int succ = 0;
+    LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // FIXME: what does the rubber ball do in case of battle mode??
+    if(lin_world)
+    {
+        unsigned int sect = 
+            lin_world->getSectorForKart(m_target->getWorldKartId());
+        succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
+    }
     if(dist)
         *dist += QuadGraph::get()->getNode(node_index)
                 .getDistanceToSuccessor(succ);

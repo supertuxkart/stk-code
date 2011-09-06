@@ -393,6 +393,8 @@ void Track::loadQuadGraph(unsigned int mode_id)
 {
     QuadGraph::create(m_root+"/"+m_all_modes[mode_id].m_quad_name,
                       m_root+"/"+m_all_modes[mode_id].m_graph_name);
+
+    QuadGraph::get()->setupPaths();
 #ifdef DEBUG
     for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {

@@ -113,7 +113,7 @@ public:
                                         =video::SColor(127, 255, 255, 255) );
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
-
+    void         setupPaths();
     // ----------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have

@@ -88,6 +88,16 @@ class GraphNode
       *  from the center of the drivelines anyway. */
      core::line2df  m_line;
 
+     typedef std::vector<int> PathToNodeVector;
+     /** This vector is only used if the graph node has more than one
+      *  successor. In this case m_path_to_node[X] will contain the index
+      *  of the successor to use in order to reach graph node X for this
+      *  graph nodes.  */
+     PathToNodeVector  m_path_to_node;
+
+     void markAllSuccessorsToUse(unsigned int n, 
+                                 PathToNodeVector *m_path_to_node);
+
 public:
     /** Keep a shared pointer so that some asserts and tests can be 
     *  done without adding additional parameters. */
@@ -100,7 +110,8 @@ public:
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
-
+    void         setupPathsToNode();
+    // ------------------------------------------------------------------------
     /** Returns the i-th successor node. */
     unsigned int getSuccessor(unsigned int i)  const 
                                { return m_successor_node[i];                  }
@@ -162,6 +173,17 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a predecessor for this node. */
     int getPredecessor() const {return m_predecessor; }
+    // ------------------------------------------------------------------------
+    /** Returns which successor node to use in order to be able to reach the
+     *  given node n.
+     *  \param n Index of the graph node to reach.
+     */
+    int getSuccessorToReach(unsigned int n)
+    {  
+        // If we have a path to node vector, use its information, otherwise
+        // (i.e. there is only one successor anyway) use this one successor.
+        return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
+    }
     // ------------------------------------------------------------------------
 };   // GraphNode
 

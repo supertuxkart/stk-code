@@ -46,6 +46,7 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     m_node_index          = node_index;
     m_predecessor         = -1;
     m_distance_from_start = 0;
+
     const Quad &quad      = m_all_quads->getQuad(m_quad_index);
     // FIXME: the following values should depend on the actual orientation 
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
@@ -116,6 +117,71 @@ void GraphNode::addSuccessor(unsigned int to)
         }
     }
 }   // addSuccessor
+
+// ----------------------------------------------------------------------------
+/** If this node has more than one successor, it will set up a vector that
+ *  contains the direction to use when a certain graph node X should be 
+ *  reached.
+ */
+void GraphNode::setupPathsToNode()
+{
+    if(m_successor_node.size()<2) return;
+
+    const unsigned int num_nodes = QuadGraph::get()->getNumNodes();
+    m_path_to_node.resize(num_nodes);
+
+    // Initialise each graph node with -1, indicating that 
+    // it hasn't been reached yet.
+    for(unsigned int i=0; i<num_nodes; i++)
+        m_path_to_node[i] = -1;
+
+    // Indicate that this node can be reached from this node by following
+    // successor 0 - just a dummy value that might only be used during the
+    // recursion below.
+    m_path_to_node[m_node_index] = 0;
+
+    // A simple depth first search is used to determine which successor to 
+    // use to reach a certain graph node. Using Dijkstra's algorithm  would
+    // give the shortest way to reach a certain node, but the shortest way
+    // might involve some shortcuts which are hidden, and should therefore 
+    // not be used.
+    for(unsigned int i=0; i<getNumberOfSuccessors(); i++)
+    {
+        GraphNode &gn = QuadGraph::get()->getNode(getSuccessor(i));
+        gn.markAllSuccessorsToUse(i, &m_path_to_node);
+    }
+#ifdef DEBUG
+    for(unsigned int i=0; i<m_path_to_node.size(); i++)
+    {
+        if(m_path_to_node[i]==-1)
+            printf("[WARNING] No path to node %d found on graph node %d.\n",
+                   i, m_node_index);
+    }
+#endif
+}   // setupPathsToNode
+
+// ----------------------------------------------------------------------------
+/** This function marks that the successor n should be used to reach this
+ *  node. It then recursively (depth first) does the same for all its 
+ *  successors. Depth-first 
+ *  \param n The successor which should be used in m_path_node to reach 
+ *         this node.
+ *  \param path_to_node The path-to-node data structure of the node for
+ *         which the paths are currently determined.
+ */
+void GraphNode::markAllSuccessorsToUse(unsigned int n, 
+                                       PathToNodeVector *path_to_node)
+{
+    // End recursion if the path to this node has already been found.
+    if( (*path_to_node)[m_node_index] >-1) return;
+
+    (*path_to_node)[m_node_index] = n;
+    for(unsigned int i=0; i<getNumberOfSuccessors(); i++)
+    {
+        GraphNode &gn = QuadGraph::get()->getNode(getSuccessor(i));
+        gn.markAllSuccessorsToUse(n, path_to_node);
+    }
+}   // markAllSuccesorsToUse
 
 // ----------------------------------------------------------------------------
 /** Returns the distance a point has from this quad in forward and sidewards
