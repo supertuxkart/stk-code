@@ -131,10 +131,10 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     {
         m_karts[kart_id]->finishedRace(WorldStatus::getTime());
         scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()->getWheelNodes();
-        wheels[0]->setVisible(false);
-        wheels[1]->setVisible(false);
-        wheels[2]->setVisible(false);
-        wheels[3]->setVisible(false);
+        if(wheels[0]) wheels[0]->setVisible(false);
+        if(wheels[1]) wheels[1]->setVisible(false);
+        if(wheels[2]) wheels[2]->setVisible(false);
+        if(wheels[3]) wheels[3]->setVisible(false);
         eliminateKart(kart_id, true, false);
     }
     
