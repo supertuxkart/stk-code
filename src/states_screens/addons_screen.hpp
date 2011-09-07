@@ -22,7 +22,6 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -35,8 +34,7 @@ namespace GUIEngine { class Widget; }
   */
 class AddonsScreen : public GUIEngine::Screen, 
                      public GUIEngine::ScreenSingleton<AddonsScreen>,
-                     public GUIEngine::IListWidgetHeaderListener,
-                     public MessageDialog::IConfirmDialogListener
+                     public GUIEngine::IListWidgetHeaderListener
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
@@ -50,6 +48,9 @@ private:
     int              m_icon_installed;
     /** Icon for is not installed yet. */
     int              m_icon_not_installed;
+    /** Icon for 'loading' */
+    int              m_icon_loading;
+    
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
     GUIEngine::LabelWidget
@@ -63,6 +64,9 @@ private:
     int              m_selected_index;
 
     float            m_icon_height;
+    
+    bool             m_reloading;
+    
 public:
 
     /** Load the addons into the main list.*/
@@ -81,11 +85,9 @@ public:
 
     virtual void init();
     virtual void tearDown();
-
-    virtual void onCancel();
     
-    /** \brief callback from IConfirmDialogListener */
-    virtual void onDialogUpdate(float dt);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
 
     void    setLastSelected();
 

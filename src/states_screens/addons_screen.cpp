@@ -28,6 +28,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -54,12 +55,15 @@ void AddonsScreen::loadedFromFile()
                                                     + "/package-featured.png");
     video::ITexture* icon5 = irr_driver->getTexture( file_manager->getGUIDir()
                                                     + "/no-package-featured.png");
+    video::ITexture* icon6 = irr_driver->getTexture( file_manager->getGUIDir()
+                                                    + "/loading.png");
     
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
     m_icon_installed     = m_icon_bank->addTextureAsSprite(icon1);
     m_icon_not_installed = m_icon_bank->addTextureAsSprite(icon2);
     m_icon_bank->addTextureAsSprite(icon4);
     m_icon_bank->addTextureAsSprite(icon5);
+    m_icon_loading = m_icon_bank->addTextureAsSprite(icon6);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
     
     GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
@@ -83,6 +87,9 @@ void AddonsScreen::beforeAddingWidget()
 void AddonsScreen::init()
 {
     Screen::init();
+    
+    m_reloading = false;
+    
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
     GUIEngine::getFont()->setTabStop(0.66f);
@@ -272,9 +279,22 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 
     else if (name == "reload")
     {
-        network_http->insertReInit();
-        new MessageDialog(_("Please wait while addons are updated, or click the button below to reload in the background."),
-            MessageDialog::MESSAGE_DIALOG_OK, this, false);
+        if (!m_reloading)
+        {
+            m_reloading = true;
+            network_http->insertReInit();
+            //new MessageDialog(_("Please wait while addons are updated, or click the button below to reload in the background."),
+            //    MessageDialog::MESSAGE_DIALOG_OK, this, false);
+            
+            GUIEngine::ListWidget* w_list = 
+            getWidget<GUIEngine::ListWidget>("list_addons");
+            w_list->clear();
+            
+            w_list->addItem("spacer", L"");
+            w_list->addItem("loading",
+                            _("Please wait while addons are updated"),
+                            m_icon_loading);
+        }
     }
 
     else if (name == "list_addons")
@@ -312,20 +332,6 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Callback function for the MessageDialog opened by the "reload" button.
- *  The network call to reload the addons list will be under way by the time
- *  function is called, so all it has to do is close two screens (the
- *  MessageDialog itself and the AddonsScreen), returning the player to the
- *  main menu to wait for the addons to be reloaded.
- */
-void AddonsScreen::onCancel() {
-    // Close the MessageDialog
-    MessageDialog::dismiss();
-    // Close the AddonsScreen
-    StateManager::get()->popMenu();
-}
-
-// ----------------------------------------------------------------------------
 /** Selects the last selected item on the list (which is the item that
  *  is just being installed) again. This function is used from the
  *  addons_loading screen: when it is closed, it will reset the
@@ -344,23 +350,24 @@ void AddonsScreen::setLastSelected()
 
 // ----------------------------------------------------------------------------
 
-void AddonsScreen::onDialogUpdate(float delta)
+void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
 {
-    if (GUIEngine::ModalDialog::isADialogActive())
+    if (m_reloading)
     {
         if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
         {
             // not allowed to access the net. how did you get to this menu in the first place??
-            GUIEngine::ModalDialog::dismiss();
+            loadList();
+            m_reloading = false;
         }
         else if (addons_manager->wasError())
         {
-            GUIEngine::ModalDialog::dismiss();
+            m_reloading = false;
             new MessageDialog( _("Sorry, an error occurred while contacting the add-ons website. Make sure you are connected to the Internet and that SuperTuxKart is not blocked by a firewall") );
         }
         else if (addons_manager->onlineReady())
         {
-            GUIEngine::ModalDialog::dismiss();
+            m_reloading = false;
             loadList();
         }
         else
