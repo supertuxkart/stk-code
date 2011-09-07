@@ -303,7 +303,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             getWidget<GUIEngine::ListWidget>("list_addons");
         std::string id = list->getSelectionInternalName();
 
-        if (!id.empty())
+        if (!id.empty() && addons_manager->getAddon(id) != NULL)
         {
             m_selected_index = list->getSelectionID();
             new AddonsLoading(0.8f, 0.8f, id);
