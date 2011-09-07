@@ -27,7 +27,8 @@
 #include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
-
+/** Constructor. Sets up the clock mode etc.
+ */
 ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
@@ -38,7 +39,9 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
-
+/** Initialises the three strikes battle. It sets up the data structure
+ *  to keep track of points etc. for each kart.
+ */
 void ThreeStrikesBattle::init()
 {
     WorldWithRank::init();
@@ -74,26 +77,29 @@ void ThreeStrikesBattle::init()
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
+/** Destructor. Clears all internal data structures, and removes the tire mesh
+ *  from the mesh cache.
+ */
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
-    PhysicalObject* obj;
-    for_in(obj, m_tires)
-    {
-        m_track->getTrackObjectManager()->removeObject(obj);
-    }
     m_tires.clearWithoutDeleting();
     
     delete[] m_kart_display_info;
-    // TODO: need to drop the mesh? I got a crash when I added this line so
-    //       not sure this is right
-    //m_tire->drop();
+
+    // Remove the mesh from the cache so that the mesh is properly
+    // freed once all refernces to it (which will happen once all
+    // karts are being freed, which would have a pointer to this mesh)
+    irr_driver->removeMeshFromCache(m_tire);
 }   // ~ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
-
+/** Adds two tires to each of the kart. The tires are used to represent 
+ *  lifes.
+ *  \param kart The pointer to the kart (not used here).
+ *  \param node The scene node of this kart.
+ */
 void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
 {
-    //int coord = node->getBoundingBox().MinEdge.Z;
     float coord = -kart->getKartLength()*0.5f;
     
     scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, node);
@@ -107,9 +113,12 @@ void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
     tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
     tire_node->setName("tire2");
-}
+}   // kartAdded
 
 //-----------------------------------------------------------------------------
+/** Called when a kart is hit. 
+ *  \param kart_id The world kart id of the kart that was hit.
+ */
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
     assert(kart_id >= 0);
@@ -218,6 +227,8 @@ void ThreeStrikesBattle::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Updates the ranking of the karts.
+ */
 void ThreeStrikesBattle::updateKartRanks()
 {
     beginSetKartPositions();
@@ -292,6 +303,8 @@ void ThreeStrikesBattle::terminateRace()
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
+/** Called then a battle is restarted.
+ */
 void ThreeStrikesBattle::restartRace()
 {
     WorldWithRank::restartRace();
@@ -337,6 +350,8 @@ void ThreeStrikesBattle::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
+/** Returns the data to display in the race gui.
+ */
 RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 {
     const unsigned int kart_amount = getNumKarts();
@@ -381,6 +396,9 @@ RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 }   // getKartDisplayInfo
 
 //-----------------------------------------------------------------------------
+/** Moves a kart to its rescue position.
+ *  \param kart The kart that was rescued.
+ */
 void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
 {
     // find closest point to drop kart on
@@ -396,8 +414,8 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
     
     for(int n=0; n<start_spots_amount; n++)
     {
-        // no need for the overhead to compute exact distance with sqrt(), so using the
-        // 'manhattan' heuristic which will do fine enough.
+        // no need for the overhead to compute exact distance with sqrt(), 
+        // so using the 'manhattan' heuristic which will do fine enough.
         const btTransform &s = world->getTrack()->getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         const float dist_n= fabs(kart_x - v.getX()) +
