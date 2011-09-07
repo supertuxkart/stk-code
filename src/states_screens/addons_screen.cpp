@@ -361,8 +361,9 @@ void AddonsScreen::onDialogUpdate(float delta)
         else if (addons_manager->onlineReady())
         {
             GUIEngine::ModalDialog::dismiss();
+            loadList();
         }
-        else 
+        else
         {
             // Addons manager is still initialising/downloading.
         }
