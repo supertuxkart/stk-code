@@ -222,9 +222,12 @@ FileManager::~FileManager()
         i!=allfiles.end(); i++)
     {
         if((*i)=="." || (*i)=="..") continue;
-        // For now there should be only zip files in tmp
+        // For now there should be only zip files or .part files
+        // (not fully downloaded files) in tmp. Warn about any
+        // other files.
         std::string full_path=tmp+"/"+*i;
-        if(StringUtils::getExtension(*i)!="zip") 
+        if(StringUtils::getExtension(*i)!="zip" &&
+           StringUtils::getExtension(*i)!="part"    ) 
         {
             printf("[addons] Warning: unexpected tmp file '%s' found.\n",
                    full_path.c_str());
