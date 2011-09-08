@@ -41,6 +41,9 @@ WorldStatus::WorldStatus()
     m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
 
     music_manager->stopMusic();
+    
+    IrrlichtDevice *device = irr_driver->getDevice();
+    if (device->getTimer()->isStopped()) device->getTimer()->start();
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -56,6 +59,9 @@ void WorldStatus::reset()
     m_previous_phase  = UNDEFINED_PHASE;
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();
+    
+    IrrlichtDevice *device = irr_driver->getDevice();
+    if (device->getTimer()->isStopped()) device->getTimer()->start();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -66,6 +72,8 @@ WorldStatus::~WorldStatus()
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
     sfx_manager->deleteSFX(m_track_intro_sound);
+    IrrlichtDevice *device = irr_driver->getDevice();
+    if (device->getTimer()->isStopped())  device->getTimer()->start();
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -272,9 +280,8 @@ void WorldStatus::pause(Phase phase)
     assert(m_previous_phase==UNDEFINED_PHASE);
     m_previous_phase = m_phase;
     m_phase          = phase;
-
     IrrlichtDevice *device = irr_driver->getDevice();
-    device->getTimer()->stop();
+    if (!device->getTimer()->isStopped())  device->getTimer()->stop();
 }   // pause
 
 //-----------------------------------------------------------------------------
@@ -287,5 +294,5 @@ void WorldStatus::unpause()
     // in pause to detect incorrect pause/unpause sequences.
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
-    device->getTimer()->start();
+    if (device->getTimer()->isStopped()) device->getTimer()->start();
 }   // unpause
