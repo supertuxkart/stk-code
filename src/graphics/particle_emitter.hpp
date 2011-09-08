@@ -89,7 +89,9 @@ public:
     
     void         setParticleType(const ParticleKind* p);
     
-    void resizeBox(float size);
+    void         resizeBox(float size);
+    
+    void         clearParticles();
     
     scene::IParticleSystemSceneNode* getNode() { return m_node; }
     

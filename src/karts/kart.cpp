@@ -506,7 +506,12 @@ void Kart::reset()
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
-    m_nitro->setCreationRate(0.0f);
+    if (m_nitro)
+    {
+        m_nitro->setCreationRate(0.0f);
+        m_nitro->clearParticles();
+    }
+    
     m_zipper_fire->setCreationRate(0.0f);
     if (m_collision_particles) m_collision_particles->setCreationRate(0.0f);
     m_powerup.reset();
@@ -875,7 +880,7 @@ void Kart::update(float dt)
         }
     }  // UserConfigParams::m_graphical_effects
     
-    m_nitro->update(dt);
+    if (m_nitro) m_nitro->update(dt);
     m_zipper_fire->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
     

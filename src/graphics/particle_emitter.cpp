@@ -289,6 +289,13 @@ void ParticleEmitter::setPosition(const Vec3 &pos)
 
 //-----------------------------------------------------------------------------
 
+void ParticleEmitter::clearParticles()
+{
+    m_node->clearParticles();
+}
+
+//-----------------------------------------------------------------------------
+
 void ParticleEmitter::setParticleType(const ParticleKind* type)
 {   
     assert(m_magic_number == 0x58781325);
