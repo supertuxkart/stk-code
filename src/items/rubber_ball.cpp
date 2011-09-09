@@ -453,12 +453,12 @@ float RubberBall::getMaxTerrainHeight() const
 }   // getMaxTerrainHeight
 
 // ----------------------------------------------------------------------------
-    void RubberBall::checkDistanceToTarget()
+/** Determines the distance to the target kart. If the target is close, the
+ *  rubber ball will switch from following the quad graph structure to
+ *  directly aim at the target.
+ */
+void RubberBall::checkDistanceToTarget()
 {
-    // If aiming at target phase, keep on aiming at target.
-    // ----------------------------------------------------
-    if(m_aiming_at_target) return;
-
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(!world) return;   // FIXME battle mode
 
