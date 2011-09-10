@@ -47,11 +47,17 @@ private:
     irr::scene::IMesh* m_tire;
     
     /** for tires that are blown away */
-    bool m_insert_tire;
+    int m_insert_tire;
     
     /** for tires that are blown away */
     core::vector3df m_tire_position;
     
+    core::vector3df m_tire_1_offset;
+    core::vector3df m_tire_2_offset;
+    core::vector3df m_tire_3_offset;
+    core::vector3df m_tire_4_offset;
+    double m_tire_rotation;
+
     PtrVector<PhysicalObject, REF> m_tires;
     
 public:

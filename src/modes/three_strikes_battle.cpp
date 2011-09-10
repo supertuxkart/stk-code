@@ -20,6 +20,8 @@
 #include <string>
 #include <IMeshSceneNode.h>
 
+#include <math.h>
+
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -33,7 +35,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
-    m_insert_tire = false;
+    m_insert_tire = 0;
     
     m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
 }   // ThreeStrikesBattle
@@ -145,6 +147,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
         eliminateKart(kart_id, true, false);
+        m_insert_tire = 4;
     }
     
     const unsigned int NUM_KARTS = getNumKarts();
@@ -182,9 +185,26 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     
     // schedule a tire to be thrown away (but can't do it in this callback
     // because the caller is currently iterating the list of track objects)
-    m_insert_tire = true;
+    m_insert_tire++;
     core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 0.0f, 0.0f);
     m_tire_position = kart_node->getPosition() + wheel_pos;
+    m_tire_rotation = 0;
+    if(m_insert_tire > 1)
+    {
+    	m_tire_position = kart_node->getPosition();
+    	m_tire_rotation = m_karts[kart_id]->getHeading();
+    }
+
+    m_tire_1_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(1).toIrrVector();
+    m_tire_2_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(2).toIrrVector();
+    m_tire_3_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(3).toIrrVector();
+    m_tire_4_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(4).toIrrVector();
+    m_tire_1_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+    m_tire_2_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+    m_tire_3_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+    m_tire_4_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+
+
 }   // kartHit
 
 //-----------------------------------------------------------------------------
@@ -204,23 +224,39 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
     
+    core::vector3df tire_offset;
+
     // insert blown away tire now if was requested
-    if (m_insert_tire)
+    while (m_insert_tire > 0)
     {        
         TrackObjectManager* tom = m_track->getTrackObjectManager();
         
+        if(m_insert_tire == 1)
+            tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
+        if(m_insert_tire == 2)
+            tire_offset = m_tire_1_offset;
+        if(m_insert_tire == 3)
+            tire_offset = m_tire_2_offset;
+        if(m_insert_tire == 4)
+            tire_offset = m_tire_3_offset;
+        if(m_insert_tire == 5)
+            tire_offset = m_tire_4_offset;
+
         PhysicalObject* obj = 
             tom->insertObject(file_manager->getModelFile("tire.b3d"),
                               PhysicalObject::MP_CYLINDER_Y,
                               15 /* mass */,
                               0.5f /* radius */,
-                              core::vector3df(800.0f,0,0) /* rotation */,
-                              m_tire_position,
+                              core::vector3df(800.0f,0,m_tire_rotation  / M_PI * 180 + 180) /* rotation */,
+                              m_tire_position + tire_offset,
                               core::vector3df(0.5f, 0.5f, 0.5f) /* scale */);
         
         // FIXME: orient the force relative to kart orientation
         obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
-        m_insert_tire = false;
+
+        m_insert_tire--;
+        if(m_insert_tire == 1)
+        	m_insert_tire = 0;
         
         m_tires.push_back(obj);
     }
