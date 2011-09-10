@@ -26,6 +26,8 @@
 #include "graphics/material.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
 #include <ITexture.h>
@@ -125,6 +127,11 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     }    
     
     mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    
+    if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+    {
+        mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
+    }
     
     //if (UserConfigParams::m_fullscreen_antialiasing)
     //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
