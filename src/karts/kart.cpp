@@ -934,7 +934,7 @@ void Kart::update(float dt)
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
-        if(min->getY() - getXYZ().getY() > 17)
+        if(min->getY() - getXYZ().getY() > 17 && !m_flying)
             forceRescue();
     }
     else
