@@ -57,7 +57,6 @@ Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
     
     if (m_removing_bomb)
     {
-        printf("Loading '%s'\n", file_manager->getModelFile("swatter_anim2.b3d").c_str());
         node->setMesh(irr_driver->getAnimatedMesh( file_manager->getModelFile("swatter_anim2.b3d") ));
         node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         node->setAnimationSpeed(0.9f);
