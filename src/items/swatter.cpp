@@ -30,8 +30,10 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/explosion.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
+#include "items/projectile_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
 
@@ -251,6 +253,22 @@ void Swatter::squashThingsAround()
         {
             kart->setSquash(kp->getSquashDuration(),
                             kp->getSquashSlowdown());
+            if (kart->getAttachment() != NULL)
+            {
+                if (kart->getAttachment()->getType() == Attachment::ATTACH_BOMB)
+                {
+                    // make bomb explode
+                    kart->getAttachment()->update(10000);
+                    
+                    HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+                    if(m_kart->getController()->isPlayerController())
+                        he->setPlayerKartHit();
+                    projectile_manager->addHitEffect(he);
+                    m_kart->handleExplosion(m_kart->getXYZ(), 
+                                            /*direct_hit*/ true);
+                }
+            }
+            
             World::getWorld()->kartHit(kart->getWorldKartId());
         }
     }
