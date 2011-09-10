@@ -1122,11 +1122,12 @@ void Kart::handleMaterialGFX()
             const btWheelInfo &wi = 
                 getVehicle()->getWheelInfo(2 + m_wheel_toggle);
             xyz = wi.m_raycastInfo.m_contactPointWS;
+            
             // FIXME: the X position is not yet always accurate.
             xyz += Vec3(0.06f * (m_wheel_toggle ? +1 : -1),
                         0,
                         0.06f);
-            m_terrain_particles->setPosition(xyz.toIrrVector());
+
             // Get the appropriate particle data depending on
             // wether the kart is skidding or driving.
             const ParticleKind* pk = 
@@ -1160,6 +1161,11 @@ void Kart::handleMaterialGFX()
 
             float create = pk->getMinRate()*(1-rate) + pk->getMaxRate()*rate;
             m_terrain_particles->setParticleType(pk);
+            
+            // when particle type changes, the emitter is re-created at (0,0,0) so we need to 
+            // set the position after setParticleType
+            m_terrain_particles->setPosition(xyz);
+            
             m_terrain_particles->setCreationRate(create);
         }
         
