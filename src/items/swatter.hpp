@@ -49,12 +49,20 @@ private:
                     m_animation_phase;
 
     /** The kart the swatter is aiming at. */
-    Moveable        *m_target;
+    Moveable          *m_target;
 
-    SFXBase         *m_swat_sound;
+    SFXBase           *m_swat_sound;
+    
+    bool               m_removing_bomb;
+    
+    scene::ISceneNode *m_bomb_scene_node;
+    
+    /** For some reason the built-in animation system doesn't work correctly here?? */
+    float              m_swat_bomb_frame;
     
 public:
-             Swatter(Attachment *attachment, Kart *kart);
+             Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
+                     scene::ISceneNode* bomb_scene_node);
     virtual ~Swatter();
     bool     updateAndTestFinished(float dt);
 

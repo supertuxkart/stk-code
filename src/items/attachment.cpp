@@ -72,15 +72,35 @@ Attachment::~Attachment()
 //-----------------------------------------------------------------------------
 void Attachment::set(AttachmentType type, float time, Kart *current_kart)
 {
+    bool was_bomb = (m_type == ATTACH_BOMB);
+    scene::ISceneNode* bomb_scene_node = NULL;
+    if (was_bomb && type == ATTACH_SWATTER)
+    {
+        // let's keep the bomb node, and create a new one for the new attachment
+        bomb_scene_node = m_node;
+        
+        m_node = irr_driver->addAnimatedMesh(
+                     attachment_manager->getMesh(Attachment::ATTACH_BOMB));
+#ifdef DEBUG
+        std::string debug_name = (current_kart ? current_kart->getIdent() : "somekart") +" (attachment)";
+        m_node->setName(debug_name.c_str());
+#endif
+        m_node->setAnimationEndCallback(this);
+        m_node->setParent(m_kart->getNode());
+        m_node->setVisible(false);
+    }
+    
     clear();
     
     // If necessary create the appropriate plugin which encapsulates the associated behavior
     switch(type)
     {
-    case ATTACH_SWATTER : 
-        m_plugin = new Swatter(this, m_kart);
+    case ATTACH_SWATTER :
+        m_node->setMesh(attachment_manager->getMesh(type));
+        m_plugin = new Swatter(this, m_kart, was_bomb, bomb_scene_node);
         break;
     case ATTACH_BOMB:
+        m_node->setMesh(attachment_manager->getMesh(type));
         if (m_bomb_sound) sfx_manager->deleteSFX(m_bomb_sound);
         m_bomb_sound = sfx_manager->createSoundSource("clock");
         m_bomb_sound->setLoop(true);
@@ -88,10 +108,9 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
         m_bomb_sound->play();
         break;
     default:
+        m_node->setMesh(attachment_manager->getMesh(type));
         break;
     }   // switch(type)
-
-    m_node->setMesh(attachment_manager->getMesh(type));
 
     if (!UserConfigParams::m_graphical_effects)
     {

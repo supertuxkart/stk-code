@@ -30,6 +30,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
@@ -40,17 +41,33 @@
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
-Swatter::Swatter(Attachment *attachment, Kart *kart)
+Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
+                 scene::ISceneNode* bomb_scene_node)
        : AttachmentPlugin(attachment, kart)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_target = NULL;
-
+    m_removing_bomb = was_bomb;
+    m_bomb_scene_node = bomb_scene_node;
+    m_swat_bomb_frame = 0.0f;
+    
     // Setup the node
     scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
     node->setPosition(SWAT_POS_OFFSET);
-    node->setAnimationSpeed(0);
     
+    if (m_removing_bomb)
+    {
+        printf("Loading '%s'\n", file_manager->getModelFile("swatter_anim2.b3d").c_str());
+        node->setMesh(irr_driver->getAnimatedMesh( file_manager->getModelFile("swatter_anim2.b3d") ));
+        node->setRotation(core::vector3df(0.0, -180.0, 0.0));
+        node->setAnimationSpeed(0.9f);
+        node->setCurrentFrame(0.0f);
+        node->setLoopMode(false);
+    }
+    else
+    {
+        node->setAnimationSpeed(0);   
+    }
     m_swat_sound = sfx_manager->createSoundSource("swatter");
 }   // Swatter
 
@@ -71,6 +88,38 @@ Swatter::~Swatter()
  */
 bool Swatter::updateAndTestFinished(float dt)
 {
+    if (m_removing_bomb)
+    {
+        m_swat_bomb_frame += dt*25.0f;
+        //printf("%f\n", (float)m_attachment->getNode()->getFrameNr() );
+        m_attachment->getNode()->setRotation(core::vector3df(0.0, -180.0, 0.0));
+        
+        m_attachment->getNode()->setCurrentFrame(m_swat_bomb_frame);
+        
+        if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
+        {
+            m_bomb_scene_node->setPosition(m_bomb_scene_node->getPosition() +
+                                           core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+            m_bomb_scene_node->setRotation(m_bomb_scene_node->getRotation() +
+                                           core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+        }
+        
+        if (m_swat_bomb_frame >= m_attachment->getNode()->getEndFrame())
+        {
+            return true;
+        }
+        else if (m_swat_bomb_frame >= 35)
+        {
+            if (m_bomb_scene_node != NULL)
+            {
+                irr_driver->removeNode(m_bomb_scene_node);
+                m_bomb_scene_node = NULL;
+            }
+        }
+        
+        return false;
+    }
+    
     switch(m_animation_phase)
     {
     case SWATTER_AIMING:
