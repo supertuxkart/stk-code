@@ -4,7 +4,7 @@
     <track id="lighthouse" laps="4" />
     <track id="startrack"  laps="3" />
     <track id="hacienda"   laps="3" />
-    <track id="secretgarden" laps="3" />
-    <track id="farm"         laps="3" />
-     
+    <track id="zengarden"  laps="4" />
+    <track id="farm"       laps="3" />
+    
 </supertuxkart_grand_prix>
