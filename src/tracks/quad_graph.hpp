@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <string>
+#include <set>
 
 #include "tracks/graph_node.hpp"
 #include "tracks/quad_set.hpp"
@@ -78,6 +79,8 @@ private:
     std::string              m_quad_filename;
 
     void setDefaultSuccessors();
+    void setChecklineRequirements(GraphNode* node, std::set<int> checklines);
+    
     void load         (const std::string &filename);
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
@@ -171,6 +174,12 @@ public:
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
     // ----------------------------------------------------------------------
+    
+    void         setChecklineRequirements()
+    {
+        setChecklineRequirements(m_all_nodes[0], std::set<int>());
+    }
+
 };   // QuadGraph
 
 #endif

@@ -323,6 +323,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 //-----------------------------------------------------------------------------
 int LinearWorld::getSectorForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return m_kart_info[kart_id].getSector()->getCurrentGraphNode();
 }   // getSectorForKart
 
@@ -333,6 +334,7 @@ int LinearWorld::getSectorForKart(const int kart_id) const
  */
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return m_kart_info[kart_id].getSector()->getDistanceFromStart();
 }   // getDistanceDownTrackForKart
 
@@ -343,12 +345,14 @@ float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
  */
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return m_kart_info[kart_id].getSector()->getDistanceToCenter();
 }   // getDistanceToCenterForKart
 
 //-----------------------------------------------------------------------------
 int LinearWorld::getLapForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return  m_kart_info[kart_id].m_race_lap;
 }   // getLapForKart
 
@@ -358,6 +362,7 @@ int LinearWorld::getLapForKart(const int kart_id) const
  */
 float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     assert(m_kart_info[kart_id].m_race_lap == race_manager->getNumLaps()-1);
     return m_kart_info[kart_id].m_estimated_finish;
 }   // getEstimatedFinishTime
@@ -365,6 +370,7 @@ float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 //-----------------------------------------------------------------------------
 float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return m_kart_info[kart_id].m_time_at_last_lap;
 }   // getTimeAtLapForKart
 

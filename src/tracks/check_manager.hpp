@@ -40,6 +40,9 @@ public:
         ~CheckManager();
     void update(float dt);
     void reset(const Track &track);
+    
+    int getCheckStructureCount() const { return m_all_checks.size(); }
+    
     /** Returns the nth. check structure. */
     CheckStructure *getCheckStructure(unsigned int n) 
     {

@@ -21,6 +21,7 @@
 #define HEADER_GRAPH_NODE_HPP
 
 #include <vector>
+#include <set>
 
 #include <vector2d.h>
 #include <dimension2d.h>
@@ -98,6 +99,13 @@ class GraphNode
      void markAllSuccessorsToUse(unsigned int n, 
                                  PathToNodeVector *m_path_to_node);
 
+    /**
+      * Sets of checklines you should have activated when you are driving on
+      * this node (there is a possibility of more than one set because of
+      * alternate ways)
+      */
+    std::vector< std::set<int> > m_checkline_requirements;
+    
 public:
     /** Keep a shared pointer so that some asserts and tests can be 
     *  done without adding additional parameters. */
@@ -159,6 +167,9 @@ public:
     /** Returns the center point of the upper edge of this graph node. */
     const Vec3& getUpperCenter() const {return m_upper_center;}
     // ------------------------------------------------------------------------
+    /** Returns the center point of this graph node. */
+    const Vec3  getCenter()      const {return (m_upper_center + m_lower_center) / 2.0f;}
+    // ------------------------------------------------------------------------
     /** Returns the length of the quad of this node. */
     float       getNodeLength() const 
                 {return (m_lower_center-m_upper_center).length();}
@@ -185,6 +196,8 @@ public:
         return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
     }
     // ------------------------------------------------------------------------
+    
+    void setChecklineRequirements(const std::set<int>& r);
 };   // GraphNode
 
 #endif

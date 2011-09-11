@@ -23,6 +23,7 @@
 
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/check_lap.hpp"
 #include "tracks/check_manager.hpp"
 
 
@@ -171,6 +172,20 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
             cs->changeDebugColor(cs->m_is_active[kart_index]);
         }
     }   // for i<indices.size()
+    
+    
+    /*
+    printf("--------\n");
+    for (int n=0; n<m_check_manager->getCheckStructureCount(); n++)
+    {
+        CheckStructure *cs = m_check_manager->getCheckStructure(n);
+        if (dynamic_cast<CheckLap*>(cs) != NULL)
+            printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index]);
+        else
+            printf("Checkline %i : %i\n", n, (int)cs->m_is_active[kart_index]);
+
+    }
+    */
 }   //changeStatus
 
 // ----------------------------------------------------------------------------

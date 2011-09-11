@@ -28,8 +28,12 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
+#include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/quad_set.hpp"
+#include "tracks/track.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph *QuadGraph::m_quad_graph = NULL;
@@ -176,9 +180,57 @@ void QuadGraph::load(const std::string &filename)
             break;
         }
     }
-    setDefaultSuccessors();
-
+    setDefaultSuccessors();    
 }   // load
+
+// ----------------------------------------------------------------------------
+
+/**
+  * Finds which checklines must be visited before driving on this quad
+  * (useful for rescue)
+  */
+void QuadGraph::setChecklineRequirements(GraphNode* node, std::set<int> checklines)
+{
+    Track* t = World::getWorld()->getTrack();
+    CheckManager* cm = t->getCheckManager();
+    assert(cm != NULL);
+    
+    for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
+    {
+        const int succ_id = node->getSuccessor(n);
+        
+        // warp-around
+        if (succ_id == 0) break;
+        
+        std::set<int> these_checklines = checklines;
+        
+        GraphNode* succ = m_all_nodes[succ_id];
+        for (int i=0; i<cm->getCheckStructureCount(); i++)
+        {
+            CheckStructure* c = cm->getCheckStructure(i);
+
+            // skip lapline
+            if (dynamic_cast<CheckLap*>(c) != NULL) continue;
+            
+            if (c->isTriggered(node->getCenter(), succ->getCenter(), 0 /* kart id */))
+            {
+                //printf("* Check %i is triggerred when going from %i to %i\n", i, node->getIndex(), succ_id);
+                these_checklines.insert(i);
+            }
+        }
+        
+        /*
+        printf("Quad %i :\n", succ_id);
+        for (std::set<int>::iterator it = these_checklines.begin();it != these_checklines.end(); it++)
+        {
+            printf("    Depends on checkline %i\n", *it);
+        }
+        */
+        
+        succ->setChecklineRequirements(these_checklines);
+        setChecklineRequirements(succ, these_checklines);
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** This function defines the "path-to-nodes" for each graph node that has 

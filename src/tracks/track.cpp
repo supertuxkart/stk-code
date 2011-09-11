@@ -1447,6 +1447,8 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
+    //QuadGraph::get()->setChecklineRequirements();
+    
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

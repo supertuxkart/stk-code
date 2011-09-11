@@ -380,6 +380,9 @@ public:
     // ------------------------------------------------------------------------
     bool isFogEnabled() const { return m_use_fog; }
     
+    CheckManager* getCheckManager() { return m_check_manager; }
+
+    
     TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
     
 };   // class Track
