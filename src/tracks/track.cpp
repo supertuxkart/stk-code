@@ -1022,6 +1022,13 @@ void Track::createWater(const XMLNode &node)
                                               wave_height, 
                                               wave_speed,
                                               wave_length);
+        
+        // 'addWaterNode' welds the mesh so keep both the original and the welded copy
+        mesh->grab();
+        irr_driver->grabAllTextures(mesh);
+        m_all_cached_meshes.push_back(mesh);
+        
+        mesh = ((scene::IMeshSceneNode*)scene_node)->getMesh();
     }
     else
     {

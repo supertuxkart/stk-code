@@ -556,7 +556,8 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
                                            float wave_length)
 {
     mesh->setMaterialFlag(EMF_GOURAUD_SHADING, true);
-    scene::ISceneNode* out = m_scene_manager->addWaterSurfaceSceneNode(mesh,
+    scene::IMesh* welded_mesh = m_scene_manager->getMeshManipulator()->createMeshWelded(mesh);
+    scene::ISceneNode* out = m_scene_manager->addWaterSurfaceSceneNode(welded_mesh,
                                                      wave_height, wave_speed,
                                                      wave_length);
     out->getMaterial(0).setFlag(EMF_GOURAUD_SHADING, true);
