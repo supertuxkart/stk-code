@@ -79,7 +79,7 @@ private:
     std::string              m_quad_filename;
 
     void setDefaultSuccessors();
-    void setChecklineRequirements(GraphNode* node, std::set<int> checklines);
+    void setChecklineRequirements(GraphNode* node, int latest_checkline);
     
     void load         (const std::string &filename);
     void createMesh(bool show_invisible=true, 
@@ -177,7 +177,7 @@ public:
     
     void         setChecklineRequirements()
     {
-        setChecklineRequirements(m_all_nodes[0], std::set<int>());
+        setChecklineRequirements(m_all_nodes[0], -1);
     }
 
 };   // QuadGraph

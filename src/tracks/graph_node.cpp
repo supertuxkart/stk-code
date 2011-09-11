@@ -219,7 +219,7 @@ float GraphNode::getDistance2FromPoint(const Vec3 &xyz)
 
 // ----------------------------------------------------------------------------
 
-void GraphNode::setChecklineRequirements(const std::set<int>& r)
+void GraphNode::setChecklineRequirements(int latest_checkline)
 {
-    m_checkline_requirements.push_back(r);
+    m_checkline_requirements.push_back(latest_checkline);
 }

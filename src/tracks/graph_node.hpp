@@ -21,7 +21,6 @@
 #define HEADER_GRAPH_NODE_HPP
 
 #include <vector>
-#include <set>
 
 #include <vector2d.h>
 #include <dimension2d.h>
@@ -104,7 +103,7 @@ class GraphNode
       * this node (there is a possibility of more than one set because of
       * alternate ways)
       */
-    std::vector< std::set<int> > m_checkline_requirements;
+    std::vector< int > m_checkline_requirements;
     
 public:
     /** Keep a shared pointer so that some asserts and tests can be 
@@ -197,7 +196,9 @@ public:
     }
     // ------------------------------------------------------------------------
     
-    void setChecklineRequirements(const std::set<int>& r);
+    void setChecklineRequirements(int latest_checkline);
+    
+    const std::vector<int>& getChecklineRequirements() const { return m_checkline_requirements; }
 };   // GraphNode
 
 #endif

@@ -62,7 +62,7 @@ void LinearWorld::init()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo info;
-        info.getSector()->update(m_karts[n]->getXYZ());
+        info.getSector()->update(m_karts[n]->getXYZ(), m_karts[n], m_track);
         m_kart_info.push_back(info);
     }   // next kart
 
@@ -92,7 +92,7 @@ void LinearWorld::restartRace()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_kart_info[i].getSector()->update(m_karts[i]->getXYZ());
+        m_kart_info[i].getSector()->update(m_karts[i]->getXYZ(), m_karts[i], m_track);
     }   // next kart
 
     // First all kart infos must be updated before  the kart position can be 
@@ -149,7 +149,7 @@ void LinearWorld::update(float dt)
         // Nothing to do for karts that are currently being rescued or eliminated
         if(kart->playingEmergencyAnimation()) continue;
 
-        kart_info.getSector()->update(kart->getXYZ());
+        kart_info.getSector()->update(kart->getXYZ(), kart, m_track);
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have

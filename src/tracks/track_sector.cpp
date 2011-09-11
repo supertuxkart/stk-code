@@ -17,9 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "modes/world.hpp"
+#include "tracks/check_manager.hpp"
+#include "tracks/check_structure.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/quad_graph.hpp"
-
 
 // ----------------------------------------------------------------------------
 /** Initialises the object, and sets the current graph node to be undefined.
@@ -42,13 +45,26 @@ void TrackSector::reset()
  *  the specified point.
  *  \param xyz The new coordinates to search the graph node for.
  */
-void TrackSector::update(const Vec3 &xyz)
+void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
 {
     int prev_sector = m_current_graph_node;
 
     QuadGraph::get()->findRoadSector(xyz, &m_current_graph_node);
     m_on_road = m_current_graph_node != QuadGraph::UNKNOWN_SECTOR;
 
+    int kart_id = -1;
+    World* world = World::getWorld();
+    for (unsigned int i=0; i<world->getNumKarts(); i++)
+    {
+        if (world->getKart(i) == kart)
+        {
+            kart_id = i;
+            break;
+        }
+    }
+    
+    assert(kart_id != -1);
+    
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
     if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
@@ -57,9 +73,47 @@ void TrackSector::update(const Vec3 &xyz)
             QuadGraph::get()->findOutOfRoadSector(xyz,
                                                   prev_sector);
     }
-    else
-        m_last_valid_graph_node = m_current_graph_node;
-
+    
+    if(m_current_graph_node != QuadGraph::UNKNOWN_SECTOR)
+    {
+        // keep the current quad as the latest valid one IF the player has one of the required checklines
+        const std::vector<int>& checkline_requirements =
+            QuadGraph::get()->getNode(m_current_graph_node).getChecklineRequirements();
+        
+        //if (m_last_valid_graph_node != m_current_graph_node)
+        //    printf("Checking quad %i, which has requirement %i\n", m_current_graph_node,
+        //           checkline_requirements.size() == 0 ? -99 : checkline_requirements[0]);
+            
+        CheckManager* cm = track->getCheckManager();
+        
+        const unsigned int count = cm->getCheckStructureCount();
+        
+        if (checkline_requirements.size() == 0)
+        {
+            //if (m_last_valid_graph_node != m_current_graph_node)
+            //    printf("[1] m_last_valid_graph_node : %i\n", m_last_valid_graph_node);
+            m_last_valid_graph_node = m_current_graph_node;
+        }
+        else
+        {
+            for (unsigned int i=0; i<checkline_requirements.size(); i++)
+            {
+                //for (int k=0; k<cm->getCheckStructureCount(); k++)
+                //    printf("    Check %i visited : %i\n", k, cm->getCheckStructure(k)->wasVisitedForKart(kart_id));
+                
+                if (checkline_requirements[i] < (int)count &&
+                    cm->getCheckStructure(checkline_requirements[i])->wasVisitedForKart(kart_id))
+                {
+                    //if (m_last_valid_graph_node != m_current_graph_node)
+                    //    printf("[2] m_last_valid_graph_node : %i\n", m_last_valid_graph_node);
+                    
+                    m_last_valid_graph_node = m_current_graph_node;
+                    break;
+                }
+            }
+        }
+    }
+    
     // Now determine the 'track' coords, i.e. ow far from the start of the 
     // track, and how far to the left or right of the center driveline.
     QuadGraph::get()->spatialToTrack(&m_current_track_coords, xyz, 
@@ -69,17 +123,8 @@ void TrackSector::update(const Vec3 &xyz)
 // ----------------------------------------------------------------------------
 void TrackSector::rescue()
 {
-    // If the kart is off road, rescue it to the last valid track position
-    // instead of the current one (since the sector might be determined by
-    // being closest to it, which allows shortcuts like drive towards another
-    // part of the lap, press rescue, and be rescued to this other part of
-    // the track (example: math class, drive towards the left after start,
-    // when hitting the books, press rescue --> you are rescued to the
-    // end of the track).
-    if(!isOnRoad())
-    {
+    if (m_last_valid_graph_node != QuadGraph::UNKNOWN_SECTOR)
         m_current_graph_node = m_last_valid_graph_node;
-    }
 
     // Using the predecessor has the additional advantage (besides punishing
     // the player a bit more) that it makes it less likely to fall in a 

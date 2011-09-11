@@ -77,6 +77,8 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
+    m_was_visited.clear();
+    
     World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
@@ -85,6 +87,7 @@ void CheckStructure::reset(const Track &track)
         
         // Activate all checkline
         m_is_active.push_back(m_active_at_reset);
+        m_was_visited.push_back(false);
     }   // for i<getNumKarts
 }   // reset
 
@@ -173,7 +176,6 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
         }
     }   // for i<indices.size()
     
-    
     /*
     printf("--------\n");
     for (int n=0; n<m_check_manager->getCheckStructureCount(); n++)
@@ -186,6 +188,7 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
 
     }
     */
+    
 }   //changeStatus
 
 // ----------------------------------------------------------------------------
@@ -194,6 +197,8 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
  */
 void CheckStructure::trigger(unsigned int kart_index)
 {
+    m_was_visited[kart_index] = true;
+    
     switch(m_check_type)
     {
     case CT_NEW_LAP : 

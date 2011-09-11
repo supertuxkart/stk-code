@@ -189,7 +189,7 @@ void QuadGraph::load(const std::string &filename)
   * Finds which checklines must be visited before driving on this quad
   * (useful for rescue)
   */
-void QuadGraph::setChecklineRequirements(GraphNode* node, std::set<int> checklines)
+void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
 {
     Track* t = World::getWorld()->getTrack();
     CheckManager* cm = t->getCheckManager();
@@ -202,7 +202,7 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, std::set<int> checklin
         // warp-around
         if (succ_id == 0) break;
         
-        std::set<int> these_checklines = checklines;
+        int new_latest_checkline = latest_checkline;
         
         GraphNode* succ = m_all_nodes[succ_id];
         for (int i=0; i<cm->getCheckStructureCount(); i++)
@@ -214,12 +214,14 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, std::set<int> checklin
             
             if (c->isTriggered(node->getCenter(), succ->getCenter(), 0 /* kart id */))
             {
-                //printf("* Check %i is triggerred when going from %i to %i\n", i, node->getIndex(), succ_id);
-                these_checklines.insert(i);
+                new_latest_checkline = i;
+                break;
             }
         }
         
         /*
+        printf("Quad %i : checkline %i\n", succ_id, new_latest_checkline);
+
         printf("Quad %i :\n", succ_id);
         for (std::set<int>::iterator it = these_checklines.begin();it != these_checklines.end(); it++)
         {
@@ -227,8 +229,10 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, std::set<int> checklin
         }
         */
         
-        succ->setChecklineRequirements(these_checklines);
-        setChecklineRequirements(succ, these_checklines);
+        if (new_latest_checkline != -1)
+            succ->setChecklineRequirements(new_latest_checkline);
+        
+        setChecklineRequirements(succ, new_latest_checkline);
     }
 }
 

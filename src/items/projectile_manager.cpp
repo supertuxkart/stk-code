@@ -152,16 +152,16 @@ void ProjectileManager::updateClient(float dt)
 
 }   // updateClient
 // -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(Kart *kart, 
+Flyable *ProjectileManager::newProjectile(Kart *kart, Track* track,
                                           PowerupManager::PowerupType type)
 {
     Flyable *f;
     switch(type) 
     {
-        case PowerupManager::POWERUP_BOWLING:    f = new Bowling(kart); break;
-        case PowerupManager::POWERUP_PLUNGER:    f = new Plunger(kart); break;
-        case PowerupManager::POWERUP_CAKE:       f = new Cake(kart);    break;
-        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart);break;
+        case PowerupManager::POWERUP_BOWLING:    f = new Bowling(kart);           break;
+        case PowerupManager::POWERUP_PLUNGER:    f = new Plunger(kart);           break;
+        case PowerupManager::POWERUP_CAKE:       f = new Cake(kart);              break;
+        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart, track); break;
         default:              return NULL;
     }
     m_active_projectiles.push_back(f);

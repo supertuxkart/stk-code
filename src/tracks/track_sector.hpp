@@ -22,6 +22,9 @@
 
 #include "utils/vec3.hpp"
 
+class Track;
+class Kart;
+
 /** This object keeps track of which sector an object is on. A sector is
  *  actually just the graph node (it's called sector to better distinguish
  *  the graph node from say xml node and scene node).
@@ -55,7 +58,7 @@ public:
           TrackSector();
     void  reset();
     void  rescue();
-    void  update(const Vec3 &xyz);
+    void  update(const Vec3 &xyz, Kart* kart, Track* track);
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */
     float getDistanceFromStart() const { return m_current_track_coords.getZ();}

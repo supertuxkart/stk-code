@@ -35,6 +35,7 @@ class Vec3;
 class Kart;
 class HitEffect;
 class Flyable;
+class Track;
 
 /**
   * \ingroup items
@@ -61,7 +62,7 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Flyable*         newProjectile    (Kart *kart, 
+    Flyable*         newProjectile    (Kart *kart, Track* track,
                                        PowerupManager::PowerupType type);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();

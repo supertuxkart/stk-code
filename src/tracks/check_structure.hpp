@@ -69,6 +69,8 @@ protected:
     AlignedArray<Vec3> m_previous_position;
     /** Stores if this check structure is active (for a given kart). */
     std::vector<bool> m_is_active;
+    /** If this check structure was triggered during this lap (for each kart) */
+    std::vector<bool> m_was_visited;
 
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
@@ -120,6 +122,21 @@ public:
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }
 
+    bool wasVisitedForKart(int kart_id)
+    {
+        assert(kart_id < (int)m_was_visited.size());
+        assert(kart_id >= 0);
+        return m_was_visited[kart_id];
+    }
+    
+    void resetVisits()
+    {
+        for (unsigned int n=0; n<m_was_visited.size(); n++)
+        {
+            m_was_visited[n] = false;
+        }
+    }
+    
 };   // CheckStructure
 
 #endif

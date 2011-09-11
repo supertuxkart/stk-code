@@ -24,6 +24,7 @@
 #include "io/xml_node.hpp"
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 
 /** Constructor for a lap line.
@@ -72,5 +73,16 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
                 m_previous_distance[indx], current_distance);
     }
     m_previous_distance[indx] = current_distance;
+    
+    
+    // If a lap was triggered, reset all visit flags
+    if (result)
+    {
+        CheckManager* cm = World::getWorld()->getTrack()->getCheckManager();
+        for (int n=0; n<cm->getCheckStructureCount(); n++)
+        {
+            cm->getCheckStructure(n)->resetVisits();
+        }
+    }
     return result;
 }   // isTriggered

@@ -34,10 +34,12 @@ float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
 int   RubberBall::m_next_id = 0;
 
-RubberBall::RubberBall(Kart *kart) 
+RubberBall::RubberBall(Kart *kart, Track* track)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
+    m_track = track;
+    
     // For debugging purpose: pre-fix each debugging line with the id of 
     // the ball so that it's easy to collect all debug output for one
     // particular ball only. 
@@ -65,7 +67,7 @@ RubberBall::RubberBall(Kart *kart)
     computeTarget();
 
     // initialises the current graph node
-    TrackSector::update(getXYZ());
+    TrackSector::update(getXYZ(), kart, track);
     initializeControlPoints(m_owner->getXYZ());
 
     // At the start the ball aims at quads till it gets close enough to the
@@ -320,7 +322,7 @@ bool RubberBall::updateAndDelete(float dt)
     next_xyz.setY(new_y);
 
     // Determine new distance along track
-    TrackSector::update(next_xyz);
+    TrackSector::update(next_xyz, m_owner, m_track);
 
     // Ball squashing:
     // ===============
