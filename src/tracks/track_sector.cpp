@@ -73,8 +73,7 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
             QuadGraph::get()->findOutOfRoadSector(xyz,
                                                   prev_sector);
     }
-    
-    if(m_current_graph_node != QuadGraph::UNKNOWN_SECTOR)
+    else
     {
         // keep the current quad as the latest valid one IF the player has one of the required checklines
         const std::vector<int>& checkline_requirements =
