@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
@@ -75,7 +76,8 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
     }
     else
     {
-        // keep the current quad as the latest valid one IF the player has one of the required checklines
+        // keep the current quad as the latest valid one IF the player has one
+        // of the required checklines
         const std::vector<int>& checkline_requirements =
             QuadGraph::get()->getNode(m_current_graph_node).getChecklineRequirements();
         
@@ -95,19 +97,36 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
         }
         else
         {
+            bool has_prerequisite = false;
+            
             for (unsigned int i=0; i<checkline_requirements.size(); i++)
             {
                 //for (int k=0; k<cm->getCheckStructureCount(); k++)
-                //    printf("    Check %i visited : %i\n", k, cm->getCheckStructure(k)->wasVisitedForKart(kart_id));
+                //    printf("    Check %i visited : %i\n", k,
+                //           cm->getCheckStructure(k)->wasVisitedForKart(kart_id));
                 
                 if (checkline_requirements[i] < (int)count &&
                     cm->getCheckStructure(checkline_requirements[i])->wasVisitedForKart(kart_id))
                 {
+                    has_prerequisite = true;
                     //if (m_last_valid_graph_node != m_current_graph_node)
                     //    printf("[2] m_last_valid_graph_node : %i\n", m_last_valid_graph_node);
                     
                     m_last_valid_graph_node = m_current_graph_node;
                     break;
+                }
+            }
+            
+            if (!has_prerequisite)
+            {
+                World* w = World::getWorld();
+                if (dynamic_cast<LinearWorld*>(w) != NULL &&
+                    dynamic_cast<LinearWorld*>(w)->getKartLap(kart_id) > -1)
+                {
+                    RaceGUIBase* race_gui = w->getRaceGUI();
+                    race_gui->addMessage(_("CHEATER!"), kart, -1.0f /* time */,
+                                         video::SColor(255,255,255,255), true /* important */,
+                                         true /* big font */);
                 }
             }
         }

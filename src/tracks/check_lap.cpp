@@ -81,7 +81,7 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
         CheckManager* cm = World::getWorld()->getTrack()->getCheckManager();
         for (int n=0; n<cm->getCheckStructureCount(); n++)
         {
-            cm->getCheckStructure(n)->resetVisits();
+            cm->getCheckStructure(n)->resetVisitsFor(indx);
         }
     }
     return result;

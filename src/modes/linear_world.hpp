@@ -137,6 +137,16 @@ public:
      *  \param kart_index  Index of the kart. */
     bool          isOnRoad(unsigned int kart_index) const 
                   { return m_kart_info[kart_index].getSector()->isOnRoad(); }
+    
+    // ------------------------------------------------------------------------
+    int           getKartLap(unsigned int kart_index) const
+                  {
+                      if (kart_index >= 0 && kart_index < m_kart_info.size())
+                          return m_kart_info[kart_index].m_race_lap;
+                      else
+                          return -1;
+                  }
+    
 };   // LinearWorld
 
 #endif

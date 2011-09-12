@@ -129,12 +129,9 @@ public:
         return m_was_visited[kart_id];
     }
     
-    void resetVisits()
+    void resetVisitsFor(unsigned int kart_index)
     {
-        for (unsigned int n=0; n<m_was_visited.size(); n++)
-        {
-            m_was_visited[n] = false;
-        }
+        m_was_visited[kart_index] = false;
     }
     
 };   // CheckStructure
