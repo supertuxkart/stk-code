@@ -147,6 +147,11 @@ public:
                           return -1;
                   }
     
+    TrackSector& getTrackSector(unsigned int kart_index)
+                  {
+                      return m_kart_info[kart_index].m_current_sector;
+                  }
+    
 };   // LinearWorld
 
 #endif

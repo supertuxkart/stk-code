@@ -195,6 +195,21 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
     CheckManager* cm = t->getCheckManager();
     assert(cm != NULL);
     
+    // Find lapline
+    if (latest_checkline == -1)
+    {
+        for (int i=0; i<cm->getCheckStructureCount(); i++)
+        {
+            CheckStructure* c = cm->getCheckStructure(i);
+            
+            if (dynamic_cast<CheckLap*>(c) != NULL)
+            {
+                latest_checkline = i;
+                break;
+            }
+        }
+    }
+    
     for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
     {
         const int succ_id = node->getSuccessor(n);

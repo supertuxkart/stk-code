@@ -53,6 +53,7 @@ private:
     /** True if the object is on the road (driveline), or not. */
     bool m_on_road;
 
+    int m_last_triggered_checkline;
 
 public:
           TrackSector();
@@ -71,7 +72,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this object is on the road (driveline). */
     bool isOnRoad() const { return m_on_road; }
-
+    // ------------------------------------------------------------------------
+    void setLastTriggeredCheckline(int i) { m_last_triggered_checkline = i; }
+    
 };   // TrackSector
 
 #endif

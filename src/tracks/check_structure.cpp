@@ -21,6 +21,7 @@
 
 #include <algorithm>
 
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/check_lap.hpp"
@@ -77,7 +78,6 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
-    m_was_visited.clear();
     
     World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -87,7 +87,6 @@ void CheckStructure::reset(const Track &track)
         
         // Activate all checkline
         m_is_active.push_back(m_active_at_reset);
-        m_was_visited.push_back(false);
     }   // for i<getNumKarts
 }   // reset
 
@@ -196,8 +195,13 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
  *  a lap to be counted, animation to be started etc.
  */
 void CheckStructure::trigger(unsigned int kart_index)
-{
-    m_was_visited[kart_index] = true;
+{    
+    World* w = World::getWorld();
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+    if (lw != NULL)
+    {
+        lw->getTrackSector(kart_index).setLastTriggeredCheckline(m_index);
+    }
     
     switch(m_check_type)
     {
