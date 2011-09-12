@@ -43,6 +43,7 @@ using namespace irr;
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -1447,8 +1448,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
-    QuadGraph::get()->setChecklineRequirements();
-    
+    if (dynamic_cast<LinearWorld*>(World::getWorld()) != NULL)
+    {
+        QuadGraph::get()->setChecklineRequirements();
+    }
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
