@@ -191,8 +191,8 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     m_tire_rotation = 0;
     if(m_insert_tire > 1)
     {
-    	m_tire_position = kart_node->getPosition();
-    	m_tire_rotation = m_karts[kart_id]->getHeading();
+        m_tire_position = kart_node->getPosition();
+        m_tire_rotation = m_karts[kart_id]->getHeading();
     }
 
     m_tire_1_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(1).toIrrVector();
@@ -203,7 +203,13 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     m_tire_2_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
     m_tire_3_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
     m_tire_4_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
-
+    m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
+    m_tire_1_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(1);
+    m_tire_2_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(2);
+    m_tire_3_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(3);
+    m_tire_4_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(4);
+    if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
+        m_insert_tire = 0;
 
 }   // kartHit
 
@@ -225,38 +231,69 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::updateTrack(dt);
     
     core::vector3df tire_offset;
+    std::string tire;
+    float scale = 0.5f;
+    float radius = 0.5f;
+    PhysicalObject::bodyTypes tire_model;
 
-    // insert blown away tire now if was requested
+    // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {        
         TrackObjectManager* tom = m_track->getTrackObjectManager();
         
         if(m_insert_tire == 1)
+        {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
+            tire = file_manager->getModelFile("tire.b3d");
+            scale = 0.5f;
+            radius = 0.5f;
+            tire_model = PhysicalObject::MP_CYLINDER_Y;
+        }
+        if(m_insert_tire != 1)
+        {
+            scale = 1.0f;
+            tire_model = PhysicalObject::MP_CYLINDER_X;
+        }
         if(m_insert_tire == 2)
+        {
             tire_offset = m_tire_1_offset;
+            tire = m_tire_dir+"/wheel-rear-left.b3d";
+            radius = m_tire_1_radius;
+        }
         if(m_insert_tire == 3)
+        {
             tire_offset = m_tire_2_offset;
+            tire = m_tire_dir+"/wheel-front-left.b3d";
+            radius = m_tire_2_radius;
+        }
         if(m_insert_tire == 4)
+        {
             tire_offset = m_tire_3_offset;
+            tire = m_tire_dir+"/wheel-front-right.b3d";
+            radius = m_tire_3_radius;
+        }
         if(m_insert_tire == 5)
+        {
             tire_offset = m_tire_4_offset;
+            tire = m_tire_dir+"/wheel-rear-right.b3d";
+            radius = m_tire_4_radius;
+        }
 
         PhysicalObject* obj = 
-            tom->insertObject(file_manager->getModelFile("tire.b3d"),
-                              PhysicalObject::MP_CYLINDER_Y,
+            tom->insertObject(tire,
+                              tire_model,
                               15 /* mass */,
-                              0.5f /* radius */,
+                              radius /* radius */,
                               core::vector3df(800.0f,0,m_tire_rotation  / M_PI * 180 + 180) /* rotation */,
                               m_tire_position + tire_offset,
-                              core::vector3df(0.5f, 0.5f, 0.5f) /* scale */);
+                              core::vector3df(scale,scale,scale) /* scale */);
         
         // FIXME: orient the force relative to kart orientation
         obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;
         if(m_insert_tire == 1)
-        	m_insert_tire = 0;
+            m_insert_tire = 0;
         
         m_tires.push_back(obj);
     }

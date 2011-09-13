@@ -56,6 +56,11 @@ private:
     core::vector3df m_tire_2_offset;
     core::vector3df m_tire_3_offset;
     core::vector3df m_tire_4_offset;
+    std::string m_tire_dir;
+    float m_tire_1_radius;
+    float m_tire_2_radius;
+    float m_tire_3_radius;
+    float m_tire_4_radius;
     double m_tire_rotation;
 
     PtrVector<PhysicalObject, REF> m_tires;
