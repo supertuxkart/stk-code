@@ -238,6 +238,12 @@ void Kart::createPhysics()
     float kart_length = getKartLength();
     float kart_height = getKartHeight();
 
+    // improve physics for tall karts
+    if (kart_height > kart_length*0.6f)
+    {
+        kart_height = kart_length*0.6f;
+    }
+    
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
                                                  0.5f*kart_height,
                                                  0.5f*kart_length));
