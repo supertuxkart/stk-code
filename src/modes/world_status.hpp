@@ -143,15 +143,15 @@ public:
     virtual void enterRaceOverState();
     virtual void terminateRace();
     
+    // ------------------------------------------------------------------------
     /** Will be called to notify your derived class that the clock,
      *  which is in COUNTDOWN mode, has reached zero. */
     virtual void countdownReachedZero() {};
-    
+    // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
     virtual void onGo() {};
     
-    
-};
+};   // WorldStatus
 
 
 #endif
