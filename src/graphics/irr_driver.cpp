@@ -753,7 +753,11 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
 {
-    return m_scene_manager->addAnimatedMeshSceneNode(mesh);
+    return m_scene_manager->addAnimatedMeshSceneNode(mesh, NULL, -1,
+                                                     core::vector3df(0,0,0),
+                                                     core::vector3df(0,0,0), 
+                                                     core::vector3df(1,1,1),
+                                                     /*addIfMeshIsZero*/true);
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------
