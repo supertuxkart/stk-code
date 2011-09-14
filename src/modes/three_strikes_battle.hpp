@@ -56,7 +56,7 @@ private:
 
     float m_tire_radius[4];
     std::string m_tire_dir;
-    double m_tire_rotation;
+    float m_tire_rotation;
 
     PtrVector<PhysicalObject, REF> m_tires;
     
