@@ -52,15 +52,10 @@ private:
     /** for tires that are blown away */
     core::vector3df m_tire_position;
     
-    core::vector3df m_tire_1_offset;
-    core::vector3df m_tire_2_offset;
-    core::vector3df m_tire_3_offset;
-    core::vector3df m_tire_4_offset;
+    core::vector3df m_tire_offsets[4];
+
+    float m_tire_radius[4];
     std::string m_tire_dir;
-    float m_tire_1_radius;
-    float m_tire_2_radius;
-    float m_tire_3_radius;
-    float m_tire_4_radius;
     double m_tire_rotation;
 
     PtrVector<PhysicalObject, REF> m_tires;

@@ -195,19 +195,16 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         m_tire_rotation = m_karts[kart_id]->getHeading();
     }
 
-    m_tire_1_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(1).toIrrVector();
-    m_tire_2_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(2).toIrrVector();
-    m_tire_3_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(3).toIrrVector();
-    m_tire_4_offset = m_karts[kart_id]->getKartModel()->getWheelGraphicsPosition(4).toIrrVector();
-    m_tire_1_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
-    m_tire_2_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
-    m_tire_3_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
-    m_tire_4_offset.rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+    for(unsigned int i=0; i<4; i++)
+    {
+        m_tire_offsets[i] = m_karts[kart_id]->getKartModel()
+                            ->getWheelGraphicsPosition(i).toIrrVector();
+        m_tire_offsets[i].rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
+        m_tire_radius[i] = m_karts[kart_id]->getKartModel()
+                                           ->getWheelGraphicsRadius(i);
+    }
+ 
     m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
-    m_tire_1_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(1);
-    m_tire_2_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(2);
-    m_tire_3_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(3);
-    m_tire_4_radius = m_karts[kart_id]->getKartModel()->getWheelGraphicsRadius(4);
     if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
         m_insert_tire = 0;
 
@@ -249,34 +246,16 @@ void ThreeStrikesBattle::update(float dt)
             radius = 0.5f;
             tire_model = PhysicalObject::MP_CYLINDER_Y;
         }
-        if(m_insert_tire != 1)
+        else
         {
             scale = 1.0f;
             tire_model = PhysicalObject::MP_CYLINDER_X;
-        }
-        if(m_insert_tire == 2)
-        {
-            tire_offset = m_tire_1_offset;
-            tire = m_tire_dir+"/wheel-rear-left.b3d";
-            radius = m_tire_1_radius;
-        }
-        if(m_insert_tire == 3)
-        {
-            tire_offset = m_tire_2_offset;
-            tire = m_tire_dir+"/wheel-front-left.b3d";
-            radius = m_tire_2_radius;
-        }
-        if(m_insert_tire == 4)
-        {
-            tire_offset = m_tire_3_offset;
-            tire = m_tire_dir+"/wheel-front-right.b3d";
-            radius = m_tire_3_radius;
-        }
-        if(m_insert_tire == 5)
-        {
-            tire_offset = m_tire_4_offset;
-            tire = m_tire_dir+"/wheel-rear-right.b3d";
-            radius = m_tire_4_radius;
+            radius = m_tire_radius[m_insert_tire-2];
+            tire_offset = m_tire_offsets[m_insert_tire-2];
+            if     (m_insert_tire == 2) tire = m_tire_dir+"/wheel-rear-left.b3d";
+            else if(m_insert_tire == 3) tire = m_tire_dir+"/wheel-front-left.b3d";
+            else if(m_insert_tire == 4) tire = m_tire_dir+"/wheel-front-right.b3d";
+            else if(m_insert_tire == 5) tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
         PhysicalObject* obj = 
