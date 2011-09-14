@@ -9,5 +9,5 @@
          last-start-frame="26"
          start-offset="-1.5 1 3"
          scale = "0.3 0.3 0.3"
-         colors="traffic_light_red.jpg traffic_light_yellow.jpg trafficlight.jpg"
+         colors="traffic_light_red.jpg traffic_light_yellow.jpg traffic_light_green.jpg"
          end-start-frame="100"/>
