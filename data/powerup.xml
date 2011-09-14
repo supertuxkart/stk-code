@@ -15,10 +15,34 @@
         model="anchor.b3d"                              />
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
+  <!--  interval: How long a single bounce takes.
+        max-height: The maximum height of a bounce.
+        min-height: Unused mostly, but defines implicitly
+                    the starting height (as average of
+                    max and min height).
+        target-distance: When the ball is closer than 
+                    this to the target, it will aim
+                    directly at the target.
+        min-interpolation-distance: how far the control
+                    points (which are center of squads)
+                    must be from each other. A large value
+                    allows smoother turning (no abrupt
+                    change of direction), but a large
+                    value can result in the ball being
+                    off track (e.g. a value of 30 results
+                    on the ramp in sand track that the 
+                    ball goes to the left of the tunnel,
+                    bouncing on the pyramid). Quite
+                    catastrophal on the startrack and
+                    skyline).
+        squash-slowdown: How much karts that are 
+                   squashed are slowed down.
+        squash-duration: How long karts stay squashed.
+   -->
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
         model="rubber_ball.b3d" speed="35.0" scale="1 1 1"
         interval="1"          max-height="4.0" min-height="0"
-        target-distance="50"  min-interpolation-distance="30"
+        target-distance="50"  min-interpolation-distance="10"
         squash-slowdown="0.5" squash-duration="3"       />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
