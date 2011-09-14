@@ -44,6 +44,7 @@
 #include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 #include <ICameraSceneNode.h>
 
@@ -91,7 +92,6 @@ RaceGUIBase::RaceGUIBase()
  *  In the base gui this is used to initialise the referee data (which needs
  *  the start positions of the karts).
  */
-
 void RaceGUIBase::init()
 {
     // While we actually only need the positions for local players,
@@ -102,6 +102,9 @@ void RaceGUIBase::init()
     {
         const Kart *kart = World::getWorld()->getKart(i);
         m_referee_pos.push_back(kart->getTrans()(Referee::getStartOffset()));
+        Vec3 hpr = Referee::getStartRotation() 
+                 + Vec3(0, kart->getHeading()*RAD_TO_DEGREE, 0);
+        m_referee_rotation.push_back(hpr);
     }
 
     m_referee = new Referee();
@@ -454,6 +457,7 @@ void RaceGUIBase::preRenderCallback(const Kart &kart)
     Vec3 xyz = m_referee_pos[kart.getWorldKartId()];
     xyz.setY(xyz.getY()+m_referee_height);
     m_referee->setPosition(xyz);
+    m_referee->setRotation(m_referee_rotation[kart.getWorldKartId()]);
 }   // preRenderCallback
 
 // ----------------------------------------------------------------------------

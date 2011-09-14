@@ -30,7 +30,14 @@ class Kart;
 /**
   * \ingroup graphics
   *  This implements the referee, a character that is displayed at the start
-  *  of the race holding a 'ready-set-go' traffic light (or so)
+  *  of the race holding a 'ready-set-go' traffic light (or so). It contains
+  *  various static functions and variables which are used to store the
+  *  original mesh, offsets, rotation, ... of the referee.
+  *  Each instance of Referee then has a scene node where the referee is
+  *  shown. One instance of this object is used to display the referee
+  *  for all(!) karts, i.e. the scene node is moved and rotated before
+  *  rendering the view for each of the cameras. This reduces rendering
+  *  effect somewhat, and helps making the startup less crowded.
   */
 class Referee
 {
@@ -83,12 +90,21 @@ public:
     void        setPosition(const Vec3 &xyz) 
                 {m_scene_node->setPosition(xyz.toIrrVector()); }
     // ------------------------------------------------------------------------
+    /** Sets the rotation of the scene node (in degrees).
+     *  \param hpr Rotation in degrees. */
+    void        setRotation(const Vec3 &hpr)
+                { m_scene_node->setRotation(hpr.toIrrVector()); }
+    // ------------------------------------------------------------------------
     /** Returns true if this referee is attached to the scene graph. */
     bool        isAttached() const {return m_scene_node->getParent()!=NULL;}
     // ------------------------------------------------------------------------
     /** Returns the graphical offset the referee should be drawn at at the
      *  start of a race. */
     static const Vec3& getStartOffset() {return m_st_start_offset; }
+    // ------------------------------------------------------------------------
+    /** Returns the rotation of the mesh so that it faces the kart (when 
+     *  applied to a kart with heading 0). */
+    static const Vec3& getStartRotation() {return m_st_start_rotation; }
 };   // Referee
 
 #endif

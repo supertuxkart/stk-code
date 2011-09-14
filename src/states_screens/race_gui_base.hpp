@@ -130,6 +130,9 @@ private:
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
 
+    /** The actual rotation to use for the referee for each kart. */
+    std::vector<Vec3> m_referee_rotation;
+
     /** The height of the referee. This is used to make the referee fly
      *  into view. This is the same Y-offset for all karts, so only a 
      *  single value needs to be used. */
