@@ -66,7 +66,8 @@ void Referee::init()
                      file_manager->getModelFile(model_filename) );
     if(!m_st_referee_mesh)
     {
-        printf("Can't find referee model '%s', aborting.\n", model_filename);
+        printf("Can't find referee model '%s', aborting.\n", 
+               model_filename.c_str());
     }
     
     node->get("first-rescue-frame", &m_st_first_rescue_frame);
