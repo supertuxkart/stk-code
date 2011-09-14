@@ -182,7 +182,7 @@ void Referee::attachToSceneNode()
  */
 void Referee::removeFromSceneGraph()
 {
-    if(!isAttached())
+    if(isAttached())
         irr_driver->removeNode(m_scene_node);
 }   // removeFromSceneGraph
 
