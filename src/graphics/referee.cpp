@@ -23,6 +23,7 @@
 #include "karts/kart.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
 int                   Referee::m_st_first_start_frame  = 1;
@@ -76,6 +77,7 @@ void Referee::init()
     node->get("last-start-frame",   &m_st_last_start_frame  );
     node->get("start-offset",       &m_st_start_offset      );
     node->get("scale",              &m_st_scale             );
+    node->get("start-rotation",     &m_st_start_rotation    );
 
     std::vector<std::string> colors;
     node->get("colors", &colors);

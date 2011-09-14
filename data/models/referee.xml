@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <!-- model: the model filename to load as referee
-    {start,end}-rescue-frame: frame numbers for the rescue animation
-    {start,end}-start-frame: frame numbers for the start animation, -->
+    {first,last}-rescue-frame: Frame numbers for the rescue animation.
+    {first,last}-start-frame: Frame numbers for the start animation.
+    start-offset: XYZ offset relative to kart where to display the start referee
+    scale: Scales the mesh. 
+    start-rotation: Rotation of the referee at start
+    colors: Three texture names that are used for ready, set, go.  -->
+
 <referee model="thunderbird.b3d"
          first-rescue-frame="1"
          last-rescue-frame="99"
@@ -9,5 +14,6 @@
          last-start-frame="26"
          start-offset="-1.5 1 3"
          scale = "0.3 0.3 0.3"
+         start-rotation="0 180 0"
          colors="traffic_light_red.jpg traffic_light_yellow.jpg traffic_light_green.jpg"
-         end-start-frame="100"/>
+/>
