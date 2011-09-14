@@ -89,6 +89,8 @@ void Moveable::reset()
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
     m_velocityLC  = Vec3(0, 0, 0);
+    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
+    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
 
 }   // reset
 
