@@ -55,6 +55,7 @@
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -863,7 +864,6 @@ void initRest()
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     network_manager         = new NetworkManager       ();
-
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts"));
     track_manager->addTrackSearchDir(
@@ -888,9 +888,6 @@ void initRest()
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty((RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
-    // race_manager->setDifficulty(RaceManager::RD_HARD);
-
-    //menu_manager= new MenuManager();
 
 }   // initRest
 
@@ -903,6 +900,7 @@ void cleanSuperTuxKart()
         network_http->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Referee::cleanup();
     if(race_manager)            delete race_manager;
     if(network_http)            delete network_http;
     if(news_manager)            delete news_manager;
@@ -989,6 +987,7 @@ int main(int argc, char *argv[] )
             // implementation) make the temporary materials permanent anyway.
             material_manager->addSharedMaterial(materials_file);
         }
+        Referee::init();
         powerup_manager         -> loadAllPowerups ();
         item_manager            -> loadDefaultItems();
 

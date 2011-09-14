@@ -264,6 +264,8 @@ set( SRCS ${SRCS} src/main.cpp
 	src/graphics/post_processing.hpp
 	src/graphics/rain.cpp
 	src/graphics/rain.hpp
+        src/graphics/referee.cpp
+        src/graphics/referee.hpp
 	src/graphics/shadow.cpp
 	src/graphics/shadow.hpp
 	src/graphics/skid_marks.cpp

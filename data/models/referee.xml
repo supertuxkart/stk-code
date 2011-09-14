@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- model: the model filename to load as referee
+    {start,end}-rescue-frame: frame numbers for the rescue animation
+    {start,end}-start-frame: frame numbers for the start animation, -->
+<referee model="thunderbird.b3d"
+         first-rescue-frame="1"
+         last-rescue-frame="99"
+         first-start-frame="1"
+         last-start-frame="26"
+         start-offset="-1.5 1 3"
+         scale = "0.3 0.3 0.3"
+         colors="traffic_light_red.jpg traffic_light_yellow.jpg trafficlight.jpg"
+         end-start-frame="100"/>

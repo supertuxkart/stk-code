@@ -618,6 +618,7 @@ namespace GUIEngine
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
+#include "states_screens/race_gui_base.hpp"
 
 using namespace irr::gui;
 using namespace irr::video;

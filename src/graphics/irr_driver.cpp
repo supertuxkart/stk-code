@@ -1273,6 +1273,7 @@ void IrrDriver::update(float dt)
             irr_driver->getVideoDriver()->enableMaterial2D();
 
             RaceGUIBase *rg = world->getRaceGUI();
+            rg->update(dt);
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
                 Kart *kart=world->getKart(i);
@@ -1287,7 +1288,7 @@ void IrrDriver::update(float dt)
                     #endif
                             
                     kart->getCamera()->activate();
-                    
+                    rg->preRenderCallback(*kart);
                     m_scene_manager->drawAll();
                     
                     PROFILER_POP_CPU_MARKER();

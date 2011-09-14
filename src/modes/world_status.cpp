@@ -143,7 +143,7 @@ void WorldStatus::update(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
-	        && m_auxiliary_timer<3.5f)
+	            && m_auxiliary_timer<3.5f)
                 return;
             m_auxiliary_timer = 0.0f;
             m_prestart_sound->play();
@@ -188,7 +188,9 @@ void WorldStatus::update(const float dt)
                 music_manager->startMusic(music_manager->getCurrentMusic());
             
             if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message  
+            {
                 m_phase=MUSIC_PHASE;
+            }
             
             m_auxiliary_timer += dt;
             

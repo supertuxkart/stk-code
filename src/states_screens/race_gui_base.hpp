@@ -30,12 +30,15 @@
 namespace irr
 {
     namespace video { class ITexture; struct S3DVertex; }
+    namespace scene { class IAnimatedMeshSceneNode; }
 }
 using namespace irr;
 
+#include "utils/vec3.hpp"
 
 class Kart;
 class Material;
+class Referee;
 
 /**
   * \brief An abstract base class for the two race guis (race_gui and 
@@ -124,7 +127,18 @@ private:
     /** Translated string 'Top %d' displayed every frame. */
     core::stringw    m_string_top;
     
-    
+    /** The position of the referee for all karts. */
+    std::vector<Vec3> m_referee_pos;
+
+    /** The height of the referee. This is used to make the referee fly
+     *  into view. This is the same Y-offset for all karts, so only a 
+     *  single value needs to be used. */
+    float m_referee_height;
+
+    /** The referee scene node. */
+    Referee *m_referee;
+
+
 protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
@@ -153,7 +167,6 @@ protected:
     void drawPowerupIcons      (const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
 
@@ -176,6 +189,8 @@ public:
                   RaceGUIBase();
     virtual      ~RaceGUIBase();
     virtual void renderGlobal(float dt);
+    virtual void init();
+    virtual void restartRace();
     virtual void renderPlayerView(const Kart *kart);
     virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
                             float time,
@@ -183,9 +198,13 @@ public:
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
                             bool big_font=false);
+    virtual void update(float dt);
+    virtual void preRenderCallback(const Kart &kart);
+    // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du 
                   getMiniMapSize() const = 0;
+    // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
 
     /** Set the flag that a lightning should be shown. */

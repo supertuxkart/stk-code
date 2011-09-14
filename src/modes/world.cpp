@@ -163,8 +163,9 @@ void World::init()
     
     powerup_manager->updateWeightsForRace(num_karts);
     // erase messages left over
-    RaceGUIBase* m = World::getWorld()->getRaceGUI();
-    if (m) m->clearAllMessages();
+    RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+    rg->init();
+    if (rg) rg->clearAllMessages();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -830,7 +831,7 @@ void World::restartRace()
 {
     // If m_saved_race_gui is set, it means that the restart was done
     // when the race result gui was being shown. In this case restore the 
-    // race gui (not that the race result gui is cached and so never really
+    // race gui (note that the race result gui is cached and so never really
     // destroyed).
     if(m_saved_race_gui)
     {
@@ -838,6 +839,7 @@ void World::restartRace()
         m_saved_race_gui = NULL;
     }
 
+    m_race_gui->restartRace();
     m_race_gui->clearAllMessages();
 
     m_schedule_pause = false;

@@ -94,6 +94,8 @@ supertuxkart_SOURCES = \
  graphics/post_processing.hpp \
  graphics/rain.cpp \
  graphics/rain.hpp \
+ graphics/referee.cpp \
+ graphics/referee.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \

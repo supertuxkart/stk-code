@@ -35,6 +35,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/referee.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -80,13 +81,56 @@ RaceGUIBase::RaceGUIBase()
     //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
     m_string_top        = _("Top %i");
     
-    
+    m_referee           = NULL;
 }   // RaceGUIBase
 
+// ----------------------------------------------------------------------------
+/** This is a second initialisation call (after the constructor) for the race
+ *  gui. This is called after the world has been initialised, e.g. all karts
+ *  do exist (while the constructor is called before the karts are created).
+ *  In the base gui this is used to initialise the referee data (which needs
+ *  the start positions of the karts).
+ */
+
+void RaceGUIBase::init()
+{
+    // While we actually only need the positions for local players,
+    // we add all karts, since it's easier to get a world kart id from
+    // the kart then the local player id (and it avoids problems in 
+    // profile mode where there might be a camera, but no player).
+    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    {
+        const Kart *kart = World::getWorld()->getKart(i);
+        m_referee_pos.push_back(kart->getTrans()(Referee::getStartOffset()));
+    }
+
+    m_referee = new Referee();
+
+    // Do everything else required at a race restart as well, esp. 
+    // resetting the height of the referee.
+    restartRace();
+}   // init
+
 //-----------------------------------------------------------------------------
+/** This is called when restarting a race. In the race gui base it resets
+ *  height of the referee, so that it can start flying down again.
+ */
+void RaceGUIBase::restartRace()
+{
+    m_referee_height = 10.0f;
+    m_referee->attachToSceneNode();
+}   // restartRace
+
+//-----------------------------------------------------------------------------
+/** The destructor removes the marker texture and the referee scene node.
+ */
 RaceGUIBase::~RaceGUIBase()
 {
     irr_driver->removeTexture(m_marker);
+
+    // If the referee is currently being shown, 
+    // remove it from the scene graph.
+    delete m_referee;
 }   // ~RaceGUIBase
 
 //-----------------------------------------------------------------------------
@@ -308,6 +352,11 @@ void RaceGUIBase::cleanupMessages(const float dt)
 }   // cleanupMessages
 
 //-----------------------------------------------------------------------------
+/** Draws the powerup icons on the screen (called once for each player).
+ *  \param kart The kart for which to draw the powerup icons.
+ *  \param viewport The viewport into which to draw the icons.
+ *  \param scaling The scaling to use when draing the icons.
+ */
 void RaceGUIBase::drawPowerupIcons(const Kart* kart, 
                                    const core::recti &viewport, 
                                    const core::vector2df &scaling)
@@ -352,6 +401,60 @@ void RaceGUIBase::renderGlobal(float dt)
     if (m_lightning > 0.0f) m_lightning -= dt;
 
 }   // renderGlobal
+
+// ----------------------------------------------------------------------------
+/** Update, called once per frame. This updates the height of the referee 
+ *  (to create a flying down animation).
+ *  \param dt Time step size.
+ */
+void RaceGUIBase::update(float dt)
+{
+    // E.g. a race result gui does not have a referee
+    if(m_referee)
+    {
+        World *world = World::getWorld();
+        // During GO move the referee up again
+        if(world->getPhase()==World::SETUP_PHASE)
+        {
+            m_referee_height = 10.0f;
+            m_referee->selectReadySetGo(0);   // set red color
+        }
+        else if(world->getPhase()==World::GO_PHASE)
+        {
+            m_referee_height += dt*5.0f;
+            m_referee->selectReadySetGo(2);
+        }
+        else if(world->getPhase()==World::TRACK_INTRO_PHASE)
+        {
+            m_referee->selectReadySetGo(0);   // set red color
+            m_referee_height -= dt*5.0f;
+            if(m_referee_height<0)
+               m_referee_height = 0;
+        }
+        else if(world->isStartPhase())  // must be ready or set now
+        {
+            m_referee_height = 0;
+            m_referee->selectReadySetGo(world->getPhase()==World::SET_PHASE 
+                                        ? 1 : 0);
+        }
+        else if(m_referee->isAttached())   // race phase:
+        {
+            m_referee->removeFromSceneGraph();
+        }
+    }   // if referee node
+}   // update
+
+// ----------------------------------------------------------------------------
+/** This function is called just before rendering the view for each kart. This
+ *  is used here to display the referee during the ready-set-go phase.
+ *  \param kart The kart whose view is rendered next.
+ */
+void RaceGUIBase::preRenderCallback(const Kart &kart)
+{
+    Vec3 xyz = m_referee_pos[kart.getWorldKartId()];
+    xyz.setY(xyz.getY()+m_referee_height);
+    m_referee->setPosition(xyz);
+}   // preRenderCallback
 
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Kart *kart)
@@ -862,4 +965,3 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
         
     } //next position
 }   // drawGlobalPlayerIcons
-
