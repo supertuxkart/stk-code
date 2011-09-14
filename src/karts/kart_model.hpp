@@ -135,6 +135,7 @@ private:
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
+    /** Pointer to the kart object belonging to this kart model. */
     Kart* m_kart;
     
 public:
@@ -144,49 +145,62 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
+    void          update(float rotation, float steer, 
+                         const float suspension[4]);
+    void          setDefaultPhysicsPosition(const Vec3 &center_shift, 
+                                            float wheel_radius);
     scene::ISceneNode*
                   attachModel(bool animatedModels);
+    // ------------------------------------------------------------------------
+    /** Returns the animated mesh of this kart model. */
     scene::IAnimatedMesh* 
                   getModel() const { return m_mesh; }
 
-    scene::IMesh* getWheelModel(const int wheelID) const 
-                                   { return m_wheel_model[wheelID]; }
-    
+    // ------------------------------------------------------------------------
+    /** Returns the mesh of the wheel for this kart. */
+    scene::IMesh* getWheelModel(const int i) const 
+                             { assert(i>=0 && i<4); return m_wheel_model[i]; }
+    // ------------------------------------------------------------------------
     /** Since karts might be animated, we might need to know which base frame 
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
-    
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart. 
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
      *           right, 3 = rear left.  */
     const Vec3& getWheelGraphicsPosition(int i) const 
-                {return m_wheel_graphics_position[i];}
-
+                {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart for the physics.
      *  The physics wheels can be attached at a different place to make the 
      *  karts more stable.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
      *           right, 3 = rear left.  */
     const Vec3& getWheelPhysicsPosition(int i) const 
-                {return m_wheel_physics_position[i];}
-
+                {assert(i>=0 && i<4); return m_wheel_physics_position[i];}
+    // ------------------------------------------------------------------------
     /** Returns the radius of the graphical wheels.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
      *           right, 3 = rear left.  */
     float       getWheelGraphicsRadius(int i) const 
-                {return m_wheel_graphics_radius[i]; }
-    float getLength                 () const {return m_kart_length;              }
-    float getWidth                  () const {return m_kart_width;               }
-    float getHeight                 () const {return m_kart_height;              }
-    void  update(float rotation, float steer, const float suspension[4]);
-    void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
-
+                {assert(i>=0 && i<4); return m_wheel_graphics_radius[i]; }
+    // ------------------------------------------------------------------------
+    /** Returns the length of the kart model. */
+    float getLength                 () const {return m_kart_length;      }
+    // ------------------------------------------------------------------------
+    /** Returns the width of the kart model. */
+    float getWidth                  () const {return m_kart_width;       }
+    // ------------------------------------------------------------------------
+    /** Returns the height of the kart. */
+    float getHeight                 () const {return m_kart_height;      }
+    // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type);
-    
+    void  setAnimation(AnimationFrameType type);    
+    // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(Kart* k) { m_kart = k; }
-    
+    // ------------------------------------------------------------------------
+    /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
     
 };   // KartModel
