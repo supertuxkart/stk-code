@@ -454,10 +454,13 @@ void RaceGUIBase::update(float dt)
  */
 void RaceGUIBase::preRenderCallback(const Kart &kart)
 {
-    Vec3 xyz = m_referee_pos[kart.getWorldKartId()];
-    xyz.setY(xyz.getY()+m_referee_height);
-    m_referee->setPosition(xyz);
-    m_referee->setRotation(m_referee_rotation[kart.getWorldKartId()]);
+    if(m_referee)
+    {
+        Vec3 xyz = m_referee_pos[kart.getWorldKartId()];
+        xyz.setY(xyz.getY()+m_referee_height);
+        m_referee->setPosition(xyz);
+        m_referee->setRotation(m_referee_rotation[kart.getWorldKartId()]);
+    }
 }   // preRenderCallback
 
 // ----------------------------------------------------------------------------
