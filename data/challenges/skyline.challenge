@@ -4,7 +4,7 @@
     version="1"
     id="gardenhead"
     name="Win a Head to Head in the Zen Garden"
-    description="Win a 3 lap Head to Head in the Secret Garden against 1 easy level AI kart."
+    description="Win a 3 lap Head to Head in the Zen Garden against 1 easy level AI kart."
     depend-on="snowmountain"
     unlock-track="skyline"
     major="single"
