@@ -55,8 +55,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     std::string sound;
     xml_node.get("sound",   &sound       );
 
-    // FIXME: at this time sound emitters are just disabled in multiplayer otherwise
-    //        the sounds would be constantly heard
+    // FIXME: at this time sound emitters are just disabled in multiplayer
+    //        otherwise the sounds would be constantly heard
     if (sound.size() > 0 && race_manager->getNumLocalPlayers() == 1)
     {
         float rolloff = 0.5;
@@ -79,11 +79,13 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         }
         else
         {
-            fprintf(stderr, "[TrackObject] Sound emitter object could not be created\n");
+            fprintf(stderr, 
+                 "[TrackObject] Sound emitter object could not be created\n");
         }
     }
     
-    // Some animated objects (billboards, sound emitters) don't use this scene node
+    // Some animated objects (billboards, sound emitters) 
+    // don't use this scene node
     if (model_name == "")
     {
         m_node = NULL;
@@ -91,7 +93,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     }
     else
     {
-        std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
+        std::string full_path = 
+            World::getWorld()->getTrack()->getTrackFile(model_name);
         if(file_manager->fileExists(full_path))
         {
             m_mesh = irr_driver->getAnimatedMesh(full_path);
@@ -104,7 +107,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             m_mesh      = irr_driver->getAnimatedMesh(full_path);
             if(!m_mesh)
             {
-                fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
+                fprintf(stderr, 
+                        "Warning: '%s' in '%s' not found and is ignored.\n",
                         xml_node.getName().c_str(), model_name.c_str());
                 return;
             }   // if(!m_mesh)
@@ -112,7 +116,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
         m_mesh->grab();
         irr_driver->grabAllTextures(m_mesh);
-        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
+        scene::IAnimatedMeshSceneNode *node =
+            irr_driver->addAnimatedMesh(m_mesh);
         m_node = node;
 #ifdef DEBUG
         std::string debug_name = model_name+" (track-object)";
@@ -187,7 +192,9 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
-
+/** Destructor. Removes the node from the scene graph, and also
+ *  drops the textures of the mesh. Sound buffers are also freed.
+ */
 TrackObject::~TrackObject()
 {
     if(m_node)
