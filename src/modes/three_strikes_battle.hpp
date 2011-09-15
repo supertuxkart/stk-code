@@ -25,6 +25,7 @@
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+class PhysicalObject;
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
@@ -43,19 +44,27 @@ private:
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
     std::vector<BattleInfo> m_kart_info;
-    
+
+    /** The mesh of the tire which is displayed when a kart loses a life. */
     irr::scene::IMesh* m_tire;
     
-    /** for tires that are blown away */
+    /** Indicates the number of tires that should be 
+     *  inserted into the track. */
     int m_insert_tire;
     
-    /** for tires that are blown away */
+    /** For tires that are blown away. */
     core::vector3df m_tire_position;
     
+    /** The original locations of the tires of a kart. */
     core::vector3df m_tire_offsets[4];
 
+    /** The radius of the karts original tires. */
     float m_tire_radius[4];
+
+    /** The directory of the original kart tires. */
     std::string m_tire_dir;
+
+    /** A rotation to apply to the tires when inserting them. */
     float m_tire_rotation;
 
     PtrVector<PhysicalObject, REF> m_tires;
