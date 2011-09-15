@@ -38,6 +38,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_insert_tire = 0;
     
     m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
+    irr_driver->grabAllTextures(m_tire);
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -88,6 +89,7 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
     
     delete[] m_kart_display_info;
 
+    irr_driver->grabAllTextures(m_tire);
     // Remove the mesh from the cache so that the mesh is properly
     // freed once all refernces to it (which will happen once all
     // karts are being freed, which would have a pointer to this mesh)
@@ -236,8 +238,6 @@ void ThreeStrikesBattle::update(float dt)
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {        
-        TrackObjectManager* tom = m_track->getTrackObjectManager();
-        
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
@@ -258,6 +258,7 @@ void ThreeStrikesBattle::update(float dt)
             else if(m_insert_tire == 5) tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
+        TrackObjectManager* tom = m_track->getTrackObjectManager();        
         PhysicalObject* obj = 
             tom->insertObject(tire,
                               tire_model,
@@ -397,8 +398,14 @@ void ThreeStrikesBattle::restartRace()
     BattleEvent evt;
     evt.m_time = 0.0f;
     evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);  
-    
+    m_battle_events.push_back(evt);
+
+    PhysicalObject *obj;
+    for_in(obj, m_tires)
+    {
+        m_track->getTrackObjectManager()->removeObject(obj);
+    }
+    m_tires.clearWithoutDeleting();
 }   // restartRace
 
 //-----------------------------------------------------------------------------

@@ -207,12 +207,13 @@ PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
 }
 
 // ----------------------------------------------------------------------------
-
-void TrackObjectManager::removeObject(PhysicalObject* who)
+/** Removes the object from the scene graph, bullet, and the list of
+ *  track objects, and then frees the object.
+ *  \param obj The physical object to remove.
+ */
+void TrackObjectManager::removeObject(PhysicalObject* obj)
 {
-    m_all_objects.remove(who);
-    
-    // FIXME: need to do memory management
-    //delete who;
-}
+    m_all_objects.remove(obj);
+    delete obj;
+}   // removeObject
 
