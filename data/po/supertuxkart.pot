@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-11 13:11-0400\n"
+"POT-Creation-Date: 2011-09-14 21:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,7 +128,7 @@ msgstr ""
 
 #. I18N: shown when a player is hit by a rubber ball. %1 is the
 #. attacker, %0 is the victim.
-#: src/items/rubber_ball.cpp:245
+#: src/items/rubber_ball.cpp:247
 #, c-format
 msgid "%s is being bounced around."
 msgstr ""
@@ -161,7 +161,7 @@ msgstr ""
 msgid "%s should play (rubber) darts instead of bowling"
 msgstr ""
 
-#: src/modes/world.cpp:797
+#: src/modes/world.cpp:798
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr ""
@@ -902,7 +902,7 @@ msgstr ""
 msgid "Gnu"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:58
+#: src/states_screens/race_gui_base.cpp:60
 msgid "Go!"
 msgstr ""
 
@@ -1032,7 +1032,7 @@ msgstr ""
 msgid "Left"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1135
+#: src/guiengine/engine.cpp:1136
 msgid "Loading"
 msgstr ""
 
@@ -1373,7 +1373,7 @@ msgid "Rank"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:56
+#: src/states_screens/race_gui_base.cpp:58
 msgid "Ready!"
 msgstr ""
 
@@ -1458,7 +1458,7 @@ msgstr ""
 msgid "Select a game mode"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:57
+#: src/states_screens/race_gui_base.cpp:59
 msgid "Set!"
 msgstr ""
 
@@ -1595,7 +1595,7 @@ msgstr ""
 msgid "SuperTuxKart features several game modes"
 msgstr ""
 
-#: src/main.cpp:1038
+#: src/main.cpp:1037
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Would you like this feature to be enabled? (To change this setting "
@@ -1700,7 +1700,7 @@ msgid "To the Moon and Back"
 msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_gui_base.cpp:83
 #, c-format
 msgid "Top %i"
 msgstr ""
@@ -1789,7 +1789,7 @@ msgstr ""
 msgid "Volume"
 msgstr ""
 
-#: src/modes/linear_world.cpp:756
+#: src/modes/linear_world.cpp:762
 msgid "WRONG WAY!"
 msgstr ""
 
@@ -1854,7 +1854,7 @@ msgstr ""
 #. I18N: ./data/challenges/skyline.challenge
 #: data/po/gui_strings.h:140 data/po/gui_strings.h:751
 msgid ""
-"Win a 3 lap Head to Head in the Secret Garden against 1 easy level AI kart."
+"Win a 3 lap Head to Head in the Zen Garden against 1 easy level AI kart."
 msgstr ""
 
 #. I18N: ./data/challenges/xr591.challenge
@@ -1937,11 +1937,11 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/karts/kart.cpp:632 src/karts/kart.cpp:651
+#: src/karts/kart.cpp:638 src/karts/kart.cpp:657
 msgid "You finished the race!"
 msgstr ""
 
-#: src/modes/world.cpp:793
+#: src/modes/world.cpp:794
 msgid "You have been eliminated!"
 msgstr ""
 
@@ -1954,7 +1954,7 @@ msgstr ""
 msgid "You unlocked a new feature!"
 msgstr ""
 
-#: src/karts/kart.cpp:632 src/karts/kart.cpp:651
+#: src/karts/kart.cpp:638 src/karts/kart.cpp:657
 msgid "You won the race!"
 msgstr ""
 
@@ -1985,7 +1985,7 @@ msgid "[none]"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:479
+#: src/states_screens/race_gui_base.cpp:589
 msgid "by"
 msgstr ""
 
