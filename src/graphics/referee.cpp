@@ -136,8 +136,10 @@ void Referee::cleanup()
 // ----------------------------------------------------------------------------
 /** Creates an instance of the referee, using the static values to initialise
  *  it.
+ *  \param is_start_referee True when this is the start referee, i.e. it must
+ *         have the traffic light attached.
  */
-Referee::Referee()
+Referee::Referee(bool is_start_referee)
 {
     assert(m_st_referee_mesh);
     // First add a NULL mesh, then set the material to be read only
@@ -146,13 +148,16 @@ Referee::Referee()
     // mesh. ATM it doesn't make any difference, but if we ever should
     // decide to use more than one referee model at startup we only
     // have to change the textures once, and all models will be in synch.
-    m_scene_node = irr_driver->addAnimatedMesh(NULL);
-    m_scene_node->setReadOnlyMaterials(true);
-    m_scene_node->setMesh(m_st_referee_mesh);
-    m_scene_node->grab();
-    m_scene_node->setRotation(m_st_start_rotation.toIrrVector());
-    m_scene_node->setScale(m_st_scale.toIrrVector());
-    m_scene_node->setFrameLoop(m_st_first_start_frame, m_st_last_start_frame);
+    if(is_start_referee)
+    {
+        m_scene_node = irr_driver->addAnimatedMesh(NULL);
+        m_scene_node->setReadOnlyMaterials(true);
+        m_scene_node->setMesh(m_st_referee_mesh);
+        m_scene_node->grab();
+        m_scene_node->setRotation(m_st_start_rotation.toIrrVector());
+        m_scene_node->setScale(m_st_scale.toIrrVector());
+        m_scene_node->setFrameLoop(m_st_first_start_frame, m_st_last_start_frame);
+    }
 }   // Referee
 
 // ----------------------------------------------------------------------------

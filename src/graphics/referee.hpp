@@ -78,7 +78,7 @@ private:
     scene::IAnimatedMeshSceneNode *m_scene_node;
 
 public:
-                Referee();
+                Referee(bool is_start_referee);
                ~Referee();
     void        selectReadySetGo(int rsg);
     void        attachToSceneNode();
