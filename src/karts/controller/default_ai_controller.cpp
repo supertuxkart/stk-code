@@ -364,7 +364,7 @@ void DefaultAIController::handleSteering(float dt)
                                                     .getCenter());
 
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(QuadGraph::get()->getQuad(next)
+        m_debug_sphere->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
