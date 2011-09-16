@@ -177,9 +177,9 @@ void TutorialRace::restartRace()
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this kind of race. 
  */
-std::string TutorialRace::getIdent() const
+const std::string& TutorialRace::getIdent() const
 {
-    return FTL_IDENT;
+    return IDENT_FTL;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

@@ -37,13 +37,13 @@ bool StandardRace::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
+void StandardRace::getDefaultCollectibles(int *collectible_type, int *amount)
 {
     // in time trial mode, give zippers
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        collectible_type = PowerupManager::POWERUP_ZIPPER;
-        amount = race_manager->getNumLaps();
+        *collectible_type = PowerupManager::POWERUP_ZIPPER;
+        *amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
 }   // getDefaultCollectibles
@@ -60,7 +60,7 @@ bool StandardRace::haveBonusBoxes()
 //-----------------------------------------------------------------------------
 /** Returns an identifier for this race. 
  */
-std::string StandardRace::getIdent() const
+const std::string& StandardRace::getIdent() const
 {
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return IDENT_TTRIAL;

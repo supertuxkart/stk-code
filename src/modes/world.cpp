@@ -94,15 +94,15 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
 }   // World
 
 // ----------------------------------------------------------------------------
-/** This function is called after the World constructor. In init() functions
- *  can be called that use World::getWorld(). The init function is 
- *  called immediately after the constructor.
+/** This function is called after instanciating. This can't be moved to the 
+ *  contructor as child classes must be instanciated, otherwise polymorphism 
+ *  will fail and the results will be incorrect . Also in init() functions
+ *  can be called that use World::getWorld(). 
  */
 void World::init()
 {
     race_state            = new RaceState();
     m_faster_music_active = false;
-    m_fastest_lap         = 9999999.9f;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -821,11 +821,17 @@ void World::eliminateKart(int kart_number, bool notifyOfElimination, bool remove
 }   // removeKart
 
 //-----------------------------------------------------------------------------
-void World::getDefaultCollectibles(int& collectible_type, int& amount )
+/** Called to determine the default collectibles to give each player at the 
+ *  start for this kind of race. Both parameters are of 'out' type. 
+ *  \param collectible_type The type of collectible each kart.
+ *  \param amount The number of collectibles.
+ */
+void World::getDefaultCollectibles(int *collectible_type, int *amount )
 {
-    collectible_type = PowerupManager::POWERUP_NOTHING;
-    amount = 0;
-}
+    *collectible_type = PowerupManager::POWERUP_NOTHING;
+    *amount = 0;
+}   // getDefaultCollectibles
+
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {

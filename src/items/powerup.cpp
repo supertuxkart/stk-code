@@ -113,7 +113,7 @@ void Powerup::reset()
     m_number = 0;
     
     int type, number;
-    World::getWorld()->getDefaultCollectibles( type, number );
+    World::getWorld()->getDefaultCollectibles( &type, &number );
     set( (PowerupManager::PowerupType)type, number );
 }   // reset
 

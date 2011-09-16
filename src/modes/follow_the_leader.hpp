@@ -40,7 +40,7 @@ public:
     
     // overriding World methods
     virtual void restartRace();
-    virtual std::string getIdent() const;
+    virtual const std::string& getIdent() const;
     float   getClockStartTime();
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
@@ -48,7 +48,7 @@ public:
     virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }
     
-};
+};   // FollowTheLeader
 
 
 #endif

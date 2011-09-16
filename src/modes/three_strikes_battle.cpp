@@ -215,9 +215,9 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
-std::string ThreeStrikesBattle::getIdent() const
+const std::string& ThreeStrikesBattle::getIdent() const
 {
-    return STRIKES_IDENT;
+    return IDENT_STRIKES;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

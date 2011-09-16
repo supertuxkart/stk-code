@@ -1029,6 +1029,11 @@ void Kart::showZipperFire()
  */
 void Kart::setSquash(float time, float slowdown)
 {
+    if(m_attachment->getType()==Attachment::ATTACH_BOMB)
+    {
+        this->handleExplosion(getXYZ(), /*direct hit*/true);
+        return;
+    }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
     MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
     m_squash_time  = time;

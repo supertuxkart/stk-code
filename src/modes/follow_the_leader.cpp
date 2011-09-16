@@ -186,9 +186,9 @@ void FollowTheLeaderRace::restartRace()
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this kind of race. 
  */
-std::string FollowTheLeaderRace::getIdent() const
+const std::string& FollowTheLeaderRace::getIdent() const
 {
-    return FTL_IDENT;
+    return IDENT_FTL;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

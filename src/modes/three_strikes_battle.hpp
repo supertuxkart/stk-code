@@ -97,7 +97,7 @@ public:
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart);
     
-    virtual std::string getIdent() const;
+    virtual const std::string& getIdent() const;
     
     virtual void kartHit(const int kart_id);
     virtual void update(float dt);

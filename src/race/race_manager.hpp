@@ -33,11 +33,10 @@
 class Kart;
 class Track;
 
-
-static const char* IDENT_STD     = "STANDARD";
-static const char* IDENT_TTRIAL  = "STD_TIMETRIAL";
-static const char* FTL_IDENT     = "FOLLOW_LEADER";
-static const char* STRIKES_IDENT = "BATTLE_3_STRIKES";
+static const std::string IDENT_STD    ("STANDARD"        );
+static const std::string IDENT_TTRIAL ("STD_TIMETRIAL"   );
+static const std::string IDENT_FTL    ("FOLLOW_LEADER"   );
+static const std::string IDENT_STRIKES("BATTLE_3_STRIKES");
 
 /** 
  * The race manager has two functions:
@@ -103,15 +102,16 @@ public:
     /** Returns a string identifier for each minor race mode.
      *  \param mode Minor race mode.
      */
-    static const char* getIdentOf(const MinorRaceModeType mode)
+    static const std::string& getIdentOf(const MinorRaceModeType mode)
     {
         switch (mode)
         {
             case MINOR_MODE_NORMAL_RACE:    return IDENT_STD;
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
-            case MINOR_MODE_FOLLOW_LEADER:  return FTL_IDENT;
-            case MINOR_MODE_3_STRIKES:      return STRIKES_IDENT;
-            default: assert(false); return NULL;
+            case MINOR_MODE_FOLLOW_LEADER:  return IDENT_FTL;
+            case MINOR_MODE_3_STRIKES:      return IDENT_STRIKES;
+            default: assert(false); 
+                     return IDENT_STD;  // stop compiler warning
         }
     }   // getIdentOf
     
@@ -173,8 +173,8 @@ public:
     {
         if      (name==IDENT_STD    ) return MINOR_MODE_NORMAL_RACE;
         else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
-        else if (name==FTL_IDENT    ) return MINOR_MODE_FOLLOW_LEADER;
-        else if (name==STRIKES_IDENT) return MINOR_MODE_3_STRIKES;
+        else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
+        else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
 
         assert(0);
         return MINOR_MODE_NONE;

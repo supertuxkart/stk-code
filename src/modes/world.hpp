@@ -67,7 +67,6 @@ protected:
     RandomGenerator           m_random;
 
     Physics*    m_physics;
-    float       m_fastest_lap;
     Kart*       m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -83,10 +82,12 @@ protected:
     */
     bool        m_use_highscores;
     
-    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, std::string* highscore_who,
+    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, 
+                             std::string* highscore_who,
                              StateManager::ActivePlayer** best_player);
     void  resetAllKarts     ();
-    void  eliminateKart     (int kart_number, bool notifyOfElimination=true, bool remove=true);
+    void  eliminateKart     (int kart_number, bool notifyOfElimination=true, 
+                             bool remove=true);
     Controller* 
           loadAIController  (Kart *kart);
 
@@ -123,18 +124,18 @@ protected:
      */
     virtual float   estimateFinishTimeForKart(Kart* kart) {return getTime(); }
 
-    /** Pausing/unpausing are not done immediately, but at next udpdate. The use of
-        this is when switching between screens : if we leave a screen that paused the
-        game, only to go to another screen that pauses back the game, this mechanism
-        prevents the game from moving on between the switch
-       */
+    /** Pausing/unpausing are not done immediately, but at next udpdate. The 
+     *  use of this is when switching between screens : if we leave a screen 
+     *  that paused the game, only to go to another screen that pauses back 
+     *  the game, this mechanism prevents the game from moving on between 
+     *  the switch. */
     bool m_schedule_pause;
     
-    /** Pausing/unpausing are not done immediately, but at next udpdate. The use of
-     this is when switching between screens : if we leave a screen that paused the
-     game, only to go to another screen that pauses back the game, this mechanism
-     prevents the game from moving on between the switch
-     */
+    /** Pausing/unpausing are not done immediately, but at next udpdate. The
+     *  use of this is when switching between screens : if we leave a screen 
+     *  that paused the game, only to go to another screen that pauses back 
+     *  the game, this mechanism prevents the game from moving on between the
+     *  switch. */
     bool m_schedule_unpause;
     
     Phase m_scheduled_pause_phase;
@@ -142,120 +143,133 @@ protected:
 public:
                     World();
     virtual        ~World();
+    // Static functions to access world:
+    // =================================
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the (singleton) world object. */
     static World*   getWorld() { return m_world; }
-
-    /** Delete the )singleton) world object, if it exists, and sets the singleton pointer to NULL.
-      * It's harmless to call this if the world has been deleted already. */
+    // ------------------------------------------------------------------------
+    /** Delete the )singleton) world object, if it exists, and sets the 
+      * singleton pointer to NULL. It's harmless to call this if the world 
+      *  has been deleted already. */
     static void     deleteWorld() { delete m_world; m_world = NULL; }
-    
+    // ------------------------------------------------------------------------    
     /** Sets the pointer to the world object. This is only used by
      *  the race_manager.*/
     static void     setWorld(World *world) {m_world = world; }
-    /** call just after instanciating. can't be moved to the contructor as child
-        classes must be instanciated, otherwise polymorphism will fail and the
-        results will be incorrect */
-    virtual void    init();
-    
-    void            updateWorld(float dt);
-    virtual void    restartRace();
-    
-    /** Put race into limbo phase */
-    void            disableRace();
-    
-    Kart           *getPlayerKart(unsigned int player) const;
-    Kart           *getLocalPlayerKart(unsigned int n) const;
-    /** Returns a pointer to the race gui. */
-    RaceGUIBase    *getRaceGUI()                const { return m_race_gui;                  }
-    unsigned int    getNumKarts()               const { return m_karts.size();              }
-    Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
-                                                            kartId < int(m_karts.size()));
-                                                        return m_karts[kartId];             }
-    /** Returns the number of currently active (i.e.non-elikminated) karts. */
-    unsigned int    getCurrentNumKarts()        const { return (int)m_karts.size() -
-                                                            m_eliminated_karts;              }
-    /** Returns the number of currently active (i.e. non-eliminated) players. */
-    unsigned int    getCurrentNumPlayers()      const { return m_num_players -
-                                                            m_eliminated_players;            }
-    
-    Physics        *getPhysics()                const { return m_physics;                   }
-    Track          *getTrack()                  const { return m_track;                     }
-    Kart           *getFastestKart()            const { return m_fastest_kart;              }
-    float           getFastestLapTime()         const { return m_fastest_lap;               }
-    void            setFastestLap(Kart *k, float time){ m_fastest_kart = k;
-                                                        m_fastest_lap  = time;              }
-    Highscores *getHighscores() const;
+    // ------------------------------------------------------------------------
 
-    virtual void terminateRace();
-    
-    /** Called to determine the default collectibles to give each player for this
-      * kind of race. Both parameters are of 'out' type.
-      */
-    virtual void getDefaultCollectibles(int& collectible_type, int& amount );
-    
-    /** Called to determine whether this race mode uses bonus boxes.
-      */
-    virtual bool haveBonusBoxes(){ return true; }
-    
+    // Pure virtual functions
+    // ======================
+
     /** Each game mode should have a unique identifier. Override
-      * this method in child classes to provide it.
-      */
-    virtual std::string getIdent() const = 0;
-        
-    virtual bool useFastMusicNearEnd() const { return true; }
-    
-    virtual void  pause(Phase phase);
-    virtual void  unpause();
-    
-    void  schedulePause(Phase phase);
-    void  scheduleUnpause();
-    
-    /**
-      * The code that draws the timer should call this first to know
-      * whether the game mode wants a timer drawn
-      */
-    bool shouldDrawTimer() const    { return isRacePhase() &&
-                                             getClockMode() != CLOCK_NONE; }
-    
-    /**
-      * If you want to do something to karts or their graphics at the start of the race, override this
-      */
-    virtual void kartAdded(Kart* kart, scene::ISceneNode* node) {}
-    
-    /** \return whether this world can generate/have highscores */
-    bool useHighScores() const      { return m_use_highscores; }
-        
-    /** Called by the code that draws the list of karts on the race GUI
-      * to know what needs to be drawn in the current mode
-      */
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
-    
+      * this method in child classes to provide it. */
+    virtual const std::string& 
+                    getIdent() const = 0;
+    // ------------------------------------------------------------------------    
     /** Since each mode will have a different way of deciding where a rescued
-      * kart is dropped, this method will be called and each mode can implement it.
-      */
-    virtual void moveKartAfterRescue(Kart* kart) = 0;
-    
-    /** Called when it is needed to know whether this kind of race involves counting laps.
-      */
+     *  kart is dropped, this method will be called and each mode can implement 
+     *  it. */
+    virtual void    moveKartAfterRescue(Kart* kart) = 0;
+    // ------------------------------------------------------------------------    
+    /** Called when it is needed to know whether this kind of race involves 
+     *  counting laps. */
     virtual bool raceHasLaps() = 0;
+    // ------------------------------------------------------------------------    
+    /** Called by the code that draws the list of karts on the race GUI
+      * to know what needs to be drawn in the current mode. */
+    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
+    // ------------------------------------------------------------------------    
 
+    // Virtual functions
+    // =================
+    virtual void    init();
+    virtual void    terminateRace();
+    virtual void    restartRace();    
+    virtual void    pause(Phase phase);
+    virtual void    unpause();    
+    virtual void    getDefaultCollectibles(int *collectible_type, 
+                                           int *amount );
+
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bonus boxes. */
+    virtual bool haveBonusBoxes(){ return true; }
+    // ------------------------------------------------------------------------
+    /** Returns if this mode should use fast music (if available). */
+    virtual bool useFastMusicNearEnd() const { return true; }
+    // ------------------------------------------------------------------------    
+    /** If you want to do something to karts or their graphics at the start 
+     *  of the race, override this. */
+    virtual void kartAdded(Kart* kart, scene::ISceneNode* node) {}
+    // ------------------------------------------------------------------------    
     /** Called whenever a kart starts a new lap. Meaningless (and won't be 
      *  called) in non-laped races.
      */
     virtual void newLap(unsigned int kart_index) {}
-    
-    /** Called when a kart was hit by a projectile
-     */
+    // ------------------------------------------------------------------------    
+    /** Called when a kart was hit by a projectile. */
     virtual void kartHit(const int kart_id) {};
-    
-    
-    bool         clearBackBuffer() const { return m_clear_back_buffer; }
-    
+
+
+    // Other functions
+    // ===============
+    Highscores     *getHighscores() const;
+    void            schedulePause(Phase phase);
+    void            scheduleUnpause();
+    void            updateWorld(float dt);
+    void            handleExplosion(const Vec3 &xyz, Kart *kart_hit, 
+                                    PhysicalObject *object);
+    Kart           *getPlayerKart(unsigned int player) const;
+    Kart           *getLocalPlayerKart(unsigned int n) const;
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the race gui. */
+    RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
+    // ------------------------------------------------------------------------
+    /** Returns the number of karts in the race. */
+    unsigned int    getNumKarts() const { return m_karts.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns the kart with a given world id. */
+    Kart           *getKart(int kartId) const {
+                        assert(kartId >= 0 && kartId < int(m_karts.size()));
+                        return m_karts[kartId];                              }
+    // ------------------------------------------------------------------------
+    /** Returns the number of currently active (i.e.non-elikminated) karts. */
+    unsigned int    getCurrentNumKarts() const { return (int)m_karts.size() -
+                                                         m_eliminated_karts; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of currently active (i.e. non-eliminated) players.*/
+    unsigned int    getCurrentNumPlayers() const { return m_num_players -
+                                                         m_eliminated_players;}
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the physics. */
+    Physics        *getPhysics() const { return m_physics; }
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the track. */
+    Track          *getTrack() const { return m_track; }
+    // ------------------------------------------------------------------------    
+    /** The code that draws the timer should call this first to know
+     *  whether the game mode wants a timer drawn. */
+    bool shouldDrawTimer() const    { return isRacePhase() &&
+                                             getClockMode() != CLOCK_NONE; }    
+    // ------------------------------------------------------------------------    
+    /** \return whether this world can generate/have highscores */
+    bool useHighScores() const { return m_use_highscores; }
+    // ------------------------------------------------------------------------
+    /** Returns if this mode needs to clear the back buffer. */
+    bool clearBackBuffer() const { return m_clear_back_buffer; }
+    // ------------------------------------------------------------------------
+    /** Returns the color to clear the back buffer. */
     const irr::video::SColor& getClearColor() const { return m_clear_color; }
-    void         setClearBackBuffer(bool enabled) { m_clear_back_buffer = enabled; }
-    void         setClearbackBufferColor(irr::video::SColor color) { m_clear_color = color; }
+    // ------------------------------------------------------------------------
+    /** Forces clearing of the back buffer. */
+    void setClearBackBuffer(bool enabled) { m_clear_back_buffer = enabled; }
+    // ------------------------------------------------------------------------
+    /** Sets the color to use when clearing the back buffer. */
+    void setClearbackBufferColor(irr::video::SColor color) 
+                                          { m_clear_color = color; }
+    // ------------------------------------------------------------------------
     
-};
+};   // World
 
 #endif
 

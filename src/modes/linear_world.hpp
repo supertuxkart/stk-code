@@ -43,6 +43,9 @@ private:
     
     bool         m_last_lap_sfx_playing;
 
+    /** The fastest lap time. */
+    float       m_fastest_lap;
+
     // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.

@@ -95,7 +95,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     else if (name == "gamemode")
     {
         DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
-        const std::string selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if (selectedMode == IDENT_STD)
         {
@@ -109,7 +109,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
-        else if (selectedMode == FTL_IDENT)
+        else if (selectedMode == IDENT_FTL)
         {
             // Make sure there are at least three karts, otherwise FTL doesn't
             if(race_manager->getNumberOfKarts()<3)
@@ -119,7 +119,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
-        else if (selectedMode == STRIKES_IDENT)
+        else if (selectedMode == IDENT_STRIKES)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
@@ -205,7 +205,7 @@ void RaceSetupScreen::init()
     name2 += _("Contains no powerups, so only your driving skills matter!");
     w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
     
-    if (unlock_manager->isLocked(FTL_IDENT))
+    if (unlock_manager->isLocked(IDENT_FTL))
     {
         w2->addItem( _("Locked : solve active challenges to gain access to more!"),
                     "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);
@@ -216,7 +216,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
         //I18N: short definition for follow-the-leader game mode
         name3 += _("Keep up with the leader kart but don't overtake it!");
-        w2->addItem(name3, FTL_IDENT, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
+        w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
     
     if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
@@ -225,7 +225,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
-        w2->addItem( name4, STRIKES_IDENT, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
+        w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
     
 
@@ -241,10 +241,10 @@ void RaceSetupScreen::init()
             w2->setSelection(IDENT_TTRIAL, PLAYER_ID_GAME_MASTER, true);
             break;
         case CONFIG_CODE_FTL :
-            w2->setSelection(FTL_IDENT, PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(IDENT_FTL, PLAYER_ID_GAME_MASTER, true);
             break;
         case CONFIG_CODE_3STRIKES :
-            w2->setSelection(STRIKES_IDENT, PLAYER_ID_GAME_MASTER, true);
+            w2->setSelection(IDENT_STRIKES, PLAYER_ID_GAME_MASTER, true);
             break;
     }
     

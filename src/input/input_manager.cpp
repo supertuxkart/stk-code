@@ -201,6 +201,8 @@ void InputManager::handleStaticAction(int key, int value)
                                      10000);
                 else
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+                kart = world->getLocalPlayerKart(1);
+                kart->getAttachment()->set(Attachment::ATTACH_BOMB, 30, NULL);
             }
             break;
             
