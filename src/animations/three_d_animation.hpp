@@ -51,6 +51,9 @@ private:
     /** A user pointer to connect a bullet body with this object. */
     UserPointer           m_user_pointer;
 
+    /** Non-null only if the shape is exact */
+    TriangleMesh         *m_triangle_mesh;
+    
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
      *  can not use the value returned by getRotation from a scene node. */

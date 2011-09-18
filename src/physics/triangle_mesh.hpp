@@ -63,7 +63,9 @@ public:
                                           {return m_triangleIndex2Material[n];}
     // ------------------------------------------------------------------------
     const btCollisionShape &getCollisionShape() const 
-                                          {return *m_collision_shape;}
+                                          { return *m_collision_shape; }
+    // ------------------------------------------------------------------------
+    btCollisionShape &getCollisionShape() { return *m_collision_shape; }
     // ------------------------------------------------------------------------
     bool castRay(const btVector3 &from, const btVector3 &to,
                  btVector3 *xyz, const Material **material, 
