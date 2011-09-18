@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-14 21:50-0400\n"
+"POT-Creation-Date: 2011-09-18 14:08-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,9 +115,16 @@ msgid "%s MB"
 msgstr ""
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
-#. I18N: as in: The Old Island by Johannes Sjolund
-#: src/modes/linear_world.cpp:309 src/states_screens/addons_screen.cpp:190
+#: src/modes/linear_world.cpp:320
 #, c-format
+msgctxt "fastest_lap"
+msgid "%s by %s"
+msgstr ""
+
+#. I18N: as in: The Old Island by Johannes Sjolund
+#: src/states_screens/addons_screen.cpp:190
+#, c-format
+msgctxt "addons"
 msgid "%s by %s"
 msgstr ""
 
@@ -737,7 +744,7 @@ msgstr ""
 msgid "Feature Unlocked"
 msgstr ""
 
-#: src/modes/linear_world.cpp:228
+#: src/modes/linear_world.cpp:237
 msgid "Final lap!"
 msgstr ""
 
@@ -968,7 +975,7 @@ msgid ""
 "challenge to unlock it."
 msgstr ""
 
-#: src/input/input_manager.cpp:560
+#: src/input/input_manager.cpp:562
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr ""
@@ -1018,7 +1025,7 @@ msgstr ""
 msgid "Lap"
 msgstr ""
 
-#: src/modes/linear_world.cpp:253
+#: src/modes/linear_world.cpp:263
 #, c-format
 msgid "Lap %i"
 msgstr ""
@@ -1139,7 +1146,7 @@ msgstr ""
 msgid "New difficulty '%s' now available"
 msgstr ""
 
-#: src/modes/linear_world.cpp:314
+#: src/modes/linear_world.cpp:326
 msgid "New fastest lap"
 msgstr ""
 
@@ -1213,7 +1220,7 @@ msgstr ""
 msgid "Oliver's Math Class"
 msgstr ""
 
-#: src/input/input_manager.cpp:590
+#: src/input/input_manager.cpp:592
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -1789,7 +1796,7 @@ msgstr ""
 msgid "Volume"
 msgstr ""
 
-#: src/modes/linear_world.cpp:762
+#: src/modes/linear_world.cpp:800
 msgid "WRONG WAY!"
 msgstr ""
 
