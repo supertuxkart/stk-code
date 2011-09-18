@@ -112,7 +112,7 @@ void Referee::init()
     for(unsigned int i=0; i<m_st_referee_mesh->getMeshBufferCount(); i++)
     {
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
-        const video::SMaterial &irrMaterial = mb->getMaterial();
+        video::SMaterial &irrMaterial = mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
         std::string name=StringUtils::getBasename(t->getName()
                                                   .getInternalName().c_str());
@@ -121,6 +121,11 @@ void Referee::init()
             m_st_traffic_buffer = i;
             break;
         }
+        else
+        {
+            irrMaterial.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        }
+        
     }
 
 }   // init
