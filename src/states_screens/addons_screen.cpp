@@ -187,7 +187,7 @@ void AddonsScreen::loadList()
             else
             {
                 //I18N: as in: The Old Island by Johannes Sjolund
-                s = _("%s by %s",addon->getName().c_str(),addon->getDesigner().c_str());
+                s = _C("addons", "%s by %s", addon->getName().c_str(),addon->getDesigner().c_str());
             }
             
             // check if text is too long to fit

@@ -345,12 +345,22 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
     return in_ptr;
 }
 
-const wchar_t* Translations::w_gettext(const wchar_t* original)
+/**
+  * \param original Message to translate
+  * \param context  Optional, can be set to differentiate 2 strings that are identical
+  *                 in English but could be different in other languages
+  */
+const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
-    return w_gettext( wide_to_utf8(original) );
+    return w_gettext( wide_to_utf8(original), context );
 }
 
-const wchar_t* Translations::w_gettext(const char* original)
+/**
+ * \param original Message to translate
+ * \param context  Optional, can be set to differentiate 2 strings that are identical
+ *                 in English but could be different in other languages
+ */
+const wchar_t* Translations::w_gettext(const char* original, const char* context)
 {
     if (original[0] == '\0') return L"";
 
@@ -358,7 +368,9 @@ const wchar_t* Translations::w_gettext(const char* original)
     std::cout << "Translating " << original << "\n";
 #endif
 
-    const std::string& original_t = m_dictionary.translate(original);
+    const std::string& original_t = (context == NULL ?
+                                     m_dictionary.translate(original) :
+                                     m_dictionary.translate_ctxt(context, original));
 
     if (original_t == original)
     {
@@ -384,6 +396,8 @@ const wchar_t* Translations::w_gettext(const char* original)
 
     return out_ptr;
 }
+
+
 
 bool Translations::isRTLLanguage() const
 {

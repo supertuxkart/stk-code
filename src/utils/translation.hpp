@@ -27,8 +27,9 @@
 
 #  include "tinygettext/tinygettext.hpp"
 
-#  define _(String, ...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
-#  define _LTR(String, ...) (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
+#  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
+#  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
+#  define _LTR(String, ...)     (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
@@ -48,8 +49,8 @@ private:
 public:
                        Translations();
     
-    const wchar_t     *w_gettext(const wchar_t* original);
-    const wchar_t     *w_gettext(const char* original);
+    const wchar_t     *w_gettext(const wchar_t* original, const char* context=NULL);
+    const wchar_t     *w_gettext(const char* original, const char* context=NULL);
     
     bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
