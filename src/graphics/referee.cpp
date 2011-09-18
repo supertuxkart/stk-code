@@ -201,5 +201,12 @@ void Referee::selectReadySetGo(int rsg)
     if(m_st_traffic_buffer<0) return;
     video::SMaterial &m = m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
     m.setTexture(0, m_st_traffic_lights[rsg]);
+    
+    // disable lighting, we need to see the traffic light even if facing away
+    // from the sun
+    m.AmbientColor  = video::SColor(255, 255, 255, 255);
+    m.DiffuseColor  = video::SColor(255, 255, 255, 255);
+    m.EmissiveColor = video::SColor(255, 255, 255, 255);
+    m.SpecularColor = video::SColor(255, 255, 255, 255);
 }   // selectReadySetGo
 
