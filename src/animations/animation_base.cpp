@@ -98,7 +98,7 @@ void AnimationBase::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Updates the time, position and rotation. Called once per framce.
+/** Updates the time, position and rotation. Called once per frame.
  *  \param dt Time since last call.
  *  \param xyz Position to be updated.
  *  \param hpr Rotation to be updated.

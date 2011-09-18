@@ -120,7 +120,7 @@ bool ProfileWorld::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Counts the number of framces.
+/** Counts the number of frames.
  */
 void ProfileWorld::update(float dt)
 {
