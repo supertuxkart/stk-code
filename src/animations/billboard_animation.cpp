@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "animations/billboard_animation.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -50,13 +51,16 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
  *  \param dt Time since last call. */
 void BillboardAnimation::update(float dt)
 {
-    core::vector3df xyz=m_node->getPosition();
-    // Rotation doesn't make too much sense for a billboard, 
-    // so just set it to 0
-    core::vector3df hpr(0, 0, 0);
-    core::vector3df scale = m_node->getScale();
-    AnimationBase::update(dt, &xyz, &hpr, &scale);
-    m_node->setPosition(xyz);
-    m_node->setScale(scale);
-    // Setting rotation doesn't make sense
+    if ( UserConfigParams::m_graphical_effects )
+    {
+        core::vector3df xyz=m_node->getPosition();
+        // Rotation doesn't make too much sense for a billboard, 
+        // so just set it to 0
+        core::vector3df hpr(0, 0, 0);
+        core::vector3df scale = m_node->getScale();
+        AnimationBase::update(dt, &xyz, &hpr, &scale);
+        m_node->setPosition(xyz);
+        m_node->setScale(scale);
+        // Setting rotation doesn't make sense
+    }
 }   // update

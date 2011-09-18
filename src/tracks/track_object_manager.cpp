@@ -116,13 +116,10 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
  */
 void TrackObjectManager::update(float dt)
 {
-    if ( UserConfigParams::m_graphical_effects )
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
     {
-        TrackObject* curr;
-        for_in (curr, m_all_objects)
-        {
-            curr->update(dt);
-        }
+        curr->update(dt);
     }
 }   // update
 

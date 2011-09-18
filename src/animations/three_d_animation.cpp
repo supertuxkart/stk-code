@@ -122,34 +122,37 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    core::vector3df xyz   = m_node->getPosition();
-    core::vector3df scale = m_node->getScale();
-    AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
-    m_node->setPosition(xyz);
-    m_node->setScale(scale);
-    // Note that the rotation order of irrlicht is different from the one
-    // in blender. So in order to reproduce the blender IPO rotations 
-    // correctly, we have to get the rotations around each axis and combine
-    // them in the right order for irrlicht
-    core::matrix4 m;
-    m.makeIdentity();
-    core::matrix4 mx;
-    mx.setRotationDegrees(core::vector3df(m_hpr.X, 0, 0));
-    core::matrix4 my;
-    my.setRotationDegrees(core::vector3df(0, m_hpr.Y, 0));
-    core::matrix4 mz;
-    mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.Z));
-    m = my*mz*mx;
-    core::vector3df hpr = m.getRotationDegrees();
-    m_node->setRotation(hpr);
-
-    // Now update the position of the bullet body if there is one:
-    if(m_body)
+    if ( UserConfigParams::m_graphical_effects )
     {
-        hpr = DEGREE_TO_RAD*hpr;
-        btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
-        Vec3 p(xyz);
-        btTransform trans(q,p);
-        m_motion_state->setWorldTransform(trans);
+        core::vector3df xyz   = m_node->getPosition();
+        core::vector3df scale = m_node->getScale();
+        AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
+        m_node->setPosition(xyz);
+        m_node->setScale(scale);
+        // Note that the rotation order of irrlicht is different from the one
+        // in blender. So in order to reproduce the blender IPO rotations 
+        // correctly, we have to get the rotations around each axis and combine
+        // them in the right order for irrlicht
+        core::matrix4 m;
+        m.makeIdentity();
+        core::matrix4 mx;
+        mx.setRotationDegrees(core::vector3df(m_hpr.X, 0, 0));
+        core::matrix4 my;
+        my.setRotationDegrees(core::vector3df(0, m_hpr.Y, 0));
+        core::matrix4 mz;
+        mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.Z));
+        m = my*mz*mx;
+        core::vector3df hpr = m.getRotationDegrees();
+        m_node->setRotation(hpr);
+
+        // Now update the position of the bullet body if there is one:
+        if(m_body)
+        {
+            hpr = DEGREE_TO_RAD*hpr;
+            btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
+            Vec3 p(xyz);
+            btTransform trans(q,p);
+            m_motion_state->setWorldTransform(trans);
+        }
     }
 }   // update

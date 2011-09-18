@@ -20,6 +20,7 @@
 #include "animations/animation_base.hpp"
 
 #include "animations/ipo.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -106,9 +107,12 @@ void AnimationBase::reset()
 void AnimationBase::update(float dt, core::vector3df *xyz, 
                            core::vector3df *hpr, core::vector3df *scale)
 {
-    Ipo* curr;
-    for_in (curr, m_all_ipos)
+    if ( UserConfigParams::m_graphical_effects )
     {
-        curr->update(dt, xyz, hpr, scale);
+        Ipo* curr;
+        for_in (curr, m_all_ipos)
+        {
+            curr->update(dt, xyz, hpr, scale);
+        }
     }
 }   // float dt
