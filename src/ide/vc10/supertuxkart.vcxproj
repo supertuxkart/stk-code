@@ -119,6 +119,7 @@
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
     <ClCompile Include="..\..\graphics\post_processing.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
+    <ClCompile Include="..\..\graphics\referee.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
@@ -339,6 +340,7 @@
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
     <ClInclude Include="..\..\graphics\post_processing.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
+    <ClInclude Include="..\..\graphics\referee.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />

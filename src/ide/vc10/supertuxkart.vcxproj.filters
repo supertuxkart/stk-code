@@ -801,6 +801,9 @@
     <ClCompile Include="..\..\graphics\hit_sfx.cpp">
       <Filter>Quelldateien\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\graphics\referee.cpp">
+      <Filter>Quelldateien\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1521,6 +1524,9 @@
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hit_sfx.hpp">
+      <Filter>Headerdateien\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\referee.hpp">
       <Filter>Headerdateien\graphics</Filter>
     </ClInclude>
   </ItemGroup>
