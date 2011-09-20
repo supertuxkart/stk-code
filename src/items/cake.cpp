@@ -63,8 +63,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     const bool  backwards = kart->getControls().m_look_back;
     const Kart *closest_kart=NULL;
     Vec3        direction;
-    float       kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction, 
+    float       kart_dist_squared;
+    getClosestKart(&closest_kart, &kart_dist_squared, &direction, 
                    kart /* search in front of this kart */, backwards);
 
     // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
@@ -73,7 +73,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     // this code finds the correct angle and upwards velocity to hit an opponents'
     // vehicle if they were to continue travelling in the same direction and same speed
     // (barring any obstacles in the way of course)
-    if(closest_kart != NULL && kartDistSquared < m_st_max_distance_squared &&
+    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
         m_speed>closest_kart->getSpeed())
     {
         m_target = (Kart*)closest_kart;

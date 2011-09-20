@@ -43,15 +43,23 @@
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
+/** Constructor: creates a swatter at a given attachment for a kart. If there
+ *  was a bomb attached, it triggers the replace bomb animations.
+ *  \param attachment The attachment instance where the swatter is attached to.
+ *  \param kart The kart to which the swatter is attached.
+ *  \param was_bomb True if the kart had a bomv as attachment.
+ *  \param bomb_scene_node The scene node of the bomb (i.e. the previous 
+ *         attachment scene node).
+ */
 Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
                  scene::ISceneNode* bomb_scene_node)
        : AttachmentPlugin(attachment, kart)
 {
     m_animation_phase  = SWATTER_AIMING;
-    m_target = NULL;
-    m_removing_bomb = was_bomb;
-    m_bomb_scene_node = bomb_scene_node;
-    m_swat_bomb_frame = 0.0f;
+    m_target           = NULL;
+    m_removing_bomb    = was_bomb;
+    m_bomb_scene_node  = bomb_scene_node;
+    m_swat_bomb_frame  = 0.0f;
     
     // Setup the node
     scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
@@ -72,7 +80,9 @@ Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
     m_swat_sound = sfx_manager->createSoundSource("swatter");
 }   // Swatter
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Destructor, stops any playing sfx.
+ */
 Swatter::~Swatter()
 {
     if (m_swat_sound)
@@ -81,7 +91,7 @@ Swatter::~Swatter()
     }
 }   // ~Swatter
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Updates an armed swatter: it checks for any karts that are close enough
  *  and not invulnerable, it swats the kart.
  *  \param dt Time step size.
@@ -158,7 +168,8 @@ bool Swatter::updateAndTestFinished(float dt)
             // Did we just finish the first part of the movement?
             if(current_frame >= middle_frame)
             {
-                // Squash the karts and items around and change the current phase
+                // Squash the karts and items around and 
+                // change the current phase
                 squashThingsAround();
                 m_animation_phase = SWATTER_FROM_TARGET;
             }
@@ -175,13 +186,18 @@ bool Swatter::updateAndTestFinished(float dt)
     return false;
 }   // updateAndTestFinished
 
-/** When the animation ends, the swatter is ready again */
+// ----------------------------------------------------------------------------
+/** When the animation ends, the swatter is ready again.
+ */
 void Swatter::onAnimationEnd()
 {
     m_animation_phase = SWATTER_AIMING;
 }   // onAnimationEnd
 
-/** Determine the nearest kart or item and update the current target accordingly */
+// ----------------------------------------------------------------------------
+/** Determine the nearest kart or item and update the current target 
+ *  accordingly.
+ */
 void Swatter::chooseTarget()
 {
     // TODO: for the moment, only handle karts...
@@ -205,7 +221,9 @@ void Swatter::chooseTarget()
     m_target = closest_kart;    // may be NULL
 }
 
-/** If there is a current target, point in its direction, otherwise adopt the default position */
+// ----------------------------------------------------------------------------
+/** If there is a current target, point in its direction, otherwise adopt the 
+ *  default position. */
 void Swatter::pointToTarget()
 {
     if(!m_target)
@@ -214,25 +232,31 @@ void Swatter::pointToTarget()
     }
     else
     {
-        Vec3 swatter_to_target = m_target->getXYZ() - m_attachment->getNode()->getAbsolutePosition();
+        Vec3 swatter_to_target = m_target->getXYZ() 
+                               -m_attachment->getNode()->getAbsolutePosition();
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
-        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx) - m_kart->getHeading()) * 180.0f/M_PI;
+        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading()) 
+                                        * 180.0f/M_PI;
 
         m_attachment->getNode()->setRotation(core::vector3df(0.0, angle, 0.0));
     }
 }
 
-/** Squash karts or items that are around the end position (determined using a joint) of the swatter */
+// ----------------------------------------------------------------------------
+/** Squash karts or items that are around the end position (determined using 
+ *  a joint) of the swatter.
+ */
 void Swatter::squashThingsAround()
 {
-    const KartProperties*  kp          = m_kart->getKartProperties();
-    float                  min_dist2   = kp->getSwatterDistance2();    // Square of the minimum distance
-    const World*           world       = World::getWorld();
-    scene::IAnimatedMeshSceneNode *node  = m_attachment->getNode();
+    const KartProperties*  kp           = m_kart->getKartProperties();
+    // Square of the minimum distance
+    float                  min_dist2    = kp->getSwatterDistance2();
+    const World*           world        = World::getWorld();
+    scene::IAnimatedMeshSceneNode *node = m_attachment->getNode();
 
-    // Get the node corresponding to the joint at the center of the swatter (by swatter, I mean
-    // the thing hold in the hand, not the whole thing)
+    // Get the node corresponding to the joint at the center of the swatter
+    // (by swatter, I mean the thing hold in the hand, not the whole thing)
     scene::ISceneNode* swatter_node = node->getJointNode("Swatter");
     assert(swatter_node);
     Vec3 swatter_pos = swatter_node->getAbsolutePosition();
@@ -255,12 +279,13 @@ void Swatter::squashThingsAround()
                             kp->getSquashSlowdown());
             if (kart->getAttachment() != NULL)
             {
-                if (kart->getAttachment()->getType() == Attachment::ATTACH_BOMB)
+                if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
                 {
                     // make bomb explode
                     kart->getAttachment()->update(10000);
                     
-                    HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+                    HitEffect *he = new Explosion(m_kart->getXYZ(), 
+                                                  "explosion");
                     if(m_kart->getController()->isPlayerController())
                         he->setPlayerKartHit();
                     projectile_manager->addHitEffect(he);

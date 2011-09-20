@@ -150,16 +150,6 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     if(m_kart->isInvulnerable())
         return;
     
-    // !Funto! TODO: squash items with the swatter...should we do it here or in the Swatter class?
-/*    Attachment *a=m_kart->getAttachment();
-    if(a->getType()==Attachment::ATTACH_SWATTER &&
-        a->isSwatterReady())
-    {
-        a->swatItem();
-        return;
-    }
-*/
-
     m_xyz   = m_kart->getXYZ();
     // Ignore explosion that are too far away.
     float r = m_kart->getKartProperties()->getExplosionRadius();
