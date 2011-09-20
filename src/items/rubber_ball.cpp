@@ -514,6 +514,13 @@ bool RubberBall::hit(Kart* kart, PhysicalObject* object)
         // If the object is not the main target, only flatten the kart
         if(kart!=m_target)
         {
+            // If the squashed kart has a bomb, explode it.
+            if(kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
+            {
+                // make bomb explode
+                kart->getAttachment()->update(10000);
+                return false;
+            }
             kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
             return false;
         }
