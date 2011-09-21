@@ -143,7 +143,8 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     if (m_kart_info[kart_id].m_lives < 1)
     {
         m_karts[kart_id]->finishedRace(WorldStatus::getTime());
-        scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()->getWheelNodes();
+        scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()
+                                                     ->getWheelNodes();
         if(wheels[0]) wheels[0]->setVisible(false);
         if(wheels[1]) wheels[1]->setVisible(false);
         if(wheels[2]) wheels[2]->setVisible(false);
@@ -169,9 +170,12 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     
     scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
     
-    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
-    core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-    for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
+    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow 
+    // getting a writable list of children, wtf??
+    core::list<scene::ISceneNode*>& children = 
+        const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+    for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); 
+                                                  it != children.end(); it++)
     {
         scene::ISceneNode* curr = *it;
 
@@ -188,7 +192,8 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // schedule a tire to be thrown away (but can't do it in this callback
     // because the caller is currently iterating the list of track objects)
     m_insert_tire++;
-    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 0.0f, 0.0f);
+    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 
+                              0.0f, 0.0f);
     m_tire_position = kart_node->getPosition() + wheel_pos;
     m_tire_rotation = 0;
     if(m_insert_tire > 1)
@@ -252,10 +257,14 @@ void ThreeStrikesBattle::update(float dt)
             tire_model = PhysicalObject::MP_CYLINDER_X;
             radius = m_tire_radius[m_insert_tire-2];
             tire_offset = m_tire_offsets[m_insert_tire-2];
-            if     (m_insert_tire == 2) tire = m_tire_dir+"/wheel-rear-left.b3d";
-            else if(m_insert_tire == 3) tire = m_tire_dir+"/wheel-front-left.b3d";
-            else if(m_insert_tire == 4) tire = m_tire_dir+"/wheel-front-right.b3d";
-            else if(m_insert_tire == 5) tire = m_tire_dir+"/wheel-rear-right.b3d";
+            if     (m_insert_tire == 2)
+                tire = m_tire_dir+"/wheel-rear-left.b3d";
+            else if(m_insert_tire == 3)
+                tire = m_tire_dir+"/wheel-front-left.b3d";
+            else if(m_insert_tire == 4)
+                tire = m_tire_dir+"/wheel-front-right.b3d";
+            else if(m_insert_tire == 5)
+                tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
         TrackObjectManager* tom = m_track->getTrackObjectManager();        
@@ -264,7 +273,8 @@ void ThreeStrikesBattle::update(float dt)
                               tire_model,
                               15 /* mass */,
                               radius /* radius */,
-                              core::vector3df(800.0f,0,m_tire_rotation  / M_PI * 180 + 180) /* rotation */,
+                              core::vector3df(800.0f,0,m_tire_rotation 
+                                                      / M_PI * 180 + 180) ,
                               m_tire_position + tire_offset,
                               core::vector3df(scale,scale,scale) /* scale */);
         
@@ -299,17 +309,19 @@ void ThreeStrikesBattle::updateKartRanks()
         sorted = true;
         for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
         {
-            const int this_karts_time = m_karts[karts_list[n]]->hasFinishedRace() ?
-                (int)m_karts[karts_list[n]]->getFinishTime() : (int)WorldStatus::getTime();
-            const int next_karts_time = m_karts[karts_list[n+1]]->hasFinishedRace() ?
-                (int)m_karts[karts_list[n+1]]->getFinishTime() : (int)WorldStatus::getTime();
-
-            bool swap = false;
+            const int this_karts_time = 
+                  m_karts[karts_list[n]]->hasFinishedRace() 
+                ? (int)m_karts[karts_list[n]]->getFinishTime()
+                : (int)WorldStatus::getTime();
+            const int next_karts_time = 
+                   m_karts[karts_list[n+1]]->hasFinishedRace()
+                ? (int)m_karts[karts_list[n+1]]->getFinishTime()
+                : (int)WorldStatus::getTime();
             
-            // if next kart survived longer...
-            if( next_karts_time > this_karts_time) swap = true;
-            // if next kart has more lives...
-            else if(m_kart_info[karts_list[n+1]].m_lives > m_kart_info[karts_list[n]].m_lives) swap = true;
+            // Swap if next kart survived longer or has more lives
+            bool swap = next_karts_time > this_karts_time ||
+                        m_kart_info[karts_list[n+1]].m_lives 
+                        > m_kart_info[karts_list[n]].m_lives;
 
             if(swap)
             {
@@ -318,8 +330,8 @@ void ThreeStrikesBattle::updateKartRanks()
                 karts_list[n] = tmp;
                 sorted = false;
                 break;
-            }
-        }
+            } 
+        }   // for n = 0; n < NUM_KARTS-1
     } while(!sorted);
     
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
