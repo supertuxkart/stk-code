@@ -183,14 +183,15 @@ Kart *World::createKart(const std::string &kart_ident, int index,
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, m_track, position, (local_player_id == 0), init_pos,
+    Kart *new_kart         = new Kart(kart_ident, m_track, position, 
+                                      (local_player_id == 0), init_pos,
                                       race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(race_manager->getKartType(index))
     {
     case RaceManager::KT_PLAYER:
         controller = new PlayerController(new_kart, 
-                                          StateManager::get()->getActivePlayer(local_player_id),
+                         StateManager::get()->getActivePlayer(local_player_id),
                                           local_player_id);
         m_num_players ++;
         break;
@@ -321,12 +322,14 @@ void World::terminateRace()
         }
     }   // i<kart_amount
     
-    // Update highscores, and retrieve the best highscore if relevant to show it in the GUI
+    // Update highscores, and retrieve the best highscore if relevant 
+    // to show it in the GUI
     int best_highscore_rank = -1;
     int best_finish_time = -1;
     std::string highscore_who = "";
     StateManager::ActivePlayer* best_player = NULL;
-    updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who, &best_player);
+    updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who, 
+                     &best_player);
     
     unlock_manager->raceFinished();
     
@@ -344,7 +347,8 @@ void World::terminateRace()
     
     if (best_highscore_rank > 0)
     {
-        results->setHighscore(highscore_who, best_player, best_highscore_rank, best_finish_time);
+        results->setHighscore(highscore_who, best_player, best_highscore_rank,
+                              best_finish_time);
     }
     else
     {
@@ -392,7 +396,8 @@ void World::resetAllKarts()
                 bool kart_over_ground = m_physics->projectKartDownwards(kart);
                 if(kart_over_ground)
                 {
-                    const Vec3 &xyz = kart->getTrans().getOrigin()+Vec3(0,0.3f,0);
+                    const Vec3 &xyz = kart->getTrans().getOrigin()
+                                    + Vec3(0,0.3f,0);
                     ((TerrainInfo*)kart)->update(xyz);
                     const Material *material = kart->getMaterial();
                     if(!material || material->isDriveReset())
@@ -435,7 +440,9 @@ void World::resetAllKarts()
 
         if (!kart_over_ground)
         {
-            fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
+            fprintf(stderr, 
+                    "ERROR: no valid starting position for kart %d "
+                    "on track %s.\n",
                     (int)(i-m_karts.begin()), m_track->getIdent().c_str());
             if (UserConfigParams::m_artist_debug_mode)
             {
@@ -485,8 +492,11 @@ void World::resetAllKarts()
                                                    &normal);
                 if(!material)
                 {
-                    fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-                            (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+                    fprintf(stderr, 
+                            "ERROR: no valid starting position for "
+                            "kart %d on track %s.\n",
+                            (int)(i-m_karts.begin()), 
+                            m_track->getIdent().c_str());
                     if (UserConfigParams::m_artist_debug_mode)
                     {
                         fprintf(stderr, "Activating fly mode.\n");
@@ -663,7 +673,8 @@ Highscores* World::getHighscores() const
  *  score, if so it notifies the HighscoreManager so the new score is added 
  *  and saved.
  */
-void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, std::string* highscore_who,
+void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, 
+                             std::string* highscore_who,
                              StateManager::ActivePlayer** best_player)
 {
     *best_highscore_rank = -1;
@@ -701,14 +712,17 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, st
             fprintf(stderr, "Error, incorrect kart positions:\n");
             for (unsigned int i=0; i<m_karts.size(); i++ )
             {
-                fprintf(stderr, "i=%d position %d\n",i, m_karts[i]->getPosition());
+                fprintf(stderr, "i=%d position %d\n",i, 
+                        m_karts[i]->getPosition());
             }
 #endif
             continue;
         }
 
-        // Only record times for player karts and only if they finished the race
-        if(!m_karts[index[pos]]->getController()->isPlayerController()) continue;
+        // Only record times for player karts and only if 
+        // they finished the race
+        if(!m_karts[index[pos]]->getController()->isPlayerController()) 
+            continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
         assert(index[pos] >= 0);
@@ -720,12 +734,13 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time, st
         PlayerController *controller = (PlayerController*)(k->getController());
         
         int highscore_rank = highscores->addData(k->getIdent(),
-                                                 controller->getPlayer()->getProfile()->getName(),
+                              controller->getPlayer()->getProfile()->getName(),
                                                  k->getFinishTime());
         
         if (highscore_rank > 0)
         {
-            if (*best_highscore_rank == -1 || highscore_rank < *best_highscore_rank)
+            if (*best_highscore_rank == -1 || 
+                highscore_rank < *best_highscore_rank)
             {
                 *best_highscore_rank = highscore_rank;
                 *best_finish_time = (int)(k->getFinishTime());
@@ -768,7 +783,8 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
     const int kart_count = m_karts.size();
     for(int i=0; i<kart_count; i++)
     {
-        if(m_karts[i]->getCamera() && m_karts[i]->getController()->isPlayerController())
+        if(m_karts[i]->getCamera() && 
+            m_karts[i]->getController()->isPlayerController())
         {
             count++;
             if(count == (int)n) return m_karts[i];
@@ -779,24 +795,27 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
 
 //-----------------------------------------------------------------------------
 /** Remove (eliminate) a kart from the race */
-void World::eliminateKart(int kart_number, bool notifyOfElimination, bool remove)
+void World::eliminateKart(int kart_number, bool notify_of_elimination, 
+                          bool remove)
 {
     Kart *kart = m_karts[kart_number];
     
     // Display a message about the eliminated kart in the race gui
-    if (notifyOfElimination)
+    if (notify_of_elimination)
     {
-        for (KartList::iterator i  = m_karts.begin(); i != m_karts.end();  i++ )
+        for (KartList::iterator i = m_karts.begin(); i != m_karts.end();  i++ )
         {
             if(!(*i)->getCamera()) continue;
             if(*i==kart)
             {
-                m_race_gui->addMessage(_("You have been eliminated!"), *i, 2.0f);
+                m_race_gui->addMessage(_("You have been eliminated!"), *i, 
+                                       2.0f);
             }
             else
             {
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())), *i, 2.0f);
+                                       core::stringw(kart->getName())), *i, 
+                                       2.0f);
             }
         }   // for i in kart
     }
@@ -898,7 +917,8 @@ void World::unpause()
         // Note that we can not test for isPlayerController here, since
         // an EndController will also return 'isPlayerController' if the
         // kart belonged to a player.
-        PlayerController *pc = dynamic_cast<PlayerController*>(m_karts[i]->getController());
+        PlayerController *pc = 
+            dynamic_cast<PlayerController*>(m_karts[i]->getController());
         if(pc)
             pc->resetInputState();
     }
