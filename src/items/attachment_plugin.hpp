@@ -37,18 +37,14 @@ class Attachment;
   */
 class AttachmentPlugin
 {
-protected:
-    /** Parent Attachment of this plugin */
-    Attachment     *m_attachment;
-    
+protected:    
     /** Kart the attachment is attached to. */
-    Kart           *m_kart;
+    Kart *m_kart;
 
 public:
     /** Constructor for a plugin. */
-    AttachmentPlugin(Attachment *attachment, Kart *kart) 
+    AttachmentPlugin(Kart *kart) 
     {
-        m_attachment = attachment;
         m_kart       = kart;
     }
     

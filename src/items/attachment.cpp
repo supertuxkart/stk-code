@@ -97,7 +97,7 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     {
     case ATTACH_SWATTER :
         m_node->setMesh(attachment_manager->getMesh(type));
-        m_plugin = new Swatter(this, m_kart, was_bomb, bomb_scene_node);
+        m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node);
         break;
     case ATTACH_BOMB:
         m_node->setMesh(attachment_manager->getMesh(type));

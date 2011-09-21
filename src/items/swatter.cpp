@@ -51,9 +51,9 @@
  *  \param bomb_scene_node The scene node of the bomb (i.e. the previous 
  *         attachment scene node).
  */
-Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
+Swatter::Swatter(Kart *kart, bool was_bomb, 
                  scene::ISceneNode* bomb_scene_node)
-       : AttachmentPlugin(attachment, kart)
+       : AttachmentPlugin(kart)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_target           = NULL;
@@ -62,20 +62,21 @@ Swatter::Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
     m_swat_bomb_frame  = 0.0f;
     
     // Setup the node
-    scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
-    node->setPosition(SWAT_POS_OFFSET);
+    m_scene_node = kart->getAttachment()->getNode();
+    m_scene_node->setPosition(SWAT_POS_OFFSET);
     
     if (m_removing_bomb)
     {
-        node->setMesh(irr_driver->getAnimatedMesh( file_manager->getModelFile("swatter_anim2.b3d") ));
-        node->setRotation(core::vector3df(0.0, -180.0, 0.0));
-        node->setAnimationSpeed(0.9f);
-        node->setCurrentFrame(0.0f);
-        node->setLoopMode(false);
+        m_scene_node->setMesh(irr_driver->getAnimatedMesh( 
+                        file_manager->getModelFile("swatter_anim2.b3d") ) );
+        m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
+        m_scene_node->setAnimationSpeed(0.9f);
+        m_scene_node->setCurrentFrame(0.0f);
+        m_scene_node->setLoopMode(false);
     }
     else
     {
-        node->setAnimationSpeed(0);   
+        m_scene_node->setAnimationSpeed(0);   
     }
     m_swat_sound = sfx_manager->createSoundSource("swatter");
 }   // Swatter
@@ -102,10 +103,9 @@ bool Swatter::updateAndTestFinished(float dt)
     if (m_removing_bomb)
     {
         m_swat_bomb_frame += dt*25.0f;
-        //printf("%f\n", (float)m_attachment->getNode()->getFrameNr() );
-        m_attachment->getNode()->setRotation(core::vector3df(0.0, -180.0, 0.0));
+        m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         
-        m_attachment->getNode()->setCurrentFrame(m_swat_bomb_frame);
+        m_scene_node->setCurrentFrame(m_swat_bomb_frame);
         
         if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
         {
@@ -115,7 +115,7 @@ bool Swatter::updateAndTestFinished(float dt)
                                            core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
         }
         
-        if (m_swat_bomb_frame >= m_attachment->getNode()->getEndFrame())
+        if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
         {
             return true;
         }
@@ -142,7 +142,9 @@ bool Swatter::updateAndTestFinished(float dt)
                 break;
 
             // Is the target too near?
-            float   dist_to_target2 = (m_target->getXYZ() - m_attachment->getNode()->getAbsolutePosition()).length2();
+            float   dist_to_target2 = 
+                (m_target->getXYZ()- m_scene_node->getAbsolutePosition())
+                .length2();
             float   min_dist2       = m_kart->getKartProperties()->getSwatterDistance2();
             if(dist_to_target2 < min_dist2)
             {
@@ -150,10 +152,9 @@ bool Swatter::updateAndTestFinished(float dt)
                 m_animation_phase = SWATTER_TO_TARGET;
 
                 // Setup the animation
-                scene::IAnimatedMeshSceneNode* node = m_attachment->getNode();
-                node->setCurrentFrame(0.0f);
-                node->setLoopMode(false);
-                node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
+                m_scene_node->setCurrentFrame(0.0f);
+                m_scene_node->setLoopMode(false);
+                m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
             }
         }
         break;
@@ -161,9 +162,8 @@ bool Swatter::updateAndTestFinished(float dt)
         {
             pointToTarget();
 
-            scene::IAnimatedMeshSceneNode *node = m_attachment->getNode();
-            const float middle_frame    = node->getEndFrame()/2.0f;
-            float       current_frame   = node->getFrameNr();
+            const float middle_frame    = m_scene_node->getEndFrame()/2.0f;
+            float       current_frame   = m_scene_node->getFrameNr();
 
             // Did we just finish the first part of the movement?
             if(current_frame >= middle_frame)
@@ -228,18 +228,18 @@ void Swatter::pointToTarget()
 {
     if(!m_target)
     {
-        m_attachment->getNode()->setRotation(core::vector3df());
+        m_scene_node->setRotation(core::vector3df());
     }
     else
     {
         Vec3 swatter_to_target = m_target->getXYZ() 
-                               -m_attachment->getNode()->getAbsolutePosition();
+                               -m_scene_node->getAbsolutePosition();
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
-        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading()) 
+        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading())
                                         * 180.0f/M_PI;
 
-        m_attachment->getNode()->setRotation(core::vector3df(0.0, angle, 0.0));
+        m_scene_node->setRotation(core::vector3df(0.0, angle, 0.0));
     }
 }
 
@@ -253,11 +253,10 @@ void Swatter::squashThingsAround()
     // Square of the minimum distance
     float                  min_dist2    = kp->getSwatterDistance2();
     const World*           world        = World::getWorld();
-    scene::IAnimatedMeshSceneNode *node = m_attachment->getNode();
 
     // Get the node corresponding to the joint at the center of the swatter
     // (by swatter, I mean the thing hold in the hand, not the whole thing)
-    scene::ISceneNode* swatter_node = node->getJointNode("Swatter");
+    scene::ISceneNode* swatter_node = m_scene_node->getJointNode("Swatter");
     assert(swatter_node);
     Vec3 swatter_pos = swatter_node->getAbsolutePosition();
 

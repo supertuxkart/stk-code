@@ -30,7 +30,6 @@
 
 class Kart;
 class Item;
-class Attachment;
 class SFXBase;
 
 /**
@@ -53,15 +52,21 @@ private:
 
     SFXBase           *m_swat_sound;
     
+    /** True if the swatter is removing an attached bomb. */
     bool               m_removing_bomb;
-    
+
+    /** The scene node of the attachment. */
+    scene::IAnimatedMeshSceneNode *m_scene_node;
+
+    /** The scene node where a bomb is saved (in case that the swatter
+     *  replaces a bomb. */
     scene::ISceneNode *m_bomb_scene_node;
     
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
     
 public:
-             Swatter(Attachment *attachment, Kart *kart, bool was_bomb,
+             Swatter(Kart *kart, bool was_bomb,
                      scene::ISceneNode* bomb_scene_node);
     virtual ~Swatter();
     bool     updateAndTestFinished(float dt);
