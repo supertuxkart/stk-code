@@ -20,13 +20,13 @@
 #include <string>
 #include <IMeshSceneNode.h>
 
-#include <math.h>
 
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "utils/constants.hpp"
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
