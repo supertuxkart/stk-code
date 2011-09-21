@@ -110,9 +110,9 @@ bool Swatter::updateAndTestFinished(float dt)
         if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
         {
             m_bomb_scene_node->setPosition(m_bomb_scene_node->getPosition() +
-                                           core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+                                      core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
             m_bomb_scene_node->setRotation(m_bomb_scene_node->getRotation() +
-                                           core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+                                      core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
         }
         
         if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
@@ -126,10 +126,10 @@ bool Swatter::updateAndTestFinished(float dt)
                 irr_driver->removeNode(m_bomb_scene_node);
                 m_bomb_scene_node = NULL;
             }
-        }
+        }   // bom_frame > 35
         
         return false;
-    }
+    }   // if removing bomb
     
     switch(m_animation_phase)
     {
@@ -137,15 +137,14 @@ bool Swatter::updateAndTestFinished(float dt)
         {
             chooseTarget();
             pointToTarget();
-
-            if(!m_target)
-                break;
+            if(!m_target) break;
 
             // Is the target too near?
-            float   dist_to_target2 = 
+            float dist_to_target2 = 
                 (m_target->getXYZ()- m_scene_node->getAbsolutePosition())
                 .length2();
-            float   min_dist2       = m_kart->getKartProperties()->getSwatterDistance2();
+            float min_dist2 
+                 = m_kart->getKartProperties()->getSwatterDistance2();
             if(dist_to_target2 < min_dist2)
             {
                 // Start squashing
@@ -241,7 +240,7 @@ void Swatter::pointToTarget()
 
         m_scene_node->setRotation(core::vector3df(0.0, angle, 0.0));
     }
-}
+}   // pointToTarget
 
 // ----------------------------------------------------------------------------
 /** Squash karts or items that are around the end position (determined using 
@@ -272,30 +271,20 @@ void Swatter::squashThingsAround()
             continue;
         float dist2 = (kart->getXYZ()-swatter_pos).length2();
 
-        if(dist2 < min_dist2)
-        {
-            kart->setSquash(kp->getSquashDuration(),
-                            kp->getSquashSlowdown());
-            if (kart->getAttachment() != NULL)
-            {
-                if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-                {
-                    // make bomb explode
-                    kart->getAttachment()->update(10000);
-                    
-                    HitEffect *he = new Explosion(m_kart->getXYZ(), 
-                                                  "explosion");
-                    if(m_kart->getController()->isPlayerController())
-                        he->setPlayerKartHit();
-                    projectile_manager->addHitEffect(he);
-                    m_kart->handleExplosion(m_kart->getXYZ(), 
-                                            /*direct_hit*/ true);
-                }
-            }
-            
-            World::getWorld()->kartHit(kart->getWorldKartId());
-        }
-    }
+        if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
+
+        kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+        if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
+        {   // make bomb explode
+            kart->getAttachment()->update(10000);
+            HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion");
+            if(m_kart->getController()->isPlayerController())
+                he->setPlayerKartHit();
+            projectile_manager->addHitEffect(he);
+            m_kart->handleExplosion(m_kart->getXYZ(),  /*direct_hit*/ true);
+        }   // if kart has bomb attached
+        World::getWorld()->kartHit(kart->getWorldKartId());
+    }   // for i < num_kartrs
 
     // TODO: squash items
 }
