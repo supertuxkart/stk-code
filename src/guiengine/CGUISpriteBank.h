@@ -9,6 +9,7 @@
 #ifdef _IRR_COMPILE_WITH_GUI_
 #include <cassert>
 #include "IGUISpriteBank.h"
+#include "utils/leak_check.hpp"
 
 namespace irr
 {
@@ -29,6 +30,8 @@ class STKModifiedSpriteBank : public IGUISpriteBank
 {
 public:
 
+    LEAK_CHECK()
+    
     STKModifiedSpriteBank(IGUIEnvironment* env);
     virtual ~STKModifiedSpriteBank();
 

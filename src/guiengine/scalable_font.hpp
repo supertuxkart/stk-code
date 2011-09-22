@@ -15,6 +15,8 @@
 #include "irrArray.h"
 #include <map>
 
+#include "utils/leak_check.hpp"
+
 namespace irr
 {
 
@@ -65,6 +67,8 @@ class ScalableFont : public IGUIFontBitmap
     
 public:
 
+    LEAK_CHECK()
+    
     bool m_black_border;
     
     ScalableFont* m_fallback_font;

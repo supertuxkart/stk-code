@@ -21,6 +21,7 @@
 
 #include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "utils/leak_check.hpp"
 
 /**
  * \brief Generic dialog to ask the user to confirm something, or to show a simple message box
@@ -37,6 +38,9 @@ public:
     class IConfirmDialogListener
     {
     public:
+        
+        LEAK_CHECK()
+        
         IConfirmDialogListener() {}
         virtual ~IConfirmDialogListener() {}
         

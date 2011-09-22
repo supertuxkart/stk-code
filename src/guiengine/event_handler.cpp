@@ -308,6 +308,12 @@ EventHandler* EventHandler::get()
     return event_handler_singleton;
 }
 
+void EventHandler::free()
+{
+    delete event_handler_singleton;
+    event_handler_singleton = NULL;
+}
+
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

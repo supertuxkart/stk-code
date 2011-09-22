@@ -181,6 +181,7 @@ public:
     
     // singleton
     static StateManager* get();
+    static void free();
     
 private:
     /**

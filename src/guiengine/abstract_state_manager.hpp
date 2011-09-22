@@ -24,6 +24,7 @@
 #include <string>
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
+#include "utils/leak_check.hpp"
 
 /**
   * \ingroup guiengine
@@ -65,6 +66,8 @@ namespace GUIEngine
         void setGameState(GameState state);
         
     public:
+        
+        LEAK_CHECK()
         
         /** inits an AbstractStateManager is MENU state */
         AbstractStateManager();

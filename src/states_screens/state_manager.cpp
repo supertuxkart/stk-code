@@ -43,6 +43,13 @@ StateManager* StateManager::get()
     return state_manager_singleton;
 }   // get
 
+void StateManager::free()
+{
+    delete state_manager_singleton;
+    state_manager_singleton = NULL;
+}
+
+
 // ============================================================================
 
 #if 0

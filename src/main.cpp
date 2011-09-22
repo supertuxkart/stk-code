@@ -57,6 +57,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/event_handler.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"
@@ -925,6 +926,9 @@ void cleanSuperTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
+    
+    StateManager::free();
+    GUIEngine::EventHandler::free();
 }   // cleanSuperTuxKart
 
 //=============================================================================

@@ -21,6 +21,7 @@
 #include <vector2d.h>
 #include <IEventReceiver.h>
 #include "input/input.hpp"
+#include "utils/leak_check.hpp"
 
 /**
  * \ingroup guiengine
@@ -70,6 +71,9 @@ namespace GUIEngine
         irr::core::vector2di     m_mouse_pos;
         
     public:
+        
+        LEAK_CHECK()
+        
         EventHandler();
         ~EventHandler();
         
@@ -92,6 +96,7 @@ namespace GUIEngine
         
         /** singleton access */
         static EventHandler* get();
+        static void free();
     };
     
 }
