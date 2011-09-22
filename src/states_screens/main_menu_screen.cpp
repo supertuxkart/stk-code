@@ -244,7 +244,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
     else if (selection == "quit")
     {
-        main_loop->abort();
+        StateManager::get()->popMenu();
         return;
     }
     else if (selection == "about")
