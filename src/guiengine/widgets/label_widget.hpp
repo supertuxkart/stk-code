@@ -24,6 +24,7 @@
 #include <SColor.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -41,14 +42,17 @@ namespace GUIEngine
         
         /** Current scroll offset. */
         float              m_scroll_offset;
+        
     public:
+        
+        LEAK_CHECK()
         
         /** Constructs the label widget. Parameter:
           * \param title  True if the special title font should be used.
           * \param bright True if a bright color should be used
           * \note \c title and \c bright are mutually exclusive
           */
-         LabelWidget(bool title=false, bool bright=false);
+        LabelWidget(bool title=false, bool bright=false);
         
         virtual ~LabelWidget() {}
         

@@ -341,6 +341,7 @@
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
+		95C631A4142AC79500416D47 /* leak_check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C631A3142AC79500416D47 /* leak_check.cpp */; };
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
 		95C77D66106958A50080838E /* check_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D65106958A50080838E /* check_line.cpp */; };
 		95C77D6F106958E10080838E /* check_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D6D106958E10080838E /* check_sphere.cpp */; };
@@ -1277,6 +1278,8 @@
 		95C2B1E70F296546000D3E5D /* string_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = string_utils.hpp; path = ../../utils/string_utils.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E80F296546000D3E5D /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = ../../utils/vec3.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E90F296546000D3E5D /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../utils/vec3.hpp; sourceTree = SOURCE_ROOT; };
+		95C631A3142AC79500416D47 /* leak_check.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = leak_check.cpp; path = ../../utils/leak_check.cpp; sourceTree = SOURCE_ROOT; };
+		95C631B3142AC95500416D47 /* leak_check.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = leak_check.hpp; path = ../../utils/leak_check.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D760F532F7D00BE7BA7 /* xml_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_node.cpp; path = ../../io/xml_node.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D770F532F7D00BE7BA7 /* xml_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_node.hpp; path = ../../io/xml_node.hpp; sourceTree = SOURCE_ROOT; };
 		95C77D611069589B0080838E /* ambient_light_sphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ambient_light_sphere.hpp; path = ../../tracks/ambient_light_sphere.hpp; sourceTree = SOURCE_ROOT; };
@@ -2648,6 +2651,8 @@
 			children = (
 				9553823910FD4FEC00737979 /* constants.cpp */,
 				95C2B1E00F296546000D3E5D /* constants.hpp */,
+				95C631A3142AC79500416D47 /* leak_check.cpp */,
+				95C631B3142AC95500416D47 /* leak_check.hpp */,
 				9540E2570FD5F8FD002985B8 /* no_copy.hpp */,
 				957899B613C8E05F007AA5A3 /* profiler.cpp */,
 				957899B713C8E05F007AA5A3 /* profiler.hpp */,
@@ -3158,6 +3163,7 @@
 				958806E913EB675F005F90FE /* track_sector.cpp in Sources */,
 				957A2D291405E21D00F45B22 /* hit_sfx.cpp in Sources */,
 				957817DC142142C500AD07B2 /* referee.cpp in Sources */,
+				95C631A4142AC79500416D47 /* leak_check.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3238,6 +3244,7 @@
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = SuperTuxKart;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Debug;
 		};

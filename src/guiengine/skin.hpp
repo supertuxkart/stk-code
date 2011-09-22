@@ -31,6 +31,8 @@ namespace irr
     namespace video { class ITexture;    }
     namespace gui   { class IGUIElement; class IGUIFont; class IGUISpriteBank; }
 }
+
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 /**
@@ -260,6 +262,8 @@ namespace GUIEngine
 #ifdef USE_PER_LINE_BACKGROUND
     public:
 #endif
+        LEAK_CHECK()
+        
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const irr::core::rect< irr::s32 > &dest,
                                            BoxRenderParams& params, bool deactivated=false,
                                            const irr::core::rect<irr::s32>* clipRect=NULL);

@@ -27,6 +27,7 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -50,6 +51,9 @@ namespace GUIEngine
         int m_value;
         
     public:
+        
+        LEAK_CHECK()
+        
         ProgressBarWidget();
         virtual ~ProgressBarWidget() {}
         

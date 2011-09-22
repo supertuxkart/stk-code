@@ -30,7 +30,6 @@ namespace irr
 #include "guiengine/skin.hpp"
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
-//#include "utils/vec3.hpp"
 
 namespace GUIEngine
 {
@@ -247,7 +246,7 @@ namespace GUIEngine
         irr::core::stringw m_tooltip_text;
         
     public:
-        
+                
         /**
          * This is set to NULL by default; set to something else in a widget to mean
          * that events happening on this widget should also be passed to m_event_handler->transmitEvent,

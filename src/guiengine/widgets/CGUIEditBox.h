@@ -9,6 +9,7 @@
 #include "IGUIEditBox.h"
 #include "irrArray.h"
 #include "IOSOperator.h"
+#include "utils/leak_check.hpp"
 
 #include "utils/time.hpp"
 
@@ -19,6 +20,8 @@ using namespace gui;
 	{
 	public:
 
+        LEAK_CHECK()
+        
 		//! constructor
 		CGUIEditBox(const wchar_t* text, bool border, IGUIEnvironment* environment,
 			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool is_rtl);

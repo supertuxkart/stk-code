@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -84,6 +85,9 @@ namespace GUIEngine
         IListWidgetHeaderListener* m_listener;
         
     public:
+        
+        LEAK_CHECK()
+        
         ListWidget();
         
         SkinWidgetContainer m_selection_skin_info;

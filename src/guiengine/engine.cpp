@@ -645,10 +645,9 @@ namespace GUIEngine
         int title_font_height;
     }
     using namespace Private;
-    
+        
     PtrVector<Widget, REF> needsUpdate;
     
-    //FIXME: the contents of this vector are never ever freed
     PtrVector<Screen, REF> g_loaded_screens;
     
     float dt = 0;
@@ -760,6 +759,8 @@ namespace GUIEngine
         if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
         g_current_screen = NULL;
         
+        needsUpdate.clearWithoutDeleting();
+        
         gui_messages.clear();
     }   // clear
 
@@ -768,10 +769,6 @@ namespace GUIEngine
     void cleanForGame()
     {
         clear();
-        
-        //FIXME: I'm not very sure why this isn't called in the regular 
-        // clear() method??
-        needsUpdate.clearWithoutDeleting();
         
         gui_messages.clear();
     }   // cleanForGame
@@ -787,7 +784,7 @@ namespace GUIEngine
     // ------------------------------------------------------------------------
     
     void switchToScreen(const char* screen_name)
-    {    
+    {
         needsUpdate.clearWithoutDeleting();
         
         // clean what was left by the previous screen
@@ -835,6 +832,11 @@ namespace GUIEngine
     }   // reshowCurrentScreen
     
     // ------------------------------------------------------------------------
+    
+    /**
+     * Clean some of the cached data, either for a shutdown or a reload.
+     * If this is a shutdown then you also need to call free().
+     */
     void cleanUp()
     {
         // There is no need to delete the skin, the gui environment holds it
@@ -864,6 +866,19 @@ namespace GUIEngine
         // nothing else to delete for now AFAIK, irrlicht will automatically 
         // kill everything along the device
     }   // cleanUp
+    
+    // ------------------------------------------------------------------------
+
+    /**
+      * To be called after cleanup().
+      * The difference between cleanup() and free() is that cleanUp() just removes
+      * some cached data but does not actually uninitialize the gui engine. This
+      * does.
+      */
+    void free()
+    {
+        g_loaded_screens.clearAndDeleteAll();
+    }
     
     // ------------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, 

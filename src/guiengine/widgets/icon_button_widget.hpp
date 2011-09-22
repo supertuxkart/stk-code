@@ -28,6 +28,7 @@ namespace irr
 }
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -71,6 +72,8 @@ namespace GUIEngine
         
     public:
 
+        LEAK_CHECK()
+        
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 

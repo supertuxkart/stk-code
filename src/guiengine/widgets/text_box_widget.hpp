@@ -23,6 +23,7 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -48,6 +49,9 @@ namespace GUIEngine
         virtual int getHeightNeededAroundLabel() const { return 10; }
         
     public:
+        
+        LEAK_CHECK()
+        
         TextBoxWidget();
         ~TextBoxWidget()
         {

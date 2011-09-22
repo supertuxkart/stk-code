@@ -27,6 +27,7 @@ namespace irr
 }
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -89,6 +90,8 @@ namespace GUIEngine
         irr::video::ITexture* getTexture();
         
     public:
+        
+        LEAK_CHECK()
         
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}

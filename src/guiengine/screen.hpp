@@ -39,6 +39,8 @@ using namespace irr;
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include "utils/leak_check.hpp"
+
 /**
  * \ingroup guiengine
  */
@@ -112,6 +114,8 @@ namespace GUIEngine
         bool m_throttle_FPS;
 
     public:
+        
+        LEAK_CHECK()
         
         /**
          * \ingroup guiengine

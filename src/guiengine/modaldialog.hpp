@@ -26,6 +26,7 @@
 //#include "guiengine/layout_manager.hpp"
 #include "guiengine/skin.hpp"
 #include "input/input_manager.hpp"
+#include "utils/leak_check.hpp"
 
 //class PlayerProfile;
 
@@ -75,7 +76,9 @@ namespace GUIEngine
           */
         virtual void loadedFromFile() {}
         
-    public:        
+    public:
+        LEAK_CHECK()
+        
         virtual ~ModalDialog();
         
         /** Returns whether to block event propagation (usually, you will want to block events you processed) */

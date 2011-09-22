@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -172,6 +173,7 @@ namespace GUIEngine
         
     public:
     
+        LEAK_CHECK()
         
         /**
           * \param combo     Whether this is a "combo" ribbon, i.e. whether there is always one selected item.

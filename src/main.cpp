@@ -78,6 +78,7 @@
 #include "tracks/track_manager.hpp"
 #include "tutorial/tutorial_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/translation.hpp"
 
 // ============================================================================
@@ -1142,6 +1143,10 @@ int main(int argc, char *argv[] )
 
     cleanSuperTuxKart();
 
+#ifdef DEBUG
+    MemoryLeaks::checkForLeaks();
+#endif
+    
     return 0 ;
 }
 

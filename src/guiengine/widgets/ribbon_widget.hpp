@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <IGUIStaticText.h>
@@ -82,7 +83,10 @@ namespace GUIEngine
         
         IRibbonListener* m_listener;
         
+        
     public:
+        
+        LEAK_CHECK()
         
         /** 
          * Internal identifier of filler items that are added in a ribbon widget to fill

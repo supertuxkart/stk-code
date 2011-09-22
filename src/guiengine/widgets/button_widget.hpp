@@ -27,6 +27,7 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -38,6 +39,9 @@ namespace GUIEngine
     class ButtonWidget : public Widget
     {
     public:
+        
+        LEAK_CHECK()
+        
         ButtonWidget();
         virtual ~ButtonWidget() {}
         

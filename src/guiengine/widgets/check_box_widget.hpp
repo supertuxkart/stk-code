@@ -21,6 +21,7 @@
 #define HEADER_CHECKBOX_HPP
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -35,6 +36,9 @@ namespace GUIEngine
         EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         
     public:
+        
+        LEAK_CHECK()
+        
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
         

@@ -78,6 +78,8 @@ class FocusDispatcher : public Widget
     
 public:
     
+    LEAK_CHECK()
+    
     FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUTTON)
     {
         m_parent = parent;
@@ -147,6 +149,7 @@ public:
         m_red_mark_widget = NULL;
         m_parent          = parent;
     }
+    
     void setID(const int m_playerID)
     {
         PlayerNameSpinner::m_playerID = m_playerID;
@@ -223,6 +226,9 @@ class PlayerKartWidget : public Widget, public SpinnerWidget::ISpinnerConfirmLis
 #endif
     
 public:
+    
+    LEAK_CHECK()
+    
     /** Sub-widgets created by this widget */
     //LabelWidget* m_player_ID_label;
     PlayerNameSpinner* m_player_ident_spinner;
@@ -369,7 +375,7 @@ public:
     // -------------------------------------------------------------------------
     
     ~PlayerKartWidget()
-    {        
+    {
         if (GUIEngine::getFocusForPlayer(m_playerID) == this)
         {
             GUIEngine::focusNothingForPlayer(m_playerID);
@@ -532,6 +538,7 @@ public:
         m_player_ident_spinner->setListener(NULL);
         m_player_ident_spinner->getIrrlichtElement()->remove();
         m_player_ident_spinner->elementRemoved();
+        delete m_player_ident_spinner;
         m_player_ident_spinner = NULL;
         
         sfx_manager->quickSound( "wee" );

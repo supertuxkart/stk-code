@@ -22,6 +22,7 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 
 namespace GUIEngine
 {
@@ -48,6 +49,8 @@ namespace GUIEngine
         float m_zoom;
         
     public:
+        
+        LEAK_CHECK()
         
         BubbleWidget();
         

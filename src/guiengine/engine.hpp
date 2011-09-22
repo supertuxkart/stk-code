@@ -100,10 +100,9 @@ namespace GUIEngine
       */
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
     
-    /**
-      * \brief frees all resources allocated by GUIEngine::init and subsequent uses of the GUI engine.
-      */
     void cleanUp();
+    
+    void free();
     
     
     /**

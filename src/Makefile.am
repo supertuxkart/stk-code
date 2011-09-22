@@ -452,6 +452,8 @@ supertuxkart_SOURCES = \
  utils/aligned_array.hpp \
  utils/constants.hpp \
  utils/constants.cpp \
+ utils/leak_check.cpp \
+ utils/leak_check.hpp \
  utils/no_copy.hpp \
  utils/profiler.cpp \
  utils/profiler.hpp \
