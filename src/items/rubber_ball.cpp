@@ -24,6 +24,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
+#include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
@@ -295,6 +296,24 @@ bool RubberBall::updateAndDelete(float dt)
         // towards it.
         Vec3 diff = m_target->getXYZ()-getXYZ();
         next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+
+        // To see if we have overtaken the target, construct a line through
+        // the rear axles of the kart, and see if the current and the new
+        // position of the ball are on different sides of the line.
+        const btVector3 &w1 = m_target->getVehicle()
+                              ->getWheelInfo(2).m_raycastInfo.m_contactPointWS;
+        const btVector3 &w2 = m_target->getVehicle()
+                              ->getWheelInfo(3).m_raycastInfo.m_contactPointWS;
+        core::line2df axle(w1.getX(), w1.getZ(), w2.getX(), w2.getZ());
+        // This is basically impossible to fulfill. I've only managed to do
+        // this by driving in a very tight circle, then in about 1 out of 10 
+        // balls I avoided the ball.
+        if( axle.getPointOrientation(getXYZ().toIrrVector2d()) *
+            axle.getPointOrientation(next_xyz.toIrrVector2d())<0)
+        {
+            printf("Congrats, rubber ball removed.\n");
+            return true;
+        }
     }
     else
     {
