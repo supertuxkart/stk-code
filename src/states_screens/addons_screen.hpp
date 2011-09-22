@@ -75,6 +75,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
 
+    virtual void unloaded();
+    
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
 

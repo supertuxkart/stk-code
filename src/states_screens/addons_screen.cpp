@@ -114,6 +114,14 @@ void AddonsScreen::init()
 
 // ----------------------------------------------------------------------------
 
+void AddonsScreen::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}
+
+// ----------------------------------------------------------------------------
+
 void AddonsScreen::tearDown()
 {
     // return tab stop to the center when leaving this screen!!
