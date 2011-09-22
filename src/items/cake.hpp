@@ -39,13 +39,14 @@ class XMLNode;
 class Cake : public Flyable
 {
 private:
-    static float m_st_max_distance;    // maximum distance for a missile to be attracted
+    /** Maximum distance for a missile to be attracted. */
     static float m_st_max_distance_squared;
     static float m_gravity;
 
     btVector3    m_initial_velocity;
-    Kart*        m_target;            // which kart is targeted by this
-                                      // projectile (NULL if none)
+
+    /** Which kart is targeted by this projectile (NULL if none). */
+    Moveable*    m_target;
 public:
                  Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);

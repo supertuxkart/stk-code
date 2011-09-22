@@ -26,7 +26,6 @@
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
-float Cake::m_st_max_distance;
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
 
@@ -124,14 +123,13 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 {
     Flyable::init(node, cake_model, PowerupManager::POWERUP_CAKE);
-    m_st_max_distance         = 80.0f;
-    m_st_max_distance_squared = 80.0f * 80.0f;
+    float max_distance        = 80.0f;
     m_gravity                 = 9.8f;
 
     if (m_gravity < 0) m_gravity *= -1.0f;
 
-    node.get("max-distance",    &m_st_max_distance  );
-    m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
+    node.get("max-distance",    &max_distance  );
+    m_st_max_distance_squared = max_distance*max_distance;
 }   // init
 
 // ----------------------------------------------------------------------------
