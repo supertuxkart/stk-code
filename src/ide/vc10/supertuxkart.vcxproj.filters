@@ -1,1533 +1,1539 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Quelldateien\guiengine">
-      <UniqueIdentifier>{88b6497f-6336-4d65-b0e3-5fad9ff35ffb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\guiengine\widgets">
-      <UniqueIdentifier>{c4431a49-640d-48e5-9ac7-473955a15283}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\challenges">
-      <UniqueIdentifier>{6eeebf67-9364-4c48-9e24-e89164897f9e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\utils">
-      <UniqueIdentifier>{3ee2b9d8-e9b8-4af3-a5bf-28ae532ed5cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\audio">
-      <UniqueIdentifier>{1bda54ec-85a1-4725-8425-e5942887808d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\modes">
-      <UniqueIdentifier>{0f42eff9-e52c-4975-bc4a-52b0310ddb99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\items">
-      <UniqueIdentifier>{c3be189e-ac78-42f5-b6e2-7193d9b32e80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\physics">
-      <UniqueIdentifier>{b91bda77-4ae6-4d47-8de1-65b8b992251e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\karts">
-      <UniqueIdentifier>{cd929227-595c-45e8-bf99-ab06e6d586d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\karts\controller">
-      <UniqueIdentifier>{4bb34709-b7d7-4c3b-9f26-e7a26ffd817a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\graphics">
-      <UniqueIdentifier>{8d8a1efe-f3d5-4532-8271-101ed960defc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\network">
-      <UniqueIdentifier>{45a7521f-d7d3-4404-8f6f-62e2b08c8f4c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\tracks">
-      <UniqueIdentifier>{07a426a7-14fb-495b-bff3-5a402664e035}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\replay">
-      <UniqueIdentifier>{00e74e62-f481-4883-a49f-661a5b3c9d88}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\io">
-      <UniqueIdentifier>{1e496486-52dd-4fe4-9bd0-3ec0f2b280fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\input">
-      <UniqueIdentifier>{7d4fb5af-51c8-4073-bdbf-e0420a211096}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\race">
-      <UniqueIdentifier>{7d4c8018-8cb8-4335-b0db-217883ee8954}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\config">
-      <UniqueIdentifier>{29b448e9-cfd5-4024-a3d7-360ad6d89fed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\animations">
-      <UniqueIdentifier>{305929ad-22c9-4dce-8514-2b3ceab47d2b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\states_screens">
-      <UniqueIdentifier>{02e2a507-6184-43fb-aa71-46ef3fc77a37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\states_screens\dialogs">
-      <UniqueIdentifier>{9ea7a6dd-0714-414c-970c-881b61411ef8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\addons">
-      <UniqueIdentifier>{376d4c71-33a2-4def-949e-31bcb5b72812}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\tutorial">
-      <UniqueIdentifier>{d7906217-8c6c-419e-94e3-898456598704}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Headerdateien\guiengine">
+    <Filter Include="Header Files\guiengine">
       <UniqueIdentifier>{55621666-34fd-482a-b2a0-077db2794fc5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\guiengine\widgets">
+    <Filter Include="Header Files\guiengine\widgets">
       <UniqueIdentifier>{386e9299-f42e-4175-8f00-c205aa480876}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\challenges">
+    <Filter Include="Header Files\challenges">
       <UniqueIdentifier>{865587a4-41b6-4832-a961-2f012204ef4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\network">
+    <Filter Include="Header Files\network">
       <UniqueIdentifier>{1953a99d-3f65-4efe-93d3-b0adb25f970d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\utils">
+    <Filter Include="Header Files\utils">
       <UniqueIdentifier>{fa2fbc61-28e7-44cc-830d-7d31019b910c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\audio">
-      <UniqueIdentifier>{06defe0c-00ba-4c91-b0f4-fe0890362f0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\modes">
-      <UniqueIdentifier>{9f93fb34-c97b-4108-9cd0-3f844d421e11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\items">
-      <UniqueIdentifier>{6c09fe56-1df1-4fdc-9023-47887316c0b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\physics">
-      <UniqueIdentifier>{1298df87-da0e-462e-b074-a496598571d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\karts">
-      <UniqueIdentifier>{11a7d573-5959-4be8-8a3f-d455d7833333}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\karts\controller">
-      <UniqueIdentifier>{d477b64b-eb9c-4059-a647-98f3a2f7203a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\graphics">
-      <UniqueIdentifier>{2f186570-85e9-4cea-88dc-0f716c6e141a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\tracks">
-      <UniqueIdentifier>{f2f3feeb-648b-4edf-8025-fb86e1a6d9bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\replay">
-      <UniqueIdentifier>{1ea79cd5-39b0-4228-b002-7bddf4d45fda}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\io">
-      <UniqueIdentifier>{24d03539-463f-4c91-9ea0-6fd4b5f1dde0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\input">
-      <UniqueIdentifier>{24740454-5060-4191-bc49-7ff560db2aba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\race">
-      <UniqueIdentifier>{03371ee6-3cf3-4ed8-b69e-21a2d0f70351}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\config">
-      <UniqueIdentifier>{62844994-aa74-4a31-b255-1815884856e2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\animations">
-      <UniqueIdentifier>{79bdc1db-0db0-4d69-9e25-c9404a5ab2ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\states_screens">
-      <UniqueIdentifier>{fbc2e0f1-a87f-4205-94b4-2a8805338d2c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\states_screens\dialogs">
-      <UniqueIdentifier>{533141f3-f1ce-4815-8e9c-4253fd5e9f5e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\addons">
-      <UniqueIdentifier>{5c9f42c5-1a5b-476b-998f-f84384767684}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\tutorial">
-      <UniqueIdentifier>{27c4a91b-95c9-4da5-adb2-b7ef92940b31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Ressourcendateien">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
-    <Filter Include="Headerdateien\tinygettext">
-      <UniqueIdentifier>{8da5c73a-5884-4e8d-818a-20521a66e611}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\utils\utf8">
+    <Filter Include="Header Files\utils\utf8">
       <UniqueIdentifier>{b231fec4-a731-46b5-a8cf-1ef8fa0bf7be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Quelldateien\tinygettext">
+    <Filter Include="Header Files\audio">
+      <UniqueIdentifier>{06defe0c-00ba-4c91-b0f4-fe0890362f0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\modes">
+      <UniqueIdentifier>{9f93fb34-c97b-4108-9cd0-3f844d421e11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\items">
+      <UniqueIdentifier>{6c09fe56-1df1-4fdc-9023-47887316c0b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\physics">
+      <UniqueIdentifier>{1298df87-da0e-462e-b074-a496598571d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\karts">
+      <UniqueIdentifier>{11a7d573-5959-4be8-8a3f-d455d7833333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\karts\controller">
+      <UniqueIdentifier>{d477b64b-eb9c-4059-a647-98f3a2f7203a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graphics">
+      <UniqueIdentifier>{2f186570-85e9-4cea-88dc-0f716c6e141a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tracks">
+      <UniqueIdentifier>{f2f3feeb-648b-4edf-8025-fb86e1a6d9bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\replay">
+      <UniqueIdentifier>{1ea79cd5-39b0-4228-b002-7bddf4d45fda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\io">
+      <UniqueIdentifier>{24d03539-463f-4c91-9ea0-6fd4b5f1dde0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\input">
+      <UniqueIdentifier>{24740454-5060-4191-bc49-7ff560db2aba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\race">
+      <UniqueIdentifier>{03371ee6-3cf3-4ed8-b69e-21a2d0f70351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\config">
+      <UniqueIdentifier>{62844994-aa74-4a31-b255-1815884856e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\animations">
+      <UniqueIdentifier>{79bdc1db-0db0-4d69-9e25-c9404a5ab2ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\states_screens">
+      <UniqueIdentifier>{fbc2e0f1-a87f-4205-94b4-2a8805338d2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\states_screens\dialogs">
+      <UniqueIdentifier>{533141f3-f1ce-4815-8e9c-4253fd5e9f5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\addons">
+      <UniqueIdentifier>{5c9f42c5-1a5b-476b-998f-f84384767684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tutorial">
+      <UniqueIdentifier>{27c4a91b-95c9-4da5-adb2-b7ef92940b31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tinygettext">
+      <UniqueIdentifier>{8da5c73a-5884-4e8d-818a-20521a66e611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\guiengine">
+      <UniqueIdentifier>{88b6497f-6336-4d65-b0e3-5fad9ff35ffb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\guiengine\widgets">
+      <UniqueIdentifier>{c4431a49-640d-48e5-9ac7-473955a15283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\challenges">
+      <UniqueIdentifier>{6eeebf67-9364-4c48-9e24-e89164897f9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{3ee2b9d8-e9b8-4af3-a5bf-28ae532ed5cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\audio">
+      <UniqueIdentifier>{1bda54ec-85a1-4725-8425-e5942887808d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\modes">
+      <UniqueIdentifier>{0f42eff9-e52c-4975-bc4a-52b0310ddb99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\items">
+      <UniqueIdentifier>{c3be189e-ac78-42f5-b6e2-7193d9b32e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\physics">
+      <UniqueIdentifier>{b91bda77-4ae6-4d47-8de1-65b8b992251e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\karts">
+      <UniqueIdentifier>{cd929227-595c-45e8-bf99-ab06e6d586d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\karts\controller">
+      <UniqueIdentifier>{4bb34709-b7d7-4c3b-9f26-e7a26ffd817a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics">
+      <UniqueIdentifier>{8d8a1efe-f3d5-4532-8271-101ed960defc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\network">
+      <UniqueIdentifier>{45a7521f-d7d3-4404-8f6f-62e2b08c8f4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tracks">
+      <UniqueIdentifier>{07a426a7-14fb-495b-bff3-5a402664e035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\replay">
+      <UniqueIdentifier>{00e74e62-f481-4883-a49f-661a5b3c9d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{1e496486-52dd-4fe4-9bd0-3ec0f2b280fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{7d4fb5af-51c8-4073-bdbf-e0420a211096}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\race">
+      <UniqueIdentifier>{7d4c8018-8cb8-4335-b0db-217883ee8954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\config">
+      <UniqueIdentifier>{29b448e9-cfd5-4024-a3d7-360ad6d89fed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\animations">
+      <UniqueIdentifier>{305929ad-22c9-4dce-8514-2b3ceab47d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\states_screens">
+      <UniqueIdentifier>{02e2a507-6184-43fb-aa71-46ef3fc77a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\states_screens\dialogs">
+      <UniqueIdentifier>{9ea7a6dd-0714-414c-970c-881b61411ef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\addons">
+      <UniqueIdentifier>{376d4c71-33a2-4def-949e-31bcb5b72812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tutorial">
+      <UniqueIdentifier>{d7906217-8c6c-419e-94e3-898456598704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tinygettext">
       <UniqueIdentifier>{5faa19dc-78e6-438e-a2a0-6a489961f098}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\main_loop.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\abstract_top_level_container.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\CGUISpriteBank.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\engine.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\event_handler.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\layout_manager.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\modaldialog.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\scalable_font.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\screen.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\screen_loader.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\skin.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widget.cpp">
-      <Filter>Quelldateien\guiengine</Filter>
+      <Filter>Source Files\guiengine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\bubble_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\button_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\check_box_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\dynamic_ribbon_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\icon_button_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\label_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\list_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\model_view_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\progress_bar_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\ribbon_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\spinner_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\text_box_widget.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\challenges\challenge.cpp">
-      <Filter>Quelldateien\challenges</Filter>
+      <Filter>Source Files\challenges</Filter>
     </ClCompile>
     <ClCompile Include="..\..\challenges\challenge_data.cpp">
-      <Filter>Quelldateien\challenges</Filter>
+      <Filter>Source Files\challenges</Filter>
     </ClCompile>
     <ClCompile Include="..\..\challenges\unlock_manager.cpp">
-      <Filter>Quelldateien\challenges</Filter>
+      <Filter>Source Files\challenges</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\constants.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\random_generator.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\string_utils.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\translation.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\vec3.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\music_information.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\music_manager.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\music_ogg.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\sfx_buffer.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\sfx_manager.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\audio\sfx_openal.cpp">
-      <Filter>Quelldateien\audio</Filter>
+      <Filter>Source Files\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\follow_the_leader.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\linear_world.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\profile_world.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\standard_race.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\three_strikes_battle.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\tutorial_race.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\world.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\world_status.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\world_with_rank.cpp">
-      <Filter>Quelldateien\modes</Filter>
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\attachment.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\attachment_manager.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\bowling.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\cake.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\flyable.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\item.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\item_manager.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\plunger.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\powerup.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\powerup_manager.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\projectile_manager.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\rubber_band.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\btKart.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\btUprightConstraint.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\irr_debug_drawer.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\physical_object.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\physics.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\triangle_mesh.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\emergency_animation.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\kart.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\kart_model.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\kart_properties.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\kart_properties_manager.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\max_speed.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\moveable.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\default_ai_controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\end_controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\new_ai_controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\player_controller.cpp">
-      <Filter>Quelldateien\karts\controller</Filter>
+      <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\camera.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\CBatchingMesh.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\explosion.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\irr_driver.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\material.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\material_manager.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\mesh_tools.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\moving_texture.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\particle_emitter.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\particle_kind.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\shadow.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\skid_marks.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\slip_stream.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\stars.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\connect_message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\kart_control_message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\kart_update_message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\network_kart.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\network_manager.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\race_info_message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\race_result_message.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\network\race_state.cpp">
-      <Filter>Quelldateien\network</Filter>
+      <Filter>Source Files\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\ambient_light_sphere.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\bezier_curve.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_lap.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_line.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_manager.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_sphere.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_structure.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\graph_node.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\quad.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\quad_graph.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\quad_set.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\terrain_info.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\track.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\track_manager.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\track_object.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\track_object_manager.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\replay\replay_base.cpp">
-      <Filter>Quelldateien\replay</Filter>
+      <Filter>Source Files\replay</Filter>
     </ClCompile>
     <ClCompile Include="..\..\replay\replay_buffers.cpp">
-      <Filter>Quelldateien\replay</Filter>
+      <Filter>Source Files\replay</Filter>
     </ClCompile>
     <ClCompile Include="..\..\replay\replay_player.cpp">
-      <Filter>Quelldateien\replay</Filter>
+      <Filter>Source Files\replay</Filter>
     </ClCompile>
     <ClCompile Include="..\..\replay\replay_recorder.cpp">
-      <Filter>Quelldateien\replay</Filter>
+      <Filter>Source Files\replay</Filter>
     </ClCompile>
     <ClCompile Include="..\..\io\file_manager.cpp">
-      <Filter>Quelldateien\io</Filter>
+      <Filter>Source Files\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\io\xml_node.cpp">
-      <Filter>Quelldateien\io</Filter>
+      <Filter>Source Files\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\io\xml_writer.cpp">
-      <Filter>Quelldateien\io</Filter>
+      <Filter>Source Files\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\input\binding.cpp">
-      <Filter>Quelldateien\input</Filter>
+      <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\input\device_manager.cpp">
-      <Filter>Quelldateien\input</Filter>
+      <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\input\input_device.cpp">
-      <Filter>Quelldateien\input</Filter>
+      <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\input\input_manager.cpp">
-      <Filter>Quelldateien\input</Filter>
+      <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\grand_prix_data.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\grand_prix_manager.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\highscore_manager.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\highscores.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\history.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\race\race_manager.cpp">
-      <Filter>Quelldateien\race</Filter>
+      <Filter>Source Files\race</Filter>
     </ClCompile>
     <ClCompile Include="..\..\config\device_config.cpp">
-      <Filter>Quelldateien\config</Filter>
+      <Filter>Source Files\config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\config\stk_config.cpp">
-      <Filter>Quelldateien\config</Filter>
+      <Filter>Source Files\config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\config\user_config.cpp">
-      <Filter>Quelldateien\config</Filter>
+      <Filter>Source Files\config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\animations\animation_base.cpp">
-      <Filter>Quelldateien\animations</Filter>
+      <Filter>Source Files\animations</Filter>
     </ClCompile>
     <ClCompile Include="..\..\animations\billboard_animation.cpp">
-      <Filter>Quelldateien\animations</Filter>
+      <Filter>Source Files\animations</Filter>
     </ClCompile>
     <ClCompile Include="..\..\animations\ipo.cpp">
-      <Filter>Quelldateien\animations</Filter>
+      <Filter>Source Files\animations</Filter>
     </ClCompile>
     <ClCompile Include="..\..\animations\three_d_animation.cpp">
-      <Filter>Quelldateien\animations</Filter>
+      <Filter>Source Files\animations</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\addons_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\arenas_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\challenges.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\credits.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\feature_unlocked.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\grand_prix_lose.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\grand_prix_win.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\help_screen_1.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\help_screen_2.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\help_screen_3.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\help_screen_4.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\kart_selection.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\main_menu_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_audio.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_input.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_input2.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_players.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_video.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\race_gui.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\race_result_gui.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\race_setup_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\state_manager.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\tracks_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\tutorial_screen.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\add_device_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\addons_loading.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\enter_player_name_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\gp_info_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\message_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\player_info_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\press_a_key_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\race_over_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\race_paused_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\track_info_dialog.cpp">
-      <Filter>Quelldateien\states_screens\dialogs</Filter>
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\addon.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\addons_manager.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\network_http.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\zip.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial\tutorial.cpp">
-      <Filter>Quelldateien\tutorial</Filter>
+      <Filter>Source Files\tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial\tutorial_data.cpp">
-      <Filter>Quelldateien\tutorial</Filter>
+      <Filter>Source Files\tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial\tutorial_manager.cpp">
-      <Filter>Quelldateien\tutorial</Filter>
+      <Filter>Source Files\tutorial</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\physics\btKartRaycast.cpp">
-      <Filter>Quelldateien\physics</Filter>
+      <Filter>Source Files\physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\rain.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\per_camera_node.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\dictionary.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\iconv.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\language.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\log.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\plural_forms.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\po_parser.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp">
-      <Filter>Quelldateien\tinygettext</Filter>
+      <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\lod_node.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp">
-      <Filter>Quelldateien\states_screens</Filter>
+      <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp">
-      <Filter>Quelldateien\guiengine\widgets</Filter>
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\news_manager.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\request.cpp">
-      <Filter>Quelldateien\addons</Filter>
+      <Filter>Source Files\addons</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\swatter.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\utils\profiler.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\hardware_skinning.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\items\rubber_ball.cpp">
-      <Filter>Quelldateien\items</Filter>
+      <Filter>Source Files\items</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\post_processing.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\karts\kart_with_stats.cpp">
-      <Filter>Quelldateien\karts</Filter>
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\track_sector.cpp">
-      <Filter>Quelldateien\tracks</Filter>
+      <Filter>Source Files\tracks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\hit_sfx.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\graphics\referee.cpp">
-      <Filter>Quelldateien\graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\utils\leak_check.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\engine.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\event_handler.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\layout_manager.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\modaldialog.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\scalable_font.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\screen.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\skin.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widget.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets.hpp">
-      <Filter>Headerdateien\guiengine</Filter>
+      <Filter>Header Files\guiengine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\bubble_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\button_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\check_box_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\dynamic_ribbon_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\icon_button_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\label_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\list_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\model_view_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\progress_bar_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\ribbon_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\spinner_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\text_box_widget.hpp">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\challenges\challenge.hpp">
-      <Filter>Headerdateien\challenges</Filter>
+      <Filter>Header Files\challenges</Filter>
     </ClInclude>
     <ClInclude Include="..\..\challenges\challenge_data.hpp">
-      <Filter>Headerdateien\challenges</Filter>
+      <Filter>Header Files\challenges</Filter>
     </ClInclude>
     <ClInclude Include="..\..\challenges\unlock_manager.hpp">
-      <Filter>Headerdateien\challenges</Filter>
+      <Filter>Header Files\challenges</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\character_confirm_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\character_info_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\character_selected_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\connect_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\flyable_info.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\item_info.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\kart_control_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\kart_packet.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\kart_update_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\network_kart.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\network_manager.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\race_info_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\race_result_ack_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\race_result_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\race_start_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\race_state.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\remote_kart_info.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\network\world_loaded_message.hpp">
-      <Filter>Headerdateien\network</Filter>
+      <Filter>Header Files\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\constants.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\no_copy.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\ptr_vector.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\random_generator.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\string_utils.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\synchronised.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\translation.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\vec3.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\music.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\music_information.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\music_manager.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\music_ogg.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\sfx_base.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\sfx_buffer.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\sfx_manager.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\audio\sfx_openal.hpp">
-      <Filter>Headerdateien\audio</Filter>
+      <Filter>Header Files\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\follow_the_leader.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\linear_world.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\profile_world.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\standard_race.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\three_strikes_battle.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\tutorial_race.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\world.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\world_status.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\world_with_rank.hpp">
-      <Filter>Headerdateien\modes</Filter>
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\attachment.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\attachment_manager.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\bowling.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\cake.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\flyable.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\item.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\item_manager.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\plunger.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\powerup.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\powerup_manager.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\projectile_manager.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\rubber_band.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\btKart.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\btUprightConstraint.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\irr_debug_drawer.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\kart_motion_state.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\physical_object.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\physics.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\triangle_mesh.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\user_pointer.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\emergency_animation.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_control.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_model.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_properties.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_properties_manager.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\max_speed.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\moveable.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\default_ai_controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\end_controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\new_ai_controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\player_controller.hpp">
-      <Filter>Headerdateien\karts\controller</Filter>
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\camera.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\CBatchingMesh.h">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\explosion.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\irr_driver.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\material.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\material_manager.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\mesh_tools.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\moving_texture.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\particle_emitter.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\particle_kind.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\shadow.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\skid_marks.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\slip_stream.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\stars.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\ambient_light_sphere.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\bezier_curve.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_lap.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_line.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_manager.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_sphere.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_structure.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\graph_node.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\quad.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\quad_graph.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\quad_set.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\terrain_info.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_manager.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_object.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_object_manager.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\replay\replay_base.hpp">
-      <Filter>Headerdateien\replay</Filter>
+      <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\replay\replay_buffer_tpl.hpp">
-      <Filter>Headerdateien\replay</Filter>
+      <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\replay\replay_buffers.hpp">
-      <Filter>Headerdateien\replay</Filter>
+      <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\replay\replay_player.hpp">
-      <Filter>Headerdateien\replay</Filter>
+      <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\replay\replay_recorder.hpp">
-      <Filter>Headerdateien\replay</Filter>
+      <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\io\file_manager.hpp">
-      <Filter>Headerdateien\io</Filter>
+      <Filter>Header Files\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\io\xml_node.hpp">
-      <Filter>Headerdateien\io</Filter>
+      <Filter>Header Files\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\io\xml_writer.hpp">
-      <Filter>Headerdateien\io</Filter>
+      <Filter>Header Files\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\input\binding.hpp">
-      <Filter>Headerdateien\input</Filter>
+      <Filter>Header Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\input\device_manager.hpp">
-      <Filter>Headerdateien\input</Filter>
+      <Filter>Header Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\input\input.hpp">
-      <Filter>Headerdateien\input</Filter>
+      <Filter>Header Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\input\input_device.hpp">
-      <Filter>Headerdateien\input</Filter>
+      <Filter>Header Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\input\input_manager.hpp">
-      <Filter>Headerdateien\input</Filter>
+      <Filter>Header Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\grand_prix_data.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\grand_prix_manager.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\highscore_manager.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\highscores.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\history.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\race\race_manager.hpp">
-      <Filter>Headerdateien\race</Filter>
+      <Filter>Header Files\race</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config\device_config.hpp">
-      <Filter>Headerdateien\config</Filter>
+      <Filter>Header Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config\player.hpp">
-      <Filter>Headerdateien\config</Filter>
+      <Filter>Header Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config\stk_config.hpp">
-      <Filter>Headerdateien\config</Filter>
+      <Filter>Header Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config\user_config.hpp">
-      <Filter>Headerdateien\config</Filter>
+      <Filter>Header Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\animations\animation_base.hpp">
-      <Filter>Headerdateien\animations</Filter>
+      <Filter>Header Files\animations</Filter>
     </ClInclude>
     <ClInclude Include="..\..\animations\billboard_animation.hpp">
-      <Filter>Headerdateien\animations</Filter>
+      <Filter>Header Files\animations</Filter>
     </ClInclude>
     <ClInclude Include="..\..\animations\ipo.hpp">
-      <Filter>Headerdateien\animations</Filter>
+      <Filter>Header Files\animations</Filter>
     </ClInclude>
     <ClInclude Include="..\..\animations\three_d_animation.hpp">
-      <Filter>Headerdateien\animations</Filter>
+      <Filter>Header Files\animations</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\addons_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\arenas_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\challenges.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\credits.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\feature_unlocked.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\grand_prix_lose.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\grand_prix_win.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\help_screen_1.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\help_screen_2.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\help_screen_3.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\help_screen_4.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\kart_selection.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\main_menu_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_audio.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_input.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_input2.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_players.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_video.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\race_gui.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\race_gui_base.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\race_result_gui.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\race_setup_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\state_manager.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\tracks_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\tutorial_screen.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\add_device_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\addons_loading.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\enter_player_name_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\gp_info_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\message_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\player_info_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\press_a_key_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\race_over_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\race_paused_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\track_info_dialog.hpp">
-      <Filter>Headerdateien\states_screens\dialogs</Filter>
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\addon.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\addons_manager.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\network_http.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\zip.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial\tutorial.hpp">
-      <Filter>Headerdateien\tutorial</Filter>
+      <Filter>Header Files\tutorial</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial\tutorial_data.hpp">
-      <Filter>Headerdateien\tutorial</Filter>
+      <Filter>Header Files\tutorial</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial\tutorial_manager.hpp">
-      <Filter>Headerdateien\tutorial</Filter>
+      <Filter>Header Files\tutorial</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\physics\btKartRaycast.hpp">
-      <Filter>Headerdateien\physics</Filter>
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\rain.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\per_camera_node.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\dictionary.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\file_system.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\iconv.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\language.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\log.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\log_stream.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\plural_forms.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\po_parser.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp">
-      <Filter>Headerdateien\tinygettext</Filter>
+      <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\utf8\unchecked.h">
-      <Filter>Headerdateien\utils\utf8</Filter>
+      <Filter>Header Files\utils\utf8</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\utf8\checked.h">
-      <Filter>Headerdateien\utils\utf8</Filter>
+      <Filter>Header Files\utils\utf8</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\utf8\core.h">
-      <Filter>Headerdateien\utils\utf8</Filter>
+      <Filter>Header Files\utils\utf8</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\utf8.h">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\lod_node.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp">
-      <Filter>Headerdateien\states_screens</Filter>
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\time.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h">
-      <Filter>Headerdateien\guiengine\widgets</Filter>
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\news_manager.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\addons\request.hpp">
-      <Filter>Headerdateien\addons</Filter>
+      <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\swatter.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\profiler.hpp">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hardware_skinning.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\items\rubber_ball.hpp">
-      <Filter>Headerdateien\items</Filter>
+      <Filter>Header Files\items</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\post_processing.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_with_stats.hpp">
-      <Filter>Headerdateien\karts</Filter>
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_sector.hpp">
-      <Filter>Headerdateien\tracks</Filter>
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hit_effect.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\hit_sfx.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\referee.hpp">
-      <Filter>Headerdateien\graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\leak_check.hpp">
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
