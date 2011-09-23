@@ -13,8 +13,9 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+#include "utils/leak_check.hpp"
 
-#include <utils/ptr_vector.hpp>
+#include "utils/ptr_vector.hpp"
 
 #ifdef DEBUG
 
@@ -22,15 +23,15 @@
     Atm only implemented for OSX */
 #define GET_STACK_TRACE 0
 
+
 #if (GET_STACK_TRACE == 1) && defined(MAC_OS_X_VERSION_10_5)
 #include <Availability.h>
 #include <execinfo.h>
 #endif
 
-#include <set>
-
-#include "utils/leak_check.hpp"
 #include <iostream>
+#include <set>
+#include <stdio.h>
 
 namespace MemoryLeaks
 {
