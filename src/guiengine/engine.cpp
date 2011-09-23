@@ -875,10 +875,10 @@ namespace GUIEngine
       * some cached data but does not actually uninitialize the gui engine. This
       * does.
       */
-    void free()
+    void deallocate()
     {
         g_loaded_screens.clearAndDeleteAll();
-    }
+    }   // deallocate
     
     // ------------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, 

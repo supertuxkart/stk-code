@@ -181,7 +181,7 @@ public:
     
     // singleton
     static StateManager* get();
-    static void free();
+    static void deallocate();
     
 private:
     /**

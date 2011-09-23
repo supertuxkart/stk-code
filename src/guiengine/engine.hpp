@@ -102,7 +102,7 @@ namespace GUIEngine
     
     void cleanUp();
     
-    void free();
+    void deallocate();
     
     
     /**

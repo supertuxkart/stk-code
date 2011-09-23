@@ -96,7 +96,7 @@ namespace GUIEngine
         
         /** singleton access */
         static EventHandler* get();
-        static void free();
+        static void deallocate();
     };
     
 }

@@ -927,8 +927,8 @@ void cleanSuperTuxKart()
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
     
-    StateManager::free();
-    GUIEngine::EventHandler::free();
+    StateManager::deallocate();
+    GUIEngine::EventHandler::deallocate();
 }   // cleanSuperTuxKart
 
 //=============================================================================

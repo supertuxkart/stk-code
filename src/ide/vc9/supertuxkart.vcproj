@@ -439,6 +439,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\leak_check.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\profiler.cpp"
 					>
 				</File>
@@ -1470,6 +1474,10 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\constants.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\leak_check.hpp"
 					>
 				</File>
 				<File

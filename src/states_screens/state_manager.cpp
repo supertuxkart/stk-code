@@ -43,11 +43,11 @@ StateManager* StateManager::get()
     return state_manager_singleton;
 }   // get
 
-void StateManager::free()
+void StateManager::deallocate()
 {
     delete state_manager_singleton;
     state_manager_singleton = NULL;
-}
+}   // deallocate
 
 
 // ============================================================================
@@ -225,7 +225,7 @@ void StateManager::onTopMostScreenChanged()
 void StateManager::onStackEmptied()
 {
     GUIEngine::cleanUp();
-    GUIEngine::free();
+    GUIEngine::deallocate();
     main_loop->abort();
 }   // onStackEmptied
 

@@ -308,11 +308,11 @@ EventHandler* EventHandler::get()
     return event_handler_singleton;
 }
 
-void EventHandler::free()
+void EventHandler::deallocate()
 {
     delete event_handler_singleton;
     event_handler_singleton = NULL;
-}
+}   // deallocate
 
 
 // -----------------------------------------------------------------------------
