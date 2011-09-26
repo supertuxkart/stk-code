@@ -20,6 +20,7 @@
 #include "graphics/referee.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "karts/kart.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -70,7 +71,19 @@ void Referee::init()
         printf("Can't find referee model '%s', aborting.\n", 
                model_filename.c_str());
     }
-    
+
+    // Translate the mesh so that the x/z middle point
+    // and for y the lowest point are at 0,0,0:
+    Vec3 min,max;
+    MeshTools::minMax3D(m_st_referee_mesh, &min, &max);
+    Vec3 offset_from_center = -0.5f*(max+min);
+    offset_from_center.setY(0);
+    scene::IMeshManipulator *mani = 
+        irr_driver->getVideoDriver()->getMeshManipulator();
+
+    core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+    translate.setTranslation(offset_from_center.toIrrVector());
+    mani->transform(m_st_referee_mesh, translate);
     node->get("first-rescue-frame", &m_st_first_rescue_frame);
     node->get("last-rescue-frame",  &m_st_last_rescue_frame );
     node->get("first-start-frame",  &m_st_first_start_frame );
