@@ -514,16 +514,22 @@ void World::resetAllKarts()
         }
     }   // while
 
-    // Now store the current (i.e. in rest) suspension length for each kart,
-    // so that the karts can visualise the suspension.
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+    {
+        // Now store the current (i.e. in rest) suspension length for each
+        // kart, so that the karts can visualise the suspension. 
         (*i)->setSuspensionLength();
-    for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getCamera())
-            m_karts[i]->getCamera()->setInitialTransform();
+        // Initialise the camera (if available), now that the correct
+        // kart position is set
+        if((*i)->getCamera())
+            (*i)->getCamera()->setInitialTransform();
+        // Update the kart transforms with the newly computed position
+        // after all karts are reset
+        (*i)->setTrans((*i)->getBody()->getWorldTransform());
+    }
 }   // resetAllKarts
 
-
+// ----------------------------------------------------------------------------
 void World::schedulePause(Phase phase)
 {
     if (m_schedule_unpause)
@@ -535,8 +541,9 @@ void World::schedulePause(Phase phase)
         m_schedule_pause = true;
         m_scheduled_pause_phase = phase;
     }
-}
+}   // schedulePause
 
+// ----------------------------------------------------------------------------
 void World::scheduleUnpause()
 {
     if (m_schedule_pause)
@@ -547,7 +554,7 @@ void World::scheduleUnpause()
     {
         m_schedule_unpause = true;
     }
-}
+}   // scheduleUnpause
 
 //-----------------------------------------------------------------------------
 /** This is the main interface to update the world. This function calls
