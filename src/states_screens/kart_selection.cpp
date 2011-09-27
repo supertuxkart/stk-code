@@ -743,9 +743,10 @@ public:
     // -------------------------------------------------------------------------
 
     /** \brief Event callback from ISpinnerConfirmListener */
-    virtual void onSpinnerConfirmed()
+    virtual EventPropagation onSpinnerConfirmed()
     {
         KartSelectionScreen::getInstance()->playerConfirm(m_playerID);
+        return EVENT_BLOCK;
     }
 };
 

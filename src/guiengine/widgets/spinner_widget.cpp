@@ -287,7 +287,10 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator
     {
         if (m_listener != NULL)
         {
-            m_listener->onSpinnerConfirmed();
+            if (m_listener->onSpinnerConfirmed() == EVENT_BLOCK)
+            {
+                return EVENT_BLOCK;
+            }
         }
     }
     

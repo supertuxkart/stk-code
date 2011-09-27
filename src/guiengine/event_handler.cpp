@@ -629,6 +629,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     else
     {
         std::string id = w->m_properties[PROP_ID];
+        assert(w->ok());
         if (w->transmitEvent(w, id, playerID) == EVENT_LET)
         {
             assert(w->ok());

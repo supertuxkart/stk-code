@@ -44,8 +44,11 @@ namespace GUIEngine
         public:
             virtual ~ISpinnerConfirmListener() {}
             
-            /** \brief Invoked when the spinner is selected and "fire" is pressed */
-            virtual void onSpinnerConfirmed() = 0;
+            /**
+              * \brief Invoked when the spinner is selected and "fire" is pressed
+              * \return whether to block the event from further processing
+              */
+            virtual EventPropagation onSpinnerConfirmed() = 0;
         };
         
     protected:
