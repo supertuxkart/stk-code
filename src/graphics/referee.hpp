@@ -78,13 +78,17 @@ private:
     scene::IAnimatedMeshSceneNode *m_scene_node;
 
 public:
-                Referee(bool is_start_referee);
+                Referee();
+                Referee(const Kart &kart);
                ~Referee();
     void        selectReadySetGo(int rsg);
     void        attachToSceneNode();
     static void init();
     static void cleanup();
     void        removeFromSceneGraph();
+    // ------------------------------------------------------------------------
+    /** Returns the scene node of this referee. */
+    scene::IAnimatedMeshSceneNode* getSceneNode() { return m_scene_node; }
     // ------------------------------------------------------------------------
     /** Moves the referee to the specified position. */
     void        setPosition(const Vec3 &xyz) 

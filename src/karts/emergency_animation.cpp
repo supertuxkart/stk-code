@@ -20,6 +20,7 @@
 #include "karts/emergency_animation.hpp"
 
 #include "graphics/camera.hpp"
+#include "graphics/referee.hpp"
 #include "graphics/stars.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
@@ -35,6 +36,7 @@
 EmergencyAnimation::EmergencyAnimation(Kart *kart)
 {
     m_stars_effect = NULL;
+    m_referee      = NULL;
     m_kart         = kart;
     // Setting kart mode here is important! If the mode should be rescue when 
     // reset() is called, it is assumed that this was triggered by a restart, 
@@ -79,6 +81,11 @@ void EmergencyAnimation::reset()
     m_timer      = 0;
     m_kart_mode  = EA_NONE;
     m_eliminated = false;
+    if(m_referee)
+    {
+        delete m_referee;
+        m_referee = NULL;
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -116,12 +123,15 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
 {
     if(playingEmergencyAnimation()) return;
 
+    assert(!m_referee);
+    m_referee     = new Referee(*m_kart);
+    m_kart->getNode()->addChild(m_referee->getSceneNode());
     m_kart_mode   = EA_RESCUE;
     m_timer       = m_kart->getKartProperties()->getRescueTime();
     m_up_velocity = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
-    m_kart->getAttachment()->set(Attachment::ATTACH_TINYTUX, m_timer);
+    m_kart->getAttachment()->clear();
 
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll()  );
@@ -221,6 +231,9 @@ void EmergencyAnimation::update(float dt)
         if(m_kart_mode==EA_RESCUE)
         {
             World::getWorld()->moveKartAfterRescue(m_kart);
+            m_kart->getNode()->removeChild(m_referee->getSceneNode());
+            delete m_referee;
+            m_referee = NULL;
         }
         World::getWorld()->getPhysics()->addKart(m_kart);
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));

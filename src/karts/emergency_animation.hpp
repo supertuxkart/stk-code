@@ -24,6 +24,7 @@
 #include "utils/vec3.hpp"
 
 class Kart;
+class Referee;
 class Stars;
 
 /** 
@@ -71,6 +72,9 @@ protected:
     /** For stars rotating around head effect */
     Stars        *m_stars_effect;
     
+    /** The referee during a rescue operation. */
+    Referee      *m_referee;
+
     /** Different kart modes: normal racing, being rescued, showing end
      *  animation, explosions, kart eliminated. */
     enum {EA_NONE, EA_RESCUE, EA_EXPLOSION}
@@ -82,23 +86,25 @@ public:
     virtual void handleExplosion(const Vec3& pos, bool direct_hit);
     virtual void forceRescue(bool is_auto_rescue=false);
     void         update(float dt);
+    void         eliminate (bool remove);
     // ------------------------------------------------------------------------
     /** Returns true if an emergency animation is being played. */
-    bool  playingEmergencyAnimation() const {return m_kart_mode!=EA_NONE; }
-    
+    bool playingEmergencyAnimation() const {return m_kart_mode!=EA_NONE; }
+    // ------------------------------------------------------------------------
     /** Returns if a rescue animation is being shown. */
-    bool  playingRescueAnimation() const {return m_kart_mode==EA_RESCUE; }
-
+    bool playingRescueAnimation() const {return m_kart_mode==EA_RESCUE; }
+    // ------------------------------------------------------------------------
     /** Returns if an explosion animation is being shown. */
-    bool  playingExplosionAnimation() const {return m_kart_mode==EA_EXPLOSION; }
-
+    bool playingExplosionAnimation() const {return m_kart_mode==EA_EXPLOSION;}
+    // ------------------------------------------------------------------------
     /** Returns the timer for the currently played animation. */
     const float getAnimationTimer() const {return m_timer;}
+    // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated. */
     bool        isEliminated     () const {return m_eliminated;}
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the stars effect. */
     const Stars *getStarEffect   () const {return m_stars_effect; }
-    void        eliminate        (bool remove);
-
+    
 };   // EmergencyAnimation
 #endif

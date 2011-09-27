@@ -107,7 +107,7 @@ void RaceGUIBase::init()
         m_referee_rotation.push_back(hpr);
     }
 
-    m_referee = new Referee(/*is_start_referee*/true);
+    m_referee = new Referee();
 
     // Do everything else required at a race restart as well, esp. 
     // resetting the height of the referee.

@@ -425,9 +425,9 @@ void Camera::update(float dt)
     getCameraSettings(&above_kart, &cam_angle, &side_way, &distance,
                       &smoothing);
 
-    // If an explosion or rescue is happening, stop moving the camera,
+    // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
-    if(m_kart->playingEmergencyAnimation())
+    if(m_kart->playingExplosionAnimation())
     {
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
