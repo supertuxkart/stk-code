@@ -34,6 +34,8 @@
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
+/** Initialises the attachment each kart has.
+ */
 Attachment::Attachment(Kart* kart)
 {
     m_type           = ATTACH_NOTHING;
@@ -57,6 +59,9 @@ Attachment::Attachment(Kart* kart)
 }   // Attachment
 
 //-----------------------------------------------------------------------------
+/** Removes the attachment object. It removes the scene node used to display
+ *  the attachment, and stops any sfx from being played.
+ */
 Attachment::~Attachment()
 {
     if(m_node)
@@ -70,19 +75,29 @@ Attachment::~Attachment()
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
+/** Sets the attachment a kart has. This will also handle animation to be 
+ *  played, e.g. when a swatter replaces a bomb.
+ *  \param type The type of the new attachment.
+ *  \param time How long this attachment should stay with the kart.
+ *  \param current_kart The kart from which an attachment is transferred.
+ *         This is currently used for the bomb (to avoid that a bomb
+ *         can be passed back to the previous owner). NULL if a no
+ *         previous owner exists.
+ */
 void Attachment::set(AttachmentType type, float time, Kart *current_kart)
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
     if (was_bomb && type == ATTACH_SWATTER)
     {
-        // let's keep the bomb node, and create a new one for the new attachment
+        // let's keep the bomb node, and create a new one for 
+        // the new attachment
         bomb_scene_node = m_node;
         
         m_node = irr_driver->addAnimatedMesh(
                      attachment_manager->getMesh(Attachment::ATTACH_BOMB));
 #ifdef DEBUG
-        std::string debug_name = (current_kart ? current_kart->getIdent() : "somekart") +" (attachment)";
+        std::string debug_name = m_kart->getIdent() + " (attachment)";
         m_node->setName(debug_name.c_str());
 #endif
         m_node->setAnimationEndCallback(this);
@@ -92,7 +107,8 @@ void Attachment::set(AttachmentType type, float time, Kart *current_kart)
     
     clear();
     
-    // If necessary create the appropriate plugin which encapsulates the associated behavior
+    // If necessary create the appropriate plugin which encapsulates 
+    // the associated behavior
     switch(type)
     {
     case ATTACH_SWATTER :
@@ -253,10 +269,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
             m_initial_speed = m_kart->getSpeed();
 
-             // if going very slowly or backwards, braking won't remove parachute
+            // if going very slowly or backwards, 
+            // braking won't remove parachute
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
-            // if ( m_kart == m_kart[0] )
-            //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         case 1:
             set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
