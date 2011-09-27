@@ -92,10 +92,10 @@ void Referee::init()
     node->get("scale",              &m_st_scale             );
     node->get("start-rotation",     &m_st_start_rotation    );
 
-    float angle_to_kart = atan2(m_st_start_offset.getY(), 
+    float angle_to_kart = atan2(m_st_start_offset.getX(), 
                                 m_st_start_offset.getZ())
                         * RAD_TO_DEGREE;
-    m_st_start_rotation.setY(m_st_start_rotation.getY()-angle_to_kart);
+    m_st_start_rotation.setY(m_st_start_rotation.getY()+angle_to_kart);
 
     std::vector<std::string> colors;
     node->get("colors", &colors);
