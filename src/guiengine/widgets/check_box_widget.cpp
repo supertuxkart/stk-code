@@ -48,6 +48,9 @@ void CheckBoxWidget::add()
 // -----------------------------------------------------------------------------
 EventPropagation CheckBoxWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+
+    
     /* toggle */
     m_state = !m_state;
     

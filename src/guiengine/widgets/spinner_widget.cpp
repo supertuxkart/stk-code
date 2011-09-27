@@ -270,6 +270,8 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
 
 EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
         

@@ -361,6 +361,9 @@ void ListWidget::markItemBlue(const int id, bool blue)
 
 EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+
+    
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
     {        
         int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';

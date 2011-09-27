@@ -628,9 +628,11 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     }
     else
     {
-        if (w->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
+        std::string id = w->m_properties[PROP_ID];
+        if (w->transmitEvent(w, id, playerID) == EVENT_LET)
         {
-            sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+            assert(w->ok());
+            sendEventToUser(w, id, playerID);
         }
     }
     

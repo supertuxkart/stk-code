@@ -584,6 +584,9 @@ void RibbonWidget::updateSelection()
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {    
+    assert(m_magic_number == 0xCAFEC001);
+
+    
     if (!m_deactivated)
     {
         const int subbuttons_amount = m_children.size();
