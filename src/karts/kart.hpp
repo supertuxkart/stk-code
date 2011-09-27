@@ -265,10 +265,6 @@ public:
     /** Sets the kart properties. */
     void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
     // ------------------------------------------------------------------------
-    /** Sets the attachment and time it stays attached. */
-    void attach(Attachment::AttachmentType attachment, float time) 
-                                     { m_attachment->set(attachment, time); }
-    // ------------------------------------------------------------------------
     /** Sets a new powerup. */
     void setPowerup (PowerupManager::PowerupType t, int n)
                                      { m_powerup.set(t, n); }

@@ -60,8 +60,12 @@ void EmergencyAnimation::reset()
 
     // Create the stars effect in the first reset
     if(!m_stars_effect)
-        m_stars_effect = new Stars(m_kart->getNode(),
-                                   core::vector3df(0.0f, m_kart->getKartModel()->getModel()->getBoundingBox().MaxEdge.Y, 0.0f));
+        m_stars_effect =
+        new Stars(m_kart->getNode(),
+                  core::vector3df(0.0f, 
+                                  m_kart->getKartModel()->getModel()
+                                        ->getBoundingBox().MaxEdge.Y,
+                                  0.0f)                               );
 
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
@@ -117,7 +121,7 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
     m_up_velocity = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
-    m_kart->attach(Attachment::ATTACH_TINYTUX, m_timer);
+    m_kart->getAttachment()->set(Attachment::ATTACH_TINYTUX, m_timer);
 
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll()  );
