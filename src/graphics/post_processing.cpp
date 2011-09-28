@@ -21,6 +21,7 @@
 #include "irr_driver.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
 #define MOTION_BLUR_FACTOR (1.0f/15.0f)
 #define MOTION_BLUR_OFFSET 20.0f
@@ -86,7 +87,8 @@ void PostProcessing::shut()
 /** Setup the render target */
 void PostProcessing::beginCapture()
 {
-    if(!m_supported || !UserConfigParams::m_postprocess_enabled)
+    if(!m_supported || !UserConfigParams::m_postprocess_enabled ||
+       race_manager->getNumPlayers() > 1)
         return;
     
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target, true, true);
@@ -95,7 +97,8 @@ void PostProcessing::beginCapture()
 /** Restore the framebuffer render target */
 void PostProcessing::endCapture()
 {
-    if(!m_supported || !UserConfigParams::m_postprocess_enabled)
+    if(!m_supported || !UserConfigParams::m_postprocess_enabled ||
+       race_manager->getNumPlayers() > 1)
         return;
     
     irr_driver->getVideoDriver()->setRenderTarget(0, true, true, 0);
@@ -113,7 +116,8 @@ void PostProcessing::update(float dt)
 /** Render the post-processed scene */
 void PostProcessing::render()
 {
-    if(!m_supported || !UserConfigParams::m_postprocess_enabled)
+    if(!m_supported || !UserConfigParams::m_postprocess_enabled ||
+       race_manager->getNumPlayers() > 1)
         return;
     
     // Draw the fullscreen quad while applying the corresponding post-processing shaders
