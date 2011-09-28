@@ -45,11 +45,13 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     m_motion_state = NULL;
     m_mass         = 1;
     m_radius       = -1;
+    m_crash_reset  = false;
 
     std::string shape;
-    xml_node.get("mass",   &m_mass  );
-    xml_node.get("radius", &m_radius);
-    xml_node.get("shape",  &shape   );
+    xml_node.get("mass",   &m_mass       );
+    xml_node.get("radius", &m_radius     );
+    xml_node.get("shape",  &shape        );
+    xml_node.get("reset",  &m_crash_reset);
 
     m_body_type = MP_NONE;
     if     (shape=="cone"  ||

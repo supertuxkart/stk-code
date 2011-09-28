@@ -25,6 +25,7 @@
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
+#include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
@@ -99,7 +100,7 @@ void Physics::removeKart(const Kart *kart)
 void Physics::update(float dt)
 {
     // Bullet can report the same collision more than once (up to 4
-    // contact points per collision. Additionally, more than one internal
+    // contact points per collision). Additionally, more than one internal
     // substep might be taken, resulting in potentially even more
     // duplicates. To handle this, all collisions (i.e. pair of objects)
     // are stored in a vector, but only one entry per collision pair
@@ -110,45 +111,72 @@ void Physics::update(float dt)
     // 20 FPS (bullet default frequency is 60 HZ).
     m_dynamics_world->stepSimulation(dt, 3);
 
-    // Now handle the actual collision. Note: rockets can not be removed
-    // inside of this loop, since the same rocket might hit more than one
-    // other object. So, only a flag is set in the rockets, the actual
+    // Now handle the actual collision. Note: flyables can not be removed
+    // inside of this loop, since the same flyables might hit more than one
+    // other object. So only a flag is set in the flyables, the actual
     // clean up is then done later in the projectile manager.
     std::vector<CollisionPair>::iterator p;
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
-        if(p->a->is(UserPointer::UP_KART)) {          // kart-kart collision
+        // Kart-kart collision
+        // --------------------
+        if(p->a->is(UserPointer::UP_KART))
+        {
             Kart *a=p->a->getPointerKart();
             Kart *b=p->b->getPointerKart();
             race_state->addCollision(a->getWorldKartId(),
                                      b->getWorldKartId());
             KartKartCollision(p->a->getPointerKart(), p->b->getPointerKart());
+            continue;
         }  // if kart-kart collision
-        else  // now the first object must be a projectile
-        {
-            if(p->b->is(UserPointer::UP_TRACK))       // must be projectile hit track
-            {
-                p->a->getPointerFlyable()->hitTrack();
-            }
-            else if(p->b->is(UserPointer::UP_PHYSICAL_OBJECT))
-            {
-                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerPhysicalObject());
 
-            }
-            else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
+        if(p->a->is(UserPointer::UP_PHYSICAL_OBJECT))
+        {
+            // Kart hits physical object
+            // -------------------------
+            PhysicalObject *obj = p->a->getPointerPhysicalObject();
+            if(obj->isCrashReset())
             {
-                // Only explode a bowling ball if the target is
-                // not invulnerable
-                if(p->a->getPointerFlyable()->getType()
-                         !=PowerupManager::POWERUP_BOWLING    ||
-                    !p->b->getPointerKart()->isInvulnerable()   )
+                Kart *kart = p->b->getPointerKart();
+                kart->forceRescue();
+            }
+            continue;
+        }
+
+
+        // now the first object must be a projectile
+        // =========================================
+        if(p->b->is(UserPointer::UP_TRACK))
+        {
+            // Projectile hits track
+            // ---------------------
+            p->a->getPointerFlyable()->hitTrack();
+        }
+        else if(p->b->is(UserPointer::UP_PHYSICAL_OBJECT))
+        {
+            // Projectile hits physical object
+            // -------------------------------
+            p->a->getPointerFlyable()
+                ->hit(NULL, p->b->getPointerPhysicalObject());
+
+        }
+        else if(p->b->is(UserPointer::UP_KART))
+        {
+            // Projectile hits kart
+            // --------------------
+            // Only explode a bowling ball if the target is
+            // not invulnerable
+            if(p->a->getPointerFlyable()->getType()
+                !=PowerupManager::POWERUP_BOWLING    ||
+                !p->b->getPointerKart()->isInvulnerable()   )
                 p->a->getPointerFlyable()->hit(p->b->getPointerKart());
-            }
-            else                                     // projectile hits projectile
-            {
-                p->a->getPointerFlyable()->hit(NULL);
-                p->b->getPointerFlyable()->hit(NULL);
-            }
+        }
+        else
+        {
+            // Projectile hits projectile
+            // --------------------------
+            p->a->getPointerFlyable()->hit(NULL);
+            p->b->getPointerFlyable()->hit(NULL);
         }
     }  // for all p in m_all_collisions
 }   // update
@@ -161,15 +189,16 @@ void Physics::update(float dt)
 bool Physics::projectKartDownwards(const Kart *k)
 {
     btVector3 hell(0, -10000, 0);
-    return k->getVehicle()->projectVehicleToSurface(hell, true /*allow translation*/);
+    return k->getVehicle()->projectVehicleToSurface(hell, 
+                                                    /*allow translation*/true);
 } //projectKartsDownwards
 
 //-----------------------------------------------------------------------------
-/** Handles the special case of two karts colliding with each other, which means
- *  that bombs must be passed on. If both karts have a bomb, they'll explode
- *  immediately. This function is called from physics::update() on the server
- *  and if no networking is used, and from race_state on the client to replay
- *  what happened on the server.
+/** Handles the special case of two karts colliding with each other, which 
+ *  means that bombs must be passed on. If both karts have a bomb, they'll 
+ *  explode immediately. This function is called from physics::update() on the 
+ *  server and if no networking is used, and from race_state on the client to 
+ *  replay what happened on the server.
  *  \param kartA First kart involved in the collision.
  *  \param kartB Second kart involved in the collision.
  */
@@ -253,9 +282,10 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
  *  physics time step might miss some collisions (when more than one internal
  *  time step was done, and the collision is added and removed). So this
  *  function stores all collisions in a list, which is then handled after the
- *  actual physics timestep. This list only stores a collision, if it's not
+ *  actual physics timestep. This list only stores a collision if it's not
  *  already in the list, so a collisions which is reported more than once is
  *  nevertheless only handled once.
+ *  The list of collision 
  *  Parameters: see bullet documentation for details.
  */
 btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
@@ -292,6 +322,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         // FIXME: Must be a moving physics object
         // FIXME: A rocket should explode here!
         if(!upA || !upB) continue;
+
         // 1) object A is a track
         // =======================
         if(upA->is(UserPointer::UP_TRACK))
@@ -324,28 +355,39 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 kart->crashed(NULL, m);   // Kart hit track
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
-                m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart
+                // 2.1 projectile hits kart
+                m_all_collisions.push_back(upB, upA);   
             else if(upB->is(UserPointer::UP_KART))
-                m_all_collisions.push_back(upA, upB);   // 2.2 kart hits kart
+                // 2.2 kart hits kart
+                m_all_collisions.push_back(upA, upB);
+            else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
+                // 2.3 kart hits physical object
+                m_all_collisions.push_back(upB, upA);
         }
         // 3) object is a projectile
         // =========================
         else if(upA->is(UserPointer::UP_FLYABLE))
         {
-            if(upB->is(UserPointer::UP_TRACK          ) ||   // 3.1) projectile hits track
-               upB->is(UserPointer::UP_FLYABLE        ) ||   // 3.2) projectile hits projectile
-               upB->is(UserPointer::UP_PHYSICAL_OBJECT) ||   // 3.3) projectile hits projectile
-               upB->is(UserPointer::UP_KART           )   )  // 3.4) projectile hits kart
+            // 3.1) projectile hits track
+            // 3.2) projectile hits projectile
+            // 3.3) projectile hits physical object
+            // 3.4) projectile hits kart
+            if(upB->is(UserPointer::UP_TRACK          ) ||
+               upB->is(UserPointer::UP_FLYABLE        ) ||
+               upB->is(UserPointer::UP_PHYSICAL_OBJECT) ||
+               upB->is(UserPointer::UP_KART           )   )
             {
                 m_all_collisions.push_back(upA, upB);
             }
         }
+        // Object is a physical object
+        // ===========================
         else if(upA->is(UserPointer::UP_PHYSICAL_OBJECT))
         {
             if(upB->is(UserPointer::UP_FLYABLE))
-            {
                 m_all_collisions.push_back(upB, upA);
-            }
+            else if(upB->is(UserPointer::UP_KART))
+                m_all_collisions.push_back(upA, upB);
         }
         else assert("Unknown user pointer");            // 4) Should never happen
     }   // for i<numManifolds

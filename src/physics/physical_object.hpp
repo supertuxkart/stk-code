@@ -42,20 +42,26 @@ public:
                     MP_CYLINDER_Y, MP_CYLINDER_X, MP_CYLINDER_Z,
                     MP_BOX, MP_SPHERE};
 
-protected:
+private:
     /** The shape of this object. */
     bodyTypes             m_body_type;
+
     /** The bullet collision shape. */
     btCollisionShape     *m_shape;
+
     /** The corresponding bullet rigid body. */
     btRigidBody          *m_body;
+
     /** Bullet's motion state for this object. */
     btDefaultMotionState *m_motion_state;
+
     /** The mass of this object. */
     float                 m_mass;
+
     /** The pointer that is stored in the bullet rigid body back to 
      *  this object. */
     UserPointer           m_user_pointer;
+
     /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
 
@@ -66,6 +72,10 @@ protected:
      *  details, but is supposed to be a sphere). In this case the radius
      *  can be set in the scene file. */
     float                 m_radius;
+
+    /** True if a kart colliding with this object should be rescued. */
+    bool                  m_crash_reset;
+
 public:
                  PhysicalObject (const XMLNode &node);
     
@@ -76,12 +86,17 @@ public:
                                 const core::vector3df& scale);
     
     virtual     ~PhysicalObject (); 
+    virtual void reset          ();
+    virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
     void         init           ();
-    virtual void reset          ();
+    // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
     btRigidBody *getBody        ()          { return m_body; }
-    virtual void handleExplosion(const Vec3& pos, bool directHit);
+    // ------------------------------------------------------------------------
+    /** Returns true if this object should trigger a rescue in a kart that
+     *  hits it. */
+    bool isCrashReset() const { return m_crash_reset; }
 };  // PhysicalObject
 
 #endif
