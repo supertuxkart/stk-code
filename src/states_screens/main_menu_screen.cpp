@@ -58,23 +58,23 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
-}
+}   // MainMenuScreen
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
 {
     m_lang_popup = NULL;
     
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
-}
+}   // loadedFromFile
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
 void MainMenuScreen::init()
 {
@@ -101,30 +101,30 @@ void MainMenuScreen::init()
 
     if (UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
     {
-        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
+        IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
         w->resetAllBadges();
         w->setBadge(BAD_BADGE);
     }
     else if (!addons_manager->onlineReady())
     {
-        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
+        IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
     }
 
     
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
-}
+}   // init
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
+    IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
         if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
@@ -153,17 +153,19 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         }
     }
 
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->update(delta);
     if(w->scrolledOff())
     {
         const core::stringw &news_text = news_manager->getNextNewsMessage();
         w->setText(news_text, true);
     }
-}
-// ------------------------------------------------------------------------------------------------------
+}   // onUpdate
 
-void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+// ----------------------------------------------------------------------------
+
+void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
+                                   const int playerID)
 {
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
@@ -171,36 +173,54 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     if (ribbon == NULL) return; // what's that event??
     
     // ---- A ribbon icon was clicked
-    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    std::string selection = 
+        ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
         // The DEBUG item
-        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        FeatureUnlockedCutScene* scene = 
+            FeatureUnlockedCutScene::getInstance();
         
         static int i = 1;
         i++;
         
         if (i % 4 == 0)
         {
-            // the passed kart will not be modified, that's why I allow myself to use const_cast
-            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("tux")),
-                                   L"Unlocked");
+            // the passed kart will not be modified, that's why I allow myself
+            // to use const_cast
+            scene->addUnlockedKart( 
+                                   const_cast<KartProperties*>(
+                                        kart_properties_manager->getKart("tux")
+                                                              ),
+                                   L"Unlocked"
+                                   );
             StateManager::get()->pushScreen(scene);
         }
         else if (i % 4 == 1)
         {
             std::vector<video::ITexture*> textures;
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("crescentcrossing")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("sandtrack")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("snowmountain")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("lighthouse")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("crescentcrossing")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("sandtrack")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("snowmountain")
+                             ->getScreenshotFile().c_str()));
 
             scene->addUnlockedPictures(textures, 1.0, 0.75, L"You did it");
             
             /*
-            scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
+            scene->addUnlockedPicture( 
+                irr_driver->getTexture(
+                    track_manager->getTrack("lighthouse")
+                    ->getScreenshotFile().c_str()),
                                       1.0, 0.75, L"You did it");
             */
             
@@ -267,9 +287,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
-}
+}   // eventCallback
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::tearDown()
 {
@@ -277,9 +297,9 @@ void MainMenuScreen::tearDown()
     {
         closeLangPopup();
     }
-}
+}   // tearDown
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 bool MainMenuScreen::onEscapePressed()
 {
@@ -290,9 +310,9 @@ bool MainMenuScreen::onEscapePressed()
     }
     
     return true;
-}
+}   // onEscapePressed
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::closeLangPopup()
 {
@@ -303,9 +323,9 @@ void MainMenuScreen::closeLangPopup()
     manualRemoveWidget(m_lang_popup);
     delete m_lang_popup;
     m_lang_popup = NULL;
-}
+}   // closeLangPopup
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
@@ -313,15 +333,19 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
     {
         if (UserConfigParams::m_internet_status != NetworkHttp::IPERM_ALLOWED)
         {
-            new MessageDialog( _("The add-ons module is currently disabled in the Options screen") );
+            new MessageDialog( _("The add-ons module is currently disabled in "
+                                 "the Options screen") );
         }
         else if (addons_manager->wasError())
         {
-            new MessageDialog( _("Sorry, an error occurred while contacting the add-ons website. Make sure you are connected to the Internet and that SuperTuxKart is not blocked by a firewall") );
+            new MessageDialog( _("Sorry, an error occurred while contacting "
+                                 "the add-ons website. Make sure you are "
+                                 "connected to the Internet and that "
+                                 "SuperTuxKart is not blocked by a firewall"));
         }
         else if (addons_manager->isLoading())
         {
-            new MessageDialog( _("Please wait while the add-ons are loading") );
+            new MessageDialog( _("Please wait while the add-ons are loading"));
         }
     }
-}
+}   // onDisabledItemClicked

@@ -38,18 +38,20 @@ struct Input;
   * \ingroup states_screens
   */
 class OptionsScreenInput2 : public GUIEngine::Screen,
-                            public GUIEngine::ScreenSingleton<OptionsScreenInput2>,
-                            public MessageDialog::IConfirmDialogListener
+                        public GUIEngine::ScreenSingleton<OptionsScreenInput2>,
+                        public MessageDialog::IConfirmDialogListener
 {
     OptionsScreenInput2();
     
     void updateInputButtons();
 
-    bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from, PlayerAction to);
+    bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from, 
+                                   PlayerAction to);
 
     DeviceConfig* m_config;
     
-    irr::core::stringw makeLabel(const irr::core::stringw translatedName, PlayerAction action) const;
+    irr::core::stringw makeLabel(const irr::core::stringw &translatedName, 
+                                 PlayerAction action) const;
 
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
@@ -60,15 +62,18 @@ public:
     virtual void loadedFromFile();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, 
+                               const std::string& name, const int playerID);
     
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    /** \brief implement optional callback from parent class 
+     *  GUIEngine::Screen */
     virtual void unloaded();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
     
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    /** \brief implement optional callback from parent class 
+     *  GUIEngine::Screen */
     virtual bool onEscapePressed();
 
     /**
