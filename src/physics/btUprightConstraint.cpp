@@ -4,13 +4,18 @@ Bullet Continuous Collision Detection and Physics Library
 Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
  
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+1. The origin of this software must not be misrepresented; you must not claim
+   that you wrote the original software. If you use this software in a 
+   product, an acknowledgment in the product documentation would be 
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 */
@@ -42,8 +47,9 @@ void btUprightConstraint::solveAngularLimit(
                                ? limit->m_angle - m_loLimit
                                : limit->m_angle - m_hiLimit;
 
-    btScalar targetVelocity       = -m_ERP*limit->m_currentLimitError/(3.1415f/8.0f*timeStep);
-    btScalar maxMotorForce        = m_maxLimitForce;
+    btScalar targetVelocity = -m_ERP*limit->m_currentLimitError
+                            / (3.1415f/8.0f*timeStep);
+    btScalar maxMotorForce  = m_maxLimitForce;
 
     maxMotorForce *= timeStep;
 
@@ -52,7 +58,8 @@ void btUprightConstraint::solveAngularLimit(
     btScalar  axisAngularVelocity   = limit->m_axis.dot( angularVelocity );
  
      // correction velocity
-    btScalar motorVelocity          = m_limitSoftness*(targetVelocity  - m_damping*axisAngularVelocity);
+    btScalar motorVelocity          = m_limitSoftness*(targetVelocity
+                                    - m_damping*axisAngularVelocity);
 
     // correction impulse
     btScalar unclippedMotorImpulse = (1+m_bounce)*motorVelocity*jacDiagABInv;
@@ -64,11 +71,13 @@ void btUprightConstraint::solveAngularLimit(
 
     if (unclippedMotorImpulse>0.0f)
     {
-        clippedMotorImpulse =  unclippedMotorImpulse > maxMotorForce? maxMotorForce: unclippedMotorImpulse;
+        clippedMotorImpulse = unclippedMotorImpulse > maxMotorForce 
+                            ? maxMotorForce : unclippedMotorImpulse;
     }
     else
     {
-        clippedMotorImpulse =  unclippedMotorImpulse < -maxMotorForce ? -maxMotorForce: unclippedMotorImpulse;
+        clippedMotorImpulse = unclippedMotorImpulse < -maxMotorForce
+                            ? -maxMotorForce : unclippedMotorImpulse;
     }
 
     // sort with accumulated impulses
@@ -79,7 +88,8 @@ void btUprightConstraint::solveAngularLimit(
 
     btScalar sum = oldaccumImpulse + clippedMotorImpulse;
 
-    limit->m_accumulatedImpulse = sum > hi ? btScalar(0.) : sum < lo ? btScalar(0.) : sum;
+    limit->m_accumulatedImpulse = sum > hi ? btScalar(0.)
+                                           : sum < lo ? btScalar(0.) : sum;
 
     clippedMotorImpulse = limit->m_accumulatedImpulse - oldaccumImpulse;
 

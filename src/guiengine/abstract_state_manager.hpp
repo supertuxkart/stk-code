@@ -42,7 +42,7 @@ namespace GUIEngine
         MENU,
         GAME,
         INGAME_MENU
-    };
+    };   // GameState
     
     /**
      * \brief Abstract base class you must override from to use the GUI engine
@@ -57,7 +57,8 @@ namespace GUIEngine
         GameState m_game_mode;
         
         /**
-         * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
+         *  This stack will contain menu names (e.g. main.stkgui), 
+         *  and/or 'race'.
          */
         std::vector<std::string> m_menu_stack;
         
@@ -110,7 +111,7 @@ namespace GUIEngine
         
         /**
           * \brief call to make the state manager enter game mode.
-          * Causes the menu stack to be cleared; all widgets shown on screen 
+          * Causes the menu stack to be cleared; all widgets shown on screen
           * are removed
           */
         void enterGameState();
@@ -157,7 +158,7 @@ namespace GUIEngine
         virtual void onGameStateChange(GameState new_state) = 0;
         
         /**
-          * \brief callback invoked when the stack is emptied (all menus are 
+          * \brief callback invoked when the stack is emptied (all menus are
           * popped out). This is essentially a request to close the 
           * application (since a game can't run without a state)
           */
@@ -165,7 +166,7 @@ namespace GUIEngine
         
         virtual void onTopMostScreenChanged() = 0;
         
-    };
+    };   // Class AbstractStateManager
     
-}
+}   // GUIEngine
 #endif

@@ -80,7 +80,7 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     m_ping_sfx             = sfx_manager->createSoundSource("ball_bounce");
 }   // RubberBall
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 RubberBall::~RubberBall()
 {
     if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
@@ -88,7 +88,7 @@ RubberBall::~RubberBall()
     sfx_manager->deleteSFX(m_ping_sfx);
 }   // ~RubberBall
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Sets up the control points for the interpolation. The parameter contains
  *  the coordinates of the first control points (i.e. a control point that 
  *  influences the direction the ball is flying only, not the actual 
@@ -117,7 +117,7 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     m_t_increase    = m_speed/m_length_cp_1_2;
 }   // initialiseControlPoints
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Determines the first kart. If a target has already been identified in an
  *  earlier call, it is tested first, avoiding a loop over all karts.
  */
@@ -140,7 +140,7 @@ void RubberBall::computeTarget()
     }
 }   // computeTarget
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Determines the successor of a graph node. For now always a successor on
  *  the main driveline is returned, but a more sophisticated implementation
  *  might check if the target kart is on a shortcut, and select the path  so
@@ -199,7 +199,7 @@ void RubberBall::getNextControlPoint()
         QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
 }   // getNextControlPoint
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Initialises this object with data from the power.xml file (this is a static
  *  function). 
  *  \param node XML Node
@@ -285,9 +285,6 @@ bool RubberBall::updateAndDelete(float dt)
 
     checkDistanceToTarget();
 
-    // FIXME: do we want to test if we have overtaken the target kart?    
-    m_previous_xyz = getXYZ();
-
     Vec3 next_xyz;
     if(m_aiming_at_target)
     {
@@ -356,6 +353,7 @@ bool RubberBall::updateAndDelete(float dt)
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
+    m_previous_xyz = getXYZ();
     setXYZ(next_xyz);
 
     return false;
@@ -387,16 +385,19 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
         m_t -= 1.0f;
     }
 
-    *next_xyz = 0.5f * ((-m_control_points[0] + 3*m_control_points[1] -3*m_control_points[2] + m_control_points[3])*m_t*m_t*m_t
-               + (2*m_control_points[0] -5*m_control_points[1] + 4*m_control_points[2] - m_control_points[3])*m_t*m_t
-               + (-m_control_points[0]+m_control_points[2])*m_t
-               + 2*m_control_points[1]);
+    *next_xyz = 0.5f * ((-  m_control_points[0] + 3*m_control_points[1] 
+                         -3*m_control_points[2] +   m_control_points[3] )
+                        *m_t*m_t*m_t
+                      + ( 2*m_control_points[0] -5*m_control_points[1] 
+                         +4*m_control_points[2] -  m_control_points[3])*m_t*m_t
+                      + (-  m_control_points[0] +  m_control_points[2])*m_t
+                      +   2*m_control_points[1]                              );
 }   // interpolate
 
 // ----------------------------------------------------------------------------
 /** Updates the height of the rubber ball, and if necessary also adjusts the 
  *  maximum height of the ball depending on distance from the target. The 
- *  height is decreased when the ball is getting closer to the target so it 
+ *  height is decreased when the ball is getting closer to the target so it
  *  hops faster and faster. This function modifies m_current_max_height.
  *  \return Returns the new height of the ball.
  */

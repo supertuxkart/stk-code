@@ -41,7 +41,9 @@ AbstractTopLevelContainer::AbstractTopLevelContainer()
     m_last_widget = NULL;
 }
 
-void AbstractTopLevelContainer::addWidgetsRecursively(PtrVector<Widget>& widgets, Widget* parent)
+void AbstractTopLevelContainer::addWidgetsRecursively(
+                                                    PtrVector<Widget>& widgets,
+                                                    Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
     
@@ -55,21 +57,25 @@ void AbstractTopLevelContainer::addWidgetsRecursively(PtrVector<Widget>& widgets
         }
         else
         {
-            // warn if widget has no dimensions (except for ribbons and icons, where it is normal since it
-            // adjusts to its contents)
+            // warn if widget has no dimensions (except for ribbons and icons,
+            // where it is normal since it adjusts to its contents)
             if ((widgets[n].m_w < 1 || widgets[n].m_h < 1) &&
                 widgets[n].getType() != WTYPE_RIBBON &&
                 widgets[n].getType() != WTYPE_ICON_BUTTON &&
                 widgets[n].getType() != WTYPE_SPACER)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str()
-                          << " of type " << widgets[n].getType() << " has no dimensions" << std::endl;
+                std::cerr << "/!\\ Warning /!\\ : widget " 
+                          << widgets[n].m_properties[PROP_ID].c_str()
+                          << " of type " << widgets[n].getType() 
+                          << " has no dimensions" << std::endl;
             }
             
             if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " << widgets[n].m_properties[PROP_ID].c_str()
-                          << " of type " << widgets[n].getType() << " has no position" << std::endl;
+                std::cerr << "/!\\ Warning /!\\ : widget " 
+                          << widgets[n].m_properties[PROP_ID].c_str()
+                          << " of type " << widgets[n].getType()
+                          << " has no position" << std::endl;
             }
             
             widgets[n].add();
@@ -155,12 +161,15 @@ Widget* AbstractTopLevelContainer::getWidget(const int id,
     {
         Widget& widget = (*within_vector)[n];
         
-        if (widget.m_element != NULL && widget.getIrrlichtElement()->getID() == id) return &widget;
+        if (widget.m_element != NULL && 
+            widget.getIrrlichtElement()->getID() == id) return &widget;
         
         if (widget.searchInsideMe() && widget.getChildren().size() > 0)
         {
-            // std::cout << "widget = <" << widget.m_properties[PROP_ID].c_str() 
-            //           << ">  widget.m_children.size()=" << widget.m_children.size() << std::endl;
+            // std::cout << "widget = <" 
+            //           << widget.m_properties[PROP_ID].c_str()
+            //           << ">  widget.m_children.size()=" 
+            // << widget.m_children.size() << std::endl;
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }
@@ -171,7 +180,8 @@ Widget* AbstractTopLevelContainer::getWidget(const int id,
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getFirstWidget(PtrVector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getFirstWidget(
+                                              PtrVector<Widget>* within_vector)
 {
     if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
@@ -180,7 +190,8 @@ Widget* AbstractTopLevelContainer::getFirstWidget(PtrVector<Widget>* within_vect
     {
         if (!within_vector->get(i)->m_focusable) continue;
         
-        // if container, also checks children (FIXME: don't hardcode which types to avoid descending into)
+        // if container, also checks children 
+        // (FIXME: don't hardcode which types to avoid descending into)
         if (within_vector->get(i)->m_children.size() > 0 &&
             within_vector->get(i)->getType() != WTYPE_RIBBON &&
             within_vector->get(i)->getType() != WTYPE_SPINNER)
@@ -192,7 +203,8 @@ Widget* AbstractTopLevelContainer::getFirstWidget(PtrVector<Widget>* within_vect
         Widget* item = within_vector->get(i);
         if (item->getIrrlichtElement() == NULL ||
             item->getIrrlichtElement()->getTabOrder() == -1 ||
-            item->getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+             /* non-tabbing items are given such IDs */ 
+            item->getIrrlichtElement()->getTabOrder() >= 1000 ||
             !item->m_focusable)
         {
             continue;
@@ -205,7 +217,8 @@ Widget* AbstractTopLevelContainer::getFirstWidget(PtrVector<Widget>* within_vect
 
 // -----------------------------------------------------------------------------
 
-Widget* AbstractTopLevelContainer::getLastWidget(PtrVector<Widget>* within_vector)
+Widget* AbstractTopLevelContainer::getLastWidget(
+                                              PtrVector<Widget>* within_vector)
 {
     if (m_last_widget != NULL) return m_last_widget;
     if (within_vector == NULL) within_vector = &m_widgets;

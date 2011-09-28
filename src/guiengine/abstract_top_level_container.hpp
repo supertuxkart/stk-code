@@ -42,22 +42,24 @@ namespace GUIEngine
         PtrVector<Widget, HOLD> m_widgets;
         
         /**
-         * AbstractTopLevelContainer is generally able to determine its first widget just fine,
-         * but in highly complex screens (e.g. multiplayer kart selection) you can help it by
-         * providing the first widget manually.
+         *  AbstractTopLevelContainer is generally able to determine its first
+         *  widget just fine, but in highly complex screens (e.g. multiplayer 
+         *  kart selection) you can help it by providing the first widget 
+         *  manually.
          */
         Widget* m_first_widget;
         
         /**
-         * AbstractTopLevelContainer is generally able to determine its last widget just fine,
-         * but in highly complex screens (e.g. multiplayer kart selection) you can help it by
-         * providing the first widget manually.
+         *  AbstractTopLevelContainer is generally able to determine its last
+         *  widget just fine, but in highly complex screens (e.g. multiplayer
+         *  kart selection) you can help it by providing the first widget 
+         *  manually.
          */
         Widget* m_last_widget;
         
-        void addWidgetsRecursively(PtrVector<Widget>& widgets, Widget* parent=NULL);
+        void addWidgetsRecursively(PtrVector<Widget>& widgets, 
+                                   Widget* parent=NULL);
 
-    
     public:
         AbstractTopLevelContainer();
         virtual ~AbstractTopLevelContainer() {}
@@ -71,29 +73,33 @@ namespace GUIEngine
         /** \return an object by irrlicht ID, or NULL if not found */
         Widget* getWidget(const int id);
         
-        /** \return an object by name, casted to specified type, or NULL if not found/wrong type */
+        /** \return an object by name, casted to specified type, or NULL if
+         *  not found/wrong type */
         template <typename T> T* getWidget(const char* name)
         {
             Widget* out = getWidget(name);
             T* outCasted = dynamic_cast<T*>( out );
             if (out != NULL && outCasted == NULL)
             {
-                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
-                        "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
+                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s'"
+                        "cannot be casted to requested type '%s'!\n", name, 
+                        typeid(*out).name(), typeid(T).name()); 
                 abort();
             }
             return outCasted;
         }
         
-        static Widget* getWidget(const char* name, PtrVector<Widget>* within_vector);
-        static Widget* getWidget(const int id, PtrVector<Widget>* within_vector);
+        static Widget* getWidget(const char* name, 
+                                 PtrVector<Widget>* within_vector);
+        static Widget* getWidget(const int id,
+                                 PtrVector<Widget>* within_vector);
       
         Widget* getFirstWidget(PtrVector<Widget>* within_vector=NULL);
         Widget* getLastWidget(PtrVector<Widget>* within_vector=NULL);
         
         bool isMyChild(Widget* widget) const;
-    };
+    };   // AbstractTopLevelContainer
     
-}
+}   // namespace GUIEngine
 
 #endif

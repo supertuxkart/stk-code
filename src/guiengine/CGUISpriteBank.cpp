@@ -32,9 +32,9 @@ STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
         if (Driver)
             Driver->grab();
     }
-}
+}   // STKModifiedSpriteBank
 
-
+// ----------------------------------------------------------------------------
 STKModifiedSpriteBank::~STKModifiedSpriteBank()
 {
     // drop textures
@@ -47,44 +47,45 @@ STKModifiedSpriteBank::~STKModifiedSpriteBank()
         Driver->drop();
     
     m_magic_number = 0xDEADBEEF;
-}
+}   // ~STKModifiedSpriteBank
 
-
+// ----------------------------------------------------------------------------
 core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
 {
     assert( m_magic_number == 0xCAFEC001 );
     copy.clear();
     
-    //FIXME: terribly unefficient, CGUIListBox will call this once for every item xD
-    //       but I have no choice, short of re-implementing IGUIListBox too
+    //FIXME: terribly unefficient, CGUIListBox will call this once for every
+    //       item xD but I have no choice, short of re-implementing 
+    //       IGUIListBox too
 
     for (int n=0; n<(int)Rectangles.size(); n++)
     {
-        copy.push_back(
-                       core::rect<s32>(Rectangles[n].UpperLeftCorner,
-                                        core::dimension2d<s32>((int)(Rectangles[n].getWidth()*m_scale),
-                                                        (int)(Rectangles[n].getHeight()*m_scale)) )
+        const int h = (int)(Rectangles[n].getHeight()*m_scale);
+        const int w = (int)(Rectangles[n].getWidth() *m_scale);
+        copy.push_back( core::rect<s32>(Rectangles[n].UpperLeftCorner,
+                                       core::dimension2d<s32>(w,h) )
                        );
     }
     
     return copy;
-}
+}   // getPositions
 
-
+// ----------------------------------------------------------------------------
 core::array< SGUISprite >& STKModifiedSpriteBank::getSprites()
 {
     assert( m_magic_number == 0xCAFEC001 );
     return Sprites;
-}
+}   // getSprites
 
-
+// ----------------------------------------------------------------------------
 u32 STKModifiedSpriteBank::getTextureCount() const
 {
     assert( m_magic_number == 0xCAFEC001 );
     return Textures.size();
-}
+}   // getTextureCount
 
-
+// ----------------------------------------------------------------------------
 video::ITexture* STKModifiedSpriteBank::getTexture(u32 index) const
 {
     assert( m_magic_number == 0xCAFEC001 );
@@ -92,9 +93,9 @@ video::ITexture* STKModifiedSpriteBank::getTexture(u32 index) const
         return Textures[index];
     else
         return 0;
-}
+}   // getTexture
 
-
+// ----------------------------------------------------------------------------
 void STKModifiedSpriteBank::addTexture(video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
@@ -102,9 +103,9 @@ void STKModifiedSpriteBank::addTexture(video::ITexture* texture)
         texture->grab();
 
     Textures.push_back(texture);
-}
+}   // addTexture
 
-
+// ----------------------------------------------------------------------------
 void STKModifiedSpriteBank::setTexture(u32 index, video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
@@ -118,9 +119,9 @@ void STKModifiedSpriteBank::setTexture(u32 index, video::ITexture* texture)
         Textures[index]->drop();
 
     Textures[index] = texture;
-}
+}   // setTexture
 
-
+// ----------------------------------------------------------------------------
 //! clear everything
 void STKModifiedSpriteBank::clear()
 {
@@ -132,9 +133,11 @@ void STKModifiedSpriteBank::clear()
     Textures.clear();
     Sprites.clear();
     Rectangles.clear();
-}
+}   // clear
 
-//! Add the texture and use it for a single non-animated sprite.
+// ----------------------------------------------------------------------------
+/** Add the texture and use it for a single non-animated sprite.
+ */
 s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
 {
     assert( m_magic_number == 0xCAFEC001 );
@@ -145,7 +148,9 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
     u32 textureIndex = getTextureCount() - 1;
 
     u32 rectangleIndex = Rectangles.size();
-    Rectangles.push_back( core::rect<s32>(0,0, texture->getOriginalSize().Width, texture->getOriginalSize().Height) );
+    Rectangles.push_back( core::rect<s32>(0,0, 
+                                          texture->getOriginalSize().Width,
+                                          texture->getOriginalSize().Height) );
 
     SGUISprite sprite;
     sprite.frameTime = 0;
@@ -158,10 +163,12 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
     Sprites.push_back( sprite );
 
     return Sprites.size() - 1;
-}
+}   // addTextureAsSprite
 
+// ----------------------------------------------------------------------------
 //! draws a sprite in 2d with scale and color
-void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos,
+void STKModifiedSpriteBank::draw2DSprite(u32 index, 
+        const core::position2di& pos,
         const core::rect<s32>* clip, const video::SColor& color,
         u32 starttime, u32 currenttime, bool loop, bool center)
 {
@@ -177,10 +184,12 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos
         if (loop)
             frame = f % Sprites[index].Frames.size();
         else
-            frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
+            frame = (f >= Sprites[index].Frames.size()) 
+                  ? Sprites[index].Frames.size()-1 : f;
     }
 
-    const video::ITexture* tex = Textures[Sprites[index].Frames[frame].textureNumber];
+    const video::ITexture* tex = 
+        Textures[Sprites[index].Frames[frame].textureNumber];
     if (!tex)
         return;
 
@@ -192,29 +201,34 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos
 
     const core::dimension2d<s32>& dim = r.getSize();
     
-    core::rect<s32> dest( pos, core::dimension2d<s32>((int)(dim.Width*m_scale), 
-                                                      (int)(dim.Height*m_scale)) );
+    core::rect<s32> dest( pos, 
+                          core::dimension2d<s32>((int)(dim.Width*m_scale), 
+                                                 (int)(dim.Height*m_scale)) );
     if (center)
     {
         dest -= dest.getSize() / 2;
     }
     
     /*
-        draw2DImage  (const video::ITexture  *texture, const core::rect<  s32  > &destRect,
-                      const core::rect<  s32  > &sourceRect, const core::rect<  s32  > *clipRect=0,
-                      const video::SColor  *const colors=0, bool useAlphaChannelOfTexture=false)=0
+        draw2DImage  (const video::ITexture  *texture, 
+                      const core::rect<  s32  > &destRect,
+                      const core::rect<  s32  > &sourceRect, 
+                      const core::rect<  s32  > *clipRect=0,
+                      const video::SColor  *const colors=0,
+                      bool useAlphaChannelOfTexture=false)=0
      */
-    Driver->draw2DImage(tex, dest, r /* source rect */, clip, NULL /* colors */, true);
+    Driver->draw2DImage(tex, dest, r /* source rect */, clip, 
+                        NULL /* colors */, true);
 
-}
+}   // draw2DSprite
 
-
-void STKModifiedSpriteBank::draw2DSpriteBatch(  const core::array<u32>& indices,
-                                        const core::array<core::position2di>& pos,
-                                        const core::rect<s32>* clip,
-                                        const video::SColor& color,
-                                        u32 starttime, u32 currenttime,
-                                        bool loop, bool center)
+// ----------------------------------------------------------------------------
+void STKModifiedSpriteBank::draw2DSpriteBatch(const core::array<u32>& indices,
+                            const core::array<core::position2di>& pos,
+                            const core::rect<s32>* clip,
+                            const video::SColor& color,
+                            u32 starttime, u32 currenttime,
+                            bool loop, bool center)
 {
     assert( m_magic_number == 0xCAFEC001 );
     const irr::u32 drawCount = core::min_<u32>(indices.size(), pos.size());
@@ -242,7 +256,8 @@ void STKModifiedSpriteBank::draw2DSpriteBatch(  const core::array<u32>& indices,
             if (loop)
                 frame = f % Sprites[index].Frames.size();
             else
-                frame = (f >= Sprites[index].Frames.size()) ? Sprites[index].Frames.size()-1 : f;
+                frame = (f >= Sprites[index].Frames.size())
+                      ? Sprites[index].Frames.size()-1 : f;
         }
 
         const u32 texNum = Sprites[index].Frames[frame].textureNumber;
@@ -272,12 +287,14 @@ void STKModifiedSpriteBank::draw2DSpriteBatch(  const core::array<u32>& indices,
 
     for(u32 i = 0;i < drawBatches.size();i++)
     {
-        if(!drawBatches[i].positions.empty() && !drawBatches[i].sourceRects.empty())
+        if(!drawBatches[i].positions.empty() && 
+            !drawBatches[i].sourceRects.empty())
             Driver->draw2DImageBatch(Textures[i], drawBatches[i].positions,
                 drawBatches[i].sourceRects, clip, color, true);
     }
-}
+}   // draw2DSpriteBatch
 
+// ----------------------------------------------------------------------------
 } // namespace gui
 } // namespace irr
 
