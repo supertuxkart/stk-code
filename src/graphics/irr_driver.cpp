@@ -25,6 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
+#include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -356,7 +357,8 @@ void IrrDriver::hidePointer()
 
 //-----------------------------------------------------------------------------
 
-void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen)
+void IrrDriver::changeResolution(const int w, const int h, 
+                                 const bool fullscreen)
 {
     // update user config values
     UserConfigParams::m_prev_width = UserConfigParams::m_width;
@@ -393,6 +395,7 @@ void IrrDriver::applyResolutionSettings()
     item_manager            -> removeTextures();
     kart_properties_manager -> unloadAllKarts();
     powerup_manager         -> unloadPowerups();
+    Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
     GUIEngine::clear();
@@ -415,7 +418,8 @@ void IrrDriver::applyResolutionSettings()
     
     
     // ---- Reinit
-    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! That's just error prone
+    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! That'
+    // s just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
     
     initDevice();
@@ -429,10 +433,13 @@ void IrrDriver::applyResolutionSettings()
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
     
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
+    GUIEngine::addLoadingIcon( 
+        irr_driver->getTexture(file_manager->getGUIDir()+"/options_video.png")
+        );
     
     file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
-    const std::string materials_file = file_manager->getModelFile("materials.xml");
+    const std::string materials_file = 
+        file_manager->getModelFile("materials.xml");
     if (materials_file != "")
     {
         material_manager->addSharedMaterial(materials_file);
@@ -441,7 +448,9 @@ void IrrDriver::applyResolutionSettings()
     powerup_manager         -> loadAllPowerups ();
     item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
+    Referee::init();
+    GUIEngine::addLoadingIcon( 
+        irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
     
     file_manager->popTextureSearchPath();
 
