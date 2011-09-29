@@ -36,32 +36,27 @@ Stars::Stars(scene::ISceneNode* parentKart, core::vector3df center)
     m_enabled = false;
 
     video::ITexture* texture = irr_driver->getTexture("starparticle.png");
-    Material* star_material = material_manager->getMaterial("starparticle.png");
+    Material* star_material = 
+        material_manager->getMaterial("starparticle.png");
     
     m_center = center;
     
     for (int n=0; n<STAR_AMOUNT; n++)
     {
-        scene::ISceneNode* billboard = irr_driver->addBillboard(core::dimension2d< f32 >(STAR_SIZE, STAR_SIZE),
-                                                                texture,
-                                                                parentKart);
+        scene::ISceneNode* billboard = 
+            irr_driver->addBillboard(core::dimension2df(STAR_SIZE, STAR_SIZE),
+                                     texture, parentKart);
 #ifdef DEBUG
         billboard->setName("star");
 #endif
         star_material->setMaterialProperties(&(billboard->getMaterial(0)));
-        //billboard->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         billboard->setMaterialTexture(0, star_material->getTexture());
         
         billboard->setVisible(false);
         
         m_nodes.push_back(billboard);
     }
-    
-    // for debugging
-    //m_enabled = true;
-    //m_remaining_time = 99999.0f;
-    //update(0);
-}
+}   // Stars
 
 // ----------------------------------------------------------------------------
 
@@ -72,7 +67,7 @@ Stars::~Stars()
     {
         m_parent_kart_node->removeChild(m_nodes[n]);
     }
-}
+}   // ~Stars
 
 // ----------------------------------------------------------------------------
 
@@ -86,12 +81,13 @@ void Stars::showFor(float time)
     for (int n=0; n<nodeAmount; n++)
     {
         m_nodes[n]->setVisible(true);
-        ((scene::IBillboardSceneNode*)m_nodes[n])->setSize( core::dimension2d< f32 >(0.01f, 0.01f) );
+        ((scene::IBillboardSceneNode*)m_nodes[n])
+               ->setSize( core::dimension2df(0.01f, 0.01f) );
     }
     
     // set stars initial position
     update(0);
-}
+}   // showFor
 
 // ----------------------------------------------------------------------------
 /** Resets the stars, esp. disabling them at a restart.
@@ -124,7 +120,8 @@ void Stars::update(float delta_t)
     const int nodeAmount = m_nodes.size();
     for (int n=0; n<nodeAmount; n++)
     {
-        // do one full rotation every 4 seconds (this "ranges" ranges from 0 to 1)
+        // do one full rotation every 4 seconds (this "ranges" ranges 
+        // from 0 to 1)
         float angle = (m_remaining_time / 4.0f) - (int)(m_remaining_time / 4);
         
         // each star must be at a different angle
@@ -139,9 +136,6 @@ void Stars::update(float delta_t)
         // manage "fade-in"
         if (m_fade_in_time > 0.0f)
         {
-            //m_nodes[n]->getMaterial(0).AmbientColor.setAlpha((1.0f - m_fade_in_time)*255.0f);
-            //m_nodes[n]->getMaterial(0).DiffuseColor.setAlpha((1.0f - m_fade_in_time)*255.0f);
-
             float fade = (1.0f - m_fade_in_time);
             
             ((scene::IBillboardSceneNode*)m_nodes[n])->setSize(
@@ -152,21 +146,22 @@ void Stars::update(float delta_t)
         // manage "fade-out"
         else if (m_remaining_time < 1.0f)
         {
-            //m_nodes[n]->getMaterial(0).AmbientColor.setAlpha(m_remaining_time*255.0f);
-            //m_nodes[n]->getMaterial(0).DiffuseColor.setAlpha(m_remaining_time*255.0f);
-
             radius *= m_remaining_time;
             
-            ((scene::IBillboardSceneNode*)m_nodes[n])->setSize( core::dimension2d< f32 >(m_remaining_time*STAR_SIZE,
-                                                                                         m_remaining_time*STAR_SIZE) );
+            ((scene::IBillboardSceneNode*)m_nodes[n])
+                ->setSize( core::dimension2df(m_remaining_time*STAR_SIZE,
+                                              m_remaining_time*STAR_SIZE) );
         }
         
-        // set position
-        m_nodes[n]->setPosition(m_center + core::vector3df( std::cos(angle*M_PI*2.0f)*radius, // Position in circle
-                                                           std::cos(angle*M_PI*2.0f + m_remaining_time*4.0f)*radius*0.25f, // Shake up and down like falling coin
-                                                           std::sin(angle*M_PI*2.0f)*radius)); // Position in circle
+        // Set position: X and Z are the position in the cirlce,
+        // the Y components shakes the stars up and down like falling coin
+        core::vector3df offset(std::cos(angle*M_PI*2.0f)*radius, 
+                               std::cos(angle*M_PI*2.0f+m_remaining_time*4.0f)
+                               *radius*0.25f,
+                               std::sin(angle*M_PI*2.0f)*radius              );
+        m_nodes[n]->setPosition(m_center + offset);
     } // end for
     
     if (m_fade_in_time > 0.0f) m_fade_in_time -= delta_t;
-}
+}   // update
 

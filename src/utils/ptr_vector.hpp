@@ -15,8 +15,9 @@
  */
 
 /*
- * I made this class to work like a regular vector, except that m_contents_vector are placed
- * one the heap so third-party m_contents_vector can keep pointers to them.
+ *  I made this class to work like a regular vector, except that 
+ *  m_contents_vector are placed* one the heap so third-party 
+ *  m_contents_vector can keep pointers to them.
  */
 
 #ifndef HEADER_PtrVector_HPP
@@ -43,21 +44,21 @@ public:
 
     PtrVector()
     {
-    }
+    }   // PtrVector
 
     // ------------------------------------------------------------------------
     
     ~PtrVector()
     {
         if(type == HOLD) clearAndDeleteAll();
-    }
+    }   // ~PtrVector
     
     // ------------------------------------------------------------------------
     
     void push_back(TYPE* t)
     {
         m_contents_vector.push_back(t);
-    }
+    }   // push_back
 
     // ------------------------------------------------------------------------
     void swap(int ID1, int ID2)
@@ -72,7 +73,7 @@ public:
 
         m_contents_vector[ID2] = m_contents_vector[ID1];
         m_contents_vector[ID1] = temp;
-    }
+    }   // swap
 
     // ------------------------------------------------------------------------
     TYPE* get(const int ID)
@@ -81,7 +82,7 @@ public:
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
         return m_contents_vector[ID];
-    }
+    }   // get
 
     // ------------------------------------------------------------------------
     const TYPE* get(const int ID) const
@@ -90,13 +91,13 @@ public:
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
         return m_contents_vector[ID];
-    }
+    }   // get
 
     // ------------------------------------------------------------------------
     int size() const
     {
         return m_contents_vector.size();
-    }
+    }   // size
 
     // ------------------------------------------------------------------------
     void erase(const int ID)
@@ -115,7 +116,7 @@ public:
 #else
         m_contents_vector.erase(m_contents_vector.begin()+ID);
 #endif
-    }
+    }   // erase
 
     // ------------------------------------------------------------------------
     TYPE* remove(const int ID)
@@ -135,7 +136,7 @@ public:
         m_contents_vector.erase(m_contents_vector.begin()+ID);
 #endif
         return out;
-    }
+    }   // remove
 
     // ------------------------------------------------------------------------
     bool contains( const TYPE* instance ) const
@@ -148,7 +149,7 @@ public:
         }
 
         return false;
-    }
+    }   // contains
 
     // ------------------------------------------------------------------------
     void clearAndDeleteAll()
@@ -164,7 +165,7 @@ public:
             assert( !contains(pointer) );
         }
         m_contents_vector.clear();
-    }
+    }  // clearAndDeleteAll
 
     // ------------------------------------------------------------------------
     TYPE& operator[](const unsigned int ID)
@@ -172,7 +173,7 @@ public:
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
         return *(m_contents_vector[ID]);
-    }
+    }   // operator[]
 
     // ------------------------------------------------------------------------
     const TYPE& operator[](const unsigned int ID) const
@@ -180,13 +181,13 @@ public:
         assert((unsigned int)ID < (unsigned int)m_contents_vector.size());
 
         return *(m_contents_vector[ID]);
-    }
+    }   // operator[]
 
     // ------------------------------------------------------------------------
     void clearWithoutDeleting()
     {
         m_contents_vector.clear();
-    }
+    }   // clearWithoutDeleting
 
     // ------------------------------------------------------------------------
     /**
@@ -213,9 +214,9 @@ public:
 #endif
                 return;
             }
-        }
+        }   // for n < size()
 
-    }
+    }   // remove
 
     // ------------------------------------------------------------------------
     /**
@@ -243,15 +244,15 @@ public:
                 delete pointer;
                 return true;
             }
-        }
+        }   // for n < size()
         return false;
-    }
+    }   // erase
 
     // ------------------------------------------------------------------------
     void insertionSort(unsigned int start=0)
     {
-        // We should not used unsigned ints here, because if the vector is empty
-        // j needs to be compared against -1
+        // We should not used unsigned ints here, because if the vector is 
+        // empty j needs to be compared against -1
         for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
         {
             if(*(m_contents_vector[j])<*(m_contents_vector[j+1])) continue;
@@ -272,7 +273,9 @@ public:
 };   // class ptrVector
 
 
-#define for_in( VAR, VECTOR ) for (int _foreach_i = 0; VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), _foreach_i < VECTOR.size(); _foreach_i++)
+#define for_in( VAR, VECTOR ) for (int _foreach_i = 0; \
+           VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL),\
+           _foreach_i < VECTOR.size(); _foreach_i++)
 
 
 #endif

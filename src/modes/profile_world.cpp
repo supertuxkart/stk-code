@@ -41,7 +41,8 @@ ProfileWorld::ProfileWorld()
     // Set number of laps so that the end of the race can be detected by 
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - otherwise just a high number.
-    race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps : 99999);
+    race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps 
+                                                          : 99999);
     m_phase            = RACE_PHASE;
     m_frame_count      = 0;
     m_start_time       = irr_driver->getRealTime();
@@ -128,7 +129,8 @@ void ProfileWorld::update(float dt)
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();
     io::IAttributes   *attr = irr_driver->getSceneManager()->getParameters();
-    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000.f ));
+    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 ) 
+                        * ( 1.f / 1000.f ));
     m_num_calls        += attr->getAttributeAsInt("calls");
     m_num_culls        += attr->getAttributeAsInt("culled" );
     m_num_solid        += attr->getAttributeAsInt("drawn_solid" );
@@ -164,7 +166,8 @@ void ProfileWorld::enterRaceOverState()
     for (unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         // ---------- update rank ------
-        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) continue;
+        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) 
+            continue;
         m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
     }
 
@@ -196,7 +199,9 @@ void ProfileWorld::enterRaceOverState()
         printf("average_speed,");
     }
 
-    printf("top_speed,skid_time,rescue_time,rescue_count,explosion_time,explosion_count,bonus_count,banana_count,small_nitro_count,large_nitro_count,bubblegum_count\n");
+    printf("top_speed,skid_time,rescue_time,rescue_count,explosion_time,"
+           "explosion_count,bonus_count,banana_count,small_nitro_count,"
+           "large_nitro_count,bubblegum_count\n");
 
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
