@@ -104,7 +104,7 @@ public:
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     /** Returns the frame size. */
-    const core::dimension2d<u32> getFrameSize() const 
+    const core::dimension2d<u32>& getFrameSize() const 
                        { return m_video_driver->getCurrentRenderTargetSize(); }
     /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
