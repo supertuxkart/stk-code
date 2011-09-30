@@ -19,6 +19,7 @@
 
 #include "physics/physics.hpp"
 
+#include "animations/three_d_animation.hpp"
 #include "config/user_config.hpp"
 #include "network/race_state.hpp"
 #include "graphics/stars.hpp"
@@ -143,7 +144,18 @@ void Physics::update(float dt)
             continue;
         }
 
+        if(p->a->is(UserPointer::UP_ANIMATION))
+        {
+            // Kart hits animation
+            ThreeDAnimation *anim=p->a->getPointerAnimation();
+            if(anim->isCrashReset())
+            {
+                Kart *kart = p->b->getPointerKart();
+                kart->forceRescue();
+            }
+            continue;
 
+        }
         // now the first object must be a projectile
         // =========================================
         if(p->b->is(UserPointer::UP_TRACK))
@@ -363,6 +375,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
                 // 2.3 kart hits physical object
                 m_all_collisions.push_back(upB, upA);
+            else if(upB->is(UserPointer::UP_ANIMATION))
+                m_all_collisions.push_back(upB, upA);
         }
         // 3) object is a projectile
         // =========================
@@ -387,6 +401,11 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
+                m_all_collisions.push_back(upA, upB);
+        }
+        else if (upA->is(UserPointer::UP_ANIMATION))
+        {
+            if(upB->is(UserPointer::UP_KART))
                 m_all_collisions.push_back(upA, upB);
         }
         else assert("Unknown user pointer");            // 4) Should never happen

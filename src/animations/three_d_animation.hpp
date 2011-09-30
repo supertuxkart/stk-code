@@ -53,6 +53,10 @@ private:
 
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
+
+    /** True if a collision with this object should trigger 
+     *  rescuing a kart. */
+    bool                  m_crash_reset;
     
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
@@ -65,6 +69,10 @@ public:
                  ThreeDAnimation(const XMLNode &node);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);
+    // ------------------------------------------------------------------------
+    /** Returns true if a collision with this object should 
+     * trigger a rescue. */
+    bool isCrashReset() const { return m_crash_reset; }
 
 };   // ThreeDAnimation
 #endif

@@ -39,6 +39,8 @@
 ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
                : AnimationBase(node)
 {
+    m_crash_reset   = false;
+    node.get("reset", &m_crash_reset);
     m_triangle_mesh = NULL;
     
     /** Save the initial position and rotation in the base animation object. */
