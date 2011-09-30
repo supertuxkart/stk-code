@@ -23,6 +23,9 @@
         target-distance: When the ball is closer than 
                     this to the target, it will aim
                     directly at the target.
+        target-max-angle: Once the ball is aiming for its
+                    target, it can at most change the angle
+                    this much per second(!).
         min-interpolation-distance: how far the control
                     points (which are center of squads)
                     must be from each other. A large value
@@ -42,7 +45,8 @@
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
         model="rubber_ball.b3d" speed="35.0" scale="1 1 1"
         interval="1"          max-height="4.0" min-height="0"
-        target-distance="50"  min-interpolation-distance="10"
+        target-distance="50"  target-max-angle = "90"
+        min-interpolation-distance="10"
         squash-slowdown="0.5" squash-duration="3"       />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />

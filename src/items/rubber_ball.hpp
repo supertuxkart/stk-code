@@ -55,6 +55,11 @@ private:
      *  start to aim directly at the target (and not interpolate anymore). */
     static float m_st_target_distance;
 
+    /** The maximum angle the ball can change per second when being close
+     *  to the taregt. If the target angle is small, it makes it much harder
+     *  to hit the target, giving it some chances to escape. */
+    static float m_st_target_max_angle;
+
     /** Each control point chosen must be at least this far away from
      *  the previous one. This gives smooth 'overall' interpolation
      *  even if the quads should be close to each other. */

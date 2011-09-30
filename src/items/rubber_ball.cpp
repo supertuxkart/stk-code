@@ -33,6 +33,7 @@ float RubberBall::m_st_min_interpolation_distance;
 float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
+float RubberBall::m_st_target_max_angle;
 int   RubberBall::m_next_id = 0;
 
 RubberBall::RubberBall(Kart *kart, Track* track)
@@ -210,8 +211,9 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_interval                   = 1.0f;
     m_st_squash_duration            = 3.0f;
     m_st_squash_slowdown            = 0.5f;
-    m_st_target_distance            = 50.0f;
     m_st_min_interpolation_distance = 30.0f;
+    m_st_target_distance            = 50.0f;
+    m_st_target_max_angle           = 25.0f;
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specified for rubber ball.\n");
     if(!node.get("squash-duration", &m_st_squash_duration))
@@ -220,15 +222,18 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     if(!node.get("squash-slowdown", &m_st_squash_slowdown))
         printf(
         "[powerup] Warning: no squash-slowdown specified for rubber ball.\n");
-    if(!node.get("target-distance", &m_st_target_distance))
-        printf(
-        "[powerup] Warning: no target-distance specified for rubber ball.\n");
     if(!node.get("min-interpolation-distance", 
                  &m_st_min_interpolation_distance))
         printf(
                "[powerup] Warning: no min-interpolation-distance specified "
                "for rubber ball.\n");
-
+    if(!node.get("target-distance", &m_st_target_distance))
+        printf(
+        "[powerup] Warning: no target-distance specified for rubber ball.\n");
+    if(!node.get("target-max-angle", &m_st_target_max_angle))
+        printf(
+        "[powerup] Warning: no target-max-angle specified for rubber ball.\n");
+    m_st_target_max_angle *= DEGREE_TO_RAD;
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 // ----------------------------------------------------------------------------
@@ -294,6 +299,40 @@ bool RubberBall::updateAndDelete(float dt)
         Vec3 diff = m_target->getXYZ()-getXYZ();
         next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
 
+        Vec3 old_vec = getXYZ()-m_previous_xyz;
+        Vec3 new_vec = next_xyz - getXYZ();
+        float angle  = atan2(new_vec.getZ(), new_vec.getX())
+                     - atan2(old_vec.getZ(), old_vec.getX());
+        // Adjust angle to be between -180 and 180 degrees
+        if(angle < -M_PI)
+            angle += M_PI;
+        else if(angle > M_PI)
+            angle -= M_PI;
+
+        // If the angle is too much, adjust next xyz
+        if(fabsf(angle)>m_st_target_max_angle*dt)
+        {
+            core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
+            if(old_2d.getLengthSQ()==0.0f)
+                old_2d.Y = 1.0f;
+            old_2d.normalize();
+            old_2d.rotateBy(  RAD_TO_DEGREE * dt 
+                                    * (angle > 0 ?  m_st_target_max_angle 
+                                                 : -m_st_target_max_angle));
+            next_xyz.setX(getXYZ().getX() + old_2d.X*dt*m_speed);
+            next_xyz.setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
+
+            Vec3 old_vec = getXYZ()-m_previous_xyz;
+            Vec3 new_vec = next_xyz - getXYZ();
+            angle  = atan2(new_vec.getZ(), new_vec.getX())
+                   - atan2(old_vec.getZ(), old_vec.getX());
+            // Adjust angle to be between -180 and 180 degrees
+            if(angle < -M_PI)
+                angle += M_PI;
+            else if(angle > M_PI)
+                angle -= M_PI;
+
+        }
         // To see if we have overtaken the target, construct a line through
         // the rear axles of the kart, and see if the current and the new
         // position of the ball are on different sides of the line.
@@ -514,6 +553,7 @@ void RubberBall::checkDistanceToTarget()
         // directly at the target back to interpolating again.
         initializeControlPoints(m_previous_xyz);
         m_aiming_at_target = false;
+        printf("Target lost\n");
     }
     
     return;
