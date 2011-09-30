@@ -34,15 +34,17 @@ class KartHoverListener;
   * \brief screen where players can choose their kart
   * \ingroup states_screens
   */
-class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<KartSelectionScreen>
+class KartSelectionScreen : public GUIEngine::Screen, 
+                         public GUIEngine::ScreenSingleton<KartSelectionScreen>
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
     
-    /** Contains the custom widget shown for every player. (ref only since we're adding them to a
-      * Screen, and the Screen will take ownership of these widgets)
-      */
+    /** Contains the custom widget shown for every player. (ref only since 
+     *  we're adding them to a Screen, and the Screen will take ownership 
+     *  of these widgets)
+     */
     PtrVector<PlayerKartWidget, REF> m_kart_widgets;
     
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
@@ -52,8 +54,8 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     
     KartSelectionScreen();
     
-    /** Stores whether any player confirmed their choice; then, some things are "frozen", for instance
-      * the selected kart group tab
+    /** Stores whether any player confirmed their choice; then, some things 
+      * are "frozen", for instance the selected kart group tab
       */
     bool m_game_master_confirmed;
     
@@ -65,10 +67,12 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     /** Called when all players selected their kart */
     void allPlayersDone();
     
-    /** Called when number/order of karts changed, so that all will keep an up-to-date ID */
+    /** Called when number/order of karts changed, so that all will keep 
+     *  an up-to-date ID */
     void renumberKarts();
 
-    /** Checks identities chosen by players, making sure no duplicates are used.
+    /** Checks identities chosen by players, making sure no duplicates are 
+      * used.
       * \return Whether all choices are ok
       */
     bool validateIdentChoices();
@@ -90,11 +94,13 @@ public:
     
     void setMultiplayer(bool multiplayer);
     
-    /** \brief Called when a player hits 'fire'/'select' on his device to join the game */
+    /** \brief Called when a player hits 'fire'/'select' on his device to 
+     *  join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
     
     /**
-      * \brief Called when a player hits 'rescue'/'cancel' on his device to leave the game
+      * \brief Called when a player hits 'rescue'/'cancel' on his device 
+      *  to leave the game
       * \return true if event was handled succesfully
       */
     bool playerQuit(StateManager::ActivePlayer* player);
@@ -108,11 +114,13 @@ public:
     virtual void tearDown();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, 
+                               const std::string& name, const int playerID);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver*);
 
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    /** \brief implement optional callback from parent 
+     *  class GUIEngine::Screen */
     virtual void unloaded();
 };
