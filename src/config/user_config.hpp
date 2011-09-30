@@ -290,53 +290,78 @@ namespace UserConfigParams
             PARAM_DEFAULT( GroupUserConfigParam("Audio", "Audio Settings") );
     
     PARAM_PREFIX BoolUserConfigParam         m_sfx
-            PARAM_DEFAULT( BoolUserConfigParam(true, "sfx_on", &m_audio_group, "Whether sound effects are enabled or not (true or false)") );
+            PARAM_DEFAULT( BoolUserConfigParam(true, "sfx_on", &m_audio_group,
+            "Whether sound effects are enabled or not (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_music
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on", &m_audio_group, "Whether musics are enabled or not (true or false)") );
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on", 
+            &m_audio_group, 
+            "Whether musics are enabled or not (true or false)") );
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume", &m_audio_group, "Volume for sound effects, see openal AL_GAIN for interpretation") );
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume", 
+            &m_audio_group, "Volume for sound effects, see openal AL_GAIN "
+                            "for interpretation") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume", &m_audio_group, "Music volume from 0.0 to 1.0") );
+            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume", 
+            &m_audio_group, "Music volume from 0.0 to 1.0") );
     
     // ---- Race setup
     PARAM_PREFIX GroupUserConfigParam        m_race_setup_group
-        PARAM_DEFAULT( GroupUserConfigParam("RaceSetup", "Race Setup Settings") );
+        PARAM_DEFAULT( GroupUserConfigParam("RaceSetup", 
+                                            "Race Setup Settings") );
     
     PARAM_PREFIX IntUserConfigParam          m_num_karts
-            PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts", &m_race_setup_group, "Default number of karts. -1 means use all") );
+            PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts", 
+                            &m_race_setup_group, 
+                            "Default number of karts. -1 means use all") );
     PARAM_PREFIX IntUserConfigParam          m_num_laps
-            PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps", &m_race_setup_group, "Default number of laps.") );
+            PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps", 
+            &m_race_setup_group, "Default number of laps.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
-            PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty", &m_race_setup_group, "Default race difficulty. 0=easy, 1=medium, 2=hard") );
+            PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty", 
+                            &m_race_setup_group, 
+                        "Default race difficulty. 0=easy, 1=medium, 2=hard") );
     PARAM_PREFIX IntUserConfigParam          m_game_mode
-            PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode", &m_race_setup_group, "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes") );
+            PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode", 
+                            &m_race_setup_group, 
+                            "Game mode. 0=standard, 1=time trial, 2=follow "
+                            "the leader, 3=3 strikes") );
     PARAM_PREFIX StringUserConfigParam m_default_kart
-            PARAM_DEFAULT( StringUserConfigParam("tux", "kart", "Kart to select by default (the last used kart)") );
+            PARAM_DEFAULT( StringUserConfigParam("tux", "kart", 
+                           "Kart to select by default (the last used kart)") );
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
-            PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group", "Last selected kart group") );
+            PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group", 
+                                                 "Last selected kart group") );
     
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );
     
     PARAM_PREFIX IntUserConfigParam         m_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "width", &m_video_group, "Screen/window width in pixels") );
+            PARAM_DEFAULT(  IntUserConfigParam(800, "width", &m_video_group,
+                                            "Screen/window width in pixels") );
     PARAM_PREFIX IntUserConfigParam         m_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "height", &m_video_group, "Screen/window height in pixels") );
+            PARAM_DEFAULT(  IntUserConfigParam(600, "height", &m_video_group,
+                                           "Screen/window height in pixels") );
     PARAM_PREFIX BoolUserConfigParam        m_fullscreen
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen", &m_video_group) );
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen", 
+                                                &m_video_group) );
     PARAM_PREFIX IntUserConfigParam         m_prev_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", &m_video_group, "Previous screen/window width") );
+            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", 
+                            &m_video_group, "Previous screen/window width") );
     PARAM_PREFIX IntUserConfigParam         m_prev_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", &m_video_group,"Previous screen/window height") );
+            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", 
+                            &m_video_group,"Previous screen/window height") );
     PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", &m_video_group) );
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", 
+                            &m_video_group) );
 
 
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", 
+                            &m_video_group, "Display frame per seconds") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps
-            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", &m_video_group, "Maximum fps, should be at least 60") );
+            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", 
+                       &m_video_group, "Maximum fps, should be at least 60") );
 
     // Renderer type (OpenGL, Direct3D9, Direct3D8, Software, etc)
     PARAM_PREFIX IntUserConfigParam         m_renderer
@@ -345,61 +370,67 @@ namespace UserConfigParams
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
-    PARAM_PREFIX bool                       m_gamepad_debug     PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_gamepad_debug PARAM_DEFAULT( false );
     
-    PARAM_PREFIX bool                       m_gamepad_visualisation PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_gamepad_visualisation PARAM_DEFAULT( false );
     
-    /** If material debugging (printing terrain specific slowdown) is enabled. */
-    PARAM_PREFIX bool                       m_material_debug    PARAM_DEFAULT( false );
+    /** If material debugging (printing terrain specific slowdown) 
+     *  is enabled. */
+    PARAM_PREFIX bool m_material_debug PARAM_DEFAULT( false );
 
     /** If track debugging is enabled. */
-    PARAM_PREFIX int                        m_track_debug       PARAM_DEFAULT( false );
+    PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
     /** True if check structures should be debugged. */
-    PARAM_PREFIX bool                       m_check_debug       PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
     /** Special debug camera being high over the kart. */
-    PARAM_PREFIX bool                       m_camera_debug      PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_camera_debug PARAM_DEFAULT( false );
 
     /** True if slipstream debugging is activated. */
-    PARAM_PREFIX bool                       m_slipstream_debug  PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
 
     /** True if follow-the-leader debug information should be printed. */
-    PARAM_PREFIX bool                       m_ftl_debug    PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_ftl_debug    PARAM_DEFAULT( false );
     
     /** True if currently developed tutorial debugging is enabled. */
-    PARAM_PREFIX bool                       m_tutorial_debug    PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_tutorial_debug    PARAM_DEFAULT( false );
 
-    /** Verbosity level for debug messages. Note that error and important warnings
-     *  must always be printed. */
-    PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
+    /** Verbosity level for debug messages. Note that error and 
+     *  important warnings must always be printed. */
+    PARAM_PREFIX int  m_verbosity         PARAM_DEFAULT( 0 );
 
-    PARAM_PREFIX bool                       m_no_start_screen   PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_no_start_screen   PARAM_DEFAULT( false );
     
-    PARAM_PREFIX bool                       m_race_now          PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
-    /** True to test funky ambient/diffuse/specularity in RGB & all anisotropic */
-    PARAM_PREFIX bool                       m_rendering_debug   PARAM_DEFAULT( false );
+    /** True to test funky ambient/diffuse/specularity in RGB & 
+     *  all anisotropic */
+    PARAM_PREFIX bool m_rendering_debug   PARAM_DEFAULT( false );
     
     /** True if graphical profiler should be displayed */
-    PARAM_PREFIX bool                       m_profiler_enabled  PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
     
     /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool                       m_hw_skinning_enabled  PARAM_DEFAULT( false );
+    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
     // ---- Networking
     PARAM_PREFIX StringUserConfigParam      m_server_address
-            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress", "Information about last server used") );
+            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress",
+                                       "Information about last server used") );
     PARAM_PREFIX IntUserConfigParam         m_server_port
-            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", "Information about last server used") );
+            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", 
+                                       "Information about last server used") );
     
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
-            PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
+            PARAM_DEFAULT( GroupUserConfigParam("GFX", 
+                                                "Graphics Quality Settings") );
     
-    // On OSX 10.4 and before there may be driver issues with FBOs, so to be safe disable them by default
+    // On OSX 10.4 and before there may be driver issues with FBOs, so to be 
+    // safe disable them by default
 #ifdef __APPLE__
     #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     #define FBO_DEFAULT false
@@ -411,106 +442,131 @@ namespace UserConfigParams
 #endif
     
     PARAM_PREFIX BoolUserConfigParam        m_fbo
-        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo", &m_graphics_quality, "Use frame buffer objects (FBOs)") );
+        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo", 
+                     &m_graphics_quality, "Use frame buffer objects (FBOs)") );
     
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx", &m_graphics_quality, "Scenery animations") );
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx", 
+                            &m_graphics_quality, "Scenery animations") );
     
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", &m_graphics_quality, "Weather effects") );
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx", 
+                                     &m_graphics_quality, "Weather effects") );
     PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, "steering_animations", &m_graphics_quality,
-                                               "Whether to display kart animations (0=disabled for all; "
-                                               "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL, 
+                            "steering_animations", &m_graphics_quality,
+                "Whether to display kart animations (0=disabled for all; "
+                "1=enabled for humans, disabled for AIs; 2=enabled for all") );
     PARAM_PREFIX BoolUserConfigParam         m_anisotropic
-            PARAM_DEFAULT( BoolUserConfigParam(true, "anisotropic", &m_graphics_quality,
-                                               "Whether anisotropic filtering is allowed to be used (true or false)") );
+            PARAM_DEFAULT( BoolUserConfigParam(true, "anisotropic", 
+                           &m_graphics_quality,
+                           "Whether anisotropic filtering is allowed to be "
+                           "used (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
-            PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
-                                               "Whether trilinear filtering is allowed to be used (true or false)") );
+            PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", 
+                           &m_graphics_quality,
+                           "Whether trilinear filtering is allowed to be "
+                           "used (true or false)") );
     PARAM_PREFIX BoolUserConfigParam         m_fullscreen_antialiasing
-            PARAM_DEFAULT( BoolUserConfigParam(false, "fullscreen_antialiasing", &m_graphics_quality,
-                                               "Whether fullscreen antialiasing is enabled") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, 
+                           "fullscreen_antialiasing", &m_graphics_quality,
+                           "Whether fullscreen antialiasing is enabled") );
     PARAM_PREFIX BoolUserConfigParam         m_vsync
-            PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", &m_graphics_quality,
-                                               "Whether vertical sync is enabled") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, "vsync", 
+                           &m_graphics_quality,
+                           "Whether vertical sync is enabled") );
     PARAM_PREFIX BoolUserConfigParam         m_postprocess_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "postprocess_enabled", &m_graphics_quality,
-                                               "Whether post-processing (motion blur...) should be enabled") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, 
+                           "postprocess_enabled", &m_graphics_quality,
+                           "Whether post-processing (motion blur...) should "
+                           "be enabled") );
     
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
+    // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_crashed
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); // TODO : is this used with new code? does it still work?
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); 
     PARAM_PREFIX BoolUserConfigParam        m_log_errors
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors", "Enable logging of stdout and stderr to logfile") );
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors", 
+                           "Enable logging of stdout and stderr to logfile") );
     
     PARAM_PREFIX IntUserConfigParam         m_reverse_look_threshold
             PARAM_DEFAULT(  IntUserConfigParam(0, "reverse_look_threshold", 
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
     PARAM_PREFIX IntUserConfigParam         m_camera_style
-            PARAM_DEFAULT( IntUserConfigParam(Camera::CS_MODERN, "camera_style", "Camera Style") );
+            PARAM_DEFAULT( IntUserConfigParam(Camera::CS_MODERN, 
+                            "camera_style", "Camera Style") );
 
     
     PARAM_PREFIX StringUserConfigParam      m_item_style
-            PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );
+            PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", 
+                            "Name of the .items file to use.") );
     
     PARAM_PREFIX StringUserConfigParam      m_last_track
-            PARAM_DEFAULT(  StringUserConfigParam("olivermath", "last_track", "Name of the last track used.") ); 
+            PARAM_DEFAULT(  StringUserConfigParam("olivermath", "last_track", 
+                            "Name of the last track used.") ); 
     PARAM_PREFIX StringUserConfigParam m_last_used_track_group
-            PARAM_DEFAULT( StringUserConfigParam("all", "last_track_group", "Last selected track group") );
+            PARAM_DEFAULT( StringUserConfigParam("all", "last_track_group",
+                           "Last selected track group") );
     
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file", "Name of the skin to use") );
+            PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
+                                                  "Name of the skin to use") );
             
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
         PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews", 
-                                            "Addon and news related settings") );
+                                          "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT(  StringUserConfigParam("http://stkaddons.net/dl/xml",
-                                                  "server_addons", 
-                                                  &m_addon_group,
-                                                  "The server used for addon.") );
+            PARAM_DEFAULT( StringUserConfigParam("http://stkaddons.net/dl/xml",
+                                                 "server_addons", 
+                                                 &m_addon_group,
+                                                "The server used for addon."));
 
     PARAM_PREFIX TimeUserConfigParam        m_news_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
-                                                &m_addon_group,
-                                                "Time news was updated last.") );
+                                              &m_addon_group,
+                                              "Time news was updated last.") );
 
     PARAM_PREFIX IntUserConfigParam         m_news_frequency
             PARAM_DEFAULT(  IntUserConfigParam(0, "news_frequency", 
                                                &m_addon_group,
-                                               "How often news should be updated.") );
+                                        "How often news should be updated.") );
 
     PARAM_PREFIX StringUserConfigParam      m_display_count
             PARAM_DEFAULT(  StringUserConfigParam("", "news_display_count", 
                                                &m_addon_group,
-                                               "How often all news messages have been displayed") );
+                                               "How often all news messages "
+                                               "have been displayed") );
 
     PARAM_PREFIX IntUserConfigParam         m_ignore_message_id
             PARAM_DEFAULT(  IntUserConfigParam(-1, "ignore_message_id", 
                                                &m_addon_group,
-                                               "Ignore all messages with this id and lower") );
+                                               "Ignore all messages with this "
+                                               "id and lower") );
 
     PARAM_PREFIX IntUserConfigParam        m_internet_status
             PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
                                                &m_addon_group,
-                                               "Status of internet: 0 user wasn't asked, 1: allowed, 2: not allowed") );
+                                               "Status of internet: 0 user "
+                                               "wasn't asked, 1: allowed, 2: "
+                                               "not allowed") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
                                                 &m_addon_group,
-                                                "Time addon-list was updated last.") );
+                                        "Time addon-list was updated last.") );
 
     PARAM_PREFIX StringUserConfigParam      m_language
-            PARAM_DEFAULT( StringUserConfigParam("system", "language", "Which language to use (language code or 'system')") );
+            PARAM_DEFAULT( StringUserConfigParam("system", "language", 
+                        "Which language to use (language code or 'system')") );
     
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
-            PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode", "Whether to enable track debugging features") );
+            PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
+                               "Whether to enable track debugging features") );
     
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
