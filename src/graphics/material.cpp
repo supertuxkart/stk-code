@@ -48,7 +48,8 @@ Material::Material(const XMLNode *node, int index)
     node->get("name", &m_texname);
     if (m_texname=="")
     {
-        throw std::runtime_error("[Material] No texture name specified in file\n");
+        throw std::runtime_error("[Material] No texture name specified "
+                                 "in file\n");
     }
     init(index);
 
@@ -152,26 +153,12 @@ Material::Material(const XMLNode *node, int index)
         if      (s == "blend")    m_alpha_blending = true;
         else if (s == "test")     m_alpha_testing = true;
         else if (s == "additive") m_add = true;
-        else if (s != "none")     fprintf(stderr, "[Material] WARNING: Unknown compositing mode '%s'\n", s.c_str());
+        else if (s != "none")     
+            fprintf(stderr, 
+                    "[Material] WARNING: Unknown compositing mode '%s'\n", 
+                    s.c_str());
     }
     
-    // Compatibility to track version 3, which stored zipper data
-    // as attributes. Can be removed if track version 3 is not
-    // supported anymore
-    node->get("zipper",                    &m_zipper                   );
-    
-    node->get("zipper-duration",           &m_zipper_duration          ); // 2.4 style
-    node->get("zipper_duration",           &m_zipper_duration          ); // 2.5 style
-
-    node->get("zipper-fade-out-time",      &m_zipper_fade_out_time     ); // 2.4 style
-    node->get("zipper_fade_out_time",      &m_zipper_fade_out_time     ); // 2.5 style
-
-    node->get("zipper-max-speed-increase", &m_zipper_max_speed_increase); // 2.4 style
-    node->get("zipper_max_speed_increase", &m_zipper_max_speed_increase); // 2.5 style
-
-    node->get("zipper-speed-gain",         &m_zipper_speed_gain        ); // 2.4 style
-    node->get("zipper_speed_gain",         &m_zipper_speed_gain        ); // 2.5 style
-
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
     for (unsigned int i=0; i<children_count; i++)
@@ -197,7 +184,9 @@ Material::Material(const XMLNode *node, int index)
         }
         else
         {
-            fprintf(stderr, "[Material] WARNING: unknown node type '%s' for texture '%s' - ignored.\n",
+            fprintf(stderr, 
+                   "[Material] WARNING: unknown node type '%s' for texture "
+                   "'%s' - ignored.\n",
                     child_node->getName().c_str(), m_texname.c_str());
         }
 
@@ -290,12 +279,14 @@ void Material::install(bool is_full_path)
         }
         else
         {
-            fprintf(stderr, "Applying mask failed for '%s'!\n", m_texname.c_str());
+            fprintf(stderr, "Applying mask failed for '%s'!\n", 
+                    m_texname.c_str());
             return;
         }
     }
     m_texture->grab();
 }   // install
+
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
@@ -328,7 +319,8 @@ void Material::initCustomSFX(const XMLNode *sfx)
     
     if (filename.empty())
     {
-        fprintf(stderr, "[Material] WARNING: sfx node has no 'filename' attribute, sound effect will be ignored\n");
+        fprintf(stderr, "[Material] WARNING: sfx node has no 'filename' "
+                        "attribute, sound effect will be ignored\n");
         return;
     }
     
@@ -373,7 +365,8 @@ void Material::initParticlesEffect(const XMLNode *node)
     node->get("base", &base);
     if (base.size() < 1)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Invalid particle settings for material '%s'\n",
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Invalid "
+                        "particle settings for material '%s'\n",
                 m_texname.c_str());
         return;
     }
@@ -385,7 +378,8 @@ void Material::initParticlesEffect(const XMLNode *node)
     }
     catch (...)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Cannot find particles '%s' for material '%s'\n",
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Cannot find "
+                        "particles '%s' for material '%s'\n",
                 base.c_str(), m_texname.c_str());
         return;
     }
@@ -397,7 +391,9 @@ void Material::initParticlesEffect(const XMLNode *node)
     
     if (count == 0)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles '%s' for material '%s' are declared but not used (no emission condition set)\n",
+        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles "
+                        "'%s' for material '%s' are declared but not used "
+                        "(no emission condition set)\n",
                 base.c_str(), m_texname.c_str());
     }
     
@@ -413,7 +409,8 @@ void Material::initParticlesEffect(const XMLNode *node)
         }
         else
         {
-            fprintf(stderr, "[Material::initParticlesEffect] WARNING: Unknown condition '%s' for material '%s'\n",
+            fprintf(stderr, "[Material::initParticlesEffect] WARNING: Unknown "
+                            "condition '%s' for material '%s'\n",
                     conditions[c].c_str(), m_texname.c_str());
         }
     }
@@ -445,7 +442,7 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
         return;
     }
 
-    float f = m_sfx_pitch_per_speed * (speed-m_sfx_min_speed) + m_sfx_min_pitch;
+    float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
     sfx->speed(f);
 }   // setSFXSpeed
 
@@ -475,11 +472,15 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     {
         //m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         
-        // EMT_TRANSPARENT_ALPHA_CHANNEL does include vertex color alpha into account, which
-        // messes up fading in/out effects. So we use the more customizable EMT_ONETEXTURE_BLEND instead
+        // EMT_TRANSPARENT_ALPHA_CHANNEL does include vertex color alpha into 
+        // account, which messes up fading in/out effects. So we use the more 
+        // customizable EMT_ONETEXTURE_BLEND instead
         m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
-        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_ONE_MINUS_SRC_ALPHA,
-                                                    video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
+        m->MaterialTypeParam = 
+            pack_texureBlendFunc(video::EBF_SRC_ALPHA, 
+                                 video::EBF_ONE_MINUS_SRC_ALPHA,
+                                 video::EMFN_MODULATE_1X, 
+                                 video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
         
         modes++;
     }
@@ -499,11 +500,15 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     {
         //m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
         
-        // EMT_TRANSPARENT_ADD_COLOR does include vertex color alpha into account, which
-        // messes up fading in/out effects. So we use the more customizable EMT_ONETEXTURE_BLEND instead
+        // EMT_TRANSPARENT_ADD_COLOR does include vertex color alpha into 
+        // account, which messes up fading in/out effects. So we use the 
+        // more customizable EMT_ONETEXTURE_BLEND instead
         m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
-        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, video::EBF_ONE,
-                                                    video::EMFN_MODULATE_1X, video::EAS_TEXTURE | video::EAS_VERTEX_COLOR); 
+        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, 
+                                                    video::EBF_ONE,
+                                                    video::EMFN_MODULATE_1X,
+                                                    video::EAS_TEXTURE | 
+                                                      video::EAS_VERTEX_COLOR);
         modes++;
     }
     if (m_normal_map)
@@ -533,7 +538,8 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     
     if (modes > 1)
     {
-        std::cerr << "[Material::setMaterialProperties] More than one main mode set for " << m_texname.c_str() << "\n";
+        std::cerr << "[Material::setMaterialProperties] More than one main "
+                     "mode set for " << m_texname.c_str() << "\n";
     }
     
     if (m_disable_z_write)
@@ -560,12 +566,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
 #endif
 
-    // anisotropic
-    //#ifdef DEBUG
-    //if (UserConfigParams::m_rendering_debug || (m_anisotropic && UserConfigParams::m_anisotropic))
-    //#else
-    //if (m_anisotropic && UserConfigParams::m_anisotropic)
-    //#endif
     if (UserConfigParams::m_anisotropic)
     {
         m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
@@ -578,8 +578,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     // UV clamping
     if ( (m_clamp_tex & UCLAMP) != 0)
     {
-        //  m->setFlag();
-        //  n1->getMaterial(0).TextureLayer[0].TextureWrap = video::ETC_CLAMP;
         /**
         //! Texture is clamped to the last pixel
 		ETC_CLAMP,
@@ -622,13 +620,13 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
 
 //-----------------------------------------------------------------------------
 
-void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const
+void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
+                            bool use_fog) const
 {
-    //printf("******** <%s> Fog enable : %i\n", m_texname.c_str(), m_fog && use_fog);
     m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     
     if (parent != NULL)
     {
         parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
-} 
+}   // adjustForFog
