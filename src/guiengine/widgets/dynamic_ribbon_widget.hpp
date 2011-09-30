@@ -39,8 +39,10 @@ namespace GUIEngine
     {
     public:
         virtual ~DynamicRibbonHoverListener() {}
-        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
-                                        const irr::core::stringw& selectionText, const int playerID) = 0;
+        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, 
+                                       const std::string& selectionID,
+                                       const irr::core::stringw& selectionText,
+                                       const int playerID) = 0;
     };
     
     /** The description of an item added to a DynamicRibbonWidget */
@@ -259,7 +261,9 @@ namespace GUIEngine
           *
           * \return Whether setting the selection was successful (whether the item exists)
           */
-        bool setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated=false);
+        bool setSelection(const std::string &item_codename, 
+                          const int playerID, const bool focusIt, 
+                          bool evenIfDeactivated=false);
         
         /** \brief Callback from parent class Widget. */
         virtual void elementRemoved();

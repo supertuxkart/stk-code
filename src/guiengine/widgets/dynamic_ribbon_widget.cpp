@@ -1045,7 +1045,9 @@ bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id
 
 // -----------------------------------------------------------------------------
 
-bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt, bool evenIfDeactivated)
+bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, 
+                                       const bool focusIt, 
+                                       bool evenIfDeactivated)
 {
     if (m_deactivated && !evenIfDeactivated) return false;
     
@@ -1100,8 +1102,10 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
     propagateSelection();
     return true;
 }
-// -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated)
+// ----------------------------------------------------------------------------
+bool DynamicRibbonWidget::setSelection(const std::string &item_codename, 
+                                       const int playerID, const bool focusIt,
+                                       bool evenIfDeactivated)
 {
     if (m_deactivated && !evenIfDeactivated) return false;
     
