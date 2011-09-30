@@ -90,7 +90,8 @@ PhysicalObject::PhysicalObject(const std::string& model,
     m_body_type = shape;
     m_mass = mass;
     m_radius = radius;
-    
+    m_crash_reset  = false;
+
     m_init_pos.setIdentity();
     btQuaternion q;
     q.setEuler(hpr.Y, hpr.X, hpr.Z);
