@@ -19,6 +19,7 @@
 
 #include "modes/profile_world.hpp"
 
+#include "main_loop.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/kart_with_stats.hpp"
@@ -237,5 +238,5 @@ void ProfileWorld::enterRaceOverState()
     // Print group statistics of all karts
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
 
-    std::exit(-2);
+    main_loop->abort();
 }   // enterRaceOverState
