@@ -63,10 +63,18 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     setAdjustUpVelocity(false);
     m_max_lifespan = 9999;
     m_target       = NULL;
+    m_ping_sfx     = sfx_manager->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz = m_owner->getXYZ();
 
     computeTarget();
+    if(!m_target)
+    {
+        // This happens if the kart firing the rubber ball is the leader
+        // of all karts left in the race.
+        hit(NULL);
+        return;
+    }
 
     // initialises the current graph node
     TrackSector::update(getXYZ(), kart, track);
@@ -78,7 +86,6 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     m_timer                = 0.0f;
     m_interval             = m_st_interval;
     m_current_max_height   = m_max_height;
-    m_ping_sfx             = sfx_manager->createSoundSource("ball_bounce");
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
