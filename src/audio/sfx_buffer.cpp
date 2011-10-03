@@ -174,7 +174,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     free(data);
     
     ov_clear(&oggFile);
-    
+    fclose(file);
     return success;
 }
 
