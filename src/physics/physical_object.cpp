@@ -76,6 +76,13 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     Vec3 init_xyz(m_init_xyz);
     m_init_pos.setOrigin(init_xyz);
 
+    if (m_node == NULL)
+    {
+        std::string model_name;
+        xml_node.get("model",   &model_name );
+        fprintf(stderr, "[PhysicalObject] WARNING, could not locate model '%s'\n", model_name.c_str());
+    }
+    
 }   // PhysicalObject
 
 // -----------------------------------------------------------------------------
@@ -238,8 +245,11 @@ void PhysicalObject::reset()
 }   // reset 
 
 // -----------------------------------------------------------------------------
-void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit) {
-    if(direct_hit) {
+void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
+{
+    
+    if(direct_hit)
+    {
         btVector3 impulse(0.0f, 0.0f, stk_config->m_explosion_impulse_objects);
         m_body->applyCentralImpulse(impulse);
     }
