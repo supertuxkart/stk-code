@@ -183,10 +183,11 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                : m_position(position)
 {
     assert(type != NULL);
-    m_magic_number = 0x58781325;
-    m_node = NULL;
-    m_particle_type = NULL;
-    m_parent = parent;
+    m_magic_number        = 0x58781325;
+    m_node                = NULL;
+    m_emitter             = NULL;
+    m_particle_type       = NULL;
+    m_parent              = parent;
     m_emission_decay_rate = 0;
     
     setParticleType(type);
@@ -202,6 +203,7 @@ ParticleEmitter::~ParticleEmitter()
     assert(m_magic_number == 0x58781325);
     assert(m_node != NULL);
     irr_driver->removeNode(m_node);
+    m_emitter->drop();
     
     m_magic_number = 0xDEADBEEF;
 }   // ~ParticleEmitter
@@ -258,15 +260,13 @@ void ParticleEmitter::setCreationRate(float f)
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
     //        the node has a method called "clearParticles" that should be cleaner than this
-    if (f <= 0.0f)
+    if (f <= 0.0f && m_node->getEmitter())
     {
-        m_emitter->grab();
         m_node->setEmitter(NULL);
     }
     else if (m_node->getEmitter() == NULL)
     {
         m_node->setEmitter(m_emitter);
-        m_emitter->drop();
     }
 }   // setCreationRate
 
@@ -299,13 +299,14 @@ void ParticleEmitter::clearParticles()
 void ParticleEmitter::setParticleType(const ParticleKind* type)
 {   
     assert(m_magic_number == 0x58781325);
-    bool isNewType = (m_particle_type != type);
-    if (isNewType)
+    bool is_new_type = (m_particle_type != type);
+    if (is_new_type)
     {
         if (m_node != NULL)
         {
             m_node->removeAll();
             m_node->removeAllAffectors();
+            m_emitter->drop();
         }
         else
         {
@@ -346,7 +347,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     m_min_rate = (float)type->getMinRate();
     m_max_rate = (float)type->getMaxRate();
     
-    if (isNewType)
+    if (is_new_type)
     {
         video::SMaterial& mat0 = m_node->getMaterial(0);
         
@@ -435,10 +436,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
     m_emitter->setMinStartSize(core::dimension2df(minSize, minSize));
     m_emitter->setMaxStartSize(core::dimension2df(maxSize, maxSize));
     
-    if (isNewType)
+    if (is_new_type)
     {
         m_node->setEmitter(m_emitter); // this grabs the emitter
-        m_emitter->drop();             // so we can drop our references
         
         scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 255, 255),
                                                                                     type->getFadeoutTime());
