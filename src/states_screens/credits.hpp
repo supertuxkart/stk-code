@@ -37,7 +37,8 @@ class CreditsSection;
  * \brief Screen where STK credits are shown
  * \ingroup states_screens
  */
-class CreditsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<CreditsScreen>
+class CreditsScreen : public GUIEngine::Screen, 
+                      public GUIEngine::ScreenSingleton<CreditsScreen>
 {
     float m_time_element;
     
@@ -54,7 +55,8 @@ class CreditsScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     
     friend class GUIEngine::ScreenSingleton<CreditsScreen>;
     CreditsScreen();
-    
+    bool getWideLine(std::ifstream& file, core::stringw* out);
+
 public:
     
     
@@ -66,14 +68,16 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    /** \brief implement optional callback from parent class 
+     *  GUIEngine::Screen */
     void onUpdate(float dt, irr::video::IVideoDriver*);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
+                       const int playerID);
 };
 
 #endif

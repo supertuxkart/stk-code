@@ -44,29 +44,36 @@ class SkidMarks : public NoCopy
 private:
     /** Reference to the kart to which these skidmarks belong. */
     const Kart        &m_kart;
+
     /** True if the kart was skidding in the previous frame. */
     bool               m_skid_marking;
+
     /** Reduce effect of Z-fighting. */
     float              m_width;
+
     /** Index of current (last added) skid mark quad. */
     int                m_current;
+
     /** Initial alpha value. */
     static const int   m_start_alpha;
+
     /** Initial grey value, same for the 3 channels. */
     static const int   m_start_grey;
 
     /** Material to use for the skid marks. */
     video::SMaterial  *m_material;
     
+    // ------------------------------------------------------------------------
     class SkidMarkQuads : public scene::SMeshBuffer, public NoCopy
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines
-         *  the first and sometimes the 2nd one is drawn on top
-         */
+         *  the first and sometimes the 2nd one is drawn on top. */
         float m_z_offset;
+
         /** Fade out = alpha value. */
         float m_fade_out;
+
         /** For culling, we need the overall radius of the skid marks. We
          *  approximate this by maintaining an axis-aligned boundary box. */
         core::aabbox3df m_aabb;
@@ -84,6 +91,7 @@ private:
         const core::aabbox3df &getAABB() { return m_aabb; }
     };  // SkidMarkQuads
 
+    // ------------------------------------------------------------------------
     /** Two skidmark objects for the left and right wheel. */
     std::vector<SkidMarkQuads *>     m_left, m_right;
 
@@ -93,10 +101,12 @@ private:
     /** Shared static so that consecutive skidmarks are at a slightly
      *  different height. */
     static float                  m_avoid_z_fighting;
+
 public:
          SkidMarks(const Kart& kart, float width=0.2f);
         ~SkidMarks();
-    void update  (float dt, bool force_skid_marks=false, video::SColor* custom_color = NULL); 
+    void update (float dt, bool force_skid_marks=false, 
+                 video::SColor* custom_color = NULL); 
     void reset();
     
     void adjustFog(bool enabled);
