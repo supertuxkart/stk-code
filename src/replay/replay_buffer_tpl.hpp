@@ -30,9 +30,13 @@
 #  ifdef _DEBUG
 #    ifndef _DBG_NEW
 #      include <crtdbg.h>
-        inline void* __operator_new(size_t __n) { return ::operator new(__n,_NORMAL_BLOCK,__FILE__,__LINE__); }
-        inline void* _cdecl operator new(size_t __n,const char* __fname,int __line) { return ::operator new(__n,_NORMAL_BLOCK,__fname,__line); }
-        inline void _cdecl operator delete(void* __p,const char*,int) { ::operator delete(__p);}
+        inline void* __operator_new(size_t __n) { return ::operator 
+            new(__n,_NORMAL_BLOCK,__FILE__,__LINE__); }
+        inline void* _cdecl operator new(size_t __n,const char* __fname,
+            int __line) { 
+                return ::operator new(__n,_NORMAL_BLOCK,__fname,__line); }
+        inline void _cdecl operator delete(void* __p,const char*,int) 
+        { ::operator delete(__p);}
 #       define _DBG_NEW new(__FILE__,__LINE__)
 #       define new _DBG_NEW
 #    endif // _DBG_NEW
@@ -50,7 +54,8 @@ class ReplayBuffer
     friend class ReplayBufferArray<T>;
 
 public:
-    ReplayBuffer() : m_pp_blocks(NULL),m_number_blocks(0),m_block_size(0),m_number_objects_used(0),m_healthy(true) {}
+    ReplayBuffer() : m_pp_blocks(NULL),m_number_blocks(0),m_block_size(0),
+                     m_number_objects_used(0),m_healthy(true) {}
     ~ReplayBuffer() { destroy(); }
 
 private:
@@ -68,8 +73,9 @@ public:
     // does not allocate memory, index must be < getNumberObjectsUsed()
     T const*        getObjectAt( size_t index ) const;
     T*              getObjectAt( size_t index );
-    size_t          getNumberObjectsUsed() const        { return m_number_objects_used; }
-    size_t          getNumberBlocks() const             { return m_number_blocks; }
+    size_t          getNumberObjectsUsed() const 
+                    { return m_number_objects_used; }
+    size_t          getNumberBlocks() const { return m_number_blocks; }
 
 private:
     // adds a new block of objects to m_pp_blocks with a size of m_block_size
@@ -103,8 +109,8 @@ private:
 };
 
 
-// does the same as ReplayBuffer<T>, but it returns an array of objects, rather than just one 
-// object .. 
+// does the same as ReplayBuffer<T>, but it returns an array of objects, 
+// rather than just one object .. 
 template<typename T>
 class ReplayBufferArray
 {
@@ -113,16 +119,24 @@ public:
     ~ReplayBufferArray() { destroy(); }
 
     void            destroy();
-    bool            init( size_t number_preallocated_arrays, size_t array_size );
+    bool            init( size_t number_preallocated_arrays, 
+                          size_t array_size );
     // returns a new *free* array of objects with size of 2nd param in init
     T*              getNewArray();
     // returs objects at given position, like usual array access,
     // does not allocate memory
-    T const*        getArrayAt( size_t index ) const    { assert( m_array_size ); return m_Buffer.getObjectAt( m_array_size * index ); }
-    T*              getArrayAt( size_t index )          { assert( m_array_size ); return m_Buffer.getObjectAt( m_array_size * index ); }
-    size_t          getNumberArraysUsed() const         { return m_Buffer.getNumberObjectsUsed() / m_array_size; }
-    size_t          getNumberBlocks() const             { return m_Buffer.getNumberBlocks(); }
-    bool            isHealthy() const                   { return m_Buffer.isHealthy(); }
+    T const*        getArrayAt( size_t index ) const
+                    { assert( m_array_size ); 
+                      return m_Buffer.getObjectAt( m_array_size * index ); }
+    T*              getArrayAt( size_t index )
+                    { assert( m_array_size ); 
+                      return m_Buffer.getObjectAt( m_array_size * index ); }
+    size_t          getNumberArraysUsed() const
+                    { return m_Buffer.getNumberObjectsUsed() / m_array_size; }
+    size_t          getNumberBlocks() const
+                    { return m_Buffer.getNumberBlocks(); }
+    bool            isHealthy() const
+                    { return m_Buffer.isHealthy(); }
 
 private:
     ReplayBuffer<T> m_Buffer;
@@ -160,8 +174,8 @@ void ReplayBuffer<T>::destroy()
     }
 }
 
-// returns a new *free* frame to be used to store the current frame-data into it
-// used to *record* the replay
+// returns a new *free* frame to be used to store the current frame-data into 
+// it used to *record* the replay
 template<typename T>
 T* ReplayBuffer<T>::getNewObject()
 {
@@ -239,7 +253,8 @@ bool ReplayBuffer<T>::addNewBlock()
     // only the pointers, to blocks of objects, which is supposed 
     // to be a very small number .. 2 is probably never reached
     size_t tmp;
-    for( tmp = 0; tmp < m_number_blocks; ++tmp ) m_pp_blocks[tmp] = pp_blocks_old[tmp];
+    for( tmp = 0; tmp < m_number_blocks; ++tmp ) 
+        m_pp_blocks[tmp] = pp_blocks_old[tmp];
 
     // create new objects at new block position
     m_pp_blocks[m_number_blocks] = buffer_new_array<T>( m_block_size );
@@ -268,7 +283,8 @@ void ReplayBufferArray<T>::destroy()
 }
 
 template<typename T>
-bool ReplayBufferArray<T>::init( size_t number_preallocated_arrays, size_t array_size )
+bool ReplayBufferArray<T>::init( size_t number_preallocated_arrays,
+                                 size_t array_size )
 {
     assert( number_preallocated_arrays );
     assert( array_size );
@@ -283,7 +299,8 @@ T* ReplayBufferArray<T>::getNewArray()
     if( !isHealthy() ) return NULL;
 
     // check, if we need a new block
-    if( m_Buffer.m_number_objects_used == (m_Buffer.m_block_size*m_Buffer.m_number_blocks) )
+    if( m_Buffer.m_number_objects_used == 
+        (m_Buffer.m_block_size*m_Buffer.m_number_blocks) )
     {
         // we need a new block
         if( !m_Buffer.addNewBlock() ) return NULL;
@@ -291,10 +308,13 @@ T* ReplayBufferArray<T>::getNewArray()
 
     // get current frame
     T* block_current = m_Buffer.m_pp_blocks[ m_Buffer.m_number_blocks-1 ];
-    size_t new_in_block_idx = m_Buffer.m_number_objects_used % m_Buffer.m_block_size;
+    size_t new_in_block_idx = 
+        m_Buffer.m_number_objects_used % m_Buffer.m_block_size;
     T* current = block_current + new_in_block_idx;
 
-    assert( (current + m_array_size) <= (m_Buffer.m_pp_blocks[ m_Buffer.m_number_blocks-1 ] + m_Buffer.m_block_size) );
+    assert( (current + m_array_size) <= (m_Buffer
+            .m_pp_blocks[ m_Buffer.m_number_blocks-1 ] 
+           + m_Buffer.m_block_size) );
 
     m_Buffer.m_number_objects_used += m_array_size;
 
