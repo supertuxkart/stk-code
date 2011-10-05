@@ -575,8 +575,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
     const MusicInformation* mi = music_manager->getCurrentMusic();
     if (!mi) return;
     
-    std::string s="\""+mi->getTitle()+"\"";
-    core::stringw thetext(s.c_str());
+    core::stringw thetext = core::stringw(L"\"") + mi->getTitle() + L"\"";
     
     core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
     int textWidth = textSize.Width;
@@ -616,8 +615,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
     {
         core::rect<s32> pos_by(textXFrom, text_y+40,
                                textXTo,   text_y+40);
-        std::string s="by "+mi->getComposer();
-        font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, 
+        font->draw(thetext_composer, pos_by, white, 
                    true, true);
     }
     

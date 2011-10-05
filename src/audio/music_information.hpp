@@ -26,6 +26,9 @@
 
 #include "utils/no_copy.hpp"
 
+#include <irrString.h>
+using irr::core::stringw;
+
 class Music;
 
 /**
@@ -37,8 +40,8 @@ class Music;
 class MusicInformation : public NoCopy
 {
 private:
-    std::string              m_composer;
-    std::string              m_title;
+    stringw                  m_composer;
+    stringw                  m_title;
     std::string              m_normal_filename;
     std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
@@ -70,11 +73,11 @@ public:
 #endif
                        MusicInformation (const std::string& filename) throw (std::runtime_error);
                       ~MusicInformation ();
-    const std::string& getComposer      () const {return m_composer;        }
-    const std::string& getTitle         () const {return m_title;           }
+    const stringw&     getComposer      () const {return m_composer;        }
+    const stringw&     getTitle         () const {return m_title;           }
     const std::string& getNormalFilename() const {return m_normal_filename; }
     const std::string& getFastFilename  () const {return m_fast_filename;   }
-    //int                getNumLoops      () const {return m_numLoops;        }
+    //int              getNumLoops      () const {return m_numLoops;        }
     float              getFasterTime    () const {return m_faster_time;     }
     float              getMaxPitch      () const {return m_max_pitch;       }
     void               addMusicToTracks ();

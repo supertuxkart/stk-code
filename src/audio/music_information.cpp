@@ -51,7 +51,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     {
         // Create information just from ogg file
         // -------------------------------------
-        m_title           = StringUtils::removeExtension(StringUtils::getBasename(filename));
+        m_title           = core::stringw(StringUtils::removeExtension(StringUtils::getBasename(filename)).c_str());
         m_normal_filename = filename;
         return;
     }
@@ -73,7 +73,8 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
                 filename.c_str());
         throw std::runtime_error("No music node found");
     }
-    if(!root->get("title", &m_title))
+    std::string title;
+    if(!root->get("title", &title))
     {
         fprintf(stderr, 
             "The 'title' attribute is missing in the music XML file '%s'!\n",
@@ -81,7 +82,10 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
         throw std::runtime_error("Incomplete or corrupt music XML file");
         return;
     }
-    if(!root->get("composer", &m_composer))
+    m_title = StringUtils::decodeFromHtmlEntities(title);
+
+    std::string composer;
+    if(!root->get("composer", &composer))
     {
         fprintf(stderr, 
             "The 'composer' attribute is missing in the music XML file '%s'!\n",
@@ -89,6 +93,8 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
         throw std::runtime_error("Incomplete or corrupt music XML file");
         return;
     }
+    m_composer = StringUtils::decodeFromHtmlEntities(composer);
+    
     if(!root->get("file", &m_normal_filename))
     {
         fprintf(stderr, 
