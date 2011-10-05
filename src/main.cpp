@@ -111,8 +111,10 @@ void gamepadVisualisation()
             for (int n=0; n<GAMEPAD_COUNT; n++)
             {
                 Gamepad& g = m_gamepads[n];
-                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++) g.m_axis[i] = 0;
-                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++) g.m_button_state[i] = false;
+                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++) 
+                    g.m_axis[i] = 0;
+                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
+                    g.m_button_state[i] = false;
             }
         }
         
@@ -126,11 +128,12 @@ void gamepadVisualisation()
                     if (evt.Joystick >= GAMEPAD_COUNT) return true;
                     
                     Gamepad& g = m_gamepads[evt.Joystick];
-                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++)
+                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES;i++)
                     {
                         g.m_axis[i] = evt.Axis[i];
                     }
-                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
+                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; 
+                         i++)
                     {
                         g.m_button_state[i] = evt.IsButtonPressed(i);
                     }
@@ -143,7 +146,8 @@ void gamepadVisualisation()
                     
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE || evt.Key == KEY_SPACE)
+                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE || 
+                            evt.Key == KEY_SPACE)
                         {
                             exit(0);
                         }
@@ -167,7 +171,7 @@ void gamepadVisualisation()
         if (!irr_driver->getDevice()->run()) break;
         
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
-        const core::dimension2d<u32> size = driver ->getCurrentRenderTargetSize();
+        const core::dimension2du size = driver ->getCurrentRenderTargetSize();
         
         driver->beginScene(true, true, video::SColor(255,0,0,0));
         
@@ -185,7 +189,8 @@ void gamepadVisualisation()
 
             const int btn_y = y + 5;
             const int btn_x = x + 5;
-            const int BTN_SIZE = (w - 10)/SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
+            const int BTN_SIZE = 
+                (w - 10)/SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
             
             for (int b=0; b<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; b++)
             {
@@ -194,7 +199,8 @@ void gamepadVisualisation()
                 
                 if (g.m_button_state[b])
                 {
-                    driver->draw2DRectangle (video::SColor(255,255,0,0), core::recti(pos, size));
+                    driver->draw2DRectangle (video::SColor(255,255,0,0),
+                                             core::recti(pos, size));
                 }
                 
                 driver->draw2DRectangleOutline( core::recti(pos, size) );
@@ -203,7 +209,8 @@ void gamepadVisualisation()
             const int axis_y = btn_y + BTN_SIZE + 5;
             const int axis_x = btn_x;
             const int axis_w = w - 10;
-            const int axis_h = (h - BTN_SIZE - 15) / SEvent::SJoystickEvent::NUMBER_OF_AXES;
+            const int axis_h = (h - BTN_SIZE - 15) 
+                            / SEvent::SJoystickEvent::NUMBER_OF_AXES;
             
             for (int a=0; a<SEvent::SJoystickEvent::NUMBER_OF_AXES; a++)
             {
@@ -239,11 +246,14 @@ void cmdLineHelp (char* invocation)
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
     "Options:\n"
-    "  -N,  --no-start-screen  Immediately start race without showing a menu.\n"
-    "  -R,  --race-now         Same as -N but also skip the ready-set-go phase and the music.\n"
+    "  -N,  --no-start-screen  Immediately start race without showing a "
+                              "menu.\n"
+    "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
+                              "and the music.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
     "       --gp NAME          Start the specified Grand Prix.\n"
-    "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
+    "       --stk-config FILE  use ./data/FILE instead of "
+                              "./data/stk_config.xml\n"
     "  -l,  --list-tracks      Show available tracks.\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
     "       --kart NAME        Use kart number NAME (see --list-karts).\n"
@@ -252,35 +262,47 @@ void cmdLineHelp (char* invocation)
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
     // TODO: add back "--players" switch
-    // "       --players n        Define number of players to between 1 and 4.\n"
+    // "       --players n      Define number of players to between 1 and 4.\n"
     "       --item STYLE       Use STYLE as your item style.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
-    "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
+    "       --trackdir DIR     A directory from which additional tracks are "
+                              "loaded.\n"
     "       --renderer NUM     Choose the renderer. Valid renderers are:\n"
     "                            Default: 0, OpenGL: 1, Direct3D9: 2, \n"
     "                            Direct3D8: 3, Software: 4, \n"
     "                            Burning's Software: 5, Null device: 6\n"
-    "       --animations=n     Play karts' animations (All: 2, Humans only: 1, Nobody: 0).\n"
-    "       --gfx=n            Play other graphical effects like impact stars dance,\n"
-    "                            water animations or explosions (Enable: 1, Disable: 0).\n"
-    "       --weather=n        Show weather effects like rain or snow (0 or 1 as --gfx).\n"
-    "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera link.\n"
-    "       --profile-laps=n   Enable automatic driven profile mode for n laps.\n"
-    "       --profile-time=n   Enable automatic driven profile mode for n seconds.\n"
+    "       --animations=n     Play karts' animations (All: 2, Humans only: 1,"
+                              " Nobody: 0).\n"
+    "       --gfx=n            Play other graphical effects like impact stars "
+                              "dance,\n"
+    "                            water animations or explosions (Enable: 1, "
+                              "Disable: 0).\n"
+    "       --weather=n        Show weather effects like rain or snow (0 or 1 "
+                              "as --gfx).\n"
+    "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera "
+                              "link.\n"
+    "       --profile-laps=n   Enable automatic driven profile mode for n "
+                              "laps.\n"
+    "       --profile-time=n   Enable automatic driven profile mode for n "
+                              "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
     // "       --history          Replay history file 'history.dat'.\n"
-    // "       --history=n        Replay history file 'history.dat' using mode:\n"
-    // "                            n=1: use recorded positions\n"
-    // "                            n=2: use recorded key strokes\n"
-    "       --server[=port]    This is the server (running on the specified port).\n"
-    "       --client=ip        This is a client, connect to the specified ip address.\n"
-    "       --port=n           Port number to use.\n"
-    "       --numclients=n     Number of clients to wait for (server only).\n"
+    // "       --history=n        Replay history file 'history.dat' using:\n"
+    // "                            n=1: recorded positions\n"
+    // "                            n=2: recorded key strokes\n"
+    //"       --server[=port]    This is the server (running on the specified "
+    //                          "port).\n"
+    //"       --client=ip        This is a client, connect to the specified ip"
+    //                          " address.\n"
+    //"       --port=n           Port number to use.\n"
+    //"       --numclients=n     Number of clients to wait for (server "
+    //                          "only).\n"
     "       --log=terminal     Write messages to screen.\n"
-    "       --log=file         Write messages/warning to log files stdout.log/stderr.log.\n"
+    "       --log=file         Write messages/warning to log files "
+                              "stdout.log/stderr.log.\n"
     "  -h,  --help             Show this help.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
@@ -342,7 +364,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
             stk_config->load(file_manager->getDataFile(argv[i+1]));
-            fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
+            fprintf ( stdout, "STK config will be read from %s.\n",argv[i+1] );
             i++;
         }
         else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
@@ -364,13 +386,16 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             // Check that current res is not blacklisted
             std::ostringstream o;
-            o << UserConfigParams::m_width << "x" << UserConfigParams::m_height;
+            o << UserConfigParams::m_width << "x" 
+              << UserConfigParams::m_height;
             std::string res = o.str();
             if (std::find(UserConfigParams::m_blacklist_res.begin(),
-                          UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())
+                          UserConfigParams::m_blacklist_res.end(),res) 
+                             == UserConfigParams::m_blacklist_res.end())
                 UserConfigParams::m_fullscreen = true;
             else 
-                fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+                fprintf ( stdout, "Resolution %s has been blacklisted, so it "
+                          "is not available!\n", res.c_str());
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
@@ -393,35 +418,45 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 std::ostringstream o;
                 o << width << "x" << height;
                 std::string res = o.str();
-                if (!UserConfigParams::m_fullscreen || std::find(UserConfigParams::m_blacklist_res.begin(), 
-                                                            UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())
+                if (!UserConfigParams::m_fullscreen || 
+                    std::find(UserConfigParams::m_blacklist_res.begin(), 
+                              UserConfigParams::m_blacklist_res.end(),res) == 
+                                  UserConfigParams::m_blacklist_res.end())
                 {
-                    UserConfigParams::m_prev_width = UserConfigParams::m_width = width;
-                    UserConfigParams::m_prev_height = UserConfigParams::m_height = height;
-                    fprintf ( stdout, "You choose to be in %dx%d.\n", (int)UserConfigParams::m_width,
+                    UserConfigParams::m_prev_width = 
+                        UserConfigParams::m_width = width;
+                    UserConfigParams::m_prev_height = 
+                        UserConfigParams::m_height = height;
+                    fprintf ( stdout, "You choose to be in %dx%d.\n", 
+                             (int)UserConfigParams::m_width,
                              (int)UserConfigParams::m_height );
                 }
                 else
-                    fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+                    fprintf ( stdout, "Resolution %s has been blacklisted, so "
+                                      "it is not available!\n", res.c_str());
                 i++;
             }
             else
             {
-                fprintf(stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
+                fprintf(stderr, "Error: --screensize argument must be given as"
+                                " WIDTHxHEIGHT\n");
                 exit(EXIT_FAILURE);
             }
         }
-        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0)
+        else if (strcmp(argv[i], "--version") == 0 || 
+                 strcmp(argv[i], "-v"       ) == 0    )
         {
             printf("==============================\n");
             fprintf ( stdout, "SuperTuxKart, %s.\n", STK_VERSION ) ;
 #ifdef SVNVERSION
-            fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
+            fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", 
+                      SVNVERSION ) ;
 #endif
             
             // IRRLICHT_VERSION_SVN
-            fprintf ( stdout, "Irrlicht version %i.%i.%i (%s)\n", IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                                                                  IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
+            fprintf ( stdout, "Irrlicht version %i.%i.%i (%s)\n", 
+                      IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
+                      IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
             
             printf("==============================\n");
             exit(0);
@@ -467,26 +502,31 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_ftl_debug = true;
         }
-        else if(UserConfigParams::m_artist_debug_mode && !strcmp(argv[i], "--camera-debug"))
+        else if(UserConfigParams::m_artist_debug_mode && 
+               !strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
         }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
-            for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts();
-                i++)
+            for(unsigned int i=0; 
+                i<kart_properties_manager->getNumberOfKarts(); i++)
             {
-                const KartProperties *km = kart_properties_manager->getKartById(i);
-                 printf("%s:\t%swidth: %f length: %f height: %f mesh-buffer count %d\n",
-                       km->getIdent().c_str(),
-                       (km->getIdent().size()<7) ? "\t" : "",
-                       km->getMasterKartModel().getWidth(),
-                       km->getMasterKartModel().getLength(),
-                       km->getMasterKartModel().getHeight(),
-                       km->getMasterKartModel().getModel()->getMeshBufferCount());
+                const KartProperties *km = 
+                    kart_properties_manager->getKartById(i);
+                 printf("%s:\t%swidth: %f length: %f height: %f mesh-buffer "
+                        "count %d\n",
+                        km->getIdent().c_str(),
+                        (km->getIdent().size()<7) ? "\t" : "",
+                        km->getMasterKartModel().getWidth(),
+                        km->getMasterKartModel().getLength(),
+                        km->getMasterKartModel().getHeight(),
+                        km->getMasterKartModel().getModel()
+                          ->getMeshBufferCount());
             }
         }
-        else if(UserConfigParams::m_artist_debug_mode && !strcmp(argv[i], "--check-debug"))
+        else if(UserConfigParams::m_artist_debug_mode && 
+                !strcmp(argv[i], "--check-debug"))
         {
             UserConfigParams::m_check_debug=true;
         }
@@ -551,18 +591,21 @@ int handleCmdLine(int argc, char **argv)
         {
             if (!unlock_manager->isLocked(argv[i+1]))
             {
-                const KartProperties *prop = kart_properties_manager->getKart(argv[i+1]);
+                const KartProperties *prop = 
+                    kart_properties_manager->getKart(argv[i+1]);
                 if(prop)
                 {
                     UserConfigParams::m_default_kart = argv[i+1];
                     
-                    // if a player was added with -N, change its kart. Otherwise, nothing to do,
-                    // kart choice will be picked up upon player creation.
+                    // if a player was added with -N, change its kart. 
+                    // Otherwise, nothing to do, kart choice will be picked 
+                    // up upon player creation.
                     if (StateManager::get()->activePlayerCount() > 0)
                     {
                         race_manager->setLocalKartInfo(0, argv[i+1]);
                     }
-                    fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
+                    fprintf ( stdout, "You chose to use kart '%s'.\n", 
+                              argv[i+1] ) ;
                     i++;
                 }
                 else
@@ -573,8 +616,10 @@ int handleCmdLine(int argc, char **argv)
             }
             else
             {
-                fprintf(stdout, "Kart %s has not been unlocked yet. \n", argv[i+1]);
-                fprintf(stdout, "Use --list-karts to list available karts.\n\n");
+                fprintf(stdout, "Kart %s has not been unlocked yet. \n", 
+                        argv[i+1]);
+                fprintf(stdout, 
+                        "Use --list-karts to list available karts.\n\n");
                 return 0;
             }
         }
@@ -608,23 +653,27 @@ int handleCmdLine(int argc, char **argv)
             if (!unlock_manager->isLocked(argv[i+1]))
             {
                 race_manager->setTrack(argv[i+1]);
-                fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+                fprintf ( stdout, "You choose to start in track: %s.\n", 
+                          argv[i+1] );
                 
                 Track* t = track_manager->getTrack(argv[i+1]);
                 if (t == NULL)
                 {
-                    fprintf(stderr, "Can't find track named <%s>\n", argv[i+1]);
+                    fprintf(stderr, "Can't find track named <%s>\n",argv[i+1]);
                     exit(1);
                 }
                 if (t->isArena())
                 {
-                    race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                    race_manager->setMinorMode(
+                                            RaceManager::MINOR_MODE_3_STRIKES);
                 }
             }
             else
             {
-                fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
-                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
+                fprintf(stdout, "Track %s has not been unlocked yet. \n", 
+                        argv[i+1]);
+                fprintf(stdout, "Use --list-tracks to list available "
+                                "tracks.\n\n");
                 return 0;
             }
             i++;
@@ -632,7 +681,8 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
         {
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-            const GrandPrixData *gp = grand_prix_manager->getGrandPrix(argv[i+1]);
+            const GrandPrixData *gp = 
+                grand_prix_manager->getGrandPrix(argv[i+1]);
             
             if (gp == NULL)
             {
@@ -654,7 +704,8 @@ int handleCmdLine(int argc, char **argv)
                 UserConfigParams::m_num_karts = stk_config->m_max_karts;
             }
             race_manager->setNumKarts( UserConfigParams::m_num_karts );
-            fprintf(stdout, "%d karts will be used.\n",  (int)UserConfigParams::m_num_karts);
+            fprintf(stdout, "%d karts will be used.\n",  
+                    (int)UserConfigParams::m_num_karts);
             i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
@@ -677,12 +728,15 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--list-karts") )
         {
             fprintf ( stdout, "  Available karts:\n" );
-            for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
+            for (unsigned int i = 0; 
+                 NULL != kart_properties_manager->getKartById(i); i++)
             {
-                const KartProperties* KP= kart_properties_manager->getKartById(i);
+                const KartProperties* KP =
+                    kart_properties_manager->getKartById(i);
                 if (!unlock_manager->isLocked(KP->getIdent()))
                 {
-                    fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName());
+                    fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(),
+                             KP->getName());
                 }
             }
             fprintf ( stdout, "\n" );
@@ -700,7 +754,8 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
+            fprintf ( stdout, "You choose to have %d laps.\n", 
+                      atoi(argv[i+1]) );
             race_manager->setNumLaps(atoi(argv[i+1]));
             i++;
         }
@@ -755,8 +810,9 @@ int handleCmdLine(int argc, char **argv)
             item_manager->setUserFilename(argv[i+1]);
             i++;
         }
-        // these commands are already processed in handleCmdLinePreliminary, but repeat this
-        // just so that we don't get error messages about unknown commands
+        // these commands are already processed in handleCmdLinePreliminary, 
+        // but repeat this just so that we don't get error messages about 
+        // unknown commands
         else if( !strcmp(argv[i], "--stk-config")&& i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
@@ -767,12 +823,14 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=flyable")                       ) {}
         else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
         else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
-        else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
+        else if( !strcmp(argv[i], "--screensize") || 
+                 !strcmp(argv[i], "-s")            )                     {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
         else if( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
 #ifdef __APPLE__
-        // on OS X, sometimes the Finder will pass a -psn* something parameter to the application
+        // on OS X, sometimes the Finder will pass a -psn* something parameter
+        // to the application
         else if( strncmp(argv[i], "-psn", 3) == 0) {}
 #endif
         else
@@ -881,7 +939,8 @@ void initRest()
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("cup_gold.png")) );
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(
+                               file_manager->getTextureFile("cup_gold.png")) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -889,7 +948,8 @@ void initRest()
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
-    race_manager->setDifficulty((RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
+    race_manager->setDifficulty(
+                 (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
 
 }   // initRest
 
@@ -947,19 +1007,22 @@ int main(int argc, char *argv[] )
 
         initRest();
 
-        if (UserConfigParams::m_log_errors) //Enable logging of stdout and stderr to logfile
+        if (UserConfigParams::m_log_errors)
         {
+             //Enable logging of stdout and stderr to logfile
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
-            printf("Error messages and other text output will be logged to %s and %s\n", logoutfile.c_str(), logerrfile.c_str());
+            printf("Error messages and other text output will be logged to %s "
+                   "and %s\n", logoutfile.c_str(), logerrfile.c_str());
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
-                fprintf(stderr, "Can not open log file '%s'. Writing to stdout instead.\n",
-                        logoutfile.c_str());
+                fprintf(stderr, "Can not open log file '%s'. Writing to "
+                                "stdout instead.\n", logoutfile.c_str());
             }
             if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
             {
-                fprintf(stderr, "Can not open log file '%s'. Writing to stderr instead.\n",
+                fprintf(stderr, "Can not open log file '%s'. Writing to stderr"
+                                " instead.\n",
                         logerrfile.c_str());
             }
         }
@@ -971,18 +1034,21 @@ int main(int argc, char *argv[] )
 
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/options_video.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(
+                           file_manager->getGUIDir() + "/options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
         //m_tutorial_manager      = new TutorialManager();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png")) );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(
+                               file_manager->getTextureFile("gui_lock.png")) );
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the 
         // materials.xml twice, we do this here once for both:
         file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
-        const std::string materials_file = file_manager->getModelFile("materials.xml");
+        const std::string materials_file = 
+            file_manager->getModelFile("materials.xml");
         if(materials_file!="")
         {
             // Some of the materials might be needed later, so just add
@@ -996,13 +1062,15 @@ int main(int argc, char *argv[] )
         powerup_manager         -> loadAllPowerups ();
         item_manager            -> loadDefaultItems();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(
+                                    file_manager->getGUIDir() + "/gift.png") );
 
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/banana.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(
+            file_manager->getGUIDir() + "/banana.png") );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
@@ -1010,18 +1078,21 @@ int main(int argc, char *argv[] )
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());
-            if(UserConfigParams::m_internet_status==NetworkHttp::IPERM_NOT_ASKED)
+            if(UserConfigParams::m_internet_status ==
+                NetworkHttp::IPERM_NOT_ASKED)
             {
-                class ConfirmServer : public MessageDialog::IConfirmDialogListener
+                class ConfirmServer : 
+                      public MessageDialog::IConfirmDialogListener
                 {
                 public:
                     virtual void onConfirm()
                     {
                         delete network_http;
-                        UserConfigParams::m_internet_status = NetworkHttp::IPERM_ALLOWED;
+                        UserConfigParams::m_internet_status = 
+                            NetworkHttp::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
                         network_http = new NetworkHttp();
-                        // Note that the network thread must be started after 
+                        // Note that the network thread must be started after
                         // the assignment to network_http (since the thread 
                         // might use network_http, otherwise a race condition 
                         // can be introduced resulting in a crash).
@@ -1032,7 +1103,8 @@ int main(int argc, char *argv[] )
                     virtual void onCancel()
                     {
                         delete network_http;
-                        UserConfigParams::m_internet_status = NetworkHttp::IPERM_NOT_ALLOWED;
+                        UserConfigParams::m_internet_status =
+                            NetworkHttp::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
                         network_http = new NetworkHttp();
                         network_http->startNetworkThread();
@@ -1040,9 +1112,11 @@ int main(int argc, char *argv[] )
                 };   // ConfirmServer
                 
                 new MessageDialog(_("SuperTuxKart may connect to a server "
-                    "to download add-ons and notify you of updates. Would you like this feature to be "
-                    "enabled? (To change this setting at a later time, go to options, select tab "
-                    "'User Interface', and edit \"Allow STK to connect to the Internet\")."),
+                    "to download add-ons and notify you of updates. Would you "
+                    "like this feature to be enabled? (To change this setting "
+                    "at a later time, go to options, select tab "
+                    "'User Interface', and edit \"Allow STK to connect to the "
+                    "Internet\")."),
                     MessageDialog::MESSAGE_DIALOG_CONFIRM,
                     new ConfirmServer(), true);
             }
@@ -1055,10 +1129,11 @@ int main(int argc, char *argv[] )
             device = input_manager->getDeviceList()->getKeyboard(0);
 
             // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+            StateManager::get()->createActivePlayer( 
+                    UserConfigParams::m_all_players.get(0), device );
 
             // Set up race manager appropriately
-            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+            race_manager->setLocalKartInfo(0,UserConfigParams::m_default_kart);
 
             // ASSIGN should make sure that only input from assigned devices
             // is read.
@@ -1137,7 +1212,7 @@ int main(int argc, char *argv[] )
         if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
         user_config->saveConfig();
     }
-    if(input_manager) delete input_manager;  // if early crash avoid delete NULL
+    if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
     if (user_config && UserConfigParams::m_log_errors) //close logfiles
     {
