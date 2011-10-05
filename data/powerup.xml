@@ -39,15 +39,19 @@
                     catastrophal on the startrack and
                     skyline).
         squash-slowdown: How much karts that are 
-                   squashed are slowed down.
+                    squashed are slowed down.
         squash-duration: How long karts stay squashed.
+        delete-timer: How long before the ball is removed
+                    if no suitable target is found.
    -->
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
-        model="rubber_ball.b3d" speed="35.0" scale="1 1 1"
-        interval="1"          max-height="4.0" min-height="0"
+        model="rubber_ball.b3d" speed="35.0" 
+        scale="1 1 1"         interval="1"
+        max-height="4.0"      min-height="0"
         target-distance="50"  target-max-angle = "90"
         min-interpolation-distance="10"
-        squash-slowdown="0.5" squash-duration="3"       />
+        squash-slowdown="0.5" squash-duration="3"
+        delete-time="5.0"                            />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
   <item name="plunger"        icon="plunger-icon.png"

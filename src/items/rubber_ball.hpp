@@ -65,6 +65,11 @@ private:
      *  even if the quads should be close to each other. */
     static float m_st_min_interpolation_distance;
 
+    /** If the ball overtakes its target or starts to aim at the kart which
+     *  originally shot the rubber ball, after this amount of time the
+     *  ball will be deleted. */
+    static float m_st_delete_time;
+
     /** A pointer to the target kart. */
     const Kart  *m_target;
 
@@ -109,7 +114,13 @@ private:
 
     /** This timer is used to determine the height depending on the time.
      *  It is always between 0 and m_interval. */
-    float        m_timer;
+    float        m_height_timer;
+
+    /** If the ball overtakes its target or starts to aim at the kart which
+     *  originally shot the rubber ball, after a certain amount of time the
+     *  ball will be deleted. This timer tracks this time. If it is < 0
+     *  it indicates that the ball is targeting another kart atm. */
+    float        m_delete_timer;
 
     /** The current maximum height of the ball. This value will be 
      *  reduced if the ball gets closer to the target. */
@@ -136,6 +147,7 @@ private:
     void         getNextControlPoint();
     float        updateHeight();
     void         interpolate(Vec3 *next_xyz, float dt);
+    void         moveTowardsTarget(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
 	float        getMaxTerrainHeight() const;
 public:

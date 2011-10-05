@@ -34,6 +34,7 @@ float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
 float RubberBall::m_st_target_max_angle;
+float RubberBall::m_st_delete_time;
 int   RubberBall::m_next_id = 0;
 
 RubberBall::RubberBall(Kart *kart, Track* track)
@@ -68,13 +69,10 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     m_previous_xyz = m_owner->getXYZ();
 
     computeTarget();
-    if(!m_target)
-    {
-        // This happens if the kart firing the rubber ball is the leader
-        // of all karts left in the race.
-        hit(NULL);
-        return;
-    }
+
+    // If there is no target (i.e. the firing kart is first kart that is 
+    // still racing, start the delete timer.
+    m_delete_timer = m_target!=m_owner ? -1.0f : 10.0f;
 
     // initialises the current graph node
     TrackSector::update(getXYZ(), kart, track);
@@ -83,7 +81,7 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     // At the start the ball aims at quads till it gets close enough to the
     // target:
     m_aiming_at_target     = false;
-    m_timer                = 0.0f;
+    m_height_timer         = 0.0f;
     m_interval             = m_st_interval;
     m_current_max_height   = m_max_height;
 }   // RubberBall
@@ -123,11 +121,10 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     m_length_cp_1_2 = (m_control_points[2]-m_control_points[1]).length();
     m_t             = 0;
     m_t_increase    = m_speed/m_length_cp_1_2;
-}   // initialiseControlPoints
+}   // initializeControlPoints
 
 // ----------------------------------------------------------------------------
-/** Determines the first kart. If a target has already been identified in an
- *  earlier call, it is tested first, avoiding a loop over all karts.
+/** Determines the first kart that is still in the race.
  */
 void RubberBall::computeTarget()
 {
@@ -141,11 +138,19 @@ void RubberBall::computeTarget()
         m_target = world->getKartAtPosition(p);
         if(!m_target->isEliminated() && !m_target->hasFinishedRace())
         {
-            // Don't aim at yourself
-            if(m_target == m_owner) m_target = NULL;
+            // If the firing kart itself is the first kart (that is 
+            // still driving), prepare to remove the rubber ball
+            if(m_target==m_owner)
+                m_delete_timer = m_st_delete_time;
             return;
         }
-    }
+    }   // for p > num_karts
+
+    // This means it must be the end-animation phase. Now just
+    // aim at the owner (the ball is unlikely to hit it), and
+    // this will trigger the usage of the delete time in updateAndDelete
+    m_delete_timer = m_st_delete_time;
+    m_target       = m_owner;
 }   // computeTarget
 
 // ----------------------------------------------------------------------------
@@ -221,6 +226,8 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_min_interpolation_distance = 30.0f;
     m_st_target_distance            = 50.0f;
     m_st_target_max_angle           = 25.0f;
+    m_st_delete_time                = 10.0f;
+
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specified for rubber ball.\n");
     if(!node.get("squash-duration", &m_st_squash_duration))
@@ -237,12 +244,16 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     if(!node.get("target-distance", &m_st_target_distance))
         printf(
         "[powerup] Warning: no target-distance specified for rubber ball.\n");
+    if(!node.get("delete-time", &m_st_delete_time))
+        printf(
+        "[powerup] Warning: no delete-time specified for rubber ball.\n");
     if(!node.get("target-max-angle", &m_st_target_max_angle))
         printf(
         "[powerup] Warning: no target-max-angle specified for rubber ball.\n");
     m_st_target_max_angle *= DEGREE_TO_RAD;
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
+
 // ----------------------------------------------------------------------------
 /** Picks a random message to be displayed when a kart is hit by the 
  *  rubber ball.
@@ -289,80 +300,24 @@ bool RubberBall::updateAndDelete(float dt)
     // finished the race).
     computeTarget();
 
-    if(!m_target)        // Remove this item from the game
+    if(m_delete_timer>0)
     {
-        hit(NULL);
-        return true;
+        m_delete_timer -= dt;
+        if(m_delete_timer<0)
+        {
+            hit(NULL);
+            return true;
+        }
     }
-
     checkDistanceToTarget();
 
     Vec3 next_xyz;
     if(m_aiming_at_target)
-    {
-        // If the rubber ball is already close to a target, i.e. aiming
-        // at it directly, stop interpolating, instead fly straight
-        // towards it.
-        Vec3 diff = m_target->getXYZ()-getXYZ();
-        next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
-
-        Vec3 old_vec = getXYZ()-m_previous_xyz;
-        Vec3 new_vec = next_xyz - getXYZ();
-        float angle  = atan2(new_vec.getZ(), new_vec.getX())
-                     - atan2(old_vec.getZ(), old_vec.getX());
-        // Adjust angle to be between -180 and 180 degrees
-        if(angle < -M_PI)
-            angle += M_PI;
-        else if(angle > M_PI)
-            angle -= M_PI;
-
-        // If the angle is too much, adjust next xyz
-        if(fabsf(angle)>m_st_target_max_angle*dt)
-        {
-            core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
-            if(old_2d.getLengthSQ()==0.0f)
-                old_2d.Y = 1.0f;
-            old_2d.normalize();
-            old_2d.rotateBy(  RAD_TO_DEGREE * dt 
-                                    * (angle > 0 ?  m_st_target_max_angle 
-                                                 : -m_st_target_max_angle));
-            next_xyz.setX(getXYZ().getX() + old_2d.X*dt*m_speed);
-            next_xyz.setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
-
-            Vec3 old_vec = getXYZ()-m_previous_xyz;
-            Vec3 new_vec = next_xyz - getXYZ();
-            angle  = atan2(new_vec.getZ(), new_vec.getX())
-                   - atan2(old_vec.getZ(), old_vec.getX());
-            // Adjust angle to be between -180 and 180 degrees
-            if(angle < -M_PI)
-                angle += M_PI;
-            else if(angle > M_PI)
-                angle -= M_PI;
-
-        }
-        // To see if we have overtaken the target, construct a line through
-        // the rear axles of the kart, and see if the current and the new
-        // position of the ball are on different sides of the line.
-        const btVector3 &w1 = m_target->getVehicle()
-                              ->getWheelInfo(2).m_raycastInfo.m_contactPointWS;
-        const btVector3 &w2 = m_target->getVehicle()
-                              ->getWheelInfo(3).m_raycastInfo.m_contactPointWS;
-        core::line2df axle(w1.getX(), w1.getZ(), w2.getX(), w2.getZ());
-        // This is basically impossible to fulfill. I've only managed to do
-        // this by driving in a very tight circle, then in about 1 out of 10 
-        // balls I avoided the ball.
-        if( axle.getPointOrientation(getXYZ().toIrrVector2d()) *
-            axle.getPointOrientation(next_xyz.toIrrVector2d())<0)
-        {
-            printf("Congrats, rubber ball removed.\n");
-            return true;
-        }
-    }
+        moveTowardsTarget(&next_xyz, dt);
     else
-    {
         interpolate(&next_xyz, dt);
-    }
-    m_timer += dt;
+
+    m_height_timer += dt;
     float height = updateHeight();
     float new_y = getHoT()+height;
 
@@ -394,8 +349,7 @@ bool RubberBall::updateAndDelete(float dt)
     // tweak the look a bit.
     float r = 2.0f;
     if(r*height<m_extend.getY())
-        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),
-        1.0f));
+        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),1.0f));
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
@@ -404,6 +358,46 @@ bool RubberBall::updateAndDelete(float dt)
 
     return false;
 }   // updateAndDelete
+
+// ----------------------------------------------------------------------------
+/** Moves the rubber ball in a straight line towards the target. This is used
+ *  once the rubber ball is close to its target. It restricts the angle by
+ *  which the rubber ball can change its direction per frame.
+ *  \param next_xyz The position the ball should move to.
+ *  \param dt Time step size.
+ */
+void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
+{
+    // If the rubber ball is already close to a target, i.e. aiming
+    // at it directly, stop interpolating, instead fly straight
+    // towards it.
+    Vec3 diff = m_target->getXYZ()-getXYZ();
+    *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+
+    Vec3 old_vec = getXYZ()-m_previous_xyz;
+    Vec3 new_vec = *next_xyz - getXYZ();
+    float angle  = atan2(new_vec.getZ(), new_vec.getX())
+                 - atan2(old_vec.getZ(), old_vec.getX());
+    // Adjust angle to be between -180 and 180 degrees
+    if(angle < -M_PI)
+        angle += 2*M_PI;
+    else if(angle > M_PI)
+        angle -= 2*M_PI;
+
+    // If the angle is too large, adjust next xyz
+    if(fabsf(angle)>m_st_target_max_angle*dt)
+    {
+        core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
+        if(old_2d.getLengthSQ()==0.0f) old_2d.Y = 1.0f;
+        old_2d.normalize();
+        old_2d.rotateBy(  RAD_TO_DEGREE * dt 
+                                       * (angle > 0 ?  m_st_target_max_angle
+                                                    : -m_st_target_max_angle));
+        next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
+        next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
+    }   // if fabsf(angle) > m_st_target_angle_max*dt
+
+}   // moveTowardsTarget
 
 // ----------------------------------------------------------------------------
 /** Uses Hermite splines (Catmull-Rom) to interpolate the position of the
@@ -452,9 +446,9 @@ float RubberBall::updateHeight()
     // When the ball hits the floor, we adjust maximum height and 
     // interval so that the ball bounces faster when it is getting
     // closer to the target.
-    if(m_timer>m_interval)
+    if(m_height_timer>m_interval)
     {
-        m_timer -= m_interval;
+        m_height_timer -= m_interval;
         if(m_ping_sfx->getStatus()!=SFXManager::SFX_PLAYING)
         {
             m_ping_sfx->position(getXYZ());
@@ -486,7 +480,7 @@ float RubberBall::updateHeight()
             m_interval           = m_st_interval;
             m_current_max_height = m_max_height;
         }
-    }   // if m_timer > m_interval
+    }   // if m_height_timer > m_interval
 
 
     // Determine the height of the ball
@@ -497,7 +491,7 @@ float RubberBall::updateHeight()
     // f(m_interval/2) = s*(-m_interval^2)/4 = max_height
     // --> s =  4*max_height / -m_interval^2
     float s = 4.0f * m_current_max_height / (-m_interval*m_interval);
-    return m_timer * (m_timer-m_interval) * s;
+    return m_height_timer * (m_height_timer-m_interval) * s;
 }   // updateHeight
 
 // ----------------------------------------------------------------------------
@@ -550,19 +544,28 @@ void RubberBall::checkDistanceToTarget()
         // It appears that we have lost the target. It was within
         // the target distance, and now it isn't. That means either
         // the original target escaped, or perhaps that there is a 
-        // new target. In this case we have to reset the control
-        // points, since it's likely that the ball is (after some time
-        // going directly towards the target) far outside of the
-        // old control points.
+        // new target. If the new distance is nearly the full track
+        // length, assume that the rubber ball has overtaken the
+        // original target, and start deleting it.
+        if(diff > 0.9f * world->getTrack()->getTrackLength())
+        {
+            m_delete_timer = m_st_delete_time;
+        }
+        
+        // Otherwise (target disappeared, e.g. has finished the race or
+        // was eliminated) we have to reset the control points, since 
+        // it's likely that the ball is (after some time going directly
+        // towards the target) far outside of the old control points.
 
         // We use the previous XYZ point to define the first control
         // point, which results in a smooth transition from aiming
         // directly at the target back to interpolating again.
         initializeControlPoints(m_previous_xyz);
         m_aiming_at_target = false;
-        printf("Target lost\n");
+
+        printf("Target lost, diff %f time %f\n", diff, m_delete_timer);
     }
-    
+
     return;
 }   // checkDistanceToTarget
 
