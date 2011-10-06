@@ -45,15 +45,7 @@ TriangleMesh::TriangleMesh() : m_mesh()
  */
 TriangleMesh::~TriangleMesh()
 {
-    if(m_body)
-    {
-        World::getWorld()->getPhysics()->removeBody(m_body);
-        delete m_body;
-        delete m_motion_state;
-        delete m_collision_shape;
-    }
-    if(m_collision_object)
-        delete m_collision_object;
+    removeAll();
 }   // ~TriangleMesh
 
 // -----------------------------------------------------------------------------
@@ -131,22 +123,31 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags)
                               btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 }   // createPhysicalBody
 
-// -----------------------------------------------------------------------------
-/** Removes the created body from the physics world. This is used when creating
- *  a temporary rigid body of the main track to get bullet raycasts. Then the
- *  main track is removed, and the track (main track including all additional
- *  objects which were loaded later) is converted again.
+// ----------------------------------------------------------------------------
+/** Removes the created body and/or collision object from the physics world. 
+ *  This is used when creating a temporary rigid body of the main track to get 
+ *  bullet raycasts. Then the main track is removed, and the track (main track 
+ *  including all additional objects which were loaded later) is converted 
+ *  again.
  */
-void TriangleMesh::removeBody()
+void TriangleMesh::removeAll()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
-    delete m_body;
-    delete m_motion_state;
+    if(m_body)
+    {
+        World::getWorld()->getPhysics()->removeBody(m_body);
+        delete m_body;
+        delete m_motion_state;
+        m_body         = NULL;
+        m_motion_state = NULL;
+    }
+    if(m_collision_object)
+    {
+        delete m_collision_object;
+        m_collision_object = NULL;
+    }
     delete m_collision_shape;
-    m_body            = NULL;
-    m_motion_state    = NULL;
     m_collision_shape = NULL;
-}   // removeBody
+}   // removeAll
 
 // -----------------------------------------------------------------------------
 /** Interpolates the normal at the given position for the triangle with

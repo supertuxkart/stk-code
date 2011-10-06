@@ -55,7 +55,8 @@ public:
     void createCollisionShape(bool create_collision_object=true);
     void createPhysicalBody(btCollisionObject::CollisionFlags flags=
                                (btCollisionObject::CollisionFlags)0);
-    void removeBody();
+    void removeAll();
+    void removeCollisionObject();
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
     // ------------------------------------------------------------------------

@@ -448,7 +448,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         return;
     }
 
-    m_track_mesh->removeBody();
+    m_track_mesh->removeAll();
+    m_gfx_effect_mesh->removeAll();
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
