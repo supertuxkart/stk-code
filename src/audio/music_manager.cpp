@@ -78,6 +78,13 @@ MusicManager::~MusicManager()
 {
     stopMusic();
 
+    for(std::map<std::string,MusicInformation*>::iterator i=m_all_music.begin();
+        i!=m_all_music.end(); i++)
+    {
+        delete i->second;
+        i->second = NULL;
+    }
+
     if(m_initialized)
     {
         ALCcontext* context = alcGetCurrentContext();
@@ -113,7 +120,7 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
         if(StringUtils::getExtension(*i)!="music") continue;
         try
         {
-            m_allMusic[StringUtils::getBasename(*i)] = new MusicInformation(*i);
+            m_all_music[StringUtils::getBasename(*i)] = new MusicInformation(*i);
         }
         catch (std::exception& e)
         {
@@ -126,8 +133,8 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
 //-----------------------------------------------------------------------------
 void MusicManager::addMusicToTracks()
 {
-    for(std::map<std::string,MusicInformation*>::iterator i=m_allMusic.begin();
-                                                          i!=m_allMusic.end(); i++)
+    for(std::map<std::string,MusicInformation*>::iterator i=m_all_music.begin();
+                                                          i!=m_all_music.end(); i++)
     {
         if(!i->second) 
         {
@@ -189,12 +196,12 @@ MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
         return NULL;
     }
     const std::string basename = StringUtils::getBasename(filename);
-    MusicInformation* mi = m_allMusic[basename];
+    MusicInformation* mi = m_all_music[basename];
     if(!mi)
     {
         // Note that this might raise an exception
         mi = new MusicInformation(filename);
-        m_allMusic[basename] = mi;
+        m_all_music[basename] = mi;
     }
     mi->volumeMusic(m_masterGain);
     return mi;

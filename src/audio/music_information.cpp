@@ -127,9 +127,9 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
 
 MusicInformation::~MusicInformation()
 {
-    delete m_normal_music;
-    delete m_fast_music;
-}
+    if(m_normal_music) delete m_normal_music;
+    if(m_fast_music)   delete m_fast_music;
+}   // ~MusicInformation
 
 //-----------------------------------------------------------------------------
 
@@ -168,7 +168,7 @@ void MusicInformation::startMusic()
     if((m_normal_music->load(m_normal_filename)) == false)
     {
         delete m_normal_music;
-        m_normal_music=0;
+        m_normal_music = NULL;
         fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
                 m_normal_filename.c_str());
         return;

@@ -45,7 +45,7 @@ private:
      *  game. */
     bool                     m_initialized; 
     std::map<std::string, MusicInformation*> 
-                             m_allMusic;
+                             m_all_music;
 
     void                     loadMusicInformation();
     float                    m_masterGain;
