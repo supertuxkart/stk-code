@@ -68,11 +68,11 @@ RubberBall::RubberBall(Kart *kart, Track* track)
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz = m_owner->getXYZ();
 
+    // A negative value indicates that the timer is not active
+    m_delete_timer = -1.0f;
+
     computeTarget();
 
-    // If there is no target (i.e. the firing kart is first kart that is 
-    // still racing, start the delete timer.
-    m_delete_timer = m_target!=m_owner ? -1.0f : 10.0f;
 
     // initialises the current graph node
     TrackSector::update(getXYZ(), kart, track);
