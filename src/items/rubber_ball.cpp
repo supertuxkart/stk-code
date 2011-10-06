@@ -290,8 +290,8 @@ bool RubberBall::updateAndDelete(float dt)
     // terrain is less than half the current maximum height.
     bool close_to_ground = 2.0*(getXYZ().getY() - getHoT()) 
                          < m_current_max_height;
-    Vec3 offset(0, close_to_ground ? 1.0f : 0.0f, 0);
-    Flyable::setPositionOffset(offset);
+    Vec3 vertical_offset(0, close_to_ground ? 1.0f : 0.0f, 0);
+    Flyable::setPositionOffset(vertical_offset);
 
     if(Flyable::updateAndDelete(dt))
         return true;
@@ -328,13 +328,15 @@ bool RubberBall::updateAndDelete(float dt)
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)  
     {
-        float terrain_height = getMaxTerrainHeight()-m_extend.getY();
+        float terrain_height = getMaxTerrainHeight(vertical_offset)
+                             - m_extend.getY();
         if(new_y>terrain_height)
             new_y = terrain_height;
     }
 
     if(UserConfigParams::logFlyable())
-        printf("newy2 %f gmth %f\n", new_y,getMaxTerrainHeight());
+        printf("newy2 %f gmth %f\n", new_y,
+               getMaxTerrainHeight(vertical_offset));
 
     next_xyz.setY(new_y);
 
@@ -499,17 +501,22 @@ float RubberBall::updateHeight()
  *  generall the height is arbitrary (a skybox is not part of the physics and
  *  will therefore not be detected), it is important that a rubber ball does 
  *  not end up on top of a tunnel.
+ *  \param vertical_offset A vertical offset which is added to the current
+ *         position of the kart in order to avoid tunneling effects (it could
+ *         happen that the raycast down find the track since it uses the 
+ *         vertical offset, while the raycast up would hit under the track
+ *         if the vertical offset is not used).
  *  \returns The height (Y coordinate) of the next terrain element found by
  *           a raycast up. If no terrain is found, it returns 99990
  */
-float RubberBall::getMaxTerrainHeight() const
+float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
 {
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
     Vec3 to(getXYZ());
     to.setY(10000.0f);
     Vec3 hit_point;
     const Material *material;
-    tm.castRay(getXYZ(), to, &hit_point, &material);
+    tm.castRay(getXYZ()+vertical_offset, to, &hit_point, &material);
 
     return (material) ? hit_point.getY() : 99999.f;
 }   // getMaxTerrainHeight
@@ -536,6 +543,8 @@ void RubberBall::checkDistanceToTarget()
 
     if(diff < m_st_target_distance)
     {
+        printf("target-height %f  ball-height %f\n",
+            m_target->getXYZ().getY(), getXYZ().getY());
         m_aiming_at_target = true;
         return;
     }

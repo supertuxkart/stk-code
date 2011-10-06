@@ -149,7 +149,7 @@ private:
     void         interpolate(Vec3 *next_xyz, float dt);
     void         moveTowardsTarget(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
-	float        getMaxTerrainHeight() const;
+    float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
 public:
                  RubberBall  (Kart* kart, Track* track);
     virtual     ~RubberBall();
