@@ -318,9 +318,13 @@ CURLcode NetworkHttp::init()
         news_manager->init();
         status = loadAddonsList(xml, xml_file);
         if(status==CURLE_OK)
+        {
+            delete xml;
             return status;
+        }
         else
         {
+            delete xml;
             // This message must be translated dynamically in the main menu.
             // If it would be translated here, it wouldn't be translated
             // if the language is changed in the menu!
