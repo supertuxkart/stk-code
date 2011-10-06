@@ -55,6 +55,7 @@ void NewsManager::init()
     const XMLNode *xml   = new XMLNode(xml_file);
     checkRedirect(xml);
     updateNews(xml, xml_file);
+    delete xml;
 }   // init
 
 // ---------------------------------------------------------------------------
