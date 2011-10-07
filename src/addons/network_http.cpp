@@ -313,18 +313,18 @@ CURLcode NetworkHttp::init()
             if(status==CURLE_OK)
                 UserConfigParams::m_news_last_updated = 
                     Time::getTimeSinceEpoch();
+            delete xml;
             xml = new XMLNode(xml_file);
         }
         news_manager->init();
         status = loadAddonsList(xml, xml_file);
+        delete xml;
         if(status==CURLE_OK)
         {
-            delete xml;
             return status;
         }
         else
         {
-            delete xml;
             // This message must be translated dynamically in the main menu.
             // If it would be translated here, it wouldn't be translated
             // if the language is changed in the menu!
