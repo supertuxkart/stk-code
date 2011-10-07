@@ -380,6 +380,7 @@ public:
     KartType     getKartType(int kart)    const { return m_kart_status[kart].m_kart_type;}
     int          getCoinTarget()          const { return m_coin_target;                  }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
+    int          getTrackNumber()         const { return m_track_number;                 } 
 
     /** Returns the list of AI karts to use. Used for networking, and for
      *  the --ai= command line option. */

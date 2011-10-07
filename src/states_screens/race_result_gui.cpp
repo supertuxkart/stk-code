@@ -26,12 +26,15 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
 DEFINE_SCREEN_SINGLETON( RaceResultGUI );
@@ -61,6 +64,35 @@ void RaceResultGUI::init()
     
     music_manager->stopMusic();
     m_finish_sound = sfx_manager->quickSound("race_finish");
+    
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        const std::vector<std::string>& tracks = race_manager->getGrandPrix()->getTracks();
+        size_t currentTrack = race_manager->getTrackNumber();
+    
+        for(size_t i=0; i<tracks.size(); i++)
+        {
+            Track* track = track_manager->getTrack(tracks[i]);
+            GUIEngine::IconButtonWidget* m_screenshot_widget = new GUIEngine::IconButtonWidget(GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+                false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
+            m_screenshot_widget->m_x = (int)(UserConfigParams::m_width*0.67);
+            m_screenshot_widget->m_y = (int)(UserConfigParams::m_height*(0.10+i*0.135));
+            m_screenshot_widget->m_w = (int)(UserConfigParams::m_width*0.17);
+            m_screenshot_widget->m_h = (int)(UserConfigParams::m_height*0.1275);
+
+            m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = (track  != NULL ?
+                track->getScreenshotFile().c_str() :
+                file_manager->getDataDir() + "gui/main_help.png");
+            m_screenshot_widget->m_properties[GUIEngine::PROP_ID] = tracks[i];
+
+            if(i <= currentTrack)
+                m_screenshot_widget->setBadge(GUIEngine::OK_BADGE);
+
+            m_screenshot_widget->add();
+            m_widgets.push_back(m_screenshot_widget);
+        }
+    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -155,16 +187,18 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         if (name == "middle")        // Next GP
         {
+            cleanupGPProgress();
             StateManager::get()->popMenu();
             race_manager->next();
         }
         else if (name == "bottom")        // Abort
         {
+            cleanupGPProgress();
             StateManager::get()->popMenu();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         }
-        else
+        else if (!getWidget(name.c_str())->isVisible())
         {
             fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n",
                             name.c_str());
@@ -258,7 +292,6 @@ void RaceResultGUI::determineTableLayout()
             m_width_kart_name = rect.Width;
     }   // for position
 
-
     std::string max_time    = StringUtils::timeToString(max_finish_time);
     core::stringw string_max_time(max_time.c_str());
     core::dimension2du r    = m_font->getDimension(string_max_time.c_str());
@@ -328,7 +361,13 @@ void RaceResultGUI::determineTableLayout()
         m_table_width += m_width_new_points + m_width_all_points
                       + 2 * m_width_column_space;
 
-    m_leftmost_column = table_area->m_x + (table_area->m_w - m_table_width)/2;
+    
+    if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        m_leftmost_column = table_area->m_x;
+    else
+        m_leftmost_column = table_area->m_x + (table_area->m_w - m_table_width)/2;
+    
+    m_gp_progress_x = (int)(UserConfigParams::m_width*0.65); 
 }   // determineTableLayout
 
 //-----------------------------------------------------------------------------
@@ -538,6 +577,8 @@ void RaceResultGUI::renderGlobal(float dt)
             break;
         }   // switch
         displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
+        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            displayGPProgress();
     }   // for i
 }   // renderGlobal
 
@@ -603,12 +644,6 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     RowInfo *ri = &(m_all_row_infos[n]);
     video::SColor color = ri->m_is_player_kart ? video::SColor(255,255,0,  0  )
                                                : video::SColor(255,255,255,255);
-
-    // if we have highscores, move items to the left to have some more room...
-    if (m_highscore_player != NULL)
-    {
-        x -= (int)(m_table_width/3.0f);
-    }
     
 #ifdef USE_PER_LINE_BACKGROUND
     // Draw the background image
@@ -682,8 +717,6 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         while(point_inc_string.size()<3)
             point_inc_string = core::stringw(" ")+point_inc_string;
         m_font->draw(point_inc_string, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
-        
-        current_x += m_width_all_points + m_width_column_space;
     }
     
     if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
@@ -691,7 +724,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     {
         if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
         {
-            current_x += 20;
+            current_x += m_width_all_points + m_width_column_space + 20; 
             
             core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
             
@@ -724,4 +757,22 @@ void RaceResultGUI::setHighscore(std::string who, StateManager::ActivePlayer* pl
     m_highscore_player = player;
     m_highscore_rank = rank;
     m_highscore_time = time;
+}
+
+void RaceResultGUI::displayGPProgress()
+{
+    video::SColor color = video::SColor(255,255,0,0); 
+    core::recti dest_rect(m_gp_progress_x, m_top, 0, 0);
+    core::stringw message("Grand Prix progress:"); 
+
+    m_font->draw(message.c_str(), dest_rect, color, false, false, NULL, true);
+}
+
+void RaceResultGUI::cleanupGPProgress()
+{
+    const std::vector<std::string>& tracks = race_manager->getGrandPrix()->getTracks();
+    for(size_t i=0; i<tracks.size(); i++)
+    {
+        m_widgets.remove(getWidget(tracks[i].c_str()));
+    }
 }

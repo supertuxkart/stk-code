@@ -152,7 +152,10 @@ private:
 
     /** The overall width of the table. */
     unsigned int               m_table_width;
-    
+
+    /** GP Progress text */ 
+    unsigned int               m_gp_progress_x; 
+
     /** The font to use. */
     gui::ScalableFont         *m_font;
 
@@ -184,7 +187,8 @@ private:
     void determineTableLayout();
     void determineGPLayout();
     void enableAllButtons();
-
+    void displayGPProgress(); 
+    void cleanupGPProgress();
 public:
 
                  RaceResultGUI();
