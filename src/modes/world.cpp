@@ -39,6 +39,7 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
@@ -781,7 +782,9 @@ Kart *World::getPlayerKart(unsigned int n) const
 }   // getPlayerKart
 
 //-----------------------------------------------------------------------------
-/** Returns the nth local player kart, i.e. a player kart that has a camera.
+/** Returns the nth local player kart, i.e. a kart that has a camera.
+ *  Note that in profile mode this means a non player kart could be returned
+ *  (since an AI kart will have the camera).
  *  \param n Index of player kart to return.
  */
 Kart *World::getLocalPlayerKart(unsigned int n) const
@@ -791,7 +794,8 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
     for(int i=0; i<kart_count; i++)
     {
         if(m_karts[i]->getCamera() && 
-            m_karts[i]->getController()->isPlayerController())
+            (m_karts[i]->getController()->isPlayerController() ||
+            ProfileWorld::isProfileMode()                          ) )
         {
             count++;
             if(count == (int)n) return m_karts[i];
