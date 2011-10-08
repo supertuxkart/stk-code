@@ -187,6 +187,7 @@ private:
     void determineTableLayout();
     void determineGPLayout();
     void enableAllButtons();
+    void enableGPProgress();
     void displayGPProgress(); 
     void cleanupGPProgress();
 public:

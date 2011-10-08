@@ -64,35 +64,6 @@ void RaceResultGUI::init()
     
     music_manager->stopMusic();
     m_finish_sound = sfx_manager->quickSound("race_finish");
-    
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
-        const std::vector<std::string>& tracks = race_manager->getGrandPrix()->getTracks();
-        size_t currentTrack = race_manager->getTrackNumber();
-    
-        for(size_t i=0; i<tracks.size(); i++)
-        {
-            Track* track = track_manager->getTrack(tracks[i]);
-            GUIEngine::IconButtonWidget* m_screenshot_widget = new GUIEngine::IconButtonWidget(GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
-            m_screenshot_widget->m_x = (int)(UserConfigParams::m_width*0.67);
-            m_screenshot_widget->m_y = (int)(UserConfigParams::m_height*(0.10+i*0.135));
-            m_screenshot_widget->m_w = (int)(UserConfigParams::m_width*0.17);
-            m_screenshot_widget->m_h = (int)(UserConfigParams::m_height*0.1275);
-
-            m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = (track  != NULL ?
-                track->getScreenshotFile().c_str() :
-                file_manager->getDataDir() + "gui/main_help.png");
-            m_screenshot_widget->m_properties[GUIEngine::PROP_ID] = tracks[i];
-
-            if(i <= currentTrack)
-                m_screenshot_widget->setBadge(GUIEngine::OK_BADGE);
-
-            m_screenshot_widget->add();
-            m_widgets.push_back(m_screenshot_widget);
-        }
-    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -124,6 +95,7 @@ void RaceResultGUI::enableAllButtons()
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
+        enableGPProgress();
         // In case of a GP:
         // ----------------
         top->setVisible(false);
@@ -360,12 +332,8 @@ void RaceResultGUI::determineTableLayout()
     if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         m_table_width += m_width_new_points + m_width_all_points
                       + 2 * m_width_column_space;
-
     
-    if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
-        m_leftmost_column = table_area->m_x;
-    else
-        m_leftmost_column = table_area->m_x + (table_area->m_w - m_table_width)/2;
+    m_leftmost_column = table_area->m_x;
     
     m_gp_progress_x = (int)(UserConfigParams::m_width*0.65); 
 }   // determineTableLayout
@@ -535,7 +503,10 @@ void RaceResultGUI::renderGlobal(float dt)
             enableAllButtons();
         }
         break;
-    case RR_WAIT_TILL_END:      break;
+    case RR_WAIT_TILL_END:      
+        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            displayGPProgress();
+        break;
     }   // switch
 
     // Second phase: update X and Y positions for the various animations
@@ -577,8 +548,6 @@ void RaceResultGUI::renderGlobal(float dt)
             break;
         }   // switch
         displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-            displayGPProgress();
     }   // for i
 }   // renderGlobal
 
@@ -723,13 +692,9 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         m_animation_state == RR_RACE_RESULT)
     {
         if (m_highscore_player != NULL && ri->m_player == m_highscore_player)
-        {
-            current_x += m_width_all_points + m_width_column_space + 20; 
-            
+        {   
             core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-            
             core::stringw message = (m_highscore_rank == 1 ? _("You topped the highscore list!") : _("New highscore!"));
-            
             GUIEngine::getSmallFont()->draw(message.c_str(), dest_rect, video::SColor(255,255,166,0),
                                             false, false, NULL, true /* ignoreRTL */);
             
@@ -759,6 +724,38 @@ void RaceResultGUI::setHighscore(std::string who, StateManager::ActivePlayer* pl
     m_highscore_time = time;
 }
 
+void RaceResultGUI::enableGPProgress()
+{
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        const std::vector<std::string>& tracks = race_manager->getGrandPrix()->getTracks();
+        size_t currentTrack = race_manager->getTrackNumber();
+    
+        for(size_t i=0; i<tracks.size(); i++)
+        {
+            Track* track = track_manager->getTrack(tracks[i]);
+            GUIEngine::IconButtonWidget* m_screenshot_widget = new GUIEngine::IconButtonWidget(GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+                false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
+            m_screenshot_widget->m_x = (int)(UserConfigParams::m_width*0.67);
+            m_screenshot_widget->m_y = (int)(UserConfigParams::m_height*(0.10+i*0.135));
+            m_screenshot_widget->m_w = (int)(UserConfigParams::m_width*0.17);
+            m_screenshot_widget->m_h = (int)(UserConfigParams::m_height*0.1275);
+
+            m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = (track  != NULL ?
+                track->getScreenshotFile().c_str() :
+                file_manager->getDataDir() + "gui/main_help.png");
+            m_screenshot_widget->m_properties[GUIEngine::PROP_ID] = tracks[i];
+
+            if(i <= currentTrack)
+                m_screenshot_widget->setBadge(GUIEngine::OK_BADGE);
+
+            m_screenshot_widget->add();
+            m_widgets.push_back(m_screenshot_widget);
+        }
+    }
+}
+
 void RaceResultGUI::displayGPProgress()
 {
     video::SColor color = video::SColor(255,255,0,0); 
@@ -773,6 +770,8 @@ void RaceResultGUI::cleanupGPProgress()
     const std::vector<std::string>& tracks = race_manager->getGrandPrix()->getTracks();
     for(size_t i=0; i<tracks.size(); i++)
     {
-        m_widgets.remove(getWidget(tracks[i].c_str()));
+        GUIEngine::Widget *trackWidget = getWidget(tracks[i].c_str());
+        m_widgets.remove(trackWidget);
+        delete trackWidget;
     }
 }
