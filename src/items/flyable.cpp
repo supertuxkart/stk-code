@@ -335,7 +335,8 @@ bool Flyable::updateAndDelete(float dt)
 
     if(m_has_hit_something) return true;
 
-    Vec3 xyz=getBody()->getWorldTransform().getOrigin();
+    //Vec3 xyz=getBody()->getWorldTransform().getOrigin();
+    const Vec3 &xyz=getXYZ();
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
