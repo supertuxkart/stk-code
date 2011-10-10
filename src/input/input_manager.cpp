@@ -33,6 +33,7 @@
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/kart.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -88,6 +89,34 @@ void InputManager::handleStaticAction(int key, int value)
 
     switch (key)
     {
+#ifdef DEBUG
+        // Special debug options for profile mode: switch the 
+        // camera to show a different kart.
+        case KEY_KEY_1:
+        case KEY_KEY_2:
+        case KEY_KEY_3:
+        case KEY_KEY_4:
+        case KEY_KEY_5:
+        case KEY_KEY_6:
+        case KEY_KEY_7:
+        case KEY_KEY_8:
+        case KEY_KEY_9:
+        {
+            if(!ProfileWorld::isProfileMode()) break;
+            int kart_id = key - KEY_KEY_1;
+            if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
+            for(unsigned int i=0; i<world->getNumKarts(); i++)
+            {
+                if(world->getKart(i)->getCamera())
+                {
+                    world->getKart(i)->getCamera()
+                                     ->changeOwner(world->getKart(kart_id));
+
+                }
+            }
+            break;
+        }
+#endif
         case KEY_CONTROL:
         case KEY_RCONTROL:
         case KEY_LCONTROL:

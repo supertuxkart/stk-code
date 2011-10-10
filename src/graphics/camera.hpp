@@ -88,8 +88,9 @@ private:
     /** Factor of the effects of steering in camera aim. */
     float           m_rotation_range;
 
-    /** The kart that the camera follows. */
-    const Kart     *m_kart;
+    /** The kart that the camera follows. It can't be const,
+     *  since in profile mode the camera might change its owner. */
+    Kart           *m_kart;
 
     /** The list of viewports for this cameras. */
     core::recti     m_viewport;
@@ -167,6 +168,7 @@ private:
         bool    isReached(const Vec3 &xyz) 
                 { return (xyz-m_position).length2() < m_distance2; }
     };   // EndCameraInformation
+    // ------------------------------------------------------------------------
 
     /** List of all end camera information. This information is shared 
      *  between all cameras, so it's static. */
@@ -190,7 +192,7 @@ private:
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
 public:
-         Camera            (int camera_index, const Kart* kart);
+         Camera            (int camera_index, Kart* kart);
         ~Camera            ();
     static void readEndCamera(const XMLNode &root);
     static void clearEndCameras();
@@ -202,24 +204,27 @@ public:
     void setInitialTransform();
     void activate();
     void update            (float dt);
+    void changeOwner       (Kart *new_kart);
 
+    // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
     void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
 
+    // ------------------------------------------------------------------------
     /** Returns the current ambient light. */
     const video::SColor &getAmbientLight() const {return m_ambient_light; }
 
+    // ------------------------------------------------------------------------
     /** Returns the viewport of this camera. */
     const core::recti& getViewport() const {return m_viewport; }
 
+    // ------------------------------------------------------------------------
     /** Returns the scaling in x/y direction for this camera. */
     const core::vector2df& getScaling() const {return m_scaling; }
     
+    // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
-    scene::ICameraSceneNode *getCameraSceneNode() 
-    {
-        return m_camera;
-    }
+    scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }
 } ;
 
 #endif
