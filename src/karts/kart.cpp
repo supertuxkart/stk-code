@@ -305,7 +305,9 @@ void Kart::createPhysics()
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
-        wheel.m_rotation                 = btScalar(float(m_kart_properties->hasRandomWheels()) * (rand() % 360));
+        wheel.m_rotation                 = 
+            btScalar(float(m_kart_properties->hasRandomWheels()) 
+            * (rand() % 360));
     }
     // Obviously these allocs have to be properly managed/freed
     btTransform t;
@@ -1263,13 +1265,20 @@ void Kart::handleMaterialGFX()
 }   // handleMaterialGFX
 
 //-----------------------------------------------------------------------------
-
+/** Sets or reset the camera attached to a kart. In profile mode even AI karts
+ *  can have a camera attached.
+ *  \params camera The camera to attach to this kart (or NULL if no camera
+ *          is to be used
+ */
 void Kart::setCamera(Camera *camera)
 {
     m_camera = camera;
-    
+    if(!camera)
+        return;
+
 #ifdef DEBUG
-    m_camera->getCameraSceneNode()->setName((m_kart_properties->getIdent() + "'s camera").c_str());
+    m_camera->getCameraSceneNode()
+            ->setName((m_kart_properties->getIdent() + "'s camera").c_str());
 #endif
     
     // Handle camera-specific nodes for now if in multiplayer
@@ -1416,7 +1425,8 @@ void Kart::crashed(Kart *k, const Material *m)
             }
             else
             {
-                fprintf(stderr, "Unknown particles kind <%s> in material crash-reset properties\n", particles.c_str());
+                fprintf(stderr, "Unknown particles kind <%s> in material "
+                                "crash-reset properties\n", particles.c_str());
             }
         }
         
@@ -1502,7 +1512,9 @@ bool Kart::playCustomSFX(unsigned int type)
         if (m_custom_sounds[type] != NULL)
         {
             ret = true;
-            //printf("Kart SFX: playing %s for %s.\n", sfx_manager->getCustomTagName(type), m_kart_properties->getIdent().c_str());
+            //printf("Kart SFX: playing %s for %s.\n", 
+            //    sfx_manager->getCustomTagName(type), 
+            //    m_kart_properties->getIdent().c_str());
             // If it's already playing, let it finish
             if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
             {
@@ -1891,8 +1903,9 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
         track->getSkyParticles()->setBoxSizeX(150.0f);
         track->getSkyParticles()->setBoxSizeZ(150.0f);
         
-        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(), core::vector3df(0.0f, 40.0f, 100.0f),
-                                                      getNode());
+        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(),
+                                          core::vector3df(0.0f, 40.0f, 100.0f),
+                                          getNode());
         
         // FIXME: in multiplayer mode, this will result in several instances of the heightmap being calculated
         //        and kept in memory
@@ -2061,7 +2074,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
         core::vector3df rot = m_node->getRotation();
         
-        float ratio = float(m_zipper_fire->getCreationRate())/float(m_zipper_fire->getParticlesInfo()->getMaxRate());
+        float ratio = float(m_zipper_fire->getCreationRate())
+                   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
         
         const float a = (13.4f - ratio*13.0f);
         float dst = -45.0f*sin((a*a)/180.f*M_PI);
