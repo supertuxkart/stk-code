@@ -60,6 +60,7 @@ void Referee::init()
     {
         printf("The file referee.xml does not contain a referee"
                "node, aborting.\n");
+        exit(-1);
     }
     std::string model_filename;
     node->get("model", &model_filename);
@@ -70,6 +71,7 @@ void Referee::init()
     {
         printf("Can't find referee model '%s', aborting.\n", 
                model_filename.c_str());
+        exit(-1);
     }
 
     // Translate the mesh so that the x/z middle point
@@ -141,6 +143,7 @@ void Referee::init()
         
     }
 
+    delete node;
 }   // init
 
 // ----------------------------------------------------------------------------
