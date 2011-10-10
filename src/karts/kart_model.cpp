@@ -136,14 +136,17 @@ KartModel::~KartModel()
         m_animated_node->drop();
     }
     
-    for(unsigned int i=0; i<4; i++)
+    for(unsigned int i=0; i<4; i++) 
     {
         if(m_wheel_node[i])
         {
             // Master KartModels should never have a wheel attached.
             assert(!m_is_master);
+
             m_wheel_node[i]->drop();
         }
+        if(m_is_master && m_wheel_model[i])
+            irr_driver->dropAllTextures(m_wheel_model[i]);
     }
 
 #ifdef DEBUG
@@ -313,7 +316,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_wheel = 
             kart_properties.getKartDir()+"/"+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
-        // FIXME: wheel handling still missing.
+        // Grab all textures. This is done for the master only, so
+        // the destructor will only free the textures if a master
+        // copy is freed.
+        irr_driver->grabAllTextures(m_wheel_model[i]);
     }   // for i<4
     
     return true;
