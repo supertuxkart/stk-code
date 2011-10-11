@@ -267,8 +267,12 @@ void Swatter::squashThingsAround()
     {
         Kart *kart = world->getKart(i);
         // TODO: isSwatterReady()
-        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
+        if(kart->isEliminated() || kart==m_kart)
             continue;
+        // don't swat an already hurt kart
+        if (kart->isInvulnerable() || kart->isSquashed())
+            continue;
+        
         float dist2 = (kart->getXYZ()-swatter_pos).length2();
 
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart

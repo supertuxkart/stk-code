@@ -1031,6 +1031,8 @@ void Kart::showZipperFire()
  */
 void Kart::setSquash(float time, float slowdown)
 {
+    if (isInvulnerable()) return;
+    
     if(m_attachment->getType()==Attachment::ATTACH_BOMB)
     {
         this->handleExplosion(getXYZ(), /*direct hit*/true);
