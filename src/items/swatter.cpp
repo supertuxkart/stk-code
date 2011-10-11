@@ -208,8 +208,12 @@ void Swatter::chooseTarget()
     {
         Kart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
-        if(kart->isEliminated() || kart==m_kart || kart->isSquashed())
+        if(kart->isEliminated() || kart==m_kart)
             continue;
+        // don't squash an already hurt kart
+        if (kart->isInvulnerable() || kart->isSquashed())
+            continue;
+        
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)
         {
