@@ -50,11 +50,6 @@ class Camera;
 class Kart;
 class PerCameraNode;
 
-struct VideoMode
-{
-    int width, height;
-};
-
 /**
   * \brief class that creates the irrLicht device and offers higher-level 
   *  ways to manage the 3D scene
@@ -85,6 +80,19 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
     
     void setAllMaterialFlags(scene::IMesh *mesh) const;
+public:
+    /** A simple class to store video resolutions. */
+    class VideoMode
+    {
+    private:
+        int m_width;
+        int m_height;
+    public:
+        VideoMode(int w, int h) {m_width=w; m_height=h; }
+        int getWidth() const  {return m_width;  }
+        int getHeight() const {return m_height; }
+    };   // VideoMode
+private:
     std::vector<VideoMode> m_modes;
 
     void                  setupViewports();
@@ -95,6 +103,8 @@ private:
     
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
+    void                 createListOfVideoModes();
+
     
 public:
                           IrrDriver();

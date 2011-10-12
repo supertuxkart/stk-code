@@ -121,7 +121,8 @@ void OptionsScreenVideo::init()
     {
         res->clearItems();
         
-        const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
+        const std::vector<IrrDriver::VideoMode>& modes = 
+                                                irr_driver->getVideoModes();
         const int amount = modes.size();
         
         bool found_config_res = false;
@@ -134,8 +135,8 @@ void OptionsScreenVideo::init()
         
         for (int n=0; n<amount; n++)
         {
-            const int w = modes[n].width;
-            const int h = modes[n].height;
+            const int w = modes[n].getWidth();
+            const int h = modes[n].getHeight();
             const float ratio = (float)w / h;
             
             if (w == UserConfigParams::m_width && h == UserConfigParams::m_height)

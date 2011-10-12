@@ -854,6 +854,7 @@ int handleCmdLine(int argc, char **argv)
  */
 void initUserConfig(char *argv[])
 {
+    irr_driver              = new IrrDriver();
     file_manager            = new FileManager(argv);
     user_config             = new UserConfig();     // needs file_manager
     const bool config_ok    = user_config->loadConfig();
@@ -886,7 +887,8 @@ void initRest()
 {
     stk_config->load(file_manager->getDataFile("stk_config.xml"));
 
-    irr_driver              = new IrrDriver();
+    // Now create the actual non-null device in the irrlicht driver
+    irr_driver->initDevice();
     
     // Init GUI
     IrrlichtDevice* device = irr_driver->getDevice();

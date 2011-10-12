@@ -124,13 +124,12 @@ FileManager::FileManager(char *argv[])
     getcwd(buffer, 256);
 #endif
 
-    m_device = createDevice(video::EDT_NULL);
-
 #ifdef __APPLE__
     chdir( buffer );
 #endif
 
-    m_file_system  = m_device->getFileSystem();
+    // CHECKME HIKER: is this grabbed???
+    m_file_system  = irr_driver->getDevice()->getFileSystem();
     m_is_full_path = false;
 
     irr::io::path exe_path;
@@ -171,28 +170,21 @@ FileManager::FileManager(char *argv[])
     checkAndCreateAddonsDir();
 }  // FileManager
 
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 /** Remove the dummy file system (which is called from IrrDriver before
  *  creating the actual device.
  */
 void FileManager::dropFileSystem()
 {
-    m_device->drop();
-    m_device = NULL;
 }   // dropFileSystem
 
 //-----------------------------------------------------------------------------
 /** This function is used to re-initialise the file-manager after reading in
  *  the user configuration data.
 */
-void FileManager::setDevice(IrrlichtDevice *device)
+void FileManager::reInit()
 {
-    m_device = device;
-
-    //std::cout << "^^^^^^^^ GRABBING m_device (FileManager) ^^^^^^^^\n";
-    m_device->grab();  // To make sure that the device still exists while
-                       // file_manager has a pointer to the file system.
-    m_file_system  = m_device->getFileSystem();
+    m_file_system  = irr_driver->getDevice()->getFileSystem();
     TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
     KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
     pushTextureSearchPath(m_root_dir+"/data/textures/");
@@ -264,7 +256,6 @@ FileManager::~FileManager()
     popTextureSearchPath();
     // m_file_system is ref-counted, so no delete/drop necessary.
     m_file_system = NULL;
-    m_device->drop();
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------

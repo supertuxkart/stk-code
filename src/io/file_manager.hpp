@@ -45,10 +45,6 @@ class FileManager : public NoCopy
 private:
     /** Handle to irrlicht's file systems. */
     io::IFileSystem  *m_file_system;
-    /** Pointer to the irrlicht device. This is necessary before reInit is
-     *  called to store the NULL device initially created. See Constructor
-     *  for details. */
-    IrrlichtDevice   *m_device;
 
     bool              m_is_full_path;
     /** Directory where user config files are stored. */
@@ -75,7 +71,7 @@ private:
 public:
                       FileManager(char *argv[]);
                      ~FileManager();
-    void              setDevice(IrrlichtDevice *device);
+    void              reInit();
     void              dropFileSystem();
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);

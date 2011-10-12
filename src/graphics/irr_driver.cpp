@@ -62,17 +62,22 @@ const int MIN_SUPPORTED_HEIGHT = 600;
 const int MIN_SUPPORTED_WIDTH  = 800;
 
 // ----------------------------------------------------------------------------
-
+/** The constructor creates the irrlicht device. It first creates a NULL 
+ *  device. This is necessary to handle the Chicken/egg problem with irrlicht: 
+ *  access to the file system is given from the device, but we can't create the
+ *  device before reading the user_config file (for resolution, fullscreen). 
+ *  So we create a dummy device here to begin with, which is then later (once
+ *  the real device exists) changed in initDevice().
+ */
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
-    m_device              = NULL;
-    file_manager->dropFileSystem();
-    initDevice();
+    m_device              = createDevice(video::EDT_NULL);
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
-
+/** Destructor - removes the irrlicht device.
+ */
 IrrDriver::~IrrDriver()
 {
     m_post_processing.shut();
@@ -82,43 +87,44 @@ IrrDriver::~IrrDriver()
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
+/** Gets a list of supported video modes from the irrlicht device. This data
+ *  is stored in m_modes.
+ */
+void IrrDriver::createListOfVideoModes()
+{
+    video::IVideoModeList* modes = m_device->getVideoModeList();
+    const int count = modes->getVideoModeCount();
 
+    for(int i=0; i<count; i++)
+    {
+        // only consider 32-bit resolutions for now
+        if (modes->getVideoModeDepth(i) >= 24)
+        {
+            const int w = modes->getVideoModeResolution(i).Width;
+            const int h = modes->getVideoModeResolution(i).Height;
+            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) 
+                continue;
+
+            VideoMode mode(w, h);
+            m_modes.push_back( mode );
+        }   // if depth >=24
+    }   // for i < video modes count
+
+}   // createListOfVideoModes
+
+// ----------------------------------------------------------------------------
+/** This creates the actualy OpenGL device. This is called 
+ */
 void IrrDriver::initDevice()
 {
-    // If --no-graphics option was used, just create a device with NULL renderer
-    if (ProfileWorld::isNoGraphics())
+    // If --no-graphics option was used, the null device can still be used.
+    if (!ProfileWorld::isNoGraphics())
     {
-        m_device = createDevice(video::EDT_NULL);
-    }
-    else
-    {
-        static bool firstTime = true;
-
-        // ---- the first time, get a list of available video modes
-        if (firstTime)
-        {        
-            m_device = createDevice(video::EDT_NULL);
-        
-            video::IVideoModeList* modes = m_device->getVideoModeList();
-            const int count = modes->getVideoModeCount();
-
-            for(int i=0; i<count; i++)
-            {
-                // only consider 32-bit resolutions for now
-                if (modes->getVideoModeDepth(i) >= 24)
-                {
-                    const int w = modes->getVideoModeResolution(i).Width;
-                    const int h = modes->getVideoModeResolution(i).Height;
-                    if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) 
-                        continue;
-
-                    VideoMode mode;
-                    mode.width = w;
-                    mode.height = h;
-                    m_modes.push_back( mode );
-                }
-            }
-
+        // This code is only executed once. No need to reload the video
+        // modes every time the resolution changes.
+        if(m_modes.size()==0)
+        {
+            createListOfVideoModes();
 		    // The debug name is only set if irrlicht is compiled in debug 
 		    // mode. So we use this to print a warning to the user.
             if(m_device->getDebugName())
@@ -127,77 +133,60 @@ void IrrDriver::initDevice()
                 printf("!!!!! This can have a significant performance impact         !!!!!\n");
             }
 
-            m_device->closeDevice();
-            // In some circumstances it would happen that a WM_QUIT message
-            // (apparently sent for this NULL device) is later received by
-            // the actual window, causing it to immediately quit.
-            // Following advise on the irrlicht forums I added the following
-            // two calles - the first one didn't make a difference (but 
-            // certainly can't hurt), but the second one apparenlty solved
-            // the problem for now.
-            m_device->clearSystemMessages();  
-            m_device->run();
-
-            firstTime = false;
         } // end if firstTime
+
+        m_device->closeDevice();
+        m_video_driver  = NULL;
+        m_gui_env       = NULL;
+        m_scene_manager = NULL;
+        // In some circumstances it would happen that a WM_QUIT message
+        // (apparently sent for this NULL device) is later received by
+        // the actual window, causing it to immediately quit.
+        // Following advise on the irrlicht forums I added the following
+        // two calles - the first one didn't make a difference (but 
+        // certainly can't hurt), but the second one apparenlty solved
+        // the problem for now.
+        m_device->clearSystemMessages();
+        m_device->run(); 
+        m_device->drop();
+        m_device  = NULL;
     
+        int num_drivers = 5;
 
-        int numDrivers = 5;
-
-        // Test if user has chosen a driver or if we should try all to find a woring
-        // one.
-        if( UserConfigParams::m_renderer != 0 )
-        {
-            numDrivers = 1;
-        }
+        // Test if user has chosen a driver or if we should try all to find
+        // a working one.
+        if( UserConfigParams::m_renderer != 0 ) num_drivers = 1;
 
         // ---- open device
         // Try different drivers: start with opengl, then DirectX
-        for(int driver_type=0; driver_type<numDrivers; driver_type++)
+        for(int driver_type=0; driver_type<num_drivers; driver_type++)
         {
 
             video::E_DRIVER_TYPE type;
 
             // Test if user has chosen a driver or if we should try all to find a
             // woring one.
-            if( UserConfigParams::m_renderer != 0 )
-            {
-                // Get the correct type.
-                type = getEngineDriverType( UserConfigParams::m_renderer );
-            } else
-            {
-                // Get the correct type.
-                type = getEngineDriverType( driver_type );
-            }
-
+            type = getEngineDriverType(
+                UserConfigParams::m_renderer ? UserConfigParams::m_renderer
+                                             : driver_type                  );
             // Try 32 and, upon failure, 24 then 16 bit per pixels
             for (int bits=32; bits>15; bits -=8)
             {
-                printf("[IrrDriver] Trying to create device with %i bits\n", bits);
-                /*
-                m_device = createDevice(type,
-                                        core::dimension2d<u32>(UserConfigParams::m_width,
-                                                               UserConfigParams::m_height ),
-                                        bits, //bits per pixel
-                                        UserConfigParams::m_fullscreen,
-                                        false,  // stencil buffers
-                                        false,  // vsync
-                                        this    // event receiver
-                                        );
-                 */
-            
+                if(UserConfigParams::logMisc())
+                    printf("[IrrDriver] Trying to create device with "
+                           "%i bits\n", bits);
                 SIrrlichtCreationParameters params;
                 params.DriverType = type;
-                params.WindowSize = core::dimension2d<u32>(UserConfigParams::m_width,
-                                                           UserConfigParams::m_height);
-                params.Bits = bits;
+                params.Stencilbuffer = false;
+                params.Bits          = bits;
                 params.EventReceiver = this;
-                params.Fullscreen = UserConfigParams::m_fullscreen;
-            
+                params.Fullscreen    = UserConfigParams::m_fullscreen;
+                params.Vsync         = UserConfigParams::m_vsync;
+                params.WindowSize    = 
+                    core::dimension2du(UserConfigParams::m_width,
+                                       UserConfigParams::m_height);
                 if (UserConfigParams::m_fullscreen_antialiasing)
                     params.AntiAlias = 8;
-            
-                params.Vsync = UserConfigParams::m_vsync;
             
                 m_device = createDeviceEx(params);
             
@@ -210,12 +199,12 @@ void IrrDriver::initDevice()
         // size is the problem
         if(!m_device)
         {
-            UserConfigParams::m_width = 800;
+            UserConfigParams::m_width  = 800;
             UserConfigParams::m_height = 600;
         
             m_device = createDevice(video::EDT_OPENGL,
-                                    core::dimension2d<u32>(UserConfigParams::m_width,
-                                                           UserConfigParams::m_height ),
+                        core::dimension2du(UserConfigParams::m_width,
+                                           UserConfigParams::m_height ),
                                     32, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
@@ -259,7 +248,7 @@ void IrrDriver::initDevice()
     }
 
     // Stores the new file system pointer.
-    file_manager->setDevice(m_device);
+    file_manager->reInit();
 
     // Initialize material2D
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
@@ -410,18 +399,12 @@ void IrrDriver::applyResolutionSettings()
     delete material_manager;
     material_manager = NULL;
 
-    m_device->drop();
-    m_device        = NULL;
-    m_video_driver  = NULL;
-    m_gui_env       = NULL;
-    m_scene_manager = NULL;
-    
-    
     // ---- Reinit
-    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! That'
-    // s just error prone
+    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! 
+    // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
     
+    // initDevice will drop the current device.
     initDevice();
     
     // Re-init GUI engine
@@ -462,7 +445,7 @@ void IrrDriver::applyResolutionSettings()
     
     GUIEngine::reshowCurrentScreen();
     
-}   // changeResolution
+}   // applyResolutionSettings
 
 // ----------------------------------------------------------------------------
 
