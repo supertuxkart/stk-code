@@ -55,6 +55,7 @@
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -982,6 +983,7 @@ void cleanSuperTuxKart()
     if(history)                 delete history;
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
+    delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
