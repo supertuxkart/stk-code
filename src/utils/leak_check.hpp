@@ -19,6 +19,9 @@
 #define __LEAK_CHECK_H__
 
 #ifdef DEBUG
+
+#include <stdio.h>
+
 namespace MemoryLeaks
 {
     
