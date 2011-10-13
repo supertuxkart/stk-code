@@ -32,6 +32,7 @@
 #include <path.h>
 using namespace irr;
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
 
@@ -56,6 +57,7 @@ private:
     std::string                          m_file_name;
     
 public:
+         LEAK_CHECK();
          XMLNode(io::IXMLReader *xml);
     
          /** \throw runtime_error if the file is not found */
