@@ -93,6 +93,9 @@ IrrDriver::~IrrDriver()
  */
 void IrrDriver::createListOfVideoModes()
 {
+    // Note that this is actually reported by valgrind as a leak, but it is
+    // a leak in irrlicht: this list is dynamically created the first time
+    // it is used, but then not cleaned on exit.
     video::IVideoModeList* modes = m_device->getVideoModeList();
     const int count = modes->getVideoModeCount();
 
@@ -110,7 +113,6 @@ void IrrDriver::createListOfVideoModes()
             m_modes.push_back( mode );
         }   // if depth >=24
     }   // for i < video modes count
-
 }   // createListOfVideoModes
 
 // ----------------------------------------------------------------------------
