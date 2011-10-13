@@ -170,7 +170,14 @@ void *NetworkHttp::mainLoop(void *obj)
                        me->m_current_request->getPriority()); 
         }
         if(me->m_current_request->getCommand()==Request::HC_QUIT)
+        {
+            if(me->m_current_request->manageMemory())
+            {
+                delete me->m_current_request;
+                me->m_current_request = NULL;
+            }
             break;
+        }
         CURLcode status=CURLE_OK;
         switch(me->m_current_request->getCommand())
         {
