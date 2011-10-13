@@ -170,8 +170,6 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
-    // Read music files in that dir as well
-    music_manager->loadMusicFromOneDir(dirname);
     return true;
 }   // loadTrack
 

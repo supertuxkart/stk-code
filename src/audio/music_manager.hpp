@@ -76,7 +76,6 @@ public:
       */ 
     MusicInformation       *getMusicInformation(const std::string& filename);
     
-    void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 
 };
