@@ -109,7 +109,28 @@ void MusicManager::loadMusicInformation()
     }   // for dir
 }   // loadMusicInformation
 
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
+void MusicManager::loadMusicFromOneDir(const std::string& dir)
+{
+    std::set<std::string> files;
+    file_manager->listFiles(files, dir, /*is_full_path*/ true,
+                            /*make_full_path*/ true);
+    for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
+    {
+        if(StringUtils::getExtension(*i)!="music") continue;
+        try
+        {
+            m_all_music[StringUtils::getBasename(*i)] = new MusicInformation(*i);
+        }
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid compiler warning
+            continue;
+        }
+    }   // for i
+} // loadMusicFromOneDir
+
+//-----------------------------------------------------------------------------//-----------------------------------------------------------------------------
 void MusicManager::addMusicToTracks()
 {
     for(std::map<std::string,MusicInformation*>::iterator i=m_all_music.begin();

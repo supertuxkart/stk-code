@@ -75,7 +75,8 @@ public:
       * @throw runtime_error if the music file could not be found/opened
       */ 
     MusicInformation       *getMusicInformation(const std::string& filename);
-    
+
+    void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 
 };
