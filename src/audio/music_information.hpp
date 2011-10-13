@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "utils/no_copy.hpp"
+#include "utils/leak_check.hpp"
 
 #include <irrString.h>
 using irr::core::stringw;
@@ -68,6 +69,8 @@ private:
     float                    m_time_since_faster;
 
 public:
+    LEAK_CHECK()
+    
 #if defined(WIN32) || defined(_WIN32)
 #pragma warning(disable:4290)
 #endif
