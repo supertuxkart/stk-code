@@ -1079,6 +1079,7 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
 
+        addons_manager->checkInstalledAddons();
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());

@@ -35,6 +35,7 @@
 #include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -49,6 +50,13 @@ AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
 {
     m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
+
+    // Load the addons list (even if internet is disabled)
+    m_addons_list.lock();
+    // Clear the list in case that a reinit is being done.
+    m_addons_list.getData().clear();
+    loadInstalledAddons();
+    m_addons_list.unlock();
 }   // AddonsManager
 
 // ----------------------------------------------------------------------------
@@ -201,6 +209,63 @@ void AddonsManager::reInit()
 }   // reInit
 
 // ----------------------------------------------------------------------------
+/** This function checks if the information in the installed addons file is
+ *  consistent with what is actually available. This avoids e.g. that an
+ *  addon is installed, but not marked here (and therefore shows up as
+ *  not installed in the addons GUI), see bug #455.
+ */
+void AddonsManager::checkInstalledAddons()
+{
+    bool something_was_changed = false;
+
+    // Lock the whole addons list to make sure a consistent view is
+    // written back to disk. The network thread might still be 
+    // downloading icons and modify content
+    m_addons_list.lock();
+
+    // First karts
+    // -----------
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties *kp = kart_properties_manager->getKartById(i);
+        const std::string &dir=kp->getKartDir();
+        if(dir.find(file_manager->getAddonsDir())==std::string::npos)
+            continue;
+        int n = getAddonIndex(kp->getIdent());
+        if(n<0) continue;
+        if(!m_addons_list.getData()[n].isInstalled())
+        {
+            printf("[addons] Marking '%s' as being installed.\n", 
+                   kp->getIdent().c_str());
+            m_addons_list.getData()[n].setInstalled(true);
+            something_was_changed = true;
+        }
+    }
+
+    // Then tracks
+    // -----------
+    for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
+    {
+        const Track *track = track_manager->getTrack(i);
+        const std::string &dir=track->getFilename();
+        if(dir.find(file_manager->getAddonsDir())==std::string::npos)
+            continue;
+        int n = getAddonIndex(track->getIdent());
+        if(n<0) continue;
+        if(!m_addons_list.getData()[n].isInstalled())
+        {
+            printf("[addons] Marking '%s' as being installed.\n", 
+                   track->getIdent().c_str());
+            m_addons_list.getData()[n].setInstalled(true);
+            something_was_changed = true;
+        }
+    }
+    if(something_was_changed)
+        saveInstalled();
+    m_addons_list.unlock();
+}   // checkInstalledAddons
+
+// ----------------------------------------------------------------------------
 /** Download all necessary icons (i.e. icons that are either missing or have 
  *  been updated since they were downloaded).
  */
@@ -244,8 +309,11 @@ void AddonsManager::downloadIcons()
 void AddonsManager::loadInstalledAddons()
 {
     /* checking for installed addons */
-    std::cout << "[addons] Loading an xml file for installed addons: ";
-    std::cout << m_file_installed << std::endl;
+    if(UserConfigParams::logAddons())
+    {
+        std::cout << "[addons] Loading an xml file for installed addons: ";
+        std::cout << m_file_installed << std::endl;
+    }
     const XMLNode *xml = file_manager->createXMLTree(m_file_installed);
     if(!xml)
         return;
@@ -276,6 +344,10 @@ const Addon* AddonsManager::getAddon(const std::string &id) const
 }   // getAddon
 
 // ----------------------------------------------------------------------------
+/** Returns the index of the addon with the given id, or -1 if no such
+ *  addon exist.
+ *  \param id The (unique) identifier of the addon.
+ */
 int AddonsManager::getAddonIndex(const std::string &id) const
 {
     for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)
