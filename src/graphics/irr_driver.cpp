@@ -84,6 +84,7 @@ IrrDriver::~IrrDriver()
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
+    m_modes.clear();
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
