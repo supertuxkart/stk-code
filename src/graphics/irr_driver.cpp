@@ -148,6 +148,8 @@ void IrrDriver::initDevice()
         // the problem for now.
         m_device->clearSystemMessages();
         m_device->run(); 
+        // Clear the pointer stored in the file manager
+        file_manager->dropFileSystem();
         m_device->drop();
         m_device  = NULL;
     
@@ -394,8 +396,6 @@ void IrrDriver::applyResolutionSettings()
     m_device->clearSystemMessages();
     m_device->run(); 
 
-    // Clear the pointer stored in the file manager
-    file_manager->dropFileSystem();
     delete material_manager;
     material_manager = NULL;
 

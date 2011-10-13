@@ -128,8 +128,8 @@ FileManager::FileManager(char *argv[])
     chdir( buffer );
 #endif
 
-    // CHECKME HIKER: is this grabbed???
     m_file_system  = irr_driver->getDevice()->getFileSystem();
+    m_file_system->grab();
     m_is_full_path = false;
 
     irr::io::path exe_path;
@@ -176,6 +176,7 @@ FileManager::FileManager(char *argv[])
  */
 void FileManager::dropFileSystem()
 {
+    m_file_system->drop();
 }   // dropFileSystem
 
 //-----------------------------------------------------------------------------
@@ -185,6 +186,7 @@ void FileManager::dropFileSystem()
 void FileManager::reInit()
 {
     m_file_system  = irr_driver->getDevice()->getFileSystem();
+    m_file_system->grab();
     TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
     KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
     pushTextureSearchPath(m_root_dir+"/data/textures/");
@@ -254,7 +256,7 @@ FileManager::~FileManager()
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
-    // m_file_system is ref-counted, so no delete/drop necessary.
+    m_file_system->drop();
     m_file_system = NULL;
 }   // ~FileManager
 
