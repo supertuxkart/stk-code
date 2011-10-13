@@ -118,16 +118,11 @@ void MusicManager::loadMusicFromOneDir(const std::string& dir)
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
         if(StringUtils::getExtension(*i)!="music") continue;
-        try
-        {
-            m_all_music[StringUtils::getBasename(*i)] = new MusicInformation(*i);
-        }
-        catch (std::exception& e)
-        {
-            (void)e;  // avoid compiler warning
-            continue;
-        }
+        MusicInformation *mi =  MusicInformation::create(*i);
+        if(mi)
+            m_all_music[StringUtils::getBasename(*i)] = mi;
     }   // for i
+
 } // loadMusicFromOneDir
 
 //-----------------------------------------------------------------------------//-----------------------------------------------------------------------------
@@ -188,7 +183,8 @@ void MusicManager::setMasterMusicVolume(float gain)
 }
 
 //-----------------------------------------------------------------------------
-
+/** 
+ */
 MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
 {
     if(filename=="")
@@ -196,15 +192,20 @@ MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
         return NULL;
     }
     const std::string basename = StringUtils::getBasename(filename);
-    MusicInformation* mi = m_all_music[basename];
-    if(!mi)
+    std::map<std::string, MusicInformation*>::iterator p;
+    p = m_all_music.find(basename);
+    if(p==m_all_music.end())
     {
         // Note that this might raise an exception
-        mi = new MusicInformation(filename);
-        m_all_music[basename] = mi;
+        MusicInformation *mi = MusicInformation::create(filename);
+        if(mi)
+        {
+            mi->volumeMusic(m_masterGain);
+            m_all_music[basename] = mi;
+        }
+        return mi;
     }
-    mi->volumeMusic(m_masterGain);
-    return mi;
+    return p->second;
 }   // getMusicInformation
 
 //----------------------------------------------------------------------------

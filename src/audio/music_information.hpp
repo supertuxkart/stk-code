@@ -31,6 +31,7 @@
 using irr::core::stringw;
 
 class Music;
+class XMLNode;
 
 /**
   * \brief Wrapper around an instance of the Music interface
@@ -55,27 +56,31 @@ private:
     float                    m_gain;
     float                    m_adjusted_gain;
     
-    /** Either time for fading faster music in, or time to change pitch */
+    /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
-    float                    m_max_pitch;      //!< maximum pitch for faster music
+    /** Maximum pitch for faster music. */
+    float                    m_max_pitch;
     static const int         LOOP_FOREVER=-1;
     Music                   *m_normal_music,
                             *m_fast_music;
-    enum {SOUND_NORMAL,                        //!< normal music is played
-          SOUND_FADING,                        //!< normal music fading out, faster fading in
-          SOUND_FASTER,                        //!< change pitch of normal music
-          SOUND_FAST}                          //!< playing faster music or max pitch reached
+    enum {SOUND_NORMAL,     //!< normal music is played
+          SOUND_FADING,     //!< normal music fading out, faster fading in
+          SOUND_FASTER,     //!< change pitch of normal music
+          SOUND_FAST}       //!< playing faster music or max pitch reached
                              m_mode; 
     float                    m_time_since_faster;
 
+    // The constructor is private so that the 
+    // static create function must be used.
+    MusicInformation (const XMLNode *root, const std::string &filename);
 public:
     LEAK_CHECK()
     
 #if defined(WIN32) || defined(_WIN32)
 #pragma warning(disable:4290)
 #endif
-                       MusicInformation (const std::string& filename) throw (std::runtime_error);
                       ~MusicInformation ();
+    static MusicInformation *create(const std::string &filename);
     const stringw&     getComposer      () const {return m_composer;        }
     const stringw&     getTitle         () const {return m_title;           }
     const std::string& getNormalFilename() const {return m_normal_filename; }

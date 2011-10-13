@@ -97,6 +97,9 @@ Track::Track(const std::string &filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
+    // Note that the music information in m_music is globally managed
+    // by the music_manager, and is freed there. So no need to free it
+    // here (esp. since various track might share the same music).
 #ifdef DEBUG
     assert(m_magic_number == 0x17AC3802);
     m_magic_number = 0xDEADBEEF;
@@ -333,47 +336,29 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
     for(int i=0; i<(int)filenames.size(); i++)
     {
         std::string full_path = m_root+"/"+filenames[i];
-        MusicInformation* mi;
-        try
-        {
-            mi = music_manager->getMusicInformation(full_path);
-        }
-        catch(std::runtime_error)
-        {
-            mi = NULL;
-        }
+        MusicInformation* mi = music_manager->getMusicInformation(full_path);
         if(!mi)
         {
             try
             {
                 std::string shared_name = file_manager->getMusicFile(filenames[i]);
                 if(shared_name!="")
-                {
-                    try
-                    {
-                        mi = music_manager->getMusicInformation(shared_name);
-                    }
-                    catch(std::runtime_error)
-                    {
-                        mi = NULL;
-                    }
-                }   // shared_name!=""
+                    mi = music_manager->getMusicInformation(shared_name);
             }
-            catch (std::exception& e)
+            catch (...)
             {
-                (void)e;
                 mi = NULL;
             }
-            
         }
-        if(!mi)
-        {
-            fprintf(stderr, "Music information file '%s' not found - ignored.\n",
+        if(mi)
+            m_music.push_back(mi);
+        else
+            fprintf(stderr,
+                    "Music information file '%s' not found - ignored.\n",
                     filenames[i].c_str());
-            continue;
-        }
-        m_music.push_back(mi);
+
     }   // for i in filenames
+
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------

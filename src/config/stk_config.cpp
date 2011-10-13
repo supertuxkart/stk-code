@@ -244,14 +244,10 @@ void STKConfig::getAllData(const XMLNode * root)
         music_node->get("title", &title_music);
         assert(title_music.size() > 0);
         
-        try
-        {
-            m_title_music = new MusicInformation(file_manager->getDataDir() + "/music/" + title_music);
-        }
-        catch (std::runtime_error& e)
-        {
-            fprintf(stderr, "Cannot load title music : %s\n", e.what());
-        }
+        m_title_music = MusicInformation::create(file_manager->getDataDir()
+                                                 + "/music/" + title_music  );
+        if(!m_title_music)
+            fprintf(stderr, "Cannot load title music : %s\n", title_music);
     }
 
     if(const XMLNode *history_node = root->getNode("history"))

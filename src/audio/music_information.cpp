@@ -29,7 +29,46 @@
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
-MusicInformation::MusicInformation(const std::string& filename) throw (std::runtime_error)
+/** A simple factory to create music information files without raising
+ *  an exception on error, instead a NULL will be returned. This avoids
+ *  resource freeing problems if the exception is raised, and simplifies
+ *  calling code.
+ *  \param filename The name of a music file.
+ *  \return The MusicInformation object, or NULL in case of an error.
+ */
+MusicInformation *MusicInformation::create(const std::string &filename)
+{
+    assert(filename.size() > 0);
+
+    XMLNode* root = file_manager->createXMLTree(filename);
+    if (!root) return NULL;
+    if(root->getName()!="music")
+    {
+        fprintf(stderr, "Music file '%s' does not contain music node.\n",
+                filename.c_str());
+        delete root;
+        return NULL;
+    }
+    std::string s;
+    if(!root->get("title",    &s) ||
+       !root->get("composer", &s) ||
+       !root->get("file",     &s)    )
+
+    {
+        fprintf(stderr, "One of 'title', 'composer' or 'file' attribute "
+                        "is missing in the music XML file '%s'!\n",
+                filename.c_str());
+        delete root;
+        return NULL;
+    }
+    MusicInformation *mi = new MusicInformation(root, filename);
+    delete root;
+    return mi;
+}   // create()
+
+// ----------------------------------------------------------------------------
+MusicInformation::MusicInformation(const XMLNode *root, 
+                                   const std::string &filename)
 {
     m_title           = "";
     m_mode            = SOUND_NORMAL;
@@ -45,69 +84,19 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     m_gain            = 1.0f;
     m_adjusted_gain   = 1.0f;
 
-    assert(filename.size() > 0);
-    
-    if (StringUtils::getExtension(filename) != "music")
-    {
-        // Create information just from ogg file
-        // -------------------------------------
-        m_title           = core::stringw(StringUtils::removeExtension(StringUtils::getBasename(filename)).c_str());
-        m_normal_filename = filename;
-        return;
-    }
 
     // Otherwise read config file
     // --------------------------
-    XMLNode* root = file_manager->createXMLTree(filename);
-    if (!root)
-    {
-        // Don't print a message here - not finding a music file
-        // is normal since the file is searched in several different
-        // directories (e.g. in data/tracks/XX and data/music).
-        throw std::runtime_error("Could not open music XML file");
-    }
-    if(root->getName()!="music")
-    {
-        std::ostringstream msg;
-        fprintf(stderr, "Music XML file '%s' does not contain music node.",
-                filename.c_str());
-        throw std::runtime_error("No music node found");
-    }
-    std::string title;
-    if(!root->get("title", &title))
-    {
-        fprintf(stderr, 
-            "The 'title' attribute is missing in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    m_title = StringUtils::decodeFromHtmlEntities(title);
-
-    std::string composer;
-    if(!root->get("composer", &composer))
-    {
-        fprintf(stderr, 
-            "The 'composer' attribute is missing in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    m_composer = StringUtils::decodeFromHtmlEntities(composer);
-    
-    if(!root->get("file", &m_normal_filename))
-    {
-        fprintf(stderr, 
-            "The 'file' attribute is mandatory in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    root->get("gain",          &m_adjusted_gain);
-    root->get("tracks",        &m_all_tracks   );
-    root->get("fast",          &m_enable_fast  );
-    root->get("fast-filename", &m_fast_filename);
-    delete root;
+    std::string s;
+    root->get("title",         &s                );
+    m_title = StringUtils::decodeFromHtmlEntities(s);
+    root->get("composer",      &s                );
+    m_composer = StringUtils::decodeFromHtmlEntities(s);
+    root->get("file",          &m_normal_filename);
+    root->get("gain",          &m_adjusted_gain  );
+    root->get("tracks",        &m_all_tracks     );
+    root->get("fast",          &m_enable_fast    );
+    root->get("fast-filename", &m_fast_filename  );
     
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
