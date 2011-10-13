@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "utils/leak_check.hpp"
 #include "utils/synchronised.hpp"
 
 class Addon;
@@ -67,6 +68,8 @@ private:
      *  ready. */
     Addon              *m_icon_addon;
 public:
+    LEAK_CHECK()
+
           Request(HttpCommands command, int priority, 
                   bool manage_memory=true);
           Request(HttpCommands command, int priority, bool manage_memory,
