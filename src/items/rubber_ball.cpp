@@ -303,7 +303,7 @@ bool RubberBall::updateAndDelete(float dt)
     if(m_delete_timer>0)
     {
         m_delete_timer -= dt;
-        if(m_delete_timer<0)
+        if(m_delete_timer<=0)
         {
             hit(NULL);
             return true;
@@ -322,8 +322,8 @@ bool RubberBall::updateAndDelete(float dt)
     float new_y = getHoT()+height;
 
     if(UserConfigParams::logFlyable())
-        printf("ball %d: height %f new_y %f gethot %f ",
-                m_id, height, new_y, getHoT());
+        printf("ball %d: %f %f %f height %f new_y %f gethot %f ",
+                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, new_y, getHoT());
 
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)  
@@ -540,6 +540,11 @@ void RubberBall::checkDistanceToTarget()
     {
         diff += world->getTrack()->getTrackLength();
     }
+    if(UserConfigParams::logFlyable())
+        printf("ball %d: target %f %f %f diff %f \n",
+        m_id, m_target->getXYZ().getX(),m_target->getXYZ().getY(),
+        m_target->getXYZ().getZ(),diff
+        );
 
     if(diff < m_st_target_distance)
     {
