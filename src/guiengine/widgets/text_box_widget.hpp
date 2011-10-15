@@ -68,6 +68,8 @@ namespace GUIEngine
         void clearListeners();
         
         irr::core::stringw getText() const;
+        
+        virtual void elementRemoved();
     };
 }
 

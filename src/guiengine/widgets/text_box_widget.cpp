@@ -154,3 +154,13 @@ void TextBoxWidget::unfocused(const int playerID)
     GUIEngine::getGUIEnv()->setFocus( ModalDialog::getCurrent()->getIrrlichtElement() );
 }
 
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::elementRemoved()
+{
+    // normally at this point normal widgets have been deleted by irrlicht already.
+    // but this is a custom widget and the gui env does not appear to want to
+    // manage it. so we free it manually
+    m_element->drop();
+    Widget::elementRemoved();
+}

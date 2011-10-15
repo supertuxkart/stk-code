@@ -47,7 +47,10 @@ PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const f
 
 PlayerInfoDialog::~PlayerInfoDialog()
 {
-    OptionsScreenPlayers::getInstance()->selectPlayer( translations->fribidize(m_player->getName()) );
+    if (m_player != NULL)
+    {
+        OptionsScreenPlayers::getInstance()->selectPlayer( translations->fribidize(m_player->getName()) );
+    }
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -237,7 +240,8 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
     else if (eventSource == "confirmremove")
     {
         OptionsScreenPlayers::getInstance()->deletePlayer( m_player );
-
+        m_player = NULL;
+        
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
