@@ -81,6 +81,16 @@ void OptionsScreenPlayers::init()
         players->addItem( core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
                           translations->fribidize(UserConfigParams::m_all_players[n].getName()) );
     }
+    
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        players->setDeactivated();
+    }
+    else
+    {
+        players->setActivated();
+    }
+    
 }   // init
 
 // -----------------------------------------------------------------------------
