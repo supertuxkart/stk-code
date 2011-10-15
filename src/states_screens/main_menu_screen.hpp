@@ -29,12 +29,9 @@ namespace GUIEngine { class Widget; class ListWidget; }
 class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
 {
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
-    
-    GUIEngine::ListWidget* m_lang_popup;
-    
+        
     MainMenuScreen();
     
-    void closeLangPopup();
     
 public:
     
@@ -51,12 +48,6 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
-    
-    /** 
-     * \brief  Called when escape is pressed.
-     * \return true if the screen should be closed, false if you handled the press another way
-     */
-    virtual bool onEscapePressed();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onDisabledItemClicked(const std::string& item);

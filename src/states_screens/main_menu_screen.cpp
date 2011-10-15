@@ -67,9 +67,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 // ----------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
-{
-    m_lang_popup = NULL;
-    
+{  
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
 }   // loadedFromFile
@@ -293,37 +291,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
 void MainMenuScreen::tearDown()
 {
-    if (m_lang_popup != NULL)
-    {
-        closeLangPopup();
-    }
 }   // tearDown
-
-// ----------------------------------------------------------------------------
-
-bool MainMenuScreen::onEscapePressed()
-{
-    if (m_lang_popup != NULL)
-    {
-        closeLangPopup();
-        return false;
-    }
-    
-    return true;
-}   // onEscapePressed
-
-// ----------------------------------------------------------------------------
-
-void MainMenuScreen::closeLangPopup()
-{
-    assert(m_lang_popup != NULL);
-    
-    m_lang_popup->getIrrlichtElement()->remove();
-    m_lang_popup->elementRemoved();
-    manualRemoveWidget(m_lang_popup);
-    delete m_lang_popup;
-    m_lang_popup = NULL;
-}   // closeLangPopup
 
 // ----------------------------------------------------------------------------
 
