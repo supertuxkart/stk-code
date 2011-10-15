@@ -174,6 +174,17 @@ void OptionsScreenUI::init()
         
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
     
+    // Forbid changing language while in-game, since this crashes (changing the language involves
+    // tearing down and rebuilding the menu stack. not good when in-game)
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        list_widget->setDeactivated();
+    }
+    else
+    {
+        list_widget->setActivated();
+    }
+    
 }   // init
 
 // -----------------------------------------------------------------------------

@@ -1477,7 +1477,8 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
 void Skin::drawList(const core::recti &rect, Widget* widget, bool focused)
 {
     drawBoxFromStretchableTexture(widget, rect, 
-                                 SkinConfig::m_render_params["list::neutral"]);
+                                  SkinConfig::m_render_params["list::neutral"],
+                                  widget->m_deactivated, NULL);
     
 }   // drawList
 
@@ -1491,10 +1492,10 @@ void Skin::drawListSelection(const core::recti &rect, Widget* widget,
 {
     ListWidget* list = dynamic_cast<ListWidget*>(widget);
     assert(list != NULL);
-    
+        
     drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
-                              SkinConfig::m_render_params["listitem::focused"],
-                              false, clip);
+                                  SkinConfig::m_render_params["listitem::focused"],
+                                  list->m_deactivated, clip);
 }   // drawListSelection
 
 // ----------------------------------------------------------------------------
