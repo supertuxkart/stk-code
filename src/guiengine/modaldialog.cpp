@@ -136,6 +136,12 @@ ModalDialog::~ModalDialog()
     else                    irr_driver->hidePointer();
 
     input_manager->setMode(m_previous_mode);
+    
+    
+    // it's generally not necessay to do that because references
+    // to the deleted widgets will be gone, but some widgets
+    // may want to perform additional cleanup at this time
+    elementsWereDeleted();
 }
 
 // ----------------------------------------------------------------------------

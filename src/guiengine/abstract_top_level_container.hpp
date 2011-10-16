@@ -97,6 +97,8 @@ namespace GUIEngine
         Widget* getFirstWidget(PtrVector<Widget>* within_vector=NULL);
         Widget* getLastWidget(PtrVector<Widget>* within_vector=NULL);
         
+        void elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
+        
         bool isMyChild(Widget* widget) const;
     };   // AbstractTopLevelContainer
     

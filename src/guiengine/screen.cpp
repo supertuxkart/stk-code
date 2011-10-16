@@ -175,31 +175,6 @@ void Screen::addWidgets()
 
 // -----------------------------------------------------------------------------
 
-/**
- * Called when screen is removed. This means all irrlicht widgets this object has pointers
- * to are now gone. Set all references to NULL to avoid problems.
- */
-void Screen::elementsWereDeleted(PtrVector<Widget>* within_vector)
-{
-    assert(m_magic_number == 0xCAFEC001);
-    if (within_vector == NULL) within_vector = &m_widgets;
-    const unsigned short widgets_amount = within_vector->size();
-    
-    for (int n=0; n<widgets_amount; n++)
-    {
-        Widget& widget = (*within_vector)[n];
-        
-        widget.elementRemoved();
-        
-        if (widget.m_children.size() > 0)
-        {
-            elementsWereDeleted( &(widget.m_children) );
-        }
-    }
-}   // elementsWereDeleted
-
-// -----------------------------------------------------------------------------
-
 void Screen::manualAddWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);

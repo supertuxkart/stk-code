@@ -164,12 +164,6 @@ namespace GUIEngine
         /** \return the name of this menu (which is the name of the file) */
         const std::string& getName() const { return m_filename; }
         
-        /** 
-          * \brief invoked when irrlicht widgets added to the screen have been deleted
-          * so that we can drop any pointer to them we had (they are now dangling pointers)
-          */
-        void elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
-        
         /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
          (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
         virtual void unload();
