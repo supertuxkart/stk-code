@@ -1137,9 +1137,17 @@ int main(int argc, char *argv[] )
             StateManager::get()->createActivePlayer( 
                     UserConfigParams::m_all_players.get(0), device );
 
-            // Set up race manager appropriately
-            race_manager->setLocalKartInfo(0,UserConfigParams::m_default_kart);
-
+            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+            {
+                printf("Kart '%s' is unknown so will use the default kart.\n", UserConfigParams::m_default_kart.c_str());
+                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+            }
+            else
+            {
+                // Set up race manager appropriately
+                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+            }
+            
             // ASSIGN should make sure that only input from assigned devices
             // is read.
             input_manager->getDeviceList()->setAssignMode(ASSIGN);

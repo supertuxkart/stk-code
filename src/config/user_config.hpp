@@ -165,6 +165,8 @@ public:
     
     void revertToDefaults() { m_value = m_default_value; }
    
+    std::string getDefaultValue() const { return m_default_value; }
+    
     irr::core::stringw toString() const { return m_value.c_str(); }
     
     operator std::string() const  { return m_value; }
