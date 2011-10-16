@@ -148,25 +148,16 @@ ModalDialog::~ModalDialog()
 
 void ModalDialog::clearWindow()
 {
-    // TODO: extract this code and its eqauivalent from Screen into the common base class?
     Widget* w;
     for_in (w, m_widgets)
     {
         m_irrlicht_window->removeChild( w->getIrrlichtElement() );
     }
+    elementsWereDeleted();
     m_widgets.clearAndDeleteAll();   
     
     m_irrlicht_window->remove();
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
-    
-    /*
-    const core::list<IGUIElement*>& remainingChildren = m_irrlicht_window->getChildren();
-    const int amount = remainingChildren.getSize();
-    for(core::list<IGUIElement*>::Iterator it=remainingChildren.begin(); it != remainingChildren.end(); it++)
-    {
-        it->remove();
-    }
-     */
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
 }
 
 // ----------------------------------------------------------------------------
