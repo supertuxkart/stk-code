@@ -777,6 +777,12 @@ namespace GUIEngine
     
     void clearScreenCache()
     {
+        Screen* screen;
+        for_in (screen, g_loaded_screens)
+        {
+            screen->unload();
+        }
+        
         g_loaded_screens.clearAndDeleteAll();
         g_current_screen = NULL;
     }
