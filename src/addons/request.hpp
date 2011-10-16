@@ -101,6 +101,9 @@ public:
     /** Returns if this request is to be cancelled. */
     bool isCancelled() const { return m_cancel; }
     // ------------------------------------------------------------------------
+    /** Specifies if the memory should be managed by network_http. */
+    void setManageMemory(bool m) { m_manage_memory = m; }
+    // ------------------------------------------------------------------------
     /** Returns if the memory for this object should be managed by
     *  by network_http (i.e. freed once the request is handled). */
     bool manageMemory() const { return m_manage_memory; }

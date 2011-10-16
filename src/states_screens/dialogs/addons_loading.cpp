@@ -180,6 +180,11 @@ GUIEngine::EventPropagation
         if(m_download_request)
         {
             assert(m_download_request);
+            // In case of a cancel we can't free the memory, since 
+            // network_http will potentially update the request. So in
+            // order to avoid a memory leak, we let network_http free
+            // the request.
+            m_download_request->setManageMemory(true);
             m_download_request->cancel();
         }
         dismiss();
