@@ -59,7 +59,7 @@ public:
           TrackSector();
     void  reset();
     void  rescue();
-    void  update(const Vec3 &xyz, Kart* kart, Track* track);
+    void  update(const Vec3 &xyz);
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */
     float getDistanceFromStart() const { return m_current_track_coords.getZ();}

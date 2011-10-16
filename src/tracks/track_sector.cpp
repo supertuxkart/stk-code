@@ -47,7 +47,7 @@ void TrackSector::reset()
  *  the specified point.
  *  \param xyz The new coordinates to search the graph node for.
  */
-void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
+void TrackSector::update(const Vec3 &xyz)
 {
     int prev_sector = m_current_graph_node;
 

@@ -77,7 +77,7 @@ RubberBall::RubberBall(Kart *kart, Track* track)
 
 
     // initialises the current graph node
-    TrackSector::update(getXYZ(), kart, m_track);
+    TrackSector::update(getXYZ());
     initializeControlPoints(m_owner->getXYZ());
 
     // At the start the ball aims at quads till it gets close enough to the
@@ -354,7 +354,7 @@ bool RubberBall::updateAndDelete(float dt)
     next_xyz.setY(new_y);
 
     // Determine new distance along track
-    TrackSector::update(next_xyz, m_owner, m_track);
+    TrackSector::update(next_xyz);
 
     // Ball squashing:
     // ===============
