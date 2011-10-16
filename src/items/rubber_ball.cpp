@@ -35,6 +35,8 @@ float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
 float RubberBall::m_st_target_max_angle;
 float RubberBall::m_st_delete_time;
+float RubberBall::m_st_max_height_difference;
+float RubberBall::m_fast_ping_distance;
 int   RubberBall::m_next_id = 0;
 
 RubberBall::RubberBall(Kart *kart, Track* track)
@@ -75,7 +77,7 @@ RubberBall::RubberBall(Kart *kart, Track* track)
 
 
     // initialises the current graph node
-    TrackSector::update(getXYZ(), kart, track);
+    TrackSector::update(getXYZ(), kart, m_track);
     initializeControlPoints(m_owner->getXYZ());
 
     // At the start the ball aims at quads till it gets close enough to the
@@ -227,6 +229,8 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_target_distance            = 50.0f;
     m_st_target_max_angle           = 25.0f;
     m_st_delete_time                = 10.0f;
+    m_st_max_height_difference      = 10.0f;
+    m_fast_ping_distance            = 50.0f;
 
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specified for rubber ball.\n");
@@ -251,6 +255,15 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
         printf(
         "[powerup] Warning: no target-max-angle specified for rubber ball.\n");
     m_st_target_max_angle *= DEGREE_TO_RAD;
+    if(!node.get("max-height-difference", &m_st_max_height_difference))
+        printf(
+        "[powerup] Warning: no max-height-difference specified for "
+        "rubber ball.\n");
+    if(!node.get("fast-ping-distance", &m_fast_ping_distance))
+        printf(
+        "[powerup] Warning: no fast-ping-distancespecified for "
+        "rubber ball.\n");
+
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -546,10 +559,10 @@ void RubberBall::checkDistanceToTarget()
         m_target->getXYZ().getZ(),diff
         );
 
-    if(diff < m_st_target_distance)
+    if(diff < m_st_target_distance && 
+        fabsf(m_target->getXYZ().getY() - getXYZ().getY()) <
+             m_st_max_height_difference                      )
     {
-        printf("target-height %f  ball-height %f\n",
-            m_target->getXYZ().getY(), getXYZ().getY());
         m_aiming_at_target = true;
         return;
     }

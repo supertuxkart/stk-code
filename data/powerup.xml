@@ -48,10 +48,11 @@
         model="rubber_ball.b3d" speed="35.0" 
         scale="1 1 1"         interval="1"
         max-height="4.0"      min-height="0"
+        fast-ping-distance="50" 
         target-distance="50"  target-max-angle = "90"
         min-interpolation-distance="10"
         squash-slowdown="0.5" squash-duration="3"
-        delete-time="5.0"                            />
+        delete-time="5.0"     max-height-difference="10" />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
   <item name="plunger"        icon="plunger-icon.png"

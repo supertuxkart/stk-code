@@ -55,6 +55,19 @@ private:
      *  start to aim directly at the target (and not interpolate anymore). */
     static float m_st_target_distance;
 
+    /** In somce track, e.g. subsea track, it is possible that the karts
+     *  are on different parts of the track (different shortcuts), but
+     *  still close to each other - because one of the parts is just
+     *  on top of the other part. Therefore use the height as additional
+     *  criteria to determine if a ball is close to its target. */
+    static float m_st_max_height_difference;
+
+    /** Distance between ball and target at which the ball will start to
+     *  bounce faster (which makes more 'ping' sfx for the driver to 
+     *  hear it coming closer, but also higher probability to hit the
+     *  target and not fly over it). */
+    static float m_fast_ping_distance;
+
     /** The maximum angle the ball can change per second when being close
      *  to the taregt. If the target angle is small, it makes it much harder
      *  to hit the target, giving it some chances to escape. */
