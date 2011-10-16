@@ -39,12 +39,10 @@ float RubberBall::m_st_max_height_difference;
 float RubberBall::m_fast_ping_distance;
 int   RubberBall::m_next_id = 0;
 
-RubberBall::RubberBall(Kart *kart, Track* track)
+RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
-{
-    m_track = track;
-    
+{    
     // For debugging purpose: pre-fix each debugging line with the id of 
     // the ball so that it's easy to collect all debug output for one
     // particular ball only. 

@@ -151,8 +151,6 @@ private:
     /** Sound effect to be played when a ball hits a kart. */
     SFXBase     *m_hit_sfx;
     
-    Track       *m_track;
-
     void         computeTarget();
     void         checkDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index, 
@@ -164,7 +162,7 @@ private:
     void         initializeControlPoints(const Vec3 &xyz);
     float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
 public:
-                 RubberBall  (Kart* kart, Track* track);
+                 RubberBall  (Kart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
