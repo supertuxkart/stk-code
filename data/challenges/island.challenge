@@ -4,7 +4,7 @@
     version="1"
     id="snowmountain"
     name="Win a race on Snow Mountain"
-    description="Win a 3 lap race on Snow Mountain under 3:05 against 3 medium AI karts."
+    description="Win a 3 lap race on Northern Resort under 3:05 against 3 medium AI karts."
     unlock-track="islandtrack"
     major="single"
     minor="quickrace"
