@@ -293,7 +293,7 @@ void AddonsManager::downloadIcons()
             std::string save        = "icons/"+icon;
             Request *r = network_http->downloadFileAsynchron(url, save, 
                                                  /*priority*/1,
-                                               /*manage_mem*/false);
+                                               /*manage_mem*/true);
             r->setAddonIconNotification(&addon);            
         }
         else

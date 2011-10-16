@@ -156,7 +156,6 @@ void *NetworkHttp::mainLoop(void *obj)
         // so it is certain that even 
         me->m_current_request = me->m_all_requests.getData().top();
         me->m_all_requests.getData().pop();
-        me->m_all_requests.unlock();
         if(UserConfigParams::logAddons())
         {
             if(me->m_current_request->getCommand()==Request::HC_DOWNLOAD_FILE)
@@ -171,13 +170,12 @@ void *NetworkHttp::mainLoop(void *obj)
         }
         if(me->m_current_request->getCommand()==Request::HC_QUIT)
         {
-            if(me->m_current_request->manageMemory())
-            {
-                delete me->m_current_request;
-                me->m_current_request = NULL;
-            }
+            delete me->m_current_request;
+            me->m_current_request = NULL;
             break;
         }
+
+        me->m_all_requests.unlock();
         CURLcode status=CURLE_OK;
         switch(me->m_current_request->getCommand())
         {
@@ -208,6 +206,17 @@ void *NetworkHttp::mainLoop(void *obj)
     }   // while !quit
     if(UserConfigParams::logAddons())
         printf("[addons] Network exiting.\n");
+
+    // At this stage we have the lock for m_all_requests
+    while(!me->m_all_requests.getData().empty())
+    {
+        Request *r = me->m_all_requests.getData().top();
+        me->m_all_requests.getData().pop();
+        // Manage memory can be ignored here, all requests
+        // need to be freed.
+        delete r;
+    }
+    me->m_all_requests.unlock();
 
     pthread_exit(NULL);
     return 0;
