@@ -53,19 +53,6 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
 
     QuadGraph::get()->findRoadSector(xyz, &m_current_graph_node);
     m_on_road = m_current_graph_node != QuadGraph::UNKNOWN_SECTOR;
-
-    int kart_id = -1;
-    World* world = World::getWorld();
-    for (unsigned int i=0; i<world->getNumKarts(); i++)
-    {
-        if (world->getKart(i) == kart)
-        {
-            kart_id = i;
-            break;
-        }
-    }
-    
-    assert(kart_id != -1);
     
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
@@ -84,7 +71,6 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
         
         if (checkline_requirements.size() == 0)
         {
-            //printf("    Check %i last visited; curr requirement = NONE\n", m_last_triggered_checkline);
             m_last_valid_graph_node = m_current_graph_node;
         }
         else
@@ -92,41 +78,17 @@ void TrackSector::update(const Vec3 &xyz, Kart* kart, Track* track)
             bool has_prerequisite = false;
             
             for (unsigned int i=0; i<checkline_requirements.size(); i++)
-            {
-                //printf("    Check %i last visited; requirement[%i] = %i\n", m_last_triggered_checkline,
-                //       i, checkline_requirements[i]);
-                
+            {                
                 if (m_last_triggered_checkline == checkline_requirements[i])
                 {
-                    has_prerequisite = true;
-                    //if (m_last_valid_graph_node != m_current_graph_node)
-                    //    printf("[2] m_last_valid_graph_node : %i\n", m_last_valid_graph_node);
-                    
+                    has_prerequisite = true;                    
                     m_last_valid_graph_node = m_current_graph_node;
                     break;
                 }
             }
             
-            
             // TODO: show a message when we detect a user cheated.
-            // The code below almost works but fails for 2 reasons :
-            // 1) if a user goes to an earlier part of the track, the message
-            //    was still shown even if they're not actual;ly cheating
-            // 2) on the quad where the checkline is the message can appear
-            //    and disappear quickly as the per-quad resolution is
-            //    insufficient
-            //if (!has_prerequisite)
-            //{
-            //    World* w = World::getWorld();
-            //    if (dynamic_cast<LinearWorld*>(w) != NULL &&
-            //        dynamic_cast<LinearWorld*>(w)->getKartLap(kart_id) > -1)
-            //    {
-            //        RaceGUIBase* race_gui = w->getRaceGUI();
-            //        race_gui->addMessage(_("CHEATER!"), kart, -1.0f /* time */,
-            //                             video::SColor(255,255,255,255), true /* important */,
-            //                             true /* big font */);
-            //   }
-            //}
+            
         }
     }
     
