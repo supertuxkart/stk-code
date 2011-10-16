@@ -260,6 +260,8 @@ void AddonsLoading::startDownload()
  */
 void AddonsLoading::doInstall()
 {
+    delete m_download_request;
+    m_download_request = NULL;
     bool error=false;
     if(!m_addon.isInstalled() || m_addon.needsUpdate())
     {
