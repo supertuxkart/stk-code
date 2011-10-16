@@ -36,7 +36,7 @@ float RubberBall::m_st_target_distance;
 float RubberBall::m_st_target_max_angle;
 float RubberBall::m_st_delete_time;
 float RubberBall::m_st_max_height_difference;
-float RubberBall::m_fast_ping_distance;
+float RubberBall::m_st_fast_ping_distance;
 int   RubberBall::m_next_id = 0;
 
 RubberBall::RubberBall(Kart *kart)
@@ -81,6 +81,7 @@ RubberBall::RubberBall(Kart *kart)
     // At the start the ball aims at quads till it gets close enough to the
     // target:
     m_aiming_at_target     = false;
+    m_fast_ping            = false;
     m_height_timer         = 0.0f;
     m_interval             = m_st_interval;
     m_current_max_height   = m_max_height;
@@ -228,7 +229,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_target_max_angle           = 25.0f;
     m_st_delete_time                = 10.0f;
     m_st_max_height_difference      = 10.0f;
-    m_fast_ping_distance            = 50.0f;
+    m_st_fast_ping_distance         = 50.0f;
 
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specified for rubber ball.\n");
@@ -257,11 +258,13 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
         printf(
         "[powerup] Warning: no max-height-difference specified for "
         "rubber ball.\n");
-    if(!node.get("fast-ping-distance", &m_fast_ping_distance))
+    if(!node.get("fast-ping-distance", &m_st_fast_ping_distance))
         printf(
         "[powerup] Warning: no fast-ping-distancespecified for "
         "rubber ball.\n");
-
+    if(m_st_fast_ping_distance < m_st_target_distance)
+        printf("Warning: ping-distance is smaller than target distance.\n"
+               "hat should not happen, but is ignored for now.\n");
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -476,7 +479,7 @@ float RubberBall::updateHeight()
 
         if(distance<0)
             distance+=World::getWorld()->getTrack()->getTrackLength();;
-        if(distance<m_st_target_distance)
+        if(m_fast_ping)
         {
             // Some experimental formulas
             m_current_max_height   = 0.5f*sqrt(distance);
@@ -546,20 +549,26 @@ void RubberBall::checkDistanceToTarget()
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
     float ball_distance = getDistanceFromStart();
 
-    float diff = target_distance - ball_distance;
-    if(diff < 0)
+    m_distance_to_target = target_distance - ball_distance;
+    if(m_distance_to_target < 0)
     {
-        diff += world->getTrack()->getTrackLength();
+        m_distance_to_target += world->getTrack()->getTrackLength();
     }
     if(UserConfigParams::logFlyable())
-        printf("ball %d: target %f %f %f diff %f \n",
+        printf("ball %d: target %f %f %f distance_2_target %f \n",
         m_id, m_target->getXYZ().getX(),m_target->getXYZ().getY(),
-        m_target->getXYZ().getZ(),diff
+        m_target->getXYZ().getZ(),m_distance_to_target
         );
 
-    if(diff < m_st_target_distance && 
-        fabsf(m_target->getXYZ().getY() - getXYZ().getY()) <
-             m_st_max_height_difference                      )
+    float height_diff = fabsf(m_target->getXYZ().getY() - getXYZ().getY());
+
+    if(m_distance_to_target < m_st_fast_ping_distance && 
+        height_diff < m_st_max_height_difference)
+    {
+        m_fast_ping = true;
+    }
+    if(m_distance_to_target < m_st_target_distance && 
+        height_diff < m_st_max_height_difference)
     {
         m_aiming_at_target = true;
         return;
@@ -572,7 +581,7 @@ void RubberBall::checkDistanceToTarget()
         // new target. If the new distance is nearly the full track
         // length, assume that the rubber ball has overtaken the
         // original target, and start deleting it.
-        if(diff > 0.9f * world->getTrack()->getTrackLength())
+        if(m_distance_to_target > 0.9f * world->getTrack()->getTrackLength())
         {
             m_delete_timer = m_st_delete_time;
         }
@@ -587,8 +596,6 @@ void RubberBall::checkDistanceToTarget()
         // directly at the target back to interpolating again.
         initializeControlPoints(m_previous_xyz);
         m_aiming_at_target = false;
-
-        printf("Target lost, diff %f time %f\n", diff, m_delete_timer);
     }
 
     return;

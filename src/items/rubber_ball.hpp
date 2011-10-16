@@ -66,7 +66,7 @@ private:
      *  bounce faster (which makes more 'ping' sfx for the driver to 
      *  hear it coming closer, but also higher probability to hit the
      *  target and not fly over it). */
-    static float m_fast_ping_distance;
+    static float m_st_fast_ping_distance;
 
     /** The maximum angle the ball can change per second when being close
      *  to the taregt. If the target angle is small, it makes it much harder
@@ -124,6 +124,16 @@ private:
 
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
+
+    /** This flag is set if the target is within the fast ping distance. It 
+     *  will cause the rubber ball to decrese the jump height and intervall. */
+    bool         m_fast_ping;
+
+    /** Distance to target. This is measured in terms of 'distance along 
+     *  track', but also takes the 3d distance and height difference into 
+     *  account (in case that the target is on a different part of the 
+     *  track) */
+    float        m_distance_to_target;
 
     /** This timer is used to determine the height depending on the time.
      *  It is always between 0 and m_interval. */
