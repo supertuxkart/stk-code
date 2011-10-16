@@ -90,6 +90,19 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
         float radius = 0.5f*std::max(extend.getX(), extend.getY());
         m_collision_shape = new btConeShapeZ(radius, extend.getZ());
     }
+    else if(shape=="cylinderX")
+    {
+        m_collision_shape = new btCylinderShapeX(0.5f*extend);
+    }
+    else if(shape=="cylinderY")
+    {
+        m_collision_shape = new btCylinderShape(0.5f*extend);
+    }
+    else if(shape=="cylinderZ")
+    {
+        m_collision_shape = new btCylinderShapeZ(0.5f*extend);
+    }
+    
     else if(shape=="exact")
     {
         TriangleMesh* triangle_mesh = new TriangleMesh();
@@ -217,7 +230,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     }
     else
     {
-        fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
+        fprintf(stderr, "[3DAnimation] WARNING: Shape '%s' is not supported, ignored.\n", shape.c_str());
         return;
     }
     const core::vector3df &hpr=m_node->getRotation()*DEGREE_TO_RAD;
