@@ -36,6 +36,9 @@ private:
     
     /** Boost amount, used to tune the motion blur. Must be in the range 0.0 to 1.0 */
     float                       m_boost_amount;
+    
+    bool                        m_used_pp_this_frame;
+    
 public:
     PostProcessing();
     virtual ~PostProcessing();

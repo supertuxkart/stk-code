@@ -91,6 +91,15 @@ void PostProcessing::beginCapture()
        race_manager->getNumPlayers() > 1)
         return;
     
+    // don't capture the input when we have no post-processing to add
+    // it will be faster and this ay we won't lose anti-aliasing
+    if (m_boost_amount <= 0.0f)
+    {
+        m_used_pp_this_frame = false;
+        return;
+    }
+    
+    m_used_pp_this_frame = true;
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target, true, true);
 }
 
@@ -101,7 +110,10 @@ void PostProcessing::endCapture()
        race_manager->getNumPlayers() > 1)
         return;
     
-    irr_driver->getVideoDriver()->setRenderTarget(0, true, true, 0);
+    if (m_used_pp_this_frame)
+    {
+        irr_driver->getVideoDriver()->setRenderTarget(video::ERT_FRAME_BUFFER, true, true, 0);
+    }
 }
 
 void PostProcessing::update(float dt)
@@ -119,6 +131,11 @@ void PostProcessing::render()
     if(!m_supported || !UserConfigParams::m_postprocess_enabled ||
        race_manager->getNumPlayers() > 1)
         return;
+    
+    if (!m_used_pp_this_frame)
+    {
+        return;
+    }
     
     // Draw the fullscreen quad while applying the corresponding post-processing shaders
     video::IVideoDriver*    video_driver = irr_driver->getVideoDriver();
