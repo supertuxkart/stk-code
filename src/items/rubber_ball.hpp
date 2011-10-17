@@ -162,7 +162,7 @@ private:
     SFXBase     *m_hit_sfx;
     
     void         computeTarget();
-    void         checkDistanceToTarget();
+    void         updateDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index, 
                                          float *f=NULL);
     void         getNextControlPoint();
@@ -181,7 +181,7 @@ public:
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
-    virtual HitEffect *getHitEffect() const {return NULL; }
+    //virtual HitEffect *getHitEffect() const {return NULL; }
 
 };   // RubberBall
 

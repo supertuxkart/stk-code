@@ -323,7 +323,7 @@ bool RubberBall::updateAndDelete(float dt)
             return true;
         }
     }
-    checkDistanceToTarget();
+    updateDistanceToTarget();
 
     Vec3 next_xyz;
     if(m_aiming_at_target)
@@ -345,7 +345,11 @@ bool RubberBall::updateAndDelete(float dt)
         float terrain_height = getMaxTerrainHeight(vertical_offset)
                              - m_extend.getY();
         if(new_y>terrain_height)
+        {
+            printf("Adjusting height from %f to %f.\n",
+                new_y, terrain_height);
             new_y = terrain_height;
+        }
     }
 
     if(UserConfigParams::logFlyable())
@@ -540,7 +544,7 @@ float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
  *  rubber ball will switch from following the quad graph structure to
  *  directly aim at the target.
  */
-void RubberBall::checkDistanceToTarget()
+void RubberBall::updateDistanceToTarget()
 {
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(!world) return;   // FIXME battle mode
@@ -599,7 +603,7 @@ void RubberBall::checkDistanceToTarget()
     }
 
     return;
-}   // checkDistanceToTarget
+}   // updateDistanceToTarget
 
 // ----------------------------------------------------------------------------
 /** Callback from the physics in case that a kart or object is hit. The rubber
@@ -611,28 +615,20 @@ void RubberBall::checkDistanceToTarget()
  */
 bool RubberBall::hit(Kart* kart, PhysicalObject* object)
 {
-    if(kart)
+    if(kart && kart!=m_target)
     {
-        // If the object is not the main target, only flatten the kart
-        if(kart!=m_target)
+        // If the squashed kart has a bomb, explode it.
+        if(kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
         {
-            // If the squashed kart has a bomb, explode it.
-            if(kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-            {
-                // make bomb explode
-                kart->getAttachment()->update(10000);
-                return false;
-            }
-            kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+            // make bomb explode
+            kart->getAttachment()->update(10000);
             return false;
         }
-        else
-        {
-            // Else trigger the full explosion animation
-            kart->handleExplosion(kart->getXYZ(), /*direct hit*/true);
-            setHasHit();
-            return true;
-        }
+        kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+        return false;
     }
-    return Flyable::hit(kart, object);
+    bool was_real_hit = Flyable::hit(kart, object);
+    if(was_real_hit)
+        explode(kart, object);
+    return was_real_hit;
 }   // hit
