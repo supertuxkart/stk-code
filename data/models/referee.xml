@@ -8,8 +8,8 @@
     colors: Three texture names that are used for ready, set, go.  -->
 
 <referee model="thunderbird.b3d"
-         first-rescue-frame="1"
-         last-rescue-frame="99"
+         first-rescue-frame="625"
+         last-rescue-frame="700"
          first-start-frame="265"
          last-start-frame="290"
          start-offset="-1.2 2 2"
