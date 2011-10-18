@@ -24,6 +24,7 @@
 #include "karts/kart_model.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
+namespace GUIEngine { class LabelWidget; }
 class KartProperties;
 
 /**
@@ -54,6 +55,8 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     irr::scene::ICameraSceneNode* m_camera;
 
     irr::scene::ILightSceneNode* m_light;
+    
+    GUIEngine::LabelWidget* m_unlocked_label;
     
     int m_phase;
     

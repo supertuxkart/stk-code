@@ -130,18 +130,23 @@ void GrandPrixWin::init()
         img->setTabStop(false);
         img->setUseAlphaChannel(true);
         
-        GUIEngine::LabelWidget* unlocked_label = new GUIEngine::LabelWidget();
-        unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
-        unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
-        unlocked_label->m_x = label_x_from;
-        unlocked_label->m_y = y_from;
-        unlocked_label->m_w = message_width;
-        unlocked_label->m_h = label_height;
-        unlocked_label->setText(message, false);
+        m_unlocked_label = new GUIEngine::LabelWidget();
+        m_unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
+        m_unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
+        m_unlocked_label->m_x = label_x_from;
+        m_unlocked_label->m_y = y_from;
+        m_unlocked_label->m_w = message_width;
+        m_unlocked_label->m_h = label_height;
+        m_unlocked_label->setText(message, false);
         //const irr::video::SColor orange(255, 255, 126, 21);
         //unlocked_label->setColor(orange);
         
-        unlocked_label->add();
+        m_unlocked_label->add();
+        manualAddWidget(m_unlocked_label);
+    }
+    else
+    {
+        m_unlocked_label = NULL;
     }
 
     m_phase = 1;
@@ -242,6 +247,13 @@ void GrandPrixWin::tearDown()
     for(unsigned int i=0; i<m_all_kart_models.size(); i++)
         delete m_all_kart_models[i];
     m_all_kart_models.clear();
+    
+    if (m_unlocked_label != NULL)
+    {
+        manualRemoveWidget(m_unlocked_label);
+        delete m_unlocked_label;
+        m_unlocked_label = NULL;
+    }
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
