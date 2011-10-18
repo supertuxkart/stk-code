@@ -677,8 +677,9 @@ if(USE_FRIBIDI)
     else()
         target_link_libraries(supertuxkart fribidi)
     endif()
+    add_definitions(-DENABLE_BIDI=1)
 endif()
-	
+
 if(UNIX AND NOT APPLE)
 	target_link_libraries(supertuxkart
 		Xxf86vm)
@@ -689,7 +690,6 @@ elseif(APPLE)
 	target_link_libraries(supertuxkart /Library/Frameworks/OpenAL.framework)
 	target_link_libraries(supertuxkart /Library/Frameworks/Vorbis.framework)
 
-	# TODO: allow linking against frameworks from a SDK. I (Auria) just am not familiar enough with CMake to do this
 	target_link_libraries(supertuxkart /System/Library/Frameworks/AGL.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/IOKit.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/QuickTime.framework)
