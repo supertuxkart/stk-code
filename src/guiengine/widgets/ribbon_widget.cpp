@@ -44,7 +44,7 @@ using namespace irr::gui;
 const char* RibbonWidget::NO_ITEM_ID = "?";
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 {
@@ -62,10 +62,9 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
     m_supports_multiplayer = (type == RIBBON_TOOLBAR);
     
     updateSelection();
-}
+}   // RibbonWidget
 
-// -----------------------------------------------------------------------------
-
+// ----------------------------------------------------------------------------
 void RibbonWidget::add()
 {
     m_labels.clearWithoutDeleting();
@@ -75,16 +74,19 @@ void RibbonWidget::add()
     
     int id = (m_reserved_id == -1 ? getNewID() : m_reserved_id);
     
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, id, L"");
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, 
+                                                         m_parent, id, L"");
     m_element = btn;
     
     const int subbuttons_amount = m_children.size();
     
-    // For some ribbon types, we can have unequal sizes depending on whether items have labels or not
+    // For some ribbon types, we can have unequal sizes depending on whether
+    // items have labels or not
     int with_label = 0;
     int without_label = 0;
     
-    // ---- check how much space each child button will take and fit them within available space
+    // ---- check how much space each child button will take and fit 
+    // them within available space
     int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
     {
@@ -92,13 +94,16 @@ void RibbonWidget::add()
         LayoutManager::readCoords(m_children.get(i));
         LayoutManager::applyCoords(m_children.get(i), NULL, this);
         
-        if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
+        if (m_children[i].m_type != WTYPE_ICON_BUTTON && 
+            m_children[i].m_type != WTYPE_BUTTON)
         {
-            fprintf(stderr, "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children\n");
+            fprintf(stderr, "/!\\ Warning /!\\ : ribbon widgets can only have "
+                            "(icon)button widgets as children\n");
             continue;
         }
         
-        // ribbon children must not be keyboard navigatable, the parent ribbon takes care of that
+        // ribbon children must not be keyboard navigatable, the parent 
+        // ribbon takes care of that
         if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
             IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
@@ -122,7 +127,8 @@ void RibbonWidget::add()
     global_zoom = (float)m_w / (float)( m_w - free_w_space + min_free_space );
     //free_w_space = (int)(m_w - total_needed_space*global_zoom);
     
-    const int one_button_space = (int)round((float)m_w / (float)subbuttons_amount);
+    const int one_button_space =
+        (int)round((float)m_w / (float)subbuttons_amount);
     
     int widget_x = -1;
     
@@ -163,14 +169,19 @@ void RibbonWidget::add()
             
             if (m_children[i].m_type == WTYPE_BUTTON)
             {
-                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, getNewNoFocusID(), message.c_str(), L"");
+                subbtn = GUIEngine::getGUIEnv()
+                       ->addButton(subsize, btn, getNewNoFocusID(), 
+                                   message.c_str(), L"");
                 subbtn->setTabStop(false);
                 subbtn->setTabGroup(false);
                 
-                if ((int)GUIEngine::getFont()->getDimension(message.c_str()).Width > subsize.getWidth() &&
-                    message.findFirst(L' ') == -1 && message.findFirst(L'\u00AD') == -1)
+                if ((int)GUIEngine::getFont()->getDimension(message.c_str())
+                                              .Width > subsize.getWidth()  &&
+                    message.findFirst(L' ') == -1                          && 
+                    message.findFirst(L'\u00AD') == -1                        )
                 {
-                    // if message too long and contains no space and no soft hyphen, make the font smaller
+                    // if message too long and contains no space and no soft 
+                    // hyphen, make the font smaller
                     subbtn->setOverrideFont(GUIEngine::getSmallFont());
                 }
             }
@@ -197,28 +208,38 @@ void RibbonWidget::add()
                                                  subsize.getWidth()-15,
                                                  subsize.getHeight());
                 
-                // use the same ID for all subcomponents; since event handling is done per-ID, no matter
-                // which one your hover, this widget will get it
+                // use the same ID for all subcomponents; since event handling 
+                // is done per-ID, no matter which one your hover, this 
+                // widget will get it
                 int same_id = getNewNoFocusID();
-                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, same_id, L"", L"");
+                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, 
+                                                           same_id, L"", L"");
                 
-                //MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, same_id, icon_part, true);
-                IGUIButton* icon = GUIEngine::getGUIEnv()->addButton(icon_part, subbtn, same_id, L"");
+                IGUIButton* icon = 
+                    GUIEngine::getGUIEnv()->addButton(icon_part, subbtn, 
+                                                      same_id, L"");
                 icon->setScaleImage(true);
-                icon->setImage( irr_driver->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+                std::string filename = file_manager->getDataDir() + "/" 
+                                     + m_children[i].m_properties[PROP_ICON];
+                icon->setImage( irr_driver->getTexture(filename.c_str()) );
                 icon->setUseAlphaChannel(true);
                 icon->setDrawBorder(false);
                 icon->setTabStop(false);
 
-                IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), label_part,
-                                                                              false /* border */,
-                                                                              true /* word wrap */,
-                                                                              subbtn, same_id);
+                IGUIStaticText* label = 
+                    GUIEngine::getGUIEnv()->addStaticText(message.c_str(), 
+                                                          label_part,
+                                                          false /* border */,
+                                                          true /* word wrap */,
+                                                          subbtn, same_id);
                 
-                if ((int)GUIEngine::getFont()->getDimension(message.c_str()).Width > label_part.getWidth() &&
-                    message.findFirst(L' ') == -1 && message.findFirst(L'\u00AD') == -1)
+                if ((int)GUIEngine::getFont()->getDimension(message.c_str())
+                                              .Width > label_part.getWidth()&&
+                    message.findFirst(L' ') == -1                           && 
+                    message.findFirst(L'\u00AD') == -1                        )
                 {
-                    // if message too long and contains no space and no soft hyphen, make the font smaller
+                    // if message too long and contains no space and no soft 
+                    // hyphen, make the font smaller
                     label->setOverrideFont(GUIEngine::getSmallFont());
                 }
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
@@ -248,12 +269,18 @@ void RibbonWidget::add()
             // consider font size, whether the label is multiline, etc...
             const bool has_label = m_children[i].m_text.size() > 0;
             
-            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight() : 10;
+            const int needed_space_under_button = has_label 
+                                                ? GUIEngine::getFontHeight() 
+                                                : 10;
             
-            float imageRatio = (float)m_children[i].m_w / (float)m_children[i].m_h;
+            float imageRatio = 
+                (float)m_children[i].m_w / (float)m_children[i].m_h;
             
             // calculate the size of the image
-            video::ITexture* image = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
+            std::string filename = file_manager->getDataDir()+"/"
+                                 + m_children[i].m_properties[PROP_ICON];
+            video::ITexture* image = 
+                irr_driver->getTexture((filename).c_str());
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
 
@@ -263,16 +290,19 @@ void RibbonWidget::add()
             if (button_y + image_h*zoom + needed_space_under_button > m_h)
             {
                 // scale down
-                while (button_y + image_h*zoom + needed_space_under_button > m_h) zoom -= 0.01f;
+                while (button_y + image_h*zoom + 
+                       needed_space_under_button > m_h)  zoom -= 0.01f;
             }
             else
             {
                 // scale up
-                while (button_y + image_h*zoom + needed_space_under_button < m_h) zoom += 0.01f;
+                while (button_y + image_h*zoom + 
+                       needed_space_under_button < m_h)  zoom += 0.01f;
             }
             
             // ---- add bitmap button part
-            // backup and restore position in case the same object is added multiple times (FIXME: unclean)
+            // backup and restore position in case the same object is added 
+            // multiple times (FIXME: unclean)
             int old_x = m_children[i].m_x;
             int old_y = m_children[i].m_y;
             int old_w = m_children[i].m_w;
@@ -284,7 +314,8 @@ void RibbonWidget::add()
             m_children[i].m_h = (int)(image_h*zoom);
             
             IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
-            icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_space - icon->m_w);
+            icon->m_properties[PROP_EXTEND_LABEL] = 
+                StringUtils::toString(one_button_space - icon->m_w);
 
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();
@@ -295,14 +326,16 @@ void RibbonWidget::add()
             m_children[i].m_w = old_w;
             m_children[i].m_h = old_h;
             
-            // the label itself will be added by the icon widget. since it adds the label outside of the
-            // widget area it is assigned to, the label will appear in the area we want at the bottom
+            // the label itself will be added by the icon widget. since it 
+            // adds the label outside of the widget area it is assigned to, 
+            // the label will appear in the area we want at the bottom
             
             widget_x += one_button_space;
         }
         else
         {
-            fprintf(stderr, "/!\\ Warning /!\\ : Invalid contents type in ribbon\n");
+            fprintf(stderr, 
+                    "/!\\ Warning /!\\ : Invalid contents type in ribbon\n");
         }
         
         
@@ -314,9 +347,9 @@ void RibbonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     updateSelection();
-}
+}   // add
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
 {
@@ -328,13 +361,14 @@ void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
     item->m_properties[PROP_ID] = id;
     
     m_children.push_back(item);
-}
+}   // addTextChild
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
-                                const int w, const int h, const std::string icon,
-                                const IconButtonWidget::IconPathType iconPathType)
+void RibbonWidget::addIconChild(const wchar_t* text, const std::string &id,
+                         const int w, const int h, 
+                         const std::string &icon,
+                         const IconButtonWidget::IconPathType icon_path_type)
 {
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);
@@ -343,16 +377,16 @@ void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
     
     ribbon_item->m_properties[PROP_ID] = id;
     
-    ribbon_item->setImage(icon.c_str(), iconPathType);
+    ribbon_item->setImage(icon.c_str(), icon_path_type);
     
     ribbon_item->m_properties[PROP_WIDTH]  = StringUtils::toString(w);
     ribbon_item->m_properties[PROP_HEIGHT] = StringUtils::toString(h);
 
     ribbon_item->m_text = text;
     m_children.push_back(ribbon_item);
-}
+}   // addIconChild
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void RibbonWidget::clearAllChildren()
 {
@@ -360,9 +394,9 @@ void RibbonWidget::clearAllChildren()
     assert(m_element == NULL);
     
     m_children.clearAndDeleteAll();
-}
+}   // clearAllChildren
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
@@ -378,20 +412,21 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
         }
     }
     
-}
-// -----------------------------------------------------------------------------
+}   // select
+
+// ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-    if (m_children.size() < 2) return EVENT_LET; // empty ribbon, or only one item (can't move right)
+    // empty ribbon, or only one item (can't move right)
+    if (m_children.size() < 2) return EVENT_LET;
 
     m_selection[playerID]++;
     if (m_selection[playerID] >= m_children.size())
     {
-        if (m_listener != NULL)         m_listener->onRibbonWidgetScroll(1);
+        if (m_listener != NULL) m_listener->onRibbonWidgetScroll(1);
 
-        if (m_event_handler != NULL)    m_selection[playerID] = m_children.size()-1;
-        else                            m_selection[playerID] = 0;
+        m_selection[playerID] = m_event_handler ? m_children.size()-1 : 0;
     }
     updateSelection();
     
@@ -413,29 +448,24 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
     
-    if (m_ribbon_type != RIBBON_TOOLBAR)
-    {
-        //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
-        return EVENT_LET;
-    }
-    else
-    {
-        return EVENT_BLOCK;
-    }
-}
-// -----------------------------------------------------------------------------
+    return m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+}   // rightPressed
+
+// ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-    if (m_children.size() < 2) return EVENT_LET; // empty ribbon, or only one item (can't move left)
+    // empty ribbon, or only one item (can't move left)
+    if (m_children.size() < 2) return EVENT_LET;
 
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
     {
-        if (m_listener != NULL)         m_listener->onRibbonWidgetScroll(-1);
+        if (m_listener != NULL) m_listener->onRibbonWidgetScroll(-1);
 
-        if (m_event_handler != NULL)    m_selection[playerID] = 0;
-        else                            m_selection[playerID] = m_children.size()-1;
+        m_selection[playerID] = m_event_handler 
+                              ? 0 
+                              : m_children.size()-1;
     }
     updateSelection();
     
@@ -463,8 +493,9 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     {
         return EVENT_BLOCK;
     }
-}
-// -----------------------------------------------------------------------------
+}   // leftPressed
+
+// ----------------------------------------------------------------------------
 
 EventPropagation RibbonWidget::focused(const int playerID)
 {    
@@ -486,20 +517,20 @@ EventPropagation RibbonWidget::focused(const int playerID)
 
     
     return EVENT_LET;
-}
+}   // focused
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void RibbonWidget::unfocused(const int playerID)
 {
-}
+}   // unfocused
 
-// -----------------------------------------------------------------------------
-EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayerID)
+// ----------------------------------------------------------------------------
+EventPropagation RibbonWidget::mouseHovered(Widget* child, 
+                                            const int mousePlayerID)
 {
     if (m_deactivated) return EVENT_LET;
     
-    //std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
     const int subbuttons_amount = m_children.size();
     
     if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
@@ -515,8 +546,10 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayer
         {
             if (m_children.get(i) == child)
             {
-                if (m_selection[mousePlayerID] == i) return EVENT_BLOCK; // was already selected, don't send another event
-                m_selection[mousePlayerID] = i; // don't change selection on hover for others
+                // Was already selected, don't send another event
+                if (m_selection[mousePlayerID] == i) return EVENT_BLOCK; 
+                // Don't change selection on hover for others
+                m_selection[mousePlayerID] = i;
                 break;
             }
         }
@@ -524,9 +557,9 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayer
     
     updateSelection();
     return EVENT_BLOCK;
-}
+}   // mouseHovered
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 const std::string& RibbonWidget::getSelectionIDString(const int playerID)
 {
     static std::string empty;
@@ -540,9 +573,9 @@ const std::string& RibbonWidget::getSelectionIDString(const int playerID)
     if(m_selection[playerID]>=m_children.size())
         return m_children[0].m_properties[PROP_ID];
     return m_children[m_selection[playerID]].m_properties[PROP_ID];
-}
+}   // getSelectionIDString
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void RibbonWidget::updateSelection()
 {
     const int subbuttons_amount = m_children.size();
@@ -555,34 +588,17 @@ void RibbonWidget::updateSelection()
     {
         for (int i=0; i<subbuttons_amount; i++)
         {
-            m_children[i].m_selected[p] = (i == m_selection[p]);
-            
-            /*
-            if (m_children[i].m_selected[p])
-                std::cout << "m_children[" << i << "].m_selected[" << p << "] = " << m_children[i].m_selected[p] << std::endl;
-            if (p == 0 && m_children.get(i) == m_mouse_focus)
-                std::cout << "m_children[" << i << "] is mouse focus" << std::endl;
-             */
+            m_children[i].m_selected[p] = (i == m_selection[p]);            
         }
     }
-    
-    // Update the 'mouse focus' if necessary
-    /*
-    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_COMBO)
-    {
-        const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        if (mousePlayerID != -1 && m_selection[mousePlayerID] != -1)
-        {
-            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
-            std::cout << "RESET mouse focus\n";
-        }
-    }
-     */
-    
+        
     if (m_listener) m_listener->onSelectionChange();
-}
-// -----------------------------------------------------------------------------
-EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+}   // updateSelection
+
+// ----------------------------------------------------------------------------
+EventPropagation RibbonWidget::transmitEvent(Widget* w, 
+                                             const std::string& originator,
+                                             const int playerID)
 {    
     assert(m_magic_number == 0xCAFEC001);
 
@@ -610,28 +626,32 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator,
     {
         if (m_children[m_selection[playerID]].m_deactivated)
         {
-            GUIEngine::getCurrentScreen()->onDisabledItemClicked(m_children[m_selection[playerID]].m_properties[PROP_ID]);
+            GUIEngine::getCurrentScreen()->onDisabledItemClicked(
+                      m_children[m_selection[playerID]].m_properties[PROP_ID]);
 
             return EVENT_BLOCK;
         }
     }
     
     return EVENT_LET;
-}
-// -----------------------------------------------------------------------------
+}   // transmitEvent
+
+// ----------------------------------------------------------------------------
 void RibbonWidget::setLabel(const int id, irr::core::stringw new_name)
 {
     // This method should only be called AFTER a widget is added
     assert(m_element != NULL);
-    
-    if (m_labels.size() == 0) return; // ignore this call for ribbons without labels
+
+    // ignore this call for ribbons without labels
+    if (m_labels.size() == 0) return;
     
     assert(id >= 0);
     assert(id < m_labels.size());
     m_labels[id].setText( new_name.c_str() );
     m_text = new_name;
-}
-// -----------------------------------------------------------------------------
+}   // setLabel
+
+// ----------------------------------------------------------------------------
 int RibbonWidget::findItemNamed(const char* internalName)
 {    
     const int size = m_children.size();
@@ -640,8 +660,9 @@ int RibbonWidget::findItemNamed(const char* internalName)
     
     for (int n=0; n<size; n++)
     {
-        //printf("     Ribbon : Looking for %s in item %i : %s\n", internalName, n, m_children[n].m_properties[PROP_ID].c_str());
+        //printf("     Ribbon : Looking for %s in item %i : %s\n", 
+        // internalName, n, m_children[n].m_properties[PROP_ID].c_str());
         if (m_children[n].m_properties[PROP_ID] == internalName) return n;
     }
     return -1;
-}
+}   // findItemNamed
