@@ -206,9 +206,7 @@ namespace GUIEngine
     
     /** \brief to spice up a bit the loading icon : add icons to the loading screen */
     void addLoadingIcon(irr::video::ITexture* icon);
-    
-    //void transmitEvent(Widget* widget, std::string& name, const int playerID);
-    
+        
     /** \brief      Finds a widget from its name (PROP_ID) in the current screen/dialog
       * \param name the name (PROP_ID) of the widget to search for
       * \return     the widget that bears that name, or NULL if it was not found

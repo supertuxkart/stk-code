@@ -544,7 +544,10 @@ namespace GUIEngine
          this call. Must return whether main (GUI engine user) event callback should be notified or not.
          Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
          of the chain decides whether the main handler is notified; return value is not read for others. */
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID) { return EVENT_LET; }
+        virtual EventPropagation transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID) 
+                { return EVENT_LET; }
         
         /**
          * \brief Create and add the irrLicht widget(s) associated with this object.

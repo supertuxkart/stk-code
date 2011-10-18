@@ -628,7 +628,9 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, 
+                                                 const std::string& originator,
+                                                 const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
 

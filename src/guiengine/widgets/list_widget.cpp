@@ -359,7 +359,9 @@ void ListWidget::markItemBlue(const int id, bool blue)
 
 // -----------------------------------------------------------------------------
 
-EventPropagation ListWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation ListWidget::transmitEvent(Widget* w, 
+                                           const std::string& originator, 
+                                           const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
 

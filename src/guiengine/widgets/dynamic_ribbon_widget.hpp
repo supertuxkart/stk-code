@@ -167,7 +167,7 @@ namespace GUIEngine
         /** Callbacks */
         virtual void add();
         virtual EventPropagation mouseHovered(Widget* child, const int playerID);
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, const std::string& originator, const int playerID);
         
         bool findItemInRows(const char* name, int* p_row, int* p_id);
         

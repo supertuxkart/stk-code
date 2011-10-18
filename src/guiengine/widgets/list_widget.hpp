@@ -208,7 +208,9 @@ namespace GUIEngine
         }
 
         /** Override callback from Widget */
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID);
         
         void setColumnListener(IListWidgetHeaderListener* listener)
         {

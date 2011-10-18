@@ -46,7 +46,9 @@ void CheckBoxWidget::add()
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
-EventPropagation CheckBoxWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation CheckBoxWidget::transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
 

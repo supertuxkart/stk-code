@@ -73,7 +73,9 @@ namespace GUIEngine
         bool m_warp_around;
         
         /** \brief implementing method from base class Widget */
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID);
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation rightPressed(const int playerID);
