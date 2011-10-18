@@ -1,14 +1,10 @@
 # CMakeLists.txt - root CMakeLists for the SuperTuxKart project
-# TODO: fribidi
-# TODO: DEBUG needs to be defined => fix that in code
 # TODO: make Ogg Vorbis optional (doesn't seem to work with autotools either!)
-# TODO: allow to disable asserts (NDEBUG?)
 
 cmake_minimum_required(VERSION 2.8.1)
 
 project(SuperTuxKart)
 
-#DEBUG
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 set(STK_SOURCE_DIR "src")
@@ -47,15 +43,6 @@ if(APPLE)
 	include_directories("/usr/include")
 	find_library(Ogg /Library/Frameworks/Ogg.framework)
 	find_library(Vorbis /Library/Frameworks/Vorbis.framework)
-	#find_library(supertuxkart -framework IOKit)
-	#find_library(supertuxkart -framework QuickTime)
-	#find_library(supertuxkart -framework Carbon)
-	#find_library(supertuxkart -framework AudioUnit)
-	#find_library(supertuxkart -framework GLUT)
-	#find_library(find_librarysupertuxkart -framework Cocoa)
-	#find_library(supertuxkart -framework OpenGL)
-	#find_library(supertuxkart -framework AGL)
-
 endif()
 
 # Set lib paths
