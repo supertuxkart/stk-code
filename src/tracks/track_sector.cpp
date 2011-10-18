@@ -112,3 +112,21 @@ void TrackSector::rescue()
     m_last_valid_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
                                                .getPredecessor();
 }    // rescue
+
+// ----------------------------------------------------------------------------
+/** Returns the relative distance of the corresponding kart from the center,
+ *  i.e. a value between -1 and 1 inclusive.
+ *  \return THe relative distance between -1.0f and +1.0f;
+ */
+float TrackSector::getRelativeDistanceToCenter() const
+{
+    float w = QuadGraph::get()->getNode(m_current_graph_node).getPathWidth();
+    // w * 0.5 is the distance from center of the quad to the left or right
+    // This way we get a value between -1 and 1.
+    float ratio = getDistanceToCenter()/(w*0.5f);
+    if(ratio>1.0f)
+        ratio=1.0f;
+    else if(ratio<-1.0f)
+        ratio=-1.0f;
+    return ratio;
+}   // getRelativeDistanceToCenter

@@ -43,13 +43,23 @@
         squash-duration: How long karts stay squashed.
         delete-timer: How long before the ball is removed
                     if no suitable target is found.
+        early-target-factor: the rubber ball can use the
+                    relative position of the kart to the
+                    center of the track for improved targeting
+                    (i.e. the ball will align its relative
+                    position to the center of the track early).
+                    This allows a lower target-distance to be
+                    used since the ball is better aligned,
+                    hopefully reducing the frequency of 
+                    tunneling.
    -->
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
         model="rubber_ball.b3d" speed="35.0" 
         scale="1 1 1"         interval="1"
         max-height="4.0"      min-height="0"
         fast-ping-distance="50" 
-        target-distance="25"  target-max-angle = "90"
+        early-target-factor="1"
+        target-distance="15"  target-max-angle = "90"
         min-interpolation-distance="10"
         squash-slowdown="0.5" squash-duration="3"
         delete-time="5.0"     max-height-difference="10" />

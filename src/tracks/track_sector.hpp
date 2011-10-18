@@ -60,6 +60,7 @@ public:
     void  reset();
     void  rescue();
     void  update(const Vec3 &xyz);
+    float getRelativeDistanceToCenter() const;
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */
     float getDistanceFromStart() const { return m_current_track_coords.getZ();}

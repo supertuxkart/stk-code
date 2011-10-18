@@ -61,6 +61,10 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(), 
                                         m_lower_center.getZ() );
+
+    // The vector from the center of the quad to the middle of the right
+    // side of the quad
+    m_center_to_right = (quad[1]+quad[2])*0.5f - quad.getCenter();
 }   // GraphNode
 
 // ----------------------------------------------------------------------------

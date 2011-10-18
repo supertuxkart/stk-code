@@ -83,6 +83,22 @@ private:
      *  ball will be deleted. */
     static float m_st_delete_time;
 
+    /** This factor is used to influence how much the rubber ball should aim
+     *  at its target early. It used the 'distance to center of track' of its
+     *  target, and adjusts the interpolation control points to be more or 
+     *  less at the same (relative) distance from center. If the factor is
+     *  1, the rubber ball will aim to be at the same relative distance,
+     *  if the factor is 0, the rubber ball will aim directly at the
+     *  driveline points. A factor of 1 usually means that by the time
+     *  the ball starts aiming directly at the target it is (nearly) on the
+     *  same 'line', meaning it only has to go straight. On the other hand
+     *  in a tunnel this might result in the ball being too far to the
+     *  side, increasing the likelihood of the ball tunneling through
+     *  (which can happen when the ball switches to aim-at-target mode,
+     *  in a tight curve, so that the direct line to the target goes through
+     *  a wall. */
+    static float m_st_early_target_factor;
+
     /** A pointer to the target kart. */
     const Kart  *m_target;
 

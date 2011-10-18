@@ -37,6 +37,7 @@ float RubberBall::m_st_target_max_angle;
 float RubberBall::m_st_delete_time;
 float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
+float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
 
 RubberBall::RubberBall(Kart *kart)
@@ -62,29 +63,28 @@ RubberBall::RubberBall(Kart *kart)
 
     // Do not adjust the up velocity 
     setAdjustUpVelocity(false);
-    m_max_lifespan = 9999;
-    m_target       = NULL;
-    m_ping_sfx     = sfx_manager->createSoundSource("ball_bounce");
+    m_max_lifespan       = 9999;
+    m_target             = NULL;
+    m_aiming_at_target   = false;
+    m_fast_ping          = false;
+    // At the start the ball aims at quads till it gets close enough to the
+    // target:
+    m_height_timer       = 0.0f;
+    m_interval           = m_st_interval;
+    m_current_max_height = m_max_height;
+    m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
-    m_previous_xyz = m_owner->getXYZ();
+    m_previous_xyz       = m_owner->getXYZ();
 
     // A negative value indicates that the timer is not active
-    m_delete_timer = -1.0f;
+    m_delete_timer     = -1.0f;
 
     computeTarget();
-
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
     initializeControlPoints(m_owner->getXYZ());
 
-    // At the start the ball aims at quads till it gets close enough to the
-    // target:
-    m_aiming_at_target     = false;
-    m_fast_ping            = false;
-    m_height_timer         = 0.0f;
-    m_interval             = m_st_interval;
-    m_current_max_height   = m_max_height;
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
@@ -209,8 +209,26 @@ void RubberBall::getNextControlPoint()
 
     m_last_aimed_graph_node = next;
     m_length_cp_2_3         = dist;
-    m_control_points[3]     = 
-        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+    const Quad &quad        = 
+        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node);
+    Vec3 aim                = quad.getCenter();
+    // If we are close enough for the ball to hop faster, adjust the position
+    // relative to the center of the track depending on where the target is:
+
+    //    if(m_fast_ping)
+    {
+        LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+        float r = world->getTrackSector(m_target->getWorldKartId())
+                        .getRelativeDistanceToCenter();
+        printf("ratio r %f, adjusting from %f %f ", r,
+            aim.getX(), aim.getZ());
+        aim -= m_st_early_target_factor * r 
+             * QuadGraph::get()->getNode(m_last_aimed_graph_node)
+                                .getCenterToRightVector();
+        printf(" to %f %f\n", aim.getX(), aim.getZ());
+    }
+
+    m_control_points[3]     = aim;
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------
@@ -221,15 +239,16 @@ void RubberBall::getNextControlPoint()
  */
 void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
 {
-    m_st_interval                   = 1.0f;
-    m_st_squash_duration            = 3.0f;
-    m_st_squash_slowdown            = 0.5f;
+    m_st_interval                   =  1.0f;
+    m_st_squash_duration            =  3.0f;
+    m_st_squash_slowdown            =  0.5f;
     m_st_min_interpolation_distance = 30.0f;
     m_st_target_distance            = 50.0f;
     m_st_target_max_angle           = 25.0f;
     m_st_delete_time                = 10.0f;
     m_st_max_height_difference      = 10.0f;
     m_st_fast_ping_distance         = 50.0f;
+    m_st_early_target_factor        =  1.0f;
 
     if(!node.get("interval", &m_st_interval))
         printf("[powerup] Warning: no interval specified for rubber ball.\n");
@@ -260,11 +279,15 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
         "rubber ball.\n");
     if(!node.get("fast-ping-distance", &m_st_fast_ping_distance))
         printf(
-        "[powerup] Warning: no fast-ping-distancespecified for "
+        "[powerup] Warning: no fast-ping-distance specified for "
         "rubber ball.\n");
     if(m_st_fast_ping_distance < m_st_target_distance)
         printf("Warning: ping-distance is smaller than target distance.\n"
                "hat should not happen, but is ignored for now.\n");
+    if(!node.get("early-target-factor", &m_st_early_target_factor))
+        printf(
+        "[powerup] Warning: no early-target-factor specified for "
+        "rubber ball.\n");
     Flyable::init(node, bowling, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 

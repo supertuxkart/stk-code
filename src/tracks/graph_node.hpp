@@ -33,7 +33,8 @@
 class QuadGraph;
 
 /** 
-  * \brief This class stores a node of the graph, i.e. a list of successor edges.
+  * \brief This class stores a node of the graph, i.e. a list of successor 
+  *  edges.
   * \ingroup tracks
   */
 class GraphNode 
@@ -81,6 +82,9 @@ class GraphNode
      /** Upper center point of the graph node. */
      Vec3 m_upper_center;
 
+     /** A vector from the center of the quad to the right edge. */
+     Vec3 m_center_to_right;
+
      /** Line between lower and upper center, saves computation in 
       *  getDistanceFromLine() later. The line is 2d only since otherwise
       *  taller karts would have a larger distance from the center. It also
@@ -118,6 +122,7 @@ public:
     void         getDistances(const Vec3 &xyz, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
     void         setupPathsToNode();
+    void         setChecklineRequirements(int latest_checkline);
     // ------------------------------------------------------------------------
     /** Returns the i-th successor node. */
     unsigned int getSuccessor(unsigned int i)  const 
@@ -167,7 +172,8 @@ public:
     const Vec3& getUpperCenter() const {return m_upper_center;}
     // ------------------------------------------------------------------------
     /** Returns the center point of this graph node. */
-    const Vec3  getCenter()      const {return (m_upper_center + m_lower_center) / 2.0f;}
+    const Vec3  getCenter()      const 
+                            {return (m_upper_center + m_lower_center) / 2.0f;}
     // ------------------------------------------------------------------------
     /** Returns the length of the quad of this node. */
     float       getNodeLength() const 
@@ -193,12 +199,15 @@ public:
         // If we have a path to node vector, use its information, otherwise
         // (i.e. there is only one successor anyway) use this one successor.
         return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
-    }
+    }   // getSuccesorToReach
     // ------------------------------------------------------------------------
-    
-    void setChecklineRequirements(int latest_checkline);
-    
-    const std::vector<int>& getChecklineRequirements() const { return m_checkline_requirements; }
+    /** Returns a vector from the center of the node to the middle of the
+     *  right side. */
+    const Vec3 &getCenterToRightVector() const { return m_center_to_right; }
+    // ------------------------------------------------------------------------
+    /** Returns the checkline requirements of this graph node. */
+    const std::vector<int>& getChecklineRequirements() const 
+                                           { return m_checkline_requirements; }
 };   // GraphNode
 
 #endif
