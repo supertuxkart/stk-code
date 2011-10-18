@@ -1,4 +1,4 @@
-Here are the guidelines to follow when coding Super Tux Kart:
+Here are the guidelines to follow when coding SuperTuxKart:
 
 Filenames
 =========
@@ -12,13 +12,13 @@ Coding style
 ============
 
 The coding style used in Super Tux Kart can be found at
-http://supertuxkart.berlios.de/wiki/index.php/Coding_Style .
+http://supertuxkart.sourceforge.net/Coding_Style
 
 
 Documentation line length
 =========================
 
-All the documentation files should have at most 75 characters, because
+All the documentation files should have at most 80 characters, because
 on some displays and on paper you often are limited to 80 characters, and
 also under some conditions appendices (for example, line numbers) are
 added. The exception if the player's manual, because it's long, so to
