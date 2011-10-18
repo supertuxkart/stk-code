@@ -179,7 +179,8 @@ void StateManager::escapePressed()
     // In menus
     else
     {
-        if (getCurrentScreen()->onEscapePressed()) popMenu();
+        if (getCurrentScreen() != NULL &&
+            getCurrentScreen()->onEscapePressed()) popMenu();
     }
 }   // escapePressed
 
