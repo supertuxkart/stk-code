@@ -1967,7 +1967,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 w->addItem( 
                     _("Locked : solve active challenges to gain access "
                       "to more!"),
-                    ID_LOCKED, prop->getAbsoluteIconFile(), LOCKED_BADGE);
+                    ID_LOCKED, prop->getAbsoluteIconFile(), LOCKED_BADGE,
+                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
             {
