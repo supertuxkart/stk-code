@@ -102,7 +102,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_KEY_8:
         case KEY_KEY_9:
         {
-            if(!ProfileWorld::isProfileMode()) break;
+            if(!ProfileWorld::isProfileMode() || !world) break;
             int kart_id = key - KEY_KEY_1;
             if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
             for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -125,7 +125,7 @@ void InputManager::handleStaticAction(int key, int value)
 
         case KEY_KEY_I:
         {
-            if (world == NULL || !UserConfigParams::m_artist_debug_mode) break;
+            if (!world || !UserConfigParams::m_artist_debug_mode) break;
             
             Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
@@ -135,7 +135,7 @@ void InputManager::handleStaticAction(int key, int value)
         }
         case KEY_KEY_K:
         {
-            if (world == NULL || !UserConfigParams::m_artist_debug_mode) break;
+            if (!world || !UserConfigParams::m_artist_debug_mode) break;
             
             Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
@@ -199,11 +199,11 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         
         case KEY_F8:
-            if (UserConfigParams::m_artist_debug_mode && value)
+            if (UserConfigParams::m_artist_debug_mode && value && world)
             {
                 if (control_is_pressed)
                 {
-                    RaceGUIBase* gui = World::getWorld()->getRaceGUI();
+                    RaceGUIBase* gui = world->getRaceGUI();
                     if (gui != NULL) gui->m_enabled = !gui->m_enabled;
                     
                     const int count = World::getWorld()->getNumKarts();
@@ -239,12 +239,9 @@ void InputManager::handleStaticAction(int key, int value)
             
         case KEY_F11:
             if (UserConfigParams::m_artist_debug_mode && value && 
-                control_is_pressed)
+                control_is_pressed && world)
             {
-                if (world != NULL)
-                {
-                    world->getPhysics()->nextDebugMode();
-                }
+                world->getPhysics()->nextDebugMode();
             }
             break;
 
@@ -255,8 +252,10 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_KEY_P:
-            if (UserConfigParams::m_artist_debug_mode && value && control_is_pressed)
-                UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
+            if (UserConfigParams::m_artist_debug_mode && value && 
+                control_is_pressed)
+                UserConfigParams::m_profiler_enabled = 
+                                         !UserConfigParams::m_profiler_enabled;
             break;
         default:
             break;
