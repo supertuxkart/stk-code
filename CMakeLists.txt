@@ -120,6 +120,26 @@ else()
 	message(FATAL_ERROR "-- libcURL not found, please install it.")
 endif()
 
+# Fribidi
+if(USE_FRIBIDI)
+    FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
+      /usr/local/include
+      /usr/include
+      )
+
+    SET(FRIBIDI_NAMES ${FRIBIDI_NAMES} fribidi libfribidi)
+    FIND_LIBRARY(FRIBIDI_LIBRARY
+      NAMES ${FRIBIDI_NAMES}
+      PATHS /usr/lib /usr/local/lib
+      )
+
+    IF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
+        message("-- Fribidi found")
+    else()
+        message(FATAL_ERROR "Fribidi not found. Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 (if you don't use a right-to-left language then you don't need this).")
+    endif()
+endif()
+   
 # Set some compiler options
 if(UNIX)
 	add_definitions(-Wall)
@@ -711,4 +731,9 @@ add_custom_target(dist
             && echo "Done, cleaning up"
             && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# Install target (WIP)
+FILE(GLOB datafiles "${CMAKE_CURRENT_SOURCE_DIR}/data/*.png" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.jpg" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.b3d" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.xml" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.challenge" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.stkgui" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.po" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.sh" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.ogg" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.music" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.grandprix" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.JPG" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.stkskin")
+install(FILES ${datafiles} CREDITS DESTINATION share/supertuxkart)
+install(TARGETS supertuxkart RUNTIME DESTINATION games)
 
