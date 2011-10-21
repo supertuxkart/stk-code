@@ -21,7 +21,7 @@
 
 /** Switch this to 1 to get the backtrace of the leaks (slows down execution a little)
     Atm only implemented for OSX */
-#define GET_STACK_TRACE 1
+#define GET_STACK_TRACE 0
 
 
 #if (GET_STACK_TRACE == 1) && defined(__APPLE__)
