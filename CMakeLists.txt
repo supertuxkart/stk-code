@@ -131,6 +131,7 @@ if(DEBUG)
 	add_definitions(-DDEBUG)
 else()
 	add_definitions(-DNDEBUG)
+	add_definitions(-O2)
 endif()
 
 find_package(Freetype)
