@@ -21,10 +21,10 @@
 
 /** Switch this to 1 to get the backtrace of the leaks (slows down execution a little)
     Atm only implemented for OSX */
-#define GET_STACK_TRACE 0
+#define GET_STACK_TRACE 1
 
 
-#if (GET_STACK_TRACE == 1) && defined(MAC_OS_X_VERSION_10_5)
+#if (GET_STACK_TRACE == 1) && defined(__APPLE__)
 #include <Availability.h>
 #include <execinfo.h>
 #endif
@@ -53,7 +53,7 @@ namespace MemoryLeaks
     {
         obj = objArg;
         
-#if (GET_STACK_TRACE == 1) && defined(MAC_OS_X_VERSION_10_5)
+#if (GET_STACK_TRACE == 1) && defined(__APPLE__)
         
         const int maxsize = 32;
         void* callstack[maxsize];

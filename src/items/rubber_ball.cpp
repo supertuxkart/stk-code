@@ -306,6 +306,8 @@ const core::stringw RubberBall::getHitString(const Kart *kart) const
         //I18N: shown when a player is hit by a rubber ball. %1 is the 
         // attacker, %0 is the victim.
         case 0: return _LTR("%s is being bounced around.");
+        //I18N: shown when a player is hit by a rubber ball. %1 is the 
+        // attacker, %0 is the victim.
         case 1: return _LTR("Fetch the ball, %0!");
         default:assert(false); return L"";   // avoid compiler warning
     }
