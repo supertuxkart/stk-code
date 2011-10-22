@@ -694,7 +694,7 @@ endif()
 
 if(USE_FRIBIDI)
     if(APPLE)
-	target_link_libraries(supertuxkart /Library/Frameworks/fribidi.framework)
+	    target_link_libraries(supertuxkart /Library/Frameworks/fribidi.framework)
     else()
         target_link_libraries(supertuxkart fribidi)
     endif()
@@ -702,8 +702,7 @@ if(USE_FRIBIDI)
 endif()
 
 if(UNIX AND NOT APPLE)
-	target_link_libraries(supertuxkart
-		Xxf86vm)
+	target_link_libraries(supertuxkart Xxf86vm)
 elseif(APPLE)
 	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
 	target_link_libraries(supertuxkart /Library/Frameworks/IrrFramework.framework)
