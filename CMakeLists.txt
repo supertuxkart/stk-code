@@ -662,7 +662,7 @@ if (APPLE)
 	    /Library/Frameworks/Ogg.framework
 	    /Library/Frameworks/OpenAL.framework
 	    /Library/Frameworks/Vorbis.framework
-	    # TODO: allow linking against frameworks from a SDK. I (Auria) just am not familiar enough with CMake to do this
+	    # TODO: allow linking against frameworks from a SDK.
 	    /System/Library/Frameworks/AGL.framework
 	    /System/Library/Frameworks/IOKit.framework
 	    /System/Library/Frameworks/QuickTime.framework
@@ -758,4 +758,11 @@ endforeach()
 install(TARGETS supertuxkart RUNTIME DESTINATION games)
 install(FILES data/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
+
+add_custom_target(GenerateDesktopFile
+                  COMMAND sed 's\#PREFIX\#${CMAKE_INSTALL_PREFIX}\#' ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart_desktop.template | sed 's\#VERSION\#${PROJECT_VERSION}\#' > ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart.desktop
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+ADD_DEPENDENCIES(supertuxkart GenerateDesktopFile)
+
+
 
