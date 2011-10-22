@@ -210,7 +210,8 @@ void FeatureUnlockedCutScene::init()
 #endif
     m_chest->setPosition( core::vector3df(2, -3, 0) );
     m_chest->setScale( core::vector3df(10.0f, 10.0f, 10.0f) );
-
+    m_chest->setMaterialFlag(video::EMF_FOG_ENABLE, false);
+    
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 
                                                                  120, 120));
     
