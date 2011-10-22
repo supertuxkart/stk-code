@@ -14,9 +14,9 @@ set(PROJECT_VERSION "0.7.3")
 # Tweakable values
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	set(DEBUG ON)
-else(CMAKE_BUILD_TYPE MATCHES "Debug")
+else()
 	set(DEBUG OFF)
-endif(CMAKE_BUILD_TYPE MATCHES "Debug")
+endif()
 
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(FONT_TOOL "Compile font tool" OFF)
@@ -754,7 +754,8 @@ foreach(curr ${datafiles})
     installfilemacro(${curr})
 endforeach()
 
-install(TARGETS supertuxkart RUNTIME DESTINATION games)
+
+install(TARGETS supertuxkart RUNTIME DESTINATION games BUNDLE DESTINATION .)
 install(FILES data/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
 
@@ -762,6 +763,5 @@ add_custom_target(GenerateDesktopFile
                   COMMAND sed 's\#PREFIX\#${CMAKE_INSTALL_PREFIX}\#' ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart_desktop.template | sed 's\#VERSION\#${PROJECT_VERSION}\#' > ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart.desktop
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 ADD_DEPENDENCIES(supertuxkart GenerateDesktopFile)
-
 
 
