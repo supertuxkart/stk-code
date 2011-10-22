@@ -720,7 +720,7 @@ elseif(APPLE)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/OpenGL.framework)
 endif()
 
-# Make dist target
+# ==== Make dist target ====
 add_custom_target(dist
     COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
             && echo "Exporting..."
@@ -732,8 +732,30 @@ add_custom_target(dist
             && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-# Install target (WIP)
-FILE(GLOB datafiles "${CMAKE_CURRENT_SOURCE_DIR}/data/*.png" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.jpg" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.b3d" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.xml" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.challenge" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.stkgui" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.po" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.sh" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.ogg" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.music" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.grandprix" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.JPG" "${CMAKE_CURRENT_SOURCE_DIR}/data/*.stkskin")
-install(FILES ${datafiles} CREDITS DESTINATION share/supertuxkart)
+# ==== Install target ====
+MACRO(installfilemacro filepath)
+    set(source_regex "(.*)/data/(.*)")
+    set(svn_regex "(.*).svn(.*)")
+    
+    string(REGEX MATCH "${svn_regex}" is_svn_dir "${curr}")
+    if(is_svn_dir)
+        # don't install SVN files
+    else()
+        string(REGEX MATCH "${source_regex}" source_path "${curr}")
+        if(source_path)
+            string(REGEX REPLACE "${source_regex}" "\\2" after_source "${source_path}")
+            get_filename_component(install_location ${after_source} PATH)
+            install(FILES ${filepath} DESTINATION "share/games/supertuxkart/data/${install_location}")
+        endif(source_path)
+    endif()
+ENDMACRO(installfilemacro)
+
+FILE(GLOB_RECURSE datafiles "${CMAKE_CURRENT_SOURCE_DIR}/data/*")
+foreach(curr ${datafiles})
+    installfilemacro(${curr})
+endforeach()
+
 install(TARGETS supertuxkart RUNTIME DESTINATION games)
+install(FILES data/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
 
