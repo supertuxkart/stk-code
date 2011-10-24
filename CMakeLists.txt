@@ -105,6 +105,8 @@ else()
     
     if(HAVE_IRRLICHT)
 	    message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
+	    #include_directories(${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
+	    include_directories(${HAVE_IRRLICHT})
     else()
 	    message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
     endif()
