@@ -626,6 +626,8 @@ set( SRCS ${SRCS} src/main.cpp
 	src/utils/aligned_array.hpp
 	src/utils/constants.cpp
 	src/utils/constants.hpp
+	src/utils/leak_check.cpp
+	src/utils/leak_check.hpp
 	src/utils/no_copy.hpp
 	src/utils/profiler.cpp
 	src/utils/profiler.hpp
