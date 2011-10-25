@@ -29,7 +29,10 @@ class SFXBase;
 class Player;
 
 /** PlayerKart manages control events from the player and moves
-    them to the Kart */
+  * them to the Kart
+  *
+  * \ingroup controller
+  */
 class PlayerController : public Controller
 {
 private:

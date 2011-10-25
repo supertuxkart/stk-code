@@ -19,7 +19,11 @@
 #ifndef STATE_MANAGER_HPP
 #define STATE_MANAGER_HPP
 
-/** \defgroup states_screens */
+/**
+  * \defgroup states_screens
+  * Contains the various screens and dialogs of the STK user interface,
+  * using the facilities of the guiengine module.
+  */
 
 #include <string>
 

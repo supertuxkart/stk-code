@@ -36,7 +36,7 @@ namespace GUIEngine
     };
     
     /** \brief A text field widget. 
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class TextBoxWidget : public Widget
     {

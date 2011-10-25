@@ -34,7 +34,7 @@ namespace irr
 namespace GUIEngine
 {
     /** \brief A button widget with an icon and optionnaly a label beneath
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class IconButtonWidget : public Widget
     {

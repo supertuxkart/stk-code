@@ -22,6 +22,9 @@
 
 #include "network/message.hpp"
 
+/**
+  * \ingroup controller
+  */
 class KartControl
 {
 public:

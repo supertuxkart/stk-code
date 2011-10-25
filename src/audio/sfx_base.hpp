@@ -26,6 +26,7 @@
 
 /**
  * \defgroup audio
+ * This module handles audio (sound effects and music).
  */
 
 class Vec3;

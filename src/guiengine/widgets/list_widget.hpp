@@ -40,7 +40,7 @@ namespace GUIEngine
     };
     
     /** \brief A vertical list widget with text entries
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       * \note items you add to a list are not kept after the the list is in was removed
       *       (i.e. you need to add items everytime the screen is shown)
       */

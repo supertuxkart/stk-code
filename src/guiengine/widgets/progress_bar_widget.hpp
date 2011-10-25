@@ -20,10 +20,6 @@
 #ifndef HEADER_PROGRESS_BAR_HPP
 #define HEADER_PROGRESS_BAR_HPP
 
-/**
-  * \defgroup widgets Guiengine/Widgets
-  */
-
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
@@ -34,7 +30,7 @@ namespace GUIEngine
 {
     /** 
       * \brief A progress bar widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class ProgressBarWidget : public Widget
     {

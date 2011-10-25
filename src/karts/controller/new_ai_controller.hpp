@@ -37,6 +37,9 @@ namespace irr
     }
 }
 
+/**
+  * \ingroup controller
+  */
 class NewAIController : public AIBaseController
 {
 private:

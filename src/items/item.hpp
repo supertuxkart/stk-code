@@ -22,6 +22,7 @@
 
 /**
   * \defgroup items
+  * Defines the various collectibles and weapons of STK.
   */
 
 namespace irr

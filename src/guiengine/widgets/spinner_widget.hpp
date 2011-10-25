@@ -34,7 +34,7 @@ namespace GUIEngine
 {
     
     /** \brief A spinner or gauge widget (to select numbers / percentages).
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class SpinnerWidget : public Widget
     {

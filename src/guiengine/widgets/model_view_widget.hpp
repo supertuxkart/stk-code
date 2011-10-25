@@ -31,7 +31,7 @@
 namespace GUIEngine
 {
     /** \brief A model view widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class ModelViewWidget : public IconButtonWidget
     {

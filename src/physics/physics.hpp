@@ -20,7 +20,10 @@
 #ifndef HEADER_PHYSICS_HPP
 #define HEADER_PHYSICS_HPP
 
-/** \defgroup physics */
+/**
+  * \defgroup physics
+  * Contains various physics utilities.
+  */
 
 #include <set>
 #include <vector>

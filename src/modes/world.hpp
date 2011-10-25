@@ -20,7 +20,11 @@
 #ifndef HEADER_WORLD_HPP
 #define HEADER_WORLD_HPP
 
-/** \defgroup modes */
+/**
+  * \defgroup modes
+  * Contains the logic for the various game modes (race, follow the leader,
+  * battle, etc.)
+  */
 
 #include <vector>
 

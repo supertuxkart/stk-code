@@ -30,7 +30,7 @@
 namespace GUIEngine
 {
     /** \brief A simple label widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class LabelWidget : public Widget
     {

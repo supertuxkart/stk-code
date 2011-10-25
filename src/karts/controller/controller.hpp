@@ -23,6 +23,12 @@
 #include <irrString.h>
 using namespace irr;
 
+/**
+  * \defgroup controller Karts/controller
+  * Contains kart controllers, which are either human players or AIs
+  * (this module thus contains the AIs)
+  */
+
 #include "input/input.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "states_screens/state_manager.hpp"
@@ -32,6 +38,7 @@ class Item;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
+ * \ingroup controller
  */
 class Controller
 {

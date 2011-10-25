@@ -22,6 +22,9 @@
 
 /**
  * \defgroup config
+ * This module handles the user configuration, the supertuxkart configuration
+ * file (which contains options usually not edited by the player) and the input
+ * configuration file.
  */
 
 #include "karts/kart_properties.hpp"

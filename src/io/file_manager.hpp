@@ -22,6 +22,7 @@
 
 /**
  * \defgroup io
+ * Contains generic utility classes for file I/O (especially XML handling).
  */
 
 #include <string>

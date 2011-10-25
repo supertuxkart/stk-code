@@ -22,6 +22,8 @@
 
 /**
   * \defgroup challenges
+  * This module handles the challenge system, which locks features (tracks, karts
+  * modes, etc.) until the user completes some task.
   */
 
 #include <string>

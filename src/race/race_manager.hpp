@@ -20,7 +20,12 @@
 #ifndef HEADER_RACEMANAGER_HPP
 #define HEADER_RACEMANAGER_HPP
 
-/** \defgroup race */
+/**
+  * \defgroup race
+  * Contains the race information that is conceptually above what you can find
+  * in group Modes. Handles highscores, grands prix, number of karts, which
+  * track was selected, etc.
+  */
 
 #include <vector>
 #include <algorithm>

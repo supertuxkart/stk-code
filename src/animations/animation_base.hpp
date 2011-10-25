@@ -22,6 +22,8 @@
 
 /**
  * \defgroup animations
+ * This module manages interpolation-based animation (of position, rotation
+ * and/or scale)
  */
 
 #include <vector>

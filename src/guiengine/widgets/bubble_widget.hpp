@@ -28,6 +28,10 @@ namespace GUIEngine
 {
     const int BUBBLE_MARGIN_ON_RIGHT = 15;
     
+    /**
+      * A text widget that can expand when focused
+      * \ingroup widgetsgroup
+      */
     class BubbleWidget : public Widget
     {
         friend class Skin;

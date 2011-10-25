@@ -19,6 +19,102 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+/**
+ * \mainpage SuperTuxKart developer documentation
+ *
+ * This document contains the developer documentation for SuperTuxKart,
+ * including the list of modules, the list of classes, the API reference,
+ * and some pages that describe in more depth some parts of the code/engine.
+ *
+ * \section Overview
+ *
+ * Here is an overview of the high-level interactions between modules :
+ \dot
+ digraph interaction {
+ race -> modes
+ race -> tracks
+ race -> karts
+ modes -> tracks
+ modes -> karts
+ tracks -> graphics
+ karts -> graphics
+ tracks -> items
+ graphics -> irrlicht
+ guiengine -> irrlicht
+ states_screens -> guiengine
+ states_screens -> input
+ guiengine -> input
+ karts->physics
+ tracks->physics
+ karts -> controller
+ input->controller
+ tracks -> animations
+ physics -> animations
+ }
+ \enddot 
+ 
+ Note that this graph is only an approximation because the real one would be
+ much too complicated :)
+ 
+ 
+ \section Modules
+ 
+ \li \ref animations :
+   This module manages interpolation-based animation (of position, rotation
+   and/or scale)
+ \li \ref audio :
+   This module handles audio (sound effects and music).
+ \li \ref challenges :
+   This module handles the challenge system, which locks features (tracks, karts
+   modes, etc.) until the user completes some task.
+ \li \ref config :
+   This module handles the user configuration, the supertuxkart configuration
+   file (which contains options usually not edited by the player) and the input
+   configuration file.
+ \li \ref graphics :
+   This module contains the core graphics engine, that is mostly a thin layer
+   on top of irrlicht providing some additional features we need for STK
+   (like particles, more scene node types, mesh manipulation tools, material
+   management, etc...)
+ \li \ref guiengine :
+   Contains the generic GUI engine (contains the widgets and the backing logic
+   for event handling, the skin, screens and dialogs). See module @ref states_screens
+   for the actual STK GUI screens. Note that all input comes through this module
+   too.
+ \li \ref widgetsgroup :
+   Contains the various types of widgets supported by the GUI engine.
+ \li \ref input :
+   Contains classes for input management (keyboard and gamepad)
+ \li \ref io :
+  Contains generic utility classes for file I/O (especially XML handling).
+ \li \ref items :
+   Defines the various collectibles and weapons of STK.
+ \li \ref karts :
+   Contains classes that deal with the properties, models and physics
+   of karts.
+ \li \ref controller :
+   Contains kart controllers, which are either human players or AIs
+   (this module thus contains the AIs)
+ \li \ref modes :
+   Contains the logic for the various game modes (race, follow the leader,
+   battle, etc.)
+ \li \ref physics :
+   Contains various physics utilities.
+ \li \ref race :
+   Contains the race information that is conceptually above what you can find
+   in group Modes. Handles highscores, grands prix, number of karts, which
+   track was selected, etc.
+ \li \ref states_screens :
+   Contains the various screens and dialogs of the STK user interface,
+   using the facilities of the guiengine module. Also contains the
+   stack of menus and handles state management (in-game vs menu).
+ \li \ref tracks :
+   Contains information about tracks, namely drivelines, checklines and track
+   objects.
+ \li \ref tutorial :
+   Work in progress
+ */
+
 #ifdef WIN32
 #  ifdef __CYGWIN__
 #    include <unistd.h>

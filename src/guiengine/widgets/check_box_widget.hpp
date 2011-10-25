@@ -28,7 +28,7 @@ namespace GUIEngine
 {
     /**
       * \brief A checkbox widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class CheckBoxWidget : public Widget
     {

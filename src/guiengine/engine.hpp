@@ -21,6 +21,10 @@
 
 /**
  * \defgroup guiengine
+ * Contains the generic GUI engine (contains the widgets and the backing logic
+ * for event handling, the skin, screens and dialogs). See module @ref states_screens
+ * for the actual STK GUI screens. Note that all input comes through this module
+ * too.
  */
 
 namespace irr

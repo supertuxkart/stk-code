@@ -30,6 +30,7 @@ class Vec3;
 
 /** A base class for all AI karts. This class basically provides some
  *  common low level functions.
+ * \ingroup controller
  */
 class AIBaseController : public Controller
 {

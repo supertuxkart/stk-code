@@ -21,7 +21,8 @@
 #define HEADER_BUTTON_HPP
 
 /**
-  * \defgroup widgets Guiengine/Widgets
+  * \defgroup widgetsgroup Guiengine/Widgets
+  * Contains the various types of widgets supported by the GUI engine.
   */
 
 #include <irrString.h>
@@ -34,7 +35,7 @@ namespace GUIEngine
 {
     /** 
       * \brief A text button widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class ButtonWidget : public Widget
     {

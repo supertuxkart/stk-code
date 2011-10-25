@@ -21,7 +21,11 @@
 #ifndef HEADER_KART_HPP
 #define HEADER_KART_HPP
 
-/** \defgroup karts */
+/**
+  * \defgroup karts
+  * Contains classes that deal with the properties, models and physics
+  * of karts.
+  */
 
 #include "btBulletDynamicsCommon.h"
 

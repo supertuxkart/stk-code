@@ -66,7 +66,7 @@ namespace GUIEngine
       * \brief An extended version of RibbonWidget, with more capabilities.
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
       * scrolling, multiple-row layouts.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       * \note items you add to a list are kept after the the ribbon was in is removed
       *       (i.e. you don't need to add items everytime the screen is shown, only upon loading)
       */

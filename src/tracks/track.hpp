@@ -18,7 +18,11 @@
 #ifndef HEADER_TRACK_HPP
 #define HEADER_TRACK_HPP
 
-/** \defgroup tracks */
+/**
+  * \defgroup tracks
+  * Contains information about tracks, namely drivelines, checklines and track
+  * objects.
+  */
 
 #include <string>
 #include <vector>

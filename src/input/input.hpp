@@ -20,7 +20,10 @@
 #ifndef HEADER_INPUT_HPP
 #define HEADER_INPUT_HPP
 
-/** \defgroup input */
+/**
+  * \defgroup input
+  * Contains classes for input management (keyboard and gamepad)
+  */
 
 #include <string>
 #include <irrString.h>

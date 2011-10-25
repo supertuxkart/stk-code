@@ -22,6 +22,10 @@
 
 /**
  * \defgroup graphics
+ * This module contains the core graphics engine, that is mostly a thin layer
+ * on top of irrlicht providing some additional features we need for STK
+ * (like particles, more scene node types, mesh manipulation tools, material
+ * management, etc...)
  */
 
 #include <string>
