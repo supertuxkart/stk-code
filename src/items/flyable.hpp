@@ -64,6 +64,12 @@ private:
      *  otherwise result in an invalid terrain. */
     Vec3              m_position_offset;
 
+    /** If this variable is set to true (which is the default) flyable
+     *  will update the height of terrain when its updateAndDelete
+     *  function is called. If it's necessary to update the height of
+     *  terrain yourself (e.g. order of operations is important)
+     *  set this to false with a call do setDoTerrainInfo(). */
+    bool              m_do_terrain_info;
 protected:
     /** Kart which shot this flyable. */
     Kart*             m_owner;
@@ -198,6 +204,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the sfx that should be played in case of an explosion. */
     virtual const char*  getExplosionSound() const { return "explosion"; }
+    // ------------------------------------------------------------------------
+    /** Sets wether Flyable should update TerrainInfo as part of its update
+     *  call, or if the inheriting object will update TerrainInfo itself
+     *  (or perhaps not at all if it is not needed). */
+    void setDoTerrainInfo(bool d) { m_do_terrain_info = d; }
 };   // Flyable
 
 #endif

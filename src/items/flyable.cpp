@@ -71,6 +71,7 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
     m_time_since_thrown            = 0;
     m_position_offset              = Vec3(0,0,0);
     m_owner_has_temporary_immunity = true;
+    m_do_terrain_info              = true;
     m_max_lifespan = -1;
 
     // Add the graphical model
@@ -363,7 +364,8 @@ bool Flyable::updateAndDelete(float dt)
     // Add the position offset so that the flyable can adjust its position 
     // (usually to do the raycast from a slightly higher position to avoid
     // problems finding the terrain in steep uphill sections).
-    TerrainInfo::update(xyz+m_position_offset);
+    if(m_do_terrain_info)
+        TerrainInfo::update(xyz+m_position_offset);
 
     // Remove flyable if its
     if(TerrainInfo::getMaterial()==NULL)

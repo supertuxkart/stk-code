@@ -115,6 +115,10 @@ private:
      *  for the interpolation. */
     Vec3         m_previous_xyz;
 
+    /** To simplify code this stores the previous height above terrain
+     *  used. */
+    float        m_previous_height;
+
     /** Estimated length of the spline between the control points
      *  1 and 2. */
     float        m_length_cp_1_2;
@@ -171,6 +175,11 @@ private:
      *  used to keep track of the state of this ball. */
     bool         m_aiming_at_target;
 
+    /** This variable counts how often a ball tunneled (in consecutive 
+     *  frames). If a ball tunnels a certain number of times, it is
+     *  considered stuck and will be removed. */
+    unsigned int m_tunnel_count;
+
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
 
@@ -187,6 +196,7 @@ private:
     void         moveTowardsTarget(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
     float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
+    bool         checkTunneling();
 public:
                  RubberBall  (Kart* kart);
     virtual     ~RubberBall();

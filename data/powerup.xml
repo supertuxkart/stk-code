@@ -60,7 +60,7 @@
         fast-ping-distance="50" 
         early-target-factor="1"
         target-distance="15"  target-max-angle = "90"
-        min-interpolation-distance="10"
+        min-interpolation-distance="5"
         squash-slowdown="0.5" squash-duration="3"
         delete-time="5.0"     max-height-difference="10" />
   <item name="parachute"      icon="parachute-icon.png"

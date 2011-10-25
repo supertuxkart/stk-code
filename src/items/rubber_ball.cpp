@@ -40,6 +40,9 @@ float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
 
+// Debug only, so that we can get a feel on how well balls are aiming etc.
+#define PRINT_BALL_REMOVE_INFO
+
 RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
@@ -50,10 +53,9 @@ RubberBall::RubberBall(Kart *kart)
     m_next_id++;
     m_id = m_next_id;
 
-    // The rubber ball often misses the terrain on steep uphill slopes, e.g.
-    // the ramp in sand track. Add an Y offset so that the terrain raycast
-    // will always be done from a position high enough to avoid this.
-    setPositionOffset(Vec3(0, 0.5f, 0));
+    // Don't let Flyable update the terrain information, since this object
+    // has to do it earlier than that.
+    setDoTerrainInfo(false);
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
     
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
@@ -75,19 +77,23 @@ RubberBall::RubberBall(Kart *kart)
     m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz       = m_owner->getXYZ();
-
+    m_previous_height    = 2.0f;  // 
     // A negative value indicates that the timer is not active
-    m_delete_timer     = -1.0f;
+    m_delete_timer       = -1.0f;
+    m_tunnel_count       = 0;
 
     computeTarget();
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
+    TerrainInfo::update(getXYZ());
     initializeControlPoints(m_owner->getXYZ());
 
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
+/** Destructor, removes any playing sfx.
+ */
 RubberBall::~RubberBall()
 {
     if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
@@ -141,8 +147,13 @@ void RubberBall::computeTarget()
         {
             // If the firing kart itself is the first kart (that is 
             // still driving), prepare to remove the rubber ball
-            if(m_target==m_owner)
+            if(m_target==m_owner && m_delete_timer < 0)
+            {
+#ifdef PRINT_BALL_REMOVE_INFO
+                printf("ball %d removed because owner is target.\n", m_id);
+#endif
                 m_delete_timer = m_st_delete_time;
+            }
             return;
         }
     }   // for p > num_karts
@@ -150,6 +161,9 @@ void RubberBall::computeTarget()
     // This means it must be the end-animation phase. Now just
     // aim at the owner (the ball is unlikely to hit it), and
     // this will trigger the usage of the delete time in updateAndDelete
+#ifdef PRINT_BALL_REMOVE_INFO
+    printf("ball %d removed because no more active target.\n", m_id);
+#endif
     m_delete_timer = m_st_delete_time;
     m_target       = m_owner;
 }   // computeTarget
@@ -216,16 +230,14 @@ void RubberBall::getNextControlPoint()
     // relative to the center of the track depending on where the target is:
 
     //    if(m_fast_ping)
+    if(0)
     {
         LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
         float r = world->getTrackSector(m_target->getWorldKartId())
                         .getRelativeDistanceToCenter();
-        printf("ratio r %f, adjusting from %f %f ", r,
-            aim.getX(), aim.getZ());
         aim -= m_st_early_target_factor * r 
              * QuadGraph::get()->getNode(m_last_aimed_graph_node)
                                 .getCenterToRightVector();
-        printf(" to %f %f\n", aim.getX(), aim.getZ());
     }
 
     m_control_points[3]     = aim;
@@ -320,7 +332,32 @@ const core::stringw RubberBall::getHitString(const Kart *kart) const
  */
 bool RubberBall::updateAndDelete(float dt)
 {
-    // We have to adjust the offset used in the height of terrain computation:
+    if(m_delete_timer>0)
+    {
+        m_delete_timer -= dt;
+        if(m_delete_timer<=0)
+        {
+            hit(NULL);
+#ifdef PRINT_BALL_REMOVE_INFO
+            printf("ball %d deleted.\n", m_id);
+#endif
+            return true;
+        }
+    }
+
+    // Update the target in case that the first kart was overtaken (or has
+    // finished the race).
+    computeTarget();
+    updateDistanceToTarget();
+
+    // Determine the new position. This new position is only temporary, 
+    // since it still needs to be adjusted for the height of the terrain.
+    Vec3 next_xyz;
+    if(m_aiming_at_target)
+        moveTowardsTarget(&next_xyz, dt);
+    else
+        interpolate(&next_xyz, dt);
+
     // If the ball is close to the ground, we have to start the raycast
     // slightly higher (to avoid that the ball tunnels through the floor).
     // But if the ball is close to the ceiling of a tunnel and we would
@@ -328,38 +365,21 @@ bool RubberBall::updateAndDelete(float dt)
     // of the ceiling.
     // The ball is considered close to the ground if the height above the
     // terrain is less than half the current maximum height.
-    bool close_to_ground = 2.0*(getXYZ().getY() - getHoT()) 
-                         < m_current_max_height;
-    Vec3 vertical_offset(0, close_to_ground ? 1.0f : 0.0f, 0);
-    Flyable::setPositionOffset(vertical_offset);
+    bool close_to_ground = 2.0*m_previous_height < m_current_max_height;
 
-    if(Flyable::updateAndDelete(dt))
-        return true;
-
-    // Update the target in case that the first kart was overtaken (or has
-    // finished the race).
-    computeTarget();
-
-    if(m_delete_timer>0)
-    {
-        m_delete_timer -= dt;
-        if(m_delete_timer<=0)
-        {
-            hit(NULL);
-            return true;
-        }
-    }
-    updateDistanceToTarget();
-
-    Vec3 next_xyz;
-    if(m_aiming_at_target)
-        moveTowardsTarget(&next_xyz, dt);
-    else
-        interpolate(&next_xyz, dt);
+    float vertical_offset = close_to_ground ? 4.0f : 2.0f;
+    // Note that at this stage getHoT still reports the height at
+    // the previous location (since TerrainInfo wasn't updated). On
+    // the other hand, we can't update TerrainInfo without having 
+    // at least a good estimation of the height.
+    next_xyz.setY(getHoT() + vertical_offset);
+    // Update height of terrain (which isn't done as part of 
+    // Flyable::update for rubber balls.
+    TerrainInfo::update(next_xyz);
 
     m_height_timer += dt;
-    float height = updateHeight();
-    float new_y = getHoT()+height;
+    float height    = updateHeight()+m_extend.getY()*0.5f;
+    float new_y     = getHoT()+height;
 
     if(UserConfigParams::logFlyable())
         printf("ball %d: %f %f %f height %f new_y %f gethot %f ",
@@ -371,11 +391,7 @@ bool RubberBall::updateAndDelete(float dt)
         float terrain_height = getMaxTerrainHeight(vertical_offset)
                              - m_extend.getY();
         if(new_y>terrain_height)
-        {
-            printf("Adjusting height from %f to %f.\n",
-                new_y, terrain_height);
             new_y = terrain_height;
-        }
     }
 
     if(UserConfigParams::logFlyable())
@@ -383,6 +399,12 @@ bool RubberBall::updateAndDelete(float dt)
                getMaxTerrainHeight(vertical_offset));
 
     next_xyz.setY(new_y);
+    m_previous_xyz = getXYZ();
+    m_previous_height = next_xyz.getY()-getHoT();
+    setXYZ(next_xyz);
+
+    if(checkTunneling())
+        return true;
 
     // Determine new distance along track
     TrackSector::update(next_xyz);
@@ -399,10 +421,7 @@ bool RubberBall::updateAndDelete(float dt)
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
-    m_previous_xyz = getXYZ();
-    setXYZ(next_xyz);
-
-    return false;
+    return Flyable::updateAndDelete(dt);
 }   // updateAndDelete
 
 // ----------------------------------------------------------------------------
@@ -481,6 +500,52 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
 }   // interpolate
 
 // ----------------------------------------------------------------------------
+/** Checks if the line from the previous ball position to the new position
+ *  hits something, which indicates that the ball is tunneling through. If 
+ *  this happens, the ball position is adjusted so that it is just before
+ *  the hit point. If tunneling happens four frames in a row the ball is 
+ *  considered stuck and explodes (e.g. the ball might try to tunnel through
+ *  a wall to get to a 'close' target. In this case the ball would not
+ *  move much anymore and be stuck).
+ *  \return True if the ball tunneled often enough to be removed.
+ */
+bool RubberBall::checkTunneling()
+{
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    Vec3 hit_point;
+    const Material *material;
+
+    tm.castRay(m_previous_xyz, getXYZ(), &hit_point, &material);
+
+    if(material)
+    {
+        // If there are three consecutive tunnelling 
+        m_tunnel_count++;
+        if(m_tunnel_count > 3) 
+        {
+#ifdef PRINT_BALL_REMOVE_INFO
+            printf("Ball %d nearly tunneled at %f %f %f -> %f %f %f\n",
+                m_id, m_previous_xyz.getX(),m_previous_xyz.getY(),
+                m_previous_xyz.getZ(),
+                getXYZ().getX(),getXYZ().getY(),getXYZ().getZ());
+#endif
+            hit(NULL);
+            return true;
+        }
+        // In case of a hit, move the hit point towards the
+        // previous point by the radius of the ball --> this
+        // point will just allow the ball to avoid tunneling.
+        Vec3 diff = m_previous_xyz - hit_point;
+        hit_point += diff * (1.1f*m_extend.getY()/diff.length());
+        setXYZ(hit_point);
+        return false;
+    }
+    else
+        m_tunnel_count = 0;
+    return false;
+}   // checkTunneling
+
+// ----------------------------------------------------------------------------
 /** Updates the height of the rubber ball, and if necessary also adjusts the 
  *  maximum height of the ball depending on distance from the target. The 
  *  height is decreased when the ball is getting closer to the target so it
@@ -501,22 +566,14 @@ float RubberBall::updateHeight()
             m_ping_sfx->play();
         }
 
-        LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-        float target_distance = 
-            world->getDistanceDownTrackForKart(m_target->getWorldKartId());
-
-        float distance = target_distance - getDistanceFromStart();
-
-        if(distance<0)
-            distance+=World::getWorld()->getTrack()->getTrackLength();;
         if(m_fast_ping)
         {
             // Some experimental formulas
-            m_current_max_height   = 0.5f*sqrt(distance);
-            m_interval = m_current_max_height / 10.0f;
+            m_current_max_height = 0.5f*sqrt(m_distance_to_target);
+            m_interval           = m_current_max_height / 10.0f;
 	        // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
-                m_interval = 0.01f;      
+                m_interval = 0.1f;
         }
         else
         {
@@ -614,6 +671,10 @@ void RubberBall::updateDistanceToTarget()
         if(m_distance_to_target > 0.9f * world->getTrack()->getTrackLength())
         {
             m_delete_timer = m_st_delete_time;
+#ifdef PRINT_BALL_REMOVE_INFO
+            printf("ball %d lost target (overtook?).\n", m_id);
+#endif
+
         }
         
         // Otherwise (target disappeared, e.g. has finished the race or
@@ -641,6 +702,10 @@ void RubberBall::updateDistanceToTarget()
  */
 bool RubberBall::hit(Kart* kart, PhysicalObject* object)
 {
+#ifdef PRINT_BALL_REMOVE_INFO
+    if(kart)
+        printf("ball %d hit kart.\n", m_id);
+#endif
     if(kart && kart!=m_target)
     {
         // If the squashed kart has a bomb, explode it.
