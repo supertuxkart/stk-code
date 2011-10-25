@@ -18,7 +18,10 @@
 #ifndef HEADER_ZIP_HPP
 #define HEADER_ZIP_HPP
 
-/** Extract a zip. */
+/**
+  * Extract a zip.
+  * \ingroup addonsgroup
+  */
 bool extract_zip(const std::string &from, const std::string &to);
 
 #endif

@@ -20,6 +20,11 @@
 #ifndef HEADER_ADDON_HPP
 #define HEADER_ADDON_HPP
 
+/**
+  * \defgroup addonsgroup Add-ons
+  * Handles add-ons that can be downloaded
+  */
+
 #include <assert.h>
 #include <string>
 
@@ -28,6 +33,9 @@
 
 class XMLNode;
 
+/**
+  * \ingroup addonsgroup
+  */
 class Addon
 {
 public:

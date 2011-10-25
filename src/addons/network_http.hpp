@@ -34,6 +34,9 @@
 
 class XMLNode;
 
+/**
+  * \ingroup addonsgroup
+  */
 class NetworkHttp
 {
 public:

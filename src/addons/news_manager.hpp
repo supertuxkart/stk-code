@@ -29,6 +29,9 @@ using namespace irr;
 
 class XMLNode;
 
+/**
+  * \ingroup addonsgroup
+  */
 class NewsManager
 {
 private:

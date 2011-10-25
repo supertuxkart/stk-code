@@ -27,6 +27,9 @@
 #include "io/xml_node.hpp"
 #include "utils/synchronised.hpp"
 
+/**
+  * \ingroup addonsgroup
+  */
 class AddonsManager
 {
 private:

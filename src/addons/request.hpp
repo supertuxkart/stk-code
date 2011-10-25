@@ -25,7 +25,10 @@
 
 class Addon;
 
-/** Stores a download request. They will be sorted by priorities. */
+/**
+  * Stores a download request. They will be sorted by priorities.
+  * \ingroup addonsgroup
+  */
 class Request
 {
 public:

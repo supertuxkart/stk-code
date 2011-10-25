@@ -59,6 +59,8 @@
  
  \section Modules
  
+ \li \ref addonsgroup :
+   Handles add-ons that can be downloaded.
  \li \ref animations :
    This module manages interpolation-based animation (of position, rotation
    and/or scale)
