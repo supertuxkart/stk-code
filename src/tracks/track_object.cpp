@@ -29,6 +29,8 @@
 #include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
+#include <IMeshCache.h>
+#include <ISceneManager.h>
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -190,15 +192,22 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
  *  drops the textures of the mesh. Sound buffers are also freed.
  */
 TrackObject::~TrackObject()
-{
+{    
     if(m_node)
         irr_driver->removeNode(m_node);
+    
     if(m_mesh)
     {
+        scene::IMeshCache* cache = irr_driver->getSceneManager()->getMeshCache();
+        bool is_in_cache = (cache->getMeshIndex(m_mesh) != -1);
+
         irr_driver->dropAllTextures(m_mesh);
-        if(m_mesh->getReferenceCount()==1)
+        
+        if (!is_in_cache && m_mesh->getReferenceCount() == 1)
             irr_driver->removeMeshFromCache(m_mesh);
         m_mesh->drop();
+        if (is_in_cache && m_mesh->getReferenceCount() == 1)
+            irr_driver->removeMeshFromCache(m_mesh);
     }
     
     if (m_sound)
