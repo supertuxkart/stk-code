@@ -225,7 +225,8 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                if(control_is_pressed)
+                if(control_is_pressed && race_manager->getMinorMode()!=
+                                          RaceManager::MINOR_MODE_3_STRIKES)
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL,
                                      10000);
                 else
