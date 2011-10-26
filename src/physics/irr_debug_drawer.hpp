@@ -41,7 +41,13 @@ class IrrDebugDrawer : public btIDebugDraw
     DebugModeType   m_debug_mode;
 protected:
     virtual void    setDebugMode(int debug_mode) {}
-    virtual int     getDebugMode() const         { return DBG_DrawWireframe;}
+    /** Callback for bullet: if debug drawing should be done or not.
+     *  Note that getDebugMode is even called when debug_drawing is disabled
+     *  (i.e. not via Physics::draw()), but internally from bullet. So 
+     *  we have to make sure to return nodebug if debugging is disabled. */
+    virtual int     getDebugMode() const         
+                    { return m_debug_mode==DM_NONE ? DBG_NoDebug 
+                                                   : DBG_DrawWireframe;}
 public:
                     IrrDebugDrawer();
     void            render(float dt);
