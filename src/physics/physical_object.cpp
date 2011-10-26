@@ -35,6 +35,7 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshManipulator.h>
+#include <IMeshSceneNode.h>
 
 // -----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
@@ -87,7 +88,7 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
 
 // -----------------------------------------------------------------------------
 
-PhysicalObject::PhysicalObject(const std::string& model,
+PhysicalObject::PhysicalObject(scene::IMesh* model,
                                bodyTypes shape, float mass, float radius,
                                const core::vector3df& hpr,
                                const core::vector3df& pos,
@@ -123,11 +124,20 @@ void PhysicalObject::init()
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    scene::IAnimatedMesh *mesh 
-        = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+    scene::IMesh *mesh = NULL;
+    
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        mesh = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+    }
+    else
+    {
+        mesh = ((scene::IMeshSceneNode*)m_node)->getMesh();
+    }
+    
     MeshTools::minMax3D(mesh, &min, &max);
     Vec3 extend = max-min;
-    // Adjust the mesth of the graphical object so that its center is where it
+    // Adjust the mesh of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
     // if this is not correct for a particular shape.
     Vec3 offset_from_center = -0.5f*(max+min);
