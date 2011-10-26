@@ -203,8 +203,6 @@ TrackObject::~TrackObject()
 
         irr_driver->dropAllTextures(m_mesh);
         
-        if (!is_in_cache && m_mesh->getReferenceCount() == 1)
-            irr_driver->removeMeshFromCache(m_mesh);
         m_mesh->drop();
         if (is_in_cache && m_mesh->getReferenceCount() == 1)
             irr_driver->removeMeshFromCache(m_mesh);
