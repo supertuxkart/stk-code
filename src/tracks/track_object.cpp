@@ -164,6 +164,7 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
     {
         m_mesh = model;
         m_mesh->grab();
+        irr_driver->grabAllTextures(m_mesh);
         
         scene::IMeshSceneNode *node = irr_driver->addMesh(model);
         m_node = node;
@@ -195,9 +196,9 @@ TrackObject::~TrackObject()
     if(m_mesh)
     {
         irr_driver->dropAllTextures(m_mesh);
-        m_mesh->drop();
         if(m_mesh->getReferenceCount()==1)
             irr_driver->removeMeshFromCache(m_mesh);
+        m_mesh->drop();
     }
     
     if (m_sound)
