@@ -65,6 +65,11 @@ private:
     /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
 
+    /** The mesh might not have the same center as bullet does. This 
+     *  offset is used to offset the location of the graphical mesh
+     *  so that the graphics are aligned with the bullet collision shape. */
+    Vec3                  m_graphical_offset;
+
     /** Radius of the object - this obviously depends on the actual shape.
      *  As a default the radius is being determined from the shape of the
      *  mesh, but in somce cases that could lead to incorrect results

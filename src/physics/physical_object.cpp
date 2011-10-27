@@ -36,7 +36,7 @@ using namespace irr;
 #include <ISceneManager.h>
 #include <IMeshManipulator.h>
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
               : TrackObject(xml_node)
 {
@@ -80,12 +80,14 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     {
         std::string model_name;
         xml_node.get("model",   &model_name );
-        fprintf(stderr, "[PhysicalObject] WARNING, could not locate model '%s'\n", model_name.c_str());
+        fprintf(stderr, 
+                "[PhysicalObject] WARNING, could not locate model '%s'\n", 
+                model_name.c_str());
     }
     
 }   // PhysicalObject
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 PhysicalObject::PhysicalObject(const std::string& model,
                                bodyTypes shape, float mass, float radius,
@@ -106,7 +108,7 @@ PhysicalObject::PhysicalObject(const std::string& model,
     m_init_pos.setOrigin(btVector3(pos.X, pos.Y, pos.Z));
 }
                                
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
     World::getWorld()->getPhysics()->removeBody(m_body);
@@ -115,7 +117,7 @@ PhysicalObject::~PhysicalObject()
     delete m_shape;
 }  // ~PhysicalObject
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
  */
 void PhysicalObject::init()
@@ -130,7 +132,7 @@ void PhysicalObject::init()
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
     // if this is not correct for a particular shape.
-    Vec3 offset_from_center = -0.5f*(max+min);
+    m_graphical_offset = -0.5f*(max+min);
     switch (m_body_type)
     {
     case MP_CONE_Y: {
@@ -186,24 +188,16 @@ void PhysicalObject::init()
                     break;
     }
 
-    // 2. Adjust the mesh so that its center is where it is in bullet
-    // --------------------------------------------------------------
-    // This means that the graphical and physical position are identical
-    // which simplifies drawing later on.
-    scene::IMeshManipulator *mesh_manipulator = 
-        irr_driver->getSceneManager()->getMeshManipulator();
-    core::matrix4 transform(core::matrix4::EM4CONST_IDENTITY);  // 
-    transform.setTranslation(offset_from_center.toIrrVector());
-    mesh_manipulator->transform(mesh, transform);
-
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin()+btVector3(0,extend.getY()*0.5f, 0));
+    m_init_pos.setOrigin(m_init_pos.getOrigin() +
+                         btVector3(0,extend.getY()*0.5f, 0));
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
-    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state, m_shape, inertia);
+    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state, 
+                                                  m_shape, inertia);
     
     // Make sure that the cones stop rolling by defining angular friction != 0.
     info.m_angularDamping = 0.5f;
@@ -214,7 +208,7 @@ void PhysicalObject::init()
     World::getWorld()->getPhysics()->addBody(m_body);
 }   // init
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void PhysicalObject::update(float dt)
 {
     btTransform t;
@@ -228,6 +222,9 @@ void PhysicalObject::update(float dt)
         m_body->setAngularVelocity(btVector3(0,0,0));
         xyz = Vec3(m_init_pos.getOrigin());
     }
+    // Offset the graphical position correctly:
+    xyz += t.getBasis()*m_graphical_offset;
+
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
     hpr.setHPR(t.getRotation());
@@ -235,7 +232,7 @@ void PhysicalObject::update(float dt)
     return;
 }   // update
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void PhysicalObject::reset()
 {
     m_body->setCenterOfMassTransform(m_init_pos);
@@ -244,7 +241,7 @@ void PhysicalObject::reset()
     m_body->activate();
 }   // reset 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
 {
     
@@ -275,6 +272,6 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
 
 }   // handleExplosion
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /* EOF */
 
