@@ -54,7 +54,7 @@ public:
     /** Enable or disable fog on objects */
     void enableFog(bool enable);
 
-    PhysicalObject* insertObject(scene::IMesh* model,
+    PhysicalObject* insertObject(const std::string& model,
                                  PhysicalObject::bodyTypes shape, 
                                  float mass, float radius,
                                  const core::vector3df& hpr,

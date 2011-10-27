@@ -189,7 +189,7 @@ void TrackObjectManager::enableFog(bool enable)
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject* TrackObjectManager::insertObject(scene::IMesh* model,
+PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
                                                  PhysicalObject::bodyTypes shape,
                                                  float mass, float radius,
                                                  const core::vector3df& hpr,

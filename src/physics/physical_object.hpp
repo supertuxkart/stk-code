@@ -79,7 +79,7 @@ private:
 public:
                  PhysicalObject (const XMLNode &node);
     
-                 PhysicalObject(scene::IMesh* model,
+                 PhysicalObject(const std::string& model,
                                 bodyTypes shape, float mass, float radius,
                                 const core::vector3df& hpr,
                                 const core::vector3df& pos,

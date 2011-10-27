@@ -70,7 +70,7 @@ protected:
 
     /** The mesh used here. It needs to be stored so that it can be 
      *  removed from irrlicht's mesh cache when it is deleted. */
-    scene::IMesh                  *m_mesh;
+    scene::IAnimatedMesh          *m_mesh;
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
@@ -87,7 +87,7 @@ protected:
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
-                             const core::vector3df& scale, scene::IMesh* model);
+                             const core::vector3df& scale, const std::string& model);
                 ~TrackObject();
     virtual void update(float dt);
     virtual void reset();

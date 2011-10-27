@@ -19,9 +19,7 @@
 
 #include <string>
 #include <IMeshSceneNode.h>
-#include <IMeshManipulator.h>
-#include <ISceneManager.h>
-#include <SMesh.h>
+
 
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
@@ -241,7 +239,7 @@ void ThreeStrikesBattle::update(float dt)
     std::string tire;
     float scale = 0.5f;
     float radius = 0.5f;
-    PhysicalObject::bodyTypes tire_physics_shape;
+    PhysicalObject::bodyTypes tire_model;
 
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
@@ -252,12 +250,12 @@ void ThreeStrikesBattle::update(float dt)
             tire = file_manager->getModelFile("tire.b3d");
             scale = 0.5f;
             radius = 0.5f;
-            tire_physics_shape = PhysicalObject::MP_CYLINDER_Y;
+            tire_model = PhysicalObject::MP_CYLINDER_Y;
         }
         else
         {
             scale = 1.0f;
-            tire_physics_shape = PhysicalObject::MP_CYLINDER_X;
+            tire_model = PhysicalObject::MP_CYLINDER_X;
             radius = m_tire_radius[m_insert_tire-2];
             tire_offset = m_tire_offsets[m_insert_tire-2];
             if     (m_insert_tire == 2)
@@ -270,44 +268,25 @@ void ThreeStrikesBattle::update(float dt)
                 tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
-        TrackObjectManager* tom = m_track->getTrackObjectManager();
+        TrackObjectManager* tom = m_track->getTrackObjectManager();        
+        PhysicalObject* obj = 
+            tom->insertObject(tire,
+                              tire_model,
+                              15 /* mass */,
+                              radius /* radius */,
+                              core::vector3df(800.0f,0,m_tire_rotation 
+                                                      / M_PI * 180 + 180) ,
+                              m_tire_position + tire_offset,
+                              core::vector3df(scale,scale,scale) /* scale */);
         
-        scene::IMesh* tire_mesh = NULL;
-        if (file_manager->fileExists(tire))
-        {
-            tire_mesh = irr_driver->getMesh(tire);
-        }
-        if (!tire_mesh)
-        {
-            fprintf(stderr, "Warning: '%s' not found and is ignored.\n",
-                    tire.c_str());
-        }
-        else
-        {
-            scene::IMeshManipulator* manipulator = irr_driver->getSceneManager()->getMeshManipulator();
-            scene::IMesh* tire_mesh_copy = manipulator->createMeshCopy(tire_mesh);
-            
-            PhysicalObject* obj = 
-                tom->insertObject(tire_mesh_copy,
-                                  tire_physics_shape,
-                                  15 /* mass */,
-                                  radius /* radius */,
-                                  core::vector3df(800.0f,0,m_tire_rotation 
-                                                          / M_PI * 180 + 180) ,
-                                  m_tire_position + tire_offset,
-                                  core::vector3df(scale,scale,scale) /* scale */);
-            
-            tire_mesh_copy->drop(); // PhysicalObject grabbed it
-            
-            // FIXME: orient the force relative to kart orientation
-            obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
-            m_tires.push_back(obj);
-        }
-        
+        // FIXME: orient the force relative to kart orientation
+        obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
+
         m_insert_tire--;
         if(m_insert_tire == 1)
             m_insert_tire = 0;
         
+        m_tires.push_back(obj);
     }
 }   // update
 
