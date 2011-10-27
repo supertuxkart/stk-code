@@ -55,14 +55,15 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_y_offset = 0.0f;
 
     m_groups.clear();
+    m_turn_angle_at_speed.clear();
+    m_turn_speed.clear();
+    m_speed_angle_increase.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_min_speed_turn = m_angle_at_min =
-        m_max_speed_turn = m_angle_at_max = m_brake_factor =
-        m_engine_power[0] = m_engine_power[1] = m_engine_power[2] =
-        m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
+    m_mass = m_brake_factor = m_engine_power[0] = m_engine_power[1] =
+        m_engine_power[2] = m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
         m_time_full_steer = m_time_full_steer_ai =
         m_nitro_power_boost = m_nitro_consumption =
         m_nitro_small_container = m_nitro_big_container =
@@ -203,14 +204,19 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                            m_wheel_radius           );
     m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
                          -m_kart_model->getWheelPhysicsPosition(2).getZ());
-    m_angle_at_min = asinf(m_wheel_base/m_min_radius);
-    m_angle_at_max = asinf(m_wheel_base/m_max_radius);
-    if(m_max_speed_turn == m_min_speed_turn)
-        m_speed_angle_increase = 0.0;
-    else
-        m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-                               / (m_max_speed_turn - m_min_speed_turn);
-
+    for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
+    {
+        m_turn_angle_at_speed[i] = sin(m_wheel_base/m_turn_angle_at_speed[i]);
+    }
+    for(unsigned int i=0; i<m_turn_speed.size()-1; i++)
+    {
+        if(m_turn_speed[i]==m_turn_speed[i+1])
+            m_speed_angle_increase.push_back(0);
+        else
+            m_speed_angle_increase.push_back(
+                (m_turn_angle_at_speed[i]-m_turn_angle_at_speed[i+1])/
+                (m_turn_speed[i+1]-m_turn_speed[i]) );
+    }
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
     file_manager->popTextureSearchPath();
@@ -304,31 +310,32 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *turn_node = root->getNode("turn"))
     {
-        turn_node->get("time-full-steer",      &m_time_full_steer   );
-        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai);
-        std::vector<float> v;
-        if(turn_node->get("min-speed-radius", &v))
+        turn_node->get("time-full-steer",      &m_time_full_steer    );
+        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai );
+        turn_node->get("turn-speed",           &m_turn_speed         );
+        turn_node->get("turn-radius",          &m_turn_angle_at_speed);
+        // For now store the turn radius in turn angle, the correct
+        // value can only be determined later in ::load
+        if(m_turn_speed.size()==0 || 
+            m_turn_angle_at_speed.size() != m_turn_speed.size())
         {
-            if(v.size()!=2)
-                printf("Incorrect min-speed-radius specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
-            {
-                m_min_speed_turn = v[0];
-                m_min_radius     = v[1];
-            }
+            printf("Inconsistent turn-speed and turn-radius "
+                   "settings for kart %s\n", getIdent().c_str());
+            exit(-1);
         }
-
-        v.clear();
-        if(turn_node->get("max-speed-radius", &v))
+        for(unsigned int i=0; i<m_turn_speed.size()-1; i++)
         {
-            if(v.size()!=2)
-                printf("Incorrect max-speed-radius specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
+            if(m_turn_speed[i]>m_turn_speed[i+1])
             {
-                m_max_speed_turn = v[0];
-                m_max_radius     = v[1];
+                printf("The turn-speed must be specified with increasing "
+                       "values for kart %s.\n", getIdent().c_str());
+                exit(-1);
+            }
+            if(m_turn_angle_at_speed[i]>m_turn_angle_at_speed[i+1])
+            {
+                printf("The turn-angle must be increasing for kart %s.\n",
+                       getIdent().c_str());
+                exit(-1);
             }
         }
     }   // if turn_node
@@ -553,10 +560,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     }
 
     CHECK_NEG(m_mass,                       "mass"                          );
-    CHECK_NEG(m_min_speed_turn,             "turn min-speed-angle"          );
-    CHECK_NEG(m_min_radius,                 "turn min-speed-angle"          );
-    CHECK_NEG(m_max_speed_turn,             "turn max-speed-angle"          );
-    CHECK_NEG(m_max_radius,                 "turn max-speed-angle"          );
     CHECK_NEG(m_time_full_steer,            "turn time-full-steer"          );
     CHECK_NEG(m_time_full_steer_ai,         "turn time-full-steer-ai"       );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
@@ -638,9 +641,22 @@ void KartProperties::checkAllSet(const std::string &filename)
 // ----------------------------------------------------------------------------
 float KartProperties::getMaxSteerAngle(float speed) const
 {
-    if(speed<=m_min_speed_turn) return m_angle_at_min;
-    if(speed>=m_max_speed_turn) return m_angle_at_max;
-    return m_angle_at_min - (speed-m_min_speed_turn)*m_speed_angle_increase;
+    if(speed<=m_turn_speed[0])  return m_turn_angle_at_speed[0];
+    unsigned int last = m_turn_speed.size()-1;
+    if(speed>=m_turn_speed[last]) return m_turn_angle_at_speed[last];
+
+    for(unsigned int i=1; i<=last; i++)
+    {
+        if(speed <= m_turn_speed[i])
+        {
+            // Interpolate between i and i+1
+            return m_turn_angle_at_speed[i] -
+                (speed-m_turn_speed[i])*m_speed_angle_increase[i-1];
+        }
+    }
+    // This should never be reached
+    assert (0);
+    return 0;  // avoid compiler warning
 }   // getMaxSteerAngle
 
 // ----------------------------------------------------------------------------

@@ -76,9 +76,6 @@ private:
     std::vector<std::string> m_groups;
     static float UNDEFINED;
 
-    /** Increase of turn angle with speed. */
-    float m_speed_angle_increase;
-
     /** Version of the .kart file. */
     int   m_version;
 
@@ -120,16 +117,16 @@ private:
     float m_time_full_steer_ai;       /**< Time for  AI karts to reach full
                                        *   steer angle (used to reduce shaking
                                        *   of karts). */
-    float m_min_speed_turn,           /**< Speed for smallest turn radius. */
-          m_angle_at_min,             /**< Steering angle for minimal turn
-                                           radius. Computed from radius and
-                                           kart length. */
-          m_min_radius;               /**< Smallest turn radius. */
-    float m_max_speed_turn,           /**< Speed for largest turn radius. */
-          m_angle_at_max,             /**< Steering angle for maximum turn
-                                           radius. Computed from radius and
-                                           kart length. */
-          m_max_radius;               /**< Largest turn radius. */
+    /** Stores the speeds at which the turn angle changes. */
+    std::vector<float> m_turn_speed;
+
+    /** Stores the turn angle at the corresponding turn speed. */
+    std::vector<float> m_turn_angle_at_speed;
+
+    /** Increase of turn angle with speed. */
+    std::vector<float> m_speed_angle_increase;
+
+
 
     /** Time a kart is moved upwards after when it is rescued. */
     float m_rescue_time;
