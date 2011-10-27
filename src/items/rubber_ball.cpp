@@ -41,7 +41,7 @@ float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
-#define PRINT_BALL_REMOVE_INFO
+#undef PRINT_BALL_REMOVE_INFO
 
 RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
