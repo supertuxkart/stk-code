@@ -497,15 +497,18 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
 
     curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
-	// Add platform to user-agent string for informational purposes
-	// FIXME: Is there a way to identify linux other than just ruling out
-	//        windows and mac?
+	// Add platform to user-agent string for informational purposes.
+	// Add more cases as necessary.
 	#ifdef WIN32
 		uagent += (std::string)" (Windows)";
-	#else
-	#  ifdef __APPLE__
+	#elif defined(__APPLE__)
 		uagent += (std::string)" (Macintosh)";
-	#  endif
+	#elif defined(FreeBSD)
+		uagent += (std::string)" (FreeBSD)";
+	#elif defined(linux)
+		uagent += (std::string)" (Linux)";
+	#else
+		// Unknown system type
 	#endif
     curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
     curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
