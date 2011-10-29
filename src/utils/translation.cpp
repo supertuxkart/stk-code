@@ -223,6 +223,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 }
             }
             
+            m_current_language_name = l.get_name();
+
             if (!l)
             {
                 m_dictionary = m_dictionary_manager.get_dictionary();
@@ -233,12 +235,16 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             std::cout << "[translate] Env var LANGUAGE = '" << language 
                       << "', which corresponds to '" 
                       << Language::from_env(language).get_name() << "'\n";
+            
+            m_current_language_name = Language::from_env(language).get_name() ;
+
             m_dictionary = m_dictionary_manager.get_dictionary(
                                                 Language::from_env(language) );
         }
     }
     else
     {
+        m_current_language_name = "Default language";
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
     
@@ -402,5 +408,11 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 bool Translations::isRTLLanguage() const
 {
     return m_rtl;
+}
+
+std::string Translations::getCurrentLanguageName()
+{
+    return m_current_language_name;
+    //return m_dictionary_manager.get_language().get_name();
 }
 

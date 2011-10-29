@@ -207,21 +207,34 @@ void CreditsScreen::loadedFromFile()
         return;
     }
     
-    std::vector<irr::core::stringw> translator  = 
-        StringUtils::split(_("translator-credits"), '\n');
-    m_sections.push_back( new CreditsSection("Launchpad translations"));
-    for(unsigned int i = 1; i < translator.size(); i = i + 4)
+    
+    irr::core::stringw translators_credits = _("translator-credits");
+    
+    if (translators_credits != L"translator-credits")
     {
-        line = stringw("Translations");
-        CreditsEntry entry(line);
-        getCurrentSection()->addEntry( entry );
-        
-        for(unsigned int j = 0; i + j < translator.size() && j < 4; j ++)
+        std::vector<irr::core::stringw> translator  = 
+            StringUtils::split(translators_credits, '\n');
+
+        m_sections.push_back( new CreditsSection("Translations"));
+        for(unsigned int i = 1; i < translator.size(); i = i + 4)
         {
-            getCurrentSection()->addSubEntry(translator[i + j]);
+            line = stringw(translations->getCurrentLanguageName().c_str());
+            CreditsEntry entry(line);
+            getCurrentSection()->addEntry( entry );
+            
+            for(unsigned int j = 0; i + j < translator.size() && j < 6; j ++)
+            {
+                getCurrentSection()->addSubEntry(translator[i + j]);
+            }
         }
+        assert(m_sections.size() > 0);
+        
+        // FIXME for testing only
+        m_sections.swap( m_sections.size() - 1, 0 );
+        
+        // translations should be just before the last screen
+        //m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
-    assert(m_sections.size() > 0);
     
 }   // loadedFromFile
 

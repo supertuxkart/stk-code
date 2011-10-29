@@ -46,6 +46,8 @@ private:
     irr::core::stringw m_converted_string;
     bool m_rtl;
     
+    std::string m_current_language_name;
+    
 public:
                        Translations();
     
@@ -57,6 +59,8 @@ public:
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     const std::vector<std::string>* getLanguageList() const;
+    
+    std::string        getCurrentLanguageName();
 };   // Translations
 
 
