@@ -229,11 +229,8 @@ void CreditsScreen::loadedFromFile()
         }
         assert(m_sections.size() > 0);
         
-        // FIXME for testing only
-        m_sections.swap( m_sections.size() - 1, 0 );
-        
         // translations should be just before the last screen
-        //m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
+        m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
     
 }   // loadedFromFile
