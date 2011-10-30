@@ -689,7 +689,7 @@ void DefaultAIController::handleAcceleration( const float dt)
         }
     }
 
-    m_controls->m_accel = 1.0f;
+    m_controls->m_accel = stk_config->m_ai_acceleration;
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------

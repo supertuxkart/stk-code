@@ -160,6 +160,8 @@ void STKConfig::init_defaults()
     m_enable_networking        = true;
     m_smooth_normals           = false;
     m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
+    m_ai_acceleration          = 1.0f;
+    
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
@@ -227,7 +229,7 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         physics_node->get("smooth-normals", &m_smooth_normals );
     }
-
+    
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
         startup_node->get("penalty", &m_penalty_time );
@@ -324,6 +326,11 @@ void STKConfig::getAllData(const XMLNode * root)
         explosion_node->get("impulse-objects", &m_explosion_impulse_objects);
     }
 
+    if(const XMLNode *ai_node = root->getNode("ai"))
+    {
+        ai_node->get("acceleration", &m_ai_acceleration);
+    }
+    
     if(const XMLNode *networking_node= root->getNode("networking"))
         networking_node->get("enable", &m_enable_networking);
 

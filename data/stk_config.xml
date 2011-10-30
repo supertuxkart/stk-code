@@ -25,6 +25,9 @@
     <points from="5"        points="1"/>
   </grand-prix>
 
+  <!-- A value between 0 and 1, change this to handicap AIs -->
+  <ai acceleration="1.0"  />
+
   <!-- Time in follow-the-leader after which karts are removed.
        The last values applies for all remaining karts. 
        time-per-kart Additional time added to the interval

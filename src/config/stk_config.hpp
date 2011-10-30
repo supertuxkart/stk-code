@@ -101,6 +101,9 @@ public:
                                          before it is ignored. */
     bool  m_enable_networking;
 
+    float m_ai_acceleration;         /**<Between 0 and 1, default being 1, can be
+                                         used to give a handicap to AIs */
+    
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
