@@ -47,7 +47,9 @@ class NormalMapProvider : public video::IShaderConstantSetCallBack
 public:
     LEAK_CHECK()
     
-    virtual void OnSetConstants(irr::video::IMaterialRendererServices *services, s32 userData)
+    virtual void OnSetConstants(
+                               irr::video::IMaterialRendererServices *services,
+                               s32 userData)
     {
         // Irrlicht knows this is actually a GLint and makes the conversion
         int decaltex = 0;
@@ -81,11 +83,11 @@ Material::Material(const XMLNode *node, int index)
 
     bool b = false;
     
-    node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; // blender 2.4 style
-    node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; // blender 2.5 style
+    node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
+    node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.5 style
     b = false;
-    node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; // blender 2.4 style
-    node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; // blender 2.5 style
+    node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.4 style
+    node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.5 style
     
     node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
@@ -564,14 +566,19 @@ void  Material::setMaterialProperties(video::SMaterial *m)
             }
             
             // Material and shaders
-            IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
+            IGPUProgrammingServices* gpu = 
+                video_driver->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                                         (file_manager->getDataDir() + "shaders/normalmap.vert").c_str(), "main",
-                                                                         video::EVST_VS_2_0,
-                                                                         (file_manager->getDataDir() + "shaders/normalmap.frag").c_str(), "main",
-                                                                         video::EPST_PS_2_0,
-                                                                         m_normal_map_provider,
-                                                                         video::EMT_SOLID_2_LAYER );
+                                  (file_manager->getDataDir() + 
+                                       "shaders/normalmap.vert").c_str(), 
+                                   "main",
+                                   video::EVST_VS_2_0,
+                                   (file_manager->getDataDir() + 
+                                       "shaders/normalmap.frag").c_str(), 
+                                   "main",
+                                   video::EPST_PS_2_0,
+                                   m_normal_map_provider,
+                                   video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             m->Lighting = false;
             m->ZWriteEnable = true;
