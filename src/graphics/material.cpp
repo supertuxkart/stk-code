@@ -50,11 +50,11 @@ public:
     virtual void OnSetConstants(irr::video::IMaterialRendererServices *services, s32 userData)
     {
         // Irrlicht knows this is actually a GLint and makes the conversion
-        int decaltex = 0.0f;
+        int decaltex = 0;
         services->setPixelShaderConstant("DecalTex", (float*)&decaltex, 1);
         
         // Irrlicht knows this is actually a GLint and makes the conversion
-        int bumptex = 1.0f;
+        int bumptex = 1;
         services->setPixelShaderConstant("BumpTex", (float*)&bumptex, 1);
         
         // TODO: check the position of the sun
