@@ -38,6 +38,8 @@ class XMLNode;
 class SFXBase;
 class ParticleKind;
 
+class NormalMapProvider;
+
 /**
   * \ingroup graphics
   */
@@ -156,6 +158,9 @@ private:
 
     std::string      m_mask;
     
+    /** Only used if normal maps are used */
+    NormalMapProvider* m_normal_map_provider;
+    
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
     void  initCustomSFX(const XMLNode *sfx);
@@ -168,7 +173,7 @@ public:
          ~Material ();
 
     void  setSFXSpeed(SFXBase *sfx, float speed) const;
-    void  setMaterialProperties(video::SMaterial *m) const;
+    void  setMaterialProperties(video::SMaterial *m);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
     
     /** Returns the ITexture associated with this material. */
@@ -253,7 +258,6 @@ public:
     }   // getZipperParameter
 
     bool isNormalMap() const { return m_normal_map; }
-    
 } ;
 
 

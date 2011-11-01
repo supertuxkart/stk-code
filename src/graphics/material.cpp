@@ -33,9 +33,36 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IGPUProgrammingServices.h>
+#include <IMaterialRendererServices.h>
+#include <IShaderConstantSetCallBack.h>
+using namespace irr::video;
 
 const unsigned int UCLAMP = 1;
 const unsigned int VCLAMP = 2;
+
+
+class NormalMapProvider : public video::IShaderConstantSetCallBack
+{
+public:
+    LEAK_CHECK()
+    
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices *services, s32 userData)
+    {
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int decaltex = 0.0f;
+        services->setPixelShaderConstant("DecalTex", (float*)&decaltex, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int bumptex = 1.0f;
+        services->setPixelShaderConstant("BumpTex", (float*)&bumptex, 1);
+        
+        // TODO: check the position of the sun
+        const float lightdir[] = {0.5f, 0.5f, 1.0f};
+        services->setVertexShaderConstant("lightdir", lightdir, 3);
+    }
+};
+
 
 //-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
@@ -44,7 +71,6 @@ const unsigned int VCLAMP = 2;
  */
 Material::Material(const XMLNode *node, int index)
 {
-    
     node->get("name", &m_texname);
     if (m_texname=="")
     {
@@ -248,6 +274,7 @@ void Material::init(unsigned int index)
     m_normal_map                = false;
     m_parallax_map              = false;
     m_is_heightmap              = false;
+    m_normal_map_provider       = NULL;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -295,6 +322,12 @@ Material::~Material()
         m_texture->drop();
         if(m_texture->getReferenceCount()==1)
             irr_driver->removeTexture(m_texture);
+    }
+    
+    if (m_normal_map_provider != NULL)
+    {
+        m_normal_map_provider->drop();
+        m_normal_map_provider = NULL;
     }
     
     // If a special sfx is installed (that isn't part of stk itself), the
@@ -450,7 +483,7 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
 /** Sets the appropriate flags in an irrlicht SMaterial.
  *  \param material The irrlicht SMaterial which gets the flags set.
  */
-void  Material::setMaterialProperties(video::SMaterial *m) const
+void  Material::setMaterialProperties(video::SMaterial *m)
 {
     // !!======== This method is only called for materials that can be found in
     //            materials.xml, if you want to set flags for all surfaces, see
@@ -513,14 +546,38 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     if (m_normal_map)
     {
-        video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex) ;
-        if (m_is_heightmap)
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
+            video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
         {
-            irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
+            ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
+            if (m_is_heightmap)
+            {
+                video_driver->makeNormalMapTexture( tex );
+            }
+            m->setTexture(1, tex);
+
+            if (m_normal_map_provider == NULL)
+            {
+                m_normal_map_provider = new NormalMapProvider();
+            }
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                                         (file_manager->getDataDir() + "shaders/normalmap.vert").c_str(), "main",
+                                                                         video::EVST_VS_2_0,
+                                                                         (file_manager->getDataDir() + "shaders/normalmap.frag").c_str(), "main",
+                                                                         video::EPST_PS_2_0,
+                                                                         m_normal_map_provider,
+                                                                         video::EMT_SOLID_2_LAYER );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            m->Lighting = false;
+            m->ZWriteEnable = true;
+            
+            modes++;
         }
-        m->setTexture(1, tex);
-        m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
-        modes++;
     }
     if (m_parallax_map)
     {
@@ -630,3 +687,5 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
 }   // adjustForFog
+
+//-----------------------------------------------------------------------------
