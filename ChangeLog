@@ -11,6 +11,7 @@ SuperTuxKart 0.7.3
 * See progression during Grand Prix
 * Improve physics for tall karts (e.g. Adiumy)
 * Lots of bug fixes
+* Improved kart control at high speeds
 * Transition track-making to blender 2.5/2.6
 
 SuperTuxKart 0.7.2
