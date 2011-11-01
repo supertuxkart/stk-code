@@ -1,3 +1,18 @@
+SuperTuxKart 0.7.3
+~~~~~~~~~~~~~~~~~~
+* New Zen Garden and Subsea tracks
+* New Island battle arena
+* New Suzanne kart
+* New graphical effects
+* New weapons 'Swatter' and 'Rubber Ball'
+* Added Thunderbird as race referee
+* 3 Strikes Battles now displays lives as spare tires
+* Improved bubble gum
+* See progression during Grand Prix
+* Improve physics for tall karts (e.g. Adiumy)
+* Lots of bug fixes
+* Transition track-making to blender 2.5/2.6
+
 SuperTuxKart 0.7.2
 ~~~~~~~~~~~~~~~~~~
 * Added in-game addon manager
