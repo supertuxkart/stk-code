@@ -73,7 +73,10 @@ public:
     int get(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, unsigned int *value) const;
+#ifndef FREEBSD
+    // FreeBSD has time_t same as int
     int get(const std::string &attribute, Time::TimeType *value) const;
+#endif
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;
