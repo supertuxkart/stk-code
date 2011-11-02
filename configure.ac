@@ -1,6 +1,6 @@
 # Process this file with autogen.sh to produce a configure script.
 
-AC_INIT(supertuxkart,SVN)
+AC_INIT(supertuxkart,0.7.3-rc1)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
 AC_PREREQ(2.61)
