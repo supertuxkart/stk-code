@@ -12,6 +12,7 @@ SuperTuxKart 0.7.3
 * Improve physics for tall karts (e.g. Adiumy)
 * Lots of bug fixes
 * Improved kart control at high speeds
+* Better placement of rescued karts
 * Transition track-making to blender 2.5/2.6
 
 SuperTuxKart 0.7.2
