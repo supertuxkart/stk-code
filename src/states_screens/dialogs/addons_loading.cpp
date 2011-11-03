@@ -169,6 +169,13 @@ void AddonsLoading::init()
 }
 
 // ----------------------------------------------------------------------------
+void AddonsLoading::escapePressed()
+{
+    processEvent("cancel");
+    ModalDialog::dismiss();
+}   // escapePressed
+
+// ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation 
                     AddonsLoading::processEvent(const std::string& event_source)

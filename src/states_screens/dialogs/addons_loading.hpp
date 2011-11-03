@@ -32,7 +32,7 @@ class Request;
   */
 class AddonsLoading : public GUIEngine::ModalDialog
 {
-//virtual void escapePressed() {};
+  virtual void escapePressed();
 private:
     GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
