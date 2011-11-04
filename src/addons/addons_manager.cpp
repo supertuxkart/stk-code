@@ -407,15 +407,19 @@ bool AddonsManager::install(const Addon &addon)
         // karts will not reload their meshes.
         const KartProperties *prop = 
             kart_properties_manager->getKart(addon.getId());
-        // If the model already exist (i.e. it's an update, not a new install)
-        // make sure to remove the cached copy of the mesh
+        // If the model already exist, first remove the old kart
         if(prop)
-        {
-            const KartModel &model = prop->getMasterKartModel();
-            irr_driver->removeMeshFromCache(model.getModel());
-        }
+            kart_properties_manager->removeKart(addon.getId());
+        kart_properties_manager->loadKart(addon.getDataDir());
     }
-    saveInstalled(addon.getType());
+    else if (addon.getType()=="track" || addon.getType()=="arena")
+    {
+        Track *track = track_manager->getTrack(addon.getId());
+        if(track)
+            track_manager->removeTrack(addon.getId());
+        track_manager->loadTrack(addon.getDataDir());
+    }
+    saveInstalled();
     return true;
 }   // install
 
@@ -437,7 +441,15 @@ bool AddonsManager::uninstall(const Addon &addon)
 
     //remove the addons directory
     bool error = !file_manager->removeDirectory(addon.getDataDir());
-    saveInstalled(addon.getType());
+    if(addon.getType()=="kart")
+    {
+        kart_properties_manager->removeKart(addon.getId());
+    }
+    else if(addon.getType()=="track" || addon.getType()=="arena")
+    {
+        track_manager->removeTrack(addon.getId());
+    }
+    saveInstalled();
     return !error;
 }   // uninstall
 

@@ -47,7 +47,7 @@ private:
     std::vector<std::string>                 m_all_groups;
 
     /** Mapping of group names to list of kart indices in each group. */
-    std::map<std::string, std::vector<int> > m_groups;
+    std::map<std::string, std::vector<int> > m_groups_2_indices;
 
     /** Vector containing kart numbers that have been selected in multiplayer
      * games.  This it used to ensure the same kart can not be selected more
@@ -58,7 +58,6 @@ private:
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 
-    bool                     loadKart(const std::string &dir);
 protected:
 
     typedef PtrVector<KartProperties> KartPropertiesVector;
@@ -75,9 +74,11 @@ public:
     int                      getKartByGroup(const std::string& group, 
                                            int i) const;
     
+    bool                     loadKart               (const std::string &dir);
     void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
 	void					 reLoadAllKarts			();
+    void                     removeKart(const std::string &id);
     const std::vector<int>   getKartsInGroup        (const std::string& g);
     bool                     kartAvailable(int kartid);
     std::vector<std::string> getAllAvailableKarts() const;

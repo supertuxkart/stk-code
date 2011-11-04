@@ -145,19 +145,15 @@ KartModel::~KartModel()
 
             m_wheel_node[i]->drop();
         }
-        // For now don't drop the textures: note that the mesh is not
-        // dropped either (which enables a reload of kart_properties
-        // without reading the full mesh again when a new addon is
-        // installed, see KartPropertiesManager::reLoadAllKarts). 
-        // Therefore if the textures are dropped here, the mesh would 
-        // reference a freed texture, causing a crash.
-        // While this potentially causes a memory leak, this is not
-        // important since all kart meshes and all textures they use
-        // are around till the very end of STK. The textures stay in
-        // irrlicht's texture cache, and will be freed on exit.
-        //if(m_is_master && m_wheel_model[i])
-        //    irr_driver->dropAllTextures(m_wheel_model[i]);
+        if(m_is_master && m_wheel_model[i])
+            irr_driver->dropAllTextures(m_wheel_model[i]);
         
+    }
+
+    if(m_is_master)
+    {
+        irr_driver->dropAllTextures(m_mesh);
+        irr_driver->removeMeshFromCache(m_mesh);
     }
 
 #ifdef DEBUG
@@ -285,7 +281,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     assert(m_is_master);
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
-    
+    irr_driver->grabAllTextures(m_mesh);
     if(!m_mesh)
     {
         printf("Problems loading mesh '%s' - kart '%s' will not be available\n",

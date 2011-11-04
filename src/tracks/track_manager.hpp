@@ -44,11 +44,12 @@ private:
     /** All track objects. */
     Tracks                                   m_tracks;
     
+    typedef std::map<std::string, std::vector<int> > Group2Indices;
     /** List of all racing track groups. */
-    std::map<std::string, std::vector<int> > m_track_groups;
+    Group2Indices                            m_track_groups;
     
     /** List of all arena groups. */
-    std::map<std::string, std::vector<int> > m_arena_groups;
+    Group2Indices                            m_arena_groups;
     
     /** List of all groups (for both normal tracks and arenas) */
     //std::vector<std::string>                 m_all_group_names;
@@ -65,21 +66,17 @@ private:
     std::vector<bool>                        m_track_avail;
 
     void          updateGroups(const Track* track);
-    bool          loadTrack(const std::string& dirname);
 
 public:
                   TrackManager();
                  ~TrackManager();
 
     static void   addTrackSearchDir(const std::string &dir);
-    
+    bool          loadTrack(const std::string& dirname);
+
     /** \brief Returns a list of all directories that contain a track. */
     const std::vector<std::string>*  getAllTrackDirs() const 
                                             { return &m_all_track_dirs; }
-    
-    /** \brief Returns a list of the names of all used groups (for tracks or arenas) */
-    //const std::vector<std::string>&
-    //              getAllGroups()      const { return m_all_group_names; }
     
     /** \brief Returns a list of the names of all used track groups. */
     const std::vector<std::string>&
@@ -122,7 +119,10 @@ public:
     
     /** Load all .track files from all directories */
     void          loadTrackList();
-};
+
+    void          removeTrack(const std::string &ident);
+
+};   // TrackManager
 
 extern TrackManager* track_manager;
 
