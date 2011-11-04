@@ -304,7 +304,7 @@ public:
                              {return translations->w_gettext(m_name.c_str()); }
     // ------------------------------------------------------------------------
     /** Returns all groups this track belongs to. */
-    const std::vector<std::string>
+    const std::vector<std::string>&
                        getGroups         () const {return m_groups;           }
     // ------------------------------------------------------------------------
     /** Returns the filename of this track. */
