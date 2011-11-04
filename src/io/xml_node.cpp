@@ -304,7 +304,7 @@ int XMLNode::get(const std::string &attribute, int *value) const
 
 // ----------------------------------------------------------------------------
 // Commented out for FREEBSD since TimeType=time_t and int are the same
-#ifndef FREEBSD
+#ifndef __FREEBSD__
 int XMLNode::get(const std::string &attribute, Time::TimeType *value) const
 {
     std::string s;
