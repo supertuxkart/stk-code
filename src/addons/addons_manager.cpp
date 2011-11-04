@@ -458,11 +458,8 @@ bool AddonsManager::uninstall(const Addon &addon)
  *  addons_installed.xml. If this is not called, information about downloaded
  *  icons is lost (and will trigger a complete redownload when STK is started
  *  next time).
- *  \param type Specified the type of addon that was modified. This will trigger
- *         re-initialisation of the kart or track manager. Default is "" (so
- *         no manager will be re-initialised).
  */
-void AddonsManager::saveInstalled(const std::string &type)
+void AddonsManager::saveInstalled()
 {
     //Put the addons in the xml file
     //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
@@ -479,9 +476,5 @@ void AddonsManager::saveInstalled(const std::string &type)
     }
     xml_installed << "</addons>" << std::endl;
     xml_installed.close();
-    if(type=="kart")
-        kart_properties_manager->reLoadAllKarts();
-    else if(type=="track" || type=="arena")
-        track_manager->loadTrackList();
 }   // saveInstalled
 

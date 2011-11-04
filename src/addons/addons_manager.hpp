@@ -53,7 +53,7 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
-    void  saveInstalled(const std::string &type="");
+    void  saveInstalled();
     void  loadInstalledAddons();
     void  downloadIcons();
 
