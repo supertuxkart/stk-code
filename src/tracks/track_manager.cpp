@@ -190,8 +190,8 @@ void TrackManager::removeTrack(const std::string &ident)
     Group2Indices &group_2_indices = track->isArena() ? m_arena_groups      
                                                       : m_track_groups;
     std::vector<std::string> &group_names = track->isArena()
-                                            ? m_arena_group_names
-                                            : m_track_group_names;
+                                                      ? m_arena_group_names
+                                                      : m_track_group_names;
     const std::vector<std::string>& groups=track->getGroups();
     for(unsigned int i=0; i<groups.size(); i++)
     {
@@ -240,34 +240,22 @@ void TrackManager::removeTrack(const std::string &ident)
   */
 void TrackManager::updateGroups(const Track* track)
 {
-    const std::vector<std::string>& new_groups = track->getGroups();
-    const bool isArena = track->isArena();
-    
+    const std::vector<std::string>& new_groups = track->getGroups();    
+
+    Group2Indices &group_2_indices = track->isArena() ? m_arena_groups      
+                                                      : m_track_groups;
+    std::vector<std::string> &group_names = track->isArena()
+                                                      ? m_arena_group_names
+                                                      : m_track_group_names;
+
     const unsigned int groups_amount = new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
-        if (isArena)
-        {
-            // update the list of group names if necessary
-            const bool isInArenaGroupsList = 
-                (m_arena_groups.find(new_groups[i]) != m_arena_groups.end());
-            if (!isInArenaGroupsList) 
-                m_arena_group_names.push_back(new_groups[i]);
-
-            // add this track to its group
-            m_arena_groups[new_groups[i]].push_back(m_tracks.size()-1);
-        }
-        else
-        {
-            // update the list of group names if necessary
-            const bool isInTrackGroupsList = 
-                (m_track_groups.find(new_groups[i]) != m_track_groups.end());
-            if (!isInTrackGroupsList) 
-                m_track_group_names.push_back(new_groups[i]);
-
-            // add this track to its group
-            m_track_groups[new_groups[i]].push_back(m_tracks.size()-1);
-        }
+        bool group_exists = group_2_indices.find(new_groups[i]) 
+                                                      != group_2_indices.end();
+        if(!group_exists)
+            group_names.push_back(new_groups[i]);
+        group_2_indices[new_groups[i]].push_back(m_tracks.size()-1);
     }
 }   // updateGroups
 
