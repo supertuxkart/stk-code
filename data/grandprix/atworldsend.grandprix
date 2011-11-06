@@ -2,7 +2,7 @@
 <supertuxkart_grand_prix name="At World's End">
 
     <track id="fortmagma"    laps="3" />
-    <track id="canyon"       laps="2" />
+    <track id="minigolf"     laps="3" />
     <track id="xr591"        laps="3" />
     <track id="mines"        laps="3" />
     <track id="city"         laps="3" />

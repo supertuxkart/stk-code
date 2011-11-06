@@ -2,14 +2,14 @@
 
 <challenge
     version="1"
-    id="canyon"
-    name="Win a race on Canyon"
-    description="Win a 3 lap race on Canyon against 4 Expert level AI karts."
+    id="minigolf"
+    name="Win a race on Minigolf"
+    description="Win a 3 lap race on Minigolf against 4 Expert level AI karts."
     depend-on="tollway"
     unlock-track="xr591"
     major="single"
     minor="quickrace"
-    track="canyon"
+    track="minigolf"
     difficulty="hard"
     laps="3"
     karts="5"
