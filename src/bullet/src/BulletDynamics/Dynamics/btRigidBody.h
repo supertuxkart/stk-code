@@ -13,18 +13,13 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef RIGIDBODY_H
-#define RIGIDBODY_H
+#ifndef BT_RIGIDBODY_H
+#define BT_RIGIDBODY_H
 
 #include "LinearMath/btAlignedObjectArray.h"
 #include "LinearMath/btTransform.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define isnan _isnan
-#endif
-#include <math.h>
 
 class btCollisionShape;
 class btMotionState;
@@ -94,7 +89,7 @@ class btRigidBody  : public btCollisionObject
 	int				m_rigidbodyFlags;
 	
 	int				m_debugBodyId;
-
+	
 
 protected:
 
@@ -258,9 +253,6 @@ public:
 	}
 	void setLinearFactor(const btVector3& linearFactor)
 	{
-        btAssert(!isnan(linearFactor.getX()));
-        btAssert(!isnan(linearFactor.getY()));
-        btAssert(!isnan(linearFactor.getZ()));
 		m_linearFactor = linearFactor;
 		m_invMass = m_linearFactor*m_inverseMass;
 	}
@@ -275,18 +267,15 @@ public:
 
 	void			applyCentralForce(const btVector3& force)
 	{
-        btAssert(!isnan(force.getX()));
-        btAssert(!isnan(force.getY()));
-        btAssert(!isnan(force.getZ()));
 		m_totalForce += force*m_linearFactor;
 	}
 
-	const btVector3& getTotalForce()
+	const btVector3& getTotalForce() const
 	{
 		return m_totalForce;
 	};
 
-	const btVector3& getTotalTorque()
+	const btVector3& getTotalTorque() const
 	{
 		return m_totalTorque;
 	};
@@ -314,42 +303,22 @@ public:
 	
 	void	applyForce(const btVector3& force, const btVector3& rel_pos) 
 	{
-        btAssert(!isnan(force.getX()));
-        btAssert(!isnan(force.getY()));
-        btAssert(!isnan(force.getZ()));
-        btAssert(!isnan(rel_pos.getX()));
-        btAssert(!isnan(rel_pos.getY()));
-        btAssert(!isnan(rel_pos.getZ()));
-
 		applyCentralForce(force);
 		applyTorque(rel_pos.cross(force*m_linearFactor));
 	}
 	
 	void applyCentralImpulse(const btVector3& impulse)
 	{
-        btAssert(!isnan(impulse.getX()));
-        btAssert(!isnan(impulse.getY()));
-        btAssert(!isnan(impulse.getZ()));
 		m_linearVelocity += impulse *m_linearFactor * m_inverseMass;
 	}
 	
   	void applyTorqueImpulse(const btVector3& torque)
 	{
-            btAssert(!isnan(torque.getX()));
-            btAssert(!isnan(torque.getY()));
-            btAssert(!isnan(torque.getZ()));
 			m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
 	}
 	
 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos) 
 	{
-        btAssert(!isnan(impulse.getX()));
-        btAssert(!isnan(impulse.getY()));
-        btAssert(!isnan(impulse.getZ()));
-        btAssert(!isnan(rel_pos.getX()));
-        btAssert(!isnan(rel_pos.getY()));
-        btAssert(!isnan(rel_pos.getZ()));
-
 		if (m_inverseMass != btScalar(0.))
 		{
 			applyCentralImpulse(impulse);
@@ -386,17 +355,11 @@ public:
 
 	inline void setLinearVelocity(const btVector3& lin_vel)
 	{ 
-        btAssert(!isnan(lin_vel.getX()));
-        btAssert(!isnan(lin_vel.getY()));
-        btAssert(!isnan(lin_vel.getZ()));
 		m_linearVelocity = lin_vel; 
 	}
 
 	inline void setAngularVelocity(const btVector3& ang_vel) 
 	{ 
-        btAssert(!isnan(ang_vel.getX()));
-        btAssert(!isnan(ang_vel.getY()));
-        btAssert(!isnan(ang_vel.getZ()));
 		m_angularVelocity = ang_vel; 
 	}
 
@@ -541,7 +504,7 @@ public:
 		return m_constraintRefs[index];
 	}
 
-	int getNumConstraintRefs()
+	int getNumConstraintRefs() const
 	{
 		return m_constraintRefs.size();
 	}
@@ -654,6 +617,7 @@ public:
 
 
 	void	internalWritebackVelocity(btScalar timeStep);
+
 	
 
 	///////////////////////////////////////////////
@@ -723,5 +687,5 @@ struct	btRigidBodyDoubleData
 
 
 
-#endif
+#endif //BT_RIGIDBODY_H
 

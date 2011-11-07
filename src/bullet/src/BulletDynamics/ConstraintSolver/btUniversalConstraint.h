@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef UNIVERSAL_CONSTRAINT_H
-#define UNIVERSAL_CONSTRAINT_H
+#ifndef BT_UNIVERSAL_CONSTRAINT_H
+#define BT_UNIVERSAL_CONSTRAINT_H
 
 
 
@@ -52,9 +52,11 @@ public:
 	// limits
 	void setUpperLimit(btScalar ang1max, btScalar ang2max) { setAngularUpperLimit(btVector3(0.f, ang1max, ang2max)); }
 	void setLowerLimit(btScalar ang1min, btScalar ang2min) { setAngularLowerLimit(btVector3(0.f, ang1min, ang2min)); }
+
+	void setAxis( const btVector3& axis1, const btVector3& axis2);
 };
 
 
 
-#endif // UNIVERSAL_CONSTRAINT_H
+#endif // BT_UNIVERSAL_CONSTRAINT_H
 

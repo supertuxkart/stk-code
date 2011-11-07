@@ -918,7 +918,7 @@ void btConeTwistConstraint::computeTwistLimitInfo(const btQuaternion& qTwist,
 
 	if (twistAngle > SIMD_PI) // long way around. flip quat and recalculate.
 	{
-		qMinTwist = operator-(qTwist);
+		qMinTwist = -(qTwist);
 		twistAngle = qMinTwist.getAngle();
 	}
 	if (twistAngle < 0)
@@ -1113,5 +1113,15 @@ btScalar btConeTwistConstraint::getParam(int num, int axis) const
 	return retVal;
 }
 
+
+void btConeTwistConstraint::setFrames(const btTransform & frameA, const btTransform & frameB)
+{
+	m_rbAFrame = frameA;
+	m_rbBFrame = frameB;
+	buildJacobian();
+	//calculateTransforms();
+}
+
+ 
 
 

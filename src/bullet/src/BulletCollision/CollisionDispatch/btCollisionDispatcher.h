@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef COLLISION__DISPATCHER_H
-#define COLLISION__DISPATCHER_H
+#ifndef BT_COLLISION__DISPATCHER_H
+#define BT_COLLISION__DISPATCHER_H
 
 #include "BulletCollision/BroadphaseCollision/btDispatcher.h"
 #include "BulletCollision/NarrowPhaseCollision/btPersistentManifold.h"
@@ -42,8 +42,11 @@ typedef void (*btNearCallback)(btBroadphasePair& collisionPair, btCollisionDispa
 ///Time of Impact, Closest Points and Penetration Depth.
 class btCollisionDispatcher : public btDispatcher
 {
+
+protected:
+
 	int		m_dispatcherFlags;
-	
+
 	btAlignedObjectArray<btPersistentManifold*>	m_manifoldsPtr;
 
 	btManifoldResult	m_defaultManifoldResult;
@@ -64,7 +67,8 @@ public:
 	enum DispatcherFlags
 	{
 		CD_STATIC_STATIC_REPORTED = 1,
-		CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD = 2
+		CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD = 2,
+		CD_DISABLE_CONTACTPOOL_DYNAMIC_ALLOCATION = 4
 	};
 
 	int	getDispatcherFlags() const
@@ -74,8 +78,7 @@ public:
 
 	void	setDispatcherFlags(int flags)
 	{
-        (void) flags;
-		m_dispatcherFlags = 0;
+		m_dispatcherFlags = flags;
 	}
 
 	///registerCollisionCreateFunc allows registration of custom/alternative collision create functions
@@ -153,7 +156,17 @@ public:
 		m_collisionConfiguration = config;
 	}
 
+	virtual	btPoolAllocator*	getInternalManifoldPool()
+	{
+		return m_persistentManifoldPoolAllocator;
+	}
+
+	virtual	const btPoolAllocator*	getInternalManifoldPool() const
+	{
+		return m_persistentManifoldPoolAllocator;
+	}
+
 };
 
-#endif //COLLISION__DISPATCHER_H
+#endif //BT_COLLISION__DISPATCHER_H
 

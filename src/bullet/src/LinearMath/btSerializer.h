@@ -111,6 +111,7 @@ public:
 #	define MAKE_ID(a,b,c,d) ( (int)(d)<<24 | (int)(c)<<16 | (b)<<8 | (a) )
 #endif
 
+#define BT_SOFTBODY_CODE		MAKE_ID('S','B','D','Y')
 #define BT_COLLISIONOBJECT_CODE MAKE_ID('C','O','B','J')
 #define BT_RIGIDBODY_CODE		MAKE_ID('R','B','D','Y')
 #define BT_CONSTRAINT_CODE		MAKE_ID('C','O','N','S')
@@ -119,8 +120,9 @@ public:
 #define BT_TRIANLGE_INFO_MAP	MAKE_ID('T','M','A','P')
 #define BT_SHAPE_CODE			MAKE_ID('S','H','A','P')
 #define BT_ARRAY_CODE			MAKE_ID('A','R','A','Y')
+#define BT_SBMATERIAL_CODE		MAKE_ID('S','B','M','T')
+#define BT_SBNODE_CODE			MAKE_ID('S','B','N','D')
 #define BT_DNA_CODE				MAKE_ID('D','N','A','1')
-
 
 
 struct	btPointerUid
@@ -132,7 +134,8 @@ struct	btPointerUid
 	};
 };
 
-
+///The btDefaultSerializer is the main Bullet serialization class.
+///The constructor takes an optional argument for backwards compatibility, it is recommended to leave this empty/zero.
 class btDefaultSerializer	:	public btSerializer
 {
 
@@ -371,14 +374,14 @@ public:
 
 	
 
-		btDefaultSerializer(int totalSize)
+		btDefaultSerializer(int totalSize=0)
 			:m_totalSize(totalSize),
 			m_currentSize(0),
 			m_dna(0),
 			m_dnaLength(0),
 			m_serializationFlags(0)
 		{
-			m_buffer = (unsigned char*)btAlignedAlloc(totalSize, 16);
+			m_buffer = m_totalSize?(unsigned char*)btAlignedAlloc(totalSize,16):0;
 			
 			const bool VOID_IS_8 = ((sizeof(void*)==8));
 
@@ -419,16 +422,14 @@ public:
 				btAlignedFree(m_dna);
 		}
 
-		virtual	void	startSerialization()
+		void	writeHeader(unsigned char* buffer) const
 		{
-			m_uniqueIdGenerator= 1;
-
-			m_currentSize = BT_HEADER_LENGTH;
+			
 
 #ifdef  BT_USE_DOUBLE_PRECISION
-			memcpy(m_buffer, "BULLETd", 7);
+			memcpy(buffer, "BULLETd", 7);
 #else
-			memcpy(m_buffer, "BULLETf", 7);
+			memcpy(buffer, "BULLETf", 7);
 #endif //BT_USE_DOUBLE_PRECISION
 	
 			int littleEndian= 1;
@@ -436,25 +437,35 @@ public:
 
 			if (sizeof(void*)==8)
 			{
-				m_buffer[7] = '-';
+				buffer[7] = '-';
 			} else
 			{
-				m_buffer[7] = '_';
+				buffer[7] = '_';
 			}
 
 			if (littleEndian)
 			{
-				m_buffer[8]='v';				
+				buffer[8]='v';				
 			} else
 			{
-				m_buffer[8]='V';
+				buffer[8]='V';
 			}
 
 
-			m_buffer[9] = '2';
-			m_buffer[10] = '7';
-			m_buffer[11] = '7';
+			buffer[9] = '2';
+			buffer[10] = '7';
+			buffer[11] = '8';
 
+		}
+
+		virtual	void	startSerialization()
+		{
+			m_uniqueIdGenerator= 1;
+			if (m_totalSize)
+			{
+				unsigned char* buffer = internalAlloc(BT_HEADER_LENGTH);
+				writeHeader(buffer);
+			}
 			
 		}
 
@@ -462,6 +473,29 @@ public:
 		{
 			writeDNA();
 
+			//if we didn't pre-allocate a buffer, we need to create a contiguous buffer now
+			int mysize = 0;
+			if (!m_totalSize)
+			{
+				if (m_buffer)
+					btAlignedFree(m_buffer);
+
+				m_currentSize += BT_HEADER_LENGTH;
+				m_buffer = (unsigned char*)btAlignedAlloc(m_currentSize,16);
+
+				unsigned char* currentPtr = m_buffer;
+				writeHeader(m_buffer);
+				currentPtr += BT_HEADER_LENGTH;
+				mysize+=BT_HEADER_LENGTH;
+				for (int i=0;i<	m_chunkPtrs.size();i++)
+				{
+					int curLength = sizeof(btChunk)+m_chunkPtrs[i]->m_length;
+					memcpy(currentPtr,m_chunkPtrs[i], curLength);
+					btAlignedFree(m_chunkPtrs[i]);
+					currentPtr+=curLength;
+					mysize+=curLength;
+				}
+			}
 
 			mTypes.clear();
 			mStructs.clear();
@@ -471,6 +505,7 @@ public:
 			m_chunkP.clear();
 			m_nameMap.clear();
 			m_uniquePointers.clear();
+			m_chunkPtrs.clear();
 		}
 
 		virtual	void*	getUniquePointer(void*oldPtr)
@@ -522,15 +557,29 @@ public:
 		}
 
 		
+		virtual unsigned char* internalAlloc(size_t size)
+		{
+			unsigned char* ptr = 0;
+
+			if (m_totalSize)
+			{
+				ptr = m_buffer+m_currentSize;
+				m_currentSize += int(size);
+				btAssert(m_currentSize<m_totalSize);
+			} else
+			{
+				ptr = (unsigned char*)btAlignedAlloc(size,16);
+				m_currentSize += int(size);
+			}
+			return ptr;
+		}
 
 		
 
 		virtual	btChunk*	allocate(size_t size, int numElements)
 		{
 
-			unsigned char* ptr = m_buffer+m_currentSize;
-			m_currentSize += int(size)*numElements+sizeof(btChunk);
-			btAssert(m_currentSize<m_totalSize);
+			unsigned char* ptr = internalAlloc(int(size)*numElements+sizeof(btChunk));
 
 			unsigned char* data = ptr + sizeof(btChunk);
 			

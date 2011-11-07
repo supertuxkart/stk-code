@@ -47,6 +47,8 @@ void btSimulationIslandManager::findUnions(btDispatcher* /* dispatcher */,btColl
 	{
 		btOverlappingPairCache* pairCachePtr = colWorld->getPairCache();
 		const int numOverlappingPairs = pairCachePtr->getNumOverlappingPairs();
+		if (numOverlappingPairs)
+		{
 		btBroadphasePair* pairPtr = pairCachePtr->getOverlappingPairArrayPtr();
 		
 		for (int i=0;i<numOverlappingPairs;i++)
@@ -62,6 +64,7 @@ void btSimulationIslandManager::findUnions(btDispatcher* /* dispatcher */,btColl
 				m_unionFind.unite((colObj0)->getIslandTag(),
 					(colObj1)->getIslandTag());
 			}
+		}
 		}
 	}
 }
@@ -392,15 +395,15 @@ void btSimulationIslandManager::buildAndProcessIslands(btDispatcher* dispatcher,
 			int islandId = getUnionFind().getElement(startIslandIndex).m_id;
 
 
-			   bool islandSleeping = false;
+			   bool islandSleeping = true;
 	                
 					for (endIslandIndex = startIslandIndex;(endIslandIndex<numElem) && (getUnionFind().getElement(endIslandIndex).m_id == islandId);endIslandIndex++)
 					{
 							int i = getUnionFind().getElement(endIslandIndex).m_sz;
 							btCollisionObject* colObj0 = collisionObjects[i];
 							m_islandBodies.push_back(colObj0);
-							if (!colObj0->isActive())
-									islandSleeping = true;
+							if (colObj0->isActive())
+									islandSleeping = false;
 					}
 	                
 

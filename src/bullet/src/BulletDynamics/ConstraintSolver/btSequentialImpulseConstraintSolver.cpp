@@ -48,11 +48,11 @@ btSequentialImpulseConstraintSolver::~btSequentialImpulseConstraintSolver()
 
 #ifdef USE_SIMD
 #include <emmintrin.h>
-#define vec_splat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e,e,e,e))
-static inline __m128 _vmathVfDot3( __m128 vec0, __m128 vec1 )
+#define btVecSplat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e,e,e,e))
+static inline __m128 btSimdDot3( __m128 vec0, __m128 vec1 )
 {
 	__m128 result = _mm_mul_ps( vec0, vec1);
-	return _mm_add_ps( vec_splat( result, 0 ), _mm_add_ps( vec_splat( result, 1 ), vec_splat( result, 2 ) ) );
+	return _mm_add_ps( btVecSplat( result, 0 ), _mm_add_ps( btVecSplat( result, 1 ), btVecSplat( result, 2 ) ) );
 }
 #endif//USE_SIMD
 
@@ -64,8 +64,8 @@ void btSequentialImpulseConstraintSolver::resolveSingleConstraintRowGenericSIMD(
 	__m128	lowerLimit1 = _mm_set1_ps(c.m_lowerLimit);
 	__m128	upperLimit1 = _mm_set1_ps(c.m_upperLimit);
 	__m128 deltaImpulse = _mm_sub_ps(_mm_set1_ps(c.m_rhs), _mm_mul_ps(_mm_set1_ps(c.m_appliedImpulse),_mm_set1_ps(c.m_cfm)));
-	__m128 deltaVel1Dotn	=	_mm_add_ps(_vmathVfDot3(c.m_contactNormal.mVec128,body1.internalGetDeltaLinearVelocity().mVec128), _vmathVfDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetDeltaAngularVelocity().mVec128));
-	__m128 deltaVel2Dotn	=	_mm_sub_ps(_vmathVfDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetDeltaAngularVelocity().mVec128),_vmathVfDot3((c.m_contactNormal).mVec128,body2.internalGetDeltaLinearVelocity().mVec128));
+	__m128 deltaVel1Dotn	=	_mm_add_ps(btSimdDot3(c.m_contactNormal.mVec128,body1.internalGetDeltaLinearVelocity().mVec128), btSimdDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetDeltaAngularVelocity().mVec128));
+	__m128 deltaVel2Dotn	=	_mm_sub_ps(btSimdDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetDeltaAngularVelocity().mVec128),btSimdDot3((c.m_contactNormal).mVec128,body2.internalGetDeltaLinearVelocity().mVec128));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel1Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel2Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	btSimdScalar sum = _mm_add_ps(cpAppliedImp,deltaImpulse);
@@ -127,8 +127,8 @@ void btSequentialImpulseConstraintSolver::resolveSingleConstraintRowGenericSIMD(
 	__m128	lowerLimit1 = _mm_set1_ps(c.m_lowerLimit);
 	__m128	upperLimit1 = _mm_set1_ps(c.m_upperLimit);
 	__m128 deltaImpulse = _mm_sub_ps(_mm_set1_ps(c.m_rhs), _mm_mul_ps(_mm_set1_ps(c.m_appliedImpulse),_mm_set1_ps(c.m_cfm)));
-	__m128 deltaVel1Dotn	=	_mm_add_ps(_vmathVfDot3(c.m_contactNormal.mVec128,body1.internalGetDeltaLinearVelocity().mVec128), _vmathVfDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetDeltaAngularVelocity().mVec128));
-	__m128 deltaVel2Dotn	=	_mm_sub_ps(_vmathVfDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetDeltaAngularVelocity().mVec128),_vmathVfDot3((c.m_contactNormal).mVec128,body2.internalGetDeltaLinearVelocity().mVec128));
+	__m128 deltaVel1Dotn	=	_mm_add_ps(btSimdDot3(c.m_contactNormal.mVec128,body1.internalGetDeltaLinearVelocity().mVec128), btSimdDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetDeltaAngularVelocity().mVec128));
+	__m128 deltaVel2Dotn	=	_mm_sub_ps(btSimdDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetDeltaAngularVelocity().mVec128),btSimdDot3((c.m_contactNormal).mVec128,body2.internalGetDeltaLinearVelocity().mVec128));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel1Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel2Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	btSimdScalar sum = _mm_add_ps(cpAppliedImp,deltaImpulse);
@@ -215,8 +215,8 @@ void	btSequentialImpulseConstraintSolver::resolveSplitPenetrationImpulseCacheFri
 	__m128	lowerLimit1 = _mm_set1_ps(c.m_lowerLimit);
 	__m128	upperLimit1 = _mm_set1_ps(c.m_upperLimit);
 	__m128 deltaImpulse = _mm_sub_ps(_mm_set1_ps(c.m_rhsPenetration), _mm_mul_ps(_mm_set1_ps(c.m_appliedPushImpulse),_mm_set1_ps(c.m_cfm)));
-	__m128 deltaVel1Dotn	=	_mm_add_ps(_vmathVfDot3(c.m_contactNormal.mVec128,body1.internalGetPushVelocity().mVec128), _vmathVfDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetTurnVelocity().mVec128));
-	__m128 deltaVel2Dotn	=	_mm_sub_ps(_vmathVfDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetTurnVelocity().mVec128),_vmathVfDot3((c.m_contactNormal).mVec128,body2.internalGetPushVelocity().mVec128));
+	__m128 deltaVel1Dotn	=	_mm_add_ps(btSimdDot3(c.m_contactNormal.mVec128,body1.internalGetPushVelocity().mVec128), btSimdDot3(c.m_relpos1CrossNormal.mVec128,body1.internalGetTurnVelocity().mVec128));
+	__m128 deltaVel2Dotn	=	_mm_sub_ps(btSimdDot3(c.m_relpos2CrossNormal.mVec128,body2.internalGetTurnVelocity().mVec128),btSimdDot3((c.m_contactNormal).mVec128,body2.internalGetPushVelocity().mVec128));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel1Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	deltaImpulse	=	_mm_sub_ps(deltaImpulse,_mm_mul_ps(deltaVel2Dotn,_mm_set1_ps(c.m_jacDiagABInv)));
 	btSimdScalar sum = _mm_add_ps(cpAppliedImp,deltaImpulse);
@@ -557,8 +557,17 @@ void btSequentialImpulseConstraintSolver::setupContactConstraint(btSolverConstra
 					rel_vel = vel1Dotn+vel2Dotn;
 
 					btScalar positionalError = 0.f;
-					positionalError = -penetration * infoGlobal.m_erp/infoGlobal.m_timeStep;
 					btScalar	velocityError = restitution - rel_vel;// * damping;
+
+					if (penetration>0)
+					{
+						positionalError = 0;
+						velocityError -= penetration / infoGlobal.m_timeStep;
+					} else
+					{
+						positionalError = -penetration * infoGlobal.m_erp/infoGlobal.m_timeStep;
+					}
+
 					btScalar  penetrationImpulse = positionalError*solverConstraint.m_jacDiagABInv;
 					btScalar velocityImpulse = velocityError *solverConstraint.m_jacDiagABInv;
 					if (!infoGlobal.m_splitImpulse || (penetration > infoGlobal.m_splitImpulsePenetrationThreshold))
@@ -779,6 +788,7 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 		{
 			btTypedConstraint* constraint = constraints[j];
 			constraint->buildJacobian();
+			constraint->internalSetAppliedImpulse(0.0f);
 		}
 	}
 	//btRigidBody* rb0=0,*rb1=0;
@@ -795,7 +805,14 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 			for (i=0;i<numConstraints;i++)
 			{
 				btTypedConstraint::btConstraintInfo1& info1 = m_tmpConstraintSizesPool[i];
-				constraints[i]->getInfo1(&info1);
+				if (constraints[i]->isEnabled())
+				{
+					constraints[i]->getInfo1(&info1);
+				} else
+				{
+					info1.m_numConstraintRows = 0;
+					info1.nub = 0;
+				}
 				totalNumRows += info1.m_numConstraintRows;
 			}
 			m_tmpSolverNonContactConstraintPool.resize(totalNumRows);
@@ -816,7 +833,6 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 					btTypedConstraint* constraint = constraints[i];
 
 
-
 					btRigidBody& rbA = constraint->getRigidBodyA();
 					btRigidBody& rbB = constraint->getRigidBodyB();
 
@@ -825,8 +841,8 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 					for ( j=0;j<info1.m_numConstraintRows;j++)
 					{
 						memset(&currentConstraintRow[j],0,sizeof(btSolverConstraint));
-						currentConstraintRow[j].m_lowerLimit = -FLT_MAX;
-						currentConstraintRow[j].m_upperLimit = FLT_MAX;
+						currentConstraintRow[j].m_lowerLimit = -SIMD_INFINITY;
+						currentConstraintRow[j].m_upperLimit = SIMD_INFINITY;
 						currentConstraintRow[j].m_appliedImpulse = 0.f;
 						currentConstraintRow[j].m_appliedPushImpulse = 0.f;
 						currentConstraintRow[j].m_solverBodyA = &rbA;
@@ -863,6 +879,17 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 					for ( j=0;j<info1.m_numConstraintRows;j++)
 					{
 						btSolverConstraint& solverConstraint = currentConstraintRow[j];
+
+						if (solverConstraint.m_upperLimit>=constraints[i]->getBreakingImpulseThreshold())
+						{
+							solverConstraint.m_upperLimit = constraints[i]->getBreakingImpulseThreshold();
+						}
+
+						if (solverConstraint.m_lowerLimit<=-constraints[i]->getBreakingImpulseThreshold())
+						{
+							solverConstraint.m_lowerLimit = -constraints[i]->getBreakingImpulseThreshold();
+						}
+
 						solverConstraint.m_originalContactPoint = constraint;
 
 						{
@@ -1106,12 +1133,13 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlyIterations(
 	//should traverse the contacts random order...
 	int iteration;
 	{
+		solveGroupCacheFriendlySplitImpulseIterations(bodies ,numBodies,manifoldPtr, numManifolds,constraints,numConstraints,infoGlobal,debugDrawer,stackAlloc);
+
 		for ( iteration = 0;iteration<infoGlobal.m_numIterations;iteration++)
 		{			
 			solveSingleIteration(iteration, bodies ,numBodies,manifoldPtr, numManifolds,constraints,numConstraints,infoGlobal,debugDrawer,stackAlloc);
 		}
 		
-		solveGroupCacheFriendlySplitImpulseIterations(bodies ,numBodies,manifoldPtr, numManifolds,constraints,numConstraints,infoGlobal,debugDrawer,stackAlloc);
 	}
 	return 0.f;
 }
@@ -1142,9 +1170,11 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlyFinish(btCo
 	{
 		const btSolverConstraint& solverConstr = m_tmpSolverNonContactConstraintPool[j];
 		btTypedConstraint* constr = (btTypedConstraint*)solverConstr.m_originalContactPoint;
-		btScalar sum = constr->internalGetAppliedImpulse();
-		sum += solverConstr.m_appliedImpulse;
-		constr->internalSetAppliedImpulse(sum);
+		constr->internalSetAppliedImpulse(solverConstr.m_appliedImpulse);
+		if (btFabs(solverConstr.m_appliedImpulse)>=constr->getBreakingImpulseThreshold())
+		{
+			constr->setEnabled(false);
+		}
 	}
 
 

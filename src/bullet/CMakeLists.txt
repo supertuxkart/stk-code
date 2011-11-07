@@ -10,9 +10,11 @@ add_library(bulletmath
 	src/LinearMath/btAlignedObjectArray.h  src/LinearMath/btQuaternion.h
 	src/LinearMath/btConvexHull.cpp        src/LinearMath/btQuickprof.cpp
 	src/LinearMath/btConvexHull.h          src/LinearMath/btQuickprof.h
+	src/LinearMath/btConvexHullComputer.h  src/LinearMath/btConvexHullComputer.cpp
 	src/LinearMath/btDefaultMotionState.h  src/LinearMath/btRandom.h
 	src/LinearMath/btGeometryUtil.cpp      src/LinearMath/btScalar.h
 	src/LinearMath/btGeometryUtil.h        src/LinearMath/btSerializer.cpp
+        src/LinearMath/btGrahamScan2dConvexHull.h
 	src/LinearMath/btHashMap.h             src/LinearMath/btSerializer.h
 	src/LinearMath/btIDebugDraw.h          src/LinearMath/btStackAlloc.h
 	src/LinearMath/btList.h                src/LinearMath/btTransform.h
@@ -126,6 +128,8 @@ add_library(bulletcollision
 	src/BulletCollision/CollisionShapes/btConvexInternalShape.h
 	src/BulletCollision/CollisionShapes/btConvexPointCloudShape.cpp
 	src/BulletCollision/CollisionShapes/btConvexPointCloudShape.h
+	src/BulletCollision/CollisionShapes/btConvexPolyhedron.cpp
+	src/BulletCollision/CollisionShapes/btConvexPolyhedron.h
 	src/BulletCollision/CollisionShapes/btConvexShape.cpp
 	src/BulletCollision/CollisionShapes/btConvexShape.h
 	src/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.cpp
@@ -233,6 +237,8 @@ add_library(bulletcollision
 	src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp
 	src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h
 	src/BulletCollision/NarrowPhaseCollision/btPointCollector.h
+	src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp
+	src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.h
 	src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp
 	src/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h
 	src/BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h
@@ -272,8 +278,6 @@ add_library(bulletdynamics
 	src/BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h
 	src/BulletDynamics/ConstraintSolver/btSolverBody.h
 	src/BulletDynamics/ConstraintSolver/btSolverConstraint.h
-	src/BulletDynamics/ConstraintSolver/btSorLcp.cpp
-	src/BulletDynamics/ConstraintSolver/btSorLcp.h
 	src/BulletDynamics/ConstraintSolver/btTypedConstraint.cpp
 	src/BulletDynamics/ConstraintSolver/btTypedConstraint.h
 	src/BulletDynamics/ConstraintSolver/btUniversalConstraint.cpp

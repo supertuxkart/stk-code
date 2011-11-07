@@ -7,13 +7,14 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btMinMax.h	 		LinearMath/btScalar.h		 \
 	LinearMath/btAlignedObjectArray.h	LinearMath/btMotionState.h	 \
 	LinearMath/btPoolAllocator.h		LinearMath/btDefaultMotionState.h\
-		 		LinearMath/btStackAlloc.h	 \
+	LinearMath/btStackAlloc.h	  	LinearMath/btGrahamScan2dConvexHull.h \
 	LinearMath/btGeometryUtil.cpp		LinearMath/btQuadWord.h		 \
 	LinearMath/btTransform.h 		LinearMath/btGeometryUtil.h	 \
 	LinearMath/btQuaternion.h		LinearMath/btTransformUtil.h	 \
 	LinearMath/btIDebugDraw.h		LinearMath/btQuickprof.cpp  	 \
 	LinearMath/btVector3.h			LinearMath/btHashMap.h		 \
 	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h        \
+	LinearMath/btConvexHullComputer.cpp	LinearMath/btConvexHullComputer.h \
         LinearMath/btSerializer.cpp             LinearMath/btSerializer.h
 
 
@@ -116,6 +117,8 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/CollisionShapes/btConvexHullShape.h			 \
 	BulletCollision/CollisionShapes/btConvexInternalShape.cpp		 \
 	BulletCollision/CollisionShapes/btConvexInternalShape.h			 \
+	BulletCollision/CollisionShapes/btConvexPolyhedron.cpp			 \
+	BulletCollision/CollisionShapes/btConvexPolyhedron.h			 \
 	BulletCollision/CollisionShapes/btConvexShape.cpp			 \
 	BulletCollision/CollisionShapes/btConvexShape.h			 	 \
 	BulletCollision/CollisionShapes/btConvexTriangleMeshShape.cpp		 \
@@ -229,6 +232,8 @@ libbulletcollision_a_SOURCES = \
 	BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp		 \
 	BulletCollision/NarrowPhaseCollision/btPersistentManifold.h		 \
 	BulletCollision/NarrowPhaseCollision/btPointCollector.h			 \
+	BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp     \
+	BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.h       \
 	BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp		 \
 	BulletCollision/NarrowPhaseCollision/btRaycastCallback.h		 \
 	BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h		 \
@@ -264,8 +269,6 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h		 \
 	BulletDynamics/ConstraintSolver/btSolverBody.h				 \
 	BulletDynamics/ConstraintSolver/btSolverConstraint.h			 \
-        BulletDynamics/ConstraintSolver/btSorLcp.cpp                             \
-        BulletDynamics/ConstraintSolver/btSorLcp.h                               \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.h			 \
         BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.cpp        \

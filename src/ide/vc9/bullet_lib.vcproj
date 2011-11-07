@@ -429,6 +429,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexPolyhedron.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexShape.cpp"
 						>
 					</File>
@@ -554,6 +558,10 @@
 					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletCollision\NarrowPhaseCollision\btPersistentManifold.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\NarrowPhaseCollision\btPolyhedralContactClipping.cpp"
 						>
 					</File>
 					<File
@@ -730,6 +738,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\bullet\src\LinearMath\btConvexHullComputer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\bullet\src\LinearMath\btGeometryUtil.cpp"
 					>
 				</File>
@@ -768,11 +780,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\bullet\src\LinearMath\btConvexHull.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
+					RelativePath="..\..\bullet\src\LinearMath\btConvexHullComputer.h"
 					>
 				</File>
 				<File
@@ -781,6 +797,10 @@
 				</File>
 				<File
 					RelativePath="..\..\bullet\src\LinearMath\btGeometryUtil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\bullet\src\LinearMath\btGrahamScan2dConvexHull.h"
 					>
 				</File>
 				<File
@@ -1075,6 +1095,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexPolyhedron.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexShape.h"
 						>
 					</File>
@@ -1228,6 +1252,10 @@
 					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletCollision\NarrowPhaseCollision\btPointCollector.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\NarrowPhaseCollision\btPolyhedralContactClipping.h"
 						>
 					</File>
 					<File

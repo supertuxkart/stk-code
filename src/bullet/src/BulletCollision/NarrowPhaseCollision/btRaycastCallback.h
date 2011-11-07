@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef RAYCAST_TRI_CALLBACK_H
-#define RAYCAST_TRI_CALLBACK_H
+#ifndef BT_RAYCAST_TRI_CALLBACK_H
+#define BT_RAYCAST_TRI_CALLBACK_H
 
 #include "BulletCollision/CollisionShapes/btTriangleCallback.h"
 #include "LinearMath/btTransform.h"
@@ -58,7 +58,8 @@ public:
 	btTransform m_convexShapeTo;
 	btTransform m_triangleToWorld;
 	btScalar m_hitFraction;
-    btScalar m_triangleCollisionMargin;
+	btScalar m_triangleCollisionMargin;
+	btScalar m_allowedPenetration;
 
 	btTriangleConvexcastCallback (const btConvexShape* convexShape, const btTransform& convexShapeFrom, const btTransform& convexShapeTo, const btTransform& triangleToWorld, const btScalar triangleCollisionMargin);
 
@@ -67,5 +68,5 @@ public:
 	virtual btScalar reportHit (const btVector3& hitNormalLocal, const btVector3& hitPointLocal, btScalar hitFraction, int partId, int triangleIndex) = 0;
 };
 
-#endif //RAYCAST_TRI_CALLBACK_H
+#endif //BT_RAYCAST_TRI_CALLBACK_H
 

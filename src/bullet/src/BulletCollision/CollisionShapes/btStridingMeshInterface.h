@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef STRIDING_MESHINTERFACE_H
-#define STRIDING_MESHINTERFACE_H
+#ifndef BT_STRIDING_MESHINTERFACE_H
+#define BT_STRIDING_MESHINTERFACE_H
 
 #include "LinearMath/btVector3.h"
 #include "btTriangleCallback.h"
@@ -116,6 +116,13 @@ struct	btShortIntIndexTripletData
 	char	m_pad[2];
 };
 
+struct	btCharIndexTripletData
+{
+	unsigned char m_values[3];
+	char	m_pad;
+};
+
+
 ///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
 struct	btMeshPartData
 {
@@ -124,6 +131,7 @@ struct	btMeshPartData
 
 	btIntIndexData				*m_indices32;
 	btShortIntIndexTripletData	*m_3indices16;
+	btCharIndexTripletData		*m_3indices8;
 
 	btShortIntIndexData			*m_indices16;//backwards compatibility
 
@@ -151,4 +159,4 @@ SIMD_FORCE_INLINE	int	btStridingMeshInterface::calculateSerializeBufferSize() co
 
 
 
-#endif //STRIDING_MESHINTERFACE_H
+#endif //BT_STRIDING_MESHINTERFACE_H

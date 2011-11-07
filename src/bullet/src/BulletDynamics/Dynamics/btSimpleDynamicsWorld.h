@@ -23,7 +23,7 @@ class btOverlappingPairCache;
 class btConstraintSolver;
 
 ///The btSimpleDynamicsWorld serves as unit-test and to verify more complicated and optimized dynamics worlds.
-///Please use btDiscreteDynamicsWorld instead (or btContinuousDynamicsWorld once it is finished).
+///Please use btDiscreteDynamicsWorld instead
 class btSimpleDynamicsWorld : public btDynamicsWorld
 {
 protected:
@@ -56,7 +56,15 @@ public:
 
 	virtual void	addRigidBody(btRigidBody* body);
 
+	virtual void	addRigidBody(btRigidBody* body, short group, short mask);
+
 	virtual void	removeRigidBody(btRigidBody* body);
+
+	virtual void	debugDrawWorld();
+				
+	virtual void	addAction(btActionInterface* action);
+
+	virtual void	removeAction(btActionInterface* action);
 
 	///removeCollisionObject will first check if it is a rigid body, if so call removeRigidBody otherwise call btCollisionWorld::removeCollisionObject
 	virtual void	removeCollisionObject(btCollisionObject* collisionObject);

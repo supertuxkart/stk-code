@@ -14,8 +14,8 @@ subject to the following restrictions:
 
 
 
-#ifndef SIMD___SCALAR_H
-#define SIMD___SCALAR_H
+#ifndef BT_SCALAR_H
+#define BT_SCALAR_H
 
 #ifdef BT_MANAGED_CODE
 //Aligned data types not supported in managed code
@@ -25,12 +25,10 @@ subject to the following restrictions:
 
 #include <math.h>
 #include <stdlib.h>//size_t for MSVC 6.0
-#include <cstdlib>
-#include <cfloat>
 #include <float.h>
 
 /* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
-#define BT_BULLET_VERSION 277
+#define BT_BULLET_VERSION 279
 
 inline int	btGetVersion()
 {
@@ -528,4 +526,4 @@ struct btTypedObject
 		return m_objectType;
 	}
 };
-#endif //SIMD___SCALAR_H
+#endif //BT_SCALAR_H

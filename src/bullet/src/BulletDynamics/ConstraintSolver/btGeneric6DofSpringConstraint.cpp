@@ -21,6 +21,8 @@ subject to the following restrictions:
 btGeneric6DofSpringConstraint::btGeneric6DofSpringConstraint(btRigidBody& rbA, btRigidBody& rbB, const btTransform& frameInA, const btTransform& frameInB ,bool useLinearReferenceFrameA)
 	: btGeneric6DofConstraint(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA)
 {
+	m_objectType = D6_SPRING_CONSTRAINT_TYPE;
+
 	for(int i = 0; i < 6; i++)
 	{
 		m_springEnabled[i] = false;
@@ -146,6 +148,25 @@ void btGeneric6DofSpringConstraint::getInfo2(btConstraintInfo2* info)
 	btGeneric6DofConstraint::getInfo2(info);
 }
 
+
+void btGeneric6DofSpringConstraint::setAxis(const btVector3& axis1,const btVector3& axis2)
+{
+	btVector3 zAxis = axis1.normalized();
+	btVector3 yAxis = axis2.normalized();
+	btVector3 xAxis = yAxis.cross(zAxis); // we want right coordinate system
+
+	btTransform frameInW;
+	frameInW.setIdentity();
+	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],	
+                                xAxis[1], yAxis[1], zAxis[1],
+                                xAxis[2], yAxis[2], zAxis[2]);
+
+	// now get constraint frame in local coordinate systems
+	m_frameInA = m_rbA.getCenterOfMassTransform().inverse() * frameInW;
+	m_frameInB = m_rbB.getCenterOfMassTransform().inverse() * frameInW;
+
+  calculateTransforms();
+}
 
 
 

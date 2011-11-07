@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef PERSISTENT_MANIFOLD_H
-#define PERSISTENT_MANIFOLD_H
+#ifndef BT_PERSISTENT_MANIFOLD_H
+#define BT_PERSISTENT_MANIFOLD_H
 
 
 #include "LinearMath/btVector3.h"
@@ -32,11 +32,11 @@ typedef bool (*ContactProcessedCallback)(btManifoldPoint& cp,void* body0,void* b
 extern ContactDestroyedCallback	gContactDestroyedCallback;
 extern ContactProcessedCallback gContactProcessedCallback;
 
-
+//the enum starts at 1024 to avoid type conflicts with btTypedConstraint
 enum btContactManifoldTypes
 {
-	BT_PERSISTENT_MANIFOLD_TYPE = 1,
-	MAX_CONTACT_MANIFOLD_TYPE
+	MIN_CONTACT_MANIFOLD_TYPE = 1024,
+	BT_PERSISTENT_MANIFOLD_TYPE
 };
 
 #define MANIFOLD_CACHE_SIZE 4
@@ -146,9 +146,9 @@ public:
 			m_pointCache[index] = m_pointCache[lastUsedIndex]; 
 			//get rid of duplicated userPersistentData pointer
 			m_pointCache[lastUsedIndex].m_userPersistentData = 0;
-			m_pointCache[lastUsedIndex].mConstraintRow[0].mAccumImpulse = 0.f;
-			m_pointCache[lastUsedIndex].mConstraintRow[1].mAccumImpulse = 0.f;
-			m_pointCache[lastUsedIndex].mConstraintRow[2].mAccumImpulse = 0.f;
+			m_pointCache[lastUsedIndex].mConstraintRow[0].m_accumImpulse = 0.f;
+			m_pointCache[lastUsedIndex].mConstraintRow[1].m_accumImpulse = 0.f;
+			m_pointCache[lastUsedIndex].mConstraintRow[2].m_accumImpulse = 0.f;
 
 			m_pointCache[lastUsedIndex].m_appliedImpulse = 0.f;
 			m_pointCache[lastUsedIndex].m_lateralFrictionInitialized = false;
@@ -167,9 +167,9 @@ public:
 #define MAINTAIN_PERSISTENCY 1
 #ifdef MAINTAIN_PERSISTENCY
 		int	lifeTime = m_pointCache[insertIndex].getLifeTime();
-		btScalar	appliedImpulse = m_pointCache[insertIndex].mConstraintRow[0].mAccumImpulse;
-		btScalar	appliedLateralImpulse1 = m_pointCache[insertIndex].mConstraintRow[1].mAccumImpulse;
-		btScalar	appliedLateralImpulse2 = m_pointCache[insertIndex].mConstraintRow[2].mAccumImpulse;
+		btScalar	appliedImpulse = m_pointCache[insertIndex].mConstraintRow[0].m_accumImpulse;
+		btScalar	appliedLateralImpulse1 = m_pointCache[insertIndex].mConstraintRow[1].m_accumImpulse;
+		btScalar	appliedLateralImpulse2 = m_pointCache[insertIndex].mConstraintRow[2].m_accumImpulse;
 //		bool isLateralFrictionInitialized = m_pointCache[insertIndex].m_lateralFrictionInitialized;
 		
 		
@@ -184,9 +184,9 @@ public:
 		m_pointCache[insertIndex].m_appliedImpulseLateral1 = appliedLateralImpulse1;
 		m_pointCache[insertIndex].m_appliedImpulseLateral2 = appliedLateralImpulse2;
 		
-		m_pointCache[insertIndex].mConstraintRow[0].mAccumImpulse =  appliedImpulse;
-		m_pointCache[insertIndex].mConstraintRow[1].mAccumImpulse = appliedLateralImpulse1;
-		m_pointCache[insertIndex].mConstraintRow[2].mAccumImpulse = appliedLateralImpulse2;
+		m_pointCache[insertIndex].mConstraintRow[0].m_accumImpulse =  appliedImpulse;
+		m_pointCache[insertIndex].mConstraintRow[1].m_accumImpulse = appliedLateralImpulse1;
+		m_pointCache[insertIndex].mConstraintRow[2].m_accumImpulse = appliedLateralImpulse2;
 
 
 		m_pointCache[insertIndex].m_lifeTime = lifeTime;
@@ -197,6 +197,7 @@ public:
 #endif
 	}
 
+	
 	bool validContactDistance(const btManifoldPoint& pt) const
 	{
 		return pt.m_distance1 <= getContactBreakingThreshold();
@@ -224,4 +225,4 @@ public:
 
 
 
-#endif //PERSISTENT_MANIFOLD_H
+#endif //BT_PERSISTENT_MANIFOLD_H

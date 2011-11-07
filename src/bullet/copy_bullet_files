@@ -44,9 +44,3 @@ echo "1) btDiscreteDynamicsWorld.cpp:
         }
 "
 
-echo "2) btRaycastVehicle.cpp
-      From:
-                    rel_pos[2] *= wheelInfo.m_rollInfluence;
-      to
-                    rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
-"

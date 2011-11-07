@@ -51,8 +51,8 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 	m_gravity_acceleration.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalForce.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalTorque.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0)),
-	m_linearDamping = btScalar(0.);
-	m_angularDamping = btScalar(0.5);
+    setDamping(constructionInfo.m_linearDamping, constructionInfo.m_angularDamping);
+
 	m_linearSleepingThreshold = constructionInfo.m_linearSleepingThreshold;
 	m_angularSleepingThreshold = constructionInfo.m_angularSleepingThreshold;
 	m_optionalMotionState = constructionInfo.m_motionState;
@@ -84,7 +84,6 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 	m_debugBodyId = uniqueId++;
 	
 	setMassProps(constructionInfo.m_mass, constructionInfo.m_localInertia);
-    setDamping(constructionInfo.m_linearDamping, constructionInfo.m_angularDamping);
 	updateInertiaTensor();
 
 	m_rigidbodyFlags = 0;
@@ -133,11 +132,7 @@ void	btRigidBody::getAabb(btVector3& aabbMin,btVector3& aabbMax) const
 
 
 void btRigidBody::setGravity(const btVector3& acceleration) 
-
 {
-    btAssert(!isnan(acceleration.getX()));
-    btAssert(!isnan(acceleration.getY()));
-    btAssert(!isnan(acceleration.getZ()));
 	if (m_inverseMass != btScalar(0.0))
 	{
 		m_gravity = acceleration * (btScalar(1.0) / m_inverseMass);
@@ -152,8 +147,6 @@ void btRigidBody::setGravity(const btVector3& acceleration)
 
 void btRigidBody::setDamping(btScalar lin_damping, btScalar ang_damping)
 {
-    btAssert(!isnan(lin_damping));
-    btAssert(!isnan(lin_damping));
 	m_linearDamping = btClamped(lin_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
 	m_angularDamping = btClamped(ang_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
 }
@@ -292,14 +285,6 @@ btQuaternion btRigidBody::getOrientation() const
 	
 void btRigidBody::setCenterOfMassTransform(const btTransform& xform)
 {
-
-    btAssert(!isnan(xform.getOrigin().getX()));
-    btAssert(!isnan(xform.getOrigin().getY()));
-    btAssert(!isnan(xform.getOrigin().getZ()));
-    btAssert(!isnan(xform.getRotation().getX()));
-    btAssert(!isnan(xform.getRotation().getY()));
-    btAssert(!isnan(xform.getRotation().getZ()));
-    btAssert(!isnan(xform.getRotation().getW()));
 
 	if (isStaticOrKinematicObject())
 	{

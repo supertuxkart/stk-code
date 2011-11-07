@@ -24,8 +24,8 @@ http://gimpact.sf.net
 */
 
 
-#ifndef GENERIC_6DOF_CONSTRAINT_H
-#define GENERIC_6DOF_CONSTRAINT_H
+#ifndef BT_GENERIC_6DOF_CONSTRAINT_H
+#define BT_GENERIC_6DOF_CONSTRAINT_H
 
 #include "LinearMath/btVector3.h"
 #include "btJacobianEntry.h"
@@ -433,6 +433,7 @@ public:
 	*/
 	btScalar getRelativePivotPosition(int axis_index) const;
 
+	void setFrames(const btTransform & frameA, const btTransform & frameB);
 
 	//! Test angular limit.
 	/*!
@@ -446,10 +447,20 @@ public:
     	m_linearLimits.m_lowerLimit = linearLower;
     }
 
-    void	setLinearUpperLimit(const btVector3& linearUpper)
-    {
-    	m_linearLimits.m_upperLimit = linearUpper;
-    }
+	void	getLinearLowerLimit(btVector3& linearLower)
+	{
+		linearLower = m_linearLimits.m_lowerLimit;
+	}
+
+	void	setLinearUpperLimit(const btVector3& linearUpper)
+	{
+		m_linearLimits.m_upperLimit = linearUpper;
+	}
+
+	void	getLinearUpperLimit(btVector3& linearUpper)
+	{
+		linearUpper = m_linearLimits.m_upperLimit;
+	}
 
     void	setAngularLowerLimit(const btVector3& angularLower)
     {
@@ -457,11 +468,23 @@ public:
 			m_angularLimits[i].m_loLimit = btNormalizeAngle(angularLower[i]);
     }
 
+	void	getAngularLowerLimit(btVector3& angularLower)
+	{
+		for(int i = 0; i < 3; i++) 
+			angularLower[i] = m_angularLimits[i].m_loLimit;
+	}
+
     void	setAngularUpperLimit(const btVector3& angularUpper)
     {
 		for(int i = 0; i < 3; i++)
 			m_angularLimits[i].m_hiLimit = btNormalizeAngle(angularUpper[i]);
     }
+
+	void	getAngularUpperLimit(btVector3& angularUpper)
+	{
+		for(int i = 0; i < 3; i++)
+			angularUpper[i] = m_angularLimits[i].m_hiLimit;
+	}
 
 	//! Retrieves the angular limit informacion
     btRotationalLimitMotor * getRotationalLimitMotor(int index)
@@ -525,6 +548,9 @@ public:
 	///return the local value of parameter
 	virtual	btScalar getParam(int num, int axis = -1) const;
 
+	void setAxis( const btVector3& axis1, const btVector3& axis2);
+
+
 	virtual	int	calculateSerializeBufferSize() const;
 
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
@@ -585,4 +611,4 @@ SIMD_FORCE_INLINE	const char*	btGeneric6DofConstraint::serialize(void* dataBuffe
 
 
 
-#endif //GENERIC_6DOF_CONSTRAINT_H
+#endif //BT_GENERIC_6DOF_CONSTRAINT_H

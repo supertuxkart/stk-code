@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef COLLISION_ALGORITHM_H
-#define COLLISION_ALGORITHM_H
+#ifndef BT_COLLISION_ALGORITHM_H
+#define BT_COLLISION_ALGORITHM_H
 
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btAlignedObjectArray.h"
@@ -44,7 +44,7 @@ struct btCollisionAlgorithmConstructionInfo
 	btDispatcher*	m_dispatcher1;
 	btPersistentManifold*	m_manifold;
 
-	int	getDispatcherId();
+//	int	getDispatcherId();
 
 };
 
@@ -59,7 +59,7 @@ protected:
 	btDispatcher*	m_dispatcher;
 
 protected:
-	int	getDispatcherId();
+//	int	getDispatcherId();
 	
 public:
 
@@ -77,4 +77,4 @@ public:
 };
 
 
-#endif //COLLISION_ALGORITHM_H
+#endif //BT_COLLISION_ALGORITHM_H

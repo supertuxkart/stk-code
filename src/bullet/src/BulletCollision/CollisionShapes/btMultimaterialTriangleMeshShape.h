@@ -15,8 +15,8 @@ subject to the following restrictions:
 
 /// This file was created by Alex Silverman
 
-#ifndef BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
-#define BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
+#ifndef BT_BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
+#define BT_BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
 
 #include "btBvhTriangleMeshShape.h"
 #include "btMaterial.h"
@@ -31,7 +31,6 @@ public:
 
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-    btMultimaterialTriangleMeshShape(): btBvhTriangleMeshShape() {m_shapeType = MULTIMATERIAL_TRIANGLE_MESH_PROXYTYPE;}
     btMultimaterialTriangleMeshShape(btStridingMeshInterface* meshInterface, bool useQuantizedAabbCompression, bool buildBvh = true):
         btBvhTriangleMeshShape(meshInterface, useQuantizedAabbCompression, buildBvh)
         {
@@ -118,4 +117,4 @@ public:
 }
 ;
 
-#endif //BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
+#endif //BT_BVH_TRIANGLE_MATERIAL_MESH_SHAPE_H
