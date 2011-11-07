@@ -16,6 +16,13 @@ subject to the following restrictions:
 #ifndef BT_COLLISION_OBJECT_H
 #define BT_COLLISION_OBJECT_H
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define isnan _isnan
+#  define isinf(x) (!_finite(x))
+#else
+#  include <math.h>
+#endif
+
 #include "LinearMath/btTransform.h"
 
 //island management, m_activationState1
@@ -294,6 +301,12 @@ public:
 
 	void	setWorldTransform(const btTransform& worldTrans)
 	{
+        btAssert(!isnan(worldTrans.getOrigin().getX()));
+        btAssert(!isnan(worldTrans.getOrigin().getY()));
+        btAssert(!isnan(worldTrans.getOrigin().getZ()));
+        btAssert(!isinf(worldTrans.getOrigin().getX()));
+        btAssert(!isinf(worldTrans.getOrigin().getY()));
+        btAssert(!isinf(worldTrans.getOrigin().getZ()));
 		m_worldTransform = worldTrans;
 	}
 
