@@ -1,7 +1,7 @@
 LOCATION=$1
 cp $LOCATION/AUTHORS .
 cp $LOCATION/BulletLicense.txt .
-cp $LOCATION/ChangeLog.txt .
+cp $LOCATION/ChangeLog .
 cp $LOCATION/LICENSE .
 cp $LOCATION/README .
 cp $LOCATION/VERSION .
