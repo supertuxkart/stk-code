@@ -20,6 +20,15 @@
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
+#ifdef _MSC_VER
+  typedef __int32          int32_t;
+  typedef unsigned __int32 uint32_t;
+  typedef __int64          int64_t;
+  typedef unsigned __int64 uint64_t;
+#else
+#  include <stdint.h>
+#endif
+
 #include <string>
 #include <map>
 #include <vector>
@@ -71,12 +80,9 @@ public:
     unsigned int       getNumNodes() const {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
-    int get(const std::string &attribute, int *value) const;
-    int get(const std::string &attribute, unsigned int *value) const;
-#ifndef FREEBSD
-    // FreeBSD has time_t same as int
-    int get(const std::string &attribute, Time::TimeType *value) const;
-#endif
+    int get(const std::string &attribute, int32_t  *value) const;
+    int get(const std::string &attribute, uint32_t *value) const;
+    int get(const std::string &attribute, int64_t  *value) const;
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;

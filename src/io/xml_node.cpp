@@ -287,7 +287,7 @@ int XMLNode::get(const std::string &attribute, video::SColorf *color) const
     return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------
-int XMLNode::get(const std::string &attribute, int *value) const
+int XMLNode::get(const std::string &attribute, int32_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
@@ -300,15 +300,15 @@ int XMLNode::get(const std::string &attribute, int *value) const
     }
     
     return 1;
-}   // get(int)
+}   // get(int32_t)
 
 // ----------------------------------------------------------------------------
-int XMLNode::get(const std::string &attribute, Time::TimeType *value) const
+int XMLNode::get(const std::string &attribute, int64_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
 
-    if (!StringUtils::parseString<Time::TimeType>(s, value))
+    if (!StringUtils::parseString<int64_t>(s, value))
     {
         fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s\n",
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
@@ -316,10 +316,11 @@ int XMLNode::get(const std::string &attribute, Time::TimeType *value) const
     }
     
     return 1;
-}   // get(TimeType)
+}   // get(int64_t)
+
 
 // ----------------------------------------------------------------------------
-int XMLNode::get(const std::string &attribute, unsigned int *value) const
+int XMLNode::get(const std::string &attribute, uint32_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
@@ -332,7 +333,7 @@ int XMLNode::get(const std::string &attribute, unsigned int *value) const
     }
     
     return 1;
-}   // get(unsigned int)
+}   // get(uint32_t)
 
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, float *value) const
