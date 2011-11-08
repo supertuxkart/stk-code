@@ -84,6 +84,11 @@ void RaceResultGUI::enableAllButtons()
     GUIEngine::Widget *middle = getWidget("middle");
     GUIEngine::Widget *bottom = getWidget("bottom");
 
+    if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        enableGPProgress();
+    }
+    
     // If something was unlocked
     // -------------------------
     int n = unlock_manager->getRecentlyUnlockedFeatures().size();
@@ -96,7 +101,6 @@ void RaceResultGUI::enableAllButtons()
     }
     else if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        enableGPProgress();
         // In case of a GP:
         // ----------------
         top->setVisible(false);
@@ -139,6 +143,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         if(name=="top")
         {
+            if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                cleanupGPProgress();
+            }
+            
             std::vector<const ChallengeData*> unlocked = 
                 unlock_manager->getRecentlyUnlockedFeatures();
             unlock_manager->clearUnlocked();
