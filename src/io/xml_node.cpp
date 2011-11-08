@@ -287,7 +287,7 @@ int XMLNode::get(const std::string &attribute, video::SColorf *color) const
     return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------
-int XMLNode::get(const std::string &attribute, int *value) const
+int XMLNode::get(const std::string &attribute, int32_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
@@ -300,12 +300,10 @@ int XMLNode::get(const std::string &attribute, int *value) const
     }
     
     return 1;
-}   // get(int)
+}   // get(int32_t)
 
 // ----------------------------------------------------------------------------
-// Commented out for FreeBSD since TimeType=time_t and int are the same
-#ifndef __FreeBSD__
-int XMLNode::get(const std::string &attribute, Time::TimeType *value) const
+int XMLNode::get(const std::string &attribute, int64_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
@@ -318,11 +316,11 @@ int XMLNode::get(const std::string &attribute, Time::TimeType *value) const
     }
     
     return 1;
-}   // get(TimeType)
-#endif
+}   // get(int64_t)
+
 
 // ----------------------------------------------------------------------------
-int XMLNode::get(const std::string &attribute, unsigned int *value) const
+int XMLNode::get(const std::string &attribute, uint32_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
@@ -335,7 +333,7 @@ int XMLNode::get(const std::string &attribute, unsigned int *value) const
     }
     
     return 1;
-}   // get(unsigned int)
+}   // get(uint32_t)
 
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, float *value) const
