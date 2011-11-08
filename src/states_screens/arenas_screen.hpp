@@ -37,6 +37,9 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
     /** \brief implement callback from parent class GUIEngine::Screen */
