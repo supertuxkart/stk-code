@@ -433,7 +433,10 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
     if(include)
     {
         include->get("file",  &addon_list_url);
-        include->get("mtime", &mtime         );
+        
+        int64_t tmp;
+        include->get("mtime", &tmp);
+        mtime = tmp;
     }
     if(addon_list_url.size()==0)
     {
