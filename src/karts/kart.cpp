@@ -278,8 +278,8 @@ void Kart::createPhysics()
         new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btKart::btVehicleTuning();
     m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
-    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster,
-                           m_kart_properties->getTrackConnectionAccel());
+    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster);
+        //FIXMEJH  m_kart_properties->getTrackConnectionAccel());
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -1724,7 +1724,7 @@ void Kart::updatePhysics(float dt)
     // you have full traction; above 0.5 rad angles you have absolutely none; 
     // inbetween  there is a linear change in friction
     float friction = 1.0f;
-    bool enable_skidding = false;
+    bool enable_sliding = false;
     
     // This way the current skidding
     // handling can be disabled for certain material (e.g. the
@@ -1744,7 +1744,7 @@ void Kart::updatePhysics(float dt)
         if (distanceFromUp < 0.85f)
         {
             friction = 0.0f;
-            enable_skidding = true;
+            enable_sliding = true;
         }
         else if (distanceFromUp > 0.9f)
         {
@@ -1753,7 +1753,7 @@ void Kart::updatePhysics(float dt)
         else
         {
             friction = (distanceFromUp - 0.85f) / 0.5f;
-            enable_skidding = true;
+            enable_sliding = true;
         }
     }
     
@@ -1763,7 +1763,7 @@ void Kart::updatePhysics(float dt)
         wheel.m_frictionSlip = friction*m_kart_properties->getFrictionSlip();
     }
     
-    m_vehicle->enableSliding(enable_skidding);
+    m_vehicle->setSliding(enable_sliding);
 
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
