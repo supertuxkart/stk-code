@@ -157,7 +157,8 @@ void PlayerController::action(PlayerAction action, int value)
         break;
     case PA_BRAKE:
         m_prev_brake = value!=0;
-        if(value)
+        // let's consider below that to be a deadzone
+        if(value > 32768/2)
         {
             m_controls->m_brake = true;
             m_controls->m_accel = 0.0f;
