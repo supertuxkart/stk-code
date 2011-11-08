@@ -242,13 +242,18 @@ void TimeUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
         //std::cout << "Couldn't find int parameter " << paramName <<std::endl;
         return;
     }
-    child->get( "value", &m_value );
+    
+    int64_t tmp;
+    child->get( "value", &tmp );
+    m_value = tmp;
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
 void TimeUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
-    node->get( m_param_name, &m_value );
+    int64_t tmp;
+    node->get( m_param_name, &tmp );
+    m_value = tmp;
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
