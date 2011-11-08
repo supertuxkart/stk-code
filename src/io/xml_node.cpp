@@ -308,7 +308,7 @@ int XMLNode::get(const std::string &attribute, int64_t *value) const
     std::string s;
     if(!get(attribute, &s)) return 0;
 
-    if (!StringUtils::parseString<Time::TimeType>(s, value))
+    if (!StringUtils::parseString<int64_t>(s, value))
     {
         fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s\n",
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
