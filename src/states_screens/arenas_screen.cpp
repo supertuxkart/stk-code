@@ -49,12 +49,19 @@ ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 
 void ArenasScreen::loadedFromFile()
 {
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ArenasScreen::beforeAddingWidget()
+{
+    
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
-
+    
     tabs->clearAllChildren();
-
+    
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
     const int group_amount = groups.size();
     
@@ -77,21 +84,20 @@ void ArenasScreen::loadedFromFile()
         // try to translate the group name
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
     }
-
+    
     int num_of_arenas=0;
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
-            Track* temp = track_manager->getTrack(n);
-            if (temp->isArena()){
-                num_of_arenas++;
-            }
+        Track* temp = track_manager->getTrack(n);
+        if (temp->isArena()){
+            num_of_arenas++;
+        }
     }
-
+    
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
     tracks_widget->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
-    
-}   // ArenasScreen
+}
 
 // ------------------------------------------------------------------------------------------------------
 
