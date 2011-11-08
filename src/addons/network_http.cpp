@@ -503,7 +503,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
 		uagent += (std::string)" (Windows)";
 	#elif defined(__APPLE__)
 		uagent += (std::string)" (Macintosh)";
-	#elif defined(FreeBSD)
+	#elif defined(__FreeBSD__)
 		uagent += (std::string)" (FreeBSD)";
 	#elif defined(linux)
 		uagent += (std::string)" (Linux)";
