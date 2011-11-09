@@ -208,7 +208,7 @@
                          the wheel can go from -1 to +1 steering in one frame, 
                          basically  disabling this mechanism.       -->
     <turn turn-speed= "0 10 25 45"
-          turn-radius="2.6 14 15 25"
+          turn-radius="2.6 12.5 15 25"
           time-full-steer ="0.2" time-full-steer-ai="0.1"    />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
