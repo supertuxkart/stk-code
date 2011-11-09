@@ -20,6 +20,7 @@ class btDynamicsWorld;
 #include "BulletDynamics/Dynamics/btActionInterface.h"
 
 class btVehicleTuning;
+class Kart;
 
 ///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
 class btKart : public btActionInterface
@@ -72,12 +73,18 @@ protected:
 	int m_indexUpAxis;
 	int	m_indexForwardAxis;
 
-	void defaultInit(const btVehicleTuning& tuning);
+    /** The STK kart object which uses this vehicle. This is mostly used to 
+     *  get access to the kart properties, which also define physics 
+     *  properties. */
+    Kart *m_kart;
+
+	void defaultInit();
 
 public:
 
 	//constructor to create a car from an existing rigidbody
-	btKart(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster );
+	btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
+           Kart *kart);
 
 	virtual ~btKart() ;
 

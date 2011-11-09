@@ -32,25 +32,25 @@ btRigidBody& btActionInterface::getFixedBody()
 	return s_fixed;
 }
 
-btKart::btKart(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
-:m_vehicleRaycaster(raycaster),
-m_pitchControl(btScalar(0.))
+btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster, 
+               Kart *kart)
+      : m_vehicleRaycaster(raycaster),
+        m_pitchControl(btScalar(0.))
 {
 	m_chassisBody = chassis;
 	m_indexRightAxis = 0;
 	m_indexUpAxis = 2;
 	m_indexForwardAxis = 1;
-	defaultInit(tuning);
+	defaultInit();
     m_num_wheels_on_ground = 0;
+    m_kart = kart;
 }
 
 
-void btKart::defaultInit(const btVehicleTuning& tuning)
+void btKart::defaultInit()
 {
-	(void)tuning;
 	m_currentVehicleSpeedKmHour = btScalar(0.);
-	m_steeringValue = btScalar(0.);
-	
+	m_steeringValue = btScalar(0.);	
 }
 
 	

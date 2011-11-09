@@ -44,7 +44,7 @@
   <news max-display="10"/>
 
   <!-- If the normals (for wheel raycasts) should be smoothened -->
-  <physics smooth-normals="false"/>
+  <physics smooth-normals="true"/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -231,9 +231,12 @@
     <mass value="225"/>
 
     <!-- Suspension related values. stiffness: kart's suspension stiffness.
-         rest Length of suspension when at rest. travel-cm: maximum 
-         movement of suspension - in cm!!  -->
-    <suspension stiffness="248.0" rest="0.2" travel-cm="19"/>
+         rest: Length of suspension when at rest. 
+         travel-cm: maximum movement of suspension - in cm!! 
+         exp-string-response: dampen the suspension spring reaction 
+            exponentially  -->
+    <suspension stiffness="50" rest="0.2" travel-cm="19"
+         exp-spring-response="true"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
          bullet, damping parameters. Radius and width of wheel.
@@ -241,7 +244,7 @@
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach 
          the wheels to. -->
-    <wheels damping-relaxation="20"  damping-compression="4.4" radius="0.25">
+    <wheels damping-relaxation="2.8"  damping-compression="1.4" radius="0.25">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />
@@ -253,25 +256,21 @@
     <friction slip="10000000"/>
 
     <!-- Values related to stability of the chassis: damping, and reduced
-         impact of roll. -->
+         impact of roll. 
+         downward-impulse-factor: A speed proportional impulse applied each
+           frame that pushes the vehicle onto the ground. 
+         track-connection-accel: An artificial force that pulls a wheel to
+           the ground if its off ground. Reduces the affect if a kart loses
+           contact with the ground (i.e. it then can't steer or accelerate
+           anymore). -->
     <stability roll-influence="0.03"
                chassis-linear-damping="0.2"
-               chassis-angular-damping="0"/>
+               chassis-angular-damping="0"
+               downward-impulse-factor="0.1"
+               track-connection-accel="2"/>
 
     <!-- Parameters for the upright constraint, which keeps karts upright. -->
     <upright tolerance="0.2" max-force="30"/>
-
-    <!-- An artificial force that pulls a wheel to the ground if its off
-         ground. Reduces the affect if a kart loses contact with the ground
-         (i.e. it then can't steer or accelerate anymore). -->
-    <track-connection-accel value="2"/>
-
-    <!-- jump-velocity is the z-axis velocity set when a jump is initiated.
-         This will cause the kart to start rising, till it is pulled back
-         by gravity. A higher value means higher Z velocity, meaning the 
-         kart will rise faster and higher, and will be in the air longer.
-         Notice that jumps are currently disabled, so this value is ignored.  -->
-    <jump velocity="3.0"/>
 
     <!-- collision-side-impulse is an additional (artificial) impulse that
          pushes the slower kart out of the way of the faster karts (i.e. 

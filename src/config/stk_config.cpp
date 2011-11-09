@@ -38,6 +38,7 @@ STKConfig::~STKConfig()
     if(m_title_music)
         delete m_title_music;
 }   // ~STKConfig
+
 //-----------------------------------------------------------------------------
 /** Loads the stk configuration file. After loading it checks if all necessary
  *  values are actually defined, otherwise an error message is printed and STK

@@ -72,7 +72,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
         m_wheel_radius = m_chassis_linear_damping =
         m_chassis_angular_damping = m_suspension_rest =
-        m_max_speed_reverse_ratio = m_jump_velocity =
+        m_max_speed_reverse_ratio = 
         m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel =
@@ -93,9 +93,10 @@ KartProperties::KartProperties(const std::string &filename)
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_ai_steering_variation = 
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
-        m_squash_duration = UNDEFINED;
+        m_squash_duration = m_downward_impulse_factor = UNDEFINED;
 
     m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_exp_spring_response    = false;
     m_has_skidmarks          = true;
     m_version                = 0;
     m_color                  = video::SColor(255, 0, 0, 0);
@@ -384,9 +385,10 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *suspension_node = root->getNode("suspension"))
     {
-        suspension_node->get("stiffness", &m_suspension_stiffness);
-        suspension_node->get("rest",      &m_suspension_rest     );
-        suspension_node->get("travel-cm", &m_suspension_travel_cm);
+        suspension_node->get("stiffness",           &m_suspension_stiffness);
+        suspension_node->get("rest",                &m_suspension_rest     );
+        suspension_node->get("travel-cm",           &m_suspension_travel_cm);
+        suspension_node->get("exp-spring-response", &m_exp_spring_response );
     }
 
     if(const XMLNode *wheels_node = root->getNode("wheels"))
@@ -401,9 +403,16 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *stability_node = root->getNode("stability"))
     {
-        stability_node->get("roll-influence",          &m_roll_influence);
-        stability_node->get("chassis-linear-damping",  &m_chassis_linear_damping);
-        stability_node->get("chassis-angular-damping", &m_chassis_angular_damping);
+        stability_node->get("roll-influence",          
+                                                   &m_roll_influence         );
+        stability_node->get("chassis-linear-damping",
+                                                   &m_chassis_linear_damping );
+        stability_node->get("chassis-angular-damping", 
+                                                   &m_chassis_angular_damping);
+        stability_node->get("downward-impulse-factor", 
+                                                   &m_downward_impulse_factor);
+        stability_node->get("track-connection-accel", 
+                                                   &m_track_connection_accel );
     }
 
     if(const XMLNode *upright_node = root->getNode("upright"))
@@ -411,12 +420,6 @@ void KartProperties::getAllData(const XMLNode * root)
         upright_node->get("tolerance", &m_upright_tolerance);
         upright_node->get("max-force", &m_upright_max_force);
     }
-
-    if(const XMLNode *track_connection_node = root->getNode("track-connection-accel"))
-        track_connection_node->get("value", &m_track_connection_accel);
-
-    if(const XMLNode *jump_node = root->getNode("jump"))
-        jump_node->get("velocity", &m_jump_velocity);
 
     if(const XMLNode *collision_node = root->getNode("collision"))
         collision_node->get("side-impulse",  &m_collision_side_impulse);
@@ -567,8 +570,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
     CHECK_NEG(m_roll_influence,             "stability roll-influence"      );
-    CHECK_NEG(m_chassis_linear_damping,     "stability chassis-linear-damping");
-    CHECK_NEG(m_chassis_angular_damping,    "stability chassis-angular-damping");
+    CHECK_NEG(m_chassis_linear_damping,  "stability chassis-linear-damping" );
+    CHECK_NEG(m_chassis_angular_damping, "stability chassis-angular-damping");
+    CHECK_NEG(m_downward_impulse_factor, "stability downward-impulse-factor");
+    CHECK_NEG(m_track_connection_accel,  "stability track-connection-accel" );
     CHECK_NEG(m_engine_power[0],            "engine power[0]"               );
     CHECK_NEG(m_engine_power[1],            "engine power[1]"               );
     CHECK_NEG(m_engine_power[2],            "engine power[2]"               );
@@ -580,11 +585,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
+    CHECK_NEG(m_exp_spring_response,        "suspension exp-string-response");
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
-    CHECK_NEG(m_jump_velocity,              "jump velocity"                 );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
-    CHECK_NEG(m_track_connection_accel,     "track-connection-accel"        );
     CHECK_NEG(m_plunger_in_face_duration[0],"plunger in-face-time[0]"       );
     CHECK_NEG(m_plunger_in_face_duration[1],"plunger in-face-time[1]"       );
     CHECK_NEG(m_plunger_in_face_duration[2],"plunger in-face-time[2]"       );

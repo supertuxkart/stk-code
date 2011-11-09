@@ -276,9 +276,7 @@ void Kart::createPhysics()
     // -------------------------
     m_vehicle_raycaster =
         new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
-    m_tuning  = new btKart::btVehicleTuning();
-    m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
-    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster);
+    m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
         //FIXMEJH  m_kart_properties->getTrackConnectionAccel());
 
     // never deactivate the vehicle
@@ -293,13 +291,16 @@ void Kart::createPhysics()
     btVector3 wheel_direction(0.0f, -1.0f, 0.0f);
     btVector3 wheel_axle(-1.0f, 0.0f, 0.0f);
 
+    btKart::btVehicleTuning tuning;
+    tuning.m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
+
     for(unsigned int i=0; i<4; i++)
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
                             m_kart_model->getWheelPhysicsPosition(i),
                             wheel_direction, wheel_axle, suspension_rest,
-                            wheel_radius, *m_tuning, is_front_wheel);
+                            wheel_radius, tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
         wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
@@ -416,7 +417,6 @@ Kart::~Kart()
 
     World::getWorld()->getPhysics()->removeKart(this);
     delete m_vehicle;
-    delete m_tuning;
     delete m_vehicle_raycaster;
     delete m_uprightConstraint;
 
@@ -756,7 +756,7 @@ bool Kart::isOnGround() const
 }   // isOnGround
 
 //-----------------------------------------------------------------------------
-/** The kart is near the ground, but not necesarily on it (small jumps). This
+/** The kart is near the ground, but not necessarily on it (small jumps). This
  *  is used to determine when to switch off the upright constraint, so that
  *  explosions can be more violent, while still
 */
@@ -1677,18 +1677,6 @@ void Kart::updatePhysics(float dt)
             }
         }   // !m_brake
     }   // not accelerating
-#ifdef ENABLE_JUMP
-    if(m_controls.jump && isOnGround())
-    {
-      //Vector3 impulse(0.0f, 0.0f, 10.0f);
-      //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
-        btVector3 velocity         = m_body->getLinearVelocity();
-        velocity.setZ( m_kart_properties->getJumpVelocity() );
-
-        getBody()->setLinearVelocity( velocity );
-
-    }
-#endif
     if (isOnGround())
     {
         if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
