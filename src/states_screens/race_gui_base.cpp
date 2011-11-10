@@ -440,6 +440,11 @@ void RaceGUIBase::update(float dt)
             m_referee->selectReadySetGo(world->getPhase()==World::SET_PHASE 
                                         ? 1 : 0);
         }
+        else if(world->getPhase()==World::IN_GAME_MENU_PHASE)
+        {
+            // Don't do anything, without this the next clause 
+            // would completely remove thunderbird.
+        }
         else if(m_referee->isAttached())   // race phase:
         {
             m_referee->removeFromSceneGraph();
