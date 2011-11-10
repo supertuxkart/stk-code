@@ -219,7 +219,7 @@ private:
     float m_wheel_radius;
 
     /** An impulse pushing the kart down which is proportional to speed. So
-     *  the actual impulse is  speed * m_downward_force_factor. Set it to
+     *  the actual impulse is  speed * m_downward_impulse_factor. Set it to
      *  0 to disable completely. Based on
      *  http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=6059\
      *  &p=21240&hilit=vehicle#p21240  */
@@ -437,6 +437,9 @@ public:
     /** Returns angular damping of chassis. */
     float getChassisAngularDamping  () const 
                                            {return m_chassis_angular_damping; }
+
+    /** Artifical downward impulse every frame. */
+    float getDownwardImpulseFactor() const { return m_downward_impulse_factor;}
 
     /** Returns artificial acceleration to keep wheels on track. */
     float getTrackConnectionAccel   () const {return m_track_connection_accel;}
