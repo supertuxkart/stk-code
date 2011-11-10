@@ -44,7 +44,7 @@
   <news max-display="10"/>
 
   <!-- If the normals (for wheel raycasts) should be smoothened -->
-  <physics smooth-normals="true"/>
+  <physics smooth-normals="false"/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -266,7 +266,7 @@
     <stability roll-influence="0.03"
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
-               downward-impulse-factor="0.1"
+               downward-impulse-factor="2"
                track-connection-accel="2"/>
 
     <!-- Parameters for the upright constraint, which keeps karts upright. -->

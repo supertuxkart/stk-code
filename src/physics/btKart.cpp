@@ -370,6 +370,12 @@ void btKart::updateVehicle( btScalar step )
 		wheel.m_deltaRotation *= btScalar(0.99);
 
 	}
+    float f = -m_kart->getSpeed() 
+            * m_kart->getKartProperties()->getDownwardImpulseFactor();
+    btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
+                                * btVector3(0, f, 0);
+
+    m_chassisBody->applyCentralImpulse(downwards_impulse);
 }   // updateVehicle
 
 // ----------------------------------------------------------------------------
