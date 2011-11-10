@@ -585,7 +585,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
-    CHECK_NEG(m_exp_spring_response,        "suspension exp-string-response");
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
