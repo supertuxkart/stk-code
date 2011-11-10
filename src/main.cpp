@@ -606,6 +606,11 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_camera_debug=1;
         }
+        else if(UserConfigParams::m_artist_debug_mode && 
+               !strcmp(argv[i], "--physics-debug"))
+        {
+            UserConfigParams::m_physics_debug=1;
+        }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             for(unsigned int i=0; 

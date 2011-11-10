@@ -29,6 +29,7 @@
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart.hpp"
+#include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 
 #define SKELETON_DEBUG 0
@@ -508,7 +509,9 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
                                                   m_max_suspension[i]);
         float ratio = clamped_suspension[i] / suspension_length;
         const int sign = ratio < 0 ? -1 : 1;
-        ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
+        // expanded form of 1 - (1 - x)^2, i.e. making suspension display 
+        // quadratic and not linear
+        ratio = sign * fabsf(ratio*(2-ratio));
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
@@ -519,6 +522,16 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_wheel_node[i]) continue;
+#ifdef DEBUG
+        if(UserConfigParams::m_physics_debug)
+        {
+            // Make wheels that are not touching the ground invisible
+            bool wheel_has_contact = 
+                m_kart->getVehicle()->getWheelInfo(i).m_raycastInfo
+                                                     .m_isInContact;
+            m_wheel_node[i]->setVisible(wheel_has_contact);
+        }
+#endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
         pos.Y += clamped_suspension[i];
         m_wheel_node[i]->setPosition(pos);
