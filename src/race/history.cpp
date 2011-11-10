@@ -99,7 +99,9 @@ void History::updateSaving(float dt)
     }
     else
     {
-        m_size ++;
+        // m_size must be m_all_deltas.size() or smaller
+        if(m_size<(int)m_all_deltas.size())
+            m_size ++;
     }
     m_all_deltas[m_current] = dt;
 
