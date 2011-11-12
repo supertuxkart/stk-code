@@ -6,7 +6,7 @@
     name="Win a race on Tux Tollway"
     description="Win a 3 lap race on Tux Tollway against 4 Expert level AI karts."
     depend-on="lighthousetime tothemoonandbackgp"
-    unlock-track="canyon"
+    unlock-track="minigolf"
     major="single"
     minor="quickrace"
     track="tuxtollway"

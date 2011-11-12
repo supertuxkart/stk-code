@@ -6,7 +6,7 @@
     name="Collect fuel for your rocket"
     description="Finish with at least 16 nitro points on 2 laps of XR591 in under 2:30 minutes."
     unlock-track="mines"
-    depend-on="lighthousetime canyon"
+    depend-on="lighthousetime minigolf"
     major="single"
     minor="quickrace"
     track="xr591"
