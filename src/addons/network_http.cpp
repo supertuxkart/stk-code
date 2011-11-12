@@ -427,13 +427,13 @@ CURLcode NetworkHttp::reInit()
 CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
                                      const std::string &filename)
 {
-    std::string    addon_list_url("");
-    Time::TimeType mtime(0);
+    std::string addon_list_url("");
+    int64_t mtime(0);
     const XMLNode *include = xml->getNode("include");
     if(include)
     {
         include->get("file",  &addon_list_url);
-        include->get("mtime", &mtime         );
+        include->get("mtime", &mtime);
     }
     if(addon_list_url.size()==0)
     {

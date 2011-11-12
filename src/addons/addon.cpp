@@ -67,7 +67,11 @@ Addon::Addon(const XMLNode &xml)
     xml.get("id",                 &m_id                );
     xml.get("designer",           &designer            );
     xml.get("status",             &m_status            );
-    xml.get("date",               &m_date              );
+    
+    int64_t date;
+    xml.get("date",               &date                );
+    m_date = date;
+    
     xml.get("installed",          &m_installed         );
     xml.get("installed-revision", &m_installed_revision);
     xml.get("revision",           &m_revision          );
