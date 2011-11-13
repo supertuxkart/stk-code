@@ -9,7 +9,7 @@ project(SuperTuxKart)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-set(PROJECT_VERSION "0.7.3-rc1")
+set(PROJECT_VERSION "0.7.3")
 
 # Tweakable values
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
