@@ -411,13 +411,8 @@ bool RubberBall::updateAndDelete(float dt)
 
     // Ball squashing:
     // ===============
-    // If we start squashing the ball as soon as the height is smaller than
-    // then height of the ball, it looks to extreme. So a ratio r of the 
-    // height of the ball and the current height of the object is used to 
-    // tweak the look a bit.
-    float r = 2.0f;
-    if(r*height<m_extend.getY())
-        m_node->setScale(core::vector3df(1.0f, r*height/m_extend.getY(),1.0f));
+    if(height<1.5f*m_extend.getY())
+        m_node->setScale(core::vector3df(1.0f, height/m_extend.getY(),1.0f));
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
