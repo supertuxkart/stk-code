@@ -290,11 +290,13 @@
           band-speed-increase="7" band-fade-out-time="3"
           in-face-time="4 6 7"/>
 
-    <!-- Kart-specific explosion parameters. Height: how high this
-         this kart is being pushed in the sky by an explosion.
-         Time: how long it takes before the kart can drive again. 
+    <!-- Kart-specific explosion parameters. 
+         Time: how long it takes before the kart can drive again (this
+               determines how height the kart is being thrown).
          Invulnerability-time: how long a kart will be invulnerable
-         after being hit by an explosion.  -->
+               after being hit by an explosion.
+         radius: Kart closer to this value will be affected by
+               an explosion as well.  -->
     <explosion time="2" radius="5" 
          invulnerability-time="6" />
 
