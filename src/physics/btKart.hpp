@@ -13,7 +13,7 @@
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
-#include "physics/btkartRaycast.hpp"
+#include "physics/btKartRaycast.hpp"
 class btDynamicsWorld;
 #include "LinearMath/btAlignedObjectArray.h"
 #include "BulletDynamics/Vehicle/btWheelInfo.h"
@@ -228,27 +228,12 @@ public:
     void setSliding(bool active);
     void activateZipper(float speed);
     void deactivateZipper();
-    bool btKart::projectVehicleToSurface(const btVector3& ray, 
-                                         bool translate_vehicle);
+    bool projectVehicleToSurface(const btVector3& ray, 
+                                 bool translate_vehicle);
     // ------------------------------------------------------------------------
     /** Returns the number of wheels on the ground. */
     unsigned int getNumWheelsOnGround() const {return m_num_wheels_on_ground;}
 };
-
-#if 0
-class btDefaultVehicleRaycaster : public btVehicleRaycaster
-{
-	btDynamicsWorld*	m_dynamicsWorld;
-public:
-	btDefaultVehicleRaycaster(btDynamicsWorld* world)
-		:m_dynamicsWorld(world)
-	{
-	}
-
-	virtual void* castRay(const btVector3& from,const btVector3& to, btVehicleRaycasterResult& result);
-
-};
-#endif
 
 #endif //BT_RAYCASTVEHICLE_H
 
