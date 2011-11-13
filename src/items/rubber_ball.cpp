@@ -565,6 +565,12 @@ float RubberBall::updateHeight()
         {
             // Some experimental formulas
             m_current_max_height = 0.5f*sqrt(m_distance_to_target);
+            // If the ball just missed the target, m_distance_to_target 
+            // can be huge (close to track length) due to the order in
+            // which a lost target is detected. Avoid this by clamping
+            // m_current_max_height.
+            if(m_current_max_height>m_max_height)
+                m_current_max_height = m_max_height;
             m_interval           = m_current_max_height / 10.0f;
 	        // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
