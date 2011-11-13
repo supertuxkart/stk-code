@@ -49,15 +49,15 @@
   <!-- The title music. -->
   <music title="main_theme.music"/>
 
-  <!-- Mostly for debugging: maximum number of history entrie$a -->
+  <!-- Mostly for debugging: maximum number of history entries -->
   <history max-frames="10000"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
-       time for skidmars to fade out. -->
+       time for skidmarks to fade out. -->
   <skid-marks max-number="100"  fadeout-time="60"/>   
  
   <!-- Defines when the upright constraint should be acctive, it's
-       disables when the kart is more than this value from the track. -->
+       disabled when the kart is more than this value from the track. -->
   <near-ground distance="2"/> 
 
   <!-- How long the end animation will be shown. -->
