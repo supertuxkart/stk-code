@@ -153,7 +153,7 @@ void History::updateReplay(float dt)
  */
 void History::Save()
 {
-    FILE *fd       = fopen("history.dat","w");
+    FILE *fd = fopen("history.dat","w");
     if(fd)
         printf("History saved in ./history.dat.\n");
     else
