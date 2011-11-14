@@ -682,7 +682,7 @@ if (APPLE)
 
 else()
 
-    add_definitions(-DSUPERTUXKART_DATADIR=${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart)
+    add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
 
     # Build the final executable
     add_executable(supertuxkart ${SRCS})
