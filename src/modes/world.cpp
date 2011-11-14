@@ -902,6 +902,9 @@ void World::restartRace()
 
     projectile_manager->cleanup();
     race_manager->reset();
+    // Make sure to overwrite the data from the previous race.
+    if(!history->replayHistory()) history->initRecording();
+
 }   // restartRace
 
 //-----------------------------------------------------------------------------
