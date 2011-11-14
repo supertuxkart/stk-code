@@ -124,12 +124,18 @@ void History::updateSaving(float dt)
 void History::updateReplay(float dt)
 {
     m_current++;
+    World *world = World::getWorld();
     if(m_current>=(int)m_all_deltas.size())
     {
         printf("Replay finished.\n");
-        exit(2);
+        m_current = 0;
+        // Note that for physics replay all physics parameters
+        // need to be reset, e.g. velocity, ...
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        {
+            world->getKart(i)->reset();
+        }
     }
-    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
