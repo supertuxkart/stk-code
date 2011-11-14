@@ -1,7 +1,6 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=SuperTuxKart
-Version=VERSION
 Icon=PREFIX/share/pixmaps/supertuxkart_64.xpm
 GenericName=A kart racing game
 GenericName[de_DE]=Ein Kart-Rennspiel
