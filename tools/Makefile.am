@@ -1,6 +1,6 @@
 # tools
 
-dist_pkgdata_DATA = \
+EXTRA_DIST = \
  $(shell find . -maxdepth 2 -name "*.cpp") \
  $(shell find . -maxdepth 2 -name "*.h") \
  $(shell find . -maxdepth 2 -name "*.sln") \
