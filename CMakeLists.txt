@@ -681,6 +681,9 @@ if (APPLE)
     add_definitions(`ln -sf ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources`)
 
 else()
+
+    add_definitions(-DSUPERTUXKART_DATADIR=${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart)
+
     # Build the final executable
     add_executable(supertuxkart ${SRCS})
 
