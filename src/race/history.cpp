@@ -345,8 +345,7 @@ void History::Load()
             fgets(s, 1023, fd);
             int buttonsCompressed;
             float x,y,z,rx,ry,rz,rw;
-            sscanf(s, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
-                    &j, 
+            sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
                     &m_all_controls[i].m_steer,
                     &m_all_controls[i].m_accel,
                     &buttonsCompressed,
