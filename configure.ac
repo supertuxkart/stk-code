@@ -232,7 +232,7 @@ fi
 
 case "${host}" in
 *-*-linux* )
-  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht -lX11"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht -lX11 -lpthread"
   ;;
 *darwin*|*macosx*)
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht -framework Cocoa"
