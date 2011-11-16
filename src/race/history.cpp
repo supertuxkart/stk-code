@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
+#include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -131,10 +132,7 @@ void History::updateReplay(float dt)
         m_current = 0;
         // Note that for physics replay all physics parameters
         // need to be reset, e.g. velocity, ...
-        for(unsigned int i=0; i<world->getNumKarts(); i++)
-        {
-            world->getKart(i)->reset();
-        }
+        world->restartRace();
     }
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)

@@ -537,6 +537,7 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
+    m_speed                = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
     
     if(m_terrain_sound)
@@ -575,9 +576,12 @@ void Kart::reset()
     if (m_skidmarks)
     {
         m_skidmarks->reset();
-        m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
+        const Track *track = 
+            track_manager->getTrack( race_manager->getTrackName() );
+        m_skidmarks->adjustFog(track->isFogEnabled() );
     }
     
+    m_vehicle->reset();
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);

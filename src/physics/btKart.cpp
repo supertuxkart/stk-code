@@ -96,6 +96,21 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
 }   // addWheel
 
 // ----------------------------------------------------------------------------
+/** Resets the kart before a (re)start, to make sure all physics variable
+ *  are properly defined. This is especially important for physics replay.
+ */
+void btKart::reset()
+{
+    for(int i=0; i<getNumWheels(); i++)
+    {
+        btWheelInfo &wheel                     = m_wheelInfo[i];
+        wheel.m_raycastInfo.m_suspensionLength = 0;
+        wheel.m_rotation                       = 0;
+        updateWheelTransformsWS(wheel);
+    }
+}   // reset
+
+// ----------------------------------------------------------------------------
 const btTransform&	btKart::getWheelTransformWS( int wheelIndex ) const
 {
 	btAssert(wheelIndex < getNumWheels());

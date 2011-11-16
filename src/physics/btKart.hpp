@@ -88,6 +88,7 @@ public:
 
 	virtual ~btKart() ;
 
+    void reset();
 
 	///btActionInterface interface
 	virtual void updateAction( btCollisionWorld* collisionWorld, btScalar step)
