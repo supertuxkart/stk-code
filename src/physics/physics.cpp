@@ -27,6 +27,7 @@
 #include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physical_object.hpp"
+#include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
@@ -48,10 +49,10 @@ Physics::Physics() : btSequentialImpulseConstraintSolver()
 void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 {
     m_axis_sweep     = new btAxisSweep3(world_min, world_max);
-    m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher,
-                                                   m_axis_sweep,
-                                                   this,
-                                                   m_collision_conf);
+    m_dynamics_world = new STKDynamicsWorld(m_dispatcher,
+                                            m_axis_sweep,
+                                            this,
+                                            m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f,
                                            -World::getWorld()->getTrack()->getGravity(),
                                            0.0f));

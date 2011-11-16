@@ -368,6 +368,10 @@ void World::terminateRace()
  */
 void World::resetAllKarts()
 {
+    // Reset the physics 'remaining' time to 0 so that the number
+    // of timesteps is reproducible if doing a physics-based history run
+    getPhysics()->getPhysicsWorld()->resetLocalTime();
+
     // If track checking is requested, check all rescue positions if
     // they are heigh enough.
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&

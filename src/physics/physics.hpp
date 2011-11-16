@@ -31,10 +31,12 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "physics/irr_debug_drawer.hpp"
+#include "physics/stk_dynamics_world.hpp"
 #include "physics/user_pointer.hpp"
 
-class Vec3;
 class Kart;
+class STKDynamicsWorld;
+class Vec3;
 
 /**
   * \ingroup physics
@@ -89,7 +91,10 @@ private:
         }
     };  // CollisionList
 
-    btDynamicsWorld                 *m_dynamics_world;
+    /** Pointer to the physics dynamics world. */
+    STKDynamicsWorld                *m_dynamics_world;
+
+    /** Used in physics debugging to draw the physics world. */
     IrrDebugDrawer                  *m_debug_drawer;
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
@@ -107,7 +112,7 @@ public:
     void  KartKartCollision(Kart *ka, Kart *kb);
     void  update           (float dt);
     void  draw             ();
-    btDynamicsWorld*
+    STKDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}
     /** Activates the next debug mode (or switches it off again).
      */
