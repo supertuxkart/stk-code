@@ -804,9 +804,8 @@ void RaceResultGUI::displayGPProgress()
 {
     video::SColor color = video::SColor(255,255,0,0); 
     core::recti dest_rect(m_gp_progress_x, m_top, 0, 0);
-    core::stringw message("Grand Prix progress:"); 
 
-    m_font->draw(message.c_str(), dest_rect, color, false, false, NULL, true);
+    m_font->draw(_("Grand Prix progress:"), dest_rect, color, false, false, NULL, true);
 }   // displayGPProgress
 
 // ----------------------------------------------------------------------------
