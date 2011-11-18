@@ -693,6 +693,7 @@ else()
 	    bulletcollision
 	    bulletmath
 	    enet
+	    pthread
 	    ${CURL_LIBRARIES}
 	    ${OPENGL_LIBRARIES}
 	    ${OPENAL_LIBRARY}
