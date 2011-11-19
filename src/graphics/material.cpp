@@ -290,6 +290,12 @@ void Material::install(bool is_full_path)
     const std::string &full_path = is_full_path 
                                  ? m_texname
                                  : file_manager->getTextureFile(m_texname);
+    
+    if (full_path.size() == 0)
+    {
+        fprintf(stderr, "[Material] WARNING, cannot find texture '%s'\n", m_texname.c_str());
+    }
+    
     m_texture = irr_driver->getTexture(full_path,
                                        isPreMul(), isPreDiv());
 
