@@ -36,7 +36,7 @@ using namespace gui;
 		virtual void setOverrideColor(video::SColor color);
 
 		//! Gets the override color
-		virtual video::SColor const & getOverrideColor() const;
+		virtual video::SColor getOverrideColor() const;
 
 		//! Sets if the text should use the overide color or the
 		//! color in the gui skin.
