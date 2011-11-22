@@ -147,7 +147,7 @@ KartModel::~KartModel()
         }
         if(m_is_master && m_wheel_model[i])
             irr_driver->dropAllTextures(m_wheel_model[i]);
-        
+        irr_driver->removeMeshFromCache(m_wheel_model[i]); 
     }
 
     if(m_is_master)
