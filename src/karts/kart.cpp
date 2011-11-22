@@ -755,7 +755,7 @@ float Kart::getActualWheelForce()
  */
 bool Kart::isOnGround() const
 {
-    return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
+    return ((int)m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
           && !playingEmergencyAnimation());
 }   // isOnGround
 
