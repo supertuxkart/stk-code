@@ -96,14 +96,13 @@ bool DeviceManager::initialize()
     {
         core::stringc name = m_irrlicht_gamepads[id].Name.c_str();
         
-        // On Windows, unless we use DirectInput, all gamepads are given the same name...
-        // This makes configuration totally useless, so append an ID to the name
-        core::stringc name_lower = name;
-        name_lower.make_lower();
-        if (name_lower == "microsoft pc-joystick driver")
-        {
-            name = name + " " + StringUtils::toString(id).c_str();
-        }
+#ifdef WIN32
+        // On Windows, unless we use DirectInput, all gamepads are given the 
+        // same name ('microsoft pc-joystick driver'). This makes configuration
+	// totally useless, so append an ID to the name. We can't test for the
+	// name, since the name is even translated.
+	name = name + " " + StringUtils::toString(id).c_str();
+#endif
         
         if (UserConfigParams::logMisc())
         {
