@@ -164,10 +164,10 @@ if(FONT_TOOL)
 	    find_package(X11)
 	    include_directories(${FREETYPE_INCLUDE_DIRS})
 	    add_executable(font_tool
-		    src/font_tool/CFontTool.cpp
-		    src/font_tool/CFontTool.h
-		    src/font_tool/CVectorFontTool.h
-		    src/font_tool/main.cpp
+		    tools/font_tool/CFontTool.cpp
+		    tools/font_tool/CFontTool.h
+		    tools/font_tool/CVectorFontTool.h
+		    tools/font_tool/main.cpp
 	    )
 	    target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
 	    target_link_libraries(font_tool ${X11_Xft_LIB})
