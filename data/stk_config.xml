@@ -208,7 +208,7 @@
                          the wheel can go from -1 to +1 steering in one frame, 
                          basically  disabling this mechanism.       -->
     <turn turn-speed= "0 10 25 45"
-          turn-radius="2 10 15 25"
+          turn-radius="2.6 12.5 15 25"
           time-full-steer ="0.2" time-full-steer-ai="0.1"    />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
@@ -235,8 +235,8 @@
          travel-cm: maximum movement of suspension - in cm!! 
          exp-string-response: dampen the suspension spring reaction 
             exponentially  -->
-    <suspension stiffness="50" rest="0.2" travel-cm="19"
-         exp-spring-response="true"/>
+    <suspension stiffness="248" rest="0.2" travel-cm="19"
+         exp-spring-response="false"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
          bullet, damping parameters. Radius and width of wheel.
@@ -244,7 +244,7 @@
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach 
          the wheels to. -->
-    <wheels damping-relaxation="2.8"  damping-compression="1.4" radius="0.25">
+    <wheels damping-relaxation="20"  damping-compression="4.4" radius="0.25">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />
@@ -267,7 +267,7 @@
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
                downward-impulse-factor="2"
-               track-connection-accel="2"/>
+               track-connection-accel="0"/>
 
     <!-- Parameters for the upright constraint, which keeps karts upright. -->
     <upright tolerance="0.2" max-force="30"/>
