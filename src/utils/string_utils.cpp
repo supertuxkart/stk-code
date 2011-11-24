@@ -39,10 +39,11 @@ namespace StringUtils
             // While this is basically correct, it fails with older
             // g++ versions (at least 2.95.3), which have a wrong template. To
             // avoid this issue, a more C-traditional way is used.
-            return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), rhs.c_str())==0;
+            return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), 
+                          rhs.c_str()                             )==0;
     }   // hasSuffix
     
-    //--------------------------i-----------------------------------------------
+    //-------------------------------------------------------------------------
     /** Returns the path of a filename, i.e. everything till the last '/'.
      */
     std::string getPath(const std::string& filename)
@@ -122,14 +123,15 @@ namespace StringUtils
         return name;
     }   // toLowerCase
 
-    //-----------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /** Splits a string into substrings separated by a certain character, and 
      *  returns a std::vector of all those substring. E.g.:
      *  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
      *  \param s The string to split.
      *  \param c The character  by which the string is split.
      */
-    std::vector<std::string> split(const std::string& s, char c, bool keepSplitChar)
+    std::vector<std::string> split(const std::string& s, char c, 
+                                   bool keepSplitChar)
     {
         std::vector<std::string> result;
         
@@ -154,8 +156,10 @@ namespace StringUtils
                 } 
                 else   // end of string reached
                 {
-                    if (keepSplitChar) result.push_back(std::string(s,start-1));
-                    else result.push_back(std::string(s,start));
+                    if (keepSplitChar) 
+                        result.push_back(std::string(s,start-1));
+                    else 
+                        result.push_back(std::string(s,start));
                     start = i;
                 }
             }
@@ -164,7 +168,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning message about unused variable
-            fprintf(stderr, "Fatal error in split(std::string) : %s @ line %i\n", __FILE__, __LINE__);
+            fprintf(stderr, 
+                    "Fatal error in split(std::string) : %s @ line %i\n",
+                     __FILE__, __LINE__);
             printf("Splitting %s\n", s.c_str());
             
             for (int n=0; n<(int)result.size(); n++)
@@ -176,8 +182,16 @@ namespace StringUtils
         }
     }   // split
     
-    /** Same as above, but for wide strings */
-    std::vector<irr::core::stringw> split(const irr::core::stringw& s, char c, bool keepSplitChar)
+    //-------------------------------------------------------------------------
+    /** Splits a string into substrings separated by a certain character, and 
+     *  returns a std::vector of all those substring. E.g.:
+     *  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
+     *  This is the version for wide strings.
+     *  \param s The string to split.
+     *  \param c The character  by which the string is split.
+     */
+    std::vector<irr::core::stringw> split(const irr::core::stringw& s, char c, 
+                                           bool keepSplitChar)
     {
         try
         {
@@ -200,8 +214,11 @@ namespace StringUtils
                 } 
                 else
                 {
-                    if (keepSplitChar) result.push_back( s.subString(start - 1, s.size()-start + 1) );
-                    else result.push_back( s.subString(start, s.size()-start) );
+                    if (keepSplitChar) 
+                        result.push_back( s.subString(start - 1, 
+                                                      s.size()-start + 1) );
+                    else 
+                        result.push_back( s.subString(start, s.size()-start) );
                     
                     return result;
                     //start = i+1;
@@ -212,7 +229,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr, "Fatal error in split(stringw) : %s @ line %i\n", __FILE__, __LINE__);
+            fprintf(stderr, 
+                    "Fatal error in split(stringw) : %s @ line %i\n", 
+                     __FILE__, __LINE__);
             exit(1);
         }
     }   // split
@@ -266,13 +285,15 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr, "Fatal error in splitPath : %s @ line %i\n", __FILE__, __LINE__);
+            fprintf(stderr, "Fatal error in splitPath : %s @ line %i\n", 
+                    __FILE__, __LINE__);
             exit(1);
         }
     }   // splitPath
     
     // ------------------------------------------------------------------------
-    std::string insertValues(const std::string &s, std::vector<std::string>& all_vals)
+    std::string insertValues(const std::string &s, 
+                             std::vector<std::string>& all_vals)
     {
         try
         {
@@ -294,12 +315,16 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid number of arguments in '%s'\n", s.c_str());
+                            fprintf(stderr, 
+                                    "[StringUtils::insertValues] ERROR: "
+                                    "Invalid number of arguments in '%s'\n", 
+                                    s.c_str());
                             new_string += "??" + sv[i].substr(2);
                         }
                         else
                         {
-                            new_string += all_vals[insertValID] + sv[i].substr(2);
+                            new_string += all_vals[insertValID] 
+                                        + sv[i].substr(2);
                         }
                         insertValID++;
                     }
@@ -308,7 +333,9 @@ namespace StringUtils
                         const unsigned int index = sv[i][1] - '0';
                         if (index >= all_vals.size())
                         {
-                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid argument index in '%s' for %i\n", s.c_str(), index);
+                            fprintf(stderr,"[StringUtils::insertValues] ERROR:"
+                                           " Invalid argument index in '%s' "
+                                           "for %i\n", s.c_str(), index);
                             new_string += "??" + sv[i].substr(2);
                         }
                         else
@@ -327,19 +354,22 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr,"Fatal error in insertValues(std::string) : %s @ line %i\n", __FILE__, __LINE__);
+            fprintf(stderr, "Fatal error in insertValues(std::string) : %s @ "
+                            "line %i\n", __FILE__, __LINE__);
             exit(1);
         }
     }
     
     // ------------------------------------------------------------------------
-    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals)
+    irr::core::stringw insertValues(const irr::core::stringw &s, 
+                                    std::vector<irr::core::stringw>& all_vals)
     {
         try
         {
             unsigned int insertValID = 0;
 
-            const std::vector<irr::core::stringw> sv = StringUtils::split(s, '%', true);
+            const std::vector<irr::core::stringw> sv = 
+                                              StringUtils::split(s, '%', true);
             
             irr::core::stringw new_string="";
             
@@ -356,7 +386,9 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid number of arguments in '%s'\n",
+                            fprintf(stderr,
+                                    "[StringUtils::insertValues] ERROR: "
+                                    "Invalid number of arguments in '%s'\n",
                                     irr::core::stringc(s.c_str()).c_str());
                             new_string += "??";
                             new_string += sv[i].subString(2, sv[i].size()-2);
@@ -370,7 +402,8 @@ namespace StringUtils
                     }
                     else if(irr::core::isdigit(sv[i][1]))
                     {
-                        irr::core::stringw rest = sv[i].subString(2, sv[i].size()-2);
+                        irr::core::stringw rest = 
+                                            sv[i].subString(2, sv[i].size()-2);
                         int delta = 0;
                         
                         if (sv[i].size() >= 4 && sv[i][2]=='$')
@@ -379,11 +412,16 @@ namespace StringUtils
                             delta = -1;
                         }
                         
-                        const unsigned int index = irr::core::stringc(sv[i].c_str()).c_str()[1] - '0' + delta;
+                        const unsigned int index = 
+                                 irr::core::stringc(sv[i].c_str()).c_str()[1] 
+                                 - '0' + delta;
                         if (index >= all_vals.size())
                         {
-                            fprintf(stderr, "[StringUtils::insertValues] ERROR: Invalid argument ID in '%s' : %i\n",
-                                    irr::core::stringc(s.c_str()).c_str(), index);
+                            fprintf(stderr, 
+                                    "[StringUtils::insertValues] ERROR: "
+                                    "Invalid argument ID in '%s' : %i\n",
+                                    irr::core::stringc(s.c_str()).c_str(), 
+                                    index);
                             new_string += "??";
                             new_string += rest;
                         }
@@ -403,7 +441,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr,"Fatal error in insertValues(stringw) : %s @ line %i\n", __FILE__, __LINE__);
+            fprintf(stderr,
+                    "Fatal error in insertValues(stringw) : %s @ line %i\n",
+                     __FILE__, __LINE__);
             exit(1);
         }
     }
@@ -445,7 +485,8 @@ namespace StringUtils
     
     // ------------------------------------------------------------------------
 
-    std::string replace(const std::string& other, const std::string& from, const std::string& to)
+    std::string replace(const std::string& other, const std::string& from, 
+                        const std::string& to)
     {
         std::string wip = other;
         
@@ -460,18 +501,6 @@ namespace StringUtils
             wip.replace(pos, from.size(), to.c_str(), to.size());
         }
         
-        /*
-        // found this on google... looks good but doesn't work, it leaves out some occurrences,
-        // didn't search why
-        std::string::size_type  next;
-        
-        for (next = wip.find(from); next != std::string::npos; next = wip.find(from, next))
-        {
-            wip.replace(next, from.length(), to);
-            next += from.length();
-        }
-        return wip;
-        */
     }
     
     // ------------------------------------------------------------------------
@@ -545,7 +574,10 @@ namespace StringUtils
                         }
                         else
                         {
-                            fprintf(stderr, "[StringUtils] WARNING: non-numeric HTML entity not supported in '%s'\n", input.c_str());
+                            fprintf(stderr, 
+                                    "[StringUtils] WARNING: non-numeric HTML "
+                                    "entity not supported in '%s'\n", 
+                                    input.c_str());
                         }
                         state = NORMAL;
                     }
