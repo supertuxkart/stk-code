@@ -201,7 +201,8 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
 	
 	btScalar depth = -1;
 	
-	btScalar raylen = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius;
+	btScalar raylen = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius
+                    + wheel.m_maxSuspensionTravelCm*0.01f;
 
 	btVector3 rayvector = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
 	const btVector3& source = wheel.m_raycastInfo.m_hardPointWS;
