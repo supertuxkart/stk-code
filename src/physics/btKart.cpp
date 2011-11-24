@@ -478,7 +478,15 @@ void btKart::updateSuspension(btScalar deltaTime)
 		btWheelInfo &wheel_info = m_wheelInfo[w_it];
 		if ( !wheel_info.m_raycastInfo.m_isInContact )
         {
-            wheel_info.m_wheelsSuspensionForce = btScalar(0.0);
+            // A very unphysical thing to handle slopes that are a bit too 
+            // steep or uneven (resulting in only one wheel on the ground)
+            // If only the front or only the rear wheels are on the ground, add
+            // a force pulling the axis down (towards the ground). Note that it
+            // is already guaranteed that either both or no wheels on one axis
+            // are on the ground, so we have to test only one of the wheels
+            wheel_info.m_wheelsSuspensionForce = 
+                 -m_kart->getKartProperties()->getTrackConnectionAccel()
+                * chassisMass;
             continue;
         }
 
