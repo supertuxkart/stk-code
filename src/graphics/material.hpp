@@ -122,8 +122,11 @@ private:
      *  the intended effect. */
     enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
                      m_adjust_image;
-    /** True if lightmapping is enabled for this material. */
+    /** True if (blending) lightmapping is enabled for this material. */
     bool             m_lightmap;
+    /** True if (additive) lightmapping is enabled for this material. */
+    bool             m_additive_lightmap;
+    
     bool             m_high_tire_adhesion;
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;

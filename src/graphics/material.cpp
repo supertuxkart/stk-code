@@ -91,6 +91,8 @@ Material::Material(const XMLNode *node, int index)
     
     node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
+    node->get("additive_lightmap",&m_additive_lightmap );
+    
     std::string s;
     node->get("adjust-image",     &s                   );
     if(s=="premultiply")
@@ -534,6 +536,11 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     if (m_lightmap)
     {
         m->MaterialType = video::EMT_LIGHTMAP;
+        modes++;
+    }
+    if (m_additive_lightmap)
+    {
+        m->MaterialType = video::EMT_LIGHTMAP_ADD;
         modes++;
     }
 #endif
