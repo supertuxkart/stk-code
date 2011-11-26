@@ -247,6 +247,7 @@ void Material::init(unsigned int index)
     m_clamp_tex                 = 0;
     m_alpha_testing             = false;
     m_lightmap                  = false;
+    m_additive_lightmap         = false;
     m_adjust_image              = ADJ_NONE;
     m_alpha_blending            = false;
     m_lighting                  = true;
