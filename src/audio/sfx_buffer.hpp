@@ -88,7 +88,7 @@ public:
     bool     isLoaded()       const { return m_loaded; }
     
     /** Only returns a valid buffer if isLoaded() returned true */
-    ALuint   getBuffer()      const { return m_buffer; }
+    ALuint   getBufferID()    const { return m_buffer; }
     
     bool     isPositional()   const { return m_positional; }
     float    getRolloff()     const { return m_rolloff; }

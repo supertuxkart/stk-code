@@ -72,13 +72,13 @@ bool SFXOpenAL::init()
     alGenSources(1, &m_soundSource );
     if (!SFXManager::checkError("generating a source")) return false;
     
-    assert( alIsBuffer(m_soundBuffer->getBuffer()) );
+    assert( alIsBuffer(m_soundBuffer->getBufferID()) );
     assert( alIsSource(m_soundSource) );
     
     //std::cout << "Setting a source with buffer " << m_soundBuffer << ", rolloff " << rolloff
     //          << ", gain=" << m_defaultGain << ", positional=" << (positional ? "true" : "false") << std::endl;
     
-    alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer->getBuffer());
+    alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer->getBufferID());
     
     if (!SFXManager::checkError("attaching the buffer to the source")) return false;
     

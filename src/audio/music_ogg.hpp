@@ -20,6 +20,8 @@
 #ifndef HEADER_MUSICOGG_HPP
 #define HEADER_MUSICOGG_HPP
 
+#if HAVE_OGGVORBIS
+
 #include <string>
 
 #include <ogg/ogg.h>
@@ -86,5 +88,7 @@ private:
     bool m_pausedMusic;
     static const int m_buffer_size = 11025*4;//one full second of audio at 44100 samples per second
 };
+
+#endif
 
 #endif // HEADER_MUSICOGG_HPP

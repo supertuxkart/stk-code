@@ -34,7 +34,9 @@ supertuxkart_SOURCES = \
  animations/ipo.hpp \
  animations/three_d_animation.cpp \
  animations/three_d_animation.hpp \
+ audio/dummy_sfx.hpp \
  audio/music.hpp \
+ audio/music_dummy.hpp \
  audio/music_information.cpp \
  audio/music_information.hpp \
  audio/music_manager.cpp \

@@ -1147,6 +1147,8 @@
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95A5402D1481BD950086FE38 /* inetwork_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = inetwork_http.hpp; path = ../../addons/inetwork_http.hpp; sourceTree = SOURCE_ROOT; };
 		95A540411481BEB60086FE38 /* dummy_network_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_network_http.hpp; path = ../../addons/dummy_network_http.hpp; sourceTree = SOURCE_ROOT; };
+		95A540581481C4760086FE38 /* dummy_sfx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_sfx.hpp; path = ../../audio/dummy_sfx.hpp; sourceTree = SOURCE_ROOT; };
+		95A5405B1481C4DB0086FE38 /* music_dummy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_dummy.hpp; path = ../../audio/music_dummy.hpp; sourceTree = SOURCE_ROOT; };
 		95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_screen.cpp; path = ../../states_screens/tutorial_screen.cpp; sourceTree = SOURCE_ROOT; };
 		95AAD97F12BAD36300B7B8A3 /* tutorial_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_screen.hpp; path = ../../states_screens/tutorial_screen.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD12102DE08F00EF2001 /* device_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_config.hpp; path = ../../config/device_config.hpp; sourceTree = SOURCE_ROOT; };
@@ -2373,7 +2375,9 @@
 		95C2AC260F296540000D3E5D /* audio */ = {
 			isa = PBXGroup;
 			children = (
+				95A540581481C4760086FE38 /* dummy_sfx.hpp */,
 				95C2AC270F296540000D3E5D /* music.hpp */,
+				95A5405B1481C4DB0086FE38 /* music_dummy.hpp */,
 				95C2AC280F296540000D3E5D /* music_information.cpp */,
 				95C2AC290F296540000D3E5D /* music_information.hpp */,
 				958BD76E117F6AE90095B483 /* music_manager.cpp */,

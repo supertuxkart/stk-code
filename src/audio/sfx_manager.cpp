@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "audio/dummy_sfx.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_buffer.hpp"
 
@@ -29,12 +30,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#  include <OpenAL/alc.h>
-#else
-#  include <AL/al.h>
-#  include <AL/alc.h>
+#if HAVE_OGGVORBIS
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#    include <OpenAL/alc.h>
+#  else
+#    include <AL/al.h>
+#    include <AL/alc.h>
+#  endif
 #endif
 
 #include "audio/sfx_openal.hpp"
@@ -274,8 +277,12 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     //       positional,
     //       race_manager->getNumLocalPlayers(), buffer->isPositional());
     
-    assert( alIsBuffer(buffer->getBuffer()) );
+#if HAVE_OGGVORBIS
+    assert( alIsBuffer(buffer->getBufferID()) );
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain());
+#else
+    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain());
+#endif
     
     sfx->volume(m_master_gain);
     
@@ -401,6 +408,7 @@ void SFXManager::resumeAll()
  */
 bool SFXManager::checkError(const std::string &context)
 {
+#if HAVE_OGGVORBIS
     // Check (and clear) the error flag
     int error = alGetError();
 
@@ -410,6 +418,7 @@ bool SFXManager::checkError(const std::string &context)
             context.c_str(), SFXManager::getErrorString(error).c_str());
         return false;
     }
+#endif
     return true;
 }   // checkError
 
@@ -447,6 +456,7 @@ void SFXManager::setMasterSFXVolume(float gain)
 //-----------------------------------------------------------------------------
 const std::string SFXManager::getErrorString(int err)
 {
+#if HAVE_OGGVORBIS
     switch(err)
     {
         case AL_NO_ERROR:          return std::string("AL_NO_ERROR"         );
@@ -457,12 +467,16 @@ const std::string SFXManager::getErrorString(int err)
         case AL_OUT_OF_MEMORY:     return std::string("AL_OUT_OF_MEMORY"    );
         default:                   return std::string("UNKNOWN");
     };
+#else
+    return std::string("sound disabled");
+#endif
 }   // getErrorString
 
 //-----------------------------------------------------------------------------
 
 void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
+#if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
     
     //forward vector
@@ -477,6 +491,7 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
     
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
     alListenerfv(AL_ORIENTATION, m_listenerVec);
+#endif
 }
 
 //-----------------------------------------------------------------------------

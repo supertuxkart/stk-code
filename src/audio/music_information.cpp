@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "audio/music_dummy.hpp"
 #include "audio/music_ogg.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -152,8 +153,13 @@ void MusicInformation::startMusic()
     }
     
     if (m_normal_music != NULL) delete m_normal_music;
+    
+#if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream();
-
+#else
+    m_normal_music = new MusicDummy();
+#endif
+    
     if((m_normal_music->load(m_normal_filename)) == false)
     {
         delete m_normal_music;
@@ -181,7 +187,12 @@ void MusicInformation::startMusic()
                 m_fast_filename.c_str());
         return;
     }
-    m_fast_music= new MusicOggStream();
+    
+#if HAVE_OGGVORBIS
+    m_fast_music = new MusicOggStream();
+#else
+    m_fast_music = new MusicDummy();
+#endif
 
     if((m_fast_music->load(m_fast_filename)) == false)
     {

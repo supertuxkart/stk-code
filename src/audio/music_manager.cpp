@@ -22,12 +22,15 @@
 
 #include <assert.h>
 #include <fstream>
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#  include <OpenAL/alc.h>
-#else
-#  include <AL/al.h>
-#  include <AL/alc.h>
+
+#if HAVE_OGGVORBIS
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#    include <OpenAL/alc.h>
+#  else
+#    include <AL/al.h>
+#    include <AL/alc.h>
+#  endif
 #endif
 
 #include "audio/music_ogg.hpp"
@@ -45,6 +48,7 @@ MusicManager::MusicManager()
     setMasterMusicVolume(UserConfigParams::m_music_volume);
 
     //FIXME: I'm not sure that this code goes here
+#if HAVE_OGGVORBIS
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
     {
@@ -69,7 +73,8 @@ MusicManager::MusicManager()
     }
 
     alGetError(); //Called here to clear any non-important errors found
-
+#endif
+    
     loadMusicInformation();
 }  // MusicManager
 
@@ -85,6 +90,7 @@ MusicManager::~MusicManager()
         i->second = NULL;
     }
 
+#if HAVE_OGGVORBIS
     if(m_initialized)
     {
         ALCcontext* context = alcGetCurrentContext();
@@ -95,6 +101,7 @@ MusicManager::~MusicManager()
 
         alcCloseDevice( device );
     }
+#endif
 }   // ~MusicManager
 
 //-----------------------------------------------------------------------------

@@ -205,7 +205,9 @@ set( SRCS ${SRCS} src/main.cpp
 	src/animations/ipo.hpp
 	src/animations/three_d_animation.cpp
 	src/animations/three_d_animation.hpp
+    src/audio/dummy_sfx.hpp
 	src/audio/music.hpp
+    src/audio/music_dummy.hpp
 	src/audio/music_information.cpp
 	src/audio/music_information.hpp
 	src/audio/music_manager.cpp

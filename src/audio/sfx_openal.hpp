@@ -20,6 +20,8 @@
 #ifndef HEADER_SFX_OPENAL_HPP
 #define HEADER_SFX_OPENAL_HPP
 
+#if HAVE_OGGVORBIS
+
 #include <assert.h>
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -77,5 +79,6 @@ public:
     
 };   // SFXOpenAL
 
+#endif
 #endif // HEADER_SFX_OPENAL_HPP
 
