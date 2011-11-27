@@ -142,6 +142,7 @@
 
 #include "main_loop.hpp"
 #include "addons/addons_manager.hpp"
+#include "addons/dummy_network_http.hpp"
 #include "addons/network_http.hpp"
 #include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
@@ -1006,7 +1007,12 @@ void initRest()
     // separate thread running in network http.
     news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
+    
+#ifdef NO_CURL
+    network_http            = new DummyNetworkHttp();
+#else
     network_http            = new NetworkHttp();
+#endif
     // Note that the network thread must be started after the assignment
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).

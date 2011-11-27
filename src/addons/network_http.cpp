@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef NO_CURL
+
 #include "addons/network_http.hpp"
 
 #include <curl/curl.h>
@@ -48,7 +50,7 @@
 #  include <unistd.h>
 #endif
 
-NetworkHttp *network_http=NULL;
+INetworkHttp *network_http = NULL;
 
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the 
@@ -631,17 +633,20 @@ int NetworkHttp::progressDownload(void *clientp,
                                   double upload_total,   double upload_now)
 {
     Request *request = (Request *)clientp;
+    
+    NetworkHttp* self = (NetworkHttp*)network_http;
+    
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
-    if(network_http->m_abort.getAtomic() || request->isCancelled() )
+    if(self->m_abort.getAtomic() || request->isCancelled() )
     {
         if(UserConfigParams::logAddons())
         {
-            if(network_http->m_abort.getAtomic())
+            if(self->m_abort.getAtomic())
             {
                 // Reset abort flag so that the next download will work 
                 // as expected.
-                network_http->m_abort.setAtomic(false);
+                self->m_abort.setAtomic(false);
                 printf("[addons] Global abort of downloads.\n");
             }
             else
@@ -670,4 +675,5 @@ int NetworkHttp::progressDownload(void *clientp,
     return 0;
 }   // progressDownload
 
+#endif
 

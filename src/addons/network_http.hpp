@@ -19,6 +19,8 @@
 #ifndef HEADER_NETWORK_HTTP_HPP
 #define HEADER_NETWORK_HTTP_HPP
 
+#ifndef NO_CURL
+
 #include <queue>
 #include <pthread.h>
 #include <string>
@@ -29,6 +31,7 @@
 #endif
 #include <curl/curl.h>
 
+#include "addons/inetwork_http.hpp"
 #include "addons/request.hpp"
 #include "utils/synchronised.hpp"
 
@@ -37,7 +40,7 @@ class XMLNode;
 /**
   * \ingroup addonsgroup
   */
-class NetworkHttp
+class NetworkHttp : public INetworkHttp
 {
 public:
     /** If stk has permission to access the internet (for news
@@ -82,7 +85,7 @@ private:
     CURLcode      reInit();
 public:
                   NetworkHttp();
-                 ~NetworkHttp();
+    virtual      ~NetworkHttp();
     void          startNetworkThread();
     void          stopNetworkThread();
     void          insertReInit();
@@ -93,7 +96,6 @@ public:
     void          cancelAllDownloads();
 };   // NetworkHttp
 
-extern NetworkHttp *network_http;
-
+#endif
 #endif
 

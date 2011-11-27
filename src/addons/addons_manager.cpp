@@ -294,7 +294,8 @@ void AddonsManager::downloadIcons()
             Request *r = network_http->downloadFileAsynchron(url, save, 
                                                  /*priority*/1,
                                                /*manage_mem*/true);
-            r->setAddonIconNotification(&addon);            
+            if (r != NULL)
+                r->setAddonIconNotification(&addon);            
         }
         else
             m_addons_list.getData()[i].setIconReady();

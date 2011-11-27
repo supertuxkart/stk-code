@@ -1145,6 +1145,8 @@
 		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = ../../input/input_device.hpp; sourceTree = SOURCE_ROOT; };
 		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = ../../input/device_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95A5402D1481BD950086FE38 /* inetwork_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = inetwork_http.hpp; path = ../../addons/inetwork_http.hpp; sourceTree = SOURCE_ROOT; };
+		95A540411481BEB60086FE38 /* dummy_network_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_network_http.hpp; path = ../../addons/dummy_network_http.hpp; sourceTree = SOURCE_ROOT; };
 		95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_screen.cpp; path = ../../states_screens/tutorial_screen.cpp; sourceTree = SOURCE_ROOT; };
 		95AAD97F12BAD36300B7B8A3 /* tutorial_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_screen.hpp; path = ../../states_screens/tutorial_screen.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD12102DE08F00EF2001 /* device_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_config.hpp; path = ../../config/device_config.hpp; sourceTree = SOURCE_ROOT; };
@@ -1510,6 +1512,8 @@
 				9538A55F12CD094200CE3220 /* addon.hpp */,
 				9538E2B512C25D6800172896 /* addons_manager.cpp */,
 				9538E2B612C25D6800172896 /* addons_manager.hpp */,
+				95A540411481BEB60086FE38 /* dummy_network_http.hpp */,
+				95A5402D1481BD950086FE38 /* inetwork_http.hpp */,
 				9538E2B712C25D6800172896 /* network_http.cpp */,
 				9538E2B812C25D6800172896 /* network_http.hpp */,
 				9584B309137CAC12008565D7 /* news_manager.cpp */,

@@ -187,6 +187,8 @@ set( SRCS ${SRCS} src/main.cpp
 	src/addons/addon.hpp
 	src/addons/addons_manager.cpp
 	src/addons/addons_manager.hpp
+    src/addons/dummy_network_http.hpp
+    src/addons/inetwork_http.hpp
 	src/addons/network_http.cpp
 	src/addons/network_http.hpp
 	src/addons/news_manager.cpp
