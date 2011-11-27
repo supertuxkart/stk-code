@@ -25,12 +25,14 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#  include <OpenAL/alc.h>
-#else
-#  include <AL/al.h>
-#  include <AL/alc.h>
+#if HAVE_OGGVORBIS
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#    include <OpenAL/alc.h>
+#  else
+#    include <AL/al.h>
+#    include <AL/alc.h>
+#  endif
 #endif
 
 //----------------------------------------------------------------------------
@@ -72,6 +74,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 bool SFXBuffer::load()
 {
+#if HAVE_OGGVORBIS
     if (m_loaded) return false;
     
     alGetError(); // clear errors from previously
@@ -90,6 +93,7 @@ bool SFXBuffer::load()
         // TODO: free al buffer here?
         return false;
     }
+#endif
     
     m_loaded = true;
     return true;
@@ -99,11 +103,13 @@ bool SFXBuffer::load()
 
 void SFXBuffer::unload()
 {
+#if HAVE_OGGVORBIS
     if (m_loaded)
     {
         alDeleteBuffers(1, &m_buffer);
         m_buffer = 0;
     }
+#endif
     m_loaded = false;
 }
 
@@ -114,6 +120,7 @@ void SFXBuffer::unload()
  */
 bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 {
+#if HAVE_OGGVORBIS
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
     
     
@@ -176,5 +183,8 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     ov_clear(&oggFile);
     fclose(file);
     return success;
+#else
+    return false;
+#endif
 }
 

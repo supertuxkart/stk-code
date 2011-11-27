@@ -24,10 +24,15 @@
 #include <string>
 #include <vector>
 #include <map>
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
+
+#if HAVE_OGGVORBIS
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#  else
+#    include <AL/al.h>
+#  endif
 #else
-#  include <AL/al.h>
+typedef unsigned int ALuint;
 #endif
 
 #include "utils/no_copy.hpp"
