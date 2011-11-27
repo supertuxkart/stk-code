@@ -24,6 +24,11 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 
+#include <ISceneManager.h>
+#include <ICameraSceneNode.h>
+#include <SColor.h>
+#include <IBillboardSceneNode.h>
+
 class XMLNode;
 
 /** A 2d billboard animation. */
@@ -36,6 +41,16 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
     xml_node.get("texture", &texture_name);
     xml_node.get("width",   &width       );
     xml_node.get("height",  &height      );
+    
+    m_fade_out_when_close = false;
+    xml_node.get("fadeout", &m_fade_out_when_close);
+    
+    if (m_fade_out_when_close)
+    {
+        xml_node.get("start",  &m_fade_out_start);
+        xml_node.get("end",    &m_fade_out_end  );
+    }
+    
     video::ITexture *texture = 
         irr_driver->getTexture(file_manager->getTextureFile(texture_name));
     m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
@@ -62,5 +77,27 @@ void BillboardAnimation::update(float dt)
         m_node->setPosition(xyz);
         m_node->setScale(scale);
         // Setting rotation doesn't make sense
+    }
+    
+    if (m_fade_out_when_close)
+    {
+        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+        const float dist =  m_node->getPosition().getDistanceFrom( curr_cam->getPosition() );
+
+        scene::IBillboardSceneNode* node = (scene::IBillboardSceneNode*)m_node;
+        
+        if (dist < m_fade_out_start)
+        {
+            node->setColor(video::SColor(0, 255, 255, 255));
+        }
+        else if (dist > m_fade_out_end)
+        {
+            node->setColor(video::SColor(255, 255, 255, 255));
+        }
+        else
+        {
+            int a = (int)(255*(dist - m_fade_out_start) / (m_fade_out_end - m_fade_out_start));
+            node->setColor(video::SColor(a, 255, 255, 255));
+        }
     }
 }   // update

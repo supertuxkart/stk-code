@@ -32,6 +32,12 @@ class XMLNode;
   */
 class BillboardAnimation : public AnimationBase
 {
+    /** To create halo-like effects where the halo disapears when you get
+        close to it. Requested by samuncle */
+    bool m_fade_out_when_close;
+    float m_fade_out_start;
+    float m_fade_out_end;
+    
 public:
              BillboardAnimation(const XMLNode &node);
     virtual ~BillboardAnimation() {};
