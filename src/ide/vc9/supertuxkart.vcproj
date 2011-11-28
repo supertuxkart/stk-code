@@ -1541,7 +1541,15 @@
 				Name="audio"
 				>
 				<File
+					RelativePath="..\..\audio\dummy_sfx.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\audio\music.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\music_dummy.hpp"
 					>
 				</File>
 				<File
@@ -2250,6 +2258,14 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\addons_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\dummy_network_http.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\inetwork_http.hpp"
 					>
 				</File>
 				<File
