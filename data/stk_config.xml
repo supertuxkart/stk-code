@@ -266,7 +266,7 @@
     <stability roll-influence="0.03"
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
-               downward-impulse-factor="2"
+               downward-impulse-factor="0"
                track-connection-accel="0"/>
 
     <!-- Parameters for the upright constraint, which keeps karts upright. -->
