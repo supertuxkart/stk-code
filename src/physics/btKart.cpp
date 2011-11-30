@@ -764,7 +764,7 @@ void btKart::updateFriction(btScalar timeStep)
 
             btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
 
-#if defined ROLLING_INFLUENCE_FIX 
+#if defined ROLLING_INFLUENCE_FIX && !defined COMPATIBLE_0_7_3
             // fix. It only worked if car's up was along Y - VT.
             btVector3 vChassisWorldUp = 
                                     getRigidBody()->getCenterOfMassTransform()
