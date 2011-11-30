@@ -38,17 +38,14 @@ btRigidBody& btActionInterface::getFixedBody()
 // ============================================================================
 btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster, 
                Kart *kart)
-      : m_vehicleRaycaster(raycaster),
-        m_pitchControl(btScalar(0.))
+      : m_vehicleRaycaster(raycaster)
 {
 	m_chassisBody               = chassis;
 	m_indexRightAxis            = 0;
 	m_indexUpAxis               = 2;
 	m_indexForwardAxis          = 1;
-	m_currentVehicleSpeedKmHour = btScalar(0.);
-	m_steeringValue             = btScalar(0.);	
-    m_num_wheels_on_ground      = 0;
     m_kart                      = kart;
+    reset();
 }   // btKart
 	
 // ----------------------------------------------------------------------------
@@ -108,6 +105,11 @@ void btKart::reset()
         wheel.m_rotation                       = 0;
         updateWheelTransformsWS(wheel);
     }
+    m_zipper_active             = false;
+    m_zipper_velocity           = btScalar(0);
+    m_allow_sliding             = false;
+	m_currentVehicleSpeedKmHour = btScalar(0.);
+    m_num_wheels_on_ground      = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -662,6 +664,21 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
+        if(m_zipper_active && m_zipper_velocity > 0)
+        {
+            if (wheel==2 || wheel==3)
+            {
+                // The zipper velocity is the speed that should be
+                // reached. So compute the impulse to accelerate the
+                // kart up to that speed:
+                m_forwardImpulse[wheel] = 
+                    0.5f*(m_zipper_velocity - 
+                          getRigidBody()->getLinearVelocity().length())
+                    / m_chassisBody->getInvMass();
+            }
+
+        }
+
         btScalar	rollingFriction = 0.f;
 
         if (wheelInfo.m_engineForce != 0.f)
@@ -713,12 +730,15 @@ void btKart::updateFriction(btScalar timeStep)
 
     }   //     for (int wheel=0; wheel<getNumWheels(); wheel++)
 
+    m_zipper_active   = false;
+    m_zipper_velocity = 0;
     if (sliding)
     {
         for (int wheel = 0; wheel < getNumWheels(); wheel++)
         {
-            if (m_sideImpulse[wheel] != btScalar(0.) &&
-                m_wheelInfo[wheel].m_skidInfo< btScalar(1.))
+            if (m_sideImpulse[wheel] != btScalar(0.)       &&
+                m_allow_sliding                            &&
+                m_wheelInfo[wheel].m_skidInfo< btScalar(1.)   )
             {
                 m_forwardImpulse[wheel] *=	m_wheelInfo[wheel].m_skidInfo;
                 m_sideImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
@@ -818,18 +838,29 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
 
 
 // ----------------------------------------------------------------------------
+/** Enables or disables sliding.
+ *  \param active Enable (true) or disable sliding.
+ */
 void btKart::setSliding(bool active) 
 {
+    m_allow_sliding = active;
 }   // setSliding
 
 // ----------------------------------------------------------------------------
+/** Activates an additional speedup for the kart so that it reaches the
+ *  specified speed.
+ *  \param speed The speed to reach.
+ */
 void btKart::activateZipper(float speed)
 {
+    m_zipper_active   = true; 
+    m_zipper_velocity = speed;
 }   // activateZipper
 
 // ----------------------------------------------------------------------------
 void btKart::deactivateZipper()
 {
+    m_zipper_active = false; 
 }   // deactivateZipper
 
 // ----------------------------------------------------------------------------

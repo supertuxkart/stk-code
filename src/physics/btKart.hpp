@@ -25,7 +25,7 @@ class Kart;
 ///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
 class btKart : public btActionInterface
 {
-protected:
+private:
 		btAlignedObjectArray<btVector3>	m_forwardWS;
 		btAlignedObjectArray<btVector3>	m_axle;
 		btAlignedObjectArray<btScalar>	m_forwardImpulse;
@@ -59,12 +59,17 @@ public:
 		};
 protected:
 
-	btScalar	m_tau;
-	btScalar	m_damping;
-	btVehicleRaycaster*	m_vehicleRaycaster;
-	btScalar		m_pitchControl;
-	btScalar	m_steeringValue; 
-	btScalar m_currentVehicleSpeedKmHour;
+	btScalar	        m_damping;
+	btVehicleRaycaster *m_vehicleRaycaster;
+	btScalar            m_currentVehicleSpeedKmHour;
+    bool                m_zipper_active;
+    btScalar            m_zipper_velocity;
+    
+    /** Sliding (skidding) will only be permited when this is true. Also check
+     *  the friction parameter in the wheels since friction directly affects 
+     *  skidding.
+     */
+    bool                m_allow_sliding;
 
 	btRigidBody* m_chassisBody;
 
@@ -139,11 +144,6 @@ public:
 
 	
 	void setBrake(btScalar brake,int wheelIndex);
-
-	void	setPitchControl(btScalar pitch)
-	{
-		m_pitchControl = pitch;
-	}
 	
 	void	updateSuspension(btScalar deltaTime);
 
