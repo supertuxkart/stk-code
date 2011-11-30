@@ -65,6 +65,30 @@ public:
     }
 };
 
+//-----------------------------------------------------------------------------
+
+class SplattingProvider : public video::IShaderConstantSetCallBack
+{
+public:
+    LEAK_CHECK()
+    
+    virtual void OnSetConstants(
+                                irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int tex_layout = 0;
+        services->setPixelShaderConstant("tex_layout", (float*)&tex_layout, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int tex_detail0 = 1;
+        services->setPixelShaderConstant("tex_detail0", (float*)&tex_detail0, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int tex_detail1 = 2;
+        services->setPixelShaderConstant("tex_detail1", (float*)&tex_detail1, 1);
+    }
+};
 
 //-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
@@ -189,6 +213,13 @@ Material::Material(const XMLNode *node, int index)
                     s.c_str());
     }
     
+    node->get("splatting", &m_splatting);
+    if (m_splatting)
+    {
+        node->get("splatting-texture-1", &m_splatting_texture_1);
+        node->get("splatting-texture-2", &m_splatting_texture_2);
+    }
+    
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
     for (unsigned int i=0; i<children_count; i++)
@@ -280,6 +311,8 @@ void Material::init(unsigned int index)
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_normal_map_provider       = NULL;
+    m_splatting_provider        = NULL;
+    m_splatting                 = NULL;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -339,6 +372,11 @@ Material::~Material()
     {
         m_normal_map_provider->drop();
         m_normal_map_provider = NULL;
+    }
+    if (m_splatting_provider != NULL)
+    {
+        m_splatting_provider->drop();
+        m_splatting_provider = NULL;
     }
     
     // If a special sfx is installed (that isn't part of stk itself), the
@@ -612,6 +650,44 @@ void  Material::setMaterialProperties(video::SMaterial *m)
         m->MaterialTypeParam = m_parallax_height;
         m->SpecularColor.set(0,0,0,0);
         modes++;
+    }
+    if (m_splatting)
+    {
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
+            video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
+        {
+            ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
+            m->setTexture(1, tex);
+            tex = irr_driver->getTexture(m_splatting_texture_2);
+            m->setTexture(2, tex);
+            
+            if (m_splatting_provider == NULL)
+            {
+                m_splatting_provider = new SplattingProvider();
+            }
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = 
+            video_driver->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                                         (file_manager->getDataDir() + 
+                                                                          "shaders/splatting.vert").c_str(), 
+                                                                         "main",
+                                                                         video::EVST_VS_2_0,
+                                                                         (file_manager->getDataDir() + 
+                                                                          "shaders/splatting.frag").c_str(), 
+                                                                         "main",
+                                                                         video::EPST_PS_2_0,
+                                                                         m_splatting_provider,
+                                                                         video::EMT_SOLID_2_LAYER );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+        }
+        else
+        {
+            // TODO: we need a sane fallback when splatting is not available!
+        }
     }
     
     if (modes > 1)

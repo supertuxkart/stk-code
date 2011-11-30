@@ -39,6 +39,7 @@ class SFXBase;
 class ParticleKind;
 
 class NormalMapProvider;
+class SplattingProvider;
 
 /**
   * \ingroup graphics
@@ -161,8 +162,20 @@ private:
 
     std::string      m_mask;
     
+    /** Whether to use splatting */
+    bool             m_splatting;
+    
+    /** If m_splatting is true, indicates the first splatting texture */
+    std::string      m_splatting_texture_1;
+    
+    /** If m_splatting is true, indicates the second splatting texture */
+    std::string      m_splatting_texture_2;
+
     /** Only used if normal maps are used */
     NormalMapProvider* m_normal_map_provider;
+    
+    /** Only used if splatting is used */
+    SplattingProvider*  m_splatting_provider;
     
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
