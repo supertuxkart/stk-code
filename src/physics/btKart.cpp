@@ -738,7 +738,13 @@ void btKart::updateFriction(btScalar timeStep)
         {
             m_chassisBody->applyImpulse(
                                   m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
+#define COMPATIBLE_0_7_3
+#ifdef COMPATIBLE_0_7_3
+                                  // This was apparently done to help hexley
+                                  btVector3(0,0,0));
+#else
                                   rel_pos);
+#endif
         }
         if (m_sideImpulse[wheel] != btScalar(0.))
         {
