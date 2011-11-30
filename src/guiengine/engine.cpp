@@ -126,9 +126,9 @@ namespace GUIEngine
  \note The layout algorithm will reserve space for at most one line of text
        (if needed) for ribbon elements. If you have ribbon elements with
        long texts that spawn many lines, 1. give the word_wrap="true" property
-       to the icon button widget in the XML file; 2. expect that the extra lines
-       will not be accounted for in the sizing algorithms (i.e. extra lines will
-       just expand over whatever is located under the ribbon)
+       to the icon button widget in the XML file; 2. expect that the extra 
+       lines will not be accounted for in the sizing algorithms (i.e. extra 
+       lines will just expand over whatever is located under the ribbon)
  
  \n
  \subsection widget2 WTYPE_SPINNER
@@ -328,7 +328,8 @@ namespace GUIEngine
  \subsection prop6 PROP_MIN_VALUE, PROP_MAX_VALUE
  <em> Name in XML files: </em> \c "min_value", \c "max_value" 
  
- used to specify a minimum and maximum value for numeric widgets (c.f. spinner)
+ used to specify a minimum and maximum value for numeric widgets 
+ (c.f. spinner)
  
  \n
  \subsection prop7 PROP_X, PROP_Y       
@@ -367,7 +368,7 @@ namespace GUIEngine
  \subsection prop9 PROP_MAX_WIDTH, PROP_MAX_HEIGHT    
  <em> Names in XML files: </em> \c "max_width", \c "max_height" 
  
- The maximum size a widget can take; especially useful when using percentages 
+ The maximum size a widget can take; especially useful when using percentages
  and proportions.
  
  \n
@@ -487,8 +488,8 @@ namespace GUIEngine
  is called after the irrlicht elements have been added on screen; if you wish
  to alter elements BEFORE they are actually added, use either
  Screen::loadedFromFile or Screen::beforeAddingWidget ; the
- difference is that the first is called once only upon loading, whereas the second
- is called every time the menu is visited.
+ difference is that the first is called once only upon loading, whereas the 
+ second is called every time the menu is visited.
  
  \n
  Summary of callbacks, in order :
@@ -502,26 +503,28 @@ namespace GUIEngine
  \li Screen::init (implement it if you need it)
  \li (Ask to leave the Screen through the StateManager)
  \li Screen::tearDown (implement it if you need it)
- \li Widget::elementRemoved is called automatically on each Widget of the screen
+ \li Widget::elementRemoved is called automatically on each Widget of the 
+     screen
  
  Widget::m_properties contains all the widget properties as loaded
  from the XML file. They are generally only read from the Widget::add
- method, so if you alter a property after 'add()' was called it will not appear
- on screen.
+ method, so if you alter a property after 'add()' was called it will not 
+ appear on screen.
  
- Note that the same instance of your object may be entered/left more than once,
- so make sure that one instance of your object can be used several times if 
- the same screen is visited several times.
+ Note that the same instance of your object may be entered/left more than 
+ once, so make sure that one instance of your object can be used several 
+ times if the same screen is visited several times.
  
  Note that the same instance of your object may be unloaded then loaded back 
  later. It is thus important to do set-up in the Screen::loadedFromFile
- callback rather than in the constructor (after the creation of Screen object, it
- may be unloaded then loaded back at will, this is why it's important to not rely
- on the constructor to perform set-up).
+ callback rather than in the constructor (after the creation of Screen object,
+ it may be unloaded then loaded back at will, this is why it's important to 
+ not rely on the constructor to perform set-up).
  
  Do not delete a Screen manually, since the GUIEngine caches them; deleting
  a Screen will only result in dangling pointers in the GUIEngine. Instead, let
- the GUIEngine do the cleanup itself on shutdown, or on e.g. resolution change.
+ the GUIEngine do the cleanup itself on shutdown, or on e.g. resolution 
+ change.
  
  You can also explore the various methods in Screen to discover 
  more optional callbacks you can use.
@@ -536,67 +539,82 @@ namespace GUIEngine
  
  \subsection Widget Widget
  
- SuperTuxKart's GUIEngine::Widget class is a wrapper for the underlying irrlicht classes.
- This is needed for a couple reasons :
+ SuperTuxKart's GUIEngine::Widget class is a wrapper for the underlying 
+ irrlicht classes. This is needed for a couple reasons :
  - irrlicht widgets do not do everything we want; so many STK widgets act as
    composite widgets (create multiple irrlicht widgets and adds logic so they
    behave as a whole to the end-user)
- - STK widgets have a longer life-span than their underlying irrlicht counterparts.
-   This is simply an optimisation measure to prevent having to seek the file to disk
-   everytime a screen switch occurs.
+ - STK widgets have a longer life-span than their underlying irrlicht 
+   counterparts. This is simply an optimisation measure to prevent having to 
+   seek the file to disk everytime a screen switch occurs.
  
- Each widget contains one (or several) \c irr::gui::IGUIElement instances that represent
- the irrlicht widget that is added to the \c IGUIEnvironment if the widget is currently
- shown; if a widget is not currently shown on screen (in irrlicht's \c IGUIEnvironment),
- then its underlying \c IGUIElement pointer will be \c NULL but the widget continues to exist
- and remains ready to re-create its underlying irrlicht widget when the screen it is
- part of is added again. The method \c add() is used to tell a widget to create its irrlicht
- counterpart in the \c IGUIEnvironment - but note that unless you start handling stuff manually
- you do NOT need to invoke \c add() on each widget manually, since the parent GUIEngine::Screen object
- will do it automatically when it is shown. When the irrlicht \c IGUIEnvironment
- is cleared (when irrlicht widgets are removed), it is very important to tell the Widgets
- that their pointer to their \cIGUIElement counterpart is no more valid; this is done by calling
- \c elementRemoved() - but again unless you do manual manipulation of the widget tree, the GUIEngine::Screen
- object will take care of this for you.
+ Each widget contains one (or several) \c irr::gui::IGUIElement instances 
+ that represent the irrlicht widget that is added to the \c IGUIEnvironment 
+ if the widget is currently shown; if a widget is not currently shown on 
+ screen (in irrlicht's \c IGUIEnvironment), then its underlying 
+ \c IGUIElement pointer will be \c NULL but the widget continues to exist
+ and remains ready to re-create its underlying irrlicht widget when the screen
+ it is part of is added again. The method \c add() is used to tell a widget 
+ to create its irrlicht counterpart in the \c IGUIEnvironment - but note that
+ unless you start handling stuff manually you do NOT need to invoke \c add() 
+ on each widget manually, since the parent GUIEngine::Screen object will do
+ it automatically when it is shown. When the irrlicht \c IGUIEnvironment
+ is cleared (when irrlicht widgets are removed), it is very important to tell
+ the Widgets that their pointer to their \cIGUIElement counterpart is no more
+ valid; this is done by calling \c elementRemoved() - but again unless you do
+ manual manipulation of the widget tree, the GUIEngine::Screen object will 
+ take care of this for you.
  
- So, before trying to access the underlying irrlicht element of a GUIEngine::Widget, it is thus important to
- check if the GUIEngine::Widget is currently added to the irr \c IGUIEnvironment. This can be done by
- calling \c ->getIrrlichtElement() and checking if the result is \c NULL (if non-null, the widget is
- currently added to the screen). Of course, in some circumstances, the check can be skipped because the
- widget is known to be currently visible.
+ So, before trying to access the underlying irrlicht element of a 
+ GUIEngine::Widget, it is thus important to check if the GUIEngine::Widget 
+ is currently added to the irr \c IGUIEnvironment. This can be done by
+ calling \c ->getIrrlichtElement() and checking if the result is \c NULL (if 
+ non-null, the widget is currently added to the screen). Of course, in some
+ circumstances, the check can be skipped because the widget is known to be
+ currently visible.
  
- VERY IMPORTANT: some methods should only be called before Screen::init, and some methods should only be
- called after Screen::init. Unfortunately the documentation does not always make this clear at this point :(
- A good hint is that methods that make calls on a IGUIElement* need to be called after init(), the others
- needs to be called before.
+ VERY IMPORTANT: some methods should only be called before Screen::init, and
+ some methods should only be called after Screen::init. Unfortunately the 
+ documentation does not always make this clear at this point :(
+ A good hint is that methods that make calls on a IGUIElement* need to be 
+ called after init(), the others needs to be called before.
  
  
  \subsection Screen Screen
  
- This class holds a tree of GUIEngine::Widget instances. It takes care of creating the tree from
- a XML file upon loading (with the help of others, for instane the GUIEngine::LayoutManager); it handles
- calling \c add() on each of its GUIEngine::Widget children when being added - so that the corresponding
- \c IGUIElement irrlicht widgets are added to the irrlicht scene. It also takes care of telling
- its GUIEngine::Widget children when their irrlicht \c IGUIElement counterpart was removed from the
+ This class holds a tree of GUIEngine::Widget instances. It takes care of 
+ creating the tree from a XML file upon loading (with the help of others, 
+ for instane the GUIEngine::LayoutManager); it handles calling \c add() on
+ each of its GUIEngine::Widget children when being added - so that the 
+ corresponding \c IGUIElement irrlicht widgets are added to the irrlicht 
+ scene. It also takes care of telling its GUIEngine::Widget children when
+ their irrlicht \c IGUIElement counterpart was removed from the
  \c IGUIEnvironment so that they don't carry dangling pointers.
 
  
- The default behavior of the GUIEngine::Screen object will be just fine for most basic purposes, but
- if you want to build highly dynamic screens, you may need to get your hands dirty. Take a
- look at GUIEngine::Screen::manualRemoveWidget() and GUIEngine::Screen::manualAddWidget() if you wish to dynamically
- modify the STK widget tree at runtime. If you get into this, be very careful about the relationship
- between the STK widget tree and the irrlicht widget tree. If you \c manualRemoveWidget() a STK
- widget that is currently visible on screen, this does not remove its associated irrlicht widget;
- call \c widget->getIrrlichtElement()->remove() for that. When you removed a widget from a Screen you
- are also responsible to call \c Widget::elementRemoved() on them to avoid dangling pointers.
- Similarly, a GUIEngine::Widget that is not inside a GUIEngine::Screen when the screen is added will not
- have its \c add() method be called automatically (so, for instance, if you \c manualAddWidget() a widget
- after a Screen was shown, you will also need to call \c ->add() on the widget so that it is added to the
- irrlicht GUI environment).
+ The default behavior of the GUIEngine::Screen object will be just fine for
+ most basic purposes, but if you want to build highly dynamic screens, you 
+ may need to get your hands dirty. Take a look at 
+ GUIEngine::Screen::manualRemoveWidget() and 
+ GUIEngine::Screen::manualAddWidget() if you wish to dynamically modify the 
+ STK widget tree at runtime. If you get into this, be very careful about the
+ relationship
+ between the STK widget tree and the irrlicht widget tree. If you 
+ \c manualRemoveWidget() a STK widget that is currently visible on screen,
+ this does not remove its associated irrlicht widget; call 
+ \c widget->getIrrlichtElement()->remove() for that. When you removed a
+ widget from a Screen you are also responsible to call 
+ \c Widget::elementRemoved() on them to avoid dangling pointers.
+ Similarly, a GUIEngine::Widget that is not inside a GUIEngine::Screen 
+ when the screen is added will not have its \c add() method be called
+ automatically (so, for instance, if you \c manualAddWidget() a widget
+ after a Screen was shown, you will also need to call \c ->add() on the
+ widget so that it is added to the irrlicht GUI environment).
  
- As a final note, note that the GUIEngine::Skin depends on both the irrlicht widget and the STK widget to
- render widgets properly. So adding an irrlicht IGUIElement without having its SuperTuxKart
- GUIEngine::Widget accessible through the current GUIEngine::Screen (or a modal dialog) may result in
+ As a final note, note that the GUIEngine::Skin depends on both the irrlicht
+ widget and the STK widget to render widgets properly. So adding an irrlicht
+ IGUIElement without having its SuperTuxKart GUIEngine::Widget accessible 
+ through the current GUIEngine::Screen (or a modal dialog) may result in
  rendering glitches.
  
  
@@ -652,13 +670,13 @@ namespace GUIEngine
     
     float dt = 0;
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     float getLatestDt()
     {
         return dt;
     }   // getLatestDt
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     struct MenuMessage
     {
         irr::core::stringw m_message;
@@ -873,20 +891,20 @@ namespace GUIEngine
         // kill everything along the device
     }   // cleanUp
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
     /**
       * To be called after cleanup().
-      * The difference between cleanup() and free() is that cleanUp() just removes
-      * some cached data but does not actually uninitialize the gui engine. This
-      * does.
+      * The difference between cleanup() and free() is that cleanUp() just 
+      * removes some cached data but does not actually uninitialize the gui
+      * engine. This does.
       */
     void deallocate()
     {
         g_loaded_screens.clearAndDeleteAll();
     }   // deallocate
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, 
               AbstractStateManager* state_manager )
     {       
@@ -917,7 +935,8 @@ namespace GUIEngine
         {
             (void)err;   // avoid warning about unused variable
             std::cerr << 
-                "ERROR, cannot load skin specified in user config. Falling back to defaults.\n";
+                "ERROR, cannot load skin specified in user config. Falling "
+                "back to defaults.\n";
             UserConfigParams::m_skin_file.revertToDefaults();
             
             try
@@ -946,8 +965,8 @@ namespace GUIEngine
             0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
         
         ScalableFont* sfont = 
-            new ScalableFont(g_env, 
-                             file_manager->getFontFile("StkFont.xml").c_str());
+            new ScalableFont(g_env,
+                            file_manager->getFontFile("StkFont.xml").c_str());
         sfont->setScale(normal_text_scale);
         sfont->setKerningHeight(-5);
         g_font = sfont;
@@ -959,11 +978,12 @@ namespace GUIEngine
         sfont_smaller->setKerningHeight(-5);
         g_small_font = sfont_smaller;
         
-        Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
+        Private::small_font_height = 
+            g_small_font->getDimension( L"X" ).Height;
         
         ScalableFont* sfont2 = 
             new ScalableFont(g_env, 
-                             file_manager->getFontFile("title_font.xml").c_str());
+                          file_manager->getFontFile("title_font.xml").c_str());
         sfont2->m_fallback_font = sfont;
         // Because the fallback font is much smaller than the title font:
         sfont2->m_fallback_font_scale = 4.0f; 
@@ -972,7 +992,8 @@ namespace GUIEngine
         sfont2->setKerningWidth(-18);
         sfont2->m_black_border = true;
         g_title_font = sfont2;
-        Private::title_font_height = g_title_font->getDimension( L"X" ).Height;
+        Private::title_font_height = 
+            g_title_font->getDimension( L"X" ).Height;
 
         
         if (g_font != NULL) g_skin->setFont(g_font);
@@ -980,12 +1001,13 @@ namespace GUIEngine
         // set event receiver
         g_device->setEventReceiver(EventHandler::get());
         
-        g_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+        g_device->getVideoDriver()
+                ->beginScene(true, true, video::SColor(255,100,101,140));
         renderLoading();
         g_device->getVideoDriver()->endScene();
     }   // init
     
-    // ------------------------------------------------------------------------    
+    // -----------------------------------------------------------------------
     void reloadSkin()
     {
         assert(g_skin != NULL);
@@ -1016,7 +1038,7 @@ namespace GUIEngine
         assert(g_skin->getReferenceCount() == 1);
     }   // reloadSkin
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     
     void render(float elapsed_time)
     {    
@@ -1049,7 +1071,8 @@ namespace GUIEngine
             g_skin->renderSections();
         }
         
-        // let irrLicht do the rest (the Skin object will be called for further render)
+        // let irrLicht do the rest (the Skin object will be called for 
+        // further render)
         g_env->drawAll();
         
         // ---- some menus may need updating
@@ -1091,7 +1114,7 @@ namespace GUIEngine
                     
                     core::rect<s32> 
                         msgRect(core::position2d<s32>(0, 
-                                                      y_from - count*text_height),
+                                                  y_from - count*text_height),
                                 core::dimension2d<s32>(screen_size.Width, 
                                                        text_height) );
                     
@@ -1119,7 +1142,7 @@ namespace GUIEngine
         
     }   // render
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     
     std::vector<irr::video::ITexture*> g_loading_icons;
     
@@ -1152,8 +1175,9 @@ namespace GUIEngine
                                             0 /* no clipping */, 0, 
                                             true /* alpha */);
         
-        
-        irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
+        // seems like we need to remind irrlicht from time to time to use 
+        // the Material2D
+        irr_driver->getVideoDriver()->enableMaterial2D();
         g_title_font->draw(_("Loading"),
                            core::rect< s32 >( 0, screen_h/2 + texture_h/2,
                                               screen_w, screen_h ),
@@ -1168,9 +1192,10 @@ namespace GUIEngine
         for (int n=0; n<icon_count; n++)
         {
             g_driver->draw2DImage(g_loading_icons[n],
-                                  core::rect<s32>(x, y, x+icon_size, y+icon_size),
-                                  core::rect<s32>(core::position2d<s32>(0, 0), g_loading_icons[n]->getSize()),
-                                  NULL, NULL, true
+                              core::rect<s32>(x, y, x+icon_size, y+icon_size),
+                              core::rect<s32>(core::position2d<s32>(0, 0), 
+                                              g_loading_icons[n]->getSize()),
+                              NULL, NULL, true
                                   );
             
             x += ICON_MARGIN + icon_size;
@@ -1183,7 +1208,7 @@ namespace GUIEngine
     
     } // renderLoading
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     
     void addLoadingIcon(irr::video::ITexture* icon)
     {
@@ -1191,24 +1216,27 @@ namespace GUIEngine
         {
             g_loading_icons.push_back(icon);
             
-            g_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+            g_device->getVideoDriver()
+                    ->beginScene(true, true, video::SColor(255,100,101,140));
             renderLoading(false);
             g_device->getVideoDriver()->endScene();
         }
         else
         {
-            std::cerr << "WARNING: GUIEngine::addLoadingIcon given NULL icon\n";
+            std::cerr << "WARNING: GUIEngine::addLoadingIcon given "
+                         "NULL icon\n";
         }
     } // addLoadingIcon
 
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     
     Widget* getWidget(const char* name)
     {
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
-            Widget* widgetWithinDialog = ModalDialog::getCurrent()->getWidget(name);
+            Widget* widgetWithinDialog = 
+                ModalDialog::getCurrent()->getWidget(name);
             if (widgetWithinDialog != NULL) return widgetWithinDialog;
         }
         
@@ -1219,13 +1247,14 @@ namespace GUIEngine
         return screen->getWidget(name);
     }   // getWidget
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     Widget* getWidget(const int id)
     {
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {        
-            Widget* widgetWithinDialog = ModalDialog::getCurrent()->getWidget(id);
+            Widget* widgetWithinDialog = 
+                ModalDialog::getCurrent()->getWidget(id);
             if (widgetWithinDialog != NULL) return widgetWithinDialog;
         }
         
