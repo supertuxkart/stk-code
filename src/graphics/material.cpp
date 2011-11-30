@@ -87,6 +87,14 @@ public:
         // Irrlicht knows this is actually a GLint and makes the conversion
         int tex_detail1 = 2;
         services->setPixelShaderConstant("tex_detail1", (float*)&tex_detail1, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int tex_detail2 = 3;
+        services->setPixelShaderConstant("tex_detail2", (float*)&tex_detail2, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int tex_detail3 = 4;
+        services->setPixelShaderConstant("tex_detail3", (float*)&tex_detail3, 1);
     }
 };
 
@@ -218,6 +226,8 @@ Material::Material(const XMLNode *node, int index)
     {
         node->get("splatting-texture-1", &m_splatting_texture_1);
         node->get("splatting-texture-2", &m_splatting_texture_2);
+        node->get("splatting-texture-3", &m_splatting_texture_3);
+        node->get("splatting-texture-4", &m_splatting_texture_4);
     }
     
     // Terrain-specifc sound effect
@@ -660,8 +670,24 @@ void  Material::setMaterialProperties(video::SMaterial *m)
         {
             ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
             m->setTexture(1, tex);
-            tex = irr_driver->getTexture(m_splatting_texture_2);
+            
+            if (m_splatting_texture_2.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_2);
+            }
             m->setTexture(2, tex);
+            
+            if (m_splatting_texture_3.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_3);
+            }
+            m->setTexture(3, tex);
+            
+            if (m_splatting_texture_4.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_4);
+            }
+            m->setTexture(4, tex);
             
             if (m_splatting_provider == NULL)
             {

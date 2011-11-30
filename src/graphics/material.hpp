@@ -170,7 +170,13 @@ private:
     
     /** If m_splatting is true, indicates the second splatting texture */
     std::string      m_splatting_texture_2;
-
+    
+    /** If m_splatting is true, indicates the third splatting texture */
+    std::string      m_splatting_texture_3;   
+    
+    /** If m_splatting is true, indicates the fourth splatting texture */
+    std::string      m_splatting_texture_4;
+    
     /** Only used if normal maps are used */
     NormalMapProvider* m_normal_map_provider;
     
