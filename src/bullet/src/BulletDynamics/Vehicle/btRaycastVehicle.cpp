@@ -83,7 +83,7 @@ btWheelInfo&	btRaycastVehicle::addWheel( const btVector3& connectionPointCS, con
 	m_wheelInfo.push_back( btWheelInfo(ci));
 	
 	btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
-	
+    wheel.m_raycastInfo.m_suspensionLength = 0.0;
 	updateWheelTransformsWS( wheel , false );
 	updateWheelTransform(getNumWheels()-1,false);
 	return wheel;
