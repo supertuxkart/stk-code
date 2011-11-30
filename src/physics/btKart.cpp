@@ -752,6 +752,15 @@ void btKart::updateFriction(btScalar timeStep)
                 (btRigidBody*) m_wheelInfo[wheel].m_raycastInfo.m_groundObject;
             btVector3 rel_pos2 = wheelInfo.m_raycastInfo.m_contactPointWS 
                                - groundObject->getCenterOfMassPosition();
+            //adjust relative position above ground so that force only 
+            // acts sideways
+            btVector3 delta_vec = (wheelInfo.m_raycastInfo.m_hardPointWS 
+                                - wheelInfo.m_raycastInfo.m_contactPointWS);
+            if (delta_vec.length() != btScalar (0))
+            {
+                delta_vec = delta_vec.normalize();
+                rel_pos -= delta_vec * rel_pos.dot(delta_vec);
+            }
 
             btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
 
