@@ -27,7 +27,7 @@
 #define ROLLING_INFLUENCE_FIX
 
 
-btRigidBody& btActionInterface::getFixedBody()
+btRigidBody& btKart::getFixedBody()
 {
 	static btRigidBody s_fixed(0, 0,0);
 	s_fixed.setMassProps(btScalar(0.),btVector3(btScalar(0.),
@@ -555,7 +555,7 @@ struct btWheelContactPoint
 };   // struct btWheelContactPoint
 
 // ----------------------------------------------------------------------------
-btScalar calcRollingFriction(btWheelContactPoint& contactPoint)
+btScalar btKart::calcRollingFriction(btWheelContactPoint& contactPoint)
 {
 
 	btScalar j1=0.f;

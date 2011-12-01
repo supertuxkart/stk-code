@@ -21,6 +21,7 @@ class btDynamicsWorld;
 
 class btVehicleTuning;
 class Kart;
+struct btWheelContactPoint;
 
 ///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
 class btKart : public btActionInterface
@@ -34,6 +35,9 @@ private:
 		///backwards compatibility
 		int	m_userConstraintType;
 		int	m_userConstraintId;
+
+        static btRigidBody& getFixedBody();
+        btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
 
 public:
 	class btVehicleTuning
