@@ -389,6 +389,9 @@ namespace UserConfigParams
     /** Special debug camera being high over the kart. */
     PARAM_PREFIX bool m_camera_debug PARAM_DEFAULT( false );
 
+    /** True if physics debugging should be enabled. */
+    PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
+
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
 

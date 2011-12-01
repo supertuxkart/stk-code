@@ -47,18 +47,35 @@ public:
                              HISTORY_POSITION = 1,
                              HISTORY_PHYSICS  = 2 };
 private:
-    // maximum number of history events to store
+    /** maximum number of history events to store. */
     HistoryReplayMode          m_replay_mode;
+
+    /** Points to the last used entry, and will wrap around. */
     int                        m_current;
+
+    /** True if the buffer has wrapped around. */
     bool                       m_wrapped;
+
+    /** Counts how many entries in the arrays are used.  So if
+     *  the buffer hasn't wrapped around, this will indicate
+     *  how many entries to save. */
     int                        m_size;
+
+    /** Stores all time step sizes. */
     std::vector<float>         m_all_deltas;
+
+    /** Stores the kart controls being used (for physics replay). */
     std::vector<KartControl>   m_all_controls;
+
+    /** Stores the coordinates (for simple replay). */
     AlignedArray<Vec3>         m_all_xyz;
+
+    /** Stores the rotations of the karts. */
     AlignedArray<btQuaternion> m_all_rotations;
 
     /** The identities of the karts to use. */
     std::vector<std::string>  m_kart_ident;
+
     void  allocateMemory(int number_of_frames);
     void  updateSaving(float dt);
     void  updateReplay(float dt);
@@ -70,7 +87,7 @@ public:
     void  Save           ();
     void  Load           ();
 
-    // ------------------------------------------------------------------------
+    // -------------------I-----------------------------------------------------
     /** Returns the identifier of the n-th kart. */
     const std::string& getKartIdent(unsigned int n)
     {

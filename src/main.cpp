@@ -457,6 +457,15 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
         }
+        else if( !strcmp(argv[i], "--log=terminal"))
+        {
+            UserConfigParams::m_log_errors=false;
+        }
+        else if( !strcmp(argv[i], "--log=file"))
+        {
+            UserConfigParams::m_log_errors=true;
+        } 
+
         else if ( !strcmp(argv[i], "--debug=all") )
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
@@ -606,6 +615,11 @@ int handleCmdLine(int argc, char **argv)
                !strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
+        }
+        else if(UserConfigParams::m_artist_debug_mode && 
+               !strcmp(argv[i], "--physics-debug"))
+        {
+            UserConfigParams::m_physics_debug=1;
         }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
@@ -859,14 +873,7 @@ int handleCmdLine(int argc, char **argv)
             race_manager->setNumLaps(atoi(argv[i+1]));
             i++;
         }
-        else if( !strcmp(argv[i], "--log=terminal"))
-        {
-            UserConfigParams::m_log_errors=false;
-        }
-        else if( !strcmp(argv[i], "--log=file"))
-        {
-            UserConfigParams::m_log_errors=true;
-        } else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
+        else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
             printf("Profiling %d laps\n",n);
             UserConfigParams::m_no_start_screen = true;
@@ -923,6 +930,8 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=flyable")                       ) {}
         else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
         else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
+        else if( !strcmp(argv[i], "--log=terminal" )                       ) {}
+        else if( !strcmp(argv[i], "--log=file"     )                       ) {}
         else if( !strcmp(argv[i], "--screensize") || 
                  !strcmp(argv[i], "-s")            )                     {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}

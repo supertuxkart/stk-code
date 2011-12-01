@@ -470,6 +470,7 @@ set( SRCS ${SRCS} src/main.cpp
 	src/physics/physical_object.hpp
 	src/physics/physics.cpp
 	src/physics/physics.hpp
+        src/physics/stk_dynamics_world.hpp
 	src/physics/triangle_mesh.cpp
 	src/physics/triangle_mesh.hpp
 	src/physics/user_pointer.hpp

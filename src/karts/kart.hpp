@@ -27,7 +27,7 @@
   * of karts.
   */
 
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btTransform.h"
 
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
@@ -36,24 +36,23 @@
 #include "karts/emergency_animation.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/moveable.hpp"
-#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
 class btUprightConstraint;
-class btVehicleTuning;
+
 class Camera;
 class Item;
-class Quad;
-class Shadow;
-class SFXBase;
-class SkidMarks;
-class SlipStream;
+class KartModel;
 class ParticleEmitter;
 class ParticleKind;
 class Rain;
+class SFXBase;
+class Shadow;
+class SkidMarks;
+class SlipStream;
 
 /** The main kart class. All type of karts are of this object, but with 
  *  different controllers. The controllers are what turn a kart into a 
@@ -133,8 +132,6 @@ private:
 
     // Bullet physics parameters
     // -------------------------
-    btRaycastVehicle::btVehicleTuning 
-                            *m_tuning;
     btCompoundShape          m_kart_chassis;
     btVehicleRaycaster      *m_vehicle_raycaster;
     btKart                  *m_vehicle;
@@ -416,7 +413,7 @@ public:
     const std::string& getIdent() const {return m_kart_properties->getIdent();}
     // ------------------------------------------------------------------------
     /** Returns the start transform, i.e. position and rotation. */
-    const btTransform getResetTransform() const {return m_reset_transform;}
+    const btTransform& getResetTransform() const {return m_reset_transform;}
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart. */
     Controller*    getController() { return m_controller; }

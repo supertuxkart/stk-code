@@ -414,6 +414,26 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="input"
+					>
+					<File
+						RelativePath="..\..\input\binding.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\input\device_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\input\input_device.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\input\input_manager.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="challenges"
@@ -924,26 +944,6 @@
 				</File>
 				<File
 					RelativePath="..\..\io\xml_writer.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="input"
-				>
-				<File
-					RelativePath="..\..\input\binding.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\device_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\input_device.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\input_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -1710,6 +1710,10 @@
 				</File>
 				<File
 					RelativePath="..\..\physics\physics.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\stk_dynamics_world.hpp"
 					>
 				</File>
 				<File

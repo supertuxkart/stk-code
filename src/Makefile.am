@@ -293,6 +293,7 @@ supertuxkart_SOURCES = \
  physics/physical_object.hpp \
  physics/physics.cpp \
  physics/physics.hpp \
+ phsyics/stk_dynamics_world.hpp \
  physics/triangle_mesh.cpp \
  physics/triangle_mesh.hpp \
  physics/user_pointer.hpp \

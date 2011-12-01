@@ -85,7 +85,7 @@ private:
 
     // Display and gui
     // ---------------
-    std::string m_name;        /**< The human readable Name of the kart
+    std::string m_name;               /**< The human readable Name of the kart
                                        *   driver. */
     std::string m_ident;              /**< The computer readable-name of the
                                        *   kart driver. */
@@ -217,21 +217,41 @@ private:
     float m_friction_slip;
     float m_roll_influence;
     float m_wheel_radius;
+
+    /** An impulse pushing the kart down which is proportional to speed. So
+     *  the actual impulse is  speed * m_downward_impulse_factor. Set it to
+     *  0 to disable completely. Based on
+     *  http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=6059\
+     *  &p=21240&hilit=vehicle#p21240  */
+    float m_downward_impulse_factor;
+
+    /** Artifical acceleration that pulls a kart down onto the track if one 
+     *  axis loses contact with the track. */
+    float m_track_connection_accel;
+
+    /** Linear damping of the chassis to prevent it from toppling over. */
     float m_chassis_linear_damping;
+
+    /** Angular damping to prevent it from turning too easily. */
     float m_chassis_angular_damping;
+
     float m_max_speed[3];
     float m_max_speed_reverse_ratio;
-    Vec3  m_gravity_center_shift;    /**< Shift of center of gravity. */
-    float m_track_connection_accel;  /**< Artifical acceleration that pulls a
-                                      *   kart down onto the track if one axis
-                                      *   loses contact with the track. */
+
+    /** Shift of center of gravity. */
+    Vec3  m_gravity_center_shift;
+
+    /** The suspension reaction is dampened to reach an exponential behaviour.
+     *  See http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\
+     *  &p=25236&hilit=vehicle#p25236  for details. */
+    bool  m_exp_spring_response;
+
     float m_suspension_rest;
     float m_suspension_travel_cm;
     /** An additional artifical side-impulse that pushes the slower kart
      *  out of the way of the faster kart in case of a collision. */
     float m_collision_side_impulse;
-    /** Vertical velocity set when jumping. */
-    float m_jump_velocity;
+
     float m_upright_tolerance;
     float m_upright_max_force;
 
@@ -418,6 +438,12 @@ public:
     float getChassisAngularDamping  () const 
                                            {return m_chassis_angular_damping; }
 
+    /** Artifical downward impulse every frame. */
+    float getDownwardImpulseFactor() const { return m_downward_impulse_factor;}
+
+    /** Returns artificial acceleration to keep wheels on track. */
+    float getTrackConnectionAccel   () const {return m_track_connection_accel;}
+
     /** Returns the maximum speed dependent on the difficult level. */
     float getMaxSpeed               () const {return
                                    m_max_speed[race_manager->getDifficulty()];}
@@ -456,8 +482,8 @@ public:
     /** Returns the amount the suspension can extend. */
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;  }
 
-    /** Returns jump velocity (unused atm). */
-    float getJumpVelocity           () const {return m_jump_velocity;         }
+    /** Returns if the spring should be exponentially dampened. */
+    bool getExpSpringResponse() const {return m_exp_spring_response; }
 
     /** Returns the (artificial) collision side impulse this kart will apply
      *  to a slower kart in case of a collision. */
@@ -490,9 +516,6 @@ public:
 
     /** Returns the maximum value of the upright counteracting force. */
     float getUprightMaxForce        () const {return m_upright_max_force;     }
-
-    /** Returns artificial acceleration to keep wheels on track. */
-    float getTrackConnectionAccel   () const {return m_track_connection_accel;}
 
     /** Returns the maximum length of a rubber band before it breaks. */
     float getRubberBandMaxLength    () const {return m_rubber_band_max_length;}

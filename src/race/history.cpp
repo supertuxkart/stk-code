@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
+#include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -99,7 +100,9 @@ void History::updateSaving(float dt)
     }
     else
     {
-        m_size ++;
+        // m_size must be m_all_deltas.size() or smaller
+        if(m_size<(int)m_all_deltas.size())
+            m_size ++;
     }
     m_all_deltas[m_current] = dt;
 
@@ -122,12 +125,15 @@ void History::updateSaving(float dt)
 void History::updateReplay(float dt)
 {
     m_current++;
+    World *world = World::getWorld();
     if(m_current>=(int)m_all_deltas.size())
     {
         printf("Replay finished.\n");
-        exit(2);
+        m_current = 0;
+        // Note that for physics replay all physics parameters
+        // need to be reset, e.g. velocity, ...
+        world->restartRace();
     }
-    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
@@ -151,7 +157,7 @@ void History::updateReplay(float dt)
  */
 void History::Save()
 {
-    FILE *fd       = fopen("history.dat","w");
+    FILE *fd = fopen("history.dat","w");
     if(fd)
         printf("History saved in ./history.dat.\n");
     else
@@ -337,8 +343,7 @@ void History::Load()
             fgets(s, 1023, fd);
             int buttonsCompressed;
             float x,y,z,rx,ry,rz,rw;
-            sscanf(s, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
-                    &j, 
+            sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
                     &m_all_controls[i].m_steer,
                     &m_all_controls[i].m_accel,
                     &buttonsCompressed,

@@ -1234,7 +1234,8 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
             m_start_transforms[position].setOrigin(xyz);
             m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),h ) );
+                                           btQuaternion(btVector3(0,1,0),
+                                                        h*DEGREE_TO_RAD ) );
         }
         else if(name=="camera")
         {

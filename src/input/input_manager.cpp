@@ -235,7 +235,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_F10:
-            if(world) history->Save();
+            if(world && value) history->Save();
             break;
             
         case KEY_F11:

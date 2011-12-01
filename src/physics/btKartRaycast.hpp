@@ -8,8 +8,8 @@
  * of this software for any purpose.  
  * It is provided "as is" without express or implied warranty.
 */
-#ifndef BTKARTRAYCASTER_HPP
-#define BTKARTRAYCSATER_HPP
+#ifndef BTKARTRAYCAST_HPP
+#define BTKARTRAYCAST_HPP
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
