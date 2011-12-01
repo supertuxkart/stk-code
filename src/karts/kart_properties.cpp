@@ -70,7 +70,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
-        m_wheel_radius = m_chassis_linear_damping =
+        m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = 
         m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
@@ -385,10 +385,11 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *suspension_node = root->getNode("suspension"))
     {
-        suspension_node->get("stiffness",           &m_suspension_stiffness);
-        suspension_node->get("rest",                &m_suspension_rest     );
-        suspension_node->get("travel-cm",           &m_suspension_travel_cm);
-        suspension_node->get("exp-spring-response", &m_exp_spring_response );
+        suspension_node->get("stiffness",            &m_suspension_stiffness);
+        suspension_node->get("rest",                 &m_suspension_rest     );
+        suspension_node->get("travel-cm",            &m_suspension_travel_cm);
+        suspension_node->get("exp-spring-response",  &m_exp_spring_response );
+        suspension_node->get("max-force",            &m_max_suspension_force);
     }
 
     if(const XMLNode *wheels_node = root->getNode("wheels"))
@@ -585,6 +586,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
+    CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );

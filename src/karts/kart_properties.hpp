@@ -214,6 +214,7 @@ private:
     float m_suspension_stiffness;
     float m_wheel_damping_relaxation;
     float m_wheel_damping_compression;
+    float m_max_suspension_force;
     float m_friction_slip;
     float m_roll_influence;
     float m_wheel_radius;
@@ -418,6 +419,9 @@ public:
     /** Returns the wheel damping compression. */
     float getWheelDampingCompression() const 
                                           {return m_wheel_damping_compression;}
+
+    /** Returns maximum suspension force. */
+    float getMaxSuspensionForce() const {return m_max_suspension_force; }
 
     /** Returns friction slip. */
     float getFrictionSlip           () const {return m_friction_slip;         }

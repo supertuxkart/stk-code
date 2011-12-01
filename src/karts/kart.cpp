@@ -292,7 +292,10 @@ void Kart::createPhysics()
     btVector3 wheel_axle(-1.0f, 0.0f, 0.0f);
 
     btKart::btVehicleTuning tuning;
-    tuning.m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
+    tuning.m_maxSuspensionTravelCm = 
+        m_kart_properties->getSuspensionTravelCM();
+    tuning.m_maxSuspensionForce    = 
+        m_kart_properties->getMaxSuspensionForce();
 
     for(unsigned int i=0; i<4; i++)
     {
