@@ -237,7 +237,7 @@
             exponentially.
          max-force: Maximum suspension force -->
     <suspension stiffness="248" rest="0.2" travel-cm="19"
-         exp-spring-response="false" max-force="6000"/>
+         exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
          bullet, damping parameters. Radius and width of wheel.
