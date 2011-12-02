@@ -1407,6 +1407,20 @@ void Kart::resetBrakes()
  */
 void Kart::crashed(Kart *k, const Material *m)
 {
+#ifdef DEBUG
+    // Simple debug output for people playing without sound.
+    // This makes it easier to see if a kart hit the track (esp.
+    // after a jump).
+    // FIXME: This should be removed once the physics are fixed.
+    if(!k && UserConfigParams::m_physics_debug)
+    {
+        // Add a counter to make it easier to see if a new line of
+        // output was added.
+        static int counter=0;
+        printf("Kart %s hit track: %d.\n", getIdent().c_str(), counter++);
+    }
+#endif
+
     m_controller->crashed();
     /** If a kart is crashing against the track, the collision is often
      *  reported more than once, resulting in a machine gun effect, and too
