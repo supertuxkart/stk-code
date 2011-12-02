@@ -277,7 +277,6 @@ void Kart::createPhysics()
     m_vehicle_raycaster =
         new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
     m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
-        //FIXMEJH  m_kart_properties->getTrackConnectionAccel());
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
