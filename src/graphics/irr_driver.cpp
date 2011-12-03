@@ -515,7 +515,7 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
         // Get the recently added archive
         io::IFileArchive* zip_archive = 
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
-        io::IReadFile* content = zip_archive->createAndOpenFile("contents.b3d");
+        io::IReadFile* content = zip_archive->createAndOpenFile(0);
         m = m_scene_manager->getMesh(content);
         
         file_system->removeFileArchive(file_system->getFileArchiveCount()-1);
@@ -527,7 +527,6 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
     
     if(!m) return NULL;
     
-    m->grab(); // FIXME: why do I need this, and is there a corresponding drop?
     setAllMaterialFlags(m);
     
     return m;
