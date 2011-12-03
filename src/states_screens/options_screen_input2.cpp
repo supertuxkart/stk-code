@@ -381,13 +381,18 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             }
         }
         
-        GamepadConfig* config =  (GamepadConfig*)m_config;
-        config->setBinding(binding_to_set, sensed_input.m_type, 
-                           sensed_input.m_button_id,
-                          (Input::AxisDirection)sensed_input.m_axis_direction);
         
-        // refresh display
-        updateInputButtons();
+        std::string gamepad_name = input_manager->getDeviceList()->getGamePadFromIrrID(sensed_input.m_device_id)->m_name;
+        if (m_config->getName() == gamepad_name)
+        {
+            GamepadConfig* config =  (GamepadConfig*)m_config;
+            config->setBinding(binding_to_set, sensed_input.m_type, 
+                               sensed_input.m_button_id,
+                              (Input::AxisDirection)sensed_input.m_axis_direction);
+            
+            // refresh display
+            updateInputButtons();
+        }
     }
     else
     {
