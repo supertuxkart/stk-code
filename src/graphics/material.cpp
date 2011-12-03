@@ -60,7 +60,12 @@ public:
         services->setPixelShaderConstant("BumpTex", (float*)&bumptex, 1);
         
         // TODO: check the position of the sun
-        const float lightdir[] = {0.5f, 0.5f, 1.0f};
+        /*
+         You have to calculate the light position in (model)view Space. It can be done, by transforming the light positions and rotations
+         with the modelviewmatrix, after the camera is set. You should do this calculations before the shader runs, but it is also possible
+         to pass the camera matrix (calculation in modelviewspace) or ModelMatrix (calculation in WorldSpace) to a shader. 
+         */
+        const float lightdir[] = {-0.5f, -0.5f, -1.0f};
         services->setVertexShaderConstant("lightdir", lightdir, 3);
     }
 };

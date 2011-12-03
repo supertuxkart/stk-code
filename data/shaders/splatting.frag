@@ -5,6 +5,7 @@ uniform sampler2D tex_detail0;
 uniform sampler2D tex_detail1;
 uniform sampler2D tex_detail2;
 uniform sampler2D tex_detail3;
+uniform sampler2D tex_detail4;
 
 void main()
 {
@@ -13,8 +14,11 @@ void main()
     vec4 detail1 = texture2D(tex_detail1, gl_TexCoord[1].st);
     vec4 detail2 = texture2D(tex_detail2, gl_TexCoord[1].st);
     vec4 detail3 = texture2D(tex_detail3, gl_TexCoord[1].st);
+    vec4 detail4 = texture2D(tex_detail4, gl_TexCoord[1].st);
+
     gl_FragColor = layout.r * detail0 +
                    layout.g * detail1 +
                    layout.b * detail2 +
-                   (1.0 - layout.r - layout.g - layout.b) * detail3;
+                   (1.0 - layout.r - layout.g - layout.b) * detail3 +
+                   (1.0 - layout.a) * detail4;
 }
