@@ -109,20 +109,17 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     velocity->get("z", &m_velocity_z);
     
     // ------------------------------------------------------------------------
-    
+    // old deperecated way
     const XMLNode* material = xml->getNode("material");
-    if (material == NULL)
+    if (material != NULL)
     {
-        delete xml;
-        throw std::runtime_error("[ParticleKind] No <material> node in " + file);
-    }
-    
-    material->get("file", &m_material_file);
-    
-    if (m_material_file.size() == 0)
-    {
-        delete xml;
-        throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
+        material->get("file", &m_material_file);
+        
+        if (m_material_file.size() == 0)
+        {
+            delete xml;
+            throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
+        }
     }
     
     // ------------------------------------------------------------------------
@@ -199,6 +196,17 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         fadeaway->get("start", &m_fade_away_start);
         fadeaway->get("end",   &m_fade_away_end);
     }
+    
+    
+    // ------------------------------------------------------------------------
+    
+    const XMLNode* materials = xml->getNode("materials");
+    if (materials != NULL)
+    {
+        material_manager->pushTempMaterial(materials, file);
+        m_material_file = material_manager->getLatestMaterial()->getTexFname();
+    }
+    
     
     // ------------------------------------------------------------------------
     

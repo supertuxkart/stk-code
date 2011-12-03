@@ -221,14 +221,23 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
         if(root) delete root;
         return true;
     }
+    const bool success = pushTempMaterial(root, filename);
+    delete root;
+    return success;
+}   // pushTempMaterial
+
+//-----------------------------------------------------------------------------
+bool MaterialManager::pushTempMaterial(const XMLNode *root,
+                                       const std::string& filename)
+{
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
         if(!node)
         {
             // We don't have access to the filename at this stage anymore :(
-            fprintf(stderr, "Unknown node in material.dat file\n");
-            exit(-1);
+            fprintf(stderr, "Unknown node in material.xml file\n");
+            continue;
         }
         try
         {
@@ -240,9 +249,9 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
             fprintf(stderr, e.what(), filename.c_str());
         }
     }   // for i<xml->getNumNodes)(
-    delete root;
     return true;
 }   // pushTempMaterial
+
 
 //-----------------------------------------------------------------------------
 void MaterialManager::popTempMaterial()

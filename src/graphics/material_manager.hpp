@@ -34,6 +34,7 @@ using namespace irr;
 
 class Material;
 class XMLReader;
+class XMLNode;
 
 /**
   * \ingroup graphics
@@ -64,9 +65,12 @@ public:
                                 bool make_permanent=false);
     void      addSharedMaterial(const std::string& filename);
     bool      pushTempMaterial (const std::string& filename);
+    bool      pushTempMaterial (const XMLNode *root, const std::string& filename);
     void      popTempMaterial  ();
     
     bool      hasMaterial(const std::string& fname);
+    
+    Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };
 
 extern MaterialManager *material_manager;
