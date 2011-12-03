@@ -153,7 +153,7 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master)
+    if(m_is_master && m_mesh != NULL)
     {
         irr_driver->dropAllTextures(m_mesh);
         irr_driver->removeMeshFromCache(m_mesh);
@@ -284,13 +284,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     assert(m_is_master);
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
-    irr_driver->grabAllTextures(m_mesh);
     if(!m_mesh)
     {
         printf("Problems loading mesh '%s' - kart '%s' will not be available\n",
-            full_path.c_str(), kart_properties.getIdent().c_str());
+               full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+    irr_driver->grabAllTextures(m_mesh);
 
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &min, &max);
