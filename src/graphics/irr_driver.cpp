@@ -497,8 +497,39 @@ void IrrDriver::printRenderStats()
  */
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
-    scene::IAnimatedMesh* m = m_scene_manager->getMesh(filename.c_str());
-    if(m) setAllMaterialFlags(m);
+    scene::IAnimatedMesh *m  = NULL;
+    
+    if (StringUtils::getExtension(filename) == "b3dz")
+    {
+        // compressed file
+        io::IFileSystem* file_system = getDevice()->getFileSystem();
+        if (!file_system->addFileArchive(filename.c_str(), 
+                                         /*ignoreCase*/false, 
+                                         /*ignorePath*/true, io::EFAT_ZIP))
+        {
+            fprintf(stderr, "[IrrDriver::getMesh] Failed to open zip file <%s>\n",
+                    filename.c_str());
+            return NULL;
+        }
+        
+        // Get the recently added archive
+        io::IFileArchive* zip_archive = 
+        file_system->getFileArchive(file_system->getFileArchiveCount()-1);
+        io::IReadFile* content = zip_archive->createAndOpenFile("contents.b3d");
+        m = m_scene_manager->getMesh(content);
+        
+        file_system->removeFileArchive(file_system->getFileArchiveCount()-1);
+    }
+    else
+    {
+        m = m_scene_manager->getMesh(filename.c_str());
+    }
+    
+    if(!m) return NULL;
+    
+    m->grab(); // FIXME: why do I need this, and is there a corresponding drop?
+    setAllMaterialFlags(m);
+    
     return m;
 }   // getAnimatedMesh
 
@@ -509,11 +540,7 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
  */
 scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 {
-    scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
-    if(!m) return NULL;
-    setAllMaterialFlags(m);
-    
-    return m->getMesh(0);
+    return getAnimatedMesh(filename)->getMesh(0);
 }   // getMesh
 
 // ----------------------------------------------------------------------------

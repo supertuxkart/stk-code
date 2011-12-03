@@ -64,6 +64,7 @@ KartModel::KartModel(bool is_master)
 {
     m_is_master = is_master;
     m_kart = NULL;
+    m_mesh = NULL;
     
     for(unsigned int i=0; i<4; i++)
     {
