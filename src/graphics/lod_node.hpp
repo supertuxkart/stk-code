@@ -24,7 +24,7 @@
 #include <ISceneNode.h>
 namespace irr
 {
-    namespace scene { class ISceneManager; }
+    namespace scene { class ISceneManager; class ISceneNode; }
 }
 using namespace irr;
 
@@ -49,7 +49,7 @@ private:
     core::aabbox3d<f32> Box;
 
     std::vector<int> m_detail;
-    std::vector<scene::ISceneNode*> m_nodes;
+    std::vector<irr::scene::ISceneNode*> m_nodes;
     
     std::set<scene::ISceneNode*> m_nodes_set;
     

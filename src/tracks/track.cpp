@@ -50,6 +50,7 @@ using namespace irr;
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/lod_node_loader.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -595,12 +596,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
 // ----------------------------------------------------------------------------
 
-
-bool PairCompare(const std::pair<int, std::string>& i, const std::pair<int, std::string>& j)
-{
-    return (i.first < j.first);
-}
-
 /** Loads the main track model (i.e. all other objects contained in the
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
@@ -676,9 +671,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    std::map< std::string, std::map< int, std::string > > lod_groups;
-    std::map< std::string, std::vector< const XMLNode* > > lod_instances;
-    
+    LodNodeLoader lodLoader;
+
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
@@ -707,14 +701,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
         
-        float lod_distance = -1.0f;
-        n->get("lod_distance", &lod_distance);
-        
-        bool lod_instance = false;
-        n->get("lod_instance", &lod_instance);
-        
-        std::string lodgroup;
-        n->get("lod_group", &lodgroup);
+        lodLoader.check(n);
         
         if (tangent)
         {
@@ -750,18 +737,9 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (!lodgroup.empty())
+        else if (lodLoader.check(n))
         {
-            if (lod_instance)
-            {
-                lod_instances[lodgroup].push_back(n);
-                //printf("LOD instance : '%s' @ (%.2f, %.2f, %.2f)\n", lodgroup.c_str(), xyz.X, xyz.Y, xyz.Z);
-            }
-            else
-            {
-                lod_groups[lodgroup][(int)lod_distance] = model_name;
-                //printf("LOD Model Definition : group='%s', detail='%i', model='%s'\n", lodgroup.c_str(), detail, model_name.c_str());
-            }
+            // nothing to do
         }
         else
         {
@@ -799,108 +777,15 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
 
     }   // for i
-
-    scene::ISceneManager* sm = irr_driver->getSceneManager();
-    scene::ISceneNode* sroot = sm->getRootSceneNode();
     
-    // ================ Level Of Detail ================
-    // Creating LOD nodes is more complicated than one might have hoped, on the C++ side;
-    // but it was done this way to minimize the work needed on the side of the artists
-    
-    // 1. Sort LOD groups (highest detail first, lowest detail last)
-    std::map<std::string, std::vector< std::pair<int, std::string> > > sorted_lod_groups;
-    
-    std::map<std::string, std::map<int, std::string> >::iterator it;
-    for (it = lod_groups.begin(); it != lod_groups.end(); it++)
+    std::vector<LODNode*> lod_nodes;
+    lodLoader.done(m_root, m_all_cached_meshes, lod_nodes);
+    for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
-        std::map<int, std::string>::iterator it2;
-        for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        {
-            //printf("Copying before sort : (%i) %s is in group %s\n", it2->first, it2->second.c_str(), it->first.c_str());
-            sorted_lod_groups[it->first].push_back( std::pair<int, std::string>(it2->first, it2->second) );
-        }
-        std::sort( sorted_lod_groups[it->first].begin(), sorted_lod_groups[it->first].end(), PairCompare );
-        
-        //printf("Group '%s' :\n", it->first.c_str());
-        //for (unsigned int x=0; x<sorted_lod_groups[it->first].size(); x++)
-        //{
-        //    printf("  - (%i) %s\n", sorted_lod_groups[it->first][x].first, sorted_lod_groups[it->first][x].second.c_str());
-        //}
+        // FIXME: support for animated textures on LOD objects
+        // handleAnimatedTextures( lod_nodes[n], *node );
+        m_all_nodes.push_back( lod_nodes[n] );
     }
-    
-    // 2. Read the XML nodes and instanciate LOD scene nodes where relevant
-    std::string groupname;
-    std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
-    for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
-    {
-        std::vector< std::pair<int, std::string> >& group = sorted_lod_groups[it3->first];
-        
-        std::vector< const XMLNode* >& v = it3->second;
-        for (unsigned int n=0; n<v.size(); n++)
-        {
-            const XMLNode* node = v[n];
-            
-            if(node->getName()!="static-object")
-            {
-                fprintf(stderr, "Incorrect tag '%s' used in LOD instance - ignored\n",
-                        node->getName().c_str());
-                continue;
-            }
-
-            groupname = "";
-            node->get("lod_group", &groupname);
-            //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
-                
-            core::vector3df xyz(0,0,0);
-            node->get("xyz", &xyz);
-            core::vector3df hpr(0,0,0);
-            node->get("hpr", &hpr);
-            core::vector3df scale(1.0f, 1.0f, 1.0f);
-            node->get("scale", &scale);
-            
-            if (group.size() > 0)
-            {
-                LODNode* lod_node = new LODNode(sroot, sm);
-                for (unsigned int m=0; m<group.size(); m++)
-                {
-                    full_path = m_root + "/" + group[m].second;
-                    
-                    // TODO: check whether the mesh contains animations or not, and use a static
-                    //       mesh when there are no animations?
-                    scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
-                    if(!a_mesh)
-                    {
-                        fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                                full_path.c_str());
-                        continue;
-                    }
-                    a_mesh->grab();  // see above for usage in m_all_cached_meshes
-                    m_all_cached_meshes.push_back(a_mesh);
-                    irr_driver->grabAllTextures(a_mesh);
-                    scene::IAnimatedMeshSceneNode* scene_node = 
-                        irr_driver->addAnimatedMesh(a_mesh);
-                    scene_node->setPosition(xyz);
-                    scene_node->setRotation(hpr);
-                    scene_node->setScale(scale);
-                    
-                    lod_node->add( group[m].first, scene_node, true );
-                }
-                
-#ifdef DEBUG
-                std::string debug_name = groupname+" (LOD track-object)";
-                lod_node->setName(debug_name.c_str());
-#endif
-                
-                handleAnimatedTextures(lod_node, *node);
-                m_all_nodes.push_back( lod_node );
-            }
-            else
-            {
-                fprintf(stderr, "[Track] WARNING, LOD group '%s' is empty\n", groupname.c_str());
-            }
-        }
-    }
-    // =================================================
     
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
@@ -1192,6 +1077,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         if(name=="track" || name=="default-start") continue;
         if(name=="object")
         {
+            // FIXME: this may be LOD
             m_track_object_manager->add(*node);
         }
         else if(name=="water")

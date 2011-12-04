@@ -340,6 +340,7 @@
 		9598A5B613CFBA83000B83EA /* hardware_skinning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9598A5B413CFBA83000B83EA /* hardware_skinning.cpp */; };
 		959DE0C613C297B90068ED78 /* swatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959DE0C413C297B90068ED78 /* swatter.cpp */; };
 		95A0BA2413E63F6700620EA6 /* kart_with_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A0BA2213E63F6700620EA6 /* kart_with_stats.cpp */; };
+		95AA4C67148AF2CC0053771D /* lod_node_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AA4C65148AF2CC0053771D /* lod_node_loader.cpp */; };
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95BF1E68127513A100F78AE7 /* max_speed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BF1E66127513A100F78AE7 /* max_speed.cpp */; };
@@ -1149,6 +1150,8 @@
 		95A540411481BEB60086FE38 /* dummy_network_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_network_http.hpp; path = ../../addons/dummy_network_http.hpp; sourceTree = SOURCE_ROOT; };
 		95A540581481C4760086FE38 /* dummy_sfx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_sfx.hpp; path = ../../audio/dummy_sfx.hpp; sourceTree = SOURCE_ROOT; };
 		95A5405B1481C4DB0086FE38 /* music_dummy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_dummy.hpp; path = ../../audio/music_dummy.hpp; sourceTree = SOURCE_ROOT; };
+		95AA4C65148AF2CC0053771D /* lod_node_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lod_node_loader.cpp; path = ../../tracks/lod_node_loader.cpp; sourceTree = SOURCE_ROOT; };
+		95AA4C66148AF2CC0053771D /* lod_node_loader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = lod_node_loader.hpp; path = ../../tracks/lod_node_loader.hpp; sourceTree = SOURCE_ROOT; };
 		95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_screen.cpp; path = ../../states_screens/tutorial_screen.cpp; sourceTree = SOURCE_ROOT; };
 		95AAD97F12BAD36300B7B8A3 /* tutorial_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_screen.hpp; path = ../../states_screens/tutorial_screen.hpp; sourceTree = SOURCE_ROOT; };
 		95B5CD12102DE08F00EF2001 /* device_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_config.hpp; path = ../../config/device_config.hpp; sourceTree = SOURCE_ROOT; };
@@ -2632,6 +2635,8 @@
 				955DE8881004273B006A4F3C /* check_structure.hpp */,
 				953789720FC7829100DD1F8E /* graph_node.cpp */,
 				953789710FC7829100DD1F8E /* graph_node.hpp */,
+				95AA4C65148AF2CC0053771D /* lod_node_loader.cpp */,
+				95AA4C66148AF2CC0053771D /* lod_node_loader.hpp */,
 				951C357E0FC05BF400A48379 /* quad_set.cpp */,
 				951C357D0FC05BF400A48379 /* quad_set.hpp */,
 				953789810FC7831400DD1F8E /* quad.cpp */,
@@ -3177,6 +3182,7 @@
 				95703D1B1468C63F006334D7 /* btGeometryUtil.cpp in Sources */,
 				95703D1C1468C63F006334D7 /* btQuickprof.cpp in Sources */,
 				95703D1D1468C63F006334D7 /* btSerializer.cpp in Sources */,
+				95AA4C67148AF2CC0053771D /* lod_node_loader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
