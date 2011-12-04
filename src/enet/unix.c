@@ -30,7 +30,8 @@
 #include <sys/poll.h>
 #endif
 
-#ifndef HAS_SOCKLEN_T
+// _SOCKLEN_T is used on OSX
+#if !defined(HAS_SOCKLEN_T) && !defined(_SOCKLEN_T)
 typedef int socklen_t;
 #endif
 
