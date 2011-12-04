@@ -220,6 +220,7 @@ Material::Material(const XMLNode *node, int index)
         if      (s == "blend")    m_alpha_blending = true;
         else if (s == "test")     m_alpha_testing = true;
         else if (s == "additive") m_add = true;
+        else if (s == "coverage") m_alpha_to_coverage = true;
         else if (s != "none")     
             fprintf(stderr, 
                     "[Material] WARNING: Unknown compositing mode '%s'\n", 
@@ -325,6 +326,7 @@ void Material::init(unsigned int index)
     m_normal_map                = false;
     m_parallax_map              = false;
     m_is_heightmap              = false;
+    m_alpha_to_coverage         = false;
     m_normal_map_provider       = NULL;
     m_splatting_provider        = NULL;
     m_splatting                 = NULL;
@@ -556,13 +558,17 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     
     if (m_alpha_testing)
     {
-        // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
-        // scene_manager->getParameters()->setAttribute(
-        //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
-        // updates of the Z buffer of the material. Since the _REF 
-        // approach is faster (and looks better imho), this is used for now.
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        
+        modes++;
+    }
+    if (m_alpha_to_coverage)
+    {
+        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        if (UserConfigParams::m_graphical_effects &&
+            irr_driver->getVideoDriver()->queryFeature(video::EVDF_ALPHA_TO_COVERAGE))
+        {
+            m->AntiAliasing = video::EAAM_QUALITY | video::EAAM_ALPHA_TO_COVERAGE;
+        }
         modes++;
     }
     if (m_alpha_blending)

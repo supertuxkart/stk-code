@@ -108,10 +108,12 @@ private:
     
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
+    
     bool             m_lighting;
     bool             m_sphere_map;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
+    bool             m_alpha_to_coverage;
 
     /** True if backface culliing should be enabled. */
     bool             m_backface_culling;
