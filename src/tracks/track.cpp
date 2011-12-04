@@ -1244,8 +1244,11 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     {
         std::vector<TrackObject*>& queue = track_objects[ lod_nodes[n]->getGroupName() ];
         assert( queue.size() > 0 );
-        queue[ queue.size() - 1 ]->setNode( lod_nodes[n] );
+        TrackObject* obj = queue[ queue.size() - 1 ];
+        obj->setNode( lod_nodes[n] );
         queue.erase( queue.end() - 1 );
+        
+        m_track_object_manager->manualInsertObject( obj );
     }
     
     track_objects.clear();

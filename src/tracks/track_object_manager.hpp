@@ -72,6 +72,11 @@ public:
     
     void removeObject(PhysicalObject* who);
     
+    void manualInsertObject(TrackObject* obj)
+    {
+        m_all_objects.push_back(obj);
+    }
+    
     /** Get the queue of LOD objects that are waiting to be assigned a scene node */
     std::map<std::string, std::vector<TrackObject*> >& getLodObjects() { return m_lod_objects; }
 };   // class TrackObjectManager
