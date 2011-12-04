@@ -20,7 +20,6 @@
 #include <string>
 #include <IMeshSceneNode.h>
 
-
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -478,29 +477,49 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
     const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
-    float smallest_distance_found = -1;
-    int  closest_id_found = -1;
+    float largest_accumulated_distance_found = -1;
+    int furthest_id_found = -1;
     
     const float kart_x = kart->getXYZ().getX();
     const float kart_z = kart->getXYZ().getZ();
-    
+
     for(int n=0; n<start_spots_amount; n++)
     {
         // no need for the overhead to compute exact distance with sqrt(), 
         // so using the 'manhattan' heuristic which will do fine enough.
         const btTransform &s = world->getTrack()->getStartTransform(n);
         const Vec3 &v=s.getOrigin();
-        const float dist_n= fabs(kart_x - v.getX()) +
-                            fabs(kart_z - v.getZ());
-        if(dist_n < smallest_distance_found || closest_id_found == -1)
+        float accumulatedDistance = .0f;
+        bool spawnPointClear = true;
+                
+        for(unsigned int k=0; k<getCurrentNumKarts(); k++) 
         {
-            closest_id_found        = n;
-            smallest_distance_found = dist_n;
+            const Kart *currentKart = World::getWorld()->getKart(k);
+            const float currentKart_x = currentKart->getXYZ().getX();
+            const float currentKartk_z = currentKart->getXYZ().getZ();
+
+            if(kart_x!=currentKart_x && kart_z !=currentKartk_z)
+            {
+                float absDistance = fabs(currentKart_x - v.getX()) +
+                    fabs(currentKartk_z - v.getZ());
+                if(absDistance < CLEAR_SPAWN_RANGE)
+                {
+                    spawnPointClear = false;
+                    break;
+                }
+                accumulatedDistance += absDistance;
+            }
+        }
+
+        if(largest_accumulated_distance_found < accumulatedDistance && spawnPointClear)
+        {
+            furthest_id_found = n;
+            largest_accumulated_distance_found = accumulatedDistance;
         }
     }
     
-    assert(closest_id_found != -1);
-    const btTransform &s = world->getTrack()->getStartTransform(closest_id_found);
+    assert(furthest_id_found != -1);
+    const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
     const Vec3 &xyz = s.getOrigin();
     kart->setXYZ(xyz);
     kart->setRotation(s.getRotation());

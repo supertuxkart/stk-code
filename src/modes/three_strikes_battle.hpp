@@ -25,6 +25,8 @@
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+#define CLEAR_SPAWN_RANGE  5
+
 class PhysicalObject;
 
 /**
