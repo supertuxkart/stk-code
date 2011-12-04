@@ -4,13 +4,13 @@
     
         <icon id="logo" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
         <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
+            <icon-button id="story" width="128" height="128"
+                         icon="gui/challenge.png"
+                         I18N="Main menu button"  text="Story Mode"/>
             <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
                     I18N="Main menu button" text="Single-player"/>
             <icon-button id="multiplayer" width="128" height="128" icon="gui/main_race_multi.png"
                     I18N="Main menu button" text="Multiplayer"/>
-            <icon-button id="challenges" width="128" height="128"
-                         icon="gui/challenge.png"
-                         I18N="Main menu button"  text="Challenges"/>
             <icon-button id="addons" width="128" height="128"
                          icon="gui/addons.png"
                          I18N="Main menu button"  text="Addons"/>

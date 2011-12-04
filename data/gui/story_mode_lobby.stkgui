@@ -1,0 +1,20 @@
+<stkgui>
+
+<div x="2%" y="2%" width="96%" height="97%" layout="vertical-row" >
+
+    <header text_align="center" width="80%" align="center" text="Select a Game Slot"/>
+    <spacer height="15" width="10"/>
+
+    <list id="gameslots" proportion="5" width="75%" align="center"/>
+    <spacer width="20" height="25"/>
+    
+    <button id="creategame" x="20"
+            I18N="In story mode 'select a game slot' menu"  
+            text="Create a new game" align="center"/>
+
+    <spacer width="20" height="15"/>
+</div>
+
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+</stkgui>

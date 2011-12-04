@@ -39,6 +39,7 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/tutorial_screen.hpp"
 
 #if DEBUG_MENU_ITEM
@@ -276,6 +277,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "challenges")
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
+    }
+    else if (selection == "story")
+    {
+        StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
     else if (selection == "tutorial")
     {
