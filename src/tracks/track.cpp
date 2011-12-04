@@ -1224,15 +1224,18 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
     }   // for i<root->getNumNodes()
     
+    // -------- Create and assign LOD nodes --------
     // recheck the static area, we will need LOD info
     const XMLNode* track_node = root->getNode("track");
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode* n = track_node->getNode(i);
-        lod_loader.check(n);
+        bool is_instance = false;
+        n->get("lod_instance", &is_instance);
+        
+        if (!is_instance) lod_loader.check(n);
     }
     
-    // -------- Create and assign LOD nodes --------
     std::vector<LODNode*> lod_nodes;
     std::vector<scene::IMesh*> devnull;
     lod_loader.done(m_root, devnull, lod_nodes);
