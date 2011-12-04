@@ -92,7 +92,7 @@
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>false</GenerateMapFile>
@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\tinygettext\po_parser.cpp" />
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
+    <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
     <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\leak_check.cpp" />
@@ -406,6 +407,7 @@
     <ClInclude Include="..\..\tinygettext\po_parser.hpp" />
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
+    <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\leak_check.hpp" />
