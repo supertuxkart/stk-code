@@ -27,6 +27,8 @@ using namespace irr;
 #include <IAnimatedMeshSceneNode.h>
 #include <ISceneManager.h>
 
+#include <algorithm>
+
 LodNodeLoader::LodNodeLoader()
 {
 }
