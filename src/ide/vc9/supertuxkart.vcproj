@@ -875,6 +875,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\lod_node_loader.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\quad.cpp"
 					>
 				</File>
@@ -1922,6 +1926,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\graph_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\lod_node_loader.hpp"
 					>
 				</File>
 				<File
