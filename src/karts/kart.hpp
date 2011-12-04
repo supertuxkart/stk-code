@@ -337,11 +337,6 @@ public:
     const video::SColor &getColor() const 
                                         {return m_kart_properties->getColor();}
     // ------------------------------------------------------------------------
-    /** Returns the current mass of this kart, including any attachment this
-     *  kart might have. */
-    float getMass() const { return m_kart_properties->getMass()
-                                 + m_attachment->weightAdjust();}
-    // ------------------------------------------------------------------------
     /** Returns the maximum engine power for this kart. */
     float getMaxPower     () const {return m_kart_properties->getMaxPower(); }
     // ------------------------------------------------------------------------

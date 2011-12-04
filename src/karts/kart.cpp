@@ -256,7 +256,7 @@ void Kart::createPhysics()
 
     // Set mass and inertia
     // --------------------
-    float mass=getMass();
+    float mass = m_kart_properties->getMass();
 
     // Position the chassis
     // --------------------
@@ -476,11 +476,11 @@ void Kart::capSpeed(float max_speed)
  */
 void Kart::updatedWeight()
 {
-    // getMass returns the mass increased by the attachment
+    float mass = m_kart_properties->getMass() + m_attachment->weightAdjust();
+
     btVector3 inertia;
-    float m=getMass();
-    m_kart_chassis.calculateLocalInertia(m, inertia);
-    m_body->setMassProps(m, inertia);
+    m_kart_chassis.calculateLocalInertia(mass, inertia);
+    m_body->setMassProps(mass, inertia);
 }   // updatedWeight
 
 //-----------------------------------------------------------------------------
