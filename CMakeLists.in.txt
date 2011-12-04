@@ -1,0 +1,311 @@
+# root CMakeLists for the SuperTuxKart project
+# Always edit 'CMakeLists.in.txt' and not 'CMakeLists.txt', the latter is automatically generated
+
+cmake_minimum_required(VERSION 2.8.1)
+
+project(SuperTuxKart)
+
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+
+set(STK_SOURCE_DIR "src")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
+set(PROJECT_VERSION "0.7.3")
+
+# Tweakable values
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+	set(DEBUG ON)
+else()
+	set(DEBUG OFF)
+endif()
+
+option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(FONT_TOOL "Compile font tool" OFF)
+set(IRRLICHT_DIR "/path/to/irrlicht" CACHE STRING "Path to Irrlicht")
+
+# Build the Bullet physics library
+add_subdirectory("${STK_SOURCE_DIR}/bullet")
+
+# Build the ENet UDP network library
+add_subdirectory("${STK_SOURCE_DIR}/enet")
+
+# Set include paths
+include_directories("${STK_SOURCE_DIR}")
+include_directories("${STK_SOURCE_DIR}/enet/include")
+include_directories("${STK_SOURCE_DIR}/bullet/src")
+
+if(APPLE)
+	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	include_directories("/Library/Frameworks/IrrFramework.framework/Versions/A/Headers/")
+	include_directories("/Library/Frameworks/fribidi.framework/Headers")
+	include_directories("/Library/Frameworks/Ogg.framework/Headers")
+	include_directories("/Library/Frameworks/Vorbis.framework/Headers")
+	include_directories("/usr/local/include")
+	include_directories("/usr/include")
+	find_library(Ogg /Library/Frameworks/Ogg.framework)
+	find_library(Vorbis /Library/Frameworks/Vorbis.framework)
+endif()
+
+# Set lib paths
+if(APPLE)
+	# nothing to add
+elseif(UNIX)
+	link_directories("${IRRLICHT_DIR}/lib/Linux")
+elseif(MSVC)
+	link_directories("${IRRLICHT_DIR}/lib/Win32-visualstudio")
+else()
+	link_directories("${IRRLICHT_DIR}/lib/Win32-gcc")
+endif()
+
+link_directories("${STK_SOURCE_DIR}/bullet")
+
+# OpenGL
+if(APPLE)
+    find_library(OpenGL /System/Library/Frameworks/OpenGL.framework /System/Library/Frameworks/AGL.framework)
+else()
+    find_package(OpenGL)
+    
+    if(OPENGL_FOUND)
+	    message("-- OpenGL found (include dirs: ${OPENGL_INCLUDE_DIR})")
+	    include_directories(${OPENGL_INCLUDE_DIR})
+    else()
+	    message(FATAL_ERROR "OpenGL not found.")
+    endif()
+    
+    if(UNIX)
+	    # X11, stk requires xf86vm
+	    find_package(X11)
+    
+	    if(X11_FOUND)
+		    message("-- X11 libs found")
+	    else()
+		    message(FATAL_ERROR "X11 not found.")
+	    endif()
+    endif()
+endif()
+
+# OpenAL
+if(APPLE)
+    find_library(OpenAL /Library/Frameworks/OpenAL.framework)
+else()
+    find_package(OpenAL)
+    
+    if(OPENAL_FOUND)
+	    message("-- OpenAL found (include dirs: ${OPENAL_INCLUDE_DIR})")
+	    include_directories(${OPENAL_INCLUDE_DIR})
+    else()
+	    message(FATAL_ERROR "OpenAL not found.")
+    endif()
+endif()
+
+# Check if we finally got irrlicht
+if(APPLE)
+    find_library(Irrlicht /Library/Frameworks/IrrFramework.framework)
+else()
+    find_path(HAVE_IRRLICHT irrlicht.h PATHS ${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
+    
+    if(HAVE_IRRLICHT)
+	    message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
+	    #include_directories(${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
+	    include_directories(${HAVE_IRRLICHT})
+    else()
+	    message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
+    endif()
+endif()
+
+include_directories(${HAVE_IRRLICHT})
+
+# CURL
+find_package(CURL)
+if(CURL_FOUND)
+	include_directories(${CURL_INCLUDE_DIRS})
+else()
+	message(FATAL_ERROR "-- libcURL not found, please install it.")
+endif()
+
+# Fribidi
+if(USE_FRIBIDI)
+    FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
+      /usr/local/include
+      /usr/include
+      )
+
+    SET(FRIBIDI_NAMES ${FRIBIDI_NAMES} fribidi libfribidi)
+    FIND_LIBRARY(FRIBIDI_LIBRARY
+      NAMES ${FRIBIDI_NAMES}
+      PATHS /usr/lib /usr/local/lib
+      )
+
+    IF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
+        message("-- Fribidi found")
+    else()
+        message(FATAL_ERROR "Fribidi not found. Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 (if you don't use a right-to-left language then you don't need this).")
+    endif()
+endif()
+   
+# Set some compiler options
+if(UNIX)
+	add_definitions(-Wall)
+endif()
+
+add_definitions(-DHAVE_OGGVORBIS)	# TODO: remove this switch
+
+if(DEBUG)
+	add_definitions(-DDEBUG)
+else()
+	add_definitions(-DNDEBUG)
+	add_definitions(-O2)
+endif()
+
+find_package(Freetype)
+
+if(FONT_TOOL)
+    if(FREETYPE_FOUND)
+	    message("-- Freetype found")
+	    find_package(X11)
+	    include_directories(${FREETYPE_INCLUDE_DIRS})
+	    add_executable(font_tool
+		    tools/font_tool/CFontTool.cpp
+		    tools/font_tool/CFontTool.h
+		    tools/font_tool/CVectorFontTool.h
+		    tools/font_tool/main.cpp
+	    )
+	    target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
+	    target_link_libraries(font_tool ${X11_Xft_LIB})
+	    target_link_libraries(font_tool ${OPENGL_LIBRARIES})
+	    target_link_libraries(font_tool Irrlicht)
+    else()
+	    message("-- Freetype was not found, the font tool won't be built (only useful for developers)")
+    endif()
+else()
+    message("-- Font tool deactivated, the font tool won't be built (only useful for developers)")
+endif()
+
+set( SRCS ${SRCS} %LIST_OF_FILES%)
+
+if (APPLE)		
+    # icon files to copy in the bundle
+    set( OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/src/ide/Xcode/stk.icns)
+    set_source_files_properties( ${OSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set( SRCS ${SRCS} ${OSX_ICON_FILES} )
+    
+    # build the executable and create an app bundle
+    add_executable(supertuxkart MACOSX_BUNDLE ${SRCS} )
+    
+    target_link_libraries(supertuxkart
+	    bulletdynamics
+	    bulletcollision
+	    bulletmath
+	    enet
+	    ${CURL_LIBRARIES}
+	    # We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	    /Library/Frameworks/IrrFramework.framework
+	    /Library/Frameworks/Ogg.framework
+	    /Library/Frameworks/OpenAL.framework
+	    /Library/Frameworks/Vorbis.framework
+	    # TODO: allow linking against frameworks from a SDK.
+	    /System/Library/Frameworks/AGL.framework
+	    /System/Library/Frameworks/IOKit.framework
+	    /System/Library/Frameworks/QuickTime.framework
+	    /System/Library/Frameworks/Carbon.framework
+	    /System/Library/Frameworks/AudioUnit.framework
+	    /System/Library/Frameworks/Cocoa.framework
+	    /System/Library/Frameworks/OpenGL.framework)
+	    
+    # configure CMake to use a custom Info.plist
+    set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
+  
+    add_definitions(`ln -sf ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources`)
+
+else()
+
+    add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
+
+    # Build the final executable
+    add_executable(supertuxkart ${SRCS})
+
+    target_link_libraries(supertuxkart
+	    Irrlicht
+	    bulletdynamics
+	    bulletcollision
+	    bulletmath
+	    enet
+	    pthread
+	    ${CURL_LIBRARIES}
+	    ${OPENGL_LIBRARIES}
+	    ${OPENAL_LIBRARY}
+	    vorbisfile)
+endif()
+
+if(USE_FRIBIDI)
+    if(APPLE)
+	    target_link_libraries(supertuxkart /Library/Frameworks/fribidi.framework)
+    else()
+        target_link_libraries(supertuxkart fribidi)
+    endif()
+    add_definitions(-DENABLE_BIDI=1)
+endif()
+
+if(UNIX AND NOT APPLE)
+	target_link_libraries(supertuxkart Xxf86vm)
+elseif(APPLE)
+	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
+	target_link_libraries(supertuxkart /Library/Frameworks/IrrFramework.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/Ogg.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/OpenAL.framework)
+	target_link_libraries(supertuxkart /Library/Frameworks/Vorbis.framework)
+
+	target_link_libraries(supertuxkart /System/Library/Frameworks/AGL.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/IOKit.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/QuickTime.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/Carbon.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/AudioUnit.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/Cocoa.framework)
+	target_link_libraries(supertuxkart /System/Library/Frameworks/OpenGL.framework)
+endif()
+
+# ==== Make dist target ====
+add_custom_target(dist
+    COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
+            && echo "Exporting..."
+            && svn export ${PROJECT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
+            && echo "Compressing..."
+            && cd ${CMAKE_BINARY_DIR}
+            && tar -cjf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2 ./SuperTuxKart-${PROJECT_VERSION}
+            && echo "Done, cleaning up"
+            && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# ==== Install target ====
+MACRO(installfilemacro filepath)
+    set(source_regex "(.*)/data/(.*)")
+    set(svn_regex "(.*).svn(.*)")
+    
+    string(REGEX MATCH "${svn_regex}" is_svn_dir "${curr}")
+    if(is_svn_dir)
+        # don't install SVN files
+    else()
+        string(REGEX MATCH "${source_regex}" source_path "${curr}")
+        if(source_path)
+            string(REGEX REPLACE "${source_regex}" "\\2" after_source "${source_path}")
+            get_filename_component(install_location ${after_source} PATH)
+            install(FILES ${filepath} DESTINATION "share/games/supertuxkart/data/${install_location}")
+        endif(source_path)
+    endif()
+ENDMACRO(installfilemacro)
+
+FILE(GLOB_RECURSE datafiles "${CMAKE_CURRENT_SOURCE_DIR}/data/*")
+foreach(curr ${datafiles})
+    installfilemacro(${curr})
+endforeach()
+
+
+install(TARGETS supertuxkart RUNTIME DESTINATION games BUNDLE DESTINATION .)
+install(FILES data/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
+
+add_custom_target(GenerateDesktopFile
+                  COMMAND sed 's\#PREFIX\#${CMAKE_INSTALL_PREFIX}\#' ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart_desktop.template | sed 's\#VERSION\#${PROJECT_VERSION}\#' > ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart.desktop
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+ADD_DEPENDENCIES(supertuxkart GenerateDesktopFile)
+
+
