@@ -340,17 +340,17 @@ void History::Load()
         int j=0;
         for(unsigned int k=0; k<num_karts; k++)
         {
+            unsigned int index = num_karts * i+k;
             fgets(s, 1023, fd);
             int buttonsCompressed;
             float x,y,z,rx,ry,rz,rw;
             sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    &m_all_controls[i].m_steer,
-                    &m_all_controls[i].m_accel,
+                    &m_all_controls[index].m_steer,
+                    &m_all_controls[index].m_accel,
                     &buttonsCompressed,
                     &x, &y, &z,
                     &rx, &ry, &rz, &rw
                     );
-            unsigned int index     = num_karts * i+k;
             m_all_xyz[index]       = Vec3(x,y,z);
             m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));
