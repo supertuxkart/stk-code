@@ -603,6 +603,8 @@ set( SRCS ${SRCS} src/main.cpp
 	src/tracks/check_sphere.hpp
 	src/tracks/check_structure.cpp
 	src/tracks/check_structure.hpp
+    src/tracks/lod_node_loader.cpp
+    src/tracks/lod_node_loader.hpp
 	src/tracks/graph_node.cpp
 	src/tracks/graph_node.hpp
 	src/tracks/quad.cpp
