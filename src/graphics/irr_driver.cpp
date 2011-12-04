@@ -191,7 +191,7 @@ void IrrDriver::initDevice()
                     core::dimension2du(UserConfigParams::m_width,
                                        UserConfigParams::m_height);
                 if (UserConfigParams::m_fullscreen_antialiasing)
-                    params.AntiAlias = 8;
+                    params.AntiAlias = 4;
             
                 m_device = createDeviceEx(params);
             
