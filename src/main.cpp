@@ -1148,10 +1148,6 @@ int main(int argc, char *argv[] )
 
         // Get into menu mode initially.
         input_manager->setMode(InputManager::MENU);
-        
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                                                          file_manager->getGUIDir() + "/options_input.png") );
-        
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
