@@ -430,6 +430,8 @@ supertuxkart_SOURCES = \
  tracks/check_structure.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
+ tracks/lod_node_loader.cpp\
+ tracks/lod_node_loader.hpp\
  tracks/quad.cpp \
  tracks/quad.hpp \
  tracks/quad_graph.cpp \
