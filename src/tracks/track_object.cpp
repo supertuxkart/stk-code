@@ -55,6 +55,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     std::string sound;
     xml_node.get("sound",   &sound       );
 
+    xml_node.get("lod_group", &m_lod_group);
+    
     // FIXME: at this time sound emitters are just disabled in multiplayer
     //        otherwise the sounds would be constantly heard
     if (sound.size() > 0 && race_manager->getNumLocalPlayers() == 1)

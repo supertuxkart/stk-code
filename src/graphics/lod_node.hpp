@@ -53,9 +53,11 @@ private:
     
     std::set<scene::ISceneNode*> m_nodes_set;
     
+    std::string m_group_name;
+    
 public:
     
-    LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
+    LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
     virtual     ~LODNode();
     
     //! returns the axis aligned bounding box of this node
@@ -90,6 +92,7 @@ public:
     
     virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_LOD_NODE; }
 
+    const std::string& getGroupName() const { return m_group_name; }
 };
 
 #endif

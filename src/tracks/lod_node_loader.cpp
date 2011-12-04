@@ -123,13 +123,6 @@ void LodNodeLoader::done(std::string directory,
         {
             const XMLNode* node = v[n];
             
-            if(node->getName()!="static-object")
-            {
-                fprintf(stderr, "Incorrect tag '%s' used in LOD instance - ignored\n",
-                        node->getName().c_str());
-                continue;
-            }
-            
             groupname = "";
             node->get("lod_group", &groupname);
             //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
@@ -145,7 +138,7 @@ void LodNodeLoader::done(std::string directory,
             
             if (group.size() > 0)
             {
-                LODNode* lod_node = new LODNode(sroot, sm);
+                LODNode* lod_node = new LODNode(groupname, sroot, sm);
                 for (unsigned int m=0; m<group.size(); m++)
                 {
                     full_path = directory + "/" + group[m].second;
@@ -184,4 +177,12 @@ void LodNodeLoader::done(std::string directory,
             }
         }
     } // end for
+}
+
+// ----------------------------------------------------------------------------
+
+void LodNodeLoader::clear()
+{
+    lod_groups.clear();
+    lod_instances.clear();
 }

@@ -50,7 +50,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     
-    LODNode* lodnode    = new LODNode(irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager());
+    LODNode* lodnode    = new LODNode("item",
+                                      irr_driver->getSceneManager()->getRootSceneNode(),
+                                      irr_driver->getSceneManager());
     scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh);
     
     if (lowres_mesh != NULL)

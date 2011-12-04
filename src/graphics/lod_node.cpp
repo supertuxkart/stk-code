@@ -24,11 +24,18 @@
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
 
-LODNode::LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id)
-: ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)
+/**
+  * @param group_name Only useful for getGroupName()
+  */
+LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
+                 scene::ISceneManager* mgr, s32 id)
+    : ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)
 {
     assert(mgr != NULL);
     assert(parent != NULL);
+    
+    m_group_name = group_name;
+    
     // At this stage refcount is two: one because of the object being 
     // created, and once because it is a child of the parent. Drop once,
     // so that only the reference from the parent is active, causing this

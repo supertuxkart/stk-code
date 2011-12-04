@@ -43,14 +43,17 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
     node.get("reset", &m_crash_reset);
     m_triangle_mesh = NULL;
     
-    /** Save the initial position and rotation in the base animation object. */
-    setInitialTransform(AnimationBase::m_node->getPosition(),
-                        AnimationBase::m_node->getRotation() );
-
+    if (AnimationBase::m_node)
+    {
+        /** Save the initial position and rotation in the base animation object. */
+        setInitialTransform(AnimationBase::m_node->getPosition(),
+                            AnimationBase::m_node->getRotation() );
+        m_hpr = AnimationBase::m_node->getRotation();
+    }
+    
     m_body            = NULL;
     m_motion_state    = NULL;
     m_collision_shape = NULL;
-    m_hpr = AnimationBase::m_node->getRotation();
     std::string shape;
     node.get("shape", &shape);
     if(shape!="")

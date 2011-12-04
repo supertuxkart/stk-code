@@ -84,6 +84,9 @@ protected:
     /** If a sound is attached to this objectt and/or this is a sound emitter object */
     SFXBase*                       m_sound;
 
+    /** LOD group this object is part of, if it is LOD */
+    std::string                    m_lod_group;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
@@ -100,6 +103,19 @@ public:
     void         setEnable(bool mode);
     
     scene::ISceneNode* getNode() { return m_node; }
+    
+    /** 2-step construction */
+    void setNode(scene::ISceneNode* node)
+    {
+        assert(m_node == NULL);
+        m_node = node;
+        m_node->setPosition(m_init_xyz);
+        m_node->setRotation(m_init_hpr);
+        m_node->setScale(m_init_scale);
+    }
+    
+    const std::string& getLodGroup() const { return m_lod_group; }
+    
 };   // TrackObject
 
 #endif

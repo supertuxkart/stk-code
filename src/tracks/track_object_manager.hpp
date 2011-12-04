@@ -28,12 +28,16 @@ class Track;
 class Vec3;
 class XMLNode;
 
+#include <map>
+#include <vector>
+#include <string>
+
 /**
   * \ingroup tracks
   */
 class TrackObjectManager
 {
-public:
+protected:
     /**
       * The different type of track objects: physical objects, graphical 
       * objects (without a physical representation) - the latter might be
@@ -41,6 +45,11 @@ public:
       */
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
     PtrVector<TrackObject> m_all_objects;
+    
+    /** Temporary storage for LOD objects whose XML node was read but whose
+      * scene node is not yet ready
+      */
+    std::map<std::string, std::vector<TrackObject*> > m_lod_objects;
     
 public:
          TrackObjectManager();
@@ -62,6 +71,9 @@ public:
                                  const core::vector3df& scale);
     
     void removeObject(PhysicalObject* who);
+    
+    /** Get the queue of LOD objects that are waiting to be assigned a scene node */
+    std::map<std::string, std::vector<TrackObject*> >& getLodObjects() { return m_lod_objects; }
 };   // class TrackObjectManager
 
 #endif

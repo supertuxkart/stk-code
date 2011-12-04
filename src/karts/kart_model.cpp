@@ -222,9 +222,9 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
     
     if (animated_models)
     {
-        LODNode* lod_node = new LODNode(
-                            irr_driver->getSceneManager()->getRootSceneNode(),
-                            irr_driver->getSceneManager()                    );
+        LODNode* lod_node = new LODNode("kart",
+                                        irr_driver->getSceneManager()->getRootSceneNode(),
+                                        irr_driver->getSceneManager()                    );
 
 
         node = irr_driver->addAnimatedMesh(m_mesh);

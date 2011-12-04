@@ -45,15 +45,33 @@ TrackObjectManager::~TrackObjectManager()
  */
 void TrackObjectManager::add(const XMLNode &xml_node)
 {
+    std::string groupname;
+    xml_node.get("lod_group", &groupname);
+    bool is_lod = !groupname.empty();
+        
     std::string type;
     xml_node.get("type", &type);
     if(type=="movable")
     {
-        m_all_objects.push_back(new PhysicalObject(xml_node));
+        if (is_lod)
+        {
+            m_lod_objects[groupname].push_back(new PhysicalObject(xml_node));
+        }
+        else
+        {
+            m_all_objects.push_back(new PhysicalObject(xml_node));
+        }
     }
     else if(type=="animation")
     {
-        m_all_objects.push_back(new ThreeDAnimation(xml_node));
+        if (is_lod)
+        {
+            m_lod_objects[groupname].push_back(new ThreeDAnimation(xml_node));
+        }
+        else
+        {
+            m_all_objects.push_back(new ThreeDAnimation(xml_node));
+        }
     }
     else if(type=="billboard")
     {

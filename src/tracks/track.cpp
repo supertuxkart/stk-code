@@ -1068,6 +1068,8 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     
     loadMainTrack(*root);
     
+    LodNodeLoader lod_loader;
+    
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -1077,7 +1079,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         if(name=="track" || name=="default-start") continue;
         if(name=="object")
         {
-            // FIXME: this may be LOD
+            lod_loader.check(node);
             m_track_object_manager->add(*node);
         }
         else if(name=="water")
@@ -1156,7 +1158,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                     {
                         scene::ISceneManager* sm = irr_driver->getSceneManager();
                         scene::ISceneNode* sroot = sm->getRootSceneNode();
-                        LODNode* lod = new LODNode(sroot, sm);
+                        LODNode* lod = new LODNode("particles", sroot, sm);
                         lod->add(clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
                         //m_all_emitters.push_back(emitter);
                         m_all_nodes.push_back( lod );
@@ -1221,6 +1223,34 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
 
     }   // for i<root->getNumNodes()
+    
+    // recheck the static area, we will need LOD info
+    const XMLNode* track_node = root->getNode("track");
+    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    {
+        const XMLNode* n = track_node->getNode(i);
+        lod_loader.check(n);
+    }
+    
+    // -------- Create and assign LOD nodes --------
+    std::vector<LODNode*> lod_nodes;
+    std::vector<scene::IMesh*> devnull;
+    lod_loader.done(m_root, devnull, lod_nodes);
+    
+    std::map<std::string, std::vector<TrackObject*> >& track_objects =
+        m_track_object_manager->getLodObjects();
+    
+    for (unsigned int n=0; n<lod_nodes.size(); n++)
+    {
+        std::vector<TrackObject*>& queue = track_objects[ lod_nodes[n]->getGroupName() ];
+        assert( queue.size() > 0 );
+        queue[ queue.size() - 1 ]->setNode( lod_nodes[n] );
+        queue.erase( queue.end() - 1 );
+    }
+    
+    track_objects.clear();
+    // ---------------------------------------------
+    
     delete root;
 
     // Init all track objects

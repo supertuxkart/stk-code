@@ -51,6 +51,8 @@ public:
     void done(std::string directory,
               std::vector<irr::scene::IMesh*>& cache,
               std::vector<LODNode*>& out);
+    
+    void clear();
 
 };  // LodNodeLoader
 
