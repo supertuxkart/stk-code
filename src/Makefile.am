@@ -340,6 +340,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/race_over_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.cpp \
+ states_screens/dialogs/story_mode_new.hpp \
+ states_screens/dialogs/story_mode_new.cpp \
  states_screens/dialogs/track_info_dialog.cpp \
  states_screens/dialogs/track_info_dialog.hpp \
  states_screens/dialogs/addons_loading.cpp \
@@ -390,6 +392,8 @@ supertuxkart_SOURCES = \
  states_screens/race_setup_screen.hpp \
  states_screens/state_manager.cpp  \
  states_screens/state_manager.hpp \
+ states_screens/story_mode_lobby.cpp \
+ states_screens/story_mode_lobby.hpp \
  states_screens/tracks_screen.cpp \
  states_screens/tracks_screen.hpp \
  states_screens/tutorial_screen.cpp \
