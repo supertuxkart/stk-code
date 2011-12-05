@@ -337,7 +337,6 @@ void History::Load()
 
     for(int i=0; i<m_size; i++)
     {
-        int j=0;
         for(unsigned int k=0; k<num_karts; k++)
         {
             unsigned int index = num_karts * i+k;
