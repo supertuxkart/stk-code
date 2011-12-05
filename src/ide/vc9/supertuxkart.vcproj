@@ -1119,6 +1119,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\story_mode_lobby.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\tracks_screen.cpp"
 					>
 				</File>
@@ -1167,6 +1171,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\story_mode_new.cpp"
 						>
 					</File>
 					<File
@@ -2205,6 +2213,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\story_mode_lobby.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\tracks_screen.hpp"
 					>
 				</File>
@@ -2253,6 +2265,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\story_mode_new.hpp"
 						>
 					</File>
 					<File
