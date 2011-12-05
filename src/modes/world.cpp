@@ -332,7 +332,7 @@ void World::terminateRace()
     updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who, 
                      &best_player);
     
-    unlock_manager->raceFinished();
+    unlock_manager->getCurrentSlot()->raceFinished();
     
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of 

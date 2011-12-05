@@ -703,7 +703,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            if (!unlock_manager->isLocked(argv[i+1]))
+            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 const KartProperties *prop = 
                     kart_properties_manager->getKart(argv[i+1]);
@@ -764,7 +764,7 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
         {
-            if (!unlock_manager->isLocked(argv[i+1]))
+            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 race_manager->setTrack(argv[i+1]);
                 fprintf ( stdout, "You choose to start in track: %s.\n", 
@@ -829,7 +829,7 @@ int handleCmdLine(int argc, char **argv)
             for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
-                if (!unlock_manager->isLocked(track->getIdent()))
+                if (!unlock_manager->getCurrentSlot()->isLocked(track->getIdent()))
                 {
                     fprintf ( stdout, "\t%14s: %ls\n",
                               track->getIdent().c_str(),
@@ -847,7 +847,7 @@ int handleCmdLine(int argc, char **argv)
             {
                 const KartProperties* KP =
                     kart_properties_manager->getKartById(i);
-                if (!unlock_manager->isLocked(KP->getIdent()))
+                if (!unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
                 {
                     fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(),
                              KP->getName());

@@ -200,7 +200,7 @@ void ArenasScreen::buildTrackList()
             Track* curr = track_manager->getTrack(n);
             if (!curr->isArena()) continue;
             
-            if (unlock_manager->isLocked(curr->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );
@@ -223,7 +223,7 @@ void ArenasScreen::buildTrackList()
             Track* curr = track_manager->getTrack(currArenas[n]);
             if (!curr->isArena()) continue;
             
-            if (unlock_manager->isLocked(curr->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );

@@ -27,9 +27,11 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "challenges/challenge_data.hpp"
 #include "io/file_manager.hpp"
+#include "io/xml_writer.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -45,6 +47,8 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager=this;
 
+    m_current_game_slot = 0;
+    
     m_locked_sound = sfx_manager->createSoundSource("locked");
     
 
@@ -174,19 +178,6 @@ void UnlockManager::addChallenge(const std::string& filename)
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
-std::vector<const ChallengeData*> UnlockManager::getActiveChallenges()
-{
-    computeActive();
-    std::vector<const ChallengeData*> all_active;
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
-    {
-        if(i->second->isActive()) all_active.push_back(i->second);
-    }
-    return all_active;
-}   // getActiveChallenges
-
-//-----------------------------------------------------------------------------
 const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 {
     if(m_all_challenges.find(id)==m_all_challenges.end()) return NULL;
@@ -204,29 +195,52 @@ void UnlockManager::load()
     {
         std::cerr << "Challenge file '" << filename << "' will be created." 
                   << std::endl;
+        
+        createSlotsIfNeeded();
         save();
         
         if (root) delete root;
-        computeActive();
         return;
     }
     
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
+    std::vector<XMLNode*> xml_game_slots;
+    root->getNodes("gameslot", xml_game_slots);
+    for (unsigned int n=0; n<xml_game_slots.size(); n++)
     {
-        i->second->load(root);
+        core::stringw player_name;
+        xml_game_slots[n]->get("player", &player_name);
+        
+        GameSlot* slot = new GameSlot(player_name);
+        
+        std::string kart_id;
+        xml_game_slots[n]->get("kart", &kart_id);
+        slot->setKartIdent(kart_id);
+        
+        m_game_slots.push_back(slot);
+        
+        for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+            i!=m_all_challenges.end();  i++)
+        {
+            ChallengeData* curr = i->second;
+            Challenge* state = new Challenge(curr);
+            slot->m_challenges_state[curr->getId()] = state;
+            state->load(root);
+        }
+        slot->computeActive();
     }
-    computeActive();
+    
+    bool something_changed = createSlotsIfNeeded();
+    if (something_changed) save();
     
     delete root;
 }   // load
 
 //-----------------------------------------------------------------------------
+
 void UnlockManager::save()
 {
-    std::ofstream challenge_file;
     std::string filename = file_manager->getChallengeFile("challenges.xml");
-    challenge_file.open(filename.c_str());
+    XMLWriter challenge_file(filename.c_str());
 
     if(!challenge_file.is_open())
     {
@@ -237,15 +251,60 @@ void UnlockManager::save()
     challenge_file << "<?xml version=\"1.0\"?>\n";
     challenge_file << "<challenges>\n";
     
-    for(AllChallengesType::iterator i = m_all_challenges.begin(); 
-                                    i!= m_all_challenges.end();  i++)
+    GameSlot* curr;
+    for_in (curr, m_game_slots)
     {
-        i->second->save(challenge_file);
+        curr->save(challenge_file);
     }
     
     challenge_file << "</challenges>\n\n";
     challenge_file.close();
 }   // save
+
+//-----------------------------------------------------------------------------
+
+bool UnlockManager::createSlotsIfNeeded()
+{
+    bool something_changed = false;
+    
+    // make sure all players have at least one game slot associated
+    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    for (int n=0; n<players.size(); n++)
+    {
+        printf("Checking if a game slot exists for player %s\n", core::stringc(players[n].getName().c_str()).c_str());
+        bool exists = false;
+        
+        GameSlot* curr_slot;
+        for_in(curr_slot, m_game_slots)
+        {
+            if (curr_slot->getPlayerName() == players[n].getName())
+            {
+                exists = true;
+                break;
+            }
+        }
+        
+        
+        if (!exists)
+        {
+            printf("==> No, creating one\n");
+            GameSlot* slot = new GameSlot(players[n].getName());
+            
+            for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+                i!=m_all_challenges.end();  i++)
+            {
+                ChallengeData* cd = i->second;
+                slot->m_challenges_state[cd->getId()] = new Challenge(cd);
+            }
+            slot->computeActive();
+            m_game_slots.push_back(slot);
+            
+            something_changed = true;
+        }
+    }
+    
+    return something_changed;
+}
 
 //-----------------------------------------------------------------------------
 void UnlockManager::playLockSound() const
@@ -264,150 +323,5 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
     return (challenge.getVersion()>=1 && challenge.getVersion()<=1);
 }   // isSupportedVersion
 
-//-----------------------------------------------------------------------------
-void UnlockManager::computeActive()
-{
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
-    {
-        // Changed challenge
-        // -----------------
-        if((i->second)->isSolved()) 
-        {
-            // The constructor calls computeActive, which actually locks 
-            // all features, so unlock the solved ones (and don't try to
-            // save the state, since we are currently reading it)
-            
-            unlockFeature(i->second, /*save*/ false);
-            continue;
-        }
-
-        // Otherwise lock the feature, and check if the challenge is active
-        // ----------------------------------------------------------------
-        lockFeature(i->second);
-        std::vector<std::string> pre_req=(i->second)->getPrerequisites();
-        bool allSolved=true;
-        for(std::vector<std::string>::iterator pre =pre_req.begin();
-                                               pre!=pre_req.end(); pre++)
-        {
-            const ChallengeData *p = getChallenge(*pre);
-            if(!p)
-            {
-                fprintf(stderr,"Challenge prerequisite '%s' of '%s' not found - ignored\n",
-                        pre->c_str(), i->first.c_str());
-                //continue;
-                allSolved=false;
-                break;
-            }
-            else if(!p->isSolved())
-            {
-                allSolved=false;
-                break;
-            }
-        }   // for all pre in pre_req
-        if(allSolved)
-        {
-            i->second->setActive();
-        }   // if solved
-    }   // for i
-    clearUnlocked();
-}   // computeActive
 
 //-----------------------------------------------------------------------------
-/** This is called when a race is finished. Call all active challenges
-*/
-void UnlockManager::raceFinished()
-{
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
-    {
-        if(i->second->isActive() && i->second->raceFinished())
-        {
-            unlockFeature(i->second);
-        }   // if isActive && challenge solved
-    }
-    //race_manager->setCoinTarget(0);  //reset
-}   // raceFinished
-
-//-----------------------------------------------------------------------------
-void UnlockManager::grandPrixFinished()
-{
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
-    {
-        if(i->second->isActive() && i->second->grandPrixFinished())
-        {
-            std::cout << "===== A FEATURE WAS UNLOCKED BECAUSE YOU WON THE GP!! ==\n";
-            unlockFeature(i->second);
-        }
-    }
-    race_manager->setCoinTarget(0);
-}   // grandPrixFinished
-
-//-----------------------------------------------------------------------------
-void UnlockManager::lockFeature(const ChallengeData *challenge)
-{
-    const unsigned int amount = (unsigned int)challenge->getFeatures().size();
-    for(unsigned int n=0; n<amount; n++)
-        m_locked_features[challenge->getFeatures()[n].m_name]=true;
-}   // lockFeature
-
-//-----------------------------------------------------------------------------
-
-void UnlockManager::unlockFeature(ChallengeData* c, bool do_save)
-{
-    const unsigned int amount = (unsigned int)c->getFeatures().size();
-    for(unsigned int n=0; n<amount; n++)
-    {
-        std::string feature = c->getFeatures()[n].m_name;
-        std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
-        if(p==m_locked_features.end())
-        {
-            //fprintf(stderr,"Unlocking feature '%s' failed: feature is not locked.\n",
-            //        (feature).c_str());
-            return;
-        }
-        m_locked_features.erase(p);
-    }
-    
-    // Add to list of recently unlocked features
-    m_unlocked_features.push_back(c);
-    c->setSolved();  // reset isActive flag
-    
-    // Save the new unlock information
-    if(do_save) save();
-}   // unlockFeature
-
-//-----------------------------------------------------------------------------
-bool UnlockManager::isLocked(const std::string& feature)
-{
-    return m_locked_features.find(feature)!=m_locked_features.end();
-}  // featureIsLocked
-//-----------------------------------------------------------------------------
-const std::vector<const ChallengeData*>   UnlockManager::getUnlockedFeatures()
-{    
-    std::vector<const ChallengeData*>  out;
-    
-    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
-        i!=m_all_challenges.end();  i++)
-    {
-        if (i->second->isSolved()) out.push_back(i->second);
-    }
-    
-    return out;
-}
-//-----------------------------------------------------------------------------
-const std::vector<const ChallengeData*>   UnlockManager::getLockedChallenges()
-{    
-    std::vector<const ChallengeData*>  out;
-    
-    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
-        i!=m_all_challenges.end();  i++)
-    {
-        if (!i->second->isSolved() && !i->second->isActive()) out.push_back(i->second);
-    }
-    
-    return out;
-}
-
-

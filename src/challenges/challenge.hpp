@@ -35,92 +35,29 @@
 #include "utils/translation.hpp"
 
 class XMLNode;
-
+class XMLWriter;
+class ChallengeData;
 
 /**
-  * \brief A class for all challenges
+  * \brief The state of a challenge for one player
   * \ingroup challenges
   */
 class Challenge : public NoCopy
 {
-public:    
-    enum REWARD_TYPE    {UNLOCK_TRACK,
-                         UNLOCK_GP,
-                         UNLOCK_MODE,
-                         UNLOCK_KART,
-                         UNLOCK_DIFFICULTY};
-    // ------------------------------------------------------------------------
-    class UnlockableFeature
-    {
-    public:
-
-        std::string        m_name; // internal name
-        irr::core::stringw m_user_name; // not all types of feature have one
-        REWARD_TYPE        m_type;
-
-        const irr::core::stringw getUnlockedMessage() const;
-    };   // UnlockableFeature
-    // ------------------------------------------------------------------------
-
 private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
-    /** Short, internal name for this challenge. */
-    std::string              m_id;
-    /** Name used in menu for this challenge. */
-    irr::core::stringw       m_name; 
-    /** Message the user gets when the feature is not yet unlocked. */
-    irr::core::stringw       m_challenge_description;
-    /** Features to unlock. */
-    std::vector<UnlockableFeature> m_feature;
-    /** What needs to be done before accessing this challenge. */
-    std::vector<std::string> m_prerequisites;
 
+    ChallengeData* m_data;
+    
 public:
-             Challenge(const std::string &id, const std::string &name);
-             Challenge() : m_state(CH_INACTIVE), m_id(""), m_name("")
-             { }
+             Challenge(ChallengeData* data) : m_state(CH_INACTIVE)
+    { m_data = data; }
     virtual ~Challenge() {};
-    void  addUnlockTrackReward(const std::string &track_name);
-    void  addUnlockModeReward(const std::string &internal_mode_name, 
-                              const irr::core::stringw &user_mode_name);
-    void  addUnlockGPReward(const std::string &gp_name);
-    void  addUnlockDifficultyReward(const std::string &internal_name, 
-                                    const irr::core::stringw &user_name);
-    void  addUnlockKartReward(const std::string &internal_name,
-                              const irr::core::stringw &user_name);
     void  load(const XMLNode* config);
-    void  save(std::ofstream& writer);
-    // These functions are meant for customisation, e.g. load/save
-    // additional state information specific to the challenge
-    virtual void loadAdditionalInfo(const XMLNode* config) {};
-    virtual void saveAdditionalInfo(std::ofstream& writer)     {};
-    // ------------------------------------------------------------------------
-    /** Returns the id of the challenge. */
-    const std::string &getId() const              { return m_id;              }
-    // ------------------------------------------------------------------------
-    /** Returns the name of the challenge. */
-    const irr::core::stringw getName() const
-                              { return irr::core::stringw(_(m_name.c_str())); }
-    // ------------------------------------------------------------------------
-    /** Sets the name of the challenge. */
-    void  setName(const irr::core::stringw & s)   { m_name = s;               }
-    // ------------------------------------------------------------------------
-    /** Sets the id of this challenge. */
-    void  setId(const std::string& s)             { m_id = s;                 }
-    // ------------------------------------------------------------------------
-    const std::vector<UnlockableFeature>&
-          getFeatures() const                    { return m_feature;          }
-    // ------------------------------------------------------------------------    
-    void  setChallengeDescription(const irr::core::stringw& d) 
-                                                 {m_challenge_description=d;  }
-    // ------------------------------------------------------------------------
-    const irr::core::stringw
-          getChallengeDescription() const 
-                                  {return _(m_challenge_description.c_str()); }
-    // ------------------------------------------------------------------------
-    void  addDependency(const std::string id)  {m_prerequisites.push_back(id);}
+    void  save(XMLWriter& writer);
+
     // ------------------------------------------------------------------------
     bool  isSolved() const                       {return m_state==CH_SOLVED;  }
     // ------------------------------------------------------------------------
@@ -129,9 +66,6 @@ public:
     void  setSolved()                            {m_state = CH_SOLVED;        }
     // ------------------------------------------------------------------------
     void  setActive()                            {m_state = CH_ACTIVE;        }
-    // ------------------------------------------------------------------------
-    const std::vector<std::string>& 
-          getPrerequisites() const               {return m_prerequisites;     }
     // ------------------------------------------------------------------------
     /** These functions are called when a race is finished. It allows
      *  the challenge to unlock features (when returning true), otherwise
@@ -142,11 +76,7 @@ public:
      *  the challenge to unlock features (when returning true), otherwise
      *  the feature remains locked. */
     virtual bool grandPrixFinished()             {return false;               }
-    // ------------------------------------------------------------------------    
-    /** Sets the right parameters in RaceManager to try this challenge */
-    virtual void setRace() const = 0;
-    // ------------------------------------------------------------------------
-    /** Checks if a challenge is valid. */
-    virtual void check() const = 0;
+    
+    ChallengeData*  getData() { return m_data; }
 };
 #endif

@@ -50,6 +50,8 @@ StoryModeNewDialog::StoryModeNewDialog(const float w, const float h) :
     
     RibbonWidget* difficulty = getWidget<RibbonWidget>("difficulty");
     difficulty->setSelection( 1 /* medium */, PLAYER_ID_GAME_MASTER );
+    
+    ident->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // -----------------------------------------------------------------------------

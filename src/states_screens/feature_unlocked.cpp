@@ -504,7 +504,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
 {
     for (unsigned int n=0; n<unlocked.size(); n++)
     {
-        const std::vector<Challenge::UnlockableFeature>& 
+        const std::vector<ChallengeData::UnlockableFeature>& 
                     unlockedFeatures = unlocked[n]->getFeatures();
         assert(unlockedFeatures.size() > 0);
         
@@ -512,7 +512,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
         {            
             switch (unlockedFeatures[i].m_type)
             {
-                case Challenge::UNLOCK_TRACK:
+                case ChallengeData::UNLOCK_TRACK:
                 {
                     Track* track = 
                         track_manager->getTrack(unlockedFeatures[i].m_name);
@@ -522,7 +522,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case Challenge::UNLOCK_GP:
+                case ChallengeData::UNLOCK_GP:
                 {
                     std::vector<ITexture*> images;
                     const GrandPrixData* gp = 
@@ -560,7 +560,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case Challenge::UNLOCK_MODE:
+                case ChallengeData::UNLOCK_MODE:
                 {
                     const RaceManager::MinorRaceModeType mode =
                         RaceManager::getModeIDFromInternalName(unlockedFeatures[i].m_name);
@@ -569,7 +569,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }
-                case Challenge::UNLOCK_KART:
+                case ChallengeData::UNLOCK_KART:
                 {
                     const KartProperties* kart =
                         kart_properties_manager->getKart(unlockedFeatures[i].m_name);
@@ -595,7 +595,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
 
                     break;
                 }
-                case Challenge::UNLOCK_DIFFICULTY:
+                case ChallengeData::UNLOCK_DIFFICULTY:
                 {
                     //TODO : implement difficulty reward
                     std::cerr << "OK, I see you unlocked a difficulty, but this is not supported yet\n";

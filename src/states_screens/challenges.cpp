@@ -69,9 +69,11 @@ void ChallengesScreen::beforeAddingWidget()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
     assert( w != NULL );
     
-    const std::vector<const ChallengeData*>& activeChallenges = unlock_manager->getActiveChallenges();
-    const std::vector<const ChallengeData*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
-    const std::vector<const ChallengeData*>& lockedChallenges = unlock_manager->getLockedChallenges();
+    GameSlot* slot = unlock_manager->getCurrentSlot();
+    
+    const std::vector<const ChallengeData*>& activeChallenges = slot->getActiveChallenges();
+    const std::vector<const ChallengeData*>& solvedChallenges = slot->getUnlockedFeatures();
+    const std::vector<const ChallengeData*>& lockedChallenges = slot->getLockedChallenges();
     
     const int activeChallengeAmount = activeChallenges.size();
     const int solvedChallengeAmount = solvedChallenges.size();
@@ -92,9 +94,11 @@ void ChallengesScreen::init()
     // Re-build track list everytime (accounts for locking changes, etc.)
     w->clearItems();
     
-    const std::vector<const ChallengeData*>& activeChallenges = unlock_manager->getActiveChallenges();
-    const std::vector<const ChallengeData*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
-    const std::vector<const ChallengeData*>& lockedChallenges = unlock_manager->getLockedChallenges();
+    GameSlot* slot = unlock_manager->getCurrentSlot();
+
+    const std::vector<const ChallengeData*>& activeChallenges = slot->getActiveChallenges();
+    const std::vector<const ChallengeData*>& solvedChallenges = slot->getUnlockedFeatures();
+    const std::vector<const ChallengeData*>& lockedChallenges = slot->getLockedChallenges();
     
     const int activeChallengeAmount = activeChallenges.size();
     const int solvedChallengeAmount = solvedChallenges.size();
@@ -158,7 +162,7 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
                 UserConfigParams::m_default_kart.revertToDefaults();
             }
             
-            const Challenge* c = unlock_manager->getChallenge(selection);
+            const ChallengeData* c = unlock_manager->getChallenge(selection);
             if (c == NULL)
             {
                 std::cerr << "[ChallengesScreen] ERROR: cannot find challenge '" << selection.c_str() << "'!\n";

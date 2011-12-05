@@ -309,7 +309,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     }
     
     // ---- Buttons at the bottom
-    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    if (unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures().size() > 0)
     {
         const int label_y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
         
@@ -480,8 +480,8 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
     else if (eventSource == "seeunlocked")
     {
         std::vector<const ChallengeData*> unlocked = 
-            unlock_manager->getRecentlyUnlockedFeatures();
-        unlock_manager->clearUnlocked();
+            unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures();
+        unlock_manager->getCurrentSlot()->clearUnlocked();
         
         FeatureUnlockedCutScene* scene = 
             FeatureUnlockedCutScene::getInstance();
@@ -505,7 +505,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
 
 void RaceOverDialog::escapePressed()
 {
-    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    if (unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures().size() > 0)
     {
         std::string what = "seeunlocked";
         processEvent(what);

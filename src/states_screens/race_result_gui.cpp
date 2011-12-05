@@ -91,7 +91,7 @@ void RaceResultGUI::enableAllButtons()
     
     // If something was unlocked
     // -------------------------
-    int n = unlock_manager->getRecentlyUnlockedFeatures().size();
+    int n = unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures().size();
     if(n>0)
     {
         top->setText(n==1 ? _("See unlocked feature") 
@@ -138,7 +138,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // If something was unlocked, the 'continue' button was 
     // actually used to display "Show unlocked feature(s)" text.
     // ---------------------------------------------------------
-    int n = unlock_manager->getRecentlyUnlockedFeatures().size();
+    int n = unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures().size();
     if(n>0)
     {
         if(name=="top")
@@ -149,8 +149,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             
             std::vector<const ChallengeData*> unlocked = 
-                unlock_manager->getRecentlyUnlockedFeatures();
-            unlock_manager->clearUnlocked();
+                unlock_manager->getCurrentSlot()->getRecentlyUnlockedFeatures();
+            unlock_manager->getCurrentSlot()->clearUnlocked();
             FeatureUnlockedCutScene* scene = 
                 FeatureUnlockedCutScene::getInstance();
             scene->addUnlockedThings(unlocked);

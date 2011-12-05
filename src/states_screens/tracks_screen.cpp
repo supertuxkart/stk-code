@@ -247,7 +247,7 @@ void TracksScreen::init()
             sshot_files.push_back("gui/main_help.png");
         }
         
-        if (unlock_manager->isLocked(gp->getId()))
+        if (unlock_manager->getCurrentSlot()->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem(_("Locked!"),
                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
@@ -304,7 +304,7 @@ void TracksScreen::buildTrackList()
             Track* curr = track_manager->getTrack( n );
             if (curr->isArena()) continue;
             
-            if (unlock_manager->isLocked(curr->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -329,7 +329,7 @@ void TracksScreen::buildTrackList()
             Track* curr = track_manager->getTrack( curr_group[n] );
             if (curr->isArena()) continue;
             
-            if (unlock_manager->isLocked(curr->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

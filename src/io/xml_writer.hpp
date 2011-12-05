@@ -49,6 +49,8 @@ public:
     }
     
     void close();
+    
+    bool is_open() { return m_base.is_open(); }
 };
 
 #endif

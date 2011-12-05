@@ -205,7 +205,7 @@ void RaceSetupScreen::init()
     name2 += _("Contains no powerups, so only your driving skills matter!");
     w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
     
-    if (unlock_manager->isLocked(IDENT_FTL))
+    if (unlock_manager->getCurrentSlot()->isLocked(IDENT_FTL))
     {
         w2->addItem( _("Locked : solve active challenges to gain access to more!"),
                     "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);

@@ -359,6 +359,7 @@
 		95E246BE111A2959000C965D /* confirm_resolution_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */; };
 		95E5C318148C17E500AD3FCC /* story_mode_lobby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5C316148C17E500AD3FCC /* story_mode_lobby.cpp */; };
 		95E5C335148C19F500AD3FCC /* story_mode_new.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5C333148C19F500AD3FCC /* story_mode_new.cpp */; };
+		95E5C3C2148C418100AD3FCC /* game_slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5C3C0148C418100AD3FCC /* game_slot.cpp */; };
 		95E6A0C011DCF37800AE088A /* addons_loading.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E6A0BE11DCF37800AE088A /* addons_loading.cpp */; };
 		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
 		95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */; };
@@ -1335,6 +1336,8 @@
 		95E5C317148C17E500AD3FCC /* story_mode_lobby.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = story_mode_lobby.hpp; path = ../../states_screens/story_mode_lobby.hpp; sourceTree = SOURCE_ROOT; };
 		95E5C333148C19F500AD3FCC /* story_mode_new.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = story_mode_new.cpp; path = ../../states_screens/dialogs/story_mode_new.cpp; sourceTree = SOURCE_ROOT; };
 		95E5C334148C19F500AD3FCC /* story_mode_new.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = story_mode_new.hpp; path = ../../states_screens/dialogs/story_mode_new.hpp; sourceTree = SOURCE_ROOT; };
+		95E5C3C0148C418100AD3FCC /* game_slot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = game_slot.cpp; path = ../../challenges/game_slot.cpp; sourceTree = SOURCE_ROOT; };
+		95E5C3C1148C418100AD3FCC /* game_slot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = game_slot.hpp; path = ../../challenges/game_slot.hpp; sourceTree = SOURCE_ROOT; };
 		95E6A0BE11DCF37800AE088A /* addons_loading.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = addons_loading.cpp; path = ../../states_screens/dialogs/addons_loading.cpp; sourceTree = SOURCE_ROOT; };
 		95E6A0BF11DCF37800AE088A /* addons_loading.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = addons_loading.hpp; path = ../../states_screens/dialogs/addons_loading.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EC10124C5000D47C5F /* button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = button_widget.cpp; path = ../../guiengine/widgets/button_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -2416,6 +2419,8 @@
 				95C2AE270F296541000D3E5D /* challenge.hpp */,
 				95C2AE280F296541000D3E5D /* challenge_data.cpp */,
 				95C2AE290F296541000D3E5D /* challenge_data.hpp */,
+				95E5C3C0148C418100AD3FCC /* game_slot.cpp */,
+				95E5C3C1148C418100AD3FCC /* game_slot.hpp */,
 				95C2AE2A0F296541000D3E5D /* unlock_manager.cpp */,
 				95C2AE2B0F296541000D3E5D /* unlock_manager.hpp */,
 			);
@@ -3195,6 +3200,7 @@
 				95AA4C67148AF2CC0053771D /* lod_node_loader.cpp in Sources */,
 				95E5C318148C17E500AD3FCC /* story_mode_lobby.cpp in Sources */,
 				95E5C335148C19F500AD3FCC /* story_mode_new.cpp in Sources */,
+				95E5C3C2148C418100AD3FCC /* game_slot.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

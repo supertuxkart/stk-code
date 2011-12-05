@@ -1962,7 +1962,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         {
             const KartProperties* prop = 
                 kart_properties_manager->getKartById(n);
-            if (unlock_manager->isLocked(prop->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(prop->getIdent()))
             {
                 w->addItem( 
                     _("Locked : solve active challenges to gain access "
@@ -1993,7 +1993,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 kart_properties_manager->getKartById(group[n]);
             const std::string &icon_path = prop->getAbsoluteIconFile();
 
-            if (unlock_manager->isLocked(prop->getIdent()))
+            if (unlock_manager->getCurrentSlot()->isLocked(prop->getIdent()))
             {
                 w->addItem( 
                     _("Locked : solve active challenges to gain access "

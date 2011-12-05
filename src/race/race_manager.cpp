@@ -102,7 +102,7 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
                    name.c_str());
             continue;
         }
-        if(unlock_manager->isLocked(name)) 
+        if(unlock_manager->getCurrentSlot()->isLocked(name)) 
         {
             printf("Kart '%s' is locked and therefore ignored.\n",
                    name.c_str());
@@ -489,7 +489,7 @@ void RaceManager::exitRace()
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
-        unlock_manager->grandPrixFinished();
+        unlock_manager->getCurrentSlot()->grandPrixFinished();
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
         
