@@ -271,7 +271,6 @@ bool UnlockManager::createSlotsIfNeeded()
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
     for (int n=0; n<players.size(); n++)
     {
-        printf("Checking if a game slot exists for player %s\n", core::stringc(players[n].getName().c_str()).c_str());
         bool exists = false;
         
         GameSlot* curr_slot;
@@ -287,7 +286,6 @@ bool UnlockManager::createSlotsIfNeeded()
         
         if (!exists)
         {
-            printf("==> No, creating one\n");
             GameSlot* slot = new GameSlot(players[n].getName());
             
             for(AllChallengesType::iterator i = m_all_challenges.begin(); 
