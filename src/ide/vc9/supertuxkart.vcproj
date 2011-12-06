@@ -447,6 +447,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\game_slot.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\unlock_manager.cpp"
 					>
 				</File>
@@ -1390,6 +1394,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\challenge_data.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\game_slot.hpp"
 					>
 				</File>
 				<File
