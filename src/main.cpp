@@ -172,7 +172,7 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
@@ -1194,7 +1194,7 @@ int main(int argc, char *argv[] )
         addons_manager->checkInstalledAddons();
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
             if(UserConfigParams::m_internet_status ==
                 NetworkHttp::IPERM_NOT_ASKED)
             {

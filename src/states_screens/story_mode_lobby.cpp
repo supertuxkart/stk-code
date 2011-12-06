@@ -17,7 +17,10 @@
 
 #include "states_screens/story_mode_lobby.hpp"
 
+#include "challenges/unlock_manager.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/story_mode_new.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
 
@@ -43,6 +46,22 @@ void StoryModeLobbyScreen::init()
 {
     Screen::init();
     
+    ListWidget* list = getWidget<ListWidget>("gameslots");
+    list->clear();
+    
+    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    for (int n=0; n<players.size(); n++)
+    {
+        if (players[n].isGuestAccount()) continue;
+        
+        // FIXME: we're using a trunacted ascii version of the player name as
+        //        identifier, let's hope this causes no issues...
+        list->addItem(core::stringc(players[n].getName().c_str()).c_str(),
+                      players[n].getName() );
+    }
+    
+    list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -66,7 +85,28 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "gameslots")
     {
-        // TODO
+        ListWidget* list = getWidget<ListWidget>("gameslots");
+        
+        bool slot_found = false;
+        
+        PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+        for (int n=0; n<players.size(); n++)
+        {
+            if (list->getSelectionLabel() == players[n].getName())
+            {
+                unlock_manager->setCurrentSlot(n);
+                slot_found = true;
+                break;;
+            }
+        }
+        
+        if (!slot_found)
+        {
+            fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
+                    core::stringc(list->getSelectionLabel().c_str()).c_str());
+        }
+            
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
     }
 }   // eventCallback
 

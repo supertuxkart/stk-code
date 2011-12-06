@@ -274,7 +274,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->pushScreen(HelpScreen1::getInstance());
     }
-    else if (selection == "challenges")
+    else if (selection == "story")
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
     }
