@@ -19,7 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-#include "states_screens/dialogs/story_mode_new.hpp"
+#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -82,7 +82,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "creategame")
     {
-        new StoryModeNewDialog(0.8f, 0.8f);
+        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
     }
     else if (name == "gameslots")
     {
@@ -118,4 +118,31 @@ void StoryModeLobbyScreen::unloaded()
 }   // unloaded
 
 // ----------------------------------------------------------------------------
+
+void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
+{
+    
+    bool slot_found = false;
+    
+    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    for (int n=0; n<players.size(); n++)
+    {
+        if (players[n].getName() == newName)
+        {
+            unlock_manager->setCurrentSlot(n);
+            slot_found = true;
+            break;
+        }
+    }
+    
+    if (!slot_found)
+    {
+        fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
+                core::stringc(newName.c_str()).c_str());
+    }
+    
+    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+}
+
+// -----------------------------------------------------------------------------
 

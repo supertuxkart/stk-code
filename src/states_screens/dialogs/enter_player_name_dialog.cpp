@@ -127,15 +127,20 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         }
         
         UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
-
-        if (m_listener != NULL) m_listener->onNewPlayerWithName( playerName );
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
+        // we will destroy the dialog before notifying the listener to be safer.
+        // but in order not to crash we must make a local copy of the listern
+        // otherwise we will crash
+        INewPlayerListener* listener = m_listener;
+        
         ModalDialog::dismiss();
+        
+        if (listener != NULL) listener->onNewPlayerWithName( playerName );
     }
     else
     {

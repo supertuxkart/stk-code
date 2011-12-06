@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -30,7 +31,8 @@ namespace GUIEngine { class Widget; }
   * \brief Audio options screen
   * \ingroup states_screens
   */
-class StoryModeLobbyScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
+class StoryModeLobbyScreen : public GUIEngine::Screen, public EnterPlayerNameDialog::INewPlayerListener,
+    public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
 {
     StoryModeLobbyScreen();
     
@@ -51,6 +53,9 @@ public:
     
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
+    
+    /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
+    virtual void onNewPlayerWithName(const irr::core::stringw& newName);
 };
 
 #endif
