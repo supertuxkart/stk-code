@@ -112,14 +112,20 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     
     if (size > 0 && nonEmptyChars > 0)
     {
-        const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
-        if (!success)
+        // check for duplicates
+        const int amount = UserConfigParams::m_all_players.size();
+        for (int n=0; n<amount; n++)
         {
-            LabelWidget* label = getWidget<LabelWidget>("title");
-            label->setText(_("Cannot add a player with this name."), false);
-            sfx_manager->quickSound( "anvil" );
-            return;
+            if (UserConfigParams::m_all_players[n].getName() == playerName)
+            {
+                LabelWidget* label = getWidget<LabelWidget>("title");
+                label->setText(_("Cannot add a player with this name."), false);
+                sfx_manager->quickSound( "anvil" );
+                return;
+            }
         }
+        
+        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

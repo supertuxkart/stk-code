@@ -23,6 +23,7 @@
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/options_screen_players.hpp"
@@ -69,7 +70,7 @@ void PlayerInfoDialog::showRegularDialog()
     
     {
         textCtrl = new TextBoxWidget();
-        textCtrl->m_properties[PROP_ID] = "renameplayer";
+        textCtrl->m_properties[PROP_ID] = "newname";
         textCtrl->setText(m_player->getName());
         textCtrl->m_x = 50;
         textCtrl->m_y = y1 - textHeight/2;
@@ -217,10 +218,24 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
     {
         // accept entered name
         stringw playerName = textCtrl->getText();
-        if (playerName.size() > 0)
+        
+        const int playerAmount =  UserConfigParams::m_all_players.size();
+        for(int n=0; n<playerAmount; n++)
         {
-            OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName, m_player );
+            if (UserConfigParams::m_all_players.get(n) == m_player) continue;
+            
+            if (UserConfigParams::m_all_players[n].getName() == playerName)
+            {
+                ButtonWidget* label = getWidget<ButtonWidget>("renameplayer");
+                label->setBadge(BAD_BADGE);
+                sfx_manager->quickSound( "anvil" );
+                return GUIEngine::EVENT_BLOCK;
+            }
         }
+        
+        if (playerName.size() <= 0) return GUIEngine::EVENT_BLOCK;
+
+        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName, m_player );
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

@@ -108,13 +108,6 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
     // ---- Add new player
     if (player == NULL)
     {
-        // check for duplicates
-        const int amount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<amount; n++)
-        {
-            if (UserConfigParams::m_all_players[n].getName() == newName) return false;
-        }
-        
         // add new player
         UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
         
