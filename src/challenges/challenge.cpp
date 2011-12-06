@@ -39,12 +39,18 @@
 void Challenge::load(const XMLNode* challengesNode)
 {
     const XMLNode* node = challengesNode->getNode( m_data->getId() );
-    if(node == NULL) return;
+    if(node == NULL)
+    {
+        fprintf(stderr, "[Challenge] WARNING: Couldn't find node <%s> in XML file\n",
+                m_data->getId().c_str());
+        return;
+    }
     
     // See if the challenge is solved (it's activated later from the
     // unlock_manager).
     bool finished=false;    
     node->get("solved", &finished);
+        
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
 }   // load
 

@@ -209,7 +209,7 @@ void UnlockManager::load()
     {
         core::stringw player_name;
         xml_game_slots[n]->get("player", &player_name);
-        
+                
         GameSlot* slot = new GameSlot(player_name);
         
         std::string kart_id;
@@ -223,8 +223,9 @@ void UnlockManager::load()
         {
             ChallengeData* curr = i->second;
             Challenge* state = new Challenge(curr);
+            
             slot->m_challenges_state[curr->getId()] = state;
-            state->load(root);
+            state->load(xml_game_slots[n]);
         }
         slot->computeActive();
     }
