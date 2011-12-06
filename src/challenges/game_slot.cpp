@@ -171,11 +171,13 @@ std::vector<const ChallengeData*> GameSlot::getActiveChallenges()
  */
 void GameSlot::raceFinished()
 {
+    printf("=== Race finished ===\n");
+    
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
     {
-        if(i->second->isActive() && i->second->raceFinished())
+        if(i->second->isActive() && i->second->getData()->raceFinished())
         {
             unlockFeature(i->second);
         }   // if isActive && challenge solved
@@ -191,7 +193,7 @@ void GameSlot::grandPrixFinished()
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
     {
-        if(i->second->isActive() && i->second->grandPrixFinished())
+        if(i->second->isActive() && i->second->getData()->grandPrixFinished())
         {
             printf("===== A FEATURE WAS UNLOCKED BECAUSE YOU WON THE GP!! ==\n");
             unlockFeature(i->second);

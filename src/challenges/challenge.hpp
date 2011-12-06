@@ -67,16 +67,6 @@ public:
     // ------------------------------------------------------------------------
     void  setActive()                            {m_state = CH_ACTIVE;        }
     // ------------------------------------------------------------------------
-    /** These functions are called when a race is finished. It allows
-     *  the challenge to unlock features (when returning true), otherwise
-     *  the feature remains locked. */
-    virtual bool raceFinished()                  {return false;               }
-    // ------------------------------------------------------------------------
-    /** These functions are called when a grand prix is finished. It allows
-     *  the challenge to unlock features (when returning true), otherwise
-     *  the feature remains locked. */
-    virtual bool grandPrixFinished()             {return false;               }
-    
     ChallengeData*  getData() { return m_data; }
 };
 #endif
