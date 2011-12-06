@@ -24,7 +24,6 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -35,9 +34,11 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
+EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
+                                             const float w, const float h) :
         ModalDialog(w, h)
 {
+    m_listener = listener;
     loadFromFile("enter_player_name_dialog.stkgui");
     
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
@@ -125,7 +126,9 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
             }
         }
         
-        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
+        UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
+
+        if (m_listener != NULL) m_listener->onNewPlayerWithName( playerName );
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

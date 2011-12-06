@@ -95,7 +95,7 @@ void OptionsScreenPlayers::init()
 
 // -----------------------------------------------------------------------------
 
-bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
+bool OptionsScreenPlayers::renamePlayer(const stringw& newName, PlayerProfile* player)
 {
     // FIXME: Using a truncated ASCII string for internal ID. Let's cross our fingers
     //        and hope no one enters two player names that, when stripped down to ASCII,
@@ -105,29 +105,31 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
     ListWidget* players = this->getWidget<ListWidget>("players");
     if (players == NULL) return false;
     
-    // ---- Add new player
-    if (player == NULL)
+
+    player->setName( newName );
+    
+    // refresh list display
+    players->clear();
+    const int playerAmount =  UserConfigParams::m_all_players.size();
+    for(int n=0; n<playerAmount; n++)
     {
-        // add new player
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
+        players->addItem(newNameC.c_str(), translations->fribidize(UserConfigParams::m_all_players[n].getName()));
+    }
         
+    return true;
+}   // renamePlayer
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenPlayers::onNewPlayerWithName(const stringw& newName)
+{
+    ListWidget* players = this->getWidget<ListWidget>("players");
+    if (players != NULL)
+    {
+        core::stringc newNameC(newName.c_str());
         players->addItem( newNameC.c_str(), translations->fribidize(newName) );
     }
-    else // ---- Rename existing player
-    {
-        player->setName( newName );
-        
-        // refresh list display
-        players->clear();
-        const int playerAmount =  UserConfigParams::m_all_players.size();
-        for(int n=0; n<playerAmount; n++)
-        {
-            players->addItem(newNameC.c_str(), translations->fribidize(UserConfigParams::m_all_players[n].getName()));
-        }
-        
-    }
-    return true;
-}   // gotNewPlayerName
+}
 
 // -----------------------------------------------------------------------------
 
@@ -176,7 +178,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "addplayer")
     {
-        new EnterPlayerNameDialog(0.5f, 0.4f);
+        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
     }
     else if (name == "players")
     {

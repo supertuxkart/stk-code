@@ -235,7 +235,7 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
         
         if (playerName.size() <= 0) return GUIEngine::EVENT_BLOCK;
 
-        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName, m_player );
+        OptionsScreenPlayers::getInstance()->renamePlayer( playerName, m_player );
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

@@ -19,6 +19,8 @@
 #ifndef HEADER_ENTERPLAYERNAME_DIALOG_HPP
 #define HEADER_ENTERPLAYERNAME_DIALOG_HPP
 
+#include <irrString.h>
+
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
@@ -37,10 +39,25 @@ class EnterPlayerNameDialog : public GUIEngine::ModalDialog//, public GUIEngine:
 {
     
 public:
+    
+    class INewPlayerListener
+    {
+    public:
+        virtual void onNewPlayerWithName(const irr::core::stringw& newName) = 0;
+        virtual ~INewPlayerListener(){}
+    };
+    
+private:
+    
+    INewPlayerListener* m_listener;
+    
+public:
+    
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
+    EnterPlayerNameDialog(INewPlayerListener* listener, const float percentWidth,
+                          const float percentHeight);
     ~EnterPlayerNameDialog();
 
     void onEnterPressedInternal();

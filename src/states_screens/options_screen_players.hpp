@@ -23,7 +23,7 @@
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
-
+#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 namespace GUIEngine { class Widget; }
 
 struct Input;
@@ -33,7 +33,8 @@ class PlayerProfile;
   * \brief Player management options screen
   * \ingroup states_screens
   */
-class OptionsScreenPlayers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenPlayers>
+class OptionsScreenPlayers : public GUIEngine::Screen, public EnterPlayerNameDialog::INewPlayerListener,
+    public GUIEngine::ScreenSingleton<OptionsScreenPlayers>
 {
 
     OptionsScreenPlayers();
@@ -50,7 +51,7 @@ public:
      * \brief Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
      * \return  whether adding was successful (can fail e.g. if trying to add a duplicate)
      */
-    bool gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
+    bool renamePlayer(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
     
     void selectPlayer(const irr::core::stringw& name);
@@ -60,6 +61,9 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
+    
+    /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
+    virtual void onNewPlayerWithName(const irr::core::stringw& newName);
 };
 
 #endif
