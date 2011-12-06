@@ -1,4 +1,3 @@
-//  $Id: animation_base.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs

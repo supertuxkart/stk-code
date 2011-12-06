@@ -1,4 +1,3 @@
-//  $Id:kart_control_message.cpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs

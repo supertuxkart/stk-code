@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Marianne Gagnon

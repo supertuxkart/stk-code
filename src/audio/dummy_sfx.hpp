@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>

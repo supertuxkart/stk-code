@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007-2008 Robert Schuster <robertschuster@fsfe.org>
