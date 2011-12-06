@@ -61,6 +61,7 @@ void StoryModeLobbyScreen::init()
     }
     
     list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    list->setSelectionID(0);
     
 }   // init
 
