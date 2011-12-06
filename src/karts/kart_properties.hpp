@@ -288,6 +288,13 @@ private:
     float m_time_till_max_skid;
     /** Kart leaves skid marks. */
     bool  m_has_skidmarks;
+
+    /** Angular velocity to be applied when skidding. */
+    float m_skid_angular_velocity;
+
+    /** Time of skidding before you get a bonus boost. */
+    float m_skid_bonus_time;
+
     /** Make the AI to steer at slightly different points to make it less
      *  likely that the AI creates 'trains' - the kart behind getting 
      *  slipstream. The variation should be a value between 0 (no variation,
@@ -619,6 +626,12 @@ public:
 
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks               () const {return m_has_skidmarks;         }
+
+    /** Returns the angular velocity to be applied when skidding. */
+    float getSkidAngularVelocity() const { return m_skid_angular_velocity;    }
+
+    /** Returns the time of skidding before you get a bonus boost. */
+    float getSkidBonusTime() const { return m_skid_bonus_time; }
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */

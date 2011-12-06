@@ -66,8 +66,22 @@ protected:
 	btScalar	        m_damping;
 	btVehicleRaycaster *m_vehicleRaycaster;
 	btScalar            m_currentVehicleSpeedKmHour;
+    /** True if a zipper is active for that kart. */
     bool                m_zipper_active;
+
+    /** The zipper velocity (i.e. the velocity the kart should reach in
+     *  the first frame that the zipper is active). */
     btScalar            m_zipper_velocity;
+
+    /** The angular velocity to be applied when the kart skids. 
+     *  0 means no skidding. */
+    btScalar            m_skid_angular_velocity;
+
+    /** True if the kart is currently skidding. This is used to detect
+     *  the end of skidding (i.e. m_skid_angular_velocity=0 and
+     *  m_is_skidding=true), and triggers adjusting of the velocity 
+     *  direction. */
+    bool                m_is_skidding;
     
     /** Sliding (skidding) will only be permited when this is true. Also check
      *  the friction parameter in the wheels since friction directly affects 
@@ -235,6 +249,10 @@ public:
     void deactivateZipper();
     bool projectVehicleToSurface(const btVector3& ray, 
                                  bool translate_vehicle);
+    // ------------------------------------------------------------------------
+    /** Sets the angular velocity to be used when skidding 
+     *  (0 means no skidding). */
+    void setSkidAngularVelocity(float v) {m_skid_angular_velocity = v; }
     // ------------------------------------------------------------------------
     /** Returns the number of wheels on the ground. */
     unsigned int getNumWheelsOnGround() const {return m_num_wheels_on_ground;}

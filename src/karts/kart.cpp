@@ -1779,6 +1779,15 @@ void Kart::updatePhysics(float dt)
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
 
+    // Handle skidding
+    float ang_vel = 0;
+    if(m_controls.m_drift)
+        if(m_controls.m_steer>0)
+            ang_vel =  m_kart_properties->getSkidAngularVelocity();
+        else if (m_controls.m_steer<0)
+            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
+    m_vehicle->setSkidAngularVelocity(ang_vel);
+
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT)

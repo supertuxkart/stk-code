@@ -84,6 +84,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
         m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
+        m_skid_angular_velocity = m_skid_bonus_time =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_slipstream_max_speed_increase =
@@ -288,12 +289,14 @@ void KartProperties::getAllData(const XMLNode * root)
     }
     if(const XMLNode *skid_node = root->getNode("skid"))
     {
-        skid_node->get("increase",      &m_skid_increase     );
-        skid_node->get("decrease",      &m_skid_decrease     );
-        skid_node->get("max",           &m_skid_max          );
-        skid_node->get("time-till-max", &m_time_till_max_skid);
-        skid_node->get("visual",        &m_skid_visual       );
-        skid_node->get("enable",        &m_has_skidmarks     );
+        skid_node->get("increase",         &m_skid_increase        );
+        skid_node->get("decrease",         &m_skid_decrease        );
+        skid_node->get("max",              &m_skid_max             );
+        skid_node->get("time-till-max",    &m_time_till_max_skid   );
+        skid_node->get("visual",           &m_skid_visual          );
+        skid_node->get("enable",           &m_has_skidmarks        );
+        skid_node->get("bonus-time",       &m_skid_bonus_time      );
+        skid_node->get("angular-velocity", &m_skid_angular_velocity);
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
@@ -608,6 +611,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_increase,              "skid increase"                 );
     CHECK_NEG(m_skid_max,                   "skid max"                      );
     CHECK_NEG(m_skid_visual,                "skid visual"                   );
+    CHECK_NEG(m_skid_angular_velocity,      "skid angular-velocity"         );
+    CHECK_NEG(m_skid_bonus_time,            "skid bonus-time"               );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
