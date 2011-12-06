@@ -21,6 +21,8 @@
 
 #include <map>
 
+#include "config/user_config.hpp"
+
 #include "challenges/challenge_data.hpp"
 #include "challenges/game_slot.hpp"
 
@@ -72,6 +74,8 @@ public:
     GameSlot*  getCurrentSlot() { return m_game_slots.get(m_current_game_slot); }
     
     void       setCurrentSlot(int slotid) { m_current_game_slot = slotid; }
+    
+    PlayerProfile* getCurrentPlayer() { return UserConfigParams::m_all_players.get(m_current_game_slot); };
     
 };   // UnlockManager
 

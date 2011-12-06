@@ -1168,7 +1168,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                           kartsAreaWidget->m_y + kartsAreaWidget->m_h);
     
     // ---- Create new active player
-    PlayerProfile* profileToUse = UserConfigParams::m_all_players.get(0);
+    PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
     
     if (!firstPlayer)
     {
@@ -1182,7 +1182,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
             }
         }
         
-        
+
         // Remove multiplayer message
         if (m_multiplayer_message != NULL)
         {
