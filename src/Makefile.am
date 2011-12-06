@@ -54,6 +54,8 @@ supertuxkart_SOURCES = \
  challenges/challenge.hpp \
  challenges/challenge_data.cpp \
  challenges/challenge_data.hpp \
+ challenges/game_slot.cpp \
+ challenges/game_slot.hpp \
  challenges/unlock_manager.cpp \
  challenges/unlock_manager.hpp \
  config/player.hpp \
