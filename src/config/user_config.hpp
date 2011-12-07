@@ -518,7 +518,11 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
                                                   "Name of the skin to use") );
-            
+    
+    PARAM_PREFIX WStringUserConfigParam     m_default_player
+        PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player", 
+                                              "Which player to use by default (if empty, will prompt)") );
+    
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
         PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews", 

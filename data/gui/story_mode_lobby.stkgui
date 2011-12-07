@@ -8,6 +8,13 @@
     <list id="gameslots" proportion="5" width="75%" align="center"/>
     <spacer width="20" height="25"/>
     
+    <div layout="horizontal-row" align="center" width="70%" height="fit">
+        <checkbox id="rememberme" />
+        <label text="Remember me" height="100%"/>
+    </div>
+    
+    <spacer width="20" height="15"/>
+    
     <button id="creategame" x="20"
             I18N="In story mode 'select a game slot' menu"  
             text="Create a new player" align="center"/>

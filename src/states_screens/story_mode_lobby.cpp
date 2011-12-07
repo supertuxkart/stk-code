@@ -18,6 +18,7 @@
 #include "states_screens/story_mode_lobby.hpp"
 
 #include "challenges/unlock_manager.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -46,10 +47,27 @@ void StoryModeLobbyScreen::init()
 {
     Screen::init();
     
+    CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
+    cb->setState(false);
+    
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
     
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    
+    if (UserConfigParams::m_default_player.toString().size() > 0)
+    {
+        for (int n=0; n<players.size(); n++)
+        {
+            if (players[n].getName() == UserConfigParams::m_default_player.toString())
+            {
+                unlock_manager->setCurrentSlot(n);
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                return;
+            }
+        }
+    }
+    
     for (int n=0; n<players.size(); n++)
     {
         if (players[n].isGuestAccount()) continue;
@@ -105,6 +123,14 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
         {
             fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
                     core::stringc(list->getSelectionLabel().c_str()).c_str());
+        }
+        else
+        {
+            CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
+            if (cb->getState())
+            {
+                UserConfigParams::m_default_player = list->getSelectionLabel();
+            }
         }
             
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
