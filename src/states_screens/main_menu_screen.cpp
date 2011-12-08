@@ -20,6 +20,7 @@
 #include "states_screens/main_menu_screen.hpp"
 
 #include <string>
+#include <IGUIButton.h>
 
 #include "addons/network_http.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -122,6 +123,7 @@ void MainMenuScreen::init()
     
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
     you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
+    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
     
     RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
     // FIXME: why do I need to do this manually

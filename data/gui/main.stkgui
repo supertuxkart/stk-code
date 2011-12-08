@@ -10,7 +10,7 @@
             
             <spacer width="2%" height="1"/>
             
-            <button id="playername" width="10%" align="center"/>
+            <button id="playername" width="15%" align="center"/>
             
             <spacer proportion="1" height="1"/>
             <buttonbar id="menu_bottomrow" x="0" y="0" width="30%" height="100%" align="center">
