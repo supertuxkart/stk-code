@@ -74,6 +74,20 @@ void IconButtonWidget::add()
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
 
+    if (m_properties[PROP_FOCUS_ICON].size() > 0)
+    {
+        if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+        {
+            m_highlight_texture = irr_driver->getTexture(m_properties[PROP_FOCUS_ICON].c_str());
+        }
+        else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
+        {
+            m_highlight_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
+                                                          m_properties[PROP_FOCUS_ICON]).c_str());
+        }
+        
+    }
+    
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
     float useAspectRatio = -1.0f;

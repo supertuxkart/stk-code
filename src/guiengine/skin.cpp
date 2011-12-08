@@ -1398,6 +1398,11 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     {
         video::ITexture* t = icon_widget->m_texture;
         
+        if (focused && icon_widget->m_highlight_texture != NULL)
+        {
+            t = icon_widget->m_highlight_texture;
+        }
+        
         const bool mouseInside = 
             rect.isPointInside(irr_driver->getDevice()->getCursorControl()
                                                       ->getPosition());

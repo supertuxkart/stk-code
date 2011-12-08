@@ -66,6 +66,7 @@ namespace GUIEngine
  \li \ref prop1
  \li \ref prop2
  \li \ref prop3
+ \li \ref prop3.1
  \li \ref prop4
  \li \ref prop5
  \li \ref prop6
@@ -171,6 +172,7 @@ namespace GUIEngine
        area without caring for aspect ratio, and another to respect an aspect 
        ratio other than the texture's (useful for track screenshots, which 
        are 4:3 compressed to fit in a power-of-two 256x256 texture)
+ \note Supports property PROP_FOCUS_ICON
  
  \n
  \subsection widget5 WTYPE_CHECKBOX
@@ -299,6 +301,12 @@ namespace GUIEngine
  default relative to the /data directory of STK (several methods of 
  IconButtonWidget and DynamicRibbon can enable you to use absolute paths if
  you wish, however).
+ 
+ \n
+ \subsection prop3.1 PROP_FOCUS_ICON
+ <em> Name in XML files: </em> \c "focus_icon"
+ 
+ For icon buttons. A different icon to show when the item is focused.
  
  \n
  \subsection prop4 PROP_TEXT_ALIGN
@@ -441,11 +449,14 @@ namespace GUIEngine
  \subsection prop16 PROP_LABELS_LOCATION
  <em> Name in XML files: </em> \c "label_location"
  
- Currently only used by dynamic ribbons. Decides where the label is. Value 
+ In dynamic ribbons : Decides where the label is. Value 
  can be "each", "bottom", or "none" (if ommitted, "none" is the default). 
  "each" means that every item has its own label. "bottom" means there is a
  single label for all at the bottom, that displays the name of the current 
  item.
+ 
+ In non-dynamic ribbons, you can also use value "hover" which will make the
+ label only visible when the icon is hovered with the mouse.
  
  \n
  \subsection prop17 PROP_MAX_ROWS

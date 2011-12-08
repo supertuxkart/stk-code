@@ -29,16 +29,16 @@
         
         <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
             <icon-button id="story" width="128" height="128"
-                         icon="gui/challenge.png" label_location="hover"
+                         icon="gui/menu_story.png" focus_icon="gui/menu_story_focus.png"
                          I18N="Main menu button"  text="Story Mode"/>
-            <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
-                         label_location="hover"
+            <icon-button id="new" width="128" height="128"
+                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
                          I18N="Main menu button" text="Single-player"/>
-            <icon-button id="multiplayer" width="128" height="128" icon="gui/main_race_multi.png"
-                         label_location="hover"
+            <icon-button id="multiplayer" width="128" height="128"
+                         icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
                          I18N="Main menu button" text="Multiplayer"/>
             <icon-button id="addons" width="128" height="128"
-                         icon="gui/addons.png" label_location="hover"
+                         icon="gui/menu_addons.png" focus_icon="gui/menu_addons_focus.png"
                          I18N="Main menu button"  text="Addons"/>
         </buttonbar>
         
