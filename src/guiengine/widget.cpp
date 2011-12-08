@@ -74,6 +74,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_parent                = NULL;
     m_focusable             = true;
     m_bottom_bar            = false;
+    m_top_bar               = false;
     m_event_handler         = NULL;
     m_reserve_id            = reserve_id;
     m_show_bounding_box     = false;
@@ -259,7 +260,7 @@ void Widget::setFocusForPlayer(const int playerID)
     // Unset focus flag on previous widget that had focus
     if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {
-        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID);
+        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID, this);
         GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
     }
     
@@ -276,7 +277,7 @@ void Widget::unsetFocusForPlayer(const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
     
-    if (m_player_focus[playerID]) this->unfocused(playerID);
+    if (m_player_focus[playerID]) this->unfocused(playerID, NULL);
     m_player_focus[playerID] = false;
 }
 

@@ -66,9 +66,15 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 
 // ----------------------------------------------------------------------------
 void RibbonWidget::add()
-{
-    m_labels.clearWithoutDeleting();
+{    
+    assert(m_magic_number == 0xCAFEC001);
+    assert(m_x > -10.0f);
+    assert(m_y > -10.0f);
+    assert(m_w > 0.0f);
+    assert(m_h > 0.0f);
     
+    
+    m_labels.clearWithoutDeleting();
     
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     
@@ -111,8 +117,14 @@ void RibbonWidget::add()
         }
         
         
-        if (m_children[i].m_text.size() > 0) with_label++;
-        else                                 without_label++;
+        bool has_label_underneath = m_children[i].m_text.size() > 0;
+        if (m_children[i].m_properties[PROP_LABELS_LOCATION].size() > 0)
+        {
+            has_label_underneath = false;
+        }
+        
+        if (has_label_underneath) with_label++;
+        else                      without_label++;
         
         total_needed_space += m_children[i].m_w;
     }
@@ -267,7 +279,12 @@ void RibbonWidget::add()
             
             // find how much space to keep for the label under the button.
             // consider font size, whether the label is multiline, etc...
-            const bool has_label = m_children[i].m_text.size() > 0;
+            bool has_label = m_children[i].m_text.size() > 0;
+            
+            if (m_children[i].m_properties[PROP_LABELS_LOCATION].size() > 0)
+            {
+                has_label = false;
+            }
             
             const int needed_space_under_button = has_label 
                                                 ? GUIEngine::getFontHeight() 
@@ -422,6 +439,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     if (m_children.size() < 2) return EVENT_LET;
 
     m_selection[playerID]++;
+    
     if (m_selection[playerID] >= m_children.size())
     {
         if (m_listener != NULL) m_listener->onRibbonWidgetScroll(1);
@@ -457,7 +475,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     if (m_deactivated) return EVENT_LET;
     // empty ribbon, or only one item (can't move left)
     if (m_children.size() < 2) return EVENT_LET;
-
+    
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
     {
@@ -467,6 +485,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
                               ? 0 
                               : m_children.size()-1;
     }
+
     updateSelection();
     
     if (m_ribbon_type == RIBBON_COMBO)
@@ -510,6 +529,14 @@ EventPropagation RibbonWidget::focused(const int playerID)
             (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER))
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
+            m_mouse_focus->focused(playerID);
+        }
+    }
+    else
+    {
+        if (m_selection[playerID] != -1)
+        {
+            m_children.get(m_selection[playerID])->focused(playerID);
         }
     }
     
@@ -521,8 +548,17 @@ EventPropagation RibbonWidget::focused(const int playerID)
 
 // ----------------------------------------------------------------------------
 
-void RibbonWidget::unfocused(const int playerID)
+void RibbonWidget::unfocused(const int playerID, Widget* new_focus)
 {
+    if (new_focus != NULL && new_focus != this && !m_children.contains(new_focus))
+    {
+        if (m_selection[playerID] != -1)
+        {
+            m_children.get(m_selection[playerID])->unfocused(playerID, new_focus);
+        }
+    }
+    
+    //if (m_selection[0] != -1) m_children.get(m_selection[0])->unfocused(0);
 }   // unfocused
 
 // ----------------------------------------------------------------------------
@@ -548,6 +584,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child,
             {
                 // Was already selected, don't send another event
                 if (m_selection[mousePlayerID] == i) return EVENT_BLOCK; 
+                
                 // Don't change selection on hover for others
                 m_selection[mousePlayerID] = i;
                 break;
@@ -588,7 +625,13 @@ void RibbonWidget::updateSelection()
     {
         for (int i=0; i<subbuttons_amount; i++)
         {
-            m_children[i].m_selected[p] = (i == m_selection[p]);            
+            bool new_val = (i == m_selection[p]);
+            if (!new_val && m_children[i].m_selected[p])
+            {
+                m_children[i].unfocused(PLAYER_ID_GAME_MASTER, NULL);
+            }
+            m_children[i].m_selected[p] = new_val;
+            if (new_val) m_children[i].focused(PLAYER_ID_GAME_MASTER);
         }
     }
         

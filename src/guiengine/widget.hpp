@@ -191,7 +191,7 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID) { setWithinATextBox(false); return EVENT_LET; }
         
         /** override in children if you need to know when the widget is unfocused. */
-        virtual void unfocused(const int playerID) { }
+        virtual void unfocused(const int playerID, Widget* new_focus) { }
         
         /**
          * An irrlicht parent (most often used to put widgets in dialogs)
@@ -238,7 +238,8 @@ namespace GUIEngine
         bool m_focusable;
         
         bool m_bottom_bar;
-            
+        bool m_top_bar;
+        
         /** If a badge wouldn't look too pretty on the very side of the widget */
         int m_badge_x_shift;
         
@@ -332,7 +333,8 @@ namespace GUIEngine
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
         
         bool isBottomBar() const { return m_bottom_bar; }
-        
+        bool isTopBar   () const { return m_top_bar;    }
+
         /**
          * \name Enabling or disabling widgets
          * \{

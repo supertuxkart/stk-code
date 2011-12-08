@@ -156,7 +156,7 @@ EventPropagation BubbleWidget::focused(const int playerID)
 
 // ----------------------------------------------------------------------------
 /*
-void BubbleWidget::unfocused(const int playerID)
+void BubbleWidget::unfocused(const int playerID, Widget* new_focus)
 {
     if (m_element != NULL)
     {

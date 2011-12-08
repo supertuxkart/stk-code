@@ -1,36 +1,40 @@
 <stkgui>
-
-    <div x="5%" y="0" width="90%" height="100%" layout="vertical-row" >
     
-        <icon id="logo" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
-        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+        
+        <topbar width="100%" height="9%" layout="horizontal-row">
+            <spacer proportion="1" height="1"/>
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="30%" height="100%" align="center">
+                <icon-button id="options" width="64" height="64" icon="gui/main_options.png"
+                             I18N="Main menu button"  text="Options" label_location="hover"/>
+                <icon-button id="help" width="64" height="64" icon="gui/main_help.png"
+                             I18N="Main menu button" text="Help" label_location="hover"/>
+                <icon-button id="about" width="64" height="64" icon="gui/main_about.png"
+                             I18N="Main menu button" text="About" label_location="hover"/>
+                <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"
+                             I18N="Main menu button" text="Quit" label_location="hover"/>
+            </buttonbar>
+        </topbar>
+        
+        <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
+        
+        <buttonbar id="menu_toprow" proportion="4" width="75%" align="center">
             <icon-button id="story" width="128" height="128"
-                         icon="gui/challenge.png"
+                         icon="gui/challenge.png" label_location="hover"
                          I18N="Main menu button"  text="Story Mode"/>
             <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
-                    I18N="Main menu button" text="Single-player"/>
+                         label_location="hover"
+                         I18N="Main menu button" text="Single-player"/>
             <icon-button id="multiplayer" width="128" height="128" icon="gui/main_race_multi.png"
-                    I18N="Main menu button" text="Multiplayer"/>
+                         label_location="hover"
+                         I18N="Main menu button" text="Multiplayer"/>
             <icon-button id="addons" width="128" height="128"
-                         icon="gui/addons.png"
+                         icon="gui/addons.png" label_location="hover"
                          I18N="Main menu button"  text="Addons"/>
         </buttonbar>
         
-        <spacer width="10" proportion="1"/>
-        
-        <buttonbar id="menu_bottomrow" proportion="3" width="85%" align="center">
-            <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
-                    I18N="Main menu button"  text="Options"/>
-            <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
-                    I18N="Main menu button" text="Help"/>
-            <icon-button id="about" width="128" height="128" icon="gui/main_about.png"
-                    I18N="Main menu button" text="About"/>
-            <icon-button id="quit" width="128" height="128" icon="gui/main_quit.png"
-                    I18N="Main menu button" text="Quit"/>
-        </buttonbar>
-        
-        <spacer width="10" proportion="1"/>
-        
+        <spacer width="10" height="3%"/>
+    
         <bottombar width="100%" height="10%" layout="horizontal-row">
 
             <spacer width="10" height="10" />

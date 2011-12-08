@@ -231,7 +231,7 @@ void ListWidget::selectItemWithLabel(const irr::core::stringw& name)
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::unfocused(const int playerID)
+void ListWidget::unfocused(const int playerID, Widget* new_focus)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
 

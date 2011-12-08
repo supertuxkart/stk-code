@@ -139,6 +139,11 @@ void IconButtonWidget::add()
         m_label->setTabStop(false);
         m_label->setNotClipped(true);
         
+        if (m_properties[PROP_LABELS_LOCATION] == "hover")
+        {
+            m_label->setVisible(false);
+        }
+        
         const int max_w = m_label->getAbsolutePosition().getWidth();
         if (!word_wrap &&
             (int)GUIEngine::getFont()->getDimension(message.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
@@ -225,3 +230,25 @@ void IconButtonWidget::setLabel(stringw new_label)
         m_label->setOverrideFont( NULL );
     }
 }
+// -----------------------------------------------------------------------------
+EventPropagation IconButtonWidget::focused(const int playerID)
+{
+    Widget::focused(playerID);
+    
+    if (m_label != NULL && m_properties[PROP_LABELS_LOCATION] == "hover")
+    {
+        m_label->setVisible(true);
+    }
+    return EVENT_LET;
+}
+// -----------------------------------------------------------------------------
+void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
+{
+    Widget::unfocused(playerID, new_focus);
+    if (m_label != NULL && m_properties[PROP_LABELS_LOCATION] == "hover")
+    {
+        m_label->setVisible(false);
+    }
+}
+
+

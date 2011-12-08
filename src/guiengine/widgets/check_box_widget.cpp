@@ -59,3 +59,6 @@ EventPropagation CheckBoxWidget::transmitEvent(Widget* w,
     /* notify main event handler */
     return EVENT_LET;
 }
+// -----------------------------------------------------------------------------
+
+

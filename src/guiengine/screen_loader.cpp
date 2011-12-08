@@ -77,6 +77,12 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                     w->m_bottom_bar = true;
                     append_to.push_back(w);
                 }
+                else if (wcscmp(L"topbar", xml->getNodeName()) == 0)
+                {
+                    Widget* w = new Widget(WTYPE_DIV);
+                    w->m_top_bar = true;
+                    append_to.push_back(w);
+                }
                 else if (wcscmp(L"roundedbox", xml->getNodeName()) == 0)
                 {
                     Widget* w = new Widget(WTYPE_DIV);
@@ -242,6 +248,10 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 if (wcscmp(L"placeholder", xml->getNodeName()) == 0)
                     return;
                 if (wcscmp(L"roundedbox", xml->getNodeName()) == 0)
+                    return;
+                if (wcscmp(L"bottombar", xml->getNodeName()) == 0)
+                    return;
+                if (wcscmp(L"topbar", xml->getNodeName()) == 0)
                     return;
                 
                 // we're done parsing this 'ribbon', return one step back in the recursive call

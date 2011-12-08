@@ -122,6 +122,12 @@ namespace GUIEngine
         {
             m_highlight_texture = texture;
         }
+        
+        /** \brief override from base class */
+        virtual EventPropagation focused(const int playerID);
+        
+        /** \brief override from base class */
+        virtual void unfocused(const int playerID, Widget* new_focus);
     };
 }
 

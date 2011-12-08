@@ -82,7 +82,7 @@ namespace GUIEngine
                                                const std::string& originator,
                                                const int playerID=0);
         virtual EventPropagation focused(const int playerID);
-        virtual void unfocused(const int playerID);
+        virtual void unfocused(const int playerID, Widget* new_focus);
         
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         

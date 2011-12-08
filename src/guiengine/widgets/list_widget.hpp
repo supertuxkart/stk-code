@@ -96,7 +96,7 @@ namespace GUIEngine
         virtual void add();
         
         /** \brief implement callback from base class GUIEngine::Widget */
-        virtual void unfocused(const int playerID);
+        virtual void unfocused(const int playerID, Widget* new_focus);
         
         /** \brief implement callback from base class GUIEngine::Widget */
         virtual void elementRemoved();
