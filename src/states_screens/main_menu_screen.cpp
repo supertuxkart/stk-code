@@ -177,6 +177,12 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
                                    const int playerID)
 {
+    if (name == "playername")
+    {
+        UserConfigParams::m_default_player = L"";
+        StateManager::get()->resetAndGoToScreen(StoryModeLobbyScreen::getInstance());
+    }
+    
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     
@@ -288,10 +294,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "story")
     {
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
-    }
-    else if (selection == "story")
-    {
-        StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
     else if (selection == "tutorial")
     {
