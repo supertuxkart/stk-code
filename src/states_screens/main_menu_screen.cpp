@@ -123,7 +123,11 @@ void MainMenuScreen::init()
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
     you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
     
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
+    // FIXME: why do I need to do this manually
+    ((IconButtonWidget*)r->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+
+    r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 

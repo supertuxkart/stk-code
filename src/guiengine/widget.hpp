@@ -513,6 +513,8 @@ namespace GUIEngine
           */
         const PtrVector<Widget>& getChildren() const { return m_children; }
         
+        PtrVector<Widget>&       getChildren()       { return m_children; }
+
         /**
           * \brief removes and deletes the child with the given PROP_ID
           * \param id PROP_ID property of the child to remove
