@@ -22,6 +22,7 @@
 #include <string>
 
 #include "addons/network_http.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -118,6 +119,12 @@ void MainMenuScreen::init()
     const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
+    
+    ButtonWidget* you = getWidget<ButtonWidget>("playername");
+    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
+    
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
+    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // ----------------------------------------------------------------------------
