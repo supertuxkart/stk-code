@@ -27,7 +27,7 @@
         
         <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
         
-        <buttonbar id="menu_toprow" proportion="4" width="75%" align="center">
+        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
             <icon-button id="story" width="128" height="128"
                          icon="gui/challenge.png" label_location="hover"
                          I18N="Main menu button"  text="Story Mode"/>
@@ -42,7 +42,7 @@
                          I18N="Main menu button"  text="Addons"/>
         </buttonbar>
         
-        <spacer width="10" height="3%"/>
+        <spacer width="10" height="7%"/>
     
         <bottombar width="100%" height="10%" layout="horizontal-row">
 
