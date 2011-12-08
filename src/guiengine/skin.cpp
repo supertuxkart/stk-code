@@ -832,7 +832,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     
     bool mark_selected = widget->isSelected(PLAYER_ID_GAME_MASTER);
     bool always_show_selection = false;
-        
+    
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
@@ -1303,38 +1303,49 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
 void Skin::drawIconButton(const core::recti &rect, Widget* widget, 
                           const bool pressed, bool focused)
 {
+    RibbonWidget* parentRibbon = (RibbonWidget*)widget->m_event_handler;
+    IGUIElement* focusedElem = NULL;
+    if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
+    {
+        focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)
+                                    ->getIrrlichtElement();
+    }
+    const bool parent_focused = (widget->m_event_handler == NULL ? false : 
+        (focusedElem == widget->m_event_handler->m_element));
+    const bool mark_focused = 
+        focused || (parent_focused && parentRibbon != NULL && 
+                    parentRibbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == widget->m_properties[PROP_ID]);
+    
     if (focused)
     {
         int grow = 45;
         static float glow_effect = 0;
         
-        
         const float dt = GUIEngine::getLatestDt();
         glow_effect += dt*3;
         if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-            grow = (int)(45 + 10*sin(glow_effect));
-            
-            
-            const int glow_center_x = rect.UpperLeftCorner.X+rect.getWidth()/2;
-            const int glow_center_y = rect.LowerRightCorner.Y;
-            
-            ITexture* tex_ficonhighlight = 
-                SkinConfig::m_render_params["focusHalo::neutral"].getImage();
-            const int texture_w = tex_ficonhighlight->getSize().Width;
-            const int texture_h = tex_ficonhighlight->getSize().Height;
-            
-            core::recti source_area = core::recti(0, 0, texture_w, texture_h);
-            
-            
-            const core::recti rect2(glow_center_x - 45 - grow,
-                                    glow_center_y - 25 - grow/2,
-                                    glow_center_x + 45 + grow,
-                                    glow_center_y + 25 + grow/2);
-            
-            GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, 
-                                                source_area,
-                                                0 /* no clipping */, 0, 
-                                                true /* alpha */);
+        grow = (int)(45 + 10*sin(glow_effect));
+        
+        const int glow_center_x = rect.UpperLeftCorner.X+rect.getWidth()/2;
+        const int glow_center_y = rect.LowerRightCorner.Y;
+        
+        ITexture* tex_ficonhighlight = 
+            SkinConfig::m_render_params["focusHalo::neutral"].getImage();
+        const int texture_w = tex_ficonhighlight->getSize().Width;
+        const int texture_h = tex_ficonhighlight->getSize().Height;
+        
+        core::recti source_area = core::recti(0, 0, texture_w, texture_h);
+        
+        
+        const core::recti rect2(glow_center_x - 45 - grow,
+                                glow_center_y - 25 - grow/2,
+                                glow_center_x + 45 + grow,
+                                glow_center_y + 25 + grow/2);
+        
+        GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, 
+                                            source_area,
+                                            0 /* no clipping */, 0, 
+                                            true /* alpha */);
     }
     
     core::recti sized_rect = rect;
@@ -1398,16 +1409,11 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     {
         video::ITexture* t = icon_widget->m_texture;
         
-        if (focused && icon_widget->m_highlight_texture != NULL)
-        {
-            t = icon_widget->m_highlight_texture;
-        }
-        
         const bool mouseInside = 
             rect.isPointInside(irr_driver->getDevice()->getCursorControl()
                                                       ->getPosition());
         if (icon_widget->m_highlight_texture != NULL && 
-            (focused || mouseInside)                   )
+            (mark_focused || mouseInside)                   )
         {
             t = icon_widget->m_highlight_texture;
         }
