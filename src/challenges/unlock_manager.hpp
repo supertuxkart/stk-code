@@ -48,12 +48,12 @@ private:
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
     
-    PtrVector<GameSlot> m_game_slots;
+    std::map<irr::core::stringw, GameSlot*> m_game_slots;
     
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
     bool createSlotsIfNeeded();
     
-    int m_current_game_slot;
+    irr::core::stringw m_current_game_slot;
     
     friend class GameSlot;
     
@@ -71,11 +71,12 @@ public:
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
     
-    GameSlot*  getCurrentSlot() { return m_game_slots.get(m_current_game_slot); }
+    GameSlot*  getCurrentSlot() { return m_game_slots[m_current_game_slot]; }
     
-    void       setCurrentSlot(int slotid) { m_current_game_slot = slotid; }
+    /** \param slotid name of the player */
+    void       setCurrentSlot(irr::core::stringw slotid) { m_current_game_slot = slotid; }
     
-    PlayerProfile* getCurrentPlayer() { return UserConfigParams::m_all_players.get(m_current_game_slot); };
+    PlayerProfile* getCurrentPlayer();
     
 };   // UnlockManager
 
