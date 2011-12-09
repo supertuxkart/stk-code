@@ -71,6 +71,8 @@ public:
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
     
+    const core::stringw& getCurrentSlotName() const { return m_current_game_slot; }
+    
     GameSlot*  getCurrentSlot() { return m_game_slots[m_current_game_slot]; }
     
     /** \param slotid name of the player */

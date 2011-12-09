@@ -20,6 +20,7 @@
 #include <IGUIStaticText.h>
 #include <IGUIEnvironment.h>
 
+#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -148,10 +149,15 @@ void PlayerInfoDialog::showConfirmDialog()
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
-    
     irr::core::stringw message = 
         //I18N: In the player info dialog (when deleting)
         _("Do you really want to delete player '%s' ?", m_player->getName());
+    
+    
+    if (unlock_manager->getCurrentSlotName() == m_player->getName())
+    {
+        message = _("You cannot delete this player because it is currently in use.");
+    }
     
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
     
@@ -162,6 +168,7 @@ void PlayerInfoDialog::showConfirmDialog()
                                               m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
+    if (unlock_manager->getCurrentSlotName() != m_player->getName())
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
