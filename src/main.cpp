@@ -858,6 +858,7 @@ int handleCmdLine(int argc, char **argv)
                      || !strcmp(argv[i], "-N")                )
         {
             UserConfigParams::m_no_start_screen = true;
+            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0].getName());
         }
         else if (    !strcmp(argv[i], "--race-now")
                      || !strcmp(argv[i], "-R")                )
@@ -1247,7 +1248,7 @@ int main(int argc, char *argv[] )
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer( 
                     UserConfigParams::m_all_players.get(0), device );
-
+            
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
                 printf("Kart '%s' is unknown so will use the default kart.\n", UserConfigParams::m_default_kart.c_str());
