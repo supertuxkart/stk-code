@@ -271,7 +271,7 @@ void KeyboardConfig::setDefaultBinds()
 KeyboardConfig::KeyboardConfig() : DeviceConfig(DEVICE_CONFIG_TYPE_KEYBOARD)
 {
     m_name = "Keyboard";
-    setPlugged(true);
+    m_plugged = 1;
     setDefaultBinds();
 }
 
@@ -317,7 +317,7 @@ GamepadConfig::GamepadConfig   ( const std::string      name,
     m_name = name;
     m_axis_count = axis_count;
     m_button_count = btnCount;
-    setPlugged(false);
+    m_plugged = 0;
     setDefaultBinds();
 }
 
@@ -345,7 +345,7 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_
         m_enabled = true;
     }
     
-    setPlugged(false);
+    m_plugged = 0;
     setDefaultBinds();
 }
 

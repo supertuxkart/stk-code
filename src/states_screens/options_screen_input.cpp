@@ -106,7 +106,14 @@ void OptionsScreenInput::buildDeviceList()
         {
             // since irrLicht's list widget has the nasty tendency to put the 
             // icons very close to the text, I'm adding spaces to compensate.
-            const irr::core::stringw name = ("   " + config->getName()).c_str();
+            irr::core::stringw name = ("   " + config->getName()).c_str();
+            
+            if (config->getNumberOfDevices() > 1)
+            {
+                name += core::stringw(L" (x");
+                name += config->getNumberOfDevices();
+                name += core::stringw(L")");
+            }
             
             std::ostringstream gpname;
             gpname << "gamepad" << i;

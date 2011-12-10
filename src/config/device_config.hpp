@@ -46,12 +46,10 @@ enum DeviceConfigType
   */
 class DeviceConfig : public NoCopy
 {
-private:
+protected:
     
     Binding  m_bindings[PA_COUNT];
-    bool     m_plugged;  //!< Is there a device connected to the system which uses this config?
-    
-protected:
+    int      m_plugged;  //!< How many devices connected to the system which uses this config?
     
     bool     m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
 
@@ -96,8 +94,9 @@ public:
                                      Input::AxisDirection   direction = Input::AD_NEUTRAL,
                                      wchar_t                character=0);
     
-    void        setPlugged            (bool plugged) {m_plugged = plugged;}
-    bool        isPlugged           () {return m_plugged;}
+    void        setPlugged          () { m_plugged++; }
+    bool        isPlugged           () const { return m_plugged > 0; }
+    int         getNumberOfDevices  () const { return m_plugged;     }
     
     /**
       * \brief              Searches for a game actions associated with the given input event

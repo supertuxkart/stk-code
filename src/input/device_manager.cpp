@@ -120,7 +120,7 @@ bool DeviceManager::initialize()
                 printf("using existing configuration.\n");
         }
 
-        gamepadConfig->setPlugged(true);
+        gamepadConfig->setPlugged();
         gamepadDevice = new GamePadDevice(id, 
                                           name.c_str(),
                                           m_irrlicht_gamepads[id].Axes,
