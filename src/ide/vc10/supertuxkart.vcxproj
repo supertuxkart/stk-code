@@ -112,6 +112,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\addons\news_manager.cpp" />
     <ClCompile Include="..\..\addons\request.cpp" />
+    <ClCompile Include="..\..\challenges\game_slot.cpp" />
     <ClCompile Include="..\..\graphics\hardware_skinning.cpp" />
     <ClCompile Include="..\..\graphics\hit_sfx.cpp" />
     <ClCompile Include="..\..\graphics\lod_node.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
+    <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
     <ClCompile Include="..\..\tinygettext\iconv.cpp" />
@@ -334,6 +336,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\addons\news_manager.hpp" />
     <ClInclude Include="..\..\addons\request.hpp" />
+    <ClInclude Include="..\..\challenges\game_slot.hpp" />
     <ClInclude Include="..\..\graphics\hardware_skinning.hpp" />
     <ClInclude Include="..\..\graphics\hit_effect.hpp" />
     <ClInclude Include="..\..\graphics\hit_sfx.hpp" />
@@ -396,6 +399,7 @@
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
+    <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />
     <ClInclude Include="..\..\tinygettext\file_system.hpp" />

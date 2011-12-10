@@ -807,6 +807,15 @@
     <ClCompile Include="..\..\utils\leak_check.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tracks\lod_node_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\challenges\game_slot.cpp">
+      <Filter>Source Files\challenges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp">
+      <Filter>Source Files\states_screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1534,6 +1543,15 @@
     </ClInclude>
     <ClInclude Include="..\..\utils\leak_check.hpp">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\lod_node_loader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\challenges\game_slot.hpp">
+      <Filter>Header Files\challenges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp">
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
