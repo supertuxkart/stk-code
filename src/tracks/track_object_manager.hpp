@@ -26,6 +26,7 @@
 class Track;
 class Vec3;
 class XMLNode;
+class LODNode;
 
 #include <map>
 #include <vector>
@@ -76,8 +77,7 @@ public:
         m_all_objects.push_back(obj);
     }
     
-    /** Get the queue of LOD objects that are waiting to be assigned a scene node */
-    std::map<std::string, std::vector<TrackObject*> >& getLodObjects() { return m_lod_objects; }
+    void assingLodNodes(const std::vector<LODNode*>& lod);
 };   // class TrackObjectManager
 
 #endif

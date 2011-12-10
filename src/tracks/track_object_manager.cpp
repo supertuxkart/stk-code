@@ -41,6 +41,9 @@ TrackObjectManager::~TrackObjectManager()
 // ----------------------------------------------------------------------------
 /** Adds an object to the track object manager. The type to add is specified
  *  in the xml_node.
+ * \note If you add add any objects with LOD, don't forget to call
+ *       TrackObjectManager::assingLodNodes after everything is loaded
+ *       to finalize their creation.
  */
 void TrackObjectManager::add(const XMLNode &xml_node)
 {
@@ -231,3 +234,26 @@ void TrackObjectManager::removeObject(PhysicalObject* obj)
     delete obj;
 }   // removeObject
 
+// ----------------------------------------------------------------------------
+/**
+  * \brief To be called after all objects are loaded and the LodNodeLoader is done
+  *        parsing everything.
+  * This method exists because LOD objects need to be created after others.
+  *
+  * \param lod_nodes the LOD nodes created by the LodNodeLoader.
+  */
+void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
+{
+    for (unsigned int n=0; n<lod_nodes.size(); n++)
+    {
+        std::vector<TrackObject*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
+        assert( queue.size() > 0 );
+        TrackObject* obj = queue[ queue.size() - 1 ];
+        obj->setNode( lod_nodes[n] );
+        queue.erase( queue.end() - 1 );
+        
+        manualInsertObject( obj );
+    }
+    
+    m_lod_objects.clear();
+}

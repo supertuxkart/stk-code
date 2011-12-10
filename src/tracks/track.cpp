@@ -1239,21 +1239,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     std::vector<scene::IMesh*> devnull;
     lod_loader.done(m_root, devnull, lod_nodes);
     
-    std::map<std::string, std::vector<TrackObject*> >& track_objects =
-        m_track_object_manager->getLodObjects();
-    
-    for (unsigned int n=0; n<lod_nodes.size(); n++)
-    {
-        std::vector<TrackObject*>& queue = track_objects[ lod_nodes[n]->getGroupName() ];
-        assert( queue.size() > 0 );
-        TrackObject* obj = queue[ queue.size() - 1 ];
-        obj->setNode( lod_nodes[n] );
-        queue.erase( queue.end() - 1 );
-        
-        m_track_object_manager->manualInsertObject( obj );
-    }
-    
-    track_objects.clear();
+    m_track_object_manager->assingLodNodes(lod_nodes);
     // ---------------------------------------------
     
     delete root;
