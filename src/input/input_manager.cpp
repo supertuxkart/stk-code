@@ -438,16 +438,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                                          value, m_mode, 
                                                          &player, &action);
 
-    // if didn't find a _menu_ action, try finding a corresponding game action
-    // as fallback (the GUI can handle them too)
-    if (!action_found && m_mode == MENU)
-    {
-        action_found = m_device_manager->translateInput(type, deviceID, 
-                                                        button, axisDirection,
-                                                        value, INGAME, &player,
-                                                        &action);
-    }
-    
     // in menus, some keyboard keys are standard (before each player selected 
     // his device). So if a key could not be mapped to any known binding, 
     // fall back to check the defaults.
