@@ -17,10 +17,12 @@
 
 #include "states_screens/options_screen_players.hpp"
 
+#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/device_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -32,7 +34,9 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 
+#include <IGUIButton.h>
 
 #include <iostream>
 #include <sstream>
@@ -91,6 +95,11 @@ void OptionsScreenPlayers::init()
         players->setActivated();
     }
     
+    
+    ButtonWidget* you = getWidget<ButtonWidget>("playername");
+    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
+    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
+        
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -199,7 +208,12 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
                 return;
             }
         } // end for
-    }   // name=="players"
+    } 
+    else if (name == "playername")
+    {
+        UserConfigParams::m_default_player = L"";
+        StateManager::get()->resetAndGoToScreen(StoryModeLobbyScreen::getInstance());
+    }
     
 }   // eventCallback
 

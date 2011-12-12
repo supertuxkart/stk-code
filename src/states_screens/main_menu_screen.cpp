@@ -20,10 +20,8 @@
 #include "states_screens/main_menu_screen.hpp"
 
 #include <string>
-#include <IGUIButton.h>
 
 #include "addons/network_http.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -41,7 +39,6 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/tutorial_screen.hpp"
 
 #if DEBUG_MENU_ITEM
@@ -121,10 +118,6 @@ void MainMenuScreen::init()
     w->setText(news_text, true);
     w->update(0.01f);
     
-    ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
-    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
-    
     RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
     // FIXME: why do I need to do this manually
     ((IconButtonWidget*)r->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
@@ -179,12 +172,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
                                    const int playerID)
 {
-    if (name == "playername")
-    {
-        UserConfigParams::m_default_player = L"";
-        StateManager::get()->resetAndGoToScreen(StoryModeLobbyScreen::getInstance());
-    }
-    
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     
