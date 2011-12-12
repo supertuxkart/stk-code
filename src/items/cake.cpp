@@ -87,7 +87,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), -m_gravity,
+                      new btCylinderShape(0.5f*m_extend), 
+                      0.5f /* restitution */, -m_gravity,
                       true /* rotation */, false /* backwards */, &trans);
     }
     else
@@ -100,7 +101,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), -m_gravity,
+                      new btCylinderShape(0.5f*m_extend), 
+                      0.5f /* restitution */, -m_gravity,
                       true /* rotation */, backwards, &trans);
     }
 

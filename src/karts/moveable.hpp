@@ -105,7 +105,8 @@ public:
     virtual void  update(float dt) ;
     btRigidBody  *getBody() const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
-                             btCollisionShape *shape);
+                             btCollisionShape *shape,
+                             float restitution);
     const btTransform 
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);

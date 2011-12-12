@@ -49,6 +49,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING,
 
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), 
+                  1.0f /*restitution*/,
                   -70.0f /*gravity*/, 
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,

@@ -141,7 +141,9 @@ void Moveable::update(float dt)
  *  \param shape Bullet collision shape for this object.
  */
 void Moveable::createBody(float mass, btTransform& trans,
-                          btCollisionShape *shape) {
+                          btCollisionShape *shape,
+                          float restitution) 
+{
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
     m_transform = trans;
@@ -149,7 +151,7 @@ void Moveable::createBody(float mass, btTransform& trans,
 
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, 
                                                   shape, inertia);
-    info.m_restitution=0.5f;
+    info.m_restitution = restitution;
 
     // Then create a rigid body
     // ------------------------

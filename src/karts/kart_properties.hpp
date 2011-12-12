@@ -257,6 +257,9 @@ private:
      *  side-side collision away from each other. */
     float m_collision_impulse;
 
+    /** The restitution factor to be used in collsions for this kart. */
+    float m_restitution;
+
     float m_upright_tolerance;
     float m_upright_max_force;
 
@@ -506,7 +509,10 @@ public:
 
     /** Returns the (artificial) collision impulse this kart will apply
      *  to another kart in case of a non-frontal collision. */
-    float getCollisionImpulse   () const {return m_collision_impulse;}
+    float getCollisionImpulse       () const {return m_collision_impulse;}
+
+    /** Returns the restitution factor for this kart. */
+    float getRestitution            () const { return m_restitution; }
 
     /** Returns the vertical offset when rescuing karts to avoid karts being
      *  rescued in (or under) the track. */

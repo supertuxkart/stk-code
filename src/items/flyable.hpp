@@ -153,6 +153,7 @@ protected:
     void              createPhysics(float y_offset,
                                     const Vec3 &velocity,
                                     btCollisionShape *shape, 
+                                    float restitution,
                                     const float gravity=0.0f,
                                     const bool rotates=false, 
                                     const bool turn_around=false,

@@ -98,7 +98,8 @@ Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass)
  *         otherwise the kart's heading will be used.
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
-                            btCollisionShape *shape, const float gravity,
+                            btCollisionShape *shape, 
+                            float restitution, const float gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
 {
@@ -126,7 +127,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     trans  *= offset_transform;
 
     m_shape = shape;
-    createBody(m_mass, trans, m_shape);
+    createBody(m_mass, trans, m_shape, restitution);
     m_user_pointer.set(this);
     World::getWorld()->getPhysics()->addBody(getBody());
 
