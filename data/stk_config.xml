@@ -277,15 +277,18 @@
     <!-- Parameters for the upright constraint, which keeps karts upright. -->
     <upright tolerance="0.2" max-force="30"/>
 
-    <!-- collision-side-impulse is an additional (artificial) impulse that
-         pushes the slower kart out of the way of the faster karts (i.e. 
-         sideways to the faster kart) when a collision happens. This is 
-         for now disabled since it needs tuning and additionally has the
-         problem that the amount of push a hit kart receives depends on
-         the orientation - if a kart is pushed in the direction it is 
-         driving, it will be more (no friction from tires), while when 
-         pushed to the side, hardly anything happens.  -->
-    <collision side-impulse="0"/>
+    <!-- collision
+         impulse: an additional impulse to be applied in a non-frontal
+           collision to push two karts away from each other.
+         side-impulse is an additional (artificial) impulse that
+           pushes the slower kart out of the way of the faster karts (i.e. 
+           sideways to the faster kart) when a collision happens. This is 
+           for now disabled since it needs tuning and additionally has the
+           problem that the amount of push a hit kart receives depends on
+           the orientation - if a kart is pushed in the direction it is 
+           driving, it will be more (no friction from tires), while when 
+           pushed to the side, hardly anything happens.  -->
+    <collision impulse="0" side-impulse="0"/>
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is

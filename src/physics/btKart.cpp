@@ -89,6 +89,26 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     
     updateWheelTransformsWS( wheel , false );
     updateWheelTransform(getNumWheels()-1,false);
+
+    m_forwardWS.resize(m_wheelInfo.size());
+    m_axle.resize(m_wheelInfo.size());
+    m_forwardImpulse.resize(m_wheelInfo.size());
+    m_sideImpulse.resize(m_wheelInfo.size());
+
+    // The average of all front wheel chassis points define the
+    // front center. This is always adjusted after adding a wheel
+    // to avoid calling a separate function just for that.
+    m_front_center_pointCS = btVector3(0,0,0);
+    unsigned int count=0;
+    for(int i=0; i<m_wheelInfo.size(); i++)
+    {
+        if(m_wheelInfo[i].m_chassisConnectionPointCS.getZ()>0)
+        {
+            m_front_center_pointCS += m_wheelInfo[i].m_chassisConnectionPointCS;
+            count ++;
+        }
+    }
+    m_front_center_pointCS *= 1.0f/count;
     return wheel;
 }   // addWheel
 
@@ -586,28 +606,10 @@ btScalar btKart::calcRollingFriction(btWheelContactPoint& contactPoint)
 
 void btKart::updateFriction(btScalar timeStep)
 {
-
     //calculate the impulse, so that the wheels don't move sidewards
-    int numWheel = getNumWheels();
-    if (!numWheel)
-        return;
-
-    m_forwardWS.resize(numWheel);
-    m_axle.resize(numWheel);
-    m_forwardImpulse.resize(numWheel);
-    m_sideImpulse.resize(numWheel);
-
-
-    //collapse all those loops into one!
     for (int i=0;i<getNumWheels();i++)
     {
-        m_sideImpulse[i]    = btScalar(0.);
-        m_forwardImpulse[i] = btScalar(0.);
-    }
-    
-
-    for (int i=0;i<getNumWheels();i++)
-    {
+        m_sideImpulse[i]       = btScalar(0.);
         btWheelInfo& wheelInfo = m_wheelInfo[i];
 
         btRigidBody* groundObject = 

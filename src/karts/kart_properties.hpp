@@ -248,9 +248,14 @@ private:
 
     float m_suspension_rest;
     float m_suspension_travel_cm;
+
     /** An additional artifical side-impulse that pushes the slower kart
-     *  out of the way of the faster kart in case of a collision. */
+     *  out of the way of the faster kart in case of a frontal collision. */
     float m_collision_side_impulse;
+
+    /** An additiojnal artificial impulse that pushes two karts in a 
+     *  side-side collision away from each other. */
+    float m_collision_impulse;
 
     float m_upright_tolerance;
     float m_upright_max_force;
@@ -498,6 +503,10 @@ public:
     /** Returns the (artificial) collision side impulse this kart will apply
      *  to a slower kart in case of a collision. */
     float getCollisionSideImpulse   () const {return m_collision_side_impulse;}
+
+    /** Returns the (artificial) collision impulse this kart will apply
+     *  to another kart in case of a non-frontal collision. */
+    float getCollisionImpulse   () const {return m_collision_impulse;}
 
     /** Returns the vertical offset when rescuing karts to avoid karts being
      *  rescued in (or under) the track. */

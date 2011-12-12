@@ -72,7 +72,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = 
-        m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
+        m_rescue_vert_offset = m_upright_tolerance = 
+        m_collision_side_impulse = m_collision_impulse =
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel =
         m_rubber_band_max_length = m_rubber_band_force =
@@ -425,7 +426,10 @@ void KartProperties::getAllData(const XMLNode * root)
     }
 
     if(const XMLNode *collision_node = root->getNode("collision"))
+    {
+        collision_node->get("impulse",       &m_collision_impulse     );
         collision_node->get("side-impulse",  &m_collision_side_impulse);
+    }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
@@ -589,6 +593,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
     CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
+    CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );

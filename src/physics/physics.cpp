@@ -127,7 +127,8 @@ void Physics::update(float dt)
             Kart *b=p->b->getPointerKart();
             race_state->addCollision(a->getWorldKartId(),
                                      b->getWorldKartId());
-            KartKartCollision(p->a->getPointerKart(), p->b->getPointerKart());
+            KartKartCollision(p->a->getPointerKart(), p->b->getPointerKart(),
+                              p->getContactPoint());
             continue;
         }  // if kart-kart collision
 
@@ -211,15 +212,16 @@ bool Physics::projectKartDownwards(const Kart *k)
  *  explode immediately. This function is called from physics::update() on the 
  *  server and if no networking is used, and from race_state on the client to 
  *  replay what happened on the server.
- *  \param kartA First kart involved in the collision.
- *  \param kartB Second kart involved in the collision.
+ *  \param kart_a First kart involved in the collision.
+ *  \param kart_b Second kart involved in the collision.
  */
-void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
+void Physics::KartKartCollision(Kart *kart_a, Kart *kart_b, 
+                                const Vec3 &contact_point)
 {
-    kartA->crashed(kartB);   // will play crash sound for player karts
-    kartB->crashed(kartA);
-    Attachment *attachmentA=kartA->getAttachment();
-    Attachment *attachmentB=kartB->getAttachment();
+    kart_a->crashed(kart_b);   // will play crash sound for player karts
+    kart_b->crashed(kart_a);
+    Attachment *attachmentA=kart_a->getAttachment();
+    Attachment *attachmentB=kart_b->getAttachment();
 
     if(attachmentA->getType()==Attachment::ATTACH_BOMB)
     {
@@ -231,41 +233,63 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
         }
         else  // only A has a bomb, move it to B (unless it was from B)
         {
-            if(attachmentA->getPreviousOwner()!=kartB)
+            if(attachmentA->getPreviousOwner()!=kart_b)
             {
-                attachmentA->moveBombFromTo(kartA, kartB);
+                attachmentA->moveBombFromTo(kart_a, kart_b);
                 // Play appropriate SFX
-                kartB->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+                kart_b->playCustomSFX(SFXManager::CUSTOM_ATTACH);
             }
         }
     }
     else if(attachmentB->getType()==Attachment::ATTACH_BOMB &&
-        attachmentB->getPreviousOwner()!=kartA)
+            attachmentB->getPreviousOwner()!=kart_a)
     {
-        attachmentB->moveBombFromTo(kartB, kartA);
-        kartA->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        attachmentB->moveBombFromTo(kart_b, kart_a);
+        kart_a->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     }
     else
     {
-        kartA->playCustomSFX(SFXManager::CUSTOM_CRASH);
-        kartB->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        kart_a->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        kart_b->playCustomSFX(SFXManager::CUSTOM_CRASH);
     }
 
     // If bouncing crashes is enabled, add an additional force to the
     // slower kart
     Kart *faster_kart, *slower_kart;
-    if(kartA->getSpeed()>=kartB->getSpeed())
+    if(kart_a->getSpeed()>=kart_b->getSpeed())
     {
-        faster_kart = kartA;
-        slower_kart = kartB;
+        faster_kart = kart_a;
+        slower_kart = kart_b;
     }
     else
     {
-        faster_kart = kartB;
-        slower_kart = kartA;
+        faster_kart = kart_b;
+        slower_kart = kart_a;
     }
-    float side_impulse = faster_kart->getKartProperties()->getCollisionSideImpulse();
-    if(side_impulse>0)
+
+    Vec3 front_center = faster_kart->getVehicle()->getFrontCenterPointWS();
+    float radius = 0.5f*faster_kart->getKartWidth();
+    bool frontal_collision = 
+        (contact_point-front_center).length2_2d() < radius*radius;
+
+    float side_impulse = 
+        faster_kart->getKartProperties()->getCollisionSideImpulse();
+    if(!frontal_collision)
+    {
+        Vec3 diff = faster_kart->getXYZ() - slower_kart->getXYZ();
+        // Remove any y component to reduce the chance of karts 
+        // toppling over
+        diff.setY(0);
+        diff = diff.normalize();
+        float impulse_base = 10.0f;
+        Vec3 impulse_fast = 
+            slower_kart->getKartProperties()->getCollisionImpulse()*diff;
+        faster_kart->getBody()->applyCentralImpulse(impulse_fast);
+        Vec3 impulse_slow = 
+            (-faster_kart->getKartProperties()->getCollisionImpulse())*diff;
+        slower_kart->getBody()->applyCentralImpulse(impulse_slow);
+    }
+    else if(side_impulse>0)   // and frontal collision
     {
         Vec3 forwards_ws(0, 1, 0);
         Vec3 forwards = faster_kart->getTrans()*forwards_ws;
@@ -340,7 +364,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         if(upA->is(UserPointer::UP_TRACK))
         {
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
-                m_all_collisions.push_back(upB, upA);
+                m_all_collisions.push_back(upB, upA,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             else if(upB->is(UserPointer::UP_KART))
             {
                 Kart *kart=upB->getPointerKart();
@@ -368,15 +393,19 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 // 2.1 projectile hits kart
-                m_all_collisions.push_back(upB, upA);   
+                m_all_collisions.push_back(upB, upA,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             else if(upB->is(UserPointer::UP_KART))
                 // 2.2 kart hits kart
-                m_all_collisions.push_back(upA, upB);
+                m_all_collisions.push_back(upA, upB,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
                 // 2.3 kart hits physical object
-                m_all_collisions.push_back(upB, upA);
+                m_all_collisions.push_back(upB, upA, 
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             else if(upB->is(UserPointer::UP_ANIMATION))
-                m_all_collisions.push_back(upB, upA);
+                m_all_collisions.push_back(upB, upA, 
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
         }
         // 3) object is a projectile
         // =========================
@@ -391,7 +420,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                upB->is(UserPointer::UP_PHYSICAL_OBJECT) ||
                upB->is(UserPointer::UP_KART           )   )
             {
-                m_all_collisions.push_back(upA, upB);
+                m_all_collisions.push_back(upA, upB, 
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             }
         }
         // Object is a physical object
@@ -399,14 +429,17 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         else if(upA->is(UserPointer::UP_PHYSICAL_OBJECT))
         {
             if(upB->is(UserPointer::UP_FLYABLE))
-                m_all_collisions.push_back(upB, upA);
+                m_all_collisions.push_back(upB, upA,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
             else if(upB->is(UserPointer::UP_KART))
-                m_all_collisions.push_back(upA, upB);
+                m_all_collisions.push_back(upA, upB,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
         }
         else if (upA->is(UserPointer::UP_ANIMATION))
         {
             if(upB->is(UserPointer::UP_KART))
-                m_all_collisions.push_back(upA, upB);
+                m_all_collisions.push_back(upA, upB,
+                    contactManifold->getContactPoint(0).getPositionWorldOnA());
         }
         else assert("Unknown user pointer");            // 4) Should never happen
     }   // for i<numManifolds
