@@ -101,12 +101,15 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
                    name.c_str());
             continue;
         }
-        if(unlock_manager->getCurrentSlot()->isLocked(name)) 
-        {
-            printf("Kart '%s' is locked and therefore ignored.\n",
-                   name.c_str());
-            continue;
-        }
+        // This doesn't work anymore, since this is called when
+        // handling the command line options, at which time the
+        // player (and therefore the current slot) is not defined yet.
+        //if(unlock_manager->getCurrentSlot()->isLocked(name)) 
+        //{
+        //   printf("Kart '%s' is locked and therefore ignored.\n",
+        //           name.c_str());
+        //    continue;
+        //}
         m_default_ai_list.push_back(name);
     }
 }   // setAIKartList
