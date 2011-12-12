@@ -702,7 +702,10 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
+            // This doesn't work anymore because now we support multiple players
+            // and currently do not know which player profile to use since it
+            // wasn't selected yet
+            //if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 const KartProperties *prop = 
                     kart_properties_manager->getKart(argv[i+1]);
@@ -727,6 +730,7 @@ int handleCmdLine(int argc, char **argv)
                             argv[i+1]);
                 }
             }
+            /*
             else
             {
                 fprintf(stdout, "Kart %s has not been unlocked yet. \n", 
@@ -735,6 +739,7 @@ int handleCmdLine(int argc, char **argv)
                         "Use --list-karts to list available karts.\n\n");
                 return 0;
             }
+             */
         }
         else if( sscanf(argv[i], "--ai=%s",  s)==1)
         {
@@ -763,7 +768,10 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
         {
-            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
+            // This doesn't work anymore because now we support multiple players
+            // and currently do not know which player profile to use since it
+            // wasn't selected yet
+            //if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 race_manager->setTrack(argv[i+1]);
                 fprintf ( stdout, "You choose to start in track: %s.\n", 
@@ -781,6 +789,7 @@ int handleCmdLine(int argc, char **argv)
                                             RaceManager::MINOR_MODE_3_STRIKES);
                 }
             }
+            /*
             else
             {
                 fprintf(stdout, "Track %s has not been unlocked yet. \n", 
@@ -789,6 +798,7 @@ int handleCmdLine(int argc, char **argv)
                                 "tracks.\n\n");
                 return 0;
             }
+             */
             i++;
         }
         else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
