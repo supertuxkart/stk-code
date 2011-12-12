@@ -140,13 +140,24 @@ void IconButtonWidget::add()
         
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         
-        // leave enough room for two lines of text if word wrap is enabled, otherwise a single line
-        widget_size = rect<s32>(m_x - label_extra_size/2,
-                                m_y + m_h,
-                                m_x + m_w + label_extra_size/2,
-                                m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 :
-                                                         GUIEngine::getFontHeight()));
-
+        if (m_properties[PROP_LABELS_LOCATION] == "hover")
+        {
+            widget_size = rect<s32>(m_x - label_extra_size/2,
+                                    m_y - (word_wrap ? GUIEngine::getFontHeight()*2 :
+                                                 GUIEngine::getFontHeight()) - 15,
+                                    m_x + m_w + label_extra_size/2,
+                                    m_y - 15);
+        }
+        else
+        {
+            // leave enough room for two lines of text if word wrap is enabled, otherwise a single line
+            widget_size = rect<s32>(m_x - label_extra_size/2,
+                                    m_y + m_h,
+                                    m_x + m_w + label_extra_size/2,
+                                    m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 :
+                                                             GUIEngine::getFontHeight()));
+        }
+        
         m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
                                                         false, word_wrap, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
@@ -159,6 +170,7 @@ void IconButtonWidget::add()
         }
         
         const int max_w = m_label->getAbsolutePosition().getWidth();
+        
         if (!word_wrap &&
             (int)GUIEngine::getFont()->getDimension(message.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
         {

@@ -331,9 +331,13 @@ void RibbonWidget::add()
             m_children[i].m_h = (int)(image_h*zoom);
             
             IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
-            icon->m_properties[PROP_EXTEND_LABEL] = 
-                StringUtils::toString(one_button_space - icon->m_w);
-
+            
+            if (icon->m_properties[PROP_EXTEND_LABEL].size() == 0)
+            {
+                icon->m_properties[PROP_EXTEND_LABEL] = 
+                    StringUtils::toString(one_button_space - icon->m_w);
+            }
+            
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();
 
