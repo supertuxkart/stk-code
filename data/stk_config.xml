@@ -165,7 +165,7 @@
          bonus-time: How long a kart needs to skid in order to get a bonus.  -->
 <!-- Note: for now skidding is disabled, set angular-velocity to 2 to test it -->
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
-          visual="0.0"
+          visual="0.16"
           angular-velocity="0"  bonus-time="5"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
