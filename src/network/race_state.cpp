@@ -173,12 +173,12 @@ void RaceState::receive(ENetPacket *pkt)
         else
         {
             // FIXME: KartKartCollision now takes information about the 
-            // collision point. This either needs to be added as the third
+            // collision points. This either needs to be added as the third
             // parameter, or perhaps the outcome of the collision (the 
             // impulse) could be added.
-            world->getPhysics()->KartKartCollision(world->getKart(kart_id1),
-                                                   world->getKart(kart_id2),
-                                                   btVector3(0,0,0));
+            world->getPhysics()->KartKartCollision(
+                world->getKart(kart_id1), Vec3(0,0,0),
+                world->getKart(kart_id2), Vec3(0,0,0));
         }
     }   // for(i=0; i<num_collisions; i+=2)
     clear();  // free message buffer

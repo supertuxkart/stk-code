@@ -95,20 +95,6 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     m_forwardImpulse.resize(m_wheelInfo.size());
     m_sideImpulse.resize(m_wheelInfo.size());
 
-    // The average of all front wheel chassis points define the
-    // front center. This is always adjusted after adding a wheel
-    // to avoid calling a separate function just for that.
-    m_front_center_pointCS = btVector3(0,0,0);
-    unsigned int count=0;
-    for(int i=0; i<m_wheelInfo.size(); i++)
-    {
-        if(m_wheelInfo[i].m_chassisConnectionPointCS.getZ()>0)
-        {
-            m_front_center_pointCS += m_wheelInfo[i].m_chassisConnectionPointCS;
-            count ++;
-        }
-    }
-    m_front_center_pointCS *= 1.0f/count;
     return wheel;
 }   // addWheel
 

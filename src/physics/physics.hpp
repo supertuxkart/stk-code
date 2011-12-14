@@ -43,6 +43,11 @@ class Vec3;
 class Physics : public btSequentialImpulseConstraintSolver
 {
 private:
+    /** Which side of a rigid body has a collision. */
+    enum CollisionSide {COL_LEFT, COL_FRONT, COL_RIGHT, COL_BACK};
+
+    CollisionSide getCollisionSide(const btRigidBody *body,
+                                   const Vec3 &contact_point);
 
     /** Bullet can report the same collision more than once (up to 4
      *  contact points per collision. Additionally, more than one internal
@@ -55,35 +60,51 @@ private:
      *  Considering that the number of collisions is usually rather small
      *  a simple list and linear search is faster is is being used here. */
     class CollisionPair {
-    public:
+    private:
         /** The user pointer of the objects involved in this collision. */
-        const UserPointer *a, *b;
+        const UserPointer *m_up[2];
 
-        /** A contact point of the collision. For now only one of the two
-         *  contact points is needed (since they are close). */
-        Vec3               m_contact_point;
+        /** The contact point for each object (in local coordincates). */
+        Vec3               m_contact_point[2];
 
+    public:
         /** The entries in Collision Pairs are sorted: if a projectile
          * is included, it's always 'a'. If only two karts are reported
          * the first kart pointer is the smaller one. */
-        CollisionPair(const UserPointer *a1, const UserPointer *b1,
-                      const btVector3 &contact_point) {
-            if(a1->is(UserPointer::UP_KART) &&
-               b1->is(UserPointer::UP_KART) && a1>b1) {
-                a=b1;b=a1;
+        CollisionPair(const UserPointer *a, const btVector3 &contact_point_a,
+                      const UserPointer *b, const btVector3 &contact_point_b) 
+        {
+            if(a->is(UserPointer::UP_KART) &&
+               b->is(UserPointer::UP_KART) && a>b) {
+                m_up[0]=b; m_contact_point[0] = contact_point_b;
+                m_up[1]=a; m_contact_point[1] = contact_point_a;
             } else {
-                a=a1; b=b1;
+                m_up[0]=a; m_contact_point[0] = contact_point_a;
+                m_up[1]=b; m_contact_point[1] = contact_point_b;
             }
-            m_contact_point = contact_point;
         };  //    CollisionPair
         // --------------------------------------------------------------------
         /** Tests if two collision pairs involve the same objects. This test
          *  is simplified (i.e. no test if p.b==a and p.a==b) since the
          *  elements are sorted. */
-        bool operator==(const CollisionPair p) {return (p.a==a && p.b==b);}
+        bool operator==(const CollisionPair p)
+        {
+            return (p.m_up[0]==m_up[0] && p.m_up[1]==m_up[1]);
+        }   // operator==
         // --------------------------------------------------------------------
-        /** Returns the contact point of the collision. */
-        const Vec3 &getContactPoint() const { return m_contact_point; }
+        const UserPointer *getUserPointer(unsigned int n) const 
+        {
+            assert(n>=0 && n<=1);
+            return m_up[n];
+        }   // getUserPointer
+        // --------------------------------------------------------------------
+        /** Returns the contact point of the collision in 
+         *  car (local) coordinates. */
+        const Vec3 &getContactPointCS(unsigned int n) const 
+        {
+            assert(n>=0 && n<=1);
+            return m_contact_point[n];
+        }   // getContactPointCS
     };  // CollisionPair
 
     // ========================================================================
@@ -101,10 +122,10 @@ private:
         };  // push_back
     public:
         /** Adds information about a collision to this vector. */
-        void push_back(const UserPointer* a, const UserPointer*b,
-                       const btVector3 &contact_point)
+        void push_back(const UserPointer *a, const btVector3 &contact_point_a,
+                       const UserPointer *b, const btVector3 &contact_point_b)
         {
-            push_back(CollisionPair(a, b, contact_point));
+            push_back(CollisionPair(a, contact_point_a, b, contact_point_b));
         }
     };  // CollisionList
     // ========================================================================
@@ -127,8 +148,8 @@ public:
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
     void  removeKart       (const Kart *k);
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
-    void  KartKartCollision(Kart *ka, Kart *kb,
-                            const Vec3 &contact_point);
+    void  KartKartCollision(Kart *ka, const Vec3 &contact_point_a,
+                            Kart *kb, const Vec3 &contact_point_b);
     void  update           (float dt);
     void  draw             ();
     STKDynamicsWorld*

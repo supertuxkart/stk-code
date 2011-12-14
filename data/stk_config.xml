@@ -289,7 +289,7 @@
            the orientation - if a kart is pushed in the direction it is 
            driving, it will be more (no friction from tires), while when 
            pushed to the side, hardly anything happens.  -->
-    <collision impulse="0" restitution="0.5" side-impulse="0"/>
+    <collision impulse="1500" restitution="0.5" side-impulse="4500"/>
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is

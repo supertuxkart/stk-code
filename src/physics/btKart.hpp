@@ -89,9 +89,6 @@ protected:
      */
     bool                m_allow_sliding;
 
-    /** The center point of the front (in car coordinates). */
-    btVector3           m_front_center_pointCS;
-
 	btRigidBody* m_chassisBody;
 
     int m_num_wheels_on_ground;
@@ -259,14 +256,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of wheels on the ground. */
     unsigned int getNumWheelsOnGround() const {return m_num_wheels_on_ground;}
-    // ------------------------------------------------------------------------
-    /** Returns the middle point of the front wheel connection points in
-     *  world coordinates. */
-    btVector3 getFrontCenterPointWS() const 
-    {
-        return m_chassisBody->getWorldTransform()(m_front_center_pointCS);
-    }   // getFrontCenterPointWS
-};
+};   // class btKart
 
 #endif //BT_RAYCASTVEHICLE_H
 
