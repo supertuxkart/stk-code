@@ -23,49 +23,52 @@ class btVehicleTuning;
 class Kart;
 struct btWheelContactPoint;
 
-///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
+/** rayCast vehicle, very special constraint that turn a rigidbody into a 
+ *  vehicle.
+ */
 class btKart : public btActionInterface
 {
-private:
-		btAlignedObjectArray<btVector3>	m_forwardWS;
-		btAlignedObjectArray<btVector3>	m_axle;
-		btAlignedObjectArray<btScalar>	m_forwardImpulse;
-		btAlignedObjectArray<btScalar>	m_sideImpulse;
-	
-		///backwards compatibility
-		int	m_userConstraintType;
-		int	m_userConstraintId;
-
-        static btRigidBody& getFixedBody();
-        btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
-
 public:
-	class btVehicleTuning
-		{
-			public:
+    class btVehicleTuning
+    {
+    public:
 
-			btVehicleTuning()
-				:m_suspensionStiffness(btScalar(5.88)),
-				m_suspensionCompression(btScalar(0.83)),
-				m_suspensionDamping(btScalar(0.88)),
-				m_maxSuspensionTravelCm(btScalar(500.)),
-				m_frictionSlip(btScalar(10.5)),
-				m_maxSuspensionForce(btScalar(6000.))
-			{
-			}
-			btScalar	m_suspensionStiffness;
-			btScalar	m_suspensionCompression;
-			btScalar	m_suspensionDamping;
-			btScalar	m_maxSuspensionTravelCm;
-			btScalar	m_frictionSlip;
-			btScalar	m_maxSuspensionForce;
+        btVehicleTuning()
+            :m_suspensionStiffness(btScalar(5.88)),
+             m_suspensionCompression(btScalar(0.83)),
+             m_suspensionDamping(btScalar(0.88)),
+             m_maxSuspensionTravelCm(btScalar(500.)),
+             m_frictionSlip(btScalar(10.5)),
+             m_maxSuspensionForce(btScalar(6000.))
+        {
+        }   // btVehicleTuning
+        
+        btScalar    m_suspensionStiffness;
+        btScalar    m_suspensionCompression;
+        btScalar    m_suspensionDamping;
+        btScalar    m_maxSuspensionTravelCm;
+        btScalar    m_frictionSlip;
+        btScalar    m_maxSuspensionForce;
 
-		};
-protected:
+    };   // class btVehicleTuning
 
-	btScalar	        m_damping;
-	btVehicleRaycaster *m_vehicleRaycaster;
-	btScalar            m_currentVehicleSpeedKmHour;
+private:
+
+    btAlignedObjectArray<btVector3> m_forwardWS;
+    btAlignedObjectArray<btVector3> m_axle;
+    btAlignedObjectArray<btScalar>  m_forwardImpulse;
+    btAlignedObjectArray<btScalar>  m_sideImpulse;
+
+    ///backwards compatibility
+    int m_userConstraintType;
+    int m_userConstraintId;
+
+    static btRigidBody& getFixedBody();
+    btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
+
+    btScalar            m_damping;
+    btVehicleRaycaster *m_vehicleRaycaster;
+
     /** True if a zipper is active for that kart. */
     bool                m_zipper_active;
 
@@ -89,166 +92,106 @@ protected:
      */
     bool                m_allow_sliding;
 
-	btRigidBody* m_chassisBody;
+    btRigidBody        *m_chassisBody;
 
-    int m_num_wheels_on_ground;
-	int m_indexRightAxis;
-	int m_indexUpAxis;
-	int	m_indexForwardAxis;
+    int                 m_num_wheels_on_ground;
+    int                 m_indexRightAxis;
+    int                 m_indexUpAxis;
+    int                 m_indexForwardAxis;
 
     /** The STK kart object which uses this vehicle. This is mostly used to 
      *  get access to the kart properties, which also define physics 
      *  properties. */
-    Kart *m_kart;
+    Kart               *m_kart;
 
-	void defaultInit();
+    btAlignedObjectArray<btWheelInfo> m_wheelInfo;
 
-public:
-
-	//constructor to create a car from an existing rigidbody
-	btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
-           Kart *kart);
-
-	virtual ~btKart() ;
-
-    void reset();
-
-	///btActionInterface interface
-	virtual void updateAction( btCollisionWorld* collisionWorld, btScalar step)
-	{
-        (void) collisionWorld;
-		updateVehicle(step);
-	}
-	
-	///btActionInterface interface
-	void	debugDraw(btIDebugDraw* debugDrawer);
-			
-	const btTransform& getChassisWorldTransform() const;
-	
-	btScalar rayCast(btWheelInfo& wheel);
-
-	virtual void updateVehicle(btScalar step);
-	
-	
-	void resetSuspension();
-
-	btScalar	getSteeringValue(int wheel) const;
-
-	void	setSteeringValue(btScalar steering,int wheel);
-
-
-	void	applyEngineForce(btScalar force, int wheel);
-
-	const btTransform&	getWheelTransformWS( int wheelIndex ) const;
-
-	void	updateWheelTransform( int wheelIndex, bool interpolatedTransform = true );
-	
-//	void	setRaycastWheelInfo( int wheelIndex , bool isInContact, const btVector3& hitPoint, const btVector3& hitNormal,btScalar depth);
-
-	btWheelInfo&	addWheel( const btVector3& connectionPointCS0, const btVector3& wheelDirectionCS0,const btVector3& wheelAxleCS,btScalar suspensionRestLength,btScalar wheelRadius,const btVehicleTuning& tuning, bool isFrontWheel);
-
-	inline int		getNumWheels() const {
-		return int (m_wheelInfo.size());
-	}
-	
-	btAlignedObjectArray<btWheelInfo>	m_wheelInfo;
-
-
-	const btWheelInfo&	getWheelInfo(int index) const;
-
-	btWheelInfo&	getWheelInfo(int index);
-
-	void	updateWheelTransformsWS(btWheelInfo& wheel , bool interpolatedTransform = true);
-
-	
-	void setBrake(btScalar brake,int wheelIndex);
-	
-	void	updateSuspension(btScalar deltaTime);
-
-	virtual void	updateFriction(btScalar	timeStep);
-
-
-
-	inline btRigidBody* getRigidBody()
-	{
-		return m_chassisBody;
-	}
-
-	const btRigidBody* getRigidBody() const
-	{
-		return m_chassisBody;
-	}
-
-	inline int	getRightAxis() const
-	{
-		return m_indexRightAxis;
-	}
-	inline int getUpAxis() const
-	{
-		return m_indexUpAxis;
-	}
-
-	inline int getForwardAxis() const
-	{
-		return m_indexForwardAxis;
-	}
-
-	
-	///Worldspace forward vector
-	btVector3 getForwardVector() const
-	{
-		const btTransform& chassisTrans = getChassisWorldTransform(); 
-
-		btVector3 forwardW ( 
-			  chassisTrans.getBasis()[0][m_indexForwardAxis], 
-			  chassisTrans.getBasis()[1][m_indexForwardAxis], 
-			  chassisTrans.getBasis()[2][m_indexForwardAxis]); 
-
-		return forwardW;
-	}
-
-	///Velocity of vehicle (positive if velocity vector has same direction as foward vector)
-	btScalar	getCurrentSpeedKmHour() const
-	{
-		return m_currentVehicleSpeedKmHour;
-	}
-
-	virtual void	setCoordinateSystem(int rightIndex,int upIndex,int forwardIndex)
-	{
-		m_indexRightAxis = rightIndex;
-		m_indexUpAxis = upIndex;
-		m_indexForwardAxis = forwardIndex;
-	}
-
-
-	///backwards compatibility
-	int getUserConstraintType() const
-	{
-		return m_userConstraintType ;
-	}
-
-	void	setUserConstraintType(int userConstraintType)
-	{
-		m_userConstraintType = userConstraintType;
-	};
-
-	void	setUserConstraintId(int uid)
-	{
-		m_userConstraintId = uid;
-	}
-
-	int getUserConstraintId() const
-	{
-		return m_userConstraintId;
-	}
-private:
+    void     defaultInit();
     btScalar rayCast(btWheelInfo& wheel, const btVector3& ray);
+
 public:
-    void setSliding(bool active);
-    void activateZipper(float speed);
-    void deactivateZipper();
-    bool projectVehicleToSurface(const btVector3& ray, 
-                                 bool translate_vehicle);
+
+    /** Constructor to create a car from an existing rigidbody. 
+     *  \param chassis The rigid body to use as chassis. 
+     *  \param raycaster The raycast object to use.
+     *  \paran kart The STK kart object that uses this vehicle
+     *         (this is used to get access to the kart properties). 
+     */
+                       btKart(btRigidBody* chassis,
+                              btVehicleRaycaster* raycaster,
+                              Kart *kart);
+     virtual          ~btKart();
+    void               reset();
+    void               debugDraw(btIDebugDraw* debugDrawer);
+    const btTransform& getChassisWorldTransform() const;
+    btScalar           rayCast(btWheelInfo& wheel);
+    virtual void       updateVehicle(btScalar step);
+    void               resetSuspension();
+    btScalar           getSteeringValue(int wheel) const;
+    void               setSteeringValue(btScalar steering,int wheel);
+    void               applyEngineForce(btScalar force, int wheel);
+    const btTransform& getWheelTransformWS( int wheelIndex ) const;
+    void               updateWheelTransform(int wheelIndex, 
+                                            bool interpolatedTransform=true);
+    btWheelInfo&       addWheel(const btVector3& connectionPointCS0,
+                                const btVector3& wheelDirectionCS0,
+                                const btVector3& wheelAxleCS,
+                                btScalar suspensionRestLength,
+                                btScalar wheelRadius,
+                                const btVehicleTuning& tuning, 
+                                bool isFrontWheel);
+    const btWheelInfo& getWheelInfo(int index) const;
+    btWheelInfo&       getWheelInfo(int index);
+    void               updateWheelTransformsWS(btWheelInfo& wheel,
+                                              bool interpolatedTransform=true);
+    void               setBrake(btScalar brake,int wheelIndex);
+    void               updateSuspension(btScalar deltaTime);
+    virtual void       updateFriction(btScalar timeStep);
+public:
+    void               setSliding(bool active);
+    void               activateZipper(float speed);
+    void               deactivateZipper();
+    bool               projectVehicleToSurface(const btVector3& ray,
+                                               bool translate_vehicle);
+
+    // ------------------------------------------------------------------------
+    /** btActionInterface interface. */
+    virtual void updateAction(btCollisionWorld* collisionWorld, 
+                              btScalar step)
+    {
+        (void) collisionWorld;
+        updateVehicle(step);
+    }   // updateAction
+    // ------------------------------------------------------------------------
+    /** Returns the number of wheels of this vehicle. */
+    inline int getNumWheels() const { return int(m_wheelInfo.size());}
+    // ------------------------------------------------------------------------
+    /** Returns the chassis (rigid) body. */
+    inline btRigidBody* getRigidBody() { return m_chassisBody; }
+    // ------------------------------------------------------------------------
+    /** Returns the chassis (rigid) body. */    
+    const btRigidBody* getRigidBody() const { return m_chassisBody; }
+    // ------------------------------------------------------------------------
+    /** Returns the index of the right axis. */
+    inline int getRightAxis() const { return m_indexRightAxis; }
+    // ------------------------------------------------------------------------
+    /** Returns the index of the up axis. */
+    inline int getUpAxis() const { return m_indexUpAxis; }
+    // ------------------------------------------------------------------------
+    /** Returns the index of the forward axis. */
+    inline int getForwardAxis() const { return m_indexForwardAxis; }
+    // ------------------------------------------------------------------------
+    /** Backwards compatibility. */
+    int getUserConstraintType() const { return m_userConstraintType ; }
+    // ------------------------------------------------------------------------
+    void setUserConstraintType(int userConstraintType)
+    {
+        m_userConstraintType = userConstraintType;
+    }   // setUserConstraintType
+    // ------------------------------------------------------------------------
+    void setUserConstraintId(int uid) { m_userConstraintId = uid; }
+    // ------------------------------------------------------------------------
+    int getUserConstraintId() const { return m_userConstraintId; }
     // ------------------------------------------------------------------------
     /** Sets the angular velocity to be used when skidding 
      *  (0 means no skidding). */
@@ -259,4 +202,3 @@ public:
 };   // class btKart
 
 #endif //BT_RAYCASTVEHICLE_H
-

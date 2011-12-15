@@ -280,7 +280,6 @@ void Kart::createPhysics()
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
-    m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 1,  /*forward: */ 2);
 
     // Add wheels
     // ----------
@@ -1462,7 +1461,7 @@ void Kart::crashed(Kart *k, const Material *m)
     // karts from bouncing back, they will instead stuck towards the obstable).
     if(m_bounce_back_time<=0.0f)
     {
-        if (fabsf(m_vehicle->getCurrentSpeedKmHour() > 2.0f))
+        if (m_body->getLinearVelocity().length()> 0.555f)
         {
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.

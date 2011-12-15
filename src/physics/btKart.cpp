@@ -42,8 +42,8 @@ btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
 {
     m_chassisBody               = chassis;
     m_indexRightAxis            = 0;
-    m_indexUpAxis               = 2;
-    m_indexForwardAxis          = 1;
+    m_indexUpAxis               = 1;
+    m_indexForwardAxis          = 2;
     m_kart                      = kart;
     reset();
 }   // btKart
@@ -116,7 +116,6 @@ void btKart::reset()
     m_skid_angular_velocity     = 0;
     m_is_skidding               = false;
     m_allow_sliding             = false;
-    m_currentVehicleSpeedKmHour = btScalar(0.);
     m_num_wheels_on_ground      = 0;
 }   // reset
 
@@ -307,20 +306,12 @@ void btKart::updateVehicle( btScalar step )
     {
         updateWheelTransform(i,false);
     }
-
-    m_currentVehicleSpeedKmHour = 
-        btScalar(3.6) * getRigidBody()->getLinearVelocity().length();
     
     const btTransform& chassisTrans = getChassisWorldTransform();
 
     btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
                        chassisTrans.getBasis()[1][m_indexForwardAxis],
                        chassisTrans.getBasis()[2][m_indexForwardAxis]);
-
-    if (forwardW.dot(getRigidBody()->getLinearVelocity()) < btScalar(0.))
-    {
-        m_currentVehicleSpeedKmHour *= btScalar(-1.);
-    }
 
     // Simulate suspension
     // -------------------
