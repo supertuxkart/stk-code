@@ -279,8 +279,10 @@ void Track::loadTrackInfo()
     }
     root->get("name",                  &m_name);
     
-    //root->get("description",           &m_description);
-    root->get("designer",              &m_designer);
+    std::string designer;
+    root->get("designer",              &designer);
+    m_designer = StringUtils::decodeFromHtmlEntities(designer);
+    
     root->get("version",               &m_version);
     std::vector<std::string> filenames;
     root->get("music",                 &filenames);
