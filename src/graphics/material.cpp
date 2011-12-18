@@ -31,6 +31,8 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 #include <IGPUProgrammingServices.h>
 #include <IMaterialRendererServices.h>
@@ -73,13 +75,27 @@ public:
 
 class SplattingProvider : public video::IShaderConstantSetCallBack
 {
+    core::vector3df m_light_direction;
+    bool m_light_dir_calculated;
+    
 public:
     LEAK_CHECK()
+    
+    SplattingProvider()
+    {
+        m_light_dir_calculated = false;
+    }
     
     virtual void OnSetConstants(
                                 irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
+        if (!m_light_dir_calculated)
+        {
+            m_light_dir_calculated = true;
+            m_light_direction = -World::getWorld()->getTrack()->getSunRotation().rotationToDirection();
+        }
+        
         // Irrlicht knows this is actually a GLint and makes the conversion
         int tex_layout = 0;
         services->setPixelShaderConstant("tex_layout", (float*)&tex_layout, 1);
@@ -100,10 +116,7 @@ public:
         int tex_detail3 = 4;
         services->setPixelShaderConstant("tex_detail3", (float*)&tex_detail3, 1);
         
-        // TODO: check the position of the sun
-        core::vector3df lightdir(-0.1f, 0.1f, 0.0f);
-        lightdir.normalize();
-        services->setVertexShaderConstant("lightdir", &lightdir.X, 3);
+        services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
     }
 };
 

@@ -23,5 +23,5 @@ void main()
                     layout.b * detail2 +
                     (1.0 - layout.r - layout.g - layout.b) * detail3 +
                     (1.0 - layout.a) * detail4)
-                    * min(1.0, 0.2 + 1.5*dot(lightdir2, normal)); // 0.2 is the ambient light. *1.5 is from trial are error to make it look nice :)
+                    * min(1.0, 0.2 + dot(lightdir2, normal)); // 0.2 is the ambient light.
 }

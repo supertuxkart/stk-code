@@ -387,6 +387,8 @@ public:
     CheckManager* getCheckManager() { return m_check_manager; }
 
     
+    core::vector3df getSunRotation();
+    
     TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
     
 };   // class Track

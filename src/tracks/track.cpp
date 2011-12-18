@@ -1631,3 +1631,10 @@ std::vector< std::vector<float> > Track::buildHeightMap()
     
     return out;
 }
+
+// ----------------------------------------------------------------------------
+
+core::vector3df Track::getSunRotation()
+{
+    return m_sun->getRotation();
+}
