@@ -74,6 +74,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_max_speed_reverse_ratio = 
         m_rescue_vert_offset = m_upright_tolerance = 
         m_collision_side_impulse = m_collision_impulse = m_restitution =
+        m_collision_impulse_time = 
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel =
         m_rubber_band_max_length = m_rubber_band_force =
@@ -428,6 +429,7 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *collision_node = root->getNode("collision"))
     {
         collision_node->get("impulse",       &m_collision_impulse     );
+        collision_node->get("impulse-time",  &m_collision_impulse_time);
         collision_node->get("side-impulse",  &m_collision_side_impulse);
         collision_node->get("restitution",   &m_restitution           );
     }
@@ -595,6 +597,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
     CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
+    CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );

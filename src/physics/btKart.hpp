@@ -91,6 +91,13 @@ private:
      *  skidding.
      */
     bool                m_allow_sliding;
+    
+    /** An additional impulse that is applied for a certain amount of time. */
+    btVector3           m_additional_impulse;
+
+    /** The time the additional impulse should be applied. */
+    float               m_time_additional_impulse;
+
 
     btRigidBody        *m_chassisBody;
 
@@ -199,6 +206,20 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of wheels on the ground. */
     unsigned int getNumWheelsOnGround() const {return m_num_wheels_on_ground;}
+    // ------------------------------------------------------------------------
+    /** Sets an impulse that is applied for a certain amount of time.
+     *  \param t Time for the impulse to be active.
+     *  \param imp The impulse to apply.  */
+    void setTimedImpulse(float t, const btVector3 &imp)
+    {
+        // Only add impulse if no other impulse is active.
+        if(m_time_additional_impulse>0) return;
+        m_additional_impulse      = imp;
+        m_time_additional_impulse = t;
+    }   // setTimedImpulse
+    // ------------------------------------------------------------------------
+    /** Returns the time an additional impulse is activated. */
+    float getImpulseTime() const { return m_time_additional_impulse; }
 };   // class btKart
 
-#endif //BT_RAYCASTVEHICLE_H
+#endif //BT_KART_HPP

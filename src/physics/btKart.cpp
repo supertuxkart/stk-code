@@ -117,6 +117,8 @@ void btKart::reset()
     m_is_skidding               = false;
     m_allow_sliding             = false;
     m_num_wheels_on_ground      = 0;
+    m_additional_impulse        = btVector3(0,0,0);
+    m_time_additional_impulse   = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -414,6 +416,12 @@ void btKart::updateVehicle( btScalar step )
                                 * btVector3(0, f, 0);
 
     m_chassisBody->applyCentralImpulse(downwards_impulse);
+
+    if(m_time_additional_impulse>0)
+    {
+        m_time_additional_impulse -= step;
+        m_chassisBody->applyCentralImpulse(m_additional_impulse);
+    }
 }   // updateVehicle
 
 // ----------------------------------------------------------------------------

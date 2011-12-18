@@ -351,7 +351,12 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
             impulse = Vec3(-dir.getZ(), 0,  dir.getX());
         impulse.normalize();
         impulse *= faster_kart->getKartProperties()->getCollisionImpulse();
-        slower_kart->getBody()->applyCentralImpulse(impulse);
+        float t = 
+            faster_kart->getKartProperties()->getCollisionImpulseTime();
+        if(t>0)
+            slower_kart->getVehicle()->setTimedImpulse(t, impulse);
+        else
+            slower_kart->getBody()->applyCentralImpulse(impulse);
         slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         // Apply some impulse to the slower kart as well?
     }
@@ -367,7 +372,12 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
             impulse = Vec3( dir.getZ(), 0, -dir.getX());
         impulse.normalize();
         impulse *= slower_kart->getKartProperties()->getCollisionImpulse();
-        faster_kart->getBody()->applyCentralImpulse(impulse);
+        float t = 
+            faster_kart->getKartProperties()->getCollisionImpulseTime();
+        if(t>0)
+            faster_kart->getVehicle()->setTimedImpulse(t, impulse);
+        else
+            faster_kart->getBody()->applyCentralImpulse(impulse);
         faster_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
 
         // Then the slower kart
@@ -379,7 +389,11 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
 
         impulse.normalize();
         impulse *= faster_kart->getKartProperties()->getCollisionImpulse();
-        slower_kart->getBody()->applyCentralImpulse(impulse);
+        t = faster_kart->getKartProperties()->getCollisionImpulseTime();
+        if(t>0)
+            slower_kart->getVehicle()->setTimedImpulse(t, impulse);
+        else
+            slower_kart->getBody()->applyCentralImpulse(impulse);
         slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 

@@ -280,6 +280,9 @@
     <!-- collision
          impulse: an additional impulse to be applied in a non-frontal
            collision to push two karts away from each other.
+         impulse-time: The impulse will be applied over a certain time
+           period, which results in less abrupt changes. If set to 0,
+           the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
          side-impulse: an additional (artificial) impulse that
            pushes the slower kart out of the way of the faster karts (i.e. 
@@ -289,7 +292,8 @@
            the orientation - if a kart is pushed in the direction it is 
            driving, it will be more (no friction from tires), while when 
            pushed to the side, hardly anything happens.  -->
-    <collision impulse="1500" restitution="0.5" side-impulse="4500"/>
+    <collision impulse="300" impulse-time="0.2" side-impulse="900"
+               restitution="0.5"/>
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is

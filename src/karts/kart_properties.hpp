@@ -257,6 +257,9 @@ private:
      *  side-side collision away from each other. */
     float m_collision_impulse;
 
+    /** How long the collision impulse should be applied. */
+    float m_collision_impulse_time;
+
     /** The restitution factor to be used in collsions for this kart. */
     float m_restitution;
 
@@ -510,6 +513,9 @@ public:
     /** Returns the (artificial) collision impulse this kart will apply
      *  to another kart in case of a non-frontal collision. */
     float getCollisionImpulse       () const {return m_collision_impulse;}
+
+    /** Returns how long the collision impulse should be applied. */
+    float getCollisionImpulseTime() const { return m_collision_impulse_time;}
 
     /** Returns the restitution factor for this kart. */
     float getRestitution            () const { return m_restitution; }
