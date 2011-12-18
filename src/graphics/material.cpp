@@ -99,6 +99,11 @@ public:
         // Irrlicht knows this is actually a GLint and makes the conversion
         int tex_detail3 = 4;
         services->setPixelShaderConstant("tex_detail3", (float*)&tex_detail3, 1);
+        
+        // TODO: check the position of the sun
+        core::vector3df lightdir(-0.1f, 0.1f, 0.0f);
+        lightdir.normalize();
+        services->setVertexShaderConstant("lightdir", &lightdir.X, 3);
     }
 };
 
