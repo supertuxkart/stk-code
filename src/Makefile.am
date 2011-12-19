@@ -239,6 +239,8 @@ supertuxkart_SOURCES = \
  modes/game_tutorial.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
+ modes/overworld.cpp \
+ modes/overworld.hpp \
  modes/profile_world.cpp \
  modes/profile_world.hpp \
  modes/standard_race.cpp \
