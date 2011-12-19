@@ -32,6 +32,8 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/overworld.hpp"
+#include "network/network_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
@@ -282,7 +284,33 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
+        /*
         StateManager::get()->pushScreen(ChallengesScreen::getInstance());
+         */
+        
+        race_manager->setNumLocalPlayers(1);
+        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+        race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
+        race_manager->setNumKarts( 1 );
+        race_manager->setTrack( "overworld" );
+        race_manager->setDifficulty(RaceManager::RD_HARD);
+        
+        // Use keyboard 0 by default (FIXME: let player choose?)
+        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+        
+        // Create player and associate player with keyboard
+        StateManager::get()->createActivePlayer( 
+                                                UserConfigParams::m_all_players.get(0), device );
+        
+        race_manager->setLocalKartInfo(0, "tux");
+        
+        // ASSIGN should make sure that only input from assigned devices
+        // is read.
+        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        
+        StateManager::get()->enterGameState();
+        network_manager->setupPlayerKartInfo();
+        race_manager->startNew();
     }
     else if (selection == "tutorial")
     {

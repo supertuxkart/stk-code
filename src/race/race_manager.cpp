@@ -28,6 +28,7 @@
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/world.hpp"
@@ -353,6 +354,8 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
+    else if(m_minor_mode==MINOR_MODE_OVERWORLD)     
+        World::setWorld(new OverWorld());
     else
     { 
         fprintf(stderr,"Could not create given race mode\n"); 

@@ -139,6 +139,10 @@ private:
     int                      m_version;
     /** Far value for cameras for this track. */
     float                    m_camera_far;
+    /** Whether this is an "internal" track. If so it won't be offered
+      * in the track seelction screen
+      */
+    bool                     m_internal;
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
@@ -386,6 +390,10 @@ public:
     
     CheckManager* getCheckManager() { return m_check_manager; }
 
+    /** Whether this is an "internal" track. If so it won't be offered
+     * in the track seelction screen
+     */
+    bool isInternal() const { return m_internal; }
     
     core::vector3df getSunRotation();
     

@@ -58,6 +58,7 @@ void LinearWorld::init()
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
     const unsigned int kart_amount  = m_karts.size();
+    
     m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)

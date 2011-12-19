@@ -37,10 +37,11 @@
 class Kart;
 class Track;
 
-static const std::string IDENT_STD    ("STANDARD"        );
-static const std::string IDENT_TTRIAL ("STD_TIMETRIAL"   );
-static const std::string IDENT_FTL    ("FOLLOW_LEADER"   );
-static const std::string IDENT_STRIKES("BATTLE_3_STRIKES");
+static const std::string IDENT_STD      ("STANDARD"        );
+static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
+static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
+static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
+static const std::string IDENT_OVERWORLD("OVERWORLD"   );
 
 /** 
  * The race manager has two functions:
@@ -99,6 +100,7 @@ public:
         MINOR_MODE_NORMAL_RACE   = LINEAR_RACE(0, true),
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
+        MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0)
     };

@@ -180,8 +180,11 @@ bool TrackManager::loadTrack(const std::string& dirname)
 void TrackManager::removeTrack(const std::string &ident)
 {
     Track *track = getTrack(ident);
+    
+    if (track->isInternal()) return;
+    
     std::vector<Track*>::iterator it = std::find(m_tracks.begin(), 
-                                                m_tracks.end(), track);
+                                                 m_tracks.end(), track);
     assert(it!=m_tracks.end());
     int index = it - m_tracks.begin();
 
@@ -239,6 +242,8 @@ void TrackManager::removeTrack(const std::string &ident)
   */
 void TrackManager::updateGroups(const Track* track)
 {
+    if (track->isInternal()) return;
+    
     const std::vector<std::string>& new_groups = track->getGroups();    
 
     Group2Indices &group_2_indices = track->isArena() ? m_arena_groups      

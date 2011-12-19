@@ -80,6 +80,7 @@ Track::Track(const std::string &filename)
     m_version               = 0;
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
+    m_internal              = false;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
@@ -291,7 +292,8 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
-        
+    root->get("internal",              &m_internal);
+    
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *mode=root->getNode(i);
