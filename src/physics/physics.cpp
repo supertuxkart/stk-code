@@ -52,9 +52,10 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                             m_axis_sweep,
                                             this,
                                             m_collision_conf);
-    m_dynamics_world->setGravity(btVector3(0.0f,
-                                           -World::getWorld()->getTrack()->getGravity(),
-                                           0.0f));
+    m_dynamics_world->setGravity(
+        btVector3(0.0f,
+                  -World::getWorld()->getTrack()->getGravity(),
+                  0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
 }   // init
@@ -69,7 +70,7 @@ Physics::~Physics()
     delete m_collision_conf;
 }   // ~Physics
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Adds a kart to the physics engine.
  *  This adds the rigid body, the vehicle, and the upright constraint.
  *  \param kart The kart to add.
@@ -138,7 +139,8 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
-            PhysicalObject *obj = p->getUserPointer(0)->getPointerPhysicalObject();
+            PhysicalObject *obj = p->getUserPointer(0)
+                                   ->getPointerPhysicalObject();
             if(obj->isCrashReset())
             {
                 Kart *kart = p->getUserPointer(1)->getPointerKart();
@@ -217,7 +219,7 @@ bool Physics::projectKartDownwards(const Kart *k)
  *         contact point.
  */
 Physics::CollisionSide Physics::getCollisionSide(const btRigidBody *body,
-                                        const Vec3 &contact_point)
+                                                 const Vec3 &contact_point)
 {
     btVector3 aabb_min, aabb_max;
     static btTransform zero_trans(btQuaternion(0, 0, 0));
@@ -413,15 +415,20 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
  */
 btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                              btPersistentManifold** manifold,int numManifolds,
-                             btTypedConstraint** constraints,int numConstraints,
+                             btTypedConstraint** constraints,
+                             int numConstraints,
                              const btContactSolverInfo& info,
-                             btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,
-                             btDispatcher* dispatcher) {
+                             btIDebugDraw* debugDrawer, 
+                             btStackAlloc* stackAlloc, 
+                             btDispatcher* dispatcher)
+{
     btScalar returnValue=
-        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies, manifold,
-                                                        numManifolds, constraints,
+        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies, 
+                                                        manifold, numManifolds,
+                                                        constraints,
                                                         numConstraints, info,
-                                                        debugDrawer, stackAlloc,
+                                                        debugDrawer, 
+                                                        stackAlloc,
                                                         dispatcher);
     int currentNumManifolds = m_dispatcher->getNumManifolds();
     // We can't explode a rocket in a loop, since a rocket might collide with
@@ -431,19 +438,20 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
     std::vector<Moveable*> rocketsToExplode;
     for(int i=0; i<currentNumManifolds; i++)
     {
-        btPersistentManifold* contactManifold = m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
+        btPersistentManifold* contact_manifold = 
+            m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
 
-        btCollisionObject* objA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-        btCollisionObject* objB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+        btCollisionObject* objA = 
+            static_cast<btCollisionObject*>(contact_manifold->getBody0());
+        btCollisionObject* objB = 
+            static_cast<btCollisionObject*>(contact_manifold->getBody1());
 
-        int numContacts = contactManifold->getNumContacts();
-        if(!numContacts) continue;   // no real collision
+        unsigned int num_contacts = contact_manifold->getNumContacts();
+        if(!num_contacts) continue;   // no real collision
 
         UserPointer *upA        = (UserPointer*)(objA->getUserPointer());
         UserPointer *upB        = (UserPointer*)(objB->getUserPointer());
 
-        // FIXME: Must be a moving physics object
-        // FIXME: A rocket should explode here!
         if(!upA || !upB) continue;
 
         // 1) object A is a track
@@ -452,13 +460,13 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(
-                    upB, contactManifold->getContactPoint(0).m_localPointB,
-                    upA, contactManifold->getContactPoint(0).m_localPointA);
+                    upB, contact_manifold->getContactPoint(0).m_localPointB,
+                    upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
             {
                 Kart *kart=upB->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
-                int n = contactManifold->getContactPoint(0).m_index0;
+                int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m 
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
@@ -473,7 +481,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             {
                 Kart *kart = upA->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
-                int n = contactManifold->getContactPoint(0).m_index1;
+                int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m 
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
@@ -482,22 +490,22 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_FLYABLE))
                 // 2.1 projectile hits kart
                 m_all_collisions.push_back(
-                    upB, contactManifold->getContactPoint(0).m_localPointB,
-                    upA, contactManifold->getContactPoint(0).m_localPointA);
+                    upB, contact_manifold->getContactPoint(0).m_localPointB,
+                    upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
                 // 2.2 kart hits kart
                 m_all_collisions.push_back(
-                    upA, contactManifold->getContactPoint(0).m_localPointA,
-                    upB, contactManifold->getContactPoint(0).m_localPointB);
+                    upA, contact_manifold->getContactPoint(0).m_localPointA,
+                    upB, contact_manifold->getContactPoint(0).m_localPointB);
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
                 // 2.3 kart hits physical object
                 m_all_collisions.push_back(
-                    upB, contactManifold->getContactPoint(0).m_localPointB,
-                    upA, contactManifold->getContactPoint(0).m_localPointA);
+                    upB, contact_manifold->getContactPoint(0).m_localPointB,
+                    upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_ANIMATION))
                 m_all_collisions.push_back(
-                    upB, contactManifold->getContactPoint(0).m_localPointB,
-                    upA, contactManifold->getContactPoint(0).m_localPointA);
+                    upB, contact_manifold->getContactPoint(0).m_localPointB,
+                    upA, contact_manifold->getContactPoint(0).m_localPointA);
         }
         // 3) object is a projectile
         // =========================
@@ -513,8 +521,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                upB->is(UserPointer::UP_KART           )   )
             {
                 m_all_collisions.push_back(
-                    upA, contactManifold->getContactPoint(0).m_localPointA,
-                    upB, contactManifold->getContactPoint(0).m_localPointB);
+                    upA, contact_manifold->getContactPoint(0).m_localPointA,
+                    upB, contact_manifold->getContactPoint(0).m_localPointB);
             }
         }
         // Object is a physical object
@@ -523,28 +531,30 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(
-                    upB, contactManifold->getContactPoint(0).m_localPointB,
-                    upA, contactManifold->getContactPoint(0).m_localPointA);
+                    upB, contact_manifold->getContactPoint(0).m_localPointB,
+                    upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
                 m_all_collisions.push_back(
-                    upA, contactManifold->getContactPoint(0).m_localPointA,
-                    upB, contactManifold->getContactPoint(0).m_localPointB);
+                    upA, contact_manifold->getContactPoint(0).m_localPointA,
+                    upB, contact_manifold->getContactPoint(0).m_localPointB);
         }
         else if (upA->is(UserPointer::UP_ANIMATION))
         {
             if(upB->is(UserPointer::UP_KART))
                 m_all_collisions.push_back(
-                    upA, contactManifold->getContactPoint(0).m_localPointA,
-                    upB, contactManifold->getContactPoint(0).m_localPointB);
+                    upA, contact_manifold->getContactPoint(0).m_localPointA,
+                    upB, contact_manifold->getContactPoint(0).m_localPointB);
         }
-        else assert("Unknown user pointer");            // 4) Should never happen
+        else 
+            assert("Unknown user pointer");           // 4) Should never happen
     }   // for i<numManifolds
 
     return returnValue;
 }   // solveGroup
 
-// -----------------------------------------------------------------------------
-/** A debug draw function to show the track and all karts.                    */
+// ----------------------------------------------------------------------------
+/** A debug draw function to show the track and all karts.
+ */
 void Physics::draw()
 {
     if(!m_debug_drawer->debugEnabled() ||
@@ -565,7 +575,7 @@ void Physics::draw()
     return;
 }   // draw
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /* EOF */
 
