@@ -646,6 +646,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 {    
     if (event.EventType == EET_GUI_EVENT)
     {
+        if (event.GUIEvent.Caller == NULL) return EVENT_LET;
         const s32 id = event.GUIEvent.Caller->getID();
         
         switch (event.GUIEvent.EventType)
