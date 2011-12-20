@@ -56,6 +56,8 @@ private:
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
     
+    video::ITexture *m_trophy;
+    
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
     int              m_marker_ai_size;
@@ -88,6 +90,8 @@ private:
 
     /** Maximum string length for the timer */
     int              m_timer_width;
+    
+    int              m_trophy_points_width;
     
     
     /* Display informat for one player on the screen. */

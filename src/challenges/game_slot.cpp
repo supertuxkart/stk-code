@@ -62,6 +62,8 @@ const std::vector<const ChallengeData*> GameSlot::getLockedChallenges()
 //-----------------------------------------------------------------------------
 void GameSlot::computeActive()
 {
+    m_points = 0;
+    
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
@@ -75,6 +77,7 @@ void GameSlot::computeActive()
             // save the state, since we are currently reading it)
             
             unlockFeature(i->second, /*save*/ false);
+            m_points++;
             continue;
         }
         

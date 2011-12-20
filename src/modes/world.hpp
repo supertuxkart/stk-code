@@ -85,6 +85,8 @@ protected:
     */
     bool        m_use_highscores;
     
+    bool        m_draw_trophy_points;
+    
     void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, 
                              std::string* highscore_who,
                              StateManager::ActivePlayer** best_player);
@@ -249,11 +251,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the track. */
     Track          *getTrack() const { return m_track; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const { return isRacePhase() &&
-                                             getClockMode() != CLOCK_NONE; }    
+                                             getClockMode() != CLOCK_NONE; }
+    // ------------------------------------------------------------------------
+    bool  shouldDrawTrophyPoints() const { return m_draw_trophy_points; }
     // ------------------------------------------------------------------------    
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }

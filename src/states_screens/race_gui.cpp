@@ -23,6 +23,7 @@ using namespace irr;
 
 #include <algorithm>
 
+#include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
@@ -53,6 +54,7 @@ using namespace irr;
 RaceGUI::RaceGUI()
 {    
     m_enabled = true;
+    m_trophy  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
     
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
@@ -94,6 +96,7 @@ RaceGUI::RaceGUI()
     m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
     
     m_timer_width = font->getDimension(L"99:99:99").Width;
+    m_trophy_points_width = font->getDimension(L"100").Width;
 
     font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
     
@@ -238,13 +241,32 @@ void RaceGUI::drawGlobalTimer()
 {
     assert(World::getWorld() != NULL);
     
-    if(!World::getWorld()->shouldDrawTimer()) return;
-    std::string s = StringUtils::timeToString(World::getWorld()->getTime());
+    bool draw_trophy_points = World::getWorld()->shouldDrawTrophyPoints();
+    
+    if (!World::getWorld()->shouldDrawTimer() && !draw_trophy_points)
+    {
+        return;
+    }
+    
+    std::string s;
+    
+    if (draw_trophy_points)
+    {
+        const int points = unlock_manager->getCurrentSlot()->getPoints();
+        s = StringUtils::toString(points);
+    }
+    else
+    {
+        s = StringUtils::timeToString(World::getWorld()->getTime());
+    }
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(UserConfigParams::m_width - m_timer_width - 10, 10, 
-                        UserConfigParams::m_width,                      50);
+    
+    int dist_from_right = 10 + (draw_trophy_points ? m_trophy_points_width : m_timer_width);
+    
+    core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10, 
+                        UserConfigParams::m_width                  , 50);
     
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)
@@ -252,8 +274,34 @@ void RaceGUI::drawGlobalTimer()
         pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
     }
     
+    bool vcenter = false;
+    
     gui::ScalableFont* font = GUIEngine::getFont();
-    font->draw(sw.c_str(), pos, time_color, false, false, NULL, true /* ignore RTL */);
+
+    if (draw_trophy_points)
+    {
+        vcenter = true;
+        
+        const int size = UserConfigParams::m_width/20.0f;
+        core::rect<s32> dest(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
+                             pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
+        core::rect<s32> source(core::position2di(0, 0), m_trophy->getSize());
+
+        irr_driver->getVideoDriver()->draw2DImage(m_trophy, dest, source, NULL,
+                                                  NULL, true /* alpha */);
+        
+        pos.LowerRightCorner.Y = dest.LowerRightCorner.Y;
+        pos.UpperLeftCorner.X += 5;
+        font->setShadow(video::SColor(255,0,0,0));
+    }
+    
+    font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    
+    if (draw_trophy_points)
+    {
+        font->disableShadow();
+    }
+    
 }   // drawGlobalTimer
 
 //-----------------------------------------------------------------------------

@@ -81,14 +81,15 @@ World* World::m_world = NULL;
  */
 World::World() : WorldStatus(), m_clear_color(255,100,101,140)
 {
-    m_physics           = NULL;
-    m_race_gui          = NULL;
-    m_saved_race_gui    = NULL;
-    m_use_highscores    = true;
-    m_track             = NULL;
-    m_clear_back_buffer = false;
-    m_schedule_pause    = false;
-    m_schedule_unpause  = false;
+    m_physics            = NULL;
+    m_race_gui           = NULL;
+    m_saved_race_gui     = NULL;
+    m_use_highscores     = true;
+    m_track              = NULL;
+    m_clear_back_buffer  = false;
+    m_schedule_pause     = false;
+    m_schedule_unpause   = false;
+    m_draw_trophy_points = false;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World

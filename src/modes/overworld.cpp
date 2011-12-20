@@ -32,6 +32,7 @@ void OverWorld::init()
 {
     LinearWorld::init();
     m_display_rank = false;
+    m_draw_trophy_points = true;
 }   // init
 
 //-----------------------------------------------------------------------------

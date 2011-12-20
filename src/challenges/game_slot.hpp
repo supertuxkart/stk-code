@@ -52,11 +52,14 @@ class GameSlot
     
     void computeActive();
     
+    int m_points;
+    
 public:
     
     GameSlot(const irr::core::stringw& player_name)
     {
         m_player_name = player_name;
+        m_points = 0;
     }
     
     const irr::core::stringw& getPlayerName() const { return m_player_name; }
@@ -91,6 +94,8 @@ public:
     void       grandPrixFinished ();
     
     void       save              (XMLWriter& file);
+    
+    int        getPoints          () const { return m_points; }
 };
 
 #endif
