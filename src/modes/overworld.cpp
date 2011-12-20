@@ -31,6 +31,7 @@ OverWorld::OverWorld() : LinearWorld()
 void OverWorld::init()
 {
     LinearWorld::init();
+    m_display_rank = false;
 }   // init
 
 //-----------------------------------------------------------------------------

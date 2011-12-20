@@ -252,7 +252,7 @@ public:
     // ------------------------------------------------------------------------    
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
-    bool shouldDrawTimer() const    { return isRacePhase() &&
+    virtual bool shouldDrawTimer() const { return isRacePhase() &&
                                              getClockMode() != CLOCK_NONE; }    
     // ------------------------------------------------------------------------    
     /** \return whether this world can generate/have highscores */

@@ -52,9 +52,13 @@ public:
     // ------------------------------------------------------------------------    
     /** The overworld is not a race per se so it's never over */
     virtual bool    isRaceOver() { return false; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
+    /** Implement base class method */
     virtual const std::string& 
                     getIdent() const { return IDENT_OVERWORLD; }
+    // ------------------------------------------------------------------------
+    /** Override base class method */
+    virtual bool shouldDrawTimer() const { return false; }
 };
 
 #endif
