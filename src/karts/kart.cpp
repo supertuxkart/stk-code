@@ -247,9 +247,10 @@ void Kart::createPhysics()
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     if(bevel.getX() || bevel.getY() || bevel.getZ())
     {
+        Vec3 orig_factor(1, 1, 1-bevel.getZ());
         Vec3 bevel_factor(1.0f-bevel.getX(),
                           1.0f-bevel.getY(),
-                          1.0f+bevel.getZ() );
+                          1.0f               );
         btConvexHullShape *hull = new btConvexHullShape();
         for(int x=-1; x<=1; x+=2)
         {
@@ -257,13 +258,12 @@ void Kart::createPhysics()
             {
                 for(int z=-1; z<=1; z+=2)
                 {
-                    btVector3 p(x*getKartModel()->getWidth() *0.5f,
-                                y*getKartModel()->getHeight()*0.5f,
-                                z*getKartModel()->getLength()*0.5f);
+                    Vec3 p(x*getKartModel()->getWidth()*0.5f,
+                          y*getKartModel()->getHeight()*0.5f,
+                          z*getKartModel()->getLength()*0.5f);
 
-                    hull->addPoint(p);
-                    p *= bevel_factor;
-                    hull->addPoint(p);
+                    hull->addPoint(p*orig_factor);
+                    hull->addPoint(p*bevel_factor);
                 }   // for z
             }   // for y
         }   // for x
