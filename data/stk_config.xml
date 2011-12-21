@@ -291,9 +291,17 @@
            problem that the amount of push a hit kart receives depends on
            the orientation - if a kart is pushed in the direction it is 
            driving, it will be more (no friction from tires), while when 
-           pushed to the side, hardly anything happens.  -->
-    <collision impulse="300" impulse-time="0.2" side-impulse="900"
-               restitution="0.5"/>
+           pushed to the side, hardly anything happens. 
+         bevel-factor: the X and Y coordinate of each point of the kart
+           chassis (box) are multiplied with (1-bevelX) and (1-bevelY),
+           and the Z coordinate is multiplied with (1+bevelZ). The 
+           resulting point is then added to the chassis collision shape.
+           This gives a bevelled box shape. A value of 0 for all bevel
+           coordinates disables bevelling, and uses a simple box shape.
+           As an example, a value of 1 for x and z will result in a 
+           sharp 'arrow' like shape.  -->
+    <collision impulse="150" impulse-time="0.1" side-impulse="600"
+               restitution="1.0" bevel-factor="0 0 0" />
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is

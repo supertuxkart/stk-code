@@ -125,7 +125,9 @@ private:
     /** Increase of turn angle with speed. */
     std::vector<float> m_speed_angle_increase;
 
-
+    /** If != 0 a bevelled box shape is used by using a point cloud as a 
+     *  collision shape. */
+    Vec3  m_bevel_factor;
 
     /** Time a kart is moved upwards after when it is rescued. */
     float m_rescue_time;
@@ -181,7 +183,7 @@ private:
     float       m_wheel_base;
     /** Nitro power boost. */
     float       m_nitro_power_boost;
-    /**< Nitro consumption. */
+    /** Nitro consumption. */
     float       m_nitro_consumption;
     /** Nitro amount for small bottle. */
     float       m_nitro_small_container;
@@ -693,6 +695,9 @@ public:
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
 	bool hasRandomWheels() const { return m_has_rand_wheels; }
+
+    /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
+    const Vec3 &getBevelFactor() const { return m_bevel_factor; }
 };   // KartProperties
 
 #endif

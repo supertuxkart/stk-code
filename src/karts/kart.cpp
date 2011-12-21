@@ -242,10 +242,43 @@ void Kart::createPhysics()
     {
         kart_height = kart_length*0.6f;
     }
-    
-    btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                                 0.5f*kart_height,
-                                                 0.5f*kart_length));
+
+    btCollisionShape *shape;
+    const Vec3 &bevel = m_kart_properties->getBevelFactor();
+    if(bevel.getX() || bevel.getY() || bevel.getZ())
+    {
+        Vec3 bevel_factor(1.0f-bevel.getX(),
+                          1.0f-bevel.getY(),
+                          1.0f+bevel.getZ() );
+        btConvexHullShape *hull = new btConvexHullShape();
+        for(int x=-1; x<=1; x+=2)
+        {
+            for(int y=-1; y<=1; y+=2)
+            {
+                for(int z=-1; z<=1; z+=2)
+                {
+                    btVector3 p(x*getKartModel()->getWidth() *0.5f,
+                                y*getKartModel()->getHeight()*0.5f,
+                                z*getKartModel()->getLength()*0.5f);
+
+                    hull->addPoint(p);
+                    p *= bevel_factor;
+                    hull->addPoint(p);
+                }   // for z
+            }   // for y
+        }   // for x
+
+        // This especially enables proper drawing of the point cloud
+        hull->initializePolyhedralFeatures();
+        shape = hull;
+    }   // bevel.getX()!=0
+    else
+    {
+        shape = new btBoxShape(btVector3(0.5f*kart_width,
+                                         0.5f*kart_height,
+                                         0.5f*kart_length));
+    }
+
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart

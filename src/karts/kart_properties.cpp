@@ -98,6 +98,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
 
     m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_bevel_factor           = Vec3(UNDEFINED);
     m_exp_spring_response    = false;
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -432,6 +433,7 @@ void KartProperties::getAllData(const XMLNode * root)
         collision_node->get("impulse-time",  &m_collision_impulse_time);
         collision_node->get("side-impulse",  &m_collision_side_impulse);
         collision_node->get("restitution",   &m_restitution           );
+        collision_node->get("bevel-factor",  &m_bevel_factor          );
     }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
@@ -600,6 +602,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
+    CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
+    CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
+    CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
     CHECK_NEG(m_plunger_in_face_duration[0],"plunger in-face-time[0]"       );
