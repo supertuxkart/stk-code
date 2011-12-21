@@ -694,7 +694,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
-            video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
+            video_driver->queryFeature(video::EVDF_MULTITEXTURE ))
         {
             ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
             m->setTexture(1, tex);
