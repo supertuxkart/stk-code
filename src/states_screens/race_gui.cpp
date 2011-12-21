@@ -282,7 +282,7 @@ void RaceGUI::drawGlobalTimer()
     {
         vcenter = true;
         
-        const int size = UserConfigParams::m_width/20.0f;
+        const int size = UserConfigParams::m_width/20;
         core::rect<s32> dest(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
                              pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
         core::rect<s32> source(core::position2di(0, 0), m_trophy->getSize());
