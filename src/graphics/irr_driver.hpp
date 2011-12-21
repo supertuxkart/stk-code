@@ -205,6 +205,8 @@ public:
     
     inline PostProcessing* getPostProcessing()  {return &m_post_processing;}
     
+    bool supportsSplatting();
+    
     // --------------------- RTT --------------------
     /**
       * Class that provides RTT (currently, only when no other 3D rendering 

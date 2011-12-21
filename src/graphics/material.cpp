@@ -691,10 +691,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     }
     if (m_splatting)
     {
-        IVideoDriver* video_driver = irr_driver->getVideoDriver();
-        if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
-            video_driver->queryFeature(video::EVDF_MULTITEXTURE ))
+        if (irr_driver->supportsSplatting())
         {
             ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
             m->setTexture(1, tex);
@@ -724,7 +721,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
             
             // Material and shaders
             IGPUProgrammingServices* gpu = 
-            video_driver->getGPUProgrammingServices();
+                irr_driver->getVideoDriver()->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
                                                                          (file_manager->getDataDir() + 
                                                                           "shaders/splatting.vert").c_str(), 

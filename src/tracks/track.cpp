@@ -689,6 +689,29 @@ bool Track::loadMainTrack(const XMLNode &root)
             continue;
         }
         
+        // some static meshes are conditional
+        std::string condition;
+        n->get("if", &condition);
+        if (condition == "splatting")
+        {
+            if (!irr_driver->supportsSplatting()) continue;
+        }
+        else if (condition.size() > 0)
+        {
+            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", condition.c_str());
+        }
+        
+        std::string neg_condition;
+        n->get("ifnot", &neg_condition);
+        if (neg_condition == "splatting")
+        {
+            if (irr_driver->supportsSplatting()) continue;
+        }
+        else if (neg_condition.size() > 0)
+        {
+            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", neg_condition.c_str());
+        }
+        
         bool tangent = false;
         n->get("tangents", &tangent);
         
