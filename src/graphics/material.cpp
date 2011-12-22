@@ -188,29 +188,47 @@ Material::Material(const XMLNode *node, int index)
         node->get("crash-reset-particles", &m_crash_reset_particles);
     }
     
-    if (node->get("normal-map",  &m_normal_map_tex))
+    bool use_normal_map = false;
+    node->get("use-normal-map",  &use_normal_map);
+    
+    if (use_normal_map)
     {
-        m_normal_map = true;
-    }
-    else if (node->get("normal-heightmap",  &m_normal_map_tex))
-    {
-        m_is_heightmap = true;
-        m_normal_map = true;
-    }
-    else if (node->get("parallax-map",  &m_normal_map_tex))
-    {
-        m_parallax_map = true;
-        m_parallax_height = 0.2f;
-        node->get("parallax-height", &m_parallax_height);
-    }
-    else if (node->get("parallax-heightmap",  &m_normal_map_tex))
-    {
-        m_is_heightmap = true;
-        m_parallax_map = true;
-        m_parallax_height = 0.2f;
-        node->get("parallax-height", &m_parallax_height);
-    }
+        if (node->get("normal-map",  &m_normal_map_tex))
+        {
+            m_normal_map = true;
+        }
+        else
+        {
+            fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
+        }
+        
+        m_normal_map_uv2 = false;
+        node->get("normal-map-uv2",  &m_normal_map_uv2);
 
+        
+        // TODO: add support for parallax maps?
+        /*
+        else if (node->get("normal-heightmap",  &m_normal_map_tex))
+        {
+            m_is_heightmap = true;
+            m_normal_map = true;
+        }
+        else if (node->get("parallax-map",  &m_normal_map_tex))
+        {
+            m_parallax_map = true;
+            m_parallax_height = 0.2f;
+            node->get("parallax-height", &m_parallax_height);
+        }
+        else if (node->get("parallax-heightmap",  &m_normal_map_tex))
+        {
+            m_is_heightmap = true;
+            m_parallax_map = true;
+            m_parallax_height = 0.2f;
+            node->get("parallax-height", &m_parallax_height);
+        }
+         */
+    }
+    
     s="";
     node->get("graphical-effect", &s                   );
     
@@ -341,6 +359,7 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_normal_map                = false;
+    m_normal_map_uv2            = false;
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
@@ -654,17 +673,22 @@ void  Material::setMaterialProperties(video::SMaterial *m)
             {
                 m_normal_map_provider = new NormalMapProvider();
             }
-            
+                        
+            const char* vertex_shader = (m_normal_map_uv2 ?
+                                            "shaders/normalmap2uv.vert" :
+                                            "shaders/normalmap.vert");
+            const char* pixel_shader  = (m_normal_map_uv2 ?
+                                            "shaders/normalmap2uv.frag" :
+                                            "shaders/normalmap.frag");
+
             // Material and shaders
             IGPUProgrammingServices* gpu = 
                 video_driver->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                  (file_manager->getDataDir() + 
-                                       "shaders/normalmap.vert").c_str(), 
+                                   (file_manager->getDataDir() + vertex_shader).c_str(),
                                    "main",
                                    video::EVST_VS_2_0,
-                                   (file_manager->getDataDir() + 
-                                       "shaders/normalmap.frag").c_str(), 
+                                   (file_manager->getDataDir() + pixel_shader).c_str(), 
                                    "main",
                                    video::EPST_PS_2_0,
                                    m_normal_map_provider,
