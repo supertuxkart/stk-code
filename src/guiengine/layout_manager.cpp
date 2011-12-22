@@ -206,33 +206,52 @@ void LayoutManager::readCoords(Widget* self)
     // ---- if this widget has children, get their size size. this can helpful determine its optimal size
     if (self->m_properties[PROP_WIDTH] == "fit" || self->m_properties[PROP_HEIGHT] == "fit")
     {
+        bool is_vertical_row = (self->m_properties[PROP_LAYOUT] == "vertical-row");
+        bool is_horizontal_row = (self->m_properties[PROP_LAYOUT] == "horizontal-row");
+
         int child_max_width = -1, child_max_height = -1;
+        int total_width = 0, total_height = 0;
+        
         for (int child=0; child<self->m_children.size(); child++)
         {
             if (self->m_children[child].m_absolute_w > -1)
             {
-                if (child_max_width == -1 || self->m_children[child].m_absolute_w > child_max_width)
+                if (is_horizontal_row)
                 {
-                    child_max_width = self->m_children[child].m_absolute_w;
+                    total_width += self->m_children[child].m_absolute_w ;
+                }
+                else
+                {
+                    if (child_max_width == -1 || self->m_children[child].m_absolute_w > child_max_width)
+                    {
+                        child_max_width = self->m_children[child].m_absolute_w;
+                    }
                 }
             }
             
             if (self->m_children[child].m_absolute_h > -1)
             {
-                if (child_max_height == -1 || self->m_children[child].m_absolute_h > child_max_height)
+                if (is_vertical_row)
                 {
-                    child_max_height = self->m_children[child].m_absolute_h;
+                    total_height += self->m_children[child].m_absolute_h;
+                }
+                else
+                {
+                    if (child_max_height == -1 || self->m_children[child].m_absolute_h > child_max_height)
+                    {
+                        child_max_height = self->m_children[child].m_absolute_h;
+                    }
                 }
             }
         }
         
         if (self->m_properties[PROP_WIDTH] == "fit")
         {
-            self->m_absolute_w = child_max_width;
+            self->m_absolute_w = (is_horizontal_row ? total_width : child_max_width);
         }
         if (self->m_properties[PROP_HEIGHT] == "fit")
         {
-            self->m_absolute_h = child_max_height;
+            self->m_absolute_h = (is_vertical_row ? total_height : child_max_height);
         }
     }
     
