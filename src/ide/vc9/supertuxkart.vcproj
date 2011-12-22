@@ -1154,6 +1154,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\custom_video_settings.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.cpp"
 						>
 					</File>
@@ -2253,6 +2257,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\custom_video_settings.hpp"
 						>
 					</File>
 					<File
