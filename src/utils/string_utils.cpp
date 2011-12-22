@@ -166,10 +166,9 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
-            (void)e;  // avoid warning message about unused variable
             fprintf(stderr, 
-                    "Fatal error in split(std::string) : %s @ line %i\n",
-                     __FILE__, __LINE__);
+                    "Fatal error in split(std::string) : %s @ line %i : %s\n",
+                     __FILE__, __LINE__, e.what());
             printf("Splitting %s\n", s.c_str());
             
             for (int n=0; n<(int)result.size(); n++)
@@ -177,6 +176,7 @@ namespace StringUtils
                 printf("Split : %s\n", result[n].c_str());
             }
             
+            assert(false); // in debug mode, trigger debugger
             exit(1);
         }
     }   // split
@@ -229,8 +229,9 @@ namespace StringUtils
         {
             (void)e;  // avoid warning about unused variable
             fprintf(stderr, 
-                    "Fatal error in split(stringw) : %s @ line %i\n", 
-                     __FILE__, __LINE__);
+                    "Fatal error in split(stringw) : %s @ line %i : %s\n", 
+                     __FILE__, __LINE__, e.what());
+            assert(false); // in dbug mode, trigger debugger
             exit(1);
         }
     }   // split
