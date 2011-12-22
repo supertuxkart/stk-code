@@ -41,9 +41,10 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_gauge = gauge;
     
     m_listener = NULL;
-    
+    m_graphical = false;
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
+    m_value = -1;
     
     m_min = 0;
     m_max = 999;
@@ -89,7 +90,10 @@ void SpinnerWidget::add()
         }
     }
     
-    m_value = (m_min + m_max)/2;
+    if (m_value == -1)
+    {
+        m_value = (m_min + m_max)/2;
+    }
     
     // create sub-widgets if they don't already exist
     if (m_children.size() == 0)
@@ -164,6 +168,12 @@ void SpinnerWidget::add()
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
+        
+        
+        if (m_labels.size() > 0)
+        {
+            label->setText(m_labels[m_value].c_str() );
+        }
     }
     
     
@@ -332,18 +342,19 @@ void SpinnerWidget::setValue(const int new_value)
         std::string imagefile = StringUtils::insertValues(icon.str(), m_value);
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
-    else if (m_labels.size() > 0)
+    else if (m_labels.size() > 0 && m_children.size() > 0)
     {
         assert(new_value >= 0);
         assert(new_value < (int)m_labels.size());
+        
         m_children[1].m_element->setText(m_labels[new_value].c_str() );
     }
-    else if (m_text.size() > 0)
+    else if (m_text.size() > 0 && m_children.size() > 0)
     {
         stringw text = StringUtils::insertValues(m_text.c_str(), m_value);
         m_children[1].m_element->setText( text.c_str() );
     }
-    else
+    else if (m_children.size() > 0)
     {
         m_children[1].m_element->setText( stringw(m_value).c_str() );
     }
@@ -407,5 +418,12 @@ void SpinnerWidget::setDeactivated()
     
     setText(L"-");
     setValue( getValue() ); // Update the display
+}
+
+// -----------------------------------------------------------------------------
+
+void SpinnerWidget::setCustomText(const core::stringw& text)
+{
+    m_children[1].m_element->setText(text.c_str());
 }
 

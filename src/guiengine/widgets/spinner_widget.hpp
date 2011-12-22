@@ -158,6 +158,9 @@ namespace GUIEngine
         
         /** Override method from base class Widget */
         virtual void setDeactivated();
+        
+        /** Display custom text in spinner */
+        void setCustomText(const core::stringw& text);
     };
     
 }

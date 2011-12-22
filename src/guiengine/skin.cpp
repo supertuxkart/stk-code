@@ -1232,12 +1232,12 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                           / (w->getMax() - w->getMin());
         
         
-        const core::recti dest_area(widget->m_x + handle_size,
-                                    widget->m_y,
-                                    widget->m_x + handle_size +
+        const core::recti dest_area(rect.UpperLeftCorner.X + handle_size,
+                                    rect.UpperLeftCorner.Y,
+                                    rect.UpperLeftCorner.X + handle_size +
                                            (int)((widget->m_w 
                                                   - 2*handle_size)*value),
-                                    widget->m_y + widget->m_h);
+                                    rect.UpperLeftCorner.Y + widget->m_h);
         
         const ITexture* texture = 
             SkinConfig::m_render_params["gaugefill::neutral"].getImage();
