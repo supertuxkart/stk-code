@@ -36,8 +36,8 @@ class AddonsLoading : public GUIEngine::ModalDialog
 private:
     GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
-    GUIEngine::ButtonWidget      *m_back_button;
-    GUIEngine::ButtonWidget      *m_install_button;
+    GUIEngine::IconButtonWidget  *m_back_button;
+    GUIEngine::IconButtonWidget  *m_install_button;
 
     GUIEngine::IconButtonWidget  *m_icon;
     
@@ -45,7 +45,8 @@ private:
     Addon                         m_addon;
     void startDownload();
     void doInstall();
-    
+    void doUninstall();
+
     /** True if the icon is being displayed. */
     bool m_icon_shown;
 

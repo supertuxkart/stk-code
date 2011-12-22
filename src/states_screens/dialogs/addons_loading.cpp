@@ -52,19 +52,12 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_install_button   = getWidget<ButtonWidget>     ("install" );
-    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
+    m_install_button   = getWidget<IconButtonWidget> ("install" );
+    m_back_button      = getWidget<IconButtonWidget> ("back"  );
     
     if(m_progress)
         m_progress->setVisible(false);
     
-    if(m_addon.isInstalled())
-    {
-        if(m_addon.needsUpdate())
-            getWidget<ButtonWidget>("install")->setLabel(_("Update"));
-        else
-            getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
-    }   // if isInstalled
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -84,8 +77,23 @@ void AddonsLoading::beforeAddingWidgets()
     /* Init the icon here to be able to load a single image*/
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
+    m_back_button      = getWidget<IconButtonWidget> ("back"    );
 
+    
+    RibbonWidget* r = getWidget<RibbonWidget>("actions");
+    
+    if (m_addon.isInstalled())
+    {
+        if (m_addon.needsUpdate())
+            getWidget<IconButtonWidget> ("install")->setText( _("Update") );
+        else
+            r->removeChildNamed("install");
+    }
+    else
+    {
+        r->removeChildNamed("uninstall");
+    }
+    
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
     getWidget<BubbleWidget>("description")
         ->setText(m_addon.getDescription().c_str());
@@ -159,6 +167,8 @@ void AddonsLoading::beforeAddingWidgets()
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
 
+// ----------------------------------------------------------------------------
+
 void AddonsLoading::init()
 {
     GUIEngine::LabelWidget* flags = getWidget<LabelWidget>("flags");
@@ -180,7 +190,7 @@ void AddonsLoading::escapePressed()
 GUIEngine::EventPropagation 
                     AddonsLoading::processEvent(const std::string& event_source)
 {
-    if(event_source == "cancel")
+    if(event_source == "back")
     {
         // Cancel a download only if we are installing/upgrading one
         // (and not uninstalling an installed one):
@@ -207,13 +217,17 @@ GUIEngine::EventPropagation
             m_progress->setVisible(true);
             // Change the 'back' button into a 'cancel' button.
             m_back_button->setText(_("Cancel"));
-            m_install_button->setVisible(false);
+            
+            RibbonWidget* r = getWidget<RibbonWidget>("actions");
+            r->setVisible(false);
+            
             startDownload();
         }
-        else   // uninstall
-        {
-            doInstall();
-        }
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (event_source == "uninstall")
+    {
+        doUninstall();
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
@@ -275,36 +289,62 @@ void AddonsLoading::doInstall()
     delete m_download_request;
     m_download_request = NULL;
     bool error=false;
-    if(!m_addon.isInstalled() || m_addon.needsUpdate())
+    
+    assert(!m_addon.isInstalled() || m_addon.needsUpdate());
+    error = !addons_manager->install(m_addon);
+    if(error)
     {
-        error = !addons_manager->install(m_addon);
-        if(error)
-        {
-            core::stringw msg = StringUtils::insertValues(
-                _("Problems installing the addon '%s'."),
-                core::stringw(m_addon.getName().c_str()));
-            m_back_button->setText(msg.c_str());
-        }
-    }
-    else
-    {
-        error = !addons_manager->uninstall(m_addon);
-        if(error)
-        {
-            printf("[addons]Directory '%s' can not be removed.\n",
-                m_addon.getDataDir().c_str());
-            printf("[addons]Please remove this directory manually.\n");
-            core::stringw msg = StringUtils::insertValues(
-                _("Problems removing the addon '%s'."),
-                core::stringw(m_addon.getName().c_str()));
-            m_back_button->setText(msg.c_str());
-        }
+        core::stringw msg = StringUtils::insertValues(
+            _("Problems installing the addon '%s'."),
+            core::stringw(m_addon.getName().c_str()));
+        m_back_button->setText(msg.c_str());
     }
 
     if(error)
     {
         m_progress->setVisible(false);
-        m_install_button->setVisible(true);
+        
+        RibbonWidget* r = getWidget<RibbonWidget>("actions");
+        r->setVisible(true);
+        
+        m_install_button->setText(_("Try again"));
+    }
+    else
+    {
+        // The list of the addon screen needs to be updated to correctly
+        // display the newly (un)installed addon.
+        AddonsScreen::getInstance()->loadList();
+        dismiss();
+    }
+}   // doInstall
+
+// ----------------------------------------------------------------------------
+
+void AddonsLoading::doUninstall()
+{
+    delete m_download_request;
+    m_download_request = NULL;
+    bool error=false;
+
+    error = !addons_manager->uninstall(m_addon);
+    if(error)
+    {
+        printf("[addons]Directory '%s' can not be removed.\n",
+               m_addon.getDataDir().c_str());
+        printf("[addons]Please remove this directory manually.\n");
+        core::stringw msg = StringUtils::insertValues(
+                                                      _("Problems removing the addon '%s'."),
+                                                      core::stringw(m_addon.getName().c_str()));
+        m_back_button->setText(msg.c_str());
+    }
+    
+    if(error)
+    {
+        m_progress->setVisible(false);
+        
+        RibbonWidget* r = getWidget<RibbonWidget>("actions");
+        r->setVisible(true);
+        
         m_install_button->setText(_("Try again"));
     }
     else

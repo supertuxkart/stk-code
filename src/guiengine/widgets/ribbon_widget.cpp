@@ -419,6 +419,24 @@ void RibbonWidget::clearAllChildren()
 
 // ----------------------------------------------------------------------------
 
+void RibbonWidget::removeChildNamed(const char* name)
+{
+    // This method should only be called BEFORE a widget is added
+    assert(m_element == NULL);
+    
+    Widget* child;
+    for_in (child, m_children)
+    {
+        if (child->m_properties[PROP_ID] == name)
+        {
+            m_children.erase(child);
+            return;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_children.size();

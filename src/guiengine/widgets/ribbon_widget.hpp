@@ -180,6 +180,12 @@ namespace GUIEngine
           */
         void clearAllChildren();
         
+        /**
+         * \brief clear one child from this ribbon
+         * \pre this must be called before RibbonWidget::add, while the widget is not yet displayed
+         */
+        void removeChildNamed(const char* name);
+        
         PtrVector<Widget>& getRibbonChildren() { return m_children; }
     };
 

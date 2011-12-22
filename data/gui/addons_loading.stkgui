@@ -18,15 +18,21 @@
     </div>
   </div>
 
-  <bubble word_wrap="true" id="description" height="100%" width="90%" proportion="6" align="center" />
+  <bubble word_wrap="true" id="description" height="100%" width="90%" proportion="5" align="center" />
 
-  <div width="90%" proportion="2" align="center">
-    <button      id="install"  x="0" y="0" width="100%" height="100%" I18N="Addons" text="Install"/>
-    <progressbar id="progress" x="0" y="20%" width="100%" height="60%"  />
+  <div width="80%" proportion="5" align="center">
+    <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
+        <icon-button id="install" width="128" height="128"
+                     icon="gui/package-update.png"
+                     I18N="Add-on screen action"  text="Install"/>
+        <icon-button id="uninstall" width="128" height="128"
+                     icon="gui/package-uninstall.png"
+                     I18N="Add-on screen action" text="Uninstall"/>
+        <icon-button id="back" width="128" height="128"
+                     icon="gui/back.png"
+                     I18N="Add-ons screen action" text="Back"/>
+    </buttonbar>
+    <progressbar id="progress" x="0" y="20%" width="100%" height="30%"  />
   </div>
-  
-  <spacer height="10" />
-  
-  <button id="cancel" proportion="2" width="90%" I18N="Addons" text="Back" align="center"/>
 </div>
 </stkgui>
