@@ -28,6 +28,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/options_screen_players.hpp"
@@ -275,19 +276,7 @@ void OptionsScreenVideo::init()
 
     
     // --- set gfx settings values
-    for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
-    {
-        if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l]&&
-            UserConfigParams::m_graphical_effects        == GFX[l] &&
-            UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
-            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l] &&
-            UserConfigParams::m_postprocess_enabled   == GFX_POSTPROCESSING[l])
-        {
-            gfx->setValue(l+1);
-            break;
-        }
-    }
-    
+    updateGfxSlider();
     
     // ---- forbid changing resolution or animation settings from in-game
     // (we need to disable them last because some items can't be edited when 
@@ -300,9 +289,39 @@ void OptionsScreenVideo::init()
         gfx->setDeactivated();
     }
     
-    
     updateTooltip();
 }   // init
+
+// ----------------------------------------------------------------------------
+
+void OptionsScreenVideo::updateGfxSlider()
+{
+    GUIEngine::SpinnerWidget* gfx = 
+    getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    assert( gfx != NULL );
+    
+    bool found = false;
+    for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
+    {
+        if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l]&&
+            UserConfigParams::m_graphical_effects        == GFX[l] &&
+            UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
+            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l] &&
+            UserConfigParams::m_postprocess_enabled   == GFX_POSTPROCESSING[l])
+        {
+            gfx->setValue(l+1);
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found)
+    {
+        //I18N: custom video settings
+        gfx->setCustomText( _("Custom") );
+    }
+    
+}
 
 // ----------------------------------------------------------------------------
 
@@ -375,6 +394,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     else if(name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if(name == "custom")
+    {
+        new CustomVideoSettingsialog(0.8f, 0.8f);
     }
     else if(name == "apply_resolution")
     {

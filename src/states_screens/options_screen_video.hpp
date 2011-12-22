@@ -57,6 +57,8 @@ public:
     
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
+    
+    void         updateGfxSlider();
 };
 
 #endif
