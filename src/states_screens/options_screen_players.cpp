@@ -212,7 +212,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     else if (name == "playername")
     {
         UserConfigParams::m_default_player = L"";
-        StateManager::get()->resetAndGoToScreen(StoryModeLobbyScreen::getInstance());
+        StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
     
 }   // eventCallback
