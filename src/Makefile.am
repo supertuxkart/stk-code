@@ -330,6 +330,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/add_device_dialog.hpp \
  states_screens/dialogs/confirm_resolution_dialog.cpp \
  states_screens/dialogs/confirm_resolution_dialog.hpp \
+ states_screens/dialogs/custom_video_settings.cpp \
+ states_screens/dialogs/custom_video_settings.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
  states_screens/dialogs/enter_player_name_dialog.hpp \
  states_screens/dialogs/gp_info_dialog.cpp \
