@@ -1459,7 +1459,8 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 
 bool IrrDriver::supportsSplatting()
 {
-    return m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+    return UserConfigParams::m_pixel_shaders &&
+           m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
            m_video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
            m_video_driver->queryFeature(video::EVDF_MULTITEXTURE );
 }

@@ -72,6 +72,7 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 
     getWidget<CheckBoxWidget>("antialiasing")->setState( UserConfigParams::m_fullscreen_antialiasing );
     getWidget<CheckBoxWidget>("postprocessing")->setState( UserConfigParams::m_postprocess_enabled );
+    getWidget<CheckBoxWidget>("pixelshaders")->setState( UserConfigParams::m_pixel_shaders );
 }
 
 // -----------------------------------------------------------------------------
@@ -90,6 +91,8 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<CheckBoxWidget>("postprocessing")->getState();
         UserConfigParams::m_show_steering_animations = 
             getWidget<SpinnerWidget>("steering_animations")->getValue();
+        UserConfigParams::m_pixel_shaders = 
+            getWidget<CheckBoxWidget>("pixelshaders")->getState();
         
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

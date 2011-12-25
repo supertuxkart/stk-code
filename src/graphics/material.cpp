@@ -655,7 +655,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
                                                       video::EAS_VERTEX_COLOR);
         modes++;
     }
-    if (m_normal_map)
+    if (m_normal_map && UserConfigParams::m_pixel_shaders)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
@@ -713,56 +713,49 @@ void  Material::setMaterialProperties(video::SMaterial *m)
         m->SpecularColor.set(0,0,0,0);
         modes++;
     }
-    if (m_splatting)
+    if (m_splatting && irr_driver->supportsSplatting())
     {
-        if (irr_driver->supportsSplatting())
+        ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
+        m->setTexture(1, tex);
+        
+        if (m_splatting_texture_2.size() > 0)
         {
-            ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
-            m->setTexture(1, tex);
-            
-            if (m_splatting_texture_2.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_2);
-            }
-            m->setTexture(2, tex);
-            
-            if (m_splatting_texture_3.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_3);
-            }
-            m->setTexture(3, tex);
-            
-            if (m_splatting_texture_4.size() > 0)
-            {
-                tex = irr_driver->getTexture(m_splatting_texture_4);
-            }
-            m->setTexture(4, tex);
-            
-            if (m_splatting_provider == NULL)
-            {
-                m_splatting_provider = new SplattingProvider();
-            }
-            
-            // Material and shaders
-            IGPUProgrammingServices* gpu = 
-                irr_driver->getVideoDriver()->getGPUProgrammingServices();
-            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                                         (file_manager->getDataDir() + 
-                                                                          "shaders/splatting.vert").c_str(), 
-                                                                         "main",
-                                                                         video::EVST_VS_2_0,
-                                                                         (file_manager->getDataDir() + 
-                                                                          "shaders/splatting.frag").c_str(), 
-                                                                         "main",
-                                                                         video::EPST_PS_2_0,
-                                                                         m_splatting_provider,
-                                                                         video::EMT_SOLID_2_LAYER );
-            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            tex = irr_driver->getTexture(m_splatting_texture_2);
         }
-        else
+        m->setTexture(2, tex);
+        
+        if (m_splatting_texture_3.size() > 0)
         {
-            // TODO: we need a sane fallback when splatting is not available!
+            tex = irr_driver->getTexture(m_splatting_texture_3);
         }
+        m->setTexture(3, tex);
+        
+        if (m_splatting_texture_4.size() > 0)
+        {
+            tex = irr_driver->getTexture(m_splatting_texture_4);
+        }
+        m->setTexture(4, tex);
+        
+        if (m_splatting_provider == NULL)
+        {
+            m_splatting_provider = new SplattingProvider();
+        }
+        
+        // Material and shaders
+        IGPUProgrammingServices* gpu = 
+            irr_driver->getVideoDriver()->getGPUProgrammingServices();
+        s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                                     (file_manager->getDataDir() + 
+                                                                      "shaders/splatting.vert").c_str(), 
+                                                                     "main",
+                                                                     video::EVST_VS_2_0,
+                                                                     (file_manager->getDataDir() + 
+                                                                      "shaders/splatting.frag").c_str(), 
+                                                                     "main",
+                                                                     video::EPST_PS_2_0,
+                                                                     m_splatting_provider,
+                                                                     video::EMT_SOLID_2_LAYER );
+        m->MaterialType = (E_MATERIAL_TYPE)material_type;
     }
     
     if (modes > 1)

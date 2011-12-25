@@ -51,6 +51,8 @@ const bool GFX_WEATHER   [] = {false, false, false, false, true,  true,  true};
 const bool GFX_ANTIALIAS [] = {false, false, false, false, false, true,  true};
 const bool GFX_POSTPROCESSING[] = 
                               {false, false, false, false, false, false, true};
+const bool GFX_PIXEL_SHADERS[] =
+                              {false, false, false, false, true,  true,  true};
 const int  GFX_LEVEL_AMOUNT = 7;
 
 // ----------------------------------------------------------------------------
@@ -122,6 +124,7 @@ void OptionsScreenVideo::init()
         full->setActivated();
         applyBtn->setActivated();
         gfx->setActivated();
+        getWidget<ButtonWidget>("custom")->setActivated();
     }
     
     // --- get resolution list from irrlicht the first time
@@ -287,6 +290,7 @@ void OptionsScreenVideo::init()
         full->setDeactivated();
         applyBtn->setDeactivated();
         gfx->setDeactivated();
+        getWidget<ButtonWidget>("custom")->setDeactivated();
     }
     
     updateTooltip();
@@ -307,7 +311,8 @@ void OptionsScreenVideo::updateGfxSlider()
             UserConfigParams::m_graphical_effects        == GFX[l] &&
             UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
             UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l] &&
-            UserConfigParams::m_postprocess_enabled   == GFX_POSTPROCESSING[l])
+            UserConfigParams::m_postprocess_enabled      == GFX_POSTPROCESSING[l] &&
+            UserConfigParams::m_pixel_shaders            == GFX_PIXEL_SHADERS[l])
         {
             gfx->setValue(l+1);
             found = true;
@@ -360,6 +365,9 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s", 
              UserConfigParams::m_fullscreen_antialiasing ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Pixel shaders : %s", 
+                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Post-processing (motion blur) : %s", 
         UserConfigParams::m_postprocess_enabled ? enabled : disabled);
@@ -435,7 +443,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
         UserConfigParams::m_fullscreen_antialiasing  = GFX_ANTIALIAS[level-1];
-        UserConfigParams::m_postprocess_enabled  = GFX_POSTPROCESSING[level-1];
+        UserConfigParams::m_postprocess_enabled      = GFX_POSTPROCESSING[level-1];
+        UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
         
         updateTooltip();
     }
