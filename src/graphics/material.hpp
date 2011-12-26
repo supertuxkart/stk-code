@@ -39,6 +39,7 @@ class ParticleKind;
 
 class NormalMapProvider;
 class SplattingProvider;
+class BubbleEffectProvider;
 
 /**
   * \ingroup graphics
@@ -46,7 +47,11 @@ class SplattingProvider;
 class Material : public NoCopy
 {
 public:
-    enum GraphicalEffect {GE_NONE, GE_WATER};
+    enum GraphicalEffect {GE_NONE,
+                          /** Water splash effect. This is set on the seabed material. */
+                          GE_WATER,
+                          /** Effect where the UV texture is moved in a wave pattern */
+                          GE_BUBBLE};
 
     enum ParticleConditions
     {
@@ -95,7 +100,7 @@ private:
     bool             m_add;
     
     bool             m_fog;
-    
+        
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
     
     /** For normal maps */
@@ -184,6 +189,9 @@ private:
     
     /** Only used if splatting is used */
     SplattingProvider*  m_splatting_provider;
+    
+    /** Only used if bubble effect is enabled */
+    BubbleEffectProvider* m_bubble_provider;
     
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);

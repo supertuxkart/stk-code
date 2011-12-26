@@ -121,6 +121,30 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+
+class BubbleEffectProvider : public video::IShaderConstantSetCallBack
+{
+    irr::u32 initial_time;
+    
+public:
+    LEAK_CHECK()
+    
+    BubbleEffectProvider()
+    {
+        initial_time = irr_driver->getDevice()->getTimer()->getRealTime();
+    }
+    
+    virtual void OnSetConstants(
+                                irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        float time = (irr_driver->getDevice()->getTimer()->getRealTime() - initial_time) / 1000.0f;
+        services->setVertexShaderConstant("time", &time, 1);
+    }
+};
+
+
+//-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
  *  \param node Node containing the parameters for this material.
  *  \param index Index in material_manager.
@@ -230,11 +254,15 @@ Material::Material(const XMLNode *node, int index)
     }
     
     s="";
-    node->get("graphical-effect", &s                   );
+    node->get("graphical-effect", &s);
     
     if (s == "water")
     {
         m_graphical_effect = GE_WATER;
+    }
+    else if (s == "bubble")
+    {
+        m_graphical_effect = GE_BUBBLE;
     }
     else if (s == "none")
     {
@@ -365,7 +393,8 @@ void Material::init(unsigned int index)
     m_alpha_to_coverage         = false;
     m_normal_map_provider       = NULL;
     m_splatting_provider        = NULL;
-    m_splatting                 = NULL;
+    m_bubble_provider           = NULL;
+    m_splatting                 = false;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -430,6 +459,11 @@ Material::~Material()
     {
         m_splatting_provider->drop();
         m_splatting_provider = NULL;
+    }
+    if (m_bubble_provider != NULL)
+    {
+        m_bubble_provider->drop();
+        m_bubble_provider = NULL;
     }
     
     // If a special sfx is installed (that isn't part of stk itself), the
@@ -762,6 +796,43 @@ void  Material::setMaterialProperties(video::SMaterial *m)
                                                                      m_splatting_provider,
                                                                      video::EMT_SOLID_2_LAYER );
         m->MaterialType = (E_MATERIAL_TYPE)material_type;
+    }
+    
+    if (m_graphical_effect == GE_BUBBLE)
+    {
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (UserConfigParams::m_pixel_shaders &&
+            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+        {
+            if (m_bubble_provider == NULL)
+            {
+                m_bubble_provider = new BubbleEffectProvider();
+            }
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                         (file_manager->getDataDir() + "shaders/bubble.vert").c_str(),
+                                         "main",
+                                         video::EVST_VS_2_0,
+                                         (file_manager->getDataDir() + "shaders/bubble.frag").c_str(), 
+                                         "main",
+                                         video::EPST_PS_2_0,
+                                         m_bubble_provider,
+                                         (m_alpha_blending ?
+                                              video::EMT_TRANSPARENT_ALPHA_CHANNEL :
+                                              video::EMT_SOLID)
+                                     );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            
+            // alpha blending and bubble shading can work together so when both are enabled
+            // don't increment the 'modes' counter to not get the 'too many modes' warning
+            if (!m_alpha_blending)
+            {
+                modes++;
+            }
+        }
     }
     
     if (modes > 1)
