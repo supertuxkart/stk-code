@@ -660,7 +660,17 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     if (m_sphere_map) 
     {
         m->MaterialType = video::EMT_SPHERE_MAP;
-        modes++;
+        
+        // sphere map + alpha blending is a supported combination so in
+        // this case don't increase mode count
+        if (m_alpha_blending)
+        {
+            m->BlendOperation = video::EBO_ADD;
+        }
+        else
+        {
+            modes++;
+        }
     }
 #if !LIGHTMAP_VISUALISATION
     if (m_lightmap)
