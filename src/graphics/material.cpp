@@ -655,10 +655,11 @@ void  Material::setMaterialProperties(video::SMaterial *m)
                                                       video::EAS_VERTEX_COLOR);
         modes++;
     }
-    if (m_normal_map && UserConfigParams::m_pixel_shaders)
+    if (m_normal_map)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
-        if (video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+        if (UserConfigParams::m_pixel_shaders &&
+            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
             video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
         {
@@ -698,6 +699,11 @@ void  Material::setMaterialProperties(video::SMaterial *m)
             m->ZWriteEnable = true;
             
             modes++;
+        }
+        else
+        {
+            // remove normal map texture so that it's not blended with the rest
+            m->setTexture(1, NULL);
         }
     }
     if (m_parallax_map)

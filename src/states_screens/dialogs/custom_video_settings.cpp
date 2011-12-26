@@ -67,7 +67,6 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     filtering->addLabel( L"Bilinear" );    // 0
     filtering->addLabel( L"Trilinear" );   // 1
     filtering->addLabel( L"Anisotropic" ); // 2
-    printf("filtering : %i\n", value);
     filtering->setValue( value );
 
     getWidget<CheckBoxWidget>("antialiasing")->setState( UserConfigParams::m_fullscreen_antialiasing );
