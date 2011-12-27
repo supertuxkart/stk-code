@@ -78,47 +78,19 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     {
         if (m_materials[i]->getTexFname()==image)
         {
-                        
-            // ---- lightmap debug
-#if LIGHTMAP_VISUALISATION
-            if (mb->getVertexType() == video::EVT_2TCOORDS)
-            {                
-
-                if (g_processed.find(mb) == g_processed.end())
-                {
-                    g_processed.insert(mb);
-                    video::S3DVertex2TCoords* coords = (video::S3DVertex2TCoords*)mb->getVertices();
-                    for (unsigned int v=0; v<mb->getVertexCount(); v++)
-                    {
-                        core::vector2d<f32> tmp = coords[v].TCoords2;
-                        coords[v].TCoords2 = coords[v].TCoords;
-                        coords[v].TCoords = tmp;
-                    }
-                }
-                
-                // atm this mode assumes lightmap textures will have 'lightmap' in their name
-                if (mb->getMaterial().getTexture(1) != NULL &&
-                    mb->getMaterial().getTexture(1)->getName().getPath().find("lightmap") != -1)
-                {
-                    //video::ITexture* tmp = mb->getMaterial().getTexture(0);
-                    mb->getMaterial().setTexture(0, mb->getMaterial().getTexture(1));
-                    //mb->getMaterial().setTexture(1, tmp);
-                    
-                    mb->setDirty();
-                }
-            } else
-#endif
-            // --------------------
-            
             m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
             return;
         }
     }   // for i
     
     // This material does not appear in materials.xml. Set some common flags...
-    if (UserConfigParams::m_anisotropic)
+    if (UserConfigParams::m_anisotropic > 0)
     {
-        mb->getMaterial().setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+        for (u32 i=0; i<video::MATERIAL_MAX_TEXTURES; ++i)
+        {
+            mb->getMaterial().TextureLayer[i].AnisotropicFilter =
+                                        UserConfigParams::m_anisotropic;
+        }
     }
     else if (UserConfigParams::m_trilinear)
     {

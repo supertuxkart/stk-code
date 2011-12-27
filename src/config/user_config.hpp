@@ -461,11 +461,10 @@ namespace UserConfigParams
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
-    PARAM_PREFIX BoolUserConfigParam         m_anisotropic
-            PARAM_DEFAULT( BoolUserConfigParam(true, "anisotropic", 
+    PARAM_PREFIX IntUserConfigParam         m_anisotropic
+            PARAM_DEFAULT( IntUserConfigParam(8, "anisotropic", 
                            &m_graphics_quality,
-                           "Whether anisotropic filtering is allowed to be "
-                           "used (true or false)") );
+                           "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
             PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", 
                            &m_graphics_quality,

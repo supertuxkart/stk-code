@@ -33,7 +33,7 @@
     <div layout="horizontal-row" width="100%" height="fit">
         <label text="Texture filtering" I18N="Video settings"/>
         <spacer width="10" height="10"/>
-        <gauge id="filtering" min_value="0" max_value="2" width="50%" />
+        <gauge id="filtering" min_value="0" max_value="5" width="50%" />
     </div>
     
     <spacer height="5" width="10" />

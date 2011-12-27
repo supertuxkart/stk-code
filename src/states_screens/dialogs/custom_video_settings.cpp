@@ -62,11 +62,18 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
-    if (UserConfigParams::m_anisotropic)   value = 2;
-    else if (UserConfigParams::m_trilinear) value = 1;
-    filtering->addLabel( L"Bilinear" );    // 0
-    filtering->addLabel( L"Trilinear" );   // 1
-    filtering->addLabel( L"Anisotropic" ); // 2
+    if      (UserConfigParams::m_anisotropic == 2)  value = 2;
+    else if (UserConfigParams::m_anisotropic == 4)  value = 3;
+    else if (UserConfigParams::m_anisotropic == 8)  value = 4;
+    else if (UserConfigParams::m_anisotropic == 16) value = 5;
+    else if (UserConfigParams::m_trilinear)         value = 1;
+    filtering->addLabel( L"Bilinear" );        // 0
+    filtering->addLabel( L"Trilinear" );       // 1
+    filtering->addLabel( L"Anisotropic x2" );  // 2
+    filtering->addLabel( L"Anisotropic x4" );  // 3
+    filtering->addLabel( L"Anisotropic x8" );  // 4
+    filtering->addLabel( L"Anisotropic x16" ); // 5
+
     filtering->setValue( value );
 
     getWidget<CheckBoxWidget>("antialiasing")->setState( UserConfigParams::m_fullscreen_antialiasing );
@@ -96,15 +103,27 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {
             case 0:
-                UserConfigParams::m_anisotropic = false;
+                UserConfigParams::m_anisotropic = 0;
                 UserConfigParams::m_trilinear   = false;
                 break;
             case 1:
-                UserConfigParams::m_anisotropic = false;
+                UserConfigParams::m_anisotropic = 0;
                 UserConfigParams::m_trilinear   = true;
                 break;
             case 2:
-                UserConfigParams::m_anisotropic = true;
+                UserConfigParams::m_anisotropic = 2;
+                UserConfigParams::m_trilinear   = true;
+                break;
+            case 3:
+                UserConfigParams::m_anisotropic = 4;
+                UserConfigParams::m_trilinear   = true;
+                break;
+            case 4:
+                UserConfigParams::m_anisotropic = 8;
+                UserConfigParams::m_trilinear   = true;
+                break;
+            case 5:
+                UserConfigParams::m_anisotropic = 16;
                 UserConfigParams::m_trilinear   = true;
                 break;
         }

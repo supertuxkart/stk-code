@@ -875,9 +875,13 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     }
 #endif
 
-    if (UserConfigParams::m_anisotropic)
+    if (UserConfigParams::m_anisotropic > 0)
     {
-        m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+        for (u32 i=0; i<video::MATERIAL_MAX_TEXTURES; ++i)
+        {
+            m->TextureLayer[i].AnisotropicFilter =
+                    UserConfigParams::m_anisotropic;
+        }
     }
     else if (UserConfigParams::m_trilinear)
     {
