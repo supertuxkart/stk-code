@@ -114,7 +114,7 @@ public:
     void  addDependency(const std::string id)  {m_prerequisites.push_back(id);}
     
     const std::vector<std::string>& 
-        getPrerequisites() const               {return m_prerequisites;     }
+        getPrerequisites() const                  { return m_prerequisites;   }
     
     /** Returns the id of the challenge. */
     const std::string &getId() const              { return m_id;              }
@@ -128,6 +128,9 @@ public:
 
     /** Sets the id of this challenge. */
     void  setId(const std::string& s)             { m_id = s;                 }
+    
+    const std::string& getTrackName() const        { return m_track_name;     }
+
     
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 

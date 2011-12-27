@@ -26,6 +26,8 @@
 using namespace irr;
 
 #include "audio/music_manager.hpp"
+#include "challenges/challenge.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -50,6 +52,7 @@ using namespace irr;
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/lod_node_loader.hpp"
+#include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -727,6 +730,10 @@ bool Track::loadMainTrack(const XMLNode &root)
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
         
+        // a special challenge orb object for overworld
+        std::string challenge;
+        n->get("challenge", &challenge);
+        
         lodLoader.check(n);
         
         if (tangent)
@@ -769,7 +776,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else
         {
-            scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+            // TODO: check if mesh is animated or not
+            scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
             if(!a_mesh)
             {
                 fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
@@ -788,7 +796,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             m_all_cached_meshes.push_back(a_mesh);
             irr_driver->grabAllTextures(a_mesh);
             a_mesh->grab();
-            scene_node = irr_driver->addAnimatedMesh(a_mesh);
+            scene_node = irr_driver->addMesh(a_mesh);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
@@ -800,6 +808,48 @@ bool Track::loadMainTrack(const XMLNode &root)
             
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
+            
+            // for challenge orbs, a bit more work to do
+            if (challenge.size() > 0)
+            {
+                const ChallengeData* c = unlock_manager->getChallenge(challenge);
+                if (c == NULL)
+                {
+                    fprintf(stderr, "[WARNING] Cannot find challenge named <%s>\n", challenge.c_str());
+                    continue;
+                }
+                Track* t = track_manager->getTrack(c->getTrackName());
+                if (t == NULL)
+                {
+                    fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackName().c_str());
+                    continue;
+                }
+                
+                std::string sshot = t->getScreenshotFile();
+                video::ITexture* screenshot = irr_driver->getTexture(sshot);
+                
+                if (screenshot == NULL)
+                {
+                    fprintf(stderr, "[WARNING] Cannot find track screenshot <%s>\n", sshot.c_str());
+                    continue;
+                }
+                
+                scene_node->getMaterial(0).setTexture(0, screenshot);
+
+                // make transparent
+                for (unsigned int m=0; m<a_mesh->getMeshBufferCount(); m++)
+                {
+                    scene::IMeshBuffer* mb = a_mesh->getMeshBuffer(m);
+                    if (mb->getVertexType() == video::EVT_STANDARD)
+                    {
+                        video::S3DVertex* v = (video::S3DVertex*)mb->getVertices();
+                        for (unsigned int n=0; n<mb->getVertexCount(); n++)
+                        {
+                            v[n].Color.setAlpha(125);
+                        }
+                    }
+                }
+            }
         }
 
     }   // for i

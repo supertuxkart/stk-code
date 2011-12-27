@@ -886,7 +886,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
     else if (UserConfigParams::m_trilinear)
     {
         m->setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }    
+    }
     
     // UV clamping
     if ( (m_clamp_tex & UCLAMP) != 0)
