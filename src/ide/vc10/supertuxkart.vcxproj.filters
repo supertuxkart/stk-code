@@ -816,6 +816,12 @@
     <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp">
+      <Filter>Source Files\states_screens\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modes\overworld.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1552,6 +1558,12 @@
     </ClInclude>
     <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp">
       <Filter>Header Files\states_screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp">
+      <Filter>Header Files\states_screens\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\overworld.hpp">
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
