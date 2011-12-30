@@ -807,7 +807,6 @@ bool Track::loadMainTrack(const XMLNode &root)
 #endif
             
             handleAnimatedTextures(scene_node, *n);
-            m_all_nodes.push_back( scene_node );
             
             // for challenge orbs, a bit more work to do
             if (challenge.size() > 0)
@@ -849,7 +848,15 @@ bool Track::loadMainTrack(const XMLNode &root)
                         }
                     }
                 }
-            }
+                
+                LODNode* lod_node = new LODNode("challenge_orb", scene_node->getParent(),
+                                                irr_driver->getSceneManager());
+                lod_node->add(50, scene_node, true /* reparent */);
+                scene_node = lod_node;
+            } // if (challenge.size() > 0)
+            
+            m_all_nodes.push_back( scene_node );
+
         }
 
     }   // for i
