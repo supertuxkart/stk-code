@@ -84,9 +84,7 @@ protected:
      *  True by default, change to false in a child class to disable.
     */
     bool        m_use_highscores;
-    
-    bool        m_draw_trophy_points;
-    
+        
     void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, 
                              std::string* highscore_who,
                              StateManager::ActivePlayer** best_player);
@@ -129,6 +127,8 @@ protected:
      */
     virtual float   estimateFinishTimeForKart(Kart* kart) {return getTime(); }
 
+    virtual void    createRaceGUI();
+    
     /** Pausing/unpausing are not done immediately, but at next udpdate. The 
      *  use of this is when switching between screens : if we leave a screen 
      *  that paused the game, only to go to another screen that pauses back 
@@ -256,8 +256,6 @@ public:
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const { return isRacePhase() &&
                                              getClockMode() != CLOCK_NONE; }
-    // ------------------------------------------------------------------------
-    bool  shouldDrawTrophyPoints() const { return m_draw_trophy_points; }
     // ------------------------------------------------------------------------    
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }

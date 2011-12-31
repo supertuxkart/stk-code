@@ -35,60 +35,57 @@ class Material;
 class RaceSetup;
 
 /**
-  * \brief Handles the in-race GUI (messages, mini-map, rankings, timer, etc...)
-  * \ingroup states_screens
-  */
-class RaceGUI : public RaceGUIBase
+ * \brief Handles the in-race GUI (messages, mini-map, rankings, timer, etc...)
+ * \ingroup states_screens
+ */
+class RaceGUIOverworld : public RaceGUIBase
 {
 private:
-
+    
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
-
+    
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
-
+    
     /** Translated string 'rank' displayed every frame. */
     core::stringw    m_string_rank;
-
+    
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-        
+    
+    video::ITexture *m_trophy;
+    
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
     int              m_marker_ai_size;
-
+    
     /** The size of a single marker on the screen or player karts, 
      *  need not be a power of 2. */
     int              m_marker_player_size;
-
+    
     /** The width of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_width;
-
+    
     /** The height of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_height;
     
     /** Width of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_width;
-
+    
     /** Height of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_height;
-
+    
     /** Distance of map from left side of screen. */
     int              m_map_left;
-
+    
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
     
-    /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
-     *  the rank/lap text correctly close to the right border. */
-    int              m_rank_lap_width;
-
-    /** Maximum string length for the timer */
-    int              m_timer_width;
-        
+    int              m_trophy_points_width;
+    
     
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const Kart *kart,
@@ -96,23 +93,21 @@ private:
                                 const core::vector2df &scaling);
     void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
-                                const core::recti &viewport);
-
+    
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
-    void drawGlobalTimer       ();
+    void drawTrophyPoints      ();
     
 public:
-
-         RaceGUI();
-        ~RaceGUI();
+    
+    RaceGUIOverworld();
+    ~RaceGUIOverworld();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Kart *kart);
-        
+    
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 
-                  { return core::dimension2du(m_map_width, m_map_height); }
+    { return core::dimension2du(m_map_width, m_map_height); }
     
 };   // RaceGUI
 

@@ -89,7 +89,6 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_clear_back_buffer  = false;
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
-    m_draw_trophy_points = false;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
@@ -112,10 +111,7 @@ void World::init()
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
     // do any rendering on texture.
-	if(UserConfigParams::m_minimal_race_gui)
-		m_race_gui = new MinimalRaceGUI();
-	else
-		m_race_gui = new RaceGUI();
+    createRaceGUI();
 
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
@@ -168,6 +164,16 @@ void World::init()
     rg->init();
     if (rg) rg->clearAllMessages();
 }   // init
+
+//-----------------------------------------------------------------------------
+
+void World::createRaceGUI()
+{
+    if(UserConfigParams::m_minimal_race_gui)
+		m_race_gui = new MinimalRaceGUI();
+	else
+		m_race_gui = new RaceGUI();
+}
 
 //-----------------------------------------------------------------------------
 /** Creates a kart, having a certain position, starting location, and local

@@ -33,7 +33,11 @@
  */
 class OverWorld : public LinearWorld
 {
-
+protected:
+    
+    /** Override from base class */
+    virtual void  createRaceGUI();
+    
 public:
                   OverWorld();
    /** call just after instanciating. can't be moved to the contructor as child

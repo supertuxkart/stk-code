@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/overworld.hpp"
-
+#include "states_screens/race_gui_overworld.hpp"
 
 //-----------------------------------------------------------------------------
 OverWorld::OverWorld() : LinearWorld()
@@ -31,8 +31,6 @@ OverWorld::OverWorld() : LinearWorld()
 void OverWorld::init()
 {
     LinearWorld::init();
-    m_display_rank = false;
-    m_draw_trophy_points = true;
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -59,3 +57,8 @@ void OverWorld::checkForWrongDirection(unsigned int i)
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------
+
+void OverWorld::createRaceGUI()
+{
+    m_race_gui = new RaceGUIOverworld();
+}

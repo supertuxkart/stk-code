@@ -372,6 +372,7 @@
 		95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */; };
 		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
 		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
+		95EF178E14AFBC91005FFEEB /* race_gui_overworld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95EF178C14AFBC91005FFEEB /* race_gui_overworld.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1365,6 +1366,8 @@
 		95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text_box_widget.cpp; path = ../../guiengine/widgets/text_box_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0FF10124C5000D47C5F /* text_box_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = text_box_widget.hpp; path = ../../guiengine/widgets/text_box_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA13C10124E6900D47C5F /* widgets.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widgets.hpp; path = ../../guiengine/widgets.hpp; sourceTree = SOURCE_ROOT; };
+		95EF178C14AFBC91005FFEEB /* race_gui_overworld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui_overworld.cpp; path = ../../states_screens/race_gui_overworld.cpp; sourceTree = SOURCE_ROOT; };
+		95EF178D14AFBC91005FFEEB /* race_gui_overworld.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui_overworld.hpp; path = ../../states_screens/race_gui_overworld.hpp; sourceTree = SOURCE_ROOT; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
@@ -2268,6 +2271,8 @@
 				958330C910122B4A00C5137E /* race_gui.hpp */,
 				956F557313527E4B005C291D /* race_gui_base.cpp */,
 				956F557413527E4B005C291D /* race_gui_base.hpp */,
+				95EF178C14AFBC91005FFEEB /* race_gui_overworld.cpp */,
+				95EF178D14AFBC91005FFEEB /* race_gui_overworld.hpp */,
 				9554C4A411F1188000906416 /* race_result_gui.cpp */,
 				9554C4A511F1188000906416 /* race_result_gui.hpp */,
 				9522F15A107949780067ECF5 /* race_setup_screen.cpp */,
@@ -3213,6 +3218,7 @@
 				95E5C3C2148C418100AD3FCC /* game_slot.cpp in Sources */,
 				9593366B149EC9B10031FD41 /* overworld.cpp in Sources */,
 				957957A214A3CA3900E72497 /* custom_video_settings.cpp in Sources */,
+				95EF178E14AFBC91005FFEEB /* race_gui_overworld.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
