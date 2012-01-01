@@ -18,6 +18,7 @@ else()
 	set(DEBUG OFF)
 endif()
 
+option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(FONT_TOOL "Compile font tool" OFF)
 set(IRRLICHT_DIR "/path/to/irrlicht" CACHE STRING "Path to Irrlicht")
@@ -28,10 +29,18 @@ add_subdirectory("${STK_SOURCE_DIR}/bullet")
 # Build the ENet UDP network library
 add_subdirectory("${STK_SOURCE_DIR}/enet")
 
+# Build the Wiiuse library
+if(USE_WIIUSE)
+	add_subdirectory("${STK_SOURCE_DIR}/wiiuse")
+endif()
+
 # Set include paths
 include_directories("${STK_SOURCE_DIR}")
 include_directories("${STK_SOURCE_DIR}/enet/include")
 include_directories("${STK_SOURCE_DIR}/bullet/src")
+if(USE_WIIUSE)
+	include_directories("${STK_SOURCE_DIR}/wiiuse")
+endif()
 
 if(APPLE)
 	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
@@ -57,6 +66,10 @@ else()
 endif()
 
 link_directories("${STK_SOURCE_DIR}/bullet")
+
+if(USE_WIIUSE)
+	link_directories("${STK_SOURCE_DIR}/wiiuse")
+endif()
 
 # OpenGL
 if(APPLE)
@@ -243,6 +256,11 @@ if(USE_FRIBIDI)
         target_link_libraries(supertuxkart fribidi)
     endif()
     add_definitions(-DENABLE_BIDI=1)
+endif()
+
+if(USE_WIIUSE)
+	target_link_libraries(supertuxkart wiiuse bluetooth)
+	add_definitions(-DENABLE_WIIUSE)
 endif()
 
 if(UNIX AND NOT APPLE)

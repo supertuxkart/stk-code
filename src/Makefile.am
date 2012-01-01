@@ -169,6 +169,8 @@ supertuxkart_SOURCES = \
  input/input_device.hpp \
  input/input_manager.cpp \
  input/input_manager.hpp \
+ input/wiimote_manager.cpp \
+ input/wiimote_manager.hpp \
  io/file_manager.cpp \
  io/file_manager.hpp \
  io/xml_node.cpp \

@@ -159,6 +159,7 @@
 #include "guiengine/event_handler.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
@@ -1155,6 +1156,10 @@ int main(int argc, char *argv[] )
         }
 
         input_manager = new InputManager ();
+        
+#ifdef ENABLE_WIIUSE
+        wiimote_manager = new WiimoteManager();
+#endif
 
         // Get into menu mode initially.
         input_manager->setMode(InputManager::MENU);
@@ -1347,6 +1352,12 @@ int main(int argc, char *argv[] )
         if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
         user_config->saveConfig();
     }
+    
+#ifdef ENABLE_WIIUSE
+    if(wiimote_manager)
+        delete wiimote_manager;
+#endif
+    
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
     if (user_config && UserConfigParams::m_log_errors) //close logfiles

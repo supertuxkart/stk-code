@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states_screens/dialogs/add_device_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
@@ -29,6 +30,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "input/wiimote_manager.hpp"
 
 #include <IGUIStaticText.h>
 #include <IGUIEnvironment.h>
@@ -45,7 +47,15 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
-    const int y_bottom = m_area.getHeight() - 2*(buttonHeight + 10) - 10;
+#ifdef ENABLE_WIIUSE
+    const int nbButtons = 3;
+#else
+    const int nbButtons = 2;
+#endif
+    
+    const int y_bottom = m_area.getHeight() - nbButtons*(buttonHeight + 10) - 10;
+    const int y_stride = buttonHeight+10;
+    int cur_y = y_bottom;
 
     core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
     
@@ -70,6 +80,28 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
     // setText is called only
     b->setText(msg.c_str());
     
+#ifdef ENABLE_WIIUSE
+    {
+        ButtonWidget* widget = new ButtonWidget();
+        widget->m_properties[PROP_ID] = "addwiimote";
+        
+        //I18N: In the 'add new input device' dialog
+        widget->setText( _("Add Wiimote") );
+        
+        const int textWidth = 
+            font->getDimension( widget->getText().c_str() ).Width + 40;
+        
+        widget->m_x = m_area.getWidth()/2 - textWidth/2;
+        widget->m_y = cur_y;
+        widget->m_w = textWidth;
+        widget->m_h = buttonHeight;
+        widget->setParent(m_irrlicht_window);
+        m_widgets.push_back(widget);
+        widget->add();
+        cur_y += y_stride;
+    }
+#endif  // ENABLE_WIIUSE
+    
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "addkeyboard";
@@ -81,12 +113,13 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
             font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
-        widget->m_y = y_bottom;
+        widget->m_y = cur_y;
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_widgets.push_back(widget);
         widget->add();
+        cur_y += y_stride;
     }
     {
         ButtonWidget* widget = new ButtonWidget();
@@ -97,12 +130,13 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
             font->getDimension( widget->getText().c_str() ).Width + 40;
         
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
-        widget->m_y = y_bottom + buttonHeight + 10;
+        widget->m_y = cur_y;
         widget->m_w = textWidth;
         widget->m_h = buttonHeight;
         widget->setParent(m_irrlicht_window);
         m_widgets.push_back(widget);
         widget->add();
+        cur_y += y_stride;
         
         widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );    
 
@@ -137,6 +171,30 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
         
         return GUIEngine::EVENT_BLOCK;
     }
+#ifdef ENABLE_WIIUSE
+    else if (eventSource == "addwiimote")
+    {
+        //new MessageDialog( _("Press the buttons 1+2 of your wiimote..."));
+        
+        wiimote_manager->launchDetection(5);
+        
+        int nb_wiimotes = wiimote_manager->getNbWiimotes();
+        if(nb_wiimotes > 0)
+        {
+            core::stringw msg = StringUtils::insertValues(
+                _("Found %d wiimote(s)"),
+                core::stringw(nb_wiimotes));
+            
+            new MessageDialog( msg );
+        }
+        else
+        {
+            new MessageDialog( _("Could not detect any wiimote :/") );
+        }
+        
+        return GUIEngine::EVENT_BLOCK;
+    }
+#endif
     
     return GUIEngine::EVENT_LET;
 }   // processEvent

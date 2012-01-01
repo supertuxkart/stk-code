@@ -26,6 +26,7 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
+#include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
@@ -150,6 +151,10 @@ void MainLoop::run()
             PROFILER_PUSH_CPU_MARKER("Input manager update", 0x00, 0x7F, 0x00);
             input_manager->update(dt);
             PROFILER_POP_CPU_MARKER();
+            
+            #ifdef ENABLE_WIIUSE
+                wiimote_manager->update();
+            #endif
             
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
