@@ -35,6 +35,7 @@ WiimoteManager::WiimoteManager()
 {
     m_wiimotes = NULL;
     m_nb_wiimotes = 0;
+    m_initial_nb_gamepads = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -80,11 +81,11 @@ void WiimoteManager::launchDetection(int timeout)
     GamepadConfig* gamepadConfig = NULL;
     GamePadDevice* gamepadDevice = NULL;
     
-    int initial_nb_gamepads = device_manager->getGamePadAmount();
+    m_initial_nb_gamepads = device_manager->getGamePadAmount();
     
     for(int i=0 ; i < m_nb_wiimotes ; i++)
     {
-        int id = i + initial_nb_gamepads;
+        int id = getGamepadId(i);
         
         core::stringc name = core::stringc("Wiimote ") + StringUtils::toString(i).c_str();
         
@@ -119,41 +120,44 @@ void WiimoteManager::update()
         {
             for (int i=0; i < MAX_WIIMOTES; ++i)
             {
+                int gamepad_id = getGamepadId(i);
+                        
                 switch (m_wiimotes[i]->event)
                 {
                 case WIIUSE_EVENT:
-                    printf("DEBUG: wiimote event\n");
+                    handleEvent(m_wiimotes[i], gamepad_id);
+                    //printf("DEBUG: wiimote event\n");
                     break;
     
                 case WIIUSE_STATUS:
-                    printf("DEBUG: status event\n");
+                    //printf("DEBUG: status event\n");
                     break;
     
                 case WIIUSE_DISCONNECT:
                 case WIIUSE_UNEXPECTED_DISCONNECT:
-                    printf("DEBUG: wiimote disconnected\n");
+                    //printf("DEBUG: wiimote disconnected\n");
                     break;
     
                 case WIIUSE_READ_DATA:
-                    printf("DEBUG: WIIUSE_READ_DATA\n");
+                    //printf("DEBUG: WIIUSE_READ_DATA\n");
                     break;
     
                 case WIIUSE_NUNCHUK_INSERTED:
-                    printf("DEBUG: Nunchuk inserted.\n");
+                    //printf("DEBUG: Nunchuk inserted.\n");
                     break;
     
                 case WIIUSE_CLASSIC_CTRL_INSERTED:
-                    printf("DEBUG: Classic controller inserted.\n");
+                    //printf("DEBUG: Classic controller inserted.\n");
                     break;
     
                 case WIIUSE_GUITAR_HERO_3_CTRL_INSERTED:
-                    printf("DEBUG: Guitar Hero 3 controller inserted.\n");
+                    //printf("DEBUG: Guitar Hero 3 controller inserted.\n");
                     break;
     
                 case WIIUSE_NUNCHUK_REMOVED:
                 case WIIUSE_CLASSIC_CTRL_REMOVED:
                 case WIIUSE_GUITAR_HERO_3_CTRL_REMOVED:
-                    printf("DEBUG: An expansion was removed.\n");
+                    //printf("DEBUG: An expansion was removed.\n");
                     break;
                 default:
                     break;
@@ -172,6 +176,58 @@ void WiimoteManager::cleanup()
         m_wiimotes = NULL;
         m_nb_wiimotes = 0;
     }
+}
+
+// -----------------------------------------------------------------------------
+void WiimoteManager::handleEvent(wiimote_t *wm, int gamepad_id)
+{
+    // Simulate an Irrlicht joystick event
+    irr::SEvent event;
+    event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
+    for(int i=0 ; i < SEvent::SJoystickEvent::NUMBER_OF_AXES ; i++)
+        event.JoystickEvent.Axis[i] = 0;
+    event.JoystickEvent.Joystick = gamepad_id;
+    event.JoystickEvent.POV = 65535;
+    event.JoystickEvent.ButtonStates = 0;
+    
+    // Send button states
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_A))
+    {
+        printf("DEBUG: A\n");
+        event.JoystickEvent.ButtonStates |= (1<<1);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_B))
+    {
+        printf("DEBUG: B\n");
+        event.JoystickEvent.ButtonStates |= (1<<2);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_PLUS))
+    {
+        printf("DEBUG: +\n");
+        event.JoystickEvent.ButtonStates |= (1<<3);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_MINUS))
+    {
+        printf("DEBUG: -\n");
+        event.JoystickEvent.ButtonStates |= (1<<4);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_ONE))
+    {
+        printf("DEBUG: 1\n");
+        event.JoystickEvent.ButtonStates |= (1<<5);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_TWO))
+    {
+        printf("DEBUG: 2\n");
+        event.JoystickEvent.ButtonStates |= (1<<6);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_HOME))
+    {
+        printf("DEBUG: Home\n");
+        event.JoystickEvent.ButtonStates |= (1<<7);
+    }
+    
+    input_manager->input(event);
 }
 
 #endif // ENABLE_WIIUSE

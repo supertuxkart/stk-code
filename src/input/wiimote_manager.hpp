@@ -32,6 +32,9 @@ class WiimoteManager
 private:
     wiimote_t**     m_wiimotes;
     int             m_nb_wiimotes;
+    
+    int             m_initial_nb_gamepads;  // Wiimotes are attributed the IDs following
+                                            // the "normal" gamepads - that's a bit of a hack...
 
 public:
     WiimoteManager();
@@ -41,7 +44,11 @@ public:
     void update();
     void cleanup();
     
-    int getNbWiimotes() const   {return m_nb_wiimotes;}
+    int  getNbWiimotes() const   {return m_nb_wiimotes;}
+    
+private:
+    void handleEvent(wiimote_t* wm, int gamepad_id);
+    int  getGamepadId(int wiimote_id) const {return wiimote_id + m_initial_nb_gamepads;}
 };
 
 extern WiimoteManager* wiimote_manager;
