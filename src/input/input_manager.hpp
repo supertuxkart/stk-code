@@ -71,7 +71,6 @@ private:
     
     void   dispatchInput(Input::InputType, int deviceID, int btnID, Input::AxisDirection direction, int value);
     void   handleStaticAction(int id0, int value);
-    void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID, Input::AxisDirection axisDirection,  int value);
 public:
            InputManager();
