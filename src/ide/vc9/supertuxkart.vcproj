@@ -1115,6 +1115,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\race_gui_overworld.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\race_result_gui.cpp"
 					>
 				</File>
@@ -2218,6 +2222,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\race_gui_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_gui_overworld.hpp"
 					>
 				</File>
 				<File

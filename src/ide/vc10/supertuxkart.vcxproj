@@ -164,6 +164,7 @@
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
+    <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp" />
     <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
@@ -403,6 +404,7 @@
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
+    <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
     <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />

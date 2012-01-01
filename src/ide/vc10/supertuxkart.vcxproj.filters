@@ -822,6 +822,9 @@
     <ClCompile Include="..\..\modes\overworld.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp">
+      <Filter>Source Files\states_screens</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1564,6 +1567,9 @@
     </ClInclude>
     <ClInclude Include="..\..\modes\overworld.hpp">
       <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp">
+      <Filter>Header Files\states_screens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
