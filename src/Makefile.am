@@ -390,6 +390,8 @@ supertuxkart_SOURCES = \
  states_screens/addons_screen.hpp \
  states_screens/race_gui_base.cpp \
  states_screens/race_gui_base.hpp \
+ states_screens/race_gui_overworld.cpp \
+ states_screens/race_gui_overworld.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
  states_screens/race_result_gui.cpp \
