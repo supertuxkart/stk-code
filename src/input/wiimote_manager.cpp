@@ -18,33 +18,44 @@
 
 #ifdef ENABLE_WIIUSE
 
-#include "wiimote_manager.hpp"
-#include "wiiuse.h"
+#include "input/wiimote_manager.hpp"
+#include "wiiuse/wiiuse.h"
 #include "graphics/irr_driver.hpp"
+#include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 
 WiimoteManager*  wiimote_manager;
 
-static const int   NB_MAX_WIIMOTES = 2;
+const int    MAX_WIIMOTES = 2;
+const int    WIIMOTE_AXES = 2;
+const int    WIIMOTE_BUTTONS = 13;
 
+// -----------------------------------------------------------------------------
 WiimoteManager::WiimoteManager()
 {
     m_wiimotes = NULL;
     m_nb_wiimotes = 0;
 }
 
+// -----------------------------------------------------------------------------
 WiimoteManager::~WiimoteManager()
 {
     cleanup();
 }
 
+// -----------------------------------------------------------------------------
+/**
+  * Launch wiimote detection and add the corresponding gamepad devices to the device manager
+  * TODO: this should be done in a separate thread, to not block the UI...
+  */
 void WiimoteManager::launchDetection(int timeout)
 {
     cleanup();
     
-    m_wiimotes =  wiiuse_init(NB_MAX_WIIMOTES);
+    m_wiimotes =  wiiuse_init(MAX_WIIMOTES);
     
     // Detect wiimotes
-    int nb_found_wiimotes = wiiuse_find(m_wiimotes, NB_MAX_WIIMOTES, timeout);
+    int nb_found_wiimotes = wiiuse_find(m_wiimotes, MAX_WIIMOTES, timeout);
     
     // Try to connect to all found wiimotes
     m_nb_wiimotes = wiiuse_connect(m_wiimotes, nb_found_wiimotes);
@@ -61,6 +72,42 @@ void WiimoteManager::launchDetection(int timeout)
 
     for(int i=0 ; i < m_nb_wiimotes ; i++)
         wiiuse_rumble(m_wiimotes[i], 0);
+    
+    // ---------------------------------------------------
+    
+    // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
+    DeviceManager* device_manager = input_manager->getDeviceList();
+    GamepadConfig* gamepadConfig = NULL;
+    GamePadDevice* gamepadDevice = NULL;
+    
+    int initial_nb_gamepads = device_manager->getGamePadAmount();
+    
+    for(int i=0 ; i < m_nb_wiimotes ; i++)
+    {
+        int id = i + initial_nb_gamepads;
+        
+        core::stringc name = core::stringc("Wiimote ") + StringUtils::toString(i).c_str();
+        
+        // Returns true if new configuration was created
+        if (device_manager->getConfigForGamepad(id, name, &gamepadConfig) == true)
+        {
+            if(UserConfigParams::logMisc()) 
+                printf("creating new configuration.\n");
+        }
+        else
+        {
+            if(UserConfigParams::logMisc())
+                printf("using existing configuration.\n");
+        }
+
+        gamepadConfig->setPlugged();
+        gamepadDevice = new GamePadDevice(id, 
+                                          name.c_str(),
+                                          WIIMOTE_AXES,
+                                          WIIMOTE_BUTTONS,
+                                          gamepadConfig );
+        device_manager->addGamepad(gamepadDevice);
+    } // end for
 }
 
 // -----------------------------------------------------------------------------
@@ -68,9 +115,9 @@ void WiimoteManager::update()
 {
     if(m_nb_wiimotes > 0)
     {
-        if(wiiuse_poll(m_wiimotes, NB_MAX_WIIMOTES))
+        if(wiiuse_poll(m_wiimotes, MAX_WIIMOTES))
         {
-            for (int i=0; i < NB_MAX_WIIMOTES; ++i)
+            for (int i=0; i < MAX_WIIMOTES; ++i)
             {
                 switch (m_wiimotes[i]->event)
                 {
@@ -121,7 +168,7 @@ void WiimoteManager::cleanup()
 {
     if(m_nb_wiimotes > 0)
     {
-        wiiuse_cleanup(m_wiimotes, NB_MAX_WIIMOTES);
+        wiiuse_cleanup(m_wiimotes, MAX_WIIMOTES);
         m_wiimotes = NULL;
         m_nb_wiimotes = 0;
     }

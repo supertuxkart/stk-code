@@ -28,6 +28,7 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "input/wiimote_manager.hpp"
 
 #define INPUT_MODE_DEBUG 0
 
@@ -196,9 +197,20 @@ bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& n
     // If we can't find an appropriate configuration then create one.
     if (!found)
     {
-        *config = new GamepadConfig( name.c_str(), 
-                                     m_irrlicht_gamepads[irr_id].Axes, 
-                                     m_irrlicht_gamepads[irr_id].Buttons );
+        if(irr_id < (int)(m_irrlicht_gamepads.size()))
+        {
+            *config = new GamepadConfig( name.c_str(), 
+                                         m_irrlicht_gamepads[irr_id].Axes, 
+                                         m_irrlicht_gamepads[irr_id].Buttons );
+        }
+#ifdef ENABLE_WIIUSE
+        else    // Wiimotes have a higher ID and do not refer to m_irrlicht_gamepads
+        {
+            *config = new GamepadConfig( name.c_str(), 
+                                         WIIMOTE_AXES, 
+                                         WIIMOTE_BUTTONS );
+        }
+#endif
 
         // Add new config to list
         m_gamepad_configs.push_back(*config);

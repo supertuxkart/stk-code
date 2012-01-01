@@ -186,6 +186,8 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
                 core::stringw(nb_wiimotes));
             
             new MessageDialog( msg );
+            
+            ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
         }
         else
         {

@@ -21,6 +21,10 @@
 
 #ifdef ENABLE_WIIUSE
 
+extern const int    MAX_WIIMOTES;
+extern const int    WIIMOTE_AXES;
+extern const int    WIIMOTE_BUTTONS;
+
 struct wiimote_t;
 
 class WiimoteManager
