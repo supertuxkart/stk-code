@@ -21,6 +21,9 @@
 
 #ifdef ENABLE_WIIUSE
 
+#include <pthread.h>
+#include "IEventReceiver.h"
+
 extern const int    MAX_WIIMOTES;
 extern const int    WIIMOTE_AXES;
 extern const int    WIIMOTE_BUTTONS;
@@ -35,6 +38,12 @@ private:
     
     int             m_initial_nb_gamepads;  // Wiimotes are attributed the IDs following
                                             // the "normal" gamepads - that's a bit of a hack...
+    
+    pthread_t       m_thread;
+    pthread_mutex_t m_mutex;
+    int             m_write_id;
+    irr::SEvent     m_irr_events[2];
+    bool            m_shut;
 
 public:
     WiimoteManager();
@@ -47,8 +56,12 @@ public:
     int  getNbWiimotes() const   {return m_nb_wiimotes;}
     
 private:
-    void handleEvent(wiimote_t* wm, int gamepad_id);
+    void translateEvent(wiimote_t* wm, int gamepad_id, irr::SEvent* event);
     int  getGamepadId(int wiimote_id) const {return wiimote_id + m_initial_nb_gamepads;}
+    void resetEvent(irr::SEvent* event, int gamepad_id);
+    
+    void threadFunc();
+    static void* threadFuncWrapper(void* data);
 };
 
 extern WiimoteManager* wiimote_manager;
