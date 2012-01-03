@@ -205,6 +205,18 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 // ----------------------------------------------------------------------------
 btScalar btKart::rayCast(btWheelInfo& wheel)
 {
+    // Work around a bullet problem: when using a convex hull the raycast
+    // would sometimes hit the chassis (which does not happen when using a
+    // box shape). Therefore set the collision mask in the chassis body so
+    // that it is not hit anymore.
+    short int old_group=0;
+    if(m_chassisBody->getBroadphaseHandle())
+    {
+        old_group = m_chassisBody->getBroadphaseHandle()
+                                 ->m_collisionFilterGroup;
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
+
     updateWheelTransformsWS( wheel,false);
 
     
@@ -292,6 +304,11 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
         wheel.m_clippedInvContactDotSuspension = btScalar(1.0);
     }
 
+    if(m_chassisBody->getBroadphaseHandle())
+    {
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup 
+            = old_group;
+    }
     return depth;
 }   // rayCast
 
@@ -321,7 +338,7 @@ void btKart::updateVehicle( btScalar step )
     m_num_wheels_on_ground = 0;
     for (int i=0;i<m_wheelInfo.size();i++)
     {
-        btScalar depth; 
+        btScalar depth;
         depth = rayCast( m_wheelInfo[i]);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
