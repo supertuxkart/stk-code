@@ -538,7 +538,13 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
  */
 scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 {
-    return getAnimatedMesh(filename)->getMesh(0);
+    IAnimatedMesh* am = getAnimatedMesh(filename);
+    if (am == NULL)
+    {
+        fprintf(stderr, "ERROR: cannot load mesh <%s>\n", filename.c_str());
+        return NULL;
+    }
+    return am->getMesh(0);
 }   // getMesh
 
 // ----------------------------------------------------------------------------
