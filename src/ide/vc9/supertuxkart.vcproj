@@ -511,26 +511,6 @@
 						>
 					</File>
 				</Filter>
-				<Filter
-					Name="input"
-					>
-					<File
-						RelativePath="..\..\input\binding.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\input\device_manager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\input\input_device.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\input\input_manager.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="challenges"
@@ -1383,6 +1363,22 @@
 			<Filter
 				Name="input"
 				>
+				<File
+					RelativePath="..\..\input\binding.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\device_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\input\wiimote_manager.cpp"
 					>
