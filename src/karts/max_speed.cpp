@@ -91,7 +91,7 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
 
 // ----------------------------------------------------------------------------
 /** Handles the update of speed increase objects. The m_duration variable
- *  contains the remaining time - as long as this variable is positibe,
+ *  contains the remaining time - as long as this variable is positive
  *  the maximum speed increase applies, while when it is between
  *  -m_fade_out_time and 0, the maximum speed will linearly decrease.
  *  \param dt Time step size.
@@ -99,7 +99,7 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
 void MaxSpeed::SpeedIncrease::update(float dt)
 {
     m_duration -= dt;
-    // ENd of increased max speed reached.
+    // End of increased max speed reached.
     if(m_duration < -m_fade_out_time)
     {
         m_current_speedup = 0;

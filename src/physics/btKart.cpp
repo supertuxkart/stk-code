@@ -482,11 +482,11 @@ btWheelInfo& btKart::getWheelInfo(int index)
 }
 
 // ----------------------------------------------------------------------------
-void btKart::setBrake(btScalar brake,int wheelIndex)
+void btKart::setAllBrakes(btScalar brake)
 {
-    btAssert((wheelIndex >= 0) && (wheelIndex < getNumWheels()));
-    getWheelInfo(wheelIndex).m_brake = brake;
-}
+    for(int i=0; i<getNumWheels(); i++)
+        getWheelInfo(i).m_brake = brake;
+}   // setAllBrakes
 
 
 // ----------------------------------------------------------------------------

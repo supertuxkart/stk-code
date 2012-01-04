@@ -302,7 +302,7 @@ void World::onGo()
     // from sliding downhill)
     for(unsigned int i=0; i<m_karts.size(); i++) 
     {
-        m_karts[i]->resetBrakes();
+        m_karts[i]->getVehicle()->setAllBrakes(0);
     }
 }   // onGo
 

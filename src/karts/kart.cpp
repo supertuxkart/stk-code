@@ -384,32 +384,29 @@ void Kart::flyDown()
  */
 void Kart::startEngineSFX()
 {
-    if(m_engine_sound)
+    if(!m_engine_sound)
+        return;
+
+    // In multiplayer mode, sounds are NOT positional (because we have 
+    // multiple listeners) so the engine sounds of all AIs is constantly 
+    // heard. So reduce volume of all sounds.
+    if (race_manager->getNumLocalPlayers() > 1)
     {
-        // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
-        // so the engine sounds of all AIs is constantly heard. So reduce volume of all sounds.
-        if (race_manager->getNumLocalPlayers() > 1)
-        {
-            const int np = race_manager->getNumLocalPlayers();
-            const int nai = race_manager->getNumberOfKarts() - np;
-            
-            // player karts twice as loud as AIs toghether
-            const float players_volume = (np * 2.0f) / (np*2.0f + np);
-            
-            if (m_controller->isPlayerController())
-            {
-                m_engine_sound->volume( players_volume / np );
-            }
-            else
-            {
-                m_engine_sound->volume( (1.0f - players_volume) / nai );
-            }
-        }
-        
-        m_engine_sound->speed(0.6f);
-        m_engine_sound->setLoop(true);
-        m_engine_sound->play();
+        const int np = race_manager->getNumLocalPlayers();
+        const int nai = race_manager->getNumberOfKarts() - np;
+
+        // player karts twice as loud as AIs toghether
+        const float players_volume = (np * 2.0f) / (np*2.0f + np);
+
+        if (m_controller->isPlayerController())
+            m_engine_sound->volume( players_volume / np );
+        else
+            m_engine_sound->volume( (1.0f - players_volume) / nai );
     }
+
+    m_engine_sound->speed(0.6f);
+    m_engine_sound->setLoop(true);
+    m_engine_sound->play();
 }   // startEngineSFX
 
 // ----------------------------------------------------------------------------
@@ -600,7 +597,7 @@ void Kart::reset()
     m_vehicle->deactivateZipper();
 
     // Set the brakes so that karts don't slide downhill
-    for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
+    m_vehicle->setAllBrakes(5.0f);
 
     setTrans(m_reset_transform);
 
@@ -1422,17 +1419,6 @@ void Kart::setSlipstreamEffect(float f)
 }   // setSlipstreamEffect
 
 // -----------------------------------------------------------------------------
-/** This function is called when the race starts. Up to then all brakes are
-    braking (to avoid the kart from rolling downhill), but they need to be set
-    to zero (otherwise the brakes will be braking whenever no engine force
-    is set, i.e. the kart is not accelerating).
-    */
-void Kart::resetBrakes()
-{
-    for(int i=0; i<4; i++) m_vehicle->setBrake(0.0f, i);
-}   // resetBrakes
-
-// -----------------------------------------------------------------------------
 /** Called when the kart crashes against the track (k=NULL) or another kart.
  *  \param k Either a kart if a kart was hit, or NULL if the track was hit.
  *  \param m 
@@ -1597,10 +1583,186 @@ void Kart::updatePhysics(float dt)
             m_vehicle->activateZipper(f);
         MaxSpeed::increaseMaxSpeed(MS_INCREASE_ZIPPER, 0.9f*f,
                                    5.0f, 5.0f);
-
     }
 
     m_bounce_back_time-=dt;
+
+    updateEnginePowerAndBrakes(dt);
+    
+    // apply flying physics if relevant
+    if (m_flying)
+        updateFlying();    
+    
+    updateSkidding(dt);
+    updateSliding();
+
+    float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
+
+    m_vehicle->setSteeringValue(steering, 0);
+    m_vehicle->setSteeringValue(steering, 1);
+
+    // Handle skidding
+    float ang_vel = 0;
+    if(m_controls.m_drift)
+    {
+        if(m_controls.m_steer>0)
+            ang_vel =  m_kart_properties->getSkidAngularVelocity();
+        else if (m_controls.m_steer<0)
+            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
+    }
+
+    m_vehicle->setSkidAngularVelocity(ang_vel);
+
+    // Only compute the current speed if this is not the client. On a client the
+    // speed is actually received from the server.
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
+        m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+
+    // calculate direction of m_speed
+    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
+    btVector3 forwardW (
+               chassisTrans.getBasis()[0][2],
+               chassisTrans.getBasis()[1][2],
+               chassisTrans.getBasis()[2][2]);
+
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
+        m_speed *= -1.f;
+
+    // Cap speed if necessary
+    MaxSpeed::update(dt);
+
+    // To avoid tunneling (which can happen on long falls), clamp the
+    // velocity in Y direction. Tunneling can happen if the Y velocity
+    // is larger than the maximum suspension travel (per frame), since then
+    // the wheel suspension can not stop/slow down the fall (though I am
+    // not sure if this is enough in all cases!). So the speed is limited
+    // to suspensionTravel / dt with dt = 1/60 (since this is the dt
+    // bullet is using).
+    // Only apply if near ground instead of purely based on speed avoiding
+    // the "parachute on top" look.
+    const Vec3 &v = m_body->getLinearVelocity();
+    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
+    {
+        Vec3 v_clamped = v;
+        // clamp the speed to 99% of the maxium falling speed.
+        v_clamped.setY(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
+        m_body->setLinearVelocity(v_clamped);
+    }
+
+    //at low velocity, forces on kart push it back and forth so we ignore this
+    if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
+         m_speed = 0;
+    updateEngineSFX();
+#ifdef XX
+    printf("forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
+       ,m_vehicle->m_forwardImpulse[0]
+       ,m_vehicle->m_forwardImpulse[1]
+       ,m_vehicle->m_forwardImpulse[2]
+       ,m_vehicle->m_forwardImpulse[3]
+       ,m_vehicle->m_sideImpulse[0]
+       ,m_vehicle->m_sideImpulse[1]
+       ,m_vehicle->m_sideImpulse[2]
+       ,m_vehicle->m_sideImpulse[3]
+       ,m_body->getAngularVelocity().getX()
+       ,m_body->getAngularVelocity().getY()
+       ,m_body->getAngularVelocity().getZ()
+       ,getHeading()
+       );
+#endif
+    
+}   // updatePhysics
+
+//-----------------------------------------------------------------------------
+/** Adjust the engine sound effect depending on the speed of the kart.
+ */
+void Kart::updateEngineSFX()
+{
+    // when going faster, use higher pitch for engine
+    if(!m_engine_sound || !sfx_manager->sfxAllowed())
+        return;
+
+    if(isOnGround())
+    {
+        float max_speed = MaxSpeed::getCurrentMaxSpeed();
+        // Engine noise is based half in total speed, half in fake gears:
+        // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
+        // ignoring the gear settings from stk_config, but providing a
+        // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
+        // it a "staired sawtooth", so more acoustically rich.
+        float f = m_speed/max_speed;
+        // Speed at this stage is not yet capped, so it can be > 1, which 
+        // results in odd engine sfx.
+        if (f>1.0f) f=1.0f;
+
+        float gears = 3.0f * fmod(f, 0.333334f);
+        m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
+    }
+    else
+    {
+        // When flying, fixed value but not too high pitch
+        // This gives some variation (vs previous "on wheels" one)
+        m_engine_sound->speed(0.9f);
+    }
+    m_engine_sound->position(getXYZ());
+}   // updateEngineSFX
+
+//-----------------------------------------------------------------------------
+/** Handles skidding.
+ */
+void Kart::updateSkidding(float dt)
+{
+    // Skid a little when hitting a bubblegum (just enough to make the 
+    // skiding sound)
+    if (m_bubblegum_time > 0.0f) m_skidding *= 1.08f;
+
+    // Still going forward while braking: skid a little when the brakes
+    // are hit (just enough to make the skiding sound)
+    if(!m_controls.m_accel && m_controls.m_brake && m_speed > 0.0f)
+        m_skidding *= 1.08f;
+
+    if (isOnGround())
+    {
+        if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
+        {
+            m_skidding +=  m_kart_properties->getSkidIncrease()
+                          *dt/m_kart_properties->getTimeTillMaxSkid();
+        }
+        else if(m_skidding>1.0f)
+        {
+            m_skidding *= m_kart_properties->getSkidDecrease();
+        }
+    }
+    else
+    {
+        m_skidding = 1.0f; // Lose any skid factor as soon as we fly
+    }
+
+    if(m_skidding>m_kart_properties->getMaxSkid())
+        m_skidding = m_kart_properties->getMaxSkid();
+    else 
+        if(m_skidding<1.0f) m_skidding=1.0f;
+
+    if(m_skidding>1.0f)
+    {
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
+            m_kart_properties->hasSkidmarks())
+            m_skid_sound->play();
+    }
+    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_skid_sound->stop();
+    }
+
+
+
+}   // updateSkidding
+
+//-----------------------------------------------------------------------------
+/** Sets the engine power. It considers the engine specs, items that influence
+ *  the available power, and braking/steering.
+ */
+void Kart::updateEnginePowerAndBrakes(float dt)
+{
     float engine_power = getActualWheelForce() + handleNitro(dt)
                        + m_slipstream->getSlipstreamPower();
 
@@ -1613,67 +1775,21 @@ void Kart::updatePhysics(float dt)
     {
         engine_power = 0.0f;
         m_body->applyTorque(btVector3(0.0, 500.0f, 0.0));
-        m_skidding *= 1.08f; //skid a little when hitting a bubblegum (just enough to make the skiding sound)
     }
-    
-    // apply flying physics if relevant
-    if (m_flying)
-    {
-        if (m_controls.m_accel)
-        {
-            float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0, 60.0f*cos(orientation)));
-        }
-        if (m_controls.m_steer != 0.0f)
-        {
-            m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
-        }
-        if (m_controls.m_brake)
-        {
-            btVector3 velocity = m_body->getLinearVelocity(); 
-            
-            const float x = velocity.x();
-            if (x > 0.2f)        velocity.setX(x - 0.2f);
-            else if (x < -0.2f)  velocity.setX(x + 0.2f);
-            else                 velocity.setX(0);
-            
-            const float y = velocity.y();
-            if (y > 0.2f)        velocity.setY(y - 0.2f);
-            else if (y < -0.2f)  velocity.setY(y + 0.2f);
-            else                 velocity.setY(0);
-            
-            const float z = velocity.z();
-            if (z > 0.2f)        velocity.setZ(z - 0.2f);
-            else if (z < -0.2f)  velocity.setZ(z + 0.2f);
-            else                 velocity.setZ(0);
-            
-            m_body->setLinearVelocity(velocity);
-            
-            //float orientation = getHeading();
-            //m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0, -60.0f*cos(orientation)));
-        }
-
-        // dampen any roll while flying, makes the kart hard to control
-        btVector3 velocity = m_body->getAngularVelocity();  
-        velocity.setX(0);
-        velocity.setZ(0);
-        m_body->setAngularVelocity(velocity);
-    }
-    
-    
+        
     if(m_controls.m_accel)   // accelerating
     {
         // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
         if(m_bounce_back_time>0.0f)
             engine_power = 0.0f;
-        // let a player going backwards accelerate quickly (e.g. if a player hits a
-        // wall, he needs to be able to start again quickly after going backwards)
+        // let a player going backwards accelerate quickly (e.g. if a player 
+        // hits a wall, he needs to be able to start again quickly after
+        // going backwards)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the adventage
-        // Up to r5483 AIs were allowed to cheat in medium and high diff levels
         if(m_controls.m_drift)
             engine_power *= 0.5f;
 
@@ -1683,28 +1799,27 @@ void Kart::updatePhysics(float dt)
         // resetting all brakes most of the time.
         if(m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
-            resetBrakes();
+            m_vehicle->setAllBrakes(0);
     }
     else
     {   // not accelerating
         if(m_controls.m_brake)
-        {   // check if the player is currently only slowing down or moving backwards
+        {   // check if the player is currently only slowing down 
+            // or moving backwards
             if(m_speed > 0.0f)
-            {   // going forward
+            {   // Still going forward while braking
                 applyEngineForce(0.f);
 
                 //apply the brakes
-                for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor(), i);
-                m_skidding*= 1.08f;//skid a little when the brakes are hit (just enough to make the skiding sound)
-                if(m_skidding>m_kart_properties->getMaxSkid())
-                    m_skidding=m_kart_properties->getMaxSkid();
+                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor());
             }
             else   // m_speed < 0
             {
-                resetBrakes();
-                // going backward, apply reverse gear ratio (unless he goes too fast backwards)
+                m_vehicle->setAllBrakes(0);
+                // going backward, apply reverse gear ratio (unless he goes 
+                // too fast backwards)
                 if ( -m_speed <  MaxSpeed::getCurrentMaxSpeed()
-                                 *m_kart_properties->getMaxSpeedReverseRatio() )
+                                 *m_kart_properties->getMaxSpeedReverseRatio())
                 {
                     // The backwards acceleration is artificially increased to
                     // allow players to get "unstuck" quicker if they hit e.g.
@@ -1724,42 +1839,18 @@ void Kart::updatePhysics(float dt)
             applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
-            // we are "parking" the kart, so in battle mode we can ambush people, eg
-            if(abs(m_speed) < 5.0f) {
-                for(int i=0; i<4; i++) m_vehicle->setBrake(20.0f, i);
-            }
+            // we are "parking" the kart, so in battle mode we can ambush people
+            if(abs(m_speed) < 5.0f) 
+                m_vehicle->setAllBrakes(20.0f);
         }   // !m_brake
     }   // not accelerating
-    if (isOnGround())
-    {
-        if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
-        {
-            m_skidding +=  m_kart_properties->getSkidIncrease()
-                          *dt/m_kart_properties->getTimeTillMaxSkid();
-            if(m_skidding>m_kart_properties->getMaxSkid())
-                m_skidding=m_kart_properties->getMaxSkid();
-        }
-        else if(m_skidding>1.0f)
-        {
-            m_skidding *= m_kart_properties->getSkidDecrease();
-            if(m_skidding<1.0f) m_skidding=1.0f;
-        }
-    }
-    else
-    {
-        m_skidding = 1.0f; // Lose any skid factor as soon as we fly
-    }
-    if(m_skidding>1.0f)
-    {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
-            m_kart_properties->hasSkidmarks())
-            m_skid_sound->play();
-    }
-    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
-    {
-        m_skid_sound->stop();
-    }
-    
+}   // updateEnginePowerAndBrakes
+
+//-----------------------------------------------------------------------------
+/** Handles sliding, i.e. the kart sliding off terrain that is too steep.
+ */
+void Kart::updateSliding()
+{
     // dynamically determine friction so that the kart looses its traction 
     // when trying to drive on too steep surfaces. Below angles of 0.25 rad, 
     // you have full traction; above 0.5 rad angles you have absolutely none; 
@@ -1805,111 +1896,55 @@ void Kart::updatePhysics(float dt)
     }
     
     m_vehicle->setSliding(enable_sliding);
-
-    float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
-
-    m_vehicle->setSteeringValue(steering, 0);
-    m_vehicle->setSteeringValue(steering, 1);
-
-    // Handle skidding
-    float ang_vel = 0;
-    if(m_controls.m_drift)
-    {
-        if(m_controls.m_steer>0)
-            ang_vel =  m_kart_properties->getSkidAngularVelocity();
-        else if (m_controls.m_steer<0)
-            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
-    }
-    m_vehicle->setSkidAngularVelocity(ang_vel);
-
-    // Only compute the current speed if this is not the client. On a client the
-    // speed is actually received from the server.
-    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-        m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-
-    // calculate direction of m_speed
-    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
-    btVector3 forwardW (
-               chassisTrans.getBasis()[0][2],
-               chassisTrans.getBasis()[1][2],
-               chassisTrans.getBasis()[2][2]);
-
-    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
-        m_speed *= -1.f;
-
-    // Cap speed if necessary
-    MaxSpeed::update(dt);
-
-    // To avoid tunneling (which can happen on long falls), clamp the
-    // velocity in Y direction. Tunneling can happen if the Y velocity
-    // is larger than the maximum suspension travel (per frame), since then
-    // the wheel suspension can not stop/slow down the fall (though I am
-    // not sure if this is enough in all cases!). So the speed is limited
-    // to suspensionTravel / dt with dt = 1/60 (since this is the dt
-    // bullet is using).
-    // Only apply if near ground instead of purely based on speed avoiding
-    // the "parachute on top" look.
-    const Vec3 &v = m_body->getLinearVelocity();
-    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
-    {
-        Vec3 v_clamped = v;
-        // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setY(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
-        m_body->setLinearVelocity(v_clamped);
-    }
-
-    //at low velocity, forces on kart push it back and forth so we ignore this
-    if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
-         m_speed = 0;
-
-    // when going faster, use higher pitch for engine
-    if(m_engine_sound && sfx_manager->sfxAllowed())
-    {
-        if(isOnGround())
-        {
-            float max_speed = MaxSpeed::getCurrentMaxSpeed();
-            // Engine noise is based half in total speed, half in fake gears:
-            // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
-            // ignoring the gear settings from stk_config, but providing a
-            // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
-            // it a "staired sawtooth", so more acoustically rich.
-            float f = m_speed/max_speed;
-            // Speed at this stage is not yet capped, so it can be > 1, which 
-            // results in odd engine sfx.
-            if (f>1.0f) f=1.0f;
-
-            float gears = 3.0f * fmod(f, 0.333334f);
-            m_engine_sound->speed(0.6f + (f +gears)* 0.35f);
-        }
-        else
-        {
-            // When flying, fixed value but not too high pitch
-            // This gives some variation (vs previous "on wheels" one)
-            m_engine_sound->speed(0.9f);
-        }
-        m_engine_sound->position(getXYZ());
-    }
-#ifdef XX
-    printf("forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
-       ,m_vehicle->m_forwardImpulse[0]
-       ,m_vehicle->m_forwardImpulse[1]
-       ,m_vehicle->m_forwardImpulse[2]
-       ,m_vehicle->m_forwardImpulse[3]
-       ,m_vehicle->m_sideImpulse[0]
-       ,m_vehicle->m_sideImpulse[1]
-       ,m_vehicle->m_sideImpulse[2]
-       ,m_vehicle->m_sideImpulse[3]
-       ,m_body->getAngularVelocity().getX()
-       ,m_body->getAngularVelocity().getY()
-       ,m_body->getAngularVelocity().getZ()
-       ,getHeading()
-       );
-#endif
-    
-}   // updatePhysics
-
+}   // updateSliding
 
 //-----------------------------------------------------------------------------
+/** Adjusts kart translation if the kart is flying (in debug mode).
+ */
+void Kart::updateFlying()
+{
+    if (m_controls.m_accel)
+    {
+        float orientation = getHeading();
+        m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0, 
+                                              60.0f*cos(orientation)));
+    }
+    if (m_controls.m_steer != 0.0f)
+    {
+        m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
+    }
+    if (m_controls.m_brake)
+    {
+        btVector3 velocity = m_body->getLinearVelocity(); 
+
+        const float x = velocity.x();
+        if (x > 0.2f)        velocity.setX(x - 0.2f);
+        else if (x < -0.2f)  velocity.setX(x + 0.2f);
+        else                 velocity.setX(0);
+
+        const float y = velocity.y();
+        if (y > 0.2f)        velocity.setY(y - 0.2f);
+        else if (y < -0.2f)  velocity.setY(y + 0.2f);
+        else                 velocity.setY(0);
+
+        const float z = velocity.z();
+        if (z > 0.2f)        velocity.setZ(z - 0.2f);
+        else if (z < -0.2f)  velocity.setZ(z + 0.2f);
+        else                 velocity.setZ(0);
+
+        m_body->setLinearVelocity(velocity);
+
+    }   // if brake
+
+    // dampen any roll while flying, makes the kart hard to control
+    btVector3 velocity = m_body->getAngularVelocity();  
+    velocity.setX(0);
+    velocity.setZ(0);
+    m_body->setAngularVelocity(velocity);
+
+}   // updateFlying
+
+// ----------------------------------------------------------------------------
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
  */

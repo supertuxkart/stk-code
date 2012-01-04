@@ -151,7 +151,7 @@ public:
     btWheelInfo&       getWheelInfo(int index);
     void               updateWheelTransformsWS(btWheelInfo& wheel,
                                               bool interpolatedTransform=true);
-    void               setBrake(btScalar brake,int wheelIndex);
+    void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
 public:

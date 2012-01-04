@@ -208,6 +208,11 @@ private:
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
     void          handleMaterialGFX();
+    void          updateFlying();
+    void          updateSliding();
+    void          updateSkidding(float dt);
+    void          updateEnginePowerAndBrakes(float dt);
+    void          updateEngineSFX();
 
 protected:
     const KartProperties *m_kart_properties;
@@ -236,7 +241,6 @@ public:
     virtual void flyUp();
     virtual void flyDown();
     
-    void           resetBrakes      ();
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);
     void           capSpeed         (float max_speed);
@@ -338,9 +342,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum engine power for this kart. */
     float getMaxPower     () const {return m_kart_properties->getMaxPower(); }
-    // ------------------------------------------------------------------------
-    /** Returns the strenght of the brakes for this kart. */
-    float getBrakeFactor() const {return m_kart_properties->getBrakeFactor();}
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart. */
     float getTimeFullSteer() const 
