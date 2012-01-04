@@ -755,12 +755,11 @@ void btKart::updateFriction(btScalar timeStep)
         av.setY(m_skid_angular_velocity);
         m_chassisBody->setAngularVelocity(av);
     }
-    else if (sliding)
+    else if (sliding && m_allow_sliding)
     {
         for (int wheel = 0; wheel < getNumWheels(); wheel++)
         {
             if (m_sideImpulse[wheel] != btScalar(0.)       &&
-                m_allow_sliding                            &&
                 m_wheelInfo[wheel].m_skidInfo< btScalar(1.)   )
             {
                 m_forwardImpulse[wheel] *= m_wheelInfo[wheel].m_skidInfo;
