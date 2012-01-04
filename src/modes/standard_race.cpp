@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "items/powerup_manager.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()

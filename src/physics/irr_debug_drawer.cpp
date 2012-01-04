@@ -18,6 +18,7 @@
 
 #include "physics/irr_debug_drawer.hpp"
 
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 
 IrrDebugDrawer::IrrDebugDrawer()

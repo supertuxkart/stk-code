@@ -26,6 +26,7 @@
 #include "config/stk_config.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/overworld.hpp"

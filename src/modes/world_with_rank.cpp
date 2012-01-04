@@ -17,6 +17,7 @@
 
 #include "modes/world_with_rank.hpp"
 
+#include "karts/kart.hpp"
 #include "race/history.hpp"
 
 #include <iostream>

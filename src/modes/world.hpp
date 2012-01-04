@@ -28,13 +28,14 @@
 #include <vector>
 
 #include "modes/world_status.hpp"
-#include "network/network_kart.hpp"
 #include "physics/physics.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/random_generator.hpp"
 
 class btRigidBody;
+class Controller;
 class Kart;
 class Track;
 
