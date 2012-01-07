@@ -44,6 +44,7 @@ public:
         return s;
     }   // toString
     // ------------------------------------------------------------------------
+    /** In integer seconds  */
     static TimeType getTimeSinceEpoch()
     {
 #ifdef WIN32
@@ -71,7 +72,56 @@ public:
         return tv.tv_sec;
 #endif
     };   // getTimeSinceEpoch
-
+    // ------------------------------------------------------------------------
+    /** In floating point seconds  */
+    static double getFloatTimeSinceEpoch(long startAt=0)
+    {
+#ifdef WIN32
+        FILETIME ft;
+        GetSystemTimeAsFileTime(&ft);
+        __int64 t = ft.dwHighDateTime;
+        t <<= 32;
+        t /= 10;
+        // The Unix epoch starts on Jan 1 1970.  Need to subtract 
+        // the difference in seconds from Jan 1 1601.
+#       if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#       else
+#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#       endif
+        t -= DELTA_EPOCH_IN_MICROSECS;
+        
+        t |= ft.dwLowDateTime;
+        // Convert to seconds since epoch
+        float f = (float)(double(t) / 1000000.0);
+        return tf;
+#else
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        int millis = (tv.tv_sec - startAt)*1000 + tv.tv_usec/1000;
+        return millis/1000.0;
+#endif
+    };   // getTimeSinceEpoch
+    
+    class ScopeProfiler
+    {
+        float m_time;
+    public:
+        ScopeProfiler(const char* name)
+        {
+            printf("%s {\n", name);
+            // 1325966438 is an arbitrary time that is in the past but much after 1970
+            // to get smaller numbers in order to not lose the precision of float
+            m_time = getFloatTimeSinceEpoch(1325966438);
+        }
+        
+        ~ScopeProfiler()
+        {
+            float f2 = getFloatTimeSinceEpoch(1325966438);
+            printf("} // took %f s\n", (f2 - m_time));
+        }
+    };
+    
 };   // namespace time
 #endif
 
