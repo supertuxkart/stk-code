@@ -51,9 +51,10 @@ public:
                      const btVector3 &t3, const btVector3 &n1,
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
-    void createCollisionShape(bool create_collision_object=true);
+    void createCollisionShape(bool create_collision_object=true, const char* serialized_bhv=NULL);
     void createPhysicalBody(btCollisionObject::CollisionFlags flags=
-                               (btCollisionObject::CollisionFlags)0);
+                               (btCollisionObject::CollisionFlags)0,
+                            const char* serializedBhv = NULL);
     void removeAll();
     void removeCollisionObject();
     btVector3 getInterpolatedNormal(unsigned int index,

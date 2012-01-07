@@ -21,6 +21,9 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "modes/world.hpp"
+#include "utils/constants.hpp"
+#include "utils/time.hpp"
+#include <fstream>
 
 // -----------------------------------------------------------------------------
 /** Constructor: Initialises all data structures with zero.
@@ -70,8 +73,10 @@ void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
 // -----------------------------------------------------------------------------
 /** Creates a collision body only, which can be used for raycasting, but
  *  has no physical properties.
+ *  @param serialized_bhv if non-null, load the serialized bhv from file instead
+ *                        of builing it on the fly
  */
-void TriangleMesh::createCollisionShape(bool create_collision_object)
+void TriangleMesh::createCollisionShape(bool create_collision_object, const char* serialized_bhv)
 {
     if(m_triangleIndex2Material.size()==0)
     {
@@ -82,7 +87,51 @@ void TriangleMesh::createCollisionShape(bool create_collision_object)
         return;
     }
     // Now convert the triangle mesh into a static rigid body
-    m_collision_shape = new btBvhTriangleMeshShape(&m_mesh, true);
+    btBvhTriangleMeshShape* bhv_triangle_mesh;
+
+    if (serialized_bhv != NULL)
+    {
+        FILE *f = fopen(serialized_bhv, "rb");
+        fseek(f, 0, SEEK_END);
+        long pos = ftell(f);
+        fseek(f, 0, SEEK_SET);
+                
+        void* bytes = btAlignedAlloc(pos, 16);
+        fread(bytes, pos, 1, f);
+        fclose(f);
+        
+        btOptimizedBvh* bhv = btOptimizedBvh::deSerializeInPlace(bytes, pos, !IS_LITTLE_ENDIAN);
+        bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, true /* useQuantizedAabbCompression */,
+                                                       false /* buildBvh */);
+        assert(bhv->isQuantized());
+        bhv_triangle_mesh->setOptimizedBvh( bhv );
+        
+        // Do *NOT* free the bytes, 'deSerializeInPlace' makes the btOptimizedBvh object
+        // directly at this memory location
+        //free(bytes);
+        
+    }
+    else
+    {
+        bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, true /* useQuantizedAabbCompression */);
+
+        /*
+         // code to serialize triangle mesh
+        btOptimizedBvh* bvh = bhv_triangle_mesh->getOptimizedBvh();
+        unsigned int ssize = bvh->calculateSerializeBufferSize();
+        char* buffer = (char*)btAlignedAlloc(ssize, 16);
+        bool success = bvh->serialize(buffer, ssize, !IS_LITTLE_ENDIAN);
+        printf("serialization success = %i\n", success);
+        
+        std::ofstream fileout("/tmp/btOptimizedBvh");
+        fileout.write(buffer, ssize);
+        fileout.close();
+        
+        btAlignedFree(buffer);
+         */
+    }
+    
+    m_collision_shape = bhv_triangle_mesh;
     m_collision_shape->setUserPointer(&m_user_pointer);
     if(create_collision_object)
     {
@@ -91,6 +140,8 @@ void TriangleMesh::createCollisionShape(bool create_collision_object)
         bt.setIdentity();
         m_collision_object->setWorldTransform(bt);
     }
+    
+    
 }   // createCollisionShape
 
 // -----------------------------------------------------------------------------
@@ -102,12 +153,15 @@ void TriangleMesh::createCollisionShape(bool create_collision_object)
  *  removed and all objects together with the track is converted again into
  *  a single rigid body. This avoids using irrlicht (or the graphics engine)
  *  for height of terrain detection).
+ *  @param serializedBhv if non-NULL, the bhv is deserialized instead of
+ *                       being calculated on the fly
  */
-void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags)
+void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
+                                      const char* serializedBhv)
 {
     // We need the collision shape, but not the collision object (since
-    // this will be creates when the dynamics body is anyway).
-    createCollisionShape(/*create_collision_object*/false);
+    // this will be created when the dynamics body is anyway).
+    createCollisionShape(/*create_collision_object*/false, serializedBhv);
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);

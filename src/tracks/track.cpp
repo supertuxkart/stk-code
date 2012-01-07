@@ -881,7 +881,17 @@ bool Track::loadMainTrack(const XMLNode &root)
         exit(-1);
     }
     
-    m_track_mesh->createPhysicalBody();
+    
+    bool use_serialized_bhv = false;
+    std::string serialized_bhv = file_manager->getDataDir() + "tracks/" + m_ident + "/" + m_ident + ".bvh";
+    if (file_manager->fileExists(serialized_bhv))
+    {
+        use_serialized_bhv = true;
+    }
+    
+    m_track_mesh->createPhysicalBody((btCollisionObject::CollisionFlags)0,
+                                     (use_serialized_bhv ? serialized_bhv.c_str() : NULL));
+ 
     m_gfx_effect_mesh->createCollisionShape();
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
     scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
