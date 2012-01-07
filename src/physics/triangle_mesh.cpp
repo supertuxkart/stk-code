@@ -103,7 +103,6 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         btOptimizedBvh* bhv = btOptimizedBvh::deSerializeInPlace(bytes, pos, !IS_LITTLE_ENDIAN);
         bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, true /* useQuantizedAabbCompression */,
                                                        false /* buildBvh */);
-        assert(bhv->isQuantized());
         bhv_triangle_mesh->setOptimizedBvh( bhv );
         
         // Do *NOT* free the bytes, 'deSerializeInPlace' makes the btOptimizedBvh object
