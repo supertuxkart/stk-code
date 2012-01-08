@@ -1051,15 +1051,6 @@ btQuantizedBvh *btQuantizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
 
 	unsigned int calculatedBufSize = bvh->calculateSerializeBufferSize();
 	btAssert(calculatedBufSize <= i_dataBufferSize);
-
-    printf("sizeof(btQuantizedBvh) = %lu\n", sizeof(btQuantizedBvh));
-    printf("sizeof(btQuantizedBvhNode) = %lu\n", sizeof(btQuantizedBvhNode));
-    printf("getAlignmentSerializationPadding() = %i\n", bvh->getAlignmentSerializationPadding());
-    printf("m_subtreeHeaderCount = 0x%x\n", bvh->m_subtreeHeaderCount);
-    printf("sizeof(btBvhSubtreeInfo) = %lu\n",  sizeof(btBvhSubtreeInfo));
-    printf("m_curNodeIndex = %i\n", bvh->m_curNodeIndex);
-    printf("m_bulletVersion = 0x%x\n", bvh->m_bulletVersion);
-    printf("sizeof(NodeArray) = %lu\n", sizeof(NodeArray));
     
 	if (calculatedBufSize > i_dataBufferSize)
 	{
