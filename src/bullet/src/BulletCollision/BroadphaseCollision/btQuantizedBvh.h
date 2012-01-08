@@ -60,10 +60,10 @@ ATTRIBUTE_ALIGNED16	(struct) btQuantizedBvhNode
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	//12 bytes
-	unsigned short int	m_quantizedAabbMin[3];
-	unsigned short int	m_quantizedAabbMax[3];
+	uint16_t	m_quantizedAabbMin[3];
+	uint16_t	m_quantizedAabbMax[3];
 	//4 bytes
-	int	m_escapeIndexOrTriangleIndex;
+	int32_t	m_escapeIndexOrTriangleIndex;
 
 	bool isLeafNode() const
 	{
@@ -101,15 +101,15 @@ ATTRIBUTE_ALIGNED16 (struct) btOptimizedBvhNode
 	btVector3	m_aabbMaxOrg;
 
 	//4
-	int	m_escapeIndex;
+	int32_t	m_escapeIndex;
 
 	//8
 	//for child nodes
-	int	m_subPart;
-	int	m_triangleIndex;
+	int32_t	m_subPart;
+	int32_t	m_triangleIndex;
 
 //pad the size to 64 bytes
-	char	m_padding[20];
+	int8_t	m_padding[20];
 };
 
 
@@ -120,13 +120,13 @@ public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	//12 bytes
-	unsigned short int	m_quantizedAabbMin[3];
-	unsigned short int	m_quantizedAabbMax[3];
+	uint16_t	m_quantizedAabbMin[3];
+	uint16_t	m_quantizedAabbMax[3];
 	//4 bytes, points to the root of the subtree
-	int			m_rootNodeIndex;
+	int32_t			m_rootNodeIndex;
 	//4 bytes
-	int			m_subtreeSize;
-	int			m_padding[3];
+	int32_t			m_subtreeSize;
+	int32_t			m_padding[3];
 
 	btBvhSubtreeInfo()
 	{
