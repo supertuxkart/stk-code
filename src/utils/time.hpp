@@ -74,7 +74,7 @@ public:
     };   // getTimeSinceEpoch
     // ------------------------------------------------------------------------
     /** In floating point seconds  */
-    static double getFloatTimeSinceEpoch(long startAt=0)
+    static float getFloatTimeSinceEpoch(long startAt=0)
     {
 #ifdef WIN32
         FILETIME ft;
@@ -99,7 +99,7 @@ public:
         struct timeval tv;
         gettimeofday(&tv, NULL);
         int millis = (tv.tv_sec - startAt)*1000 + tv.tv_usec/1000;
-        return millis/1000.0;
+        return (float)(millis/1000.0);
 #endif
     };   // getTimeSinceEpoch
     
