@@ -19,6 +19,8 @@ subject to the following restrictions:
 #include "LinearMath/btIDebugDraw.h"
 #include "LinearMath/btSerializer.h"
 
+#include <stdio.h>
+
 #define RAYAABB2
 
 btQuantizedBvh::btQuantizedBvh() : 
