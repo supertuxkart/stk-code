@@ -19,8 +19,6 @@ subject to the following restrictions:
 #include "LinearMath/btIDebugDraw.h"
 #include "LinearMath/btSerializer.h"
 
-#include <stdio.h>
-
 #define RAYAABB2
 
 btQuantizedBvh::btQuantizedBvh() : 
@@ -1035,7 +1033,6 @@ btQuantizedBvh *btQuantizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
 
 	if (i_alignedDataBuffer == NULL)// || (((unsigned)i_alignedDataBuffer & BVH_ALIGNMENT_MASK) != 0))
 	{
-        fprintf(stderr, "[btQuantizedBvh::deSerializeInPlace] ERROR: the buffer is null!\n");
 		return NULL;
 	}
 	btQuantizedBvh *bvh = (btQuantizedBvh *)i_alignedDataBuffer;
@@ -1066,8 +1063,6 @@ btQuantizedBvh *btQuantizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
     
 	if (calculatedBufSize > i_dataBufferSize)
 	{
-        fprintf(stderr, "[btQuantizedBvh::deSerializeInPlace] ERROR: expected %i bytes, got %i!\n",
-                calculatedBufSize, i_dataBufferSize);
 		return NULL;
 	}
 

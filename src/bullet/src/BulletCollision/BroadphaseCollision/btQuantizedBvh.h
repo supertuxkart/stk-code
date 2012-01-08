@@ -200,12 +200,11 @@ protected:
 	btVector3			m_bvhAabbMax;
 	btVector3			m_bvhQuantization;
 
-	int32_t				m_bulletVersion;	//for serialization versioning. It could also be used to detect endianess.
+	int					m_bulletVersion;	//for serialization versioning. It could also be used to detect endianess.
 
-	int32_t				m_curNodeIndex;
+	int					m_curNodeIndex;
 	//quantization data
-    
-	int32_t				m_useQuantization; //!< This is a bool
+	bool				m_useQuantization;
 
 
 
@@ -218,7 +217,7 @@ protected:
 	BvhSubtreeInfoArray		m_SubtreeHeaders;
 
 	//This is only used for serialization so we don't have to add serialization directly to btAlignedObjectArray
-	mutable int32_t m_subtreeHeaderCount;
+	mutable int m_subtreeHeaderCount;
 
 	
 
