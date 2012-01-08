@@ -94,7 +94,7 @@ public:
         t |= ft.dwLowDateTime;
         // Convert to seconds since epoch
         float f = (float)(double(t) / 1000000.0);
-        return tf;
+        return f;
 #else
         struct timeval tv;
         gettimeofday(&tv, NULL);
