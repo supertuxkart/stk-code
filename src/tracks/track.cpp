@@ -880,17 +880,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot loadMainTrack\n");
         exit(-1);
     }
-    
-    
-    bool use_serialized_bhv = false;
-    std::string serialized_bhv = file_manager->getDataDir() + "tracks/" + m_ident + "/" + m_ident + ".bvh";
-    if (file_manager->fileExists(serialized_bhv))
-    {
-        use_serialized_bhv = true;
-    }
-    
-    m_track_mesh->createPhysicalBody((btCollisionObject::CollisionFlags)0,
-                                     (use_serialized_bhv ? serialized_bhv.c_str() : NULL));
  
     m_gfx_effect_mesh->createCollisionShape();
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
@@ -1182,21 +1171,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
         {
-            Item::ItemType type;
-            if     (name=="banana"     ) type = Item::ITEM_BANANA;
-            else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
-            else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
-            else                         type = Item::ITEM_NITRO_BIG;
-            Vec3 xyz;
-            // Set some kind of default in case Z is not defined in the file
-            // (with the new track exporter it always is defined anyway).
-            // Z is the height from which the item is dropped on the track.
-            xyz.setY(1000);
-            node->getXYZ(&xyz);
-            bool drop=true;
-            node->get("drop", &drop);
-            // Height is needed if bit 2 (for z) is not set
-            itemCommand(xyz, type, drop);
+            // will be handled later
         }
         else if (name=="start")
         {
@@ -1336,8 +1311,6 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     m_track_object_manager->assingLodNodes(lod_nodes);
     // ---------------------------------------------
     
-    delete root;
-
     // Init all track objects
     m_track_object_manager->init();
 
@@ -1427,6 +1400,35 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
 
     createPhysicsModel(main_track_count);
+    
+    
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        const std::string name = node->getName();
+        if (name=="banana"      || name=="item" || 
+            name=="small-nitro" || name=="big-nitro")
+        {
+            Item::ItemType type;
+            if     (name=="banana"     ) type = Item::ITEM_BANANA;
+            else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
+            else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
+            else                         type = Item::ITEM_NITRO_BIG;
+            Vec3 xyz;
+            // Set some kind of default in case Z is not defined in the file
+            // (with the new track exporter it always is defined anyway).
+            // Z is the height from which the item is dropped on the track.
+            xyz.setY(1000);
+            node->getXYZ(&xyz);
+            bool drop=true;
+            node->get("drop", &drop);
+            // Height is needed if bit 2 (for z) is not set
+            itemCommand(xyz, type, drop);
+        }
+    }   // for i<root->getNumNodes()
+
+    delete root;
+
     if (UserConfigParams::m_track_debug) QuadGraph::get()->createDebugMesh();
     
     // Only print warning if not in battle mode, since battle tracks don't have
