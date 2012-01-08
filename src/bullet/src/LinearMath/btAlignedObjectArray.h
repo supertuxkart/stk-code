@@ -47,11 +47,11 @@ class btAlignedObjectArray
 {
 	btAlignedAllocator<T , 16>	m_allocator;
 
-	int					m_size;
-	int					m_capacity;
+	int32_t				m_size;
+	int32_t				m_capacity;
 	T*					m_data;
 	//PCK: added this line
-	bool				m_ownsMemory;
+	int32_t				m_ownsMemory; //!< boolean
 
 	protected:
 		SIMD_FORCE_INLINE	int	allocSize(int size)
