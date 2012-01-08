@@ -1062,9 +1062,10 @@ btQuantizedBvh *btQuantizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
         printf("sizeof(btQuantizedBvh) = %lui\n", sizeof(btQuantizedBvh));
         printf("sizeof(btQuantizedBvhNode) = %lui\n", sizeof(btQuantizedBvhNode));
         printf("getAlignmentSerializationPadding() = %i\n", bvh->getAlignmentSerializationPadding());
-        printf("m_subtreeHeaderCount = %i\n", bvh->m_subtreeHeaderCount);
+        printf("m_subtreeHeaderCount = 0x%x\n", bvh->m_subtreeHeaderCount);
         printf("sizeof(btBvhSubtreeInfo) = %lui\n",  sizeof(btBvhSubtreeInfo));
         printf("m_curNodeIndex = %i\n", bvh->m_curNodeIndex);
+        printf("m_bulletVersion = 0x%x\n", bvh->m_bulletVersion);
 		return NULL;
 	}
 
