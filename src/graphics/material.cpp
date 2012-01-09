@@ -187,7 +187,30 @@ Material::Material(const XMLNode *node, int index)
     node->get("sphere",           &m_sphere_map        );
     node->get("high-adhesion",    &m_high_tire_adhesion);
     node->get("reset",            &m_drive_reset       );
-    node->get("crash-reset",      &m_crash_reset       );
+    
+    // backwards compatibility
+    bool crash_reset = false;
+    node->get("crash-reset",      &crash_reset         );
+    if (crash_reset)
+    {
+        m_collision_reaction = RESCUE;
+    }
+    
+    std::string creaction;
+    node->get("collision-reaction", &creaction);
+    if (creaction == "reset")
+    {
+        m_collision_reaction = RESCUE;
+    }
+    else if (creaction == "push")
+    {
+        m_collision_reaction = PUSH_BACK;
+    }
+    else if (creaction.size() > 0)
+    {
+        fprintf(stderr, "[Material] WARNING: Unknown collision reaction '%s'\n", creaction.c_str());
+    }
+    
     node->get("below-surface",    &m_below_surface     );
     node->get("falling-effect",   &m_falling_effect    );
     // A terrain with falling effect has to force a reset
@@ -207,9 +230,15 @@ Material::Material(const XMLNode *node, int index)
     
     node->get("mask",             &m_mask);
     
-    if (m_crash_reset)
+    if (m_collision_reaction != NORMAL)
     {
-        node->get("crash-reset-particles", &m_crash_reset_particles);
+        node->get("collision-particles", &m_collision_particles);
+        
+        if (m_collision_particles.size() == 0)
+        {
+            // backwards compatibility
+            node->get("crash-reset-particles", &m_collision_particles);
+        }
     }
     
     bool use_normal_map = false;
@@ -369,7 +398,7 @@ void Material::init(unsigned int index)
     m_surface                   = false;
     m_ignore                    = false;
     m_drive_reset               = false;
-    m_crash_reset               = false;
+    m_collision_reaction        = NORMAL;
     m_add                       = false;
     m_disable_z_write           = false;
     m_fog                       = true;

@@ -61,6 +61,13 @@ public:
         EMIT_KINDS_COUNT
     };
     
+    enum CollisionReaction
+    {
+        NORMAL,
+        RESCUE,
+        PUSH_BACK
+    };
+    
 private:
     video::ITexture *m_texture;
     unsigned int     m_index;
@@ -89,10 +96,10 @@ private:
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
     /** If a kart is rescued when crashing into this surface. */
-    bool             m_crash_reset;
+    CollisionReaction m_collision_reaction;
     
-    /** Particles to show on crash-reset */
-    std::string      m_crash_reset_particles;
+    /** Particles to show on touch */
+    std::string      m_collision_particles;
     
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
@@ -219,9 +226,9 @@ public:
     bool  isDriveReset       () const { return m_drive_reset;        }
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
-    bool  isCrashReset       () const { return m_crash_reset;        }
+    CollisionReaction  getCollisionReaction() const { return m_collision_reaction; }
     
-    std::string getCrashResetParticles() const { return m_crash_reset_particles; }
+    std::string getCrashResetParticles() const { return m_collision_particles; }
     
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
     const std::string& 

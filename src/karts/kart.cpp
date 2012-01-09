@@ -1445,7 +1445,7 @@ void Kart::crashed(Kart *k, const Material *m)
      *  long disabling of the engine. Therefore, this reaction is disabled
      *  for 0.5 seconds after a crash.
      */
-    if(m && m->isCrashReset() && !playingEmergencyAnimation())
+    if(m && m->getCollisionReaction() != Material::NORMAL && !playingEmergencyAnimation())
     {
         std::string particles = m->getCrashResetParticles();
         if (particles.size() > 0)
@@ -1470,7 +1470,21 @@ void Kart::crashed(Kart *k, const Material *m)
             }
         }
         
-        forceRescue();
+        if (m->getCollisionReaction() == Material::RESCUE)
+        {
+            forceRescue();
+        }
+        else if (m->getCollisionReaction() == Material::PUSH_BACK)
+        {
+            if (m_bounce_back_time <= 0.0f)
+            {
+            btVector3 push = m_vehicle->getRigidBody()->getLinearVelocity().normalized();
+            push[1] = -0.1f;
+            m_vehicle->getRigidBody()->applyCentralImpulse( -4000.0f*push );
+            //m_vehicle->getRigidBody()->setLinearVelocity( -m_vehicle->getRigidBody()->getLinearVelocity() );
+            m_bounce_back_time = 2.0f;
+            }
+        }
     }
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
