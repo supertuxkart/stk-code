@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "karts/kart.hpp"
 #include "modes/overworld.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 
@@ -45,6 +46,14 @@ OverWorld::~OverWorld()
 void OverWorld::update(float dt)
 {
     LinearWorld::update(dt);
+    
+    const unsigned int kart_amount  = m_karts.size();
+
+    // isn't cool, on the overworld nitro is free!
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        m_karts[n]->setEnergy(100.0f);
+    }
 }   // update
 
 //-----------------------------------------------------------------------------

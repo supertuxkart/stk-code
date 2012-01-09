@@ -91,8 +91,6 @@ private:
     void drawEnergyMeter       (int x, int y, const Kart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
-                                const core::vector2df &scaling);
     
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
