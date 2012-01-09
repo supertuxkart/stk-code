@@ -1479,7 +1479,7 @@ void Kart::crashed(Kart *k, const Material *m)
             if (m_bounce_back_time <= 0.0f)
             {
             btVector3 push = m_vehicle->getRigidBody()->getLinearVelocity().normalized();
-            push[1] = -0.1f;
+            push[1] = 0.1f;
             m_vehicle->getRigidBody()->applyCentralImpulse( -4000.0f*push );
             //m_vehicle->getRigidBody()->setLinearVelocity( -m_vehicle->getRigidBody()->getLinearVelocity() );
             m_bounce_back_time = 2.0f;
