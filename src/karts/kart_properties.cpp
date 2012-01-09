@@ -83,10 +83,9 @@ KartProperties::KartProperties(const std::string &filename)
         m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
-        m_time_till_max_skid =
+        m_time_till_max_skid = m_skid_angular_velocity =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
-        m_skid_angular_velocity = m_skid_bonus_time =
-        m_slipstream_length = m_slipstream_collect_time = 
+        m_skid_visual_time = m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_slipstream_max_speed_increase =
         m_slipstream_duration = m_slipstream_fade_out_time =
@@ -96,6 +95,10 @@ KartProperties::KartProperties(const std::string &filename)
         m_explosion_radius = m_ai_steering_variation = 
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
+
+    m_skid_bonus_time.clear();
+    m_skid_bonus_force.clear();
+    m_skid_time_till_bonus.clear();
 
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_bevel_factor           = Vec3(UNDEFINED);
@@ -296,7 +299,10 @@ void KartProperties::getAllData(const XMLNode * root)
         skid_node->get("max",              &m_skid_max             );
         skid_node->get("time-till-max",    &m_time_till_max_skid   );
         skid_node->get("visual",           &m_skid_visual          );
+        skid_node->get("visual-time",      &m_skid_visual_time     );
         skid_node->get("enable",           &m_has_skidmarks        );
+        skid_node->get("time-till-bonus",  &m_skid_time_till_bonus );
+        skid_node->get("bonus-force",      &m_skid_bonus_force     );
         skid_node->get("bonus-time",       &m_skid_bonus_time      );
         skid_node->get("angular-velocity", &m_skid_angular_velocity);
     }
@@ -625,8 +631,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_increase,              "skid increase"                 );
     CHECK_NEG(m_skid_max,                   "skid max"                      );
     CHECK_NEG(m_skid_visual,                "skid visual"                   );
+    CHECK_NEG(m_skid_visual_time,           "skid visual-time"              );
     CHECK_NEG(m_skid_angular_velocity,      "skid angular-velocity"         );
-    CHECK_NEG(m_skid_bonus_time,            "skid bonus-time"               );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
@@ -660,6 +666,29 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
     CHECK_NEG(m_ai_steering_variation,      "ai steering-variation"         );
 
+    if(m_skid_time_till_bonus.size()==0)
+        fprintf(stderr, "Warning: no skid time declared, can be ignored.\n");
+    if(m_skid_time_till_bonus.size()!=m_skid_bonus_force.size())
+    {
+        fprintf(stderr, "Warning: skid time-till-bonus and bonus-force\n");
+        fprintf(stderr, "         must have same number of elements.\n");
+        exit(-1);
+    }
+    if(m_skid_time_till_bonus.size()!=m_skid_bonus_time.size())
+    {
+        fprintf(stderr, "Warning: skid time-till-bonus and bonus-time must\n");
+        fprintf(stderr, "         have same number of elements.\n");
+        exit(-1);
+    }
+    for(unsigned int i=0; i<m_skid_time_till_bonus.size()-1; i++)
+    {
+        if(m_skid_time_till_bonus[i]>=m_skid_time_till_bonus[i+1])
+        {
+            fprintf(stderr, "Warning: skid time-till-bonus not sorted.\n");
+            exit(-1);
+        }
+    }   // for i
+
 }   // checkAllSet
 
 // ----------------------------------------------------------------------------
@@ -682,6 +711,25 @@ float KartProperties::getMaxSteerAngle(float speed) const
     assert (0);
     return 0;  // avoid compiler warning
 }   // getMaxSteerAngle
+
+// ----------------------------------------------------------------------------
+/** Returns the bonus force to be applied to a kart which has skidded for the
+ *  specified amount of time.
+ *  \param t Time the kart has skidded.
+ */
+void KartProperties::getSkidBonus(float t, float *bonus_time, 
+                                  float *bonus_force) const
+{
+    *bonus_time = 0;
+    *bonus_force = 0;
+    for(unsigned int i=0; i<m_skid_bonus_force.size(); i++)
+    {
+        if(t<=m_skid_time_till_bonus[i]) return ;
+        *bonus_force = m_skid_bonus_force[i];
+        *bonus_time= m_skid_bonus_time[i];
+    }
+    return;
+}   // getSkidBonusForce
 
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches

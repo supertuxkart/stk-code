@@ -561,6 +561,7 @@ void Kart::reset()
     m_bubblegum_time       = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
+    m_skid_time            = 0.0f;
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_has_started          = false;
@@ -1610,22 +1611,22 @@ void Kart::updatePhysics(float dt)
     updateSkidding(dt);
     updateSliding();
 
-    float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
+    float steering;
+    // FIXME: Misuse (for now) the skid visual time to disable the new 
+    //        skidding code
+    if(m_kart_properties->getSkidVisualTime()==0)
+    {
+        steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
+    }
+    else if(m_controls.m_drift)
+    {
+            steering = getMaxSteerAngle() * m_controls.m_steer/sqrt(m_skidding)*1.2f;
+    }
+    else
+        steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding*m_skidding;
 
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
-
-    // Handle skidding
-    float ang_vel = 0;
-    if(m_controls.m_drift)
-    {
-        if(m_controls.m_steer>0)
-            ang_vel =  m_kart_properties->getSkidAngularVelocity();
-        else if (m_controls.m_steer<0)
-            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
-    }
-
-    m_vehicle->setSkidAngularVelocity(ang_vel);
 
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
@@ -1767,8 +1768,37 @@ void Kart::updateSkidding(float dt)
         m_skid_sound->stop();
     }
 
+    // Handle skidding
+    float ang_vel = 0;
+    if(m_controls.m_drift)
+    {
+        m_skid_time += dt;
+        if(m_controls.m_steer>0)
+            ang_vel =  m_kart_properties->getSkidAngularVelocity();
+        else if (m_controls.m_steer<0)
+            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
+    }
+    else if(m_skid_time>0 &&
+        // FIXME hiker: remove once the new skidding code is finished.
+        m_kart_properties->getSkidVisualTime()>0)
+           // See if a skid bonus is applied
+    {
+        float bonus_time, bonus_force;
+        m_kart_properties->getSkidBonus(m_skid_time, 
+                                        &bonus_time, &bonus_force);
+        printf("skid time %f bonus %f bonus-time %f\n",
+            m_skid_time, bonus_time, bonus_force);
+        m_skid_time = 0;
+        if(bonus_time>0)
+        {
+            MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_SKIDDING,
+                                       10, bonus_time, 1);
+            // FIXME hiker: for now just misuse the zipper code
+            handleZipper(0);
+        }
+    }
 
-
+    m_vehicle->setSkidAngularVelocity(ang_vel);
 }   // updateSkidding
 
 //-----------------------------------------------------------------------------
@@ -2010,8 +2040,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
                                           core::vector3df(0.0f, 40.0f, 100.0f),
                                           getNode());
         
-        // FIXME: in multiplayer mode, this will result in several instances of the heightmap being calculated
-        //        and kept in memory
+        // FIXME: in multiplayer mode, this will result in several instances
+        //        of the heightmap being calculated and kept in memory
         m_sky_particles_emitter->addHeightMapAffector(track);
     }
     
@@ -2164,6 +2194,12 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
+    if(m_kart_properties->getSkidVisualTime()>0 &&
+        m_skid_time < m_kart_properties->getSkidVisualTime())
+    {
+        offset_heading *= m_skid_time/m_kart_properties->getSkidVisualTime();
+    }
+
     Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(offset_heading, 0, 0));
     

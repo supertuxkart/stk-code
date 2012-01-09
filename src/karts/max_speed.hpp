@@ -27,12 +27,14 @@ class MaxSpeed
 {
 public:
     /** The categories to use for increasing the speed of a kart:
-     *  Increase due to zipper, slipstream, nitro, rubber band usage. */
+     *  Increase due to zipper, slipstream, nitro, rubber band,
+     *  skidding usage. */
     enum  {MS_INCREASE_MIN,
            MS_INCREASE_ZIPPER = MS_INCREASE_MIN, 
            MS_INCREASE_SLIPSTREAM, 
            MS_INCREASE_NITRO,
            MS_INCREASE_RUBBER,
+           MS_INCREASE_SKIDDING,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:

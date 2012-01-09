@@ -268,9 +268,6 @@ private:
     float m_upright_tolerance;
     float m_upright_max_force;
 
-    /** Additional rotation of 3d model when skidding. */
-    float m_skid_visual;              
-
     /** How far behind a kart slipstreaming is effective. */
     float m_slipstream_length;
     /** Time after which sstream gives a bonus. */
@@ -300,12 +297,25 @@ private:
     float m_time_till_max_skid;
     /** Kart leaves skid marks. */
     bool  m_has_skidmarks;
+    /** Additional rotation of 3d model when skidding. */
+    float m_skid_visual;              
 
+    /** How long it takes for visual skid to reach maximum. */
+    float m_skid_visual_time;
     /** Angular velocity to be applied when skidding. */
     float m_skid_angular_velocity;
 
-    /** Time of skidding before you get a bonus boost. */
-    float m_skid_bonus_time;
+    /** Time of skidding before you get a bonus boost. It's possible to
+     *  define more than one time, i.e. longer skidding gives more bonus. */
+    std::vector<float> m_skid_time_till_bonus;
+
+    /** How much additional speed a kart gets when skidding. It's possible to
+     *  define more than one force, i.e. longer skidding gives more bonus. */
+    std::vector<float> m_skid_bonus_force;
+
+    /** How long the bonus will last. It's possible to define more than one 
+    *   time, i.e. longer skidding gives more bonus. */
+    std::vector<float> m_skid_bonus_time;
 
     /** Make the AI to steer at slightly different points to make it less
      *  likely that the AI creates 'trains' - the kart behind getting 
@@ -348,11 +358,12 @@ public:
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
     void  getAllData        (const XMLNode * root);
-    void  checkAllSet(const std::string &filename);
-    float getStartupBoost()  const;
+    void  checkAllSet       (const std::string &filename);
+    float getStartupBoost   () const;
 
     /** Returns the maximum steering angle (depending on speed). */
-    float getMaxSteerAngle           (float speed) const;
+    float getMaxSteerAngle  (float speed) const;
+    void  getSkidBonus(float t, float *bonus_time, float *bonus_force) const;
 
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }
@@ -589,6 +600,9 @@ public:
 
     /** Returns additional rotation of 3d model when skidding. */
     float getSkidVisual             () const {return m_skid_visual;           }
+    /** Returns the time for the visual skid to reach maximum. */
+
+    float getSkidVisualTime         () const {return m_skid_visual_time;      }
 
     /** Returns how far behind a kart slipstreaming works. */
     float getSlipstreamLength       () const {return m_slipstream_length;     }
@@ -613,6 +627,7 @@ public:
     /** Returns how long the higher speed lasts after slipstream 
      *  stopped working. */
     float getSlipstreamDuration     () const { return m_slipstream_duration;  }
+
     /** Returns how long the slip stream speed increase will gradually 
      *  be reduced. */
     float getSlipstreamFadeOutTime  () const 
@@ -651,9 +666,6 @@ public:
 
     /** Returns the angular velocity to be applied when skidding. */
     float getSkidAngularVelocity() const { return m_skid_angular_velocity;    }
-
-    /** Returns the time of skidding before you get a bonus boost. */
-    float getSkidBonusTime() const { return m_skid_bonus_time; }
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */

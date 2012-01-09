@@ -161,12 +161,16 @@
          max: maximum skidding factor = maximum increase of steering angle.
          time-till-max: Time till maximum skidding is reached.
          visual: Additional graphical rotation of kart.
+         visual-time: How long it takes for the visual skid to reach maximum.
          angular-velocity: Angular velocity to be used for the kart when skidding.
-         bonus-time: How long a kart needs to skid in order to get a bonus.  -->
+         time-till-bonus: How long a kart needs to skid in order to get a bonus.
+         bonus-force: A speedup applied to the kart whick skidded for a while.
+         bonus-time: How long the bonus-force is applied.  -->
 <!-- Note: for now skidding is disabled, set angular-velocity to 2 to test it -->
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
-          visual="0.16"
-          angular-velocity="0"  bonus-time="5"/>
+          visual="0.16" visual-time="0"
+          angular-velocity="0"  time-till-bonus="1.5 2"
+          bonus-force="100 200" bonus-time="3.0 3.0"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit

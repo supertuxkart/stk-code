@@ -76,6 +76,10 @@ private:
     /** Accumulated skidding factor. */
     float        m_skidding;
 
+    /** Keeps track on how long a kart has been skidding, in order to
+     *  trigger the skidding bonus. */
+    float        m_skid_time;
+
     /** The main controller of this object, used for driving. This 
      *  controller is used to run the kart. It will be replaced
      *  with an end kart controller when the kart finishes the race. */
