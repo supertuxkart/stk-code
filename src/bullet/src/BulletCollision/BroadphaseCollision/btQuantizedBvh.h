@@ -41,21 +41,7 @@ class btSerializer;
 #define btQuantizedBvhDataName "btQuantizedBvhFloatData"
 #endif
 
-#ifdef __GNUC__
-#include <stdint.h>
-#elif defined(_MSC_VER)
-typedef __int32 int32_t;
-typedef __int64 int64_t;
-typedef __uint16 uint16_t;
-typedef __int8 int8_t;
-typedef unsigned __int32 uint32_t;
-typedef unsigned __int64 uint64_t;
-#else
-typedef int int32_t;
-typedef long long int int64_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long int uint64_t;
-#endif
+
 
 //http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclang/html/vclrf__m128.asp
 
@@ -74,10 +60,10 @@ ATTRIBUTE_ALIGNED16	(struct) btQuantizedBvhNode
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	//12 bytes
-	uint16_t	m_quantizedAabbMin[3];
-	uint16_t	m_quantizedAabbMax[3];
+	unsigned short int	m_quantizedAabbMin[3];
+	unsigned short int	m_quantizedAabbMax[3];
 	//4 bytes
-	int32_t	m_escapeIndexOrTriangleIndex;
+	int	m_escapeIndexOrTriangleIndex;
 
 	bool isLeafNode() const
 	{
@@ -115,15 +101,15 @@ ATTRIBUTE_ALIGNED16 (struct) btOptimizedBvhNode
 	btVector3	m_aabbMaxOrg;
 
 	//4
-	int32_t	m_escapeIndex;
+	int	m_escapeIndex;
 
 	//8
 	//for child nodes
-	int32_t	m_subPart;
-	int32_t	m_triangleIndex;
+	int	m_subPart;
+	int	m_triangleIndex;
 
 //pad the size to 64 bytes
-	int8_t	m_padding[20];
+	char	m_padding[20];
 };
 
 
@@ -134,13 +120,13 @@ public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	//12 bytes
-	uint16_t	m_quantizedAabbMin[3];
-	uint16_t	m_quantizedAabbMax[3];
+	unsigned short int	m_quantizedAabbMin[3];
+	unsigned short int	m_quantizedAabbMax[3];
 	//4 bytes, points to the root of the subtree
-	int32_t			m_rootNodeIndex;
+	int			m_rootNodeIndex;
 	//4 bytes
-	int32_t			m_subtreeSize;
-	int32_t			m_padding[3];
+	int			m_subtreeSize;
+	int			m_padding[3];
 
 	btBvhSubtreeInfo()
 	{

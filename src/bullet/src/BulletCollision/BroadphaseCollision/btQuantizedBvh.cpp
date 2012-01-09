@@ -1051,7 +1051,7 @@ btQuantizedBvh *btQuantizedBvh::deSerializeInPlace(void *i_alignedDataBuffer, un
 
 	unsigned int calculatedBufSize = bvh->calculateSerializeBufferSize();
 	btAssert(calculatedBufSize <= i_dataBufferSize);
-    
+
 	if (calculatedBufSize > i_dataBufferSize)
 	{
 		return NULL;
