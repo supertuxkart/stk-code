@@ -54,16 +54,38 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_enabled = true;
     m_trophy  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
     
+    
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
     m_marker_ai_size        = (int)( 14.0f * scaling);
-    m_marker_player_size    = (int)( 16.0f * scaling);
-    m_map_width             = (int)(100.0f * scaling);
-    m_map_height            = (int)(100.0f * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
+    m_marker_player_size    = (int)( 24.0f * scaling);
+    m_map_width             = (int)(250.0f * scaling);
+    m_map_height            = (int)(250.0f * scaling);
+    
+    // The location of the minimap varies with number of 
+    // splitscreen players:
+    switch(race_manager->getNumLocalPlayers())
+    {
+        case 0 : // In case of profile mode
+        case 1 : // Lower left corner
+            m_map_left   = 10;
+            m_map_bottom = UserConfigParams::m_height-10;
+            break;
+        case 2:  // Middle of left side
+            m_map_left   = 10;
+            m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
+            break;
+        case 3:  // Lower right quarter (which is not used by a player)
+            m_map_left   = UserConfigParams::m_width/2 + 10;
+            m_map_bottom = UserConfigParams::m_height-10;
+            break;
+        case 4:  // Middle of the screen.
+            m_map_left   = UserConfigParams::m_width/2-m_map_width/2;
+            m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
+            break;
+    }
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -162,32 +184,6 @@ void RaceGUIOverworld::renderPlayerView(const Kart *kart)
     
     //std::cout << "Scale : " << scaling.X << ", " << scaling.Y << std::endl;
     
-    if (kart->hasViewBlockedByPlunger())
-    {        
-        const int screen_width = viewport.LowerRightCorner.X 
-        - viewport.UpperLeftCorner.X;
-        const int plunger_size = (int)(0.6f * screen_width);
-        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
-        - plunger_size/2;
-        
-        int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2 - plunger_size/2;
-        
-        video::ITexture *t=m_plunger_face->getTexture();
-        core::rect<s32> dest(plunger_x,              offset_y, 
-                             plunger_x+plunger_size, offset_y+plunger_size);
-        
-        const core::rect<s32> source(core::position2d<s32>(0,0), 
-                                     t->getOriginalSize());
-        
-        //static const video::SColor white = video::SColor(255, 255, 255, 255);
-        
-        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 
-                                                  &viewport /* clip */, 
-                                                  NULL /* color */, 
-                                                  true /* alpha */);
-    }
-    
-    
     drawAllMessages     (kart, viewport, scaling);
     
     if(!World::getWorld()->isRacePhase()) return;
@@ -249,8 +245,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
     
-    int upper_y = UserConfigParams::m_height - m_map_bottom - m_map_height;
-    int lower_y = UserConfigParams::m_height - m_map_bottom;
+    int upper_y = m_map_bottom - m_map_height;
+    int lower_y = m_map_bottom;
     
     if (mini_map != NULL)
     {
@@ -260,28 +256,56 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     }
     
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    // In the first iteration, only draw AI karts, then only draw
+    // player karts. This guarantees that player kart icons are always
+    // on top of AI kart icons.
+    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1; 
+        only_draw_player_kart++)
     {
-        const Kart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        const Vec3& xyz = kart->getXYZ();
-        Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-        // int marker_height = m_marker->getOriginalSize().Height;
-        core::rect<s32> source(i    *m_marker_rendered_size,
-                               0, 
-                               (i+1)*m_marker_rendered_size, 
-                               m_marker_rendered_size);
-        int marker_half_size = (kart->getController()->isPlayerController() 
-                                ? m_marker_player_size 
-                                : m_marker_ai_size                        )>>1;
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
-                                 m_map_left+(int)(draw_at.getX()+marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
-                                                  NULL, NULL, true);
-    }   // for i<getNumKarts
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        {
+            const Kart *kart = world->getKart(i);
+            if(kart->isEliminated()) continue;   // don't draw eliminated kart
+                                                 // Make sure to only draw AI kart icons first, then
+                                                 // only player karts.
+            if(kart->getController()->isPlayerController() 
+               !=(only_draw_player_kart==1)) continue;
+            const Vec3& xyz = kart->getXYZ();
+            Vec3 draw_at;
+            world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+            
+            core::rect<s32> source(i    *m_marker_rendered_size,
+                                   0, 
+                                   (i+1)*m_marker_rendered_size, 
+                                   m_marker_rendered_size);
+            int marker_half_size = (kart->getController()->isPlayerController() 
+                                    ? m_marker_player_size 
+                                    : m_marker_ai_size                        )>>1;
+            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
+                                     lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                     m_map_left+(int)(draw_at.getX()+marker_half_size), 
+                                     lower_y   -(int)(draw_at.getY()-marker_half_size));
+            
+            // Highlight the player icons with some backgorund image.
+            if (kart->getController()->isPlayerController())
+            {
+                video::SColor colors[4];
+                for (unsigned int i=0;i<4;i++)
+                {
+                    colors[i]=kart->getKartProperties()->getColor();
+                }
+                const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                           m_icons_frame->getTexture()->getOriginalSize());
+                
+                irr_driver->getVideoDriver()->draw2DImage(
+                                                          m_icons_frame->getTexture(), position, rect,
+                                                          NULL, colors, true);
+            }   // if isPlayerController
+            
+            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
+                                                      NULL, NULL, true);
+        }   // for i<getNumKarts
+    }   // for only_draw_player_kart
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
@@ -365,6 +389,7 @@ void RaceGUIOverworld::drawSpeedAndEnergy(const Kart* kart, const core::recti &v
                     (int)(viewport.LowerRightCorner.Y - meter_height*0.75f), 
                     kart, viewport, scaling);
     
+    /*
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
     
@@ -462,6 +487,7 @@ void RaceGUIOverworld::drawSpeedAndEnergy(const Kart* kart, const core::recti &v
     irr_driver->getVideoDriver()->setMaterial(m);
     irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
                                                             index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+     */
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
