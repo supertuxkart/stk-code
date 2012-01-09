@@ -119,7 +119,7 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
     }
     else
     {
-        bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, true /* useQuantizedAabbCompression */);
+        bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, false /* useQuantizedAabbCompression */);
 
         /*
          // code to serialize triangle mesh
