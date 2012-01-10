@@ -693,18 +693,53 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         
         // some static meshes are conditional
-        std::string condition;
+        core::stringc condition;
         n->get("if", &condition);
         if (condition == "splatting")
         {
             if (!irr_driver->supportsSplatting()) continue;
+        }
+        else if (condition.find("trophies") == 0)
+        {
+            std::vector<std::string> split = StringUtils::split(std::string(condition.c_str()), ' ');
+            if (split.size() != 3)
+            {
+                fprintf(stderr, "[Track] WARNING: unexpected number of tokens in '%s'\n", condition.c_str());
+                continue;
+            }
+            const std::string& op = split[1];
+            int val = -1;
+            if (StringUtils::fromString(split[2], val))
+            {
+                // only 'lt' is supported atm
+                if (op != "lt")
+                {
+                    fprintf(stderr, "[Track] WARNING: operator '%s' not supported in '%s'\n", op.c_str(),
+                            condition.c_str());
+                }
+                
+                if (unlock_manager->getCurrentSlot()->getPoints() < val)
+                {
+                    // show object
+                }
+                else
+                {
+                    // don't show object
+                    continue;
+                }
+            }
+            else
+            {
+                fprintf(stderr, "[Track] WARNING: token '%s' in '%s' should have been a number\n",
+                        split[2].c_str(), condition.c_str());
+            }
         }
         else if (condition.size() > 0)
         {
             fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", condition.c_str());
         }
         
-        std::string neg_condition;
+        core::stringc neg_condition;
         n->get("ifnot", &neg_condition);
         if (neg_condition == "splatting")
         {
