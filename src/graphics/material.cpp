@@ -1023,7 +1023,6 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 /** Callback from LOD nodes to create some effects */
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
-    printf("onMadeVisible %s\n", m_texname.c_str());
     if (m_bubble_provider.find(who) != m_bubble_provider.end())
     {
         m_bubble_provider[who]->onMadeVisible();
@@ -1035,7 +1034,6 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 /** Callback from LOD nodes to create some effects */
 void Material::onHidden(scene::IMeshBuffer* who)
 {
-    printf("onHidden %s\n", m_texname.c_str());
     if (m_bubble_provider.find(who) != m_bubble_provider.end())
     {
         m_bubble_provider[who]->onHidden();

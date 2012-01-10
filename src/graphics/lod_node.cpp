@@ -90,9 +90,7 @@ void LODNode::OnRegisterSceneNode()
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))
     {
         if (m_previous_visibility == WAS_HIDDEN && shown)
-        {
-            printf("== Show '%s' ==\n", m_group_name.c_str());
-            
+        {            
             scene::IMesh* mesh;
             
             if (m_nodes[0]->getType() == scene::ESNT_MESH)
@@ -121,9 +119,7 @@ void LODNode::OnRegisterSceneNode()
             }
         }
         else if (m_previous_visibility == WAS_SHOWN && !shown)
-        {
-            printf("== Hide '%s' ==\n", m_group_name.c_str());
-            
+        {           
             scene::IMesh* mesh;
             
             if (m_nodes[0]->getType() == scene::ESNT_MESH)
