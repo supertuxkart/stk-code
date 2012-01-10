@@ -309,6 +309,9 @@ public:
 
 	void	applyTorque(const btVector3& torque)
 	{
+        btAssert(!isnan(torque.getX()));
+        btAssert(!isnan(torque.getY()));
+        btAssert(!isnan(torque.getZ()));
 		m_totalTorque += torque*m_angularFactor;
 	}
 	
