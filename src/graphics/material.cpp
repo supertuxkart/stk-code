@@ -26,6 +26,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
+#include "guiengine/engine.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
@@ -42,6 +43,7 @@ using namespace irr::video;
 const unsigned int UCLAMP = 1;
 const unsigned int VCLAMP = 2;
 
+//-----------------------------------------------------------------------------
 
 class NormalMapProvider : public video::IShaderConstantSetCallBack
 {
@@ -72,6 +74,10 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#endif
 
 class SplattingProvider : public video::IShaderConstantSetCallBack
 {
@@ -121,10 +127,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+#if 0
+#pragma mark -
+#endif
 
 class BubbleEffectProvider : public video::IShaderConstantSetCallBack
 {
     irr::u32 initial_time;
+    float m_transparency;
+    bool m_is_visible;
     
 public:
     LEAK_CHECK()
@@ -132,17 +143,51 @@ public:
     BubbleEffectProvider()
     {
         initial_time = irr_driver->getDevice()->getTimer()->getRealTime();
+        m_transparency = 1.0f;
+        m_is_visible = true;
     }
     
     virtual void OnSetConstants(
                                 irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
+        if (m_is_visible && m_transparency < 1.0f)
+        {
+            m_transparency += GUIEngine::getLatestDt()*0.3f;
+            if (m_transparency > 1.0f) m_transparency = 1.0f;
+        }
+        else if (!m_is_visible && m_transparency > 0.0f)
+        {
+            m_transparency -= GUIEngine::getLatestDt()*0.3f;
+            if (m_transparency < 0.0f) m_transparency = 0.0f;
+        }
+        
         float time = (irr_driver->getDevice()->getTimer()->getRealTime() - initial_time) / 1000.0f;
         services->setVertexShaderConstant("time", &time, 1);
+        services->setVertexShaderConstant("transparency", &m_transparency, 1);
+    }
+    
+    void onMadeVisible()
+    {
+        m_is_visible = true;
+    }
+    
+    void onHidden()
+    {
+        m_is_visible = false;
+        m_transparency = 0.0f;
+    }
+    
+    void isInitiallyHidden()
+    {
+        m_is_visible = false;
+        m_transparency = 0.0f;
     }
 };
 
+#if 0
+#pragma mark -
+#endif
 
 //-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
@@ -422,7 +467,6 @@ void Material::init(unsigned int index)
     m_alpha_to_coverage         = false;
     m_normal_map_provider       = NULL;
     m_splatting_provider        = NULL;
-    m_bubble_provider           = NULL;
     m_splatting                 = false;
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
@@ -489,10 +533,11 @@ Material::~Material()
         m_splatting_provider->drop();
         m_splatting_provider = NULL;
     }
-    if (m_bubble_provider != NULL)
+    
+    for (std::map<scene::IMeshBuffer*, BubbleEffectProvider*>::iterator it = m_bubble_provider.begin();
+         it != m_bubble_provider.end(); it++)
     {
-        m_bubble_provider->drop();
-        m_bubble_provider = NULL;
+        it->second->drop();
     }
     
     // If a special sfx is installed (that isn't part of stk itself), the
@@ -648,7 +693,7 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
 /** Sets the appropriate flags in an irrlicht SMaterial.
  *  \param material The irrlicht SMaterial which gets the flags set.
  */
-void  Material::setMaterialProperties(video::SMaterial *m)
+void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb)
 {
     // !!======== This method is only called for materials that can be found in
     //            materials.xml, if you want to set flags for all surfaces, see
@@ -837,16 +882,16 @@ void  Material::setMaterialProperties(video::SMaterial *m)
         m->MaterialType = (E_MATERIAL_TYPE)material_type;
     }
     
-    if (m_graphical_effect == GE_BUBBLE)
+    if (m_graphical_effect == GE_BUBBLE && mb != NULL)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
             video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
-            if (m_bubble_provider == NULL)
+            if (m_bubble_provider.find(mb) == m_bubble_provider.end())
             {
-                m_bubble_provider = new BubbleEffectProvider();
+                m_bubble_provider[mb] = new BubbleEffectProvider();
             }
             
             // Material and shaders
@@ -858,7 +903,7 @@ void  Material::setMaterialProperties(video::SMaterial *m)
                                          (file_manager->getDataDir() + "shaders/bubble.frag").c_str(), 
                                          "main",
                                          video::EPST_PS_2_0,
-                                         m_bubble_provider,
+                                         m_bubble_provider[mb],
                                          (m_alpha_blending ?
                                               video::EMT_TRANSPARENT_ALPHA_CHANNEL :
                                               video::EMT_SOLID)
@@ -972,5 +1017,39 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
 }   // adjustForFog
+
+//-----------------------------------------------------------------------------
+
+/** Callback from LOD nodes to create some effects */
+void Material::onMadeVisible(scene::IMeshBuffer* who)
+{
+    printf("onMadeVisible %s\n", m_texname.c_str());
+    if (m_bubble_provider.find(who) != m_bubble_provider.end())
+    {
+        m_bubble_provider[who]->onMadeVisible();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+/** Callback from LOD nodes to create some effects */
+void Material::onHidden(scene::IMeshBuffer* who)
+{
+    printf("onHidden %s\n", m_texname.c_str());
+    if (m_bubble_provider.find(who) != m_bubble_provider.end())
+    {
+        m_bubble_provider[who]->onHidden();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void Material::isInitiallyHidden(scene::IMeshBuffer* who)
+{
+    if (m_bubble_provider.find(who) != m_bubble_provider.end())
+    {
+        m_bubble_provider[who]->isInitiallyHidden();
+    }
+}
 
 //-----------------------------------------------------------------------------

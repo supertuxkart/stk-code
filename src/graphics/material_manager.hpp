@@ -50,8 +50,10 @@ public:
               MaterialManager();
              ~MaterialManager();
     void      loadMaterial     ();
+    Material* getMaterialFor(video::ITexture* t, 
+                             scene::IMeshBuffer *mb);
     void      setAllMaterialFlags(video::ITexture* t, 
-                                  scene::IMeshBuffer *mb) const;
+                                  scene::IMeshBuffer *mb);
     void      adjustForFog(video::ITexture* t, 
                            scene::IMeshBuffer *mb,
                            scene::ISceneNode* parent,

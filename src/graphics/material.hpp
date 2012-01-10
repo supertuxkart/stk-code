@@ -22,6 +22,7 @@
 #include "utils/no_copy.hpp"
 
 #include <string>
+#include <map>
 
 #define LIGHTMAP_VISUALISATION 0
 
@@ -29,7 +30,7 @@
 namespace irr
 {
     namespace video { class ITexture; class SMaterial; }
-    namespace scene { class ISceneNode; }
+    namespace scene { class ISceneNode; class IMeshBuffer; }
 }
 using namespace irr;
 
@@ -198,7 +199,7 @@ private:
     SplattingProvider*  m_splatting_provider;
     
     /** Only used if bubble effect is enabled */
-    BubbleEffectProvider* m_bubble_provider;
+    std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
     
     void  init    (unsigned int index);
     void  install (bool is_full_path=false);
@@ -212,7 +213,7 @@ public:
          ~Material ();
 
     void  setSFXSpeed(SFXBase *sfx, float speed) const;
-    void  setMaterialProperties(video::SMaterial *m);
+    void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
     
     /** Returns the ITexture associated with this material. */
@@ -297,6 +298,10 @@ public:
     }   // getZipperParameter
 
     bool isNormalMap() const { return m_normal_map; }
+    
+    void onMadeVisible(scene::IMeshBuffer* who);
+    void onHidden(scene::IMeshBuffer* who);
+    void isInitiallyHidden(scene::IMeshBuffer* who);
 } ;
 
 

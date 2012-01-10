@@ -19,10 +19,14 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/hardware_skinning.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/material.hpp"
 #include "config/user_config.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
+#include <IMeshSceneNode.h>
+#include <IAnimatedMeshSceneNode.h>
 
 /**
   * @param group_name Only useful for getGroupName()
@@ -35,6 +39,8 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     assert(parent != NULL);
     
     m_group_name = group_name;
+    
+    m_previous_visibility = FIRST_PASS;
     
     // At this stage refcount is two: one because of the object being 
     // created, and once because it is a child of the parent. Drop once,
@@ -64,15 +70,119 @@ void LODNode::OnRegisterSceneNode()
     // Assumes all children are at the same location
     const int dist = 
         (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
-        
+    
+    bool shown = false;
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
         {
             m_nodes[n]->OnRegisterSceneNode();
+            shown = true;
             break;
         }
     }
+    
+    //printf("m_group_name = %s, m_nodes.size() = %i\n, type is mesh = %i\n", m_group_name.c_str(), (int)m_nodes.size(),
+    //       m_nodes[0]->getType() == scene::ESNT_MESH);
+    
+    // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
+    if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
+                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))
+    {
+        if (m_previous_visibility == WAS_HIDDEN && shown)
+        {
+            printf("== Show '%s' ==\n", m_group_name.c_str());
+            
+            scene::IMesh* mesh;
+            
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+            
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->onMadeVisible(mb);
+                }
+            }
+        }
+        else if (m_previous_visibility == WAS_SHOWN && !shown)
+        {
+            printf("== Hide '%s' ==\n", m_group_name.c_str());
+            
+            scene::IMesh* mesh;
+            
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+            
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->onHidden(mb);
+                }
+            }
+        }
+        else if (m_previous_visibility == FIRST_PASS && !shown)
+        {            
+            scene::IMesh* mesh;
+            
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+            
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->isInitiallyHidden(mb);
+                }
+            }
+        }        
+    }
+    
+    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN); 
     
     // If this node has children other than the LOD nodes, draw them
     core::list<ISceneNode*>::Iterator it;

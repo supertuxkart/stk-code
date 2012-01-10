@@ -355,7 +355,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         if (material != NULL)
         {
             assert(material->getTexture() != NULL);
-            material->setMaterialProperties(&mat0);
+            material->setMaterialProperties(&mat0, NULL);
             m_node->setMaterialTexture(0, material->getTexture());
         
             mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent

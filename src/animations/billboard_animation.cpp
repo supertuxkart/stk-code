@@ -55,7 +55,7 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
     m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
                                                        texture);
     Material *stk_material = material_manager->getMaterial(texture_name);
-    stk_material->setMaterialProperties(&(m_node->getMaterial(0)));
+    stk_material->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
 
     m_node->setPosition(m_init_xyz);
 }   // BillboardAnimation

@@ -49,7 +49,7 @@ Stars::Stars(scene::ISceneNode* parentKart, core::vector3df center)
 #ifdef DEBUG
         billboard->setName("star");
 #endif
-        star_material->setMaterialProperties(&(billboard->getMaterial(0)));
+        star_material->setMaterialProperties(&(billboard->getMaterial(0)), NULL);
         billboard->setMaterialTexture(0, star_material->getTexture());
         
         billboard->setVisible(false);

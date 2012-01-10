@@ -45,7 +45,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
     m_node->setPosition(coord.toIrrVector());
     Material* m = material_manager->getMaterial("explode.png");
     m_node->setMaterialTexture(0, m->getTexture());
-    m->setMaterialProperties(&(m_node->getMaterial(0)));
+    m->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
     m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
 
     scene::IParticleEmitter* em = 

@@ -61,7 +61,7 @@ Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent,
         scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
         
         buffer->Material.setTexture(0, m->getTexture());
-        m->setMaterialProperties(&buffer->Material);
+        m->setMaterialProperties(&buffer->Material, NULL);
         buffer->Material.ZWriteEnable = false;
         buffer->Material.BackfaceCulling = false;
         

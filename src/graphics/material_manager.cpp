@@ -64,13 +64,9 @@ std::set<scene::IMeshBuffer*> g_processed;
 #endif
 
 //-----------------------------------------------------------------------------
-/** Searches for the material in the given texture, and calls a function
- *  in the material to set the irrlicht material flags.
- *  \param t Pointer to the texture.
- *  \param mb Pointer to the mesh buffer.
-*/
-void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
-                                          scene::IMeshBuffer *mb) const
+
+Material* MaterialManager::getMaterialFor(video::ITexture* t, 
+                                          scene::IMeshBuffer *mb)
 {
     const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
     // Search backward so that temporary (track) textures are found first
@@ -78,11 +74,29 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     {
         if (m_materials[i]->getTexFname()==image)
         {
-            m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
-            return;
+            return m_materials[i];
         }
     }   // for i
     
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+/** Searches for the material in the given texture, and calls a function
+ *  in the material to set the irrlicht material flags.
+ *  \param t Pointer to the texture.
+ *  \param mb Pointer to the mesh buffer.
+*/
+void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
+                                          scene::IMeshBuffer *mb)
+{
+    Material* mat = getMaterialFor(t, mb);
+    if (mat != NULL)
+    {
+        mat->setMaterialProperties(&(mb->getMaterial()), mb);
+        return;
+    }
+        
     // This material does not appear in materials.xml. Set some common flags...
     if (UserConfigParams::m_anisotropic > 0)
     {

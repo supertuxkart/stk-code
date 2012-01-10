@@ -55,6 +55,15 @@ private:
     
     std::string m_group_name;
     
+    enum PreviousVisibility
+    {
+        FIRST_PASS,
+        WAS_SHOWN,
+        WAS_HIDDEN
+    };
+    
+    PreviousVisibility m_previous_visibility;
+    
 public:
     
     LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
