@@ -180,21 +180,6 @@ int XMLNode::get(const std::string &attribute, std::string *value) const
     *value=core::stringc(o->second).c_str();
     return 1;
 }   // get
-    // ----------------------------------------------------------------------------
-/** If 'attribute' was defined, set 'value' to the value of the
- *   attribute and return 1, otherwise return 0 and do not change value.
- *  \param attribute Name of the attribute.
- *  \param value Value of the attribute.
- */
-int XMLNode::get(const std::string &attribute, core::stringc *value) const
-{
-    if(m_attributes.size()==0) return 0;
-    std::map<std::string, core::stringw>::const_iterator o;
-    o = m_attributes.find(attribute);
-    if(o==m_attributes.end()) return 0;
-    *value = core::stringc(o->second).c_str();
-    return 1;
-}   // get
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::stringw *value) const
 {

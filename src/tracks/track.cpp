@@ -693,7 +693,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         
         // some static meshes are conditional
-        core::stringc condition;
+        std::string condition;
         n->get("if", &condition);
         if (condition == "splatting")
         {
@@ -701,7 +701,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (condition.find("trophies") == 0)
         {
-            std::vector<std::string> split = StringUtils::split(std::string(condition.c_str()), ' ');
+            std::vector<std::string> split = StringUtils::split(condition, ' ');
             if (split.size() != 3)
             {
                 fprintf(stderr, "[Track] WARNING: unexpected number of tokens in '%s'\n", condition.c_str());
@@ -739,7 +739,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", condition.c_str());
         }
         
-        core::stringc neg_condition;
+        std::string neg_condition;
         n->get("ifnot", &neg_condition);
         if (neg_condition == "splatting")
         {
