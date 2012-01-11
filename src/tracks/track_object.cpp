@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "items/item_manager.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 
@@ -56,6 +57,12 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
     xml_node.get("lod_group", &m_lod_group);
     
+    /** For sound effects */
+    bool trigger_when_near = false;
+    
+    /** For sound effects */
+    float trigger_distance = 1.0f;
+
     // FIXME: at this time sound emitters are just disabled in multiplayer
     //        otherwise the sounds would be constantly heard
     if (sound.size() > 0 && race_manager->getNumLocalPlayers() == 1)
@@ -65,7 +72,18 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         float volume = 1.0;
         xml_node.get("volume",   &volume );
         
-        SFXBuffer* buffer = new SFXBuffer(file_manager->getModelFile(sound),
+        xml_node.get("play-when-near", &trigger_when_near);
+        
+        xml_node.get("distance", &trigger_distance);
+
+        // first try track dir, then global dir
+        std::string soundfile = file_manager->getModelFile(sound);
+        if (!file_manager->fileExists(soundfile))
+        {
+            soundfile = file_manager->getSFXFile(sound);
+        }
+        
+        SFXBuffer* buffer = new SFXBuffer(soundfile,
                                           true /* positional */,
                                           rolloff,
                                           volume);
@@ -75,8 +93,11 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         if (m_sound != NULL)
         {
             m_sound->position(m_init_xyz);
-            m_sound->setLoop(true);
-            m_sound->play();
+            if (!trigger_when_near)
+            {
+                m_sound->setLoop(true);
+                m_sound->play();
+            }
         }
         else
         {
@@ -91,6 +112,11 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     {
         m_node = NULL;
         m_mesh = NULL;
+        
+        if (trigger_when_near)
+        {
+             item_manager->newItem(m_init_xyz, trigger_distance, this);
+        }
     }
     else
     {
@@ -261,3 +287,12 @@ void TrackObject::update(float dt)
 {
 }   // update
 // ----------------------------------------------------------------------------
+
+/** Implement callback from TriggerItemListener. Not used by all track objects. */
+void TrackObject::onTriggerItemApproached(Item* who)
+{
+    if (m_sound != NULL && m_sound->getStatus() == SFXManager::SFX_STOPPED)
+    {
+        m_sound->play();
+    }
+}

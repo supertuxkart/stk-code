@@ -110,7 +110,7 @@ void ItemManager::loadDefaultItems()
     // it is implemented as one, and so loaded here, too.
     static const std::string item_names[] = {"bonus-box", "banana",
                                              "nitro-big", "nitro-small",
-                                             "bubblegum" };
+                                             "bubblegum", "trigger" };
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
@@ -121,6 +121,10 @@ void ItemManager::loadDefaultItems()
         {
             node->get("model", &model_filename);
             node->get("lowmodel", &lowres_model_filename);
+        }
+        else
+        {
+            continue;
         }
         
         scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
@@ -179,6 +183,29 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
     else
         m_all_items.push_back(item);
 
+    return item;
+}   // newItem
+
+//-----------------------------------------------------------------------------
+/** Creates a new trigger item.
+ *  \param xyz  Position of the item.
+ */
+Item* ItemManager::newItem(const Vec3& xyz, float distance, TriggerItemListener* listener)
+{
+    // Find where the item can be stored in the index list: either in a
+    // previously deleted entry, otherwise at the end.
+    int index = -1;
+    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    
+    if(index==-1) index = m_all_items.size();
+    Item* item;
+    item = new Item(xyz, distance, listener, index);
+
+    if(index<(int)m_all_items.size())
+        m_all_items[index] = item;
+    else
+        m_all_items.push_back(item);
+    
     return item;
 }   // newItem
 

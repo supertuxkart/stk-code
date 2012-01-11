@@ -27,6 +27,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "items/item.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 #include <string>
@@ -40,7 +41,8 @@ class SFXBase;
  *  might also have a skeletal animation. This is used by objects that
  *  have an IPO animation, as well as physical objects.
  */
-class TrackObject : public scene::IAnimationEndCallBack, public NoCopy
+class TrackObject : public scene::IAnimationEndCallBack, public NoCopy,
+                    public TriggerItemListener
 {
 //public:
     // The different type of track objects: physical objects, graphical 
@@ -114,6 +116,8 @@ public:
     }
     
     const std::string& getLodGroup() const { return m_lod_group; }
+    
+    virtual void onTriggerItemApproached(Item* who);
     
 };   // TrackObject
 

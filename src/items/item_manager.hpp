@@ -62,6 +62,7 @@ public:
     void           loadDefaultItems();
     Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
                                     const Vec3 &normal, Kart* parent=NULL);
+    Item*          newItem         (const Vec3& xyz, float distance, TriggerItemListener* listener);
     void           update          (float delta);
     void           checkItemHit    (Kart* kart);
     void           cleanup         ();

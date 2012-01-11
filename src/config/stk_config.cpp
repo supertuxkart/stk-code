@@ -97,7 +97,7 @@ void STKConfig::load(const std::string &filename)
     
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
-        fprintf(stderr,"No item switches defined in stk_config");
+        fprintf(stderr,"Wrong number of item switches defined in stk_config");
         exit(-1);
     }
 

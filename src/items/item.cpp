@@ -33,10 +33,13 @@
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id)
 {
+    assert(type != ITEM_TRIGGER); // use other constructor for that
+    
     setType(type);
     m_event_handler     = NULL;
     m_xyz               = xyz;
     m_deactive_time     = 0;
+    m_distance_2        = 0.8f;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, normal);
     m_item_id           = item_id;
@@ -48,6 +51,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                         : -1 ;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
+    m_listener          = NULL;
     
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
@@ -82,6 +86,34 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 }   // Item
 
 //-----------------------------------------------------------------------------
+
+/** \brief Constructor to create a trigger item.
+  * Trigger items are invisible and can be used to trigger a behavior when
+  * approaching a point.
+  */
+Item::Item (const Vec3& xyz, float distance, TriggerItemListener* trigger,
+            unsigned int item_id)
+{
+    m_type = ITEM_TRIGGER;
+    m_event_handler     = NULL;
+    m_xyz               = xyz;
+    m_deactive_time     = 0;
+    // Sets heading to 0, and sets pitch and roll depending on the normal. */
+    m_original_hpr      = Vec3(0, 0, 0);
+    m_item_id           = item_id;
+    m_original_type     = ITEM_NONE;
+    m_collected         = false;
+    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
+    m_disappear_counter = -1;
+    m_original_mesh     = NULL;
+    m_original_lowmesh  = NULL;
+    m_node              = NULL;
+    m_listener          = trigger;
+    m_rotate            = false;
+    m_distance_2        = distance*distance;
+}
+
+//-----------------------------------------------------------------------------
 /** Sets the type of this item, but also derived values, e.g. m_rotate.
  *  (bubblegums do not return).
  *  \param type New type of the item.
@@ -99,6 +131,9 @@ void Item::setType(ItemType type)
  */
 void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
+    // triggers should not be switched
+    if (m_type == ITEM_TRIGGER) return;
+    
     m_original_type = m_type;
     setType(type);
     
@@ -118,6 +153,9 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
  */
 void Item::switchBack()
 {
+    // triggers should not be switched
+    if (m_type == ITEM_TRIGGER) return;
+    
     // If the item is not switched, do nothing. This can happen if a bubble
     // gum is dropped while items are switched - when switching back, this
     // bubble gum has no original type.
@@ -144,8 +182,11 @@ void Item::switchBack()
  */
 Item::~Item()
 {
-    irr_driver->removeNode(m_node);
-    m_node->drop();
+    if (m_node != NULL)
+    {
+        irr_driver->removeNode(m_node);
+        m_node->drop();
+    }
 }   // ~Item
 
 //-----------------------------------------------------------------------------
@@ -165,7 +206,10 @@ void Item::reset()
         m_original_type = ITEM_NONE;
     }
     
-    m_node->setScale(core::vector3df(1,1,1));
+    if (m_node != NULL)
+    {
+        m_node->setScale(core::vector3df(1,1,1));
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -194,20 +238,26 @@ void Item::update(float dt)
         if(m_time_till_return<0)
         {
             m_collected=false;
-            m_node->setScale(core::vector3df(1,1,1));
-
+            
+            if (m_node != NULL)
+            {
+                m_node->setScale(core::vector3df(1,1,1));
+            }
         }   // time till return <0 --> is fully visible again
         else if ( m_time_till_return <=1.0f )
         {
-            // Make it visible by scaling it from 0 to 1:
-            m_node->setVisible(true);
-            m_node->setScale(core::vector3df(1,1,1)*(1-m_time_till_return));
+            if (m_node != NULL)
+            {
+                // Make it visible by scaling it from 0 to 1:
+                m_node->setVisible(true);
+                m_node->setScale(core::vector3df(1,1,1)*(1-m_time_till_return));
+            }
         }   // time till return < 1
     }   // if collected
     else
     {   // not m_collected
         
-        if(!m_rotate) return;
+        if(!m_rotate || m_node == NULL) return;
         // have it rotate
         Vec3 rotation(0, dt*M_PI, 0);
         core::vector3df r = m_node->getRotation();
@@ -244,7 +294,15 @@ void Item::collected(const Kart *kart, float t)
         // Note if the time is negative, in update the m_collected flag will
         // be automatically set to false again.
         m_time_till_return = t;
-        m_node->setVisible(false);
+        if (m_node != NULL)
+        {
+            m_node->setVisible(false);
+        }
+    }
+    
+    if (m_listener != NULL)
+    {
+        m_listener->onTriggerItemApproached(this);
     }
     
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)

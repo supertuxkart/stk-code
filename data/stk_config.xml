@@ -90,8 +90,8 @@
   <powerup collect-mode="new"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
-             Order: item, banana, big-nitro, small-nitro, bubble-bum -->
-  <switch time="5"  items="1 0 4 4 2"/>
+             Order: giftbox, banana, big-nitro, small-nitro, bubble-bum, trigger -->
+  <switch time="5"  items="1 0 4 4 2 5"/>
 
   <!-- How often bubble gum get driven over before it disappears. --> 
   <bubble-gum disappear-counter="1"/>

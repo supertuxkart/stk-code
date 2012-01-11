@@ -34,8 +34,20 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 
 class LODNode;
+class Item;
 
 // -----------------------------------------------------------------------------
+
+/**
+ * \ingroup items
+ * \brief Listener class to go with Items of type ITEM_TRIGGER
+ */
+class TriggerItemListener
+{
+public:
+    virtual ~TriggerItemListener() {}
+    virtual void onTriggerItemApproached(Item* who) = 0;
+};
 
 /**
   * \ingroup items
@@ -56,7 +68,11 @@ public:
         ITEM_NITRO_BIG,
         ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
-        ITEM_LAST = ITEM_BUBBLEGUM,
+        /** An invisible item that can be used to trigger some behavior when
+          * approaching a point
+          */
+        ITEM_TRIGGER,
+        ITEM_LAST = ITEM_TRIGGER,
         ITEM_COUNT,
         ITEM_NONE
     };
@@ -115,9 +131,18 @@ private:
     int           m_disappear_counter;
 
     void          setType(ItemType type);
+    
+    /** callback used if type == ITEM_TRIGGER */
+    TriggerItemListener* m_listener;
+    
+    /** square distance at which item is collected */
+    float m_distance_2;
+    
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
                         scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id);
+                  Item (const Vec3& xyz, float distance, TriggerItemListener* trigger,
+                        unsigned int item_id);
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  collected(const Kart *kart, float t=2.0f);
@@ -130,7 +155,7 @@ public:
     bool hitKart (Kart* kart ) const
     {
         return (m_event_handler!=kart || m_deactive_time <=0) &&
-               (kart->getXYZ()-m_xyz).length2()<0.8f;
+               (kart->getXYZ()-m_xyz).length2()<m_distance_2;
     }   // hitKart
 
     // ------------------------------------------------------------------------
