@@ -170,7 +170,8 @@
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
           visual="0.16" visual-time="0"
           angular-velocity="0"  time-till-bonus="1.5 2"
-          bonus-force="100 200" bonus-time="3.0 3.0"/>
+          bonus-force="100 200" bonus-time="3.0 3.0" 
+          post-skid-rotation="1000" />
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit

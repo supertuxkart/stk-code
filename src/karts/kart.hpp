@@ -218,6 +218,8 @@ private:
     void          updateEnginePowerAndBrakes(float dt);
     void          updateEngineSFX();
 
+    float         getVisualSkidOffset() const;
+
 protected:
     const KartProperties *m_kart_properties;
     /** This stores a copy of the kart model. It has to be a copy

@@ -278,8 +278,8 @@ private:
     float m_slipstream_add_power;
     /** Minimum speed for slipstream to take effect. */
     float m_slipstream_min_speed;
-    /**          max-speed-increase: How much the speed of the kart might exceed
-         its normal maximum speed. */
+    /** How much the speed of the kart might exceed its 
+     *  normal maximum speed. */
     float m_slipstream_max_speed_increase;
     /** How long the higher speed lasts after slipstream stopped working. */
     float m_slipstream_duration;
@@ -295,15 +295,18 @@ private:
     float m_skid_decrease;
     /**< Time till maximum skidding is reached. */
     float m_time_till_max_skid;
-    /** Kart leaves skid marks. */
-    bool  m_has_skidmarks;
     /** Additional rotation of 3d model when skidding. */
     float m_skid_visual;              
-
     /** How long it takes for visual skid to reach maximum. */
     float m_skid_visual_time;
     /** Angular velocity to be applied when skidding. */
     float m_skid_angular_velocity;
+
+    /** A rotation to be applied to the rigid body when stopped skidding. */
+    float m_post_skid_rotation;
+
+    /** Kart leaves skid marks. */
+    bool  m_has_skidmarks;
 
     /** Time of skidding before you get a bonus boost. It's possible to
      *  define more than one time, i.e. longer skidding gives more bonus. */
@@ -598,12 +601,6 @@ public:
     float getZipperMaxSpeedIncrease () const 
                                          { return m_zipper_max_speed_increase;}
 
-    /** Returns additional rotation of 3d model when skidding. */
-    float getSkidVisual             () const {return m_skid_visual;           }
-    /** Returns the time for the visual skid to reach maximum. */
-
-    float getSkidVisualTime         () const {return m_skid_visual_time;      }
-
     /** Returns how far behind a kart slipstreaming works. */
     float getSlipstreamLength       () const {return m_slipstream_length;     }
 
@@ -633,10 +630,6 @@ public:
     float getSlipstreamFadeOutTime  () const 
                                          { return m_slipstream_fade_out_time; }
 
-    /** Returns the maximum factor by which the steering angle
-     *  can be increased. */
-    float getMaxSkid                () const {return m_skid_max;              }
-    
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
     float getShadowScale            () const {return m_shadow_scale;          }
@@ -649,6 +642,10 @@ public:
      *  had to be set. */
     float getShadowYOffset          () const {return m_shadow_y_offset;       }
     
+    /** Returns the maximum factor by which the steering angle
+     *  can be increased. */
+    float getMaxSkid                () const {return m_skid_max;              }
+
     /** Returns the factor by which m_skidding is multiplied when the kart is
      *  skidding to increase it to the maximum. */
     float getSkidIncrease           () const {return m_skid_increase;         }
@@ -661,11 +658,20 @@ public:
      *  is reached. */
     float getTimeTillMaxSkid        () const {return m_time_till_max_skid;    }
 
-    /** Returns if the kart leaves skidmarks or not. */
-    bool hasSkidmarks               () const {return m_has_skidmarks;         }
+    /** Returns additional rotation of 3d model when skidding. */
+    float getSkidVisual             () const {return m_skid_visual;           }
+
+    /** Returns the time for the visual skid to reach maximum. */
+    float getSkidVisualTime         () const {return m_skid_visual_time;      }
 
     /** Returns the angular velocity to be applied when skidding. */
-    float getSkidAngularVelocity() const { return m_skid_angular_velocity;    }
+    float getSkidAngularVelocity    () const { return m_skid_angular_velocity;}
+
+    /** Returns the rotation to be applied when stopping to skid. */
+    float getPostSkidRotation       () const { return m_post_skid_rotation;   }
+
+    /** Returns if the kart leaves skidmarks or not. */
+    bool hasSkidmarks               () const {return m_has_skidmarks;         }
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */
