@@ -444,6 +444,9 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
             //See Kart::collectedItem()
             m_ugh_sound->play();
             break;
+        case Item::ITEM_TRIGGER:
+            // no default sound for triggers
+            break;
         default:
             m_grab_sound->play();
             break; 

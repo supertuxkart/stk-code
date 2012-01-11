@@ -291,7 +291,7 @@ void TrackObject::update(float dt)
 /** Implement callback from TriggerItemListener. Not used by all track objects. */
 void TrackObject::onTriggerItemApproached(Item* who)
 {
-    if (m_sound != NULL && m_sound->getStatus() == SFXManager::SFX_STOPPED)
+    if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
     {
         m_sound->play();
     }
