@@ -54,38 +54,16 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_enabled = true;
     m_trophy  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
     
-    
-    // Originally m_map_height was 100, and we take 480 as minimum res
-    const float scaling = irr_driver->getFrameSize().Height / 480.0f;
+    const float scaling = irr_driver->getFrameSize().Height / 420.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_ai_size        = (int)( 14.0f * scaling);
+    m_marker_challenge_size        = (int)( 12.0f * scaling);
     m_marker_player_size    = (int)( 24.0f * scaling);
     m_map_width             = (int)(250.0f * scaling);
     m_map_height            = (int)(250.0f * scaling);
     
-    // The location of the minimap varies with number of 
-    // splitscreen players:
-    switch(race_manager->getNumLocalPlayers())
-    {
-        case 0 : // In case of profile mode
-        case 1 : // Lower left corner
-            m_map_left   = 10;
-            m_map_bottom = UserConfigParams::m_height-10;
-            break;
-        case 2:  // Middle of left side
-            m_map_left   = 10;
-            m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
-            break;
-        case 3:  // Lower right quarter (which is not used by a player)
-            m_map_left   = UserConfigParams::m_width/2 + 10;
-            m_map_bottom = UserConfigParams::m_height-10;
-            break;
-        case 4:  // Middle of the screen.
-            m_map_left   = UserConfigParams::m_width/2-m_map_width/2;
-            m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
-            break;
-    }
+    m_map_left   = 20;
+    m_map_bottom = UserConfigParams::m_height-10;
     
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -114,6 +92,15 @@ RaceGUIOverworld::RaceGUIOverworld()
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 
     m_trophy_points_width = font->getDimension(L"100").Width;
+    
+    const std::vector<const ChallengeData*>& v = unlock_manager->getCurrentSlot()->getLockedChallenges();
+    for (unsigned int n=0; n<v.size(); n++)
+    {
+        m_locked_challenges.insert(v[n]);
+    }
+    
+    m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
+    
 }   // RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
@@ -255,6 +242,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     }
     
+    Track* t = world->getTrack();
+    
     // In the first iteration, only draw AI karts, then only draw
     // player karts. This guarantees that player kart icons are always
     // on top of AI kart icons.
@@ -271,7 +260,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                !=(only_draw_player_kart==1)) continue;
             const Vec3& xyz = kart->getXYZ();
             Vec3 draw_at;
-            world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+            t->mapPoint2MiniMap(xyz, &draw_at);
             
             core::rect<s32> source(i    *m_marker_rendered_size,
                                    0, 
@@ -279,7 +268,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                    m_marker_rendered_size);
             int marker_half_size = (kart->getController()->isPlayerController() 
                                     ? m_marker_player_size 
-                                    : m_marker_ai_size                        )>>1;
+                                    : m_marker_challenge_size                        )>>1;
             core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
                                      lower_y   -(int)(draw_at.getY()+marker_half_size),
                                      m_map_left+(int)(draw_at.getX()+marker_half_size), 
@@ -296,15 +285,35 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
                                            m_icons_frame->getTexture()->getOriginalSize());
                 
-                irr_driver->getVideoDriver()->draw2DImage(
-                                                          m_icons_frame->getTexture(), position, rect,
-                                                          NULL, colors, true);
+                irr_driver->getVideoDriver()->draw2DImage(m_icons_frame->getTexture(), position,
+                                                          rect, NULL, colors, true);
             }   // if isPlayerController
             
             irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
                                                       NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
+    
+    
+    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
+    for (unsigned int n=0; n<challenges.size(); n++)
+    {
+        Vec3 draw_at;
+        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
+        
+        const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
+        bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
+        
+        const core::rect<s32> source(core::position2d<s32>(0,0),
+                                     m_lock->getOriginalSize());
+        
+        core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-m_marker_challenge_size/2), 
+                             lower_y   -(int)(draw_at.getY()+m_marker_challenge_size/2),
+                             m_map_left+(int)(draw_at.getX()+m_marker_challenge_size/2), 
+                             lower_y   -(int)(draw_at.getY()-m_marker_challenge_size/2));
+        irr_driver->getVideoDriver()->draw2DImage(m_lock, dest,
+                                                  source, NULL, NULL, true);
+    }
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------

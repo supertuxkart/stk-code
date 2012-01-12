@@ -64,6 +64,18 @@ enum WeatherType
     WEATHER_RAIN
 };
 
+struct OverworldChallenge
+{
+    core::vector3df m_position;
+    std::string m_challenge_id;
+    
+    OverworldChallenge(core::vector3df position, std::string challenge_id)
+    {
+        m_position = position;
+        m_challenge_id = challenge_id;
+    }
+};
+
 /**
   * \ingroup tracks
   */
@@ -80,6 +92,9 @@ private:
     std::string              m_screenshot;
     std::vector<MusicInformation*> m_music;
 
+    /** Will only be sued on overworld */
+    std::vector<OverworldChallenge> m_challenges;
+    
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
     AlignedArray<btTransform> m_start_transforms;
@@ -398,6 +413,10 @@ public:
     core::vector3df getSunRotation();
     
     TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
+    
+    /** Get list of challenges placed on that world. Works only for overworld. */
+    const std::vector<OverworldChallenge>& getChallengeList() const
+        { return m_challenges; }
     
 };   // class Track
 

@@ -610,8 +610,12 @@ bool Track::loadMainTrack(const XMLNode &root)
 {
     assert(m_track_mesh==NULL);
     assert(m_gfx_effect_mesh==NULL);
+    
+    m_challenges.clear();
+    
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
+    
     const XMLNode *track_node= root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
@@ -852,6 +856,9 @@ bool Track::loadMainTrack(const XMLNode &root)
                     fprintf(stderr, "[WARNING] Cannot find challenge named <%s>\n", challenge.c_str());
                     continue;
                 }
+                
+                m_challenges.push_back( OverworldChallenge(xyz, challenge) );
+                
                 Track* t = track_manager->getTrack(c->getTrackName());
                 if (t == NULL)
                 {
