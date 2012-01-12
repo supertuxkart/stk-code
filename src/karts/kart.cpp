@@ -1793,8 +1793,8 @@ void Kart::updateSkidding(float dt)
                   ? m_skid_time
                   : m_kart_properties->getSkidVisualTime();
         float vso = getVisualSkidOffset();
-        btVector3 rot(0, vso, 0);
-        m_vehicle->setTimedRotation(t, rot/(3.0f*t));
+        btVector3 rot(0, vso*m_kart_properties->getPostSkidRotateFactor(), 0);
+        m_vehicle->setTimedRotation(t, rot);
         m_skid_time = 0;
         if(bonus_time>0)
         {

@@ -83,7 +83,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
-        m_time_till_max_skid = m_skid_angular_velocity = m_post_skid_rotation =
+        m_time_till_max_skid = m_skid_angular_velocity = 
+        m_post_skid_rotate_factor =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_skid_visual_time = m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
@@ -294,18 +295,18 @@ void KartProperties::getAllData(const XMLNode * root)
     }
     if(const XMLNode *skid_node = root->getNode("skid"))
     {
-        skid_node->get("increase",          &m_skid_increase        );
-        skid_node->get("decrease",          &m_skid_decrease        );
-        skid_node->get("max",               &m_skid_max             );
-        skid_node->get("time-till-max",     &m_time_till_max_skid   );
-        skid_node->get("visual",            &m_skid_visual          );
-        skid_node->get("visual-time",       &m_skid_visual_time     );
-        skid_node->get("enable",            &m_has_skidmarks        );
-        skid_node->get("time-till-bonus",   &m_skid_time_till_bonus );
-        skid_node->get("bonus-force",       &m_skid_bonus_force     );
-        skid_node->get("bonus-time",        &m_skid_bonus_time      );
-        skid_node->get("angular-velocity",  &m_skid_angular_velocity);
-        skid_node->get("post-skid-rotation",&m_post_skid_rotation   );
+        skid_node->get("increase",               &m_skid_increase          );
+        skid_node->get("decrease",               &m_skid_decrease          );
+        skid_node->get("max",                    &m_skid_max               );
+        skid_node->get("time-till-max",          &m_time_till_max_skid     );
+        skid_node->get("visual",                 &m_skid_visual            );
+        skid_node->get("visual-time",            &m_skid_visual_time       );
+        skid_node->get("enable",                 &m_has_skidmarks          );
+        skid_node->get("time-till-bonus",        &m_skid_time_till_bonus   );
+        skid_node->get("bonus-force",            &m_skid_bonus_force       );
+        skid_node->get("bonus-time",             &m_skid_bonus_time        );
+        skid_node->get("angular-velocity",       &m_skid_angular_velocity  );
+        skid_node->get("post-skid-rotate-factor",&m_post_skid_rotate_factor);
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
@@ -634,7 +635,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_visual,                "skid visual"                   );
     CHECK_NEG(m_skid_visual_time,           "skid visual-time"              );
     CHECK_NEG(m_skid_angular_velocity,      "skid angular-velocity"         );
-    CHECK_NEG(m_post_skid_rotation,         "skid post-skid-rotation"       );
+    CHECK_NEG(m_post_skid_rotate_factor,    "skid post-skid-rotate-factor"  );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );

@@ -302,8 +302,11 @@ private:
     /** Angular velocity to be applied when skidding. */
     float m_skid_angular_velocity;
 
-    /** A rotation to be applied to the rigid body when stopped skidding. */
-    float m_post_skid_rotation;
+    /** This factor is used to determine how much the chassis of a kart
+     *  should rotate to match the graphical view. A factor of 1 is 
+     *  identical, a smaller factor will rotate the kart less (which might
+     *  feel better). */
+    float m_post_skid_rotate_factor;
 
     /** Kart leaves skid marks. */
     bool  m_has_skidmarks;
@@ -667,8 +670,11 @@ public:
     /** Returns the angular velocity to be applied when skidding. */
     float getSkidAngularVelocity    () const { return m_skid_angular_velocity;}
 
-    /** Returns the rotation to be applied when stopping to skid. */
-    float getPostSkidRotation       () const { return m_post_skid_rotation;   }
+    /** Returns a factor to be used to determine how much the chassis of a 
+     *  kart should rotate to match the graphical view. A factor of 1 is 
+     *  identical, a smaller factor will rotate the kart less (which might
+     *  feel better). */
+    float getPostSkidRotateFactor  () const {return m_post_skid_rotate_factor;}
 
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks               () const {return m_has_skidmarks;         }

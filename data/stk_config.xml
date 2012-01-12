@@ -165,13 +165,16 @@
          angular-velocity: Angular velocity to be used for the kart when skidding.
          time-till-bonus: How long a kart needs to skid in order to get a bonus.
          bonus-force: A speedup applied to the kart whick skidded for a while.
-         bonus-time: How long the bonus-force is applied.  -->
-<!-- Note: for now skidding is disabled, set angular-velocity to 2 to test it -->
+         bonus-time: How long the bonus-force is applied.
+         post-skid-rotate-factor: a factor to be used to determine how much 
+           the chassis of a kart should rotate to match the graphical view. 
+           A factor of 1 is identical, a smaller factor will rotate the kart
+           less (which might  feel better).   -->
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
           visual="0.16" visual-time="0"
           angular-velocity="0"  time-till-bonus="1.5 2"
           bonus-force="100 200" bonus-time="3.0 3.0" 
-          post-skid-rotation="1000" />
+          post-skid-rotate-factor="1" />
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
