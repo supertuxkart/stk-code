@@ -98,12 +98,23 @@ private:
     /** The time the additional impulse should be applied. */
     float               m_time_additional_impulse;
 
+    /** Additional rotation that is applied over a certain amount of time. */
+    btVector3           m_additional_rotation;
 
+    /** Duration over which the additional rotation is applied. */
+    float               m_time_additional_rotation;
+
+    /** The rigid body that is the chassis of the kart. */
     btRigidBody        *m_chassisBody;
 
+    /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
+
+    /** Index of the right axis. */
     int                 m_indexRightAxis;
+    /** Index of the up axis. */
     int                 m_indexUpAxis;
+    /** Index of the forward axis. */
     int                 m_indexForwardAxis;
 
     /** The STK kart object which uses this vehicle. This is mostly used to 
@@ -210,7 +221,7 @@ public:
     /** Sets an impulse that is applied for a certain amount of time.
      *  \param t Time for the impulse to be active.
      *  \param imp The impulse to apply.  */
-    void setTimedImpulse(float t, const btVector3 &imp)
+    void setTimedCentralImpulse(float t, const btVector3 &imp)
     {
         // Only add impulse if no other impulse is active.
         if(m_time_additional_impulse>0) return;
@@ -220,6 +231,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     float getImpulseTime() const { return m_time_additional_impulse; }
+    // ------------------------------------------------------------------------
+    /** Sets a rotation that is applied over a certain amount of time (to avoid
+     *  a too rapid changes in the kart).
+     *  \param t Time for the rotation to be applied.
+     *  \param torque The rotation to apply.  */
+    void setTimedRotation(float t, const btVector3 &rot)
+    {
+        m_additional_rotation      = rot;
+        m_time_additional_rotation = t;
+    }   // setTimedTorque
 };   // class btKart
 
 #endif //BT_KART_HPP

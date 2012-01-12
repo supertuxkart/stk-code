@@ -119,6 +119,8 @@ void btKart::reset()
     m_num_wheels_on_ground      = 0;
     m_additional_impulse        = btVector3(0,0,0);
     m_time_additional_impulse   = 0;
+    m_additional_rotation       = btVector3(0,0,0);
+    m_time_additional_rotation  = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -438,6 +440,16 @@ void btKart::updateVehicle( btScalar step )
     {
         m_time_additional_impulse -= step;
         m_chassisBody->applyCentralImpulse(m_additional_impulse);
+    }
+
+    if(m_time_additional_rotation>0)
+    {
+        btTransform &t = m_chassisBody->getWorldTransform();
+        t.setRotation(t.getRotation()
+                       *btQuaternion(m_additional_rotation.getY()*step,
+                                     m_additional_rotation.getX()*step,
+                                     m_additional_rotation.getZ()*step));
+        m_time_additional_rotation -= step;
     }
 }   // updateVehicle
 

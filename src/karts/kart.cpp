@@ -1787,14 +1787,15 @@ void Kart::updateSkidding(float dt)
         float bonus_time, bonus_force;
         m_kart_properties->getSkidBonus(m_skid_time, 
                                         &bonus_time, &bonus_force);
-        printf("skid time %f bonus %f bonus-time %f\n",
-            m_skid_time, bonus_time, bonus_force);
         // Set skid_time to a negative value indicating how long an
         // additional rotation is going to be applied to the chassis
-        if(m_skid_time > m_kart_properties->getSkidVisualTime())
-            m_skid_time = - m_kart_properties->getSkidVisualTime();
-        else
-            m_skid_time = - m_skid_time;
+        float t = (m_skid_time <= m_kart_properties->getSkidVisualTime())
+                  ? m_skid_time
+                  : m_kart_properties->getSkidVisualTime();
+        float vso = getVisualSkidOffset();
+        btVector3 rot(0, vso, 0);
+        m_vehicle->setTimedRotation(t, rot/(3.0f*t));
+        m_skid_time = 0;
         if(bonus_time>0)
         {
             MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_SKIDDING,
@@ -1802,15 +1803,6 @@ void Kart::updateSkidding(float dt)
             // FIXME hiker: for now just misuse the zipper code
             handleZipper(0);
         }
-    }
-    if(m_skid_time<0)
-    {
-        // Apply additional rotation to the physics model
-        float vso = getVisualSkidOffset();
-        btVector3 rot(0, vso*m_kart_properties->getPostSkidRotation(), 0);
-        getBody()->applyTorque(rot);
-        m_skid_time += dt;
-        if(m_skid_time>0) m_skid_time = 0;
     }
     m_vehicle->setSkidAngularVelocity(ang_vel);
 }   // updateSkidding
@@ -2204,7 +2196,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             m_zipper_fire->resizeBox(std::max(0.25f, getSpeed()*dt));
         }
     }
-
+    printf("visual %f %f\n", World::getWorld()->getTime(), getVisualSkidOffset());
     Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(getVisualSkidOffset(), 0, 0));
     
@@ -2245,7 +2237,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 float Kart::getVisualSkidOffset() const
 {
     float speed_ratio    = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
-    if(m_kart_properties->getSkidVisualTime()==0)
+    //if(m_kart_properties->getSkidVisualTime()==0)
         return getSteerPercent()*m_kart_properties->getSkidVisual()
                * speed_ratio * m_skidding*m_skidding;
     float f = fabsf(m_skid_time);

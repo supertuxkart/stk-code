@@ -356,7 +356,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
         float t = 
             faster_kart->getKartProperties()->getCollisionImpulseTime();
         if(t>0)
-            slower_kart->getVehicle()->setTimedImpulse(t, impulse);
+            slower_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
         else
             slower_kart->getBody()->applyCentralImpulse(impulse);
         slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
@@ -377,7 +377,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
         float t = 
             faster_kart->getKartProperties()->getCollisionImpulseTime();
         if(t>0)
-            faster_kart->getVehicle()->setTimedImpulse(t, impulse);
+            faster_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
         else
             faster_kart->getBody()->applyCentralImpulse(impulse);
         faster_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
@@ -393,7 +393,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
         impulse *= faster_kart->getKartProperties()->getCollisionImpulse();
         t = faster_kart->getKartProperties()->getCollisionImpulseTime();
         if(t>0)
-            slower_kart->getVehicle()->setTimedImpulse(t, impulse);
+            slower_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
         else
             slower_kart->getBody()->applyCentralImpulse(impulse);
         slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
