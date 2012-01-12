@@ -13,23 +13,30 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "enet.vcproj", "{B0E
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		breakpad|Win32 = breakpad|Win32
 		debug|Win32 = debug|Win32
 		Release|Win32 = Release|Win32
 		wiiuse-debug|Win32 = wiiuse-debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.breakpad|Win32.ActiveCfg = breakpad|Win32
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.breakpad|Win32.Build.0 = breakpad|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|Win32.ActiveCfg = Debug|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|Win32.Build.0 = Debug|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.ActiveCfg = Release|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.Build.0 = Release|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.wiiuse-debug|Win32.ActiveCfg = wiiuse-debug|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.wiiuse-debug|Win32.Build.0 = wiiuse-debug|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.breakpad|Win32.ActiveCfg = breakpad|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.breakpad|Win32.Build.0 = breakpad|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|Win32.ActiveCfg = Debug|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|Win32.Build.0 = Debug|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.ActiveCfg = Release|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.Build.0 = Release|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.wiiuse-debug|Win32.ActiveCfg = Debug|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.wiiuse-debug|Win32.Build.0 = Debug|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.breakpad|Win32.ActiveCfg = breakpad|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.breakpad|Win32.Build.0 = breakpad|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|Win32.ActiveCfg = Debug|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|Win32.Build.0 = Debug|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.ActiveCfg = Release|Win32

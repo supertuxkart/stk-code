@@ -1120,9 +1120,25 @@ void cleanSuperTuxKart()
 }   // cleanSuperTuxKart
 
 //=============================================================================
+#ifdef BREAKPAD
+bool ShowDumpResults(const wchar_t* dump_path,
+                     const wchar_t* minidump_id,
+                     void* context,
+                     EXCEPTION_POINTERS* exinfo,
+                     MDRawAssertionInfo* assertion,
+                     bool succeeded) 
+{
+    wprintf(L"Path: %s id %s.\n", dump_path, minidump_id);
+    return succeeded;
+}
+#endif
 
 int main(int argc, char *argv[] )
 {
+#ifdef BREAKPAD
+    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults, 
+                                         NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
+#endif
     srand(( unsigned ) time( 0 ));
 
     try {
