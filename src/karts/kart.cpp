@@ -2196,7 +2196,6 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             m_zipper_fire->resizeBox(std::max(0.25f, getSpeed()*dt));
         }
     }
-    printf("visual %f %f\n", World::getWorld()->getTime(), getVisualSkidOffset());
     Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(getVisualSkidOffset(), 0, 0));
     
