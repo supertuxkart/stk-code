@@ -189,7 +189,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     {
         description += core::stringw(L"\n");
         //I18N: nitro points needed to win a challenge
-        description += _("Collect %i points of nitr", m_energy);
+        description += _("Collect %i points of nitro", m_energy);
     }
     
     m_challenge_description = description;
