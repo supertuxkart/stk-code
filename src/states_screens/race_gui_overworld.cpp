@@ -100,7 +100,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     }
     
     m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
-    
+    m_open_challenge = irr_driver->getTexture( file_manager->getGUIDir() + "challenge.png" );
 }   // RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
@@ -295,24 +295,27 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     }   // for only_draw_player_kart
     
     
-    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
+    //const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
+    const std::vector<OverworldForceField>& challenges = t->getForceFieldList();
+    
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         Vec3 draw_at;
         t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
         
-        const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
-        bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
+        //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
+       // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
+        bool locked = challenges[n].m_is_locked;
         
         const core::rect<s32> source(core::position2d<s32>(0,0),
-                                     m_lock->getOriginalSize());
+                                     (locked ? m_lock : m_open_challenge)->getOriginalSize());
         
         core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-m_marker_challenge_size/2), 
                              lower_y   -(int)(draw_at.getY()+m_marker_challenge_size/2),
                              m_map_left+(int)(draw_at.getX()+m_marker_challenge_size/2), 
                              lower_y   -(int)(draw_at.getY()-m_marker_challenge_size/2));
-        irr_driver->getVideoDriver()->draw2DImage(m_lock, dest,
-                                                  source, NULL, NULL, true);
+        irr_driver->getVideoDriver()->draw2DImage(locked ? m_lock : m_open_challenge,
+                                                  dest, source, NULL, NULL, true);
     }
 }   // drawGlobalMiniMap
 

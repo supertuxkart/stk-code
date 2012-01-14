@@ -60,7 +60,8 @@ private:
     
     video::ITexture *m_trophy;
     video::ITexture *m_lock;
-    
+    video::ITexture *m_open_challenge;
+
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
     int              m_marker_challenge_size;

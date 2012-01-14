@@ -75,6 +75,18 @@ struct OverworldChallenge
         m_challenge_id = challenge_id;
     }
 };
+struct OverworldForceField
+{
+    core::vector3df m_position;
+    bool m_is_locked;
+    
+    OverworldForceField(core::vector3df position, bool is_locked)
+    {
+        m_position = position;
+        m_is_locked = is_locked;
+    }
+};
+
 
 /**
   * \ingroup tracks
@@ -94,6 +106,8 @@ private:
 
     /** Will only be sued on overworld */
     std::vector<OverworldChallenge> m_challenges;
+    
+    std::vector<OverworldForceField> m_force_fields;
     
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
@@ -417,6 +431,11 @@ public:
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const
         { return m_challenges; }
+    
+    /** Get list of force fields placed on that world. Works only for overworld. */
+    const std::vector<OverworldForceField>& getForceFieldList() const
+        { return m_force_fields; }
+
     
 };   // class Track
 

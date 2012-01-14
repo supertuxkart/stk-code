@@ -612,6 +612,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     assert(m_gfx_effect_mesh==NULL);
     
     m_challenges.clear();
+    m_force_fields.clear();
     
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
@@ -696,6 +697,14 @@ bool Track::loadMainTrack(const XMLNode &root)
             continue;
         }
         
+        
+        core::vector3df xyz(0,0,0);
+        n->get("xyz", &xyz);
+        core::vector3df hpr(0,0,0);
+        n->get("hpr", &hpr);
+        core::vector3df scale(1.0f, 1.0f, 1.0f);
+        n->get("scale", &scale);
+        
         // some static meshes are conditional
         std::string condition;
         n->get("if", &condition);
@@ -722,15 +731,11 @@ bool Track::loadMainTrack(const XMLNode &root)
                             condition.c_str());
                 }
                 
-                if (unlock_manager->getCurrentSlot()->getPoints() < val)
-                {
-                    // show object
-                }
-                else
-                {
-                    // don't show object
-                    continue;
-                }
+                bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
+                
+                m_force_fields.push_back(OverworldForceField(xyz, shown));
+                
+                if (!shown) continue;
             }
             else
             {
@@ -761,13 +766,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         model_name="";
         n->get("model", &model_name);
         full_path = m_root+"/"+model_name;
-        
-        core::vector3df xyz(0,0,0);
-        n->get("xyz", &xyz);
-        core::vector3df hpr(0,0,0);
-        n->get("hpr", &hpr);
-        core::vector3df scale(1.0f, 1.0f, 1.0f);
-        n->get("scale", &scale);
         
         // a special challenge orb object for overworld
         std::string challenge;
