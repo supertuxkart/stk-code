@@ -41,9 +41,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_difficulty  = RaceManager::RD_EASY;
     m_num_laps    = -1;
     m_num_karts   = -1;
-
+    m_position    = -1;
     m_time        = -1.0f;
-    m_track_name  = "";
+    m_track_id  = "";
     m_gp_id       = "";
     m_energy      = -1;
     m_version     = 0;
@@ -94,10 +94,12 @@ ChallengeData::ChallengeData(const std::string& filename)
     //std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
     setName( s.c_str() );
 
-    if(!root->get("description", &s) ) error("description");
-    setChallengeDescription( s.c_str() );
+    //if(!root->get("description", &s) ) error("description");
+    //setChallengeDescription( s.c_str() );
     //std::cout << "    // Challenge description = <" << s.c_str() << ">\n";
 
+    
+    
     if(!root->get("karts", &m_num_karts)  ) error("karts");
 
     // Position is optional except in GP and FTL
@@ -124,11 +126,11 @@ ChallengeData::ChallengeData(const std::string& filename)
     root->get("energy", &m_energy ); // This is optional
     if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
-        if (!root->get("track",  &m_track_name ))
+        if (!root->get("track",  &m_track_id ))
         {
             error("track");
         }
-        if (track_manager->getTrack(m_track_name) == NULL)
+        if (track_manager->getTrack(m_track_id) == NULL)
         {
             error("track");
         }
@@ -163,6 +165,34 @@ ChallengeData::ChallengeData(const std::string& filename)
     }
     delete root;
 
+    
+    
+    core::stringw description;
+    //I18N: number of laps to race in a challenge
+    description += _("Laps : %i", m_num_laps);
+    description += core::stringw(L"\n");
+    //I18N: number of AI karts in a challenge
+    description += _("AI Karts : %i", m_num_karts - 1);
+    if (m_position > 0)
+    {
+        description += core::stringw(L"\n");
+        //I18N: position required to win in a challenge
+        description += _("Required rank : %i", m_position);
+    }
+    if (m_time > 0)
+    {
+        description += core::stringw(L"\n");
+        //I18N: time required to win a challenge
+        description += _("Time to achieve : %s", StringUtils::timeToString(m_time).c_str());
+    }
+    if (m_energy > 0)
+    {
+        description += core::stringw(L"\n");
+        //I18N: nitro points needed to win a challenge
+        description += _("Collect %i points of nitr", m_energy);
+    }
+    
+    m_challenge_description = description;
 }   // ChallengeData
 
 // ----------------------------------------------------------------------------
@@ -188,7 +218,7 @@ void ChallengeData::check() const
     {
         try
         {
-            track_manager->getTrack(m_track_name);
+            track_manager->getTrack(m_track_id);
         }
         catch(std::exception&)
         {
@@ -270,7 +300,7 @@ void ChallengeData::setRace() const
     if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
         race_manager->setMinorMode(m_minor);
-        race_manager->setTrack(m_track_name);
+        race_manager->setTrack(m_track_id);
         race_manager->setDifficulty(m_difficulty);
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts);
@@ -298,7 +328,7 @@ bool ChallengeData::raceFinished()
     // ------------
     World *world = World::getWorld();
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!=m_track_name                         ) return false;
+    if(track_name!=m_track_id                         ) return false;
     if((int)world->getNumKarts()<m_num_karts            ) return false;
     Kart* kart = world->getPlayerKart(0);
     if(m_energy>0   && kart->getEnergy()  < m_energy    ) return false;

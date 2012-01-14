@@ -61,7 +61,7 @@ private:
     int                            m_num_karts;
     float                          m_time;
     std::string                    m_gp_id;
-    std::string                    m_track_name;
+    std::string                    m_track_id;
     int                            m_energy;
     std::string                    m_filename;
     /** Version number of the challenge. */
@@ -105,9 +105,6 @@ public:
     const std::vector<UnlockableFeature>&
         getFeatures() const                    { return m_feature;          }
 
-    void  setChallengeDescription(const irr::core::stringw& d) 
-        {m_challenge_description=d;  }
-
     const irr::core::stringw getChallengeDescription() const 
         {return _(m_challenge_description.c_str()); }
 
@@ -129,7 +126,7 @@ public:
     /** Sets the id of this challenge. */
     void  setId(const std::string& s)             { m_id = s;                 }
     
-    const std::string& getTrackName() const        { return m_track_name;     }
+    const std::string& getTrackId() const        { return m_track_id;     }
 
     
     void  addUnlockTrackReward(const std::string &track_name);
@@ -140,6 +137,16 @@ public:
                                     const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
+    
+    
+    RaceManager::MajorRaceModeType getMajorMode()  const { return m_major;      }
+    RaceManager::MinorRaceModeType getMinorMode()  const { return m_minor;      }
+    RaceManager::Difficulty        getDifficulty() const { return m_difficulty; }
+    int                            getNumLaps()    const { return m_num_laps;   }
+    int                            getPosition()   const { return m_position;   }
+    int                            getNumKarts()   const { return m_num_karts;  }
+    float                          getTime()       const { return m_time;       }
+    int                            getEnergy()     const { return m_energy;     }
     
 };   // ChallengeData
 

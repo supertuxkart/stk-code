@@ -857,10 +857,10 @@ bool Track::loadMainTrack(const XMLNode &root)
                 
                 m_challenges.push_back( OverworldChallenge(xyz, challenge) );
                 
-                Track* t = track_manager->getTrack(c->getTrackName());
+                Track* t = track_manager->getTrack(c->getTrackId());
                 if (t == NULL)
                 {
-                    fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackName().c_str());
+                    fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackId().c_str());
                     continue;
                 }
                 

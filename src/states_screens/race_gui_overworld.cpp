@@ -41,6 +41,7 @@ using namespace irr;
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -244,6 +245,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     
     Track* t = world->getTrack();
     
+    Vec3 kart_xyz;
+    
     // In the first iteration, only draw AI karts, then only draw
     // player karts. This guarantees that player kart icons are always
     // on top of AI kart icons.
@@ -258,9 +261,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                                  // only player karts.
             if(kart->getController()->isPlayerController() 
                !=(only_draw_player_kart==1)) continue;
-            const Vec3& xyz = kart->getXYZ();
+            kart_xyz= kart->getXYZ();
             Vec3 draw_at;
-            t->mapPoint2MiniMap(xyz, &draw_at);
+            t->mapPoint2MiniMap(kart_xyz, &draw_at);
             
             core::rect<s32> source(i    *m_marker_rendered_size,
                                    0, 
@@ -296,16 +299,16 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     
     
     //const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
-    const std::vector<OverworldForceField>& challenges = t->getForceFieldList();
+    const std::vector<OverworldForceField>& forcefields = t->getForceFieldList();
     
-    for (unsigned int n=0; n<challenges.size(); n++)
+    for (unsigned int n=0; n<forcefields.size(); n++)
     {
         Vec3 draw_at;
-        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
+        t->mapPoint2MiniMap(forcefields[n].m_position, &draw_at);
         
         //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
-        bool locked = challenges[n].m_is_locked;
+        bool locked = forcefields[n].m_is_locked;
         
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      (locked ? m_lock : m_open_challenge)->getOriginalSize());
@@ -317,6 +320,52 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         irr_driver->getVideoDriver()->draw2DImage(locked ? m_lock : m_open_challenge,
                                                   dest, source, NULL, NULL, true);
     }
+    
+    
+    // ---- Draw nearby challenge if any
+    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
+    for (unsigned int n=0; n<challenges.size(); n++)
+    {
+        if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < 20)
+        {
+            core::rect<s32> pos(15,
+                                10, 
+                                15 + UserConfigParams::m_width/2,
+                                10 + GUIEngine::getTitleFontHeight());
+            
+            const ChallengeData* challenge = unlock_manager->getChallenge(challenges[n].m_challenge_id);
+            
+            if (challenge == NULL)
+            {
+                fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find challenge <%s>\n",
+                        challenges[n].m_challenge_id.c_str());
+                break;
+            }
+            
+            Track* track = track_manager->getTrack(challenge->getTrackId());
+            if (track == NULL)
+            {
+                fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find track <%s>, "
+                        "referenced from challenge <%s>\n",
+                        challenge->getTrackId().c_str(),
+                        challenges[n].m_challenge_id.c_str());
+                break;
+            }
+            
+            gui::ScalableFont* font = GUIEngine::getTitleFont();
+            font->draw(track->getName(), pos, video::SColor(255,255,255,255),
+                       false, true /* vcenter */, NULL);
+            
+            
+            pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
+            pos.LowerRightCorner.Y = UserConfigParams::m_height;
+            GUIEngine::getFont()->draw(challenge->getChallengeDescription().c_str(),
+                                       pos, video::SColor(255,255,255,255),
+                                       false, false /* vcenter */, NULL);
+            break;
+        }
+    }
+    
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
