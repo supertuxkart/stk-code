@@ -96,6 +96,8 @@ public:
     void       save              (XMLWriter& file);
     
     int        getPoints          () const { return m_points; }
+    
+    const Challenge* getChallenge(const std::string& id) { return m_challenges_state[id]; }
 };
 
 #endif

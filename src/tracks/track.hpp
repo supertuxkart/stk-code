@@ -64,26 +64,31 @@ enum WeatherType
     WEATHER_RAIN
 };
 
-struct OverworldChallenge
-{
-    core::vector3df m_position;
-    std::string m_challenge_id;
-    
-    OverworldChallenge(core::vector3df position, std::string challenge_id)
-    {
-        m_position = position;
-        m_challenge_id = challenge_id;
-    }
-};
 struct OverworldForceField
 {
     core::vector3df m_position;
     bool m_is_locked;
     
+    OverworldForceField()
+    {
+    }
+    
     OverworldForceField(core::vector3df position, bool is_locked)
     {
         m_position = position;
         m_is_locked = is_locked;
+    }
+};
+struct OverworldChallenge
+{
+    core::vector3df m_position;
+    std::string m_challenge_id;
+    OverworldForceField m_force_field;
+    
+    OverworldChallenge(core::vector3df position, std::string challenge_id)
+    {
+        m_position = position;
+        m_challenge_id = challenge_id;
     }
 };
 
@@ -431,10 +436,6 @@ public:
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const
         { return m_challenges; }
-    
-    /** Get list of force fields placed on that world. Works only for overworld. */
-    const std::vector<OverworldForceField>& getForceFieldList() const
-        { return m_force_fields; }
 
     
 };   // class Track

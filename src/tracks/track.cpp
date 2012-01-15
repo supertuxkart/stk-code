@@ -901,6 +901,27 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     }   // for i
     
+    // Associate force fields and challenges
+    for (unsigned int c=0; c<m_challenges.size(); c++)
+    {
+        int closest_field_id = -1;
+        float closest_distance = 99999.0f;
+        for (unsigned int f=0; f<m_force_fields.size(); f++)
+        {
+            float dist = m_force_fields[f].m_position.getDistanceFromSQ(m_challenges[c].m_position);
+            if (closest_field_id == -1 || dist < closest_distance)
+            {
+                closest_field_id = f;
+                closest_distance = dist;
+            }
+        }
+        
+        assert(closest_field_id >= 0);
+        assert(closest_field_id < (int)m_force_fields.size());
+        m_challenges[c].m_force_field = m_force_fields[closest_field_id];
+    }
+    
+    // Create LOD nodes
     std::vector<LODNode*> lod_nodes;
     lodLoader.done(m_root, m_all_cached_meshes, lod_nodes);
     for (unsigned int n=0; n<lod_nodes.size(); n++)

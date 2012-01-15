@@ -46,6 +46,10 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+const int LOCKED = 0;
+const int OPEN = 1;
+const int COMPLETED = 2;
+
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
  *  created, so only the race manager can be accessed safely.
@@ -102,6 +106,10 @@ RaceGUIOverworld::RaceGUIOverworld()
     
     m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
     m_open_challenge = irr_driver->getTexture( file_manager->getGUIDir() + "challenge.png" );
+    
+    m_icons[0] = m_lock;
+    m_icons[1] = m_open_challenge;
+    m_icons[2] = m_trophy;
 }   // RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
@@ -298,32 +306,33 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     }   // for only_draw_player_kart
     
     
-    //const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
-    const std::vector<OverworldForceField>& forcefields = t->getForceFieldList();
+    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
     
-    for (unsigned int n=0; n<forcefields.size(); n++)
+    for (unsigned int n=0; n<challenges.size(); n++)
     {
         Vec3 draw_at;
-        t->mapPoint2MiniMap(forcefields[n].m_position, &draw_at);
+        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
         
         //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
-        bool locked = forcefields[n].m_is_locked;
+        int state = (challenges[n].m_force_field.m_is_locked ? LOCKED : OPEN);
         
+        const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenges[n].m_challenge_id);
+        if (c->isSolved()) state = COMPLETED;
+            
         const core::rect<s32> source(core::position2d<s32>(0,0),
-                                     (locked ? m_lock : m_open_challenge)->getOriginalSize());
+                                     m_icons[state]->getOriginalSize());
         
         core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-m_marker_challenge_size/2), 
                              lower_y   -(int)(draw_at.getY()+m_marker_challenge_size/2),
                              m_map_left+(int)(draw_at.getX()+m_marker_challenge_size/2), 
                              lower_y   -(int)(draw_at.getY()-m_marker_challenge_size/2));
-        irr_driver->getVideoDriver()->draw2DImage(locked ? m_lock : m_open_challenge,
+        irr_driver->getVideoDriver()->draw2DImage(m_icons[state],
                                                   dest, source, NULL, NULL, true);
     }
     
     
     // ---- Draw nearby challenge if any
-    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < 20)
