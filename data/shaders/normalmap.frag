@@ -27,12 +27,12 @@ void main()
 	float shininess ;
   
 	// compute ambient
-	vec4 ambientLight = vec4(0.3, 0.3, 0.3, 0.0);	
+	vec4 ambientLight = vec4(0.5, 0.5, 0.5, 1.0);	
 	
 	if (lamberFactor > 0.0)
 	{
 		diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
-		diffuseLight  = vec4(0.7, 0.7, 0.7, 0.0);
+		diffuseLight  = vec4(0.5, 0.5, 0.5, 1.0);
 
 		gl_FragColor =	diffuseMaterial * diffuseLight * lamberFactor ;	
 	}

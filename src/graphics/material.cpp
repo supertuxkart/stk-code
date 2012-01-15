@@ -65,7 +65,7 @@ public:
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
         // comes from the camera gives good results
-        const float lightdir[] = {0.0f, 0.0f, -1.0f};
+        const float lightdir[] = {0.1852f, -0.1852f, -0.9259f};
         services->setVertexShaderConstant("lightdir", lightdir, 3);
     }
 };
