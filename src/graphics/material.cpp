@@ -297,8 +297,9 @@ Material::Material(const XMLNode *node, int index)
             fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
         }
         
-        m_normal_map_uv2 = false;
-        node->get("normal-map-uv2",  &m_normal_map_uv2);
+        // not supported by irrlicht
+        //m_normal_map_uv2 = false;
+        //node->get("normal-map-uv2",  &m_normal_map_uv2);
 
         
         // TODO: add support for parallax maps?
@@ -458,7 +459,7 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_normal_map                = false;
-    m_normal_map_uv2            = false;
+    //m_normal_map_uv2            = false;
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
@@ -784,18 +785,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 video_driver->makeNormalMapTexture( tex );
             }
             m->setTexture(1, tex);
-
+            
             if (m_normal_map_provider == NULL)
             {
                 m_normal_map_provider = new NormalMapProvider();
             }
                         
-            const char* vertex_shader = (m_normal_map_uv2 ?
-                                            "shaders/normalmap2uv.vert" :
-                                            "shaders/normalmap.vert");
-            const char* pixel_shader  = (m_normal_map_uv2 ?
-                                            "shaders/normalmap2uv.frag" :
-                                            "shaders/normalmap.frag");
+            const char* vertex_shader = "shaders/normalmap.vert";
+            const char* pixel_shader  = "shaders/normalmap.frag";
 
             // Material and shaders
             IGPUProgrammingServices* gpu = 

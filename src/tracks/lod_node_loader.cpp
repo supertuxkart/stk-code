@@ -23,9 +23,9 @@ using namespace irr;
 #include "graphics/lod_node.hpp"
 #include "io/xml_node.hpp"
 
-#include <IAnimatedMeshSceneNode.h>
+#include <IMeshSceneNode.h>
 #include <ISceneManager.h>
-
+#include <IMeshManipulator.h>
 #include <algorithm>
 
 LodNodeLoader::LodNodeLoader()
@@ -34,7 +34,7 @@ LodNodeLoader::LodNodeLoader()
 
 // ----------------------------------------------------------------------------
 
-bool PairCompare(const std::pair<int, std::string>& i, const std::pair<int, std::string>& j)
+bool PairCompare(const std::pair<int, LodModel>& i, const std::pair<int, LodModel>& j)
 {
     return (i.first < j.first);
 }
@@ -53,6 +53,9 @@ bool LodNodeLoader::check(const XMLNode* xml)
     std::string lodgroup;
     xml->get("lod_group", &lodgroup);
     
+    bool tangent = false;
+    xml->get("tangents", &tangent);
+
     if (!lodgroup.empty())
     {
         if (lod_instance)
@@ -64,7 +67,7 @@ bool LodNodeLoader::check(const XMLNode* xml)
             std::string model_name;
             xml->get("model", &model_name);
             
-            lod_groups[lodgroup][(int)lod_distance] = model_name;
+            lod_groups[lodgroup][(int)lod_distance] = LodModel(model_name, tangent);
         }
         return true;
     }
@@ -92,16 +95,16 @@ void LodNodeLoader::done(std::string directory,
     // but it was done this way to minimize the work needed on the side of the artists
     
     // 1. Sort LOD groups (highest detail first, lowest detail last)
-    std::map<std::string, std::vector< std::pair<int, std::string> > > sorted_lod_groups;
+    std::map<std::string, std::vector< std::pair<int, LodModel> > > sorted_lod_groups;
     
-    std::map<std::string, std::map<int, std::string> >::iterator it;
+    std::map<std::string, std::map<int, LodModel> >::iterator it;
     for (it = lod_groups.begin(); it != lod_groups.end(); it++)
     {
-        std::map<int, std::string>::iterator it2;
+        std::map<int, LodModel>::iterator it2;
         for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
         {
             //printf("Copying before sort : (%i) %s is in group %s\n", it2->first, it2->second.c_str(), it->first.c_str());
-            sorted_lod_groups[it->first].push_back( std::pair<int, std::string>(it2->first, it2->second) );
+            sorted_lod_groups[it->first].push_back( std::pair<int, LodModel>(it2->first, it2->second) );
         }
         std::sort( sorted_lod_groups[it->first].begin(), sorted_lod_groups[it->first].end(), PairCompare );
         
@@ -117,7 +120,7 @@ void LodNodeLoader::done(std::string directory,
     std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
     for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
     {
-        std::vector< std::pair<int, std::string> >& group = sorted_lod_groups[it3->first];
+        std::vector< std::pair<int, LodModel> >& group = sorted_lod_groups[it3->first];
         
         std::vector< const XMLNode* >& v = it3->second;
         for (unsigned int n=0; n<v.size(); n++)
@@ -134,7 +137,7 @@ void LodNodeLoader::done(std::string directory,
             node->get("hpr", &hpr);
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             node->get("scale", &scale);
-            
+
             std::string full_path;
             
             if (group.size() > 0)
@@ -142,22 +145,31 @@ void LodNodeLoader::done(std::string directory,
                 LODNode* lod_node = new LODNode(groupname, sroot, sm);
                 for (unsigned int m=0; m<group.size(); m++)
                 {
-                    full_path = directory + "/" + group[m].second;
+                    full_path = directory + "/" + group[m].second.m_model_file;
                     
-                    // TODO: check whether the mesh contains animations or not, and use a static
-                    //       mesh when there are no animations?
-                    scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+                    // TODO: check whether the mesh contains animations or not?
+                    scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
                     if(!a_mesh)
                     {
                         fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
                                 full_path.c_str());
                         continue;
                     }
+                    
+                    if (group[m].second.m_tangent)
+                    {
+                        scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+                        scene::IMesh* m2 = manip->createMeshWithTangents(a_mesh);
+                        // FIXME: do we need to clean up 'a_mesh' ?
+                        a_mesh = m2;
+                        irr_driver->setAllMaterialFlags(a_mesh);
+
+                    }
+                    
                     a_mesh->grab();
                     cache.push_back(a_mesh);
                     irr_driver->grabAllTextures(a_mesh);
-                    scene::IAnimatedMeshSceneNode* scene_node = 
-                        irr_driver->addAnimatedMesh(a_mesh);
+                    scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh);
                     scene_node->setPosition(xyz);
                     scene_node->setRotation(hpr);
                     scene_node->setScale(scale);

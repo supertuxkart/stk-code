@@ -35,13 +35,31 @@ namespace irr
     }
 }
 
+struct LodModel
+{
+    std::string m_model_file;
+    bool m_tangent;
+    
+    /** Constructor to allow storing this in STL containers */
+    LodModel()
+    {
+        m_tangent = false;
+    }
+    
+    LodModel(std::string& model, bool tangent)
+    {
+        m_model_file = model;
+        m_tangent = tangent;
+    }
+};
+
 /** Utility class to load level-of-detail nodes
  * \ingroup tracks
  */
 class LodNodeLoader
 {
 private:
-    std::map< std::string, std::map< int, std::string > > lod_groups;
+    std::map< std::string, std::map< int, LodModel > > lod_groups;
     std::map< std::string, std::vector< const XMLNode* > > lod_instances;
 
 public:

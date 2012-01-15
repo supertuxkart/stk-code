@@ -82,7 +82,6 @@ private:
     enum {RES_CHANGE_NONE, RES_CHANGE_YES, 
           RES_CHANGE_CANCEL}                m_resolution_changing;
     
-    void setAllMaterialFlags(scene::IMesh *mesh) const;
 public:
     /** A simple class to store video resolutions. */
     class VideoMode
@@ -114,6 +113,8 @@ public:
                          ~IrrDriver();
     void                 initDevice();
     
+    void setAllMaterialFlags(scene::IMesh *mesh) const;
+
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     /** Returns the frame size. */

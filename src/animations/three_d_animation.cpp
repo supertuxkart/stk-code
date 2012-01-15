@@ -154,7 +154,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
             if (mb->getVertexType() != video::EVT_STANDARD &&
                 mb->getVertexType() != video::EVT_2TCOORDS)
             {
-                fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
+                fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!\n", 
                         mb->getVertexType());
                 continue;
             }

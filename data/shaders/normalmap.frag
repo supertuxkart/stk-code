@@ -38,5 +38,4 @@ void main()
 	}
 	
 	gl_FragColor +=	ambientLight;
-	
 }			
