@@ -156,7 +156,19 @@ bool TrackManager::loadTrack(const std::string& dirname)
     if(!f) return false;
     fclose(f);
 
-    Track *track = new Track(config_file);
+    Track *track;
+    
+    try
+    {
+        track = new Track(config_file);
+    }
+    catch (std::exception& e)
+    {
+        fprintf(stderr, "[TrackManager] ERROR: Cannot load track <%s> : %s\n",
+                dirname.c_str(), e.what());
+        return false;
+    }
+    
     if(track->getVersion()<stk_config->m_min_track_version ||
         track->getVersion()>stk_config->m_max_track_version)
     {

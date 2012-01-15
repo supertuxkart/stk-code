@@ -418,7 +418,16 @@ bool AddonsManager::install(const Addon &addon)
         Track *track = track_manager->getTrack(addon.getId());
         if(track)
             track_manager->removeTrack(addon.getId());
-        track_manager->loadTrack(addon.getDataDir());
+        
+        try
+        {
+            track_manager->loadTrack(addon.getDataDir());
+        }
+        catch (std::exception& e)
+        {
+            fprintf(stderr, "[AddonsManager] ERROR: Cannot load track <%s> : %s\n",
+                    addon.getDataDir().c_str(), e.what());
+        }
     }
     saveInstalled();
     return true;
