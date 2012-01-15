@@ -1,24 +1,54 @@
-// By http://content.gpwiki.org/index.php/OpenGL:Tutorials:GLSL_Bump_Mapping
-// Released under GNU FDL license, without invariant (so DFSG-compliant, see
-// http://wiki.debian.org/DFSGLicenses#Exception)
+// Shader based on work by Fabien Sanglard
+// Released under the terms of CC-BY 3.0
 
-varying vec4 passcolor; //The vertex color passed
- varying vec3 LightDir; //The transformed light direction, to pass to the fragment shader
- attribute vec3 tangent; //The inverse tangent to the geometry
- attribute vec3 binormal; //The inverse binormal to the geometry
- uniform vec3 lightdir; //The direction the light is shining
- void main() 
- {
-   //Put the color in a varying variable
-   passcolor = gl_Color;
-   //Put the vertex in the position passed
-   gl_Position = ftransform(); 
-   //Construct a 3x3 matrix from the geometry’s inverse tangent, binormal, and normal
-   mat3 rotmat = mat3(tangent,binormal,gl_Normal);
-   //Rotate the light into tangent space
-   LightDir = rotmat * normalize(lightdir);
-   //Normalize the light
-   normalize(LightDir); 
-   //Use the first set of texture coordinates in the fragment shader 
-   gl_TexCoord[0] = gl_MultiTexCoord0;
- }
+varying vec3 lightVec;
+varying vec3 halfVec;
+varying vec3 eyeVec;
+
+uniform vec3 lightdir;
+
+void main()
+{
+
+	gl_TexCoord[0] =  gl_MultiTexCoord0;
+	
+	// Building the matrix Eye Space -> Tangent Space
+	vec3 n = normalize (gl_NormalMatrix * gl_Normal);
+	vec3 t = normalize (gl_NormalMatrix * gl_MultiTexCoord1.xyz); // tangent
+	vec3 b = cross (n, t);
+	
+	vec3 vertexPosition = vec3(gl_ModelViewMatrix *  gl_Vertex);
+    
+	// transform light and half angle vectors by tangent basis
+	vec3 v;
+	v.x = dot (lightdir, t);
+	v.y = dot (lightdir, b);
+	v.z = dot (lightdir, n);
+	lightVec = normalize (v);
+	
+	  
+	v.x = dot (vertexPosition, t);
+	v.y = dot (vertexPosition, b);
+	v.z = dot (vertexPosition, n);
+	eyeVec = normalize (v);
+	
+	
+	vertexPosition = normalize(vertexPosition);
+	
+	// Normalize the halfVector to pass it to the fragment shader
+
+	// No need to divide by two, the result is normalized anyway.
+	// vec3 halfVector = normalize((vertexPosition + lightDir) / 2.0); 
+	vec3 halfVector = normalize(vertexPosition + lightdir);
+	v.x = dot (halfVector, t);
+	v.y = dot (halfVector, b);
+	v.z = dot (halfVector, n);
+
+	// No need to normalize, t,b,n and halfVector are normal vectors.
+	//normalize (v);
+	halfVec = v ; 
+	  
+	  
+	gl_Position = ftransform();
+
+}
