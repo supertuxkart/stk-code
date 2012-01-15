@@ -371,6 +371,14 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             GUIEngine::getFont()->draw(challenge->getChallengeDescription().c_str(),
                                        pos, video::SColor(255,255,255,255),
                                        false, false /* vcenter */, NULL);
+            
+            core::rect<s32> pos2(0,
+                                 UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
+                                 UserConfigParams::m_width,
+                                 UserConfigParams::m_height);
+            GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
+                                       video::SColor(255,255,150,60),
+                                       true, true /* vcenter */, NULL);
             break;
         }
     }

@@ -274,6 +274,8 @@ public:
     void setClearbackBufferColor(irr::video::SColor color) 
                                           { m_clear_color = color; }
     // ------------------------------------------------------------------------
+    /** Override if you want to know when a kart presses fire */
+    virtual void onFirePressed(Controller* who) {}
     
 };   // World
 

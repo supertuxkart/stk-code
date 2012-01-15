@@ -176,6 +176,10 @@ void PlayerController::action(PlayerAction action, int value)
         break;
     case PA_FIRE:
         m_controls->m_fire = (value!=0);
+        if (value > 0)
+        {
+            World::getWorld()->onFirePressed(this);
+        }
         break;
     case PA_LOOK_BACK:
         m_controls->m_look_back = (value!=0);

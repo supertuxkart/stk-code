@@ -63,6 +63,10 @@ public:
     // ------------------------------------------------------------------------
     /** Override base class method */
     virtual bool shouldDrawTimer() const { return false; }
+    // ------------------------------------------------------------------------
+    /** Override base class method */
+    virtual void onFirePressed(Controller* who);
+
 };
 
 #endif
