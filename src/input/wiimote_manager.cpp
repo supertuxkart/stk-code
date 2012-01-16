@@ -23,6 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "utils/string_utils.hpp"
 
 WiimoteManager*  wiimote_manager;
 
