@@ -29,6 +29,7 @@
 #include "utils/no_copy.hpp"
 
 #include <vector>
+#include <string>
 
 class KartProperties;
 class MusicInformation;
