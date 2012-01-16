@@ -2250,7 +2250,6 @@ float Kart::getVisualSkidOffset() const
             st = m_kart_properties->getSkidVisualTime();
         f *= sqrt(st/m_kart_properties->getSkidVisualTime());
     }
-printf("f %f visual %f\n", f, f*m_kart_properties->getSkidVisual());
     return f*m_kart_properties->getSkidVisual();
 
 }   // getVisualSkidOffset
