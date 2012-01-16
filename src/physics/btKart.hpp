@@ -238,7 +238,7 @@ public:
      *  \param torque The rotation to apply.  */
     void setTimedRotation(float t, const btVector3 &rot)
     {
-        m_additional_rotation      = rot;
+        m_additional_rotation      = rot/t;
         m_time_additional_rotation = t;
     }   // setTimedTorque
 };   // class btKart

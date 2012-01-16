@@ -301,12 +301,14 @@ private:
     float m_skid_visual_time;
     /** Angular velocity to be applied when skidding. */
     float m_skid_angular_velocity;
-
     /** This factor is used to determine how much the chassis of a kart
      *  should rotate to match the graphical view. A factor of 1 is 
      *  identical, a smaller factor will rotate the kart less (which might
      *  feel better). */
     float m_post_skid_rotate_factor;
+    /** This factor reduces the amount of steering while skidding.
+     */
+    float m_skid_reduce_turn;
 
     /** Kart leaves skid marks. */
     bool  m_has_skidmarks;
@@ -675,6 +677,10 @@ public:
      *  identical, a smaller factor will rotate the kart less (which might
      *  feel better). */
     float getPostSkidRotateFactor  () const {return m_post_skid_rotate_factor;}
+
+    /** Returns the factor by which to recude the amount of steering while 
+        skidding. */
+    float getSkidReduceTurn         () const { return m_skid_reduce_turn;     }
 
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks               () const {return m_has_skidmarks;         }
