@@ -35,6 +35,8 @@ namespace irr
     }
 }
 
+class SFXBase;
+
 /**
   * \brief Displays the results (while the end animation is shown).
   * \ingroup states_screens

@@ -23,7 +23,11 @@
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
 
-namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
+namespace irr { 
+    namespace scene { class ISceneNode; class ICameraSceneNode; 
+                      class ILightSceneNode;                       } 
+}
+class KartModel;
 class KartProperties;
 class ChallengeData;
 

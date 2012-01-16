@@ -41,6 +41,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 // Use Sleep, which takes time in msecs. It must be defined after the

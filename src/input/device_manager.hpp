@@ -24,6 +24,8 @@
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <irrArray.h>
+
 enum PlayerAssignMode
 {
     NO_ASSIGN,  //!< react to all devices

@@ -22,6 +22,7 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 

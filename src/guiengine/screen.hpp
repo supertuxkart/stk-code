@@ -24,6 +24,8 @@
 #include <typeinfo>
 
 #include <irrString.h>
+#include <IXMLReader.h>
+
 namespace irr
 {
     namespace gui { class IGUIElement; }
@@ -34,7 +36,6 @@ using namespace irr;
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
-//#include "guiengine/layout_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"

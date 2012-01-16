@@ -22,20 +22,31 @@
 #include <stdio.h>
 #include <sstream>
 
+#include "audio/music_information.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
-#include "audio/music_information.hpp"
+#include "karts/kart_properties.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;
 
 //-----------------------------------------------------------------------------
+/** Constructor, which only initialises the object. The actual work is done
+ *  by calling load().
+ */
+STKConfig::STKConfig()
+{
+    m_has_been_loaded         = false;
+    m_default_kart_properties = new KartProperties();
+}   // STKConfig
+//-----------------------------------------------------------------------------
 STKConfig::~STKConfig()
 {
     if(m_title_music)
         delete m_title_music;
+    delete m_default_kart_properties;
 }   // ~STKConfig
 
 //-----------------------------------------------------------------------------
@@ -128,7 +139,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
 
-    m_kart_properties.checkAllSet(filename);
+    m_default_kart_properties->checkAllSet(filename);
 }   // load
 
 // -----------------------------------------------------------------------------
@@ -343,7 +354,7 @@ void STKConfig::getAllData(const XMLNode * root)
         msg << "Couldn't load general-kart-defaults: no node.";
         throw std::runtime_error(msg.str());
     }
-    m_kart_properties.getAllData(node);
+    m_default_kart_properties->getAllData(node);
 
 }   // getAllData
 

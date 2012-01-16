@@ -30,6 +30,7 @@
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/translation.hpp"
 #include "utils/ptr_vector.hpp"
 
 DEFINE_SCREEN_SINGLETON( AddonsScreen );

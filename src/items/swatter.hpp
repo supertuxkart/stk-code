@@ -19,13 +19,14 @@
 #ifndef HEADER_SWATTER_HPP
 #define HEADER_SWATTER_HPP
 
-#include <vector3d.h>
-
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
 #include "karts/moveable.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
+
+#include <vector3d.h>
+#include <IAnimatedMeshSceneNode.h>
 
 class Kart;
 class Item;

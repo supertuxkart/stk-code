@@ -20,6 +20,7 @@
 #include <IGUIStaticText.h>
 #include <IGUIEnvironment.h>
 
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"

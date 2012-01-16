@@ -19,6 +19,9 @@
 #include "items/powerup_manager.hpp"
 
 #include <stdexcept>
+
+#include <irrlicht.h>
+
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"

@@ -24,6 +24,9 @@
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
+using namespace irr;
+
 class Kart;
 class Item;
 class SFXBase;

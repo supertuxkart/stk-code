@@ -31,6 +31,7 @@ using irr::core::stringc;
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 DEFINE_SCREEN_SINGLETON( CreditsScreen );
 

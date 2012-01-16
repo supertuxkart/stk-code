@@ -32,6 +32,7 @@
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 #include <sstream>

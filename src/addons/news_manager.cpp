@@ -23,6 +23,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 

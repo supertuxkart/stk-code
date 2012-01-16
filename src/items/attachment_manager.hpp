@@ -24,6 +24,7 @@ namespace irr
     namespace scene { class IAnimatedMesh; }
 }
 
+#include "graphics/material.hpp"
 #include "items/attachment.hpp"
 #include "utils/no_copy.hpp"
 

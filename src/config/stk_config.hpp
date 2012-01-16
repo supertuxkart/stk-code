@@ -26,11 +26,13 @@
  * configuration file.
  */
 
-#include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
 
-class XMLNode;
+#include <vector>
+
+class KartProperties;
 class MusicInformation;
+class XMLNode;
 
 /** 
  * \brief Global STK configuration information.
@@ -42,7 +44,9 @@ class MusicInformation;
 class STKConfig : public NoCopy
 {
 protected:
-    KartProperties  m_kart_properties; /**< Default kart properties. */
+    /** Default kart properties. */
+    KartProperties  *m_default_kart_properties; 
+
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
      *  - NEW:  give it a random new bonx box.
@@ -124,18 +128,18 @@ private:
     bool  m_has_been_loaded;
 
 public:
-    /** Empty constructor. The actual work is done in load. */
-         STKConfig() {m_has_been_loaded= false;};
+         STKConfig();
         ~STKConfig();
     void init_defaults    ();
     void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);
-    /** Returns the default kart properties for each kart. */
-    const KartProperties &
-         getDefaultKartProperties() const {return m_kart_properties; }
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
+    // ------------------------------------------------------------------------
+    /** Returns the default kart properties for each kart. */
+    const KartProperties &
+         getDefaultKartProperties() const {return *m_default_kart_properties; }
 }
 ;   // STKConfig
 
