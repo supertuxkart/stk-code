@@ -172,11 +172,11 @@
            less (which might  feel better).   
          reduce-turn: A factor that's multiplied to the steering when skidding,
            which is used to reduce the turn angle  used to reduce the turn angle. -->
-    <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
-          visual="1.9" visual-time="0"
+    <skid increase="1.05" decrease="0.95" max="4.5" time-till-max="0.4"
+          visual="1.0" visual-time="2.0"
           angular-velocity="0"  time-till-bonus="1.5 2"
           bonus-force="100 200" bonus-time="3.0 3.0" 
-          post-skid-rotate-factor="0.33" reduce-turn="0.6"/>
+          post-skid-rotate-factor="0.33" reduce-turn="0.4"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
