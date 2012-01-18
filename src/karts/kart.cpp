@@ -1805,6 +1805,12 @@ void Kart::updateSkidding(float dt)
             handleZipper(0);
         }
     }
+    else if (m_skid_time < 0)
+    {
+        m_skid_time += dt;
+        if(m_skid_time>0) 
+            m_skid_time = 0;
+    }
     m_vehicle->setSkidAngularVelocity(ang_vel);
 }   // updateSkidding
 
