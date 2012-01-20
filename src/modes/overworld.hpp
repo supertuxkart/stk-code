@@ -66,7 +66,9 @@ public:
     // ------------------------------------------------------------------------
     /** Override base class method */
     virtual void onFirePressed(Controller* who);
-
+    // ------------------------------------------------------------------------    
+    /** Override settings from base class */
+    virtual bool computeChecklineRequirements() const { return false; }
 };
 
 #endif

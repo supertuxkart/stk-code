@@ -136,6 +136,9 @@ public:
     /** Returns if this race mode has bonus items. */
     virtual bool  haveBonusBoxes(){ return true; }
     // ------------------------------------------------------------------------    
+    /** Override settings from base class */
+    virtual bool computeChecklineRequirements() const { return true; }
+    // ------------------------------------------------------------------------    
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart. */
     bool          isOnRoad(unsigned int kart_index) const 

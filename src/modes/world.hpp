@@ -277,6 +277,10 @@ public:
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}
     
+    /** Whether to compute checkline requirements for each world on the
+      * quadgraph. Override to change value. */
+    virtual bool computeChecklineRequirements() const { return false; }
+    
 };   // World
 
 #endif

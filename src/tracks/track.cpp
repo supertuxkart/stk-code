@@ -1524,7 +1524,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
-    if (dynamic_cast<LinearWorld*>(World::getWorld()) != NULL)
+    if (World::getWorld()->computeChecklineRequirements())
     {
         QuadGraph::get()->setChecklineRequirements();
     }
