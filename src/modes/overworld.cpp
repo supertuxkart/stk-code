@@ -104,16 +104,18 @@ void OverWorld::onFirePressed(Controller* who)
             }
             
             race_manager->exitRace();
+            //StateManager::get()->resetActivePlayers();
             
             // Use latest used device
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-            
-            int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
-            input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(id) );
+            assert(device != NULL);
             
             // Set up race manager appropriately
             race_manager->setNumLocalPlayers(1);
             race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+            
+            //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
+            input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
             
             // ASSIGN should make sure that only input from assigned devices is read.
             input_manager->getDeviceList()->setAssignMode(ASSIGN);
