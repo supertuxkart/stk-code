@@ -46,6 +46,9 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <ISceneCollisionManager.h>
+#include <ISceneManager.h>
+
 const int LOCKED = 0;
 const int OPEN = 1;
 const int COMPLETED = 2;
@@ -379,7 +382,19 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
                                        video::SColor(255,255,150,60),
                                        true, true /* vcenter */, NULL);
-            break;
+        }
+        
+        // force field points
+        if ((kart_xyz - Vec3(challenges[n].m_force_field.m_position)).length2_2d() < 60*60)
+        {
+            int pts = challenges[n].m_force_field.m_required_points;
+            scene::ISceneCollisionManager* scm = irr_driver->getSceneManager()->getSceneCollisionManager();
+            core::vector2di pos = scm->getScreenCoordinatesFrom3DPosition(challenges[n].m_force_field.m_position);
+            
+            GUIEngine::getTitleFont()->draw(core::stringw(StringUtils::toString(pts).c_str()),
+                                            core::rect<s32>(pos, pos + core::vector2di(100, 100)),
+                                            video::SColor(255,255,150,60),
+                                            false, false /* vcenter */, NULL);
         }
     }
     

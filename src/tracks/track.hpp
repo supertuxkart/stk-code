@@ -68,15 +68,17 @@ struct OverworldForceField
 {
     core::vector3df m_position;
     bool m_is_locked;
+    int m_required_points;
     
     OverworldForceField()
     {
     }
     
-    OverworldForceField(core::vector3df position, bool is_locked)
+    OverworldForceField(core::vector3df position, bool is_locked, int required_points)
     {
         m_position = position;
         m_is_locked = is_locked;
+        m_required_points = required_points;
     }
 };
 struct OverworldChallenge

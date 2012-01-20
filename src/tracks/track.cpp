@@ -750,7 +750,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 
                 bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
                 
-                m_force_fields.push_back(OverworldForceField(xyz, shown));
+                m_force_fields.push_back(OverworldForceField(xyz, shown, val));
                 
                 if (!shown) continue;
             }
