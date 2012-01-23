@@ -2244,7 +2244,7 @@ float Kart::getVisualSkidOffset() const
 {
     float speed_ratio = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
     float f = getSteerPercent() * speed_ratio;
-    if(m_kart_properties->getSkidVisualTime()==0 || m_skid_time < 0)
+    if(m_kart_properties->getSkidVisualTime()==0)
     {
         float r = m_skidding / m_kart_properties->getMaxSkid();
         f *= r;
@@ -2254,7 +2254,7 @@ float Kart::getVisualSkidOffset() const
         float st = fabsf(m_skid_time);
         if(st>m_kart_properties->getSkidVisualTime())
             st = m_kart_properties->getSkidVisualTime();
-        f *= sqrt(st/m_kart_properties->getSkidVisualTime());
+        f *= st/m_kart_properties->getSkidVisualTime();
     }
     return f*m_kart_properties->getSkidVisual();
 
