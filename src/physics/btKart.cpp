@@ -448,10 +448,13 @@ void btKart::updateVehicle( btScalar step )
         float dt = step > m_time_additional_rotation 
                  ? m_time_additional_rotation 
                  : step;
-        t.setRotation(t.getRotation()
-                       *btQuaternion(m_additional_rotation.getY()*dt,
-                                     m_additional_rotation.getX()*dt,
-                                     m_additional_rotation.getZ()*dt));
+        btQuaternion add_rot(m_additional_rotation.getY()*dt,
+                             m_additional_rotation.getX()*dt,
+                             m_additional_rotation.getZ()*dt);
+        t.setRotation(t.getRotation()*add_rot);
+        m_chassisBody->setWorldTransform(t);
+        btTransform &iwt=m_chassisBody->getInterpolationWorldTransform();
+        iwt.setRotation(iwt.getRotation()*add_rot);
         m_time_additional_rotation -= step;
     }
 }   // updateVehicle
