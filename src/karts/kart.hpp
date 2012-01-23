@@ -396,6 +396,8 @@ public:
      *  from the server information.                                       */
     void           setSpeed         (float s) {m_speed = s;                   }
     // ------------------------------------------------------------------------
+    btQuaternion   getVisualRotation() const ;
+    // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
     const SlipStream* getSlipstream() const {return m_slipstream; }
     // ------------------------------------------------------------------------

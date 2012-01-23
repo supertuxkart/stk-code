@@ -2235,6 +2235,12 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
+btQuaternion Kart::getVisualRotation() const
+{
+    return getRotation() * btQuaternion(getVisualSkidOffset(), 0, 0);
+}   // getVisualRotation
+
+// ----------------------------------------------------------------------------
 /** Determines how much the graphics model of the kart should be rotated
  *  additionally (for skidding), depending on how long the kart has been
  *  skidding etc.

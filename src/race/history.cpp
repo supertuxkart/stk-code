@@ -113,7 +113,7 @@ void History::updateSaving(float dt)
         const Kart *kart         = world->getKart(i);
         m_all_controls[index+i]  = kart->getControls();
         m_all_xyz[index+i]       = kart->getXYZ();
-        m_all_rotations[index+i] = kart->getRotation();
+        m_all_rotations[index+i] = kart->getVisualRotation();
     }   // for i
 }   // updateSaving
 
