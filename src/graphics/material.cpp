@@ -722,10 +722,10 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         // customizable EMT_ONETEXTURE_BLEND instead
         m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
         m->MaterialTypeParam = 
-            pack_texureBlendFunc(video::EBF_SRC_ALPHA, 
-                                 video::EBF_ONE_MINUS_SRC_ALPHA,
-                                 video::EMFN_MODULATE_1X, 
-                                 video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+            pack_textureBlendFunc(video::EBF_SRC_ALPHA, 
+                                  video::EBF_ONE_MINUS_SRC_ALPHA,
+                                  video::EMFN_MODULATE_1X, 
+                                  video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
         
         modes++;
     }
@@ -764,7 +764,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         // account, which messes up fading in/out effects. So we use the 
         // more customizable EMT_ONETEXTURE_BLEND instead
         m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
-        m->MaterialTypeParam = pack_texureBlendFunc(video::EBF_SRC_ALPHA, 
+        m->MaterialTypeParam = pack_textureBlendFunc(video::EBF_SRC_ALPHA, 
                                                     video::EBF_ONE,
                                                     video::EMFN_MODULATE_1X,
                                                     video::EAS_TEXTURE | 
