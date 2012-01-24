@@ -2248,21 +2248,22 @@ btQuaternion Kart::getVisualRotation() const
  */
 float Kart::getVisualSkidOffset() const
 {
-    float speed_ratio = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
-    float f = getSteerPercent() * speed_ratio;
     if(m_kart_properties->getSkidVisualTime()==0)
     {
+        float speed_ratio = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
         float r = m_skidding / m_kart_properties->getMaxSkid();
-        f *= r;
+        return getSteerPercent() * speed_ratio * r;
     }
-    else
-    {
-        float st = fabsf(m_skid_time);
-        if(st>m_kart_properties->getSkidVisualTime())
-            st = m_kart_properties->getSkidVisualTime();
+
+    // New skidding code
+    float f = m_kart_properties->getSkidVisual() * getSteerPercent();
+    if(getSpeed() < m_kart_properties->getMaxSpeed())
+        f *= getSpeed()/m_kart_properties->getMaxSpeed();
+    float st = fabsf(m_skid_time);
+    if(st<m_kart_properties->getSkidVisualTime())
         f *= st/m_kart_properties->getSkidVisualTime();
-    }
-    return f*m_kart_properties->getSkidVisual();
+
+    return f;
 
 }   // getVisualSkidOffset
 
