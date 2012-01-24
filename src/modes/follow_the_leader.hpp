@@ -19,7 +19,6 @@
 #define _follow_the_leader_hpp_
 
 #include "modes/linear_world.hpp"
-struct RaceGUIBase::KartIconDisplayInfo;
 
 /**
   * \brief An implementation of World, based on LinearWorld, to provide the Follow-the-leader game mode
