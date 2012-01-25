@@ -338,7 +338,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < 20)
+        if (challenges[n].m_force_field.m_is_locked) continue;
+
+        if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {
             core::rect<s32> pos(15,
                                 10, 
