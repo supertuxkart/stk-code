@@ -307,6 +307,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         // ASSIGN should make sure that only input from assigned devices
         // is read.
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        input_manager->getDeviceList()
+            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
         
         StateManager::get()->enterGameState();
         network_manager->setupPlayerKartInfo();
