@@ -326,7 +326,7 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
 {
     // Test if challenge version number is in between minimum
     // and maximum supported version.
-    return (challenge.getVersion()>=1 && challenge.getVersion()<=1);
+    return (challenge.getVersion()>=2 && challenge.getVersion()<=2);
 }   // isSupportedVersion
 
 

@@ -55,14 +55,13 @@ public:
 private:
     RaceManager::MajorRaceModeType m_major;
     RaceManager::MinorRaceModeType m_minor;
-    RaceManager::Difficulty        m_difficulty;
     int                            m_num_laps;
-    int                            m_position;
-    int                            m_num_karts;
-    float                          m_time;
+    int                            m_position[RaceManager::DIFFICULTY_COUNT];
+    int                            m_num_karts[RaceManager::DIFFICULTY_COUNT];
+    float                          m_time[RaceManager::DIFFICULTY_COUNT];
+    int                            m_energy[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_gp_id;
     std::string                    m_track_id;
-    int                            m_energy;
     std::string                    m_filename;
     /** Version number of the challenge. */
     int                            m_version;
@@ -73,15 +72,11 @@ private:
 
     /** Short, internal name for this challenge. */
     std::string              m_id;
-    /** Name used in menu for this challenge. */
-    irr::core::stringw       m_name; 
-    /** Message the user gets when the feature is not yet unlocked. */
-    irr::core::stringw       m_challenge_description;
+
     /** Features to unlock. */
     std::vector<UnlockableFeature> m_feature;
-    /** What needs to be done before accessing this challenge. */
-    std::vector<std::string> m_prerequisites;
 
+    irr::core::stringw m_challenge_description;
     
 public:
 #ifdef WIN32
@@ -93,7 +88,7 @@ public:
     virtual      ~ChallengeData() {}
     
     /** sets the right parameters in RaceManager to try this challenge */
-    void         setRace() const;
+    void         setRace(RaceManager::Difficulty d) const;
     
     virtual void check() const;
     virtual bool raceFinished();
@@ -103,32 +98,18 @@ public:
     
 
     const std::vector<UnlockableFeature>&
-        getFeatures() const                    { return m_feature;          }
-
-    const irr::core::stringw getChallengeDescription() const 
-        {return _(m_challenge_description.c_str()); }
-
-    void  addDependency(const std::string id)  {m_prerequisites.push_back(id);}
-    
-    const std::vector<std::string>& 
-        getPrerequisites() const                  { return m_prerequisites;   }
+        getFeatures() const                    { return m_feature;         }
     
     /** Returns the id of the challenge. */
-    const std::string &getId() const              { return m_id;              }
-
-    /** Returns the name of the challenge. */
-    const irr::core::stringw getName() const
-    { return irr::core::stringw(_(m_name.c_str())); }
-
-    /** Sets the name of the challenge. */
-    void  setName(const irr::core::stringw & s)   { m_name = s;               }
+    const std::string &getId() const           { return m_id;              }
 
     /** Sets the id of this challenge. */
-    void  setId(const std::string& s)             { m_id = s;                 }
+    void  setId(const std::string& s)          { m_id = s;                 }
     
-    const std::string& getTrackId() const        { return m_track_id;     }
+    const std::string& getTrackId() const      { return m_track_id;        }
 
-    
+    int   getNumLaps() const                   { return m_num_laps;        }
+
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
                               const irr::core::stringw &user_mode_name);
@@ -141,13 +122,14 @@ public:
     
     RaceManager::MajorRaceModeType getMajorMode()  const { return m_major;      }
     RaceManager::MinorRaceModeType getMinorMode()  const { return m_minor;      }
-    RaceManager::Difficulty        getDifficulty() const { return m_difficulty; }
-    int                            getNumLaps()    const { return m_num_laps;   }
-    int                            getPosition()   const { return m_position;   }
-    int                            getNumKarts()   const { return m_num_karts;  }
-    float                          getTime()       const { return m_time;       }
-    int                            getEnergy()     const { return m_energy;     }
+
+    const irr::core::stringw& getChallengeDescription() const { return m_challenge_description; }
     
-};   // ChallengeData
+    int   getPosition(RaceManager::Difficulty difficulty) const { return m_position[difficulty];   }
+    int   getNumKarts(RaceManager::Difficulty difficulty) const { return m_num_karts[difficulty];  }
+    float getTime    (RaceManager::Difficulty difficulty) const { return m_time[difficulty];       }
+    int   getEnergy  (RaceManager::Difficulty difficulty) const { return m_energy[difficulty];     }
+    
+};   // Ch
 
 #endif   // HEADER_CHALLENGE_DATA_HPP

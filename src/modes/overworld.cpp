@@ -130,8 +130,9 @@ void OverWorld::onFirePressed(Controller* who)
             // network_manager else call race_manager).
             network_manager->initCharacterDataStructures();
             
+            // TODO: allow user to select difficulty
             // Launch challenge
-            challenge->setRace();
+            challenge->setRace(RaceManager::RD_HARD);
             
             // Sets up kart info, including random list of kart for AI
             network_manager->setupPlayerKartInfo();

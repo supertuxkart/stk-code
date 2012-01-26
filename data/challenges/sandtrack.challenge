@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <challenge version="2">
-    <track id="xr591" laps="2"/>
+    <track id="sandtrack" laps="3"/>
     <mode major="single" minor="quickrace"/>
     
     <hard>
         <karts number="1"/>
-        <requirements energy="16" time="150"/>
+        <requirements energy="16" time="130"/>
     </hard>
     <medium>
         <karts number="1"/>
-        <requirements energy="14" time="160"/>
+        <requirements energy="12" time="140"/>
     </medium>
     <easy>
         <karts number="1"/>
-        <requirements energy="12" time="170"/>
+        <requirements energy="10" time="150"/>
     </easy>
 </challenge>
-
-

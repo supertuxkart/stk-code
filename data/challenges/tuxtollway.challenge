@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <challenge version="2">
-    <track id="minigolf" laps="3"/>
+    <track id="tuxtollway" laps="3"/>
     <mode major="single" minor="quickrace"/>
     
     <hard>
@@ -12,7 +12,7 @@
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="3"/>
+        <karts number="4"/>
         <requirements position="1"/>
     </easy>
 </challenge>

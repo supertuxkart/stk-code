@@ -16,7 +16,6 @@
 		950D45D1118E040E006CFC41 /* options_screen_input2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950D45CF118E040E006CFC41 /* options_screen_input2.cpp */; };
 		9516B07E12629C4E005F9493 /* sfx_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9516B07C12629C4E005F9493 /* sfx_buffer.cpp */; };
 		951B50AE12C9698B004F6993 /* xml_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951B50AD12C9698B004F6993 /* xml_writer.cpp */; };
-		951B7D19108E52C900BC03AE /* challenges.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951B7D18108E52C900BC03AE /* challenges.cpp */; };
 		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
 		9522F125107948AD0067ECF5 /* main_menu_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F124107948AD0067ECF5 /* main_menu_screen.cpp */; };
 		9522F15B107949780067ECF5 /* race_setup_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F15A107949780067ECF5 /* race_setup_screen.cpp */; };
@@ -411,8 +410,6 @@
 		9516B07D12629C4E005F9493 /* sfx_buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sfx_buffer.hpp; path = ../../audio/sfx_buffer.hpp; sourceTree = SOURCE_ROOT; };
 		951B50AD12C9698B004F6993 /* xml_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_writer.cpp; path = ../../io/xml_writer.cpp; sourceTree = SOURCE_ROOT; };
 		951B50AF12C96A13004F6993 /* xml_writer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_writer.hpp; path = ../../io/xml_writer.hpp; sourceTree = SOURCE_ROOT; };
-		951B7D17108E52C900BC03AE /* challenges.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenges.hpp; path = ../../states_screens/challenges.hpp; sourceTree = SOURCE_ROOT; };
-		951B7D18108E52C900BC03AE /* challenges.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges.cpp; path = ../../states_screens/challenges.cpp; sourceTree = SOURCE_ROOT; };
 		951BC65C0FFAF290006B5FF1 /* ipo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipo.cpp; path = ../../animations/ipo.cpp; sourceTree = SOURCE_ROOT; };
 		951BC65D0FFAF290006B5FF1 /* ipo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ipo.hpp; path = ../../animations/ipo.hpp; sourceTree = SOURCE_ROOT; };
 		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = ../../tracks/quad_set.hpp; sourceTree = SOURCE_ROOT; };
@@ -2231,8 +2228,6 @@
 				9551B26E11DC0D4D002DD140 /* addons_screen.hpp */,
 				956541B910DD5F0A00C83E99 /* arenas_screen.cpp */,
 				956541BA10DD5F0A00C83E99 /* arenas_screen.hpp */,
-				951B7D18108E52C900BC03AE /* challenges.cpp */,
-				951B7D17108E52C900BC03AE /* challenges.hpp */,
 				958330C210122B4A00C5137E /* credits.cpp */,
 				958330C310122B4A00C5137E /* credits.hpp */,
 				95D2343E1078227A00625256 /* feature_unlocked.cpp */,
@@ -3011,7 +3006,6 @@
 				9522F1E610795EFF0067ECF5 /* help_screen_3.cpp in Sources */,
 				9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */,
 				9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */,
-				951B7D19108E52C900BC03AE /* challenges.cpp in Sources */,
 				956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */,
 				956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */,
 				95C9C97210E93456005A418D /* stars.cpp in Sources */,

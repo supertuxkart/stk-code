@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<challenge version="2">
+    <track id="startrack" laps="3"/>
+    <mode major="single" minor="followtheleader"/>
+    
+    <hard>
+        <karts number="6"/>
+        <requirements position="2"/>
+    </hard>
+    <medium>
+        <karts number="6"/>
+        <requirements position="2"/>
+    </medium>
+    <easy>
+        <karts number="6"/>
+        <requirements position="2"/>
+    </easy>
+</challenge>

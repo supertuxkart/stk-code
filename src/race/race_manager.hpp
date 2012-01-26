@@ -192,6 +192,8 @@ public:
     /** Game difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD };
 
+    static const int DIFFICULTY_COUNT = 3;
+    
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart 
      *  (currently not used). */

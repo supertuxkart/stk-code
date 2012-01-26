@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <challenge version="2">
-    <track id="minigolf" laps="3"/>
+    <track id="snowtuxpeak" laps="3"/>
     <mode major="single" minor="quickrace"/>
     
     <hard>
         <karts number="5"/>
-        <requirements position="1"/>
+        <requirements position="1" time="137"/>
     </hard>
     <medium>
         <karts number="4"/>
-        <requirements position="1"/>
+        <requirements time="150"/>
     </medium>
     <easy>
-        <karts number="3"/>
-        <requirements position="1"/>
+        <karts number="4"/>
+        <requirements time="160"/>
     </easy>
 </challenge>

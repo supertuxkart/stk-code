@@ -81,33 +81,10 @@ void GameSlot::computeActive()
             continue;
         }
         
-        // Otherwise lock the feature, and check if the challenge is active
-        // ----------------------------------------------------------------
+        // Otherwise lock the feature
+        // --------------------------
         lockFeature(i->second);
-        std::vector<std::string> pre_req=(i->second)->getData()->getPrerequisites();
-        bool allSolved=true;
-        for(std::vector<std::string>::iterator pre =pre_req.begin();
-            pre!=pre_req.end(); pre++)
-        {
-            const Challenge* p = m_challenges_state[*pre];
-            if(!p)
-            {
-                fprintf(stderr,"Challenge prerequisite '%s' of '%s' not found - ignored\n",
-                        pre->c_str(), i->first.c_str());
-                //continue;
-                allSolved=false;
-                break;
-            }
-            else if(!p->isSolved())
-            {
-                allSolved=false;
-                break;
-            }
-        }   // for all pre in pre_req
-        if(allSolved)
-        {
-            i->second->setActive();
-        }   // if solved
+        i->second->setActive();
     }   // for i
     clearUnlocked();
 }   // computeActive

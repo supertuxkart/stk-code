@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <challenge version="2">
-    <track id="minigolf" laps="3"/>
-    <mode major="single" minor="quickrace"/>
+    <track id="zengarden" laps="3"/>
+    <mode major="single" minor="timetrial"/>
     
     <hard>
-        <karts number="5"/>
+        <karts number="2"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="4"/>
+        <karts number="2"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="3"/>
+        <karts number="2"/>
         <requirements position="1"/>
     </easy>
 </challenge>
