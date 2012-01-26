@@ -214,7 +214,8 @@ void GameSlot::save(XMLWriter& out)
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
     {
-        i->second->save(out);
+        if (i->second != NULL)
+            i->second->save(out);
     }
     out << "    </gameslot>\n";
 }
