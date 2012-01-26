@@ -46,6 +46,14 @@ namespace StringUtils
         oss << any ;
         return oss.str();
     }
+    
+    template <class T>
+    irr::core::stringw toWString (const T& any)
+    {
+        std::ostringstream oss;
+        oss << any ;
+        return oss.str().c_str();
+    }
 
     /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
      *  seconds, 1/100 seconds.

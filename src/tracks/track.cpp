@@ -40,6 +40,7 @@ using namespace irr;
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -751,6 +752,19 @@ bool Track::loadMainTrack(const XMLNode &root)
                 bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
                 
                 m_force_fields.push_back(OverworldForceField(xyz, shown, val));
+                
+                core::stringw msg = StringUtils::toWString(val);
+                core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(msg.c_str());
+                scene::ISceneManager* sm = irr_driver->getSceneManager();
+                sm->addBillboardTextSceneNode(GUIEngine::getFont(),
+                                              msg.c_str(),
+                                              NULL,
+                                              core::dimension2df(textsize.Width/10.0f,
+                                                                 textsize.Height/10.0f),
+                                              xyz,
+                                              -1 /* id */,
+                                              video::SColor(255, 255, 225, 0),
+                                              video::SColor(255, 255, 89, 0));
                 
                 if (!shown) continue;
             }
