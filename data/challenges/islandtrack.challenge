@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<challenge verison="2">
+<challenge version="2">
     <track id="islandtrack" laps="3"/>
     <mode major="single" minor="followtheleader"/>
     
