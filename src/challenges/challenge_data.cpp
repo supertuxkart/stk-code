@@ -51,10 +51,12 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_energy[d]    = -1;
     }
     
-    XMLNode *root = new XMLNode( filename );
-    if(!root || root->getName()!="challenge")
+    // we are using auto_ptr to make sure the XML node is released when leaving
+    // the scope
+    std::auto_ptr<XMLNode> root(new XMLNode( filename ));
+    
+    if(root.get() == NULL || root->getName()!="challenge")
     {
-        delete root;
         std::ostringstream msg;
         msg << "Couldn't load challenge '" << filename << "': no challenge node.";
         throw std::runtime_error(msg.str());
@@ -69,7 +71,6 @@ ChallengeData::ChallengeData(const std::string& filename)
     {
         fprintf(stderr, "[ChallengeData] WARNING: challenge <%s> is older "
                 "or newer than this version of STK, will be ignored.\n", filename.c_str());
-        delete root;
         return;
     }
     
@@ -176,15 +177,15 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
     }
 */
-    
+        
     const XMLNode* unlock_node = root->getNode("unlock");
     if (unlock_node != NULL)
     {
-        getUnlocks(root, "unlock-track",      ChallengeData::UNLOCK_TRACK);
-        getUnlocks(root, "unlock-gp",         ChallengeData::UNLOCK_GP   );
-        getUnlocks(root, "unlock-mode",       ChallengeData::UNLOCK_MODE );
-        getUnlocks(root, "unlock-difficulty", ChallengeData::UNLOCK_DIFFICULTY);
-        getUnlocks(root, "unlock-kart",       ChallengeData::UNLOCK_KART);
+        getUnlocks(root.get(), "unlock-track",      ChallengeData::UNLOCK_TRACK);
+        getUnlocks(root.get(), "unlock-gp",         ChallengeData::UNLOCK_GP   );
+        getUnlocks(root.get(), "unlock-mode",       ChallengeData::UNLOCK_MODE );
+        getUnlocks(root.get(), "unlock-difficulty", ChallengeData::UNLOCK_DIFFICULTY);
+        getUnlocks(root.get(), "unlock-kart",       ChallengeData::UNLOCK_KART);
     }
     
     core::stringw description;
