@@ -23,6 +23,7 @@
  *  This class implements all particle effects for a kart. */
 
 #include <vector>
+#include <string>
 
 class Kart;
 class ParticleEmitter;
