@@ -60,6 +60,7 @@
 		953F8B2111F7C13C00205E66 /* scalable_font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F8B1F11F7C13C00205E66 /* scalable_font.cpp */; };
 		9542FC7712D3BDB000C00366 /* particle_emitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FC7512D3BDB000C00366 /* particle_emitter.cpp */; };
 		9542FD4C12D3E0D700C00366 /* particle_kind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FD4A12D3E0D700C00366 /* particle_kind.cpp */; };
+		9543D58F14D36EE3000B0888 /* kart_gfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9543D58D14D36EE3000B0888 /* kart_gfx.cpp */; };
 		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
@@ -507,6 +508,8 @@
 		9542FC7612D3BDB000C00366 /* particle_emitter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_emitter.hpp; path = ../../graphics/particle_emitter.hpp; sourceTree = SOURCE_ROOT; };
 		9542FD4A12D3E0D700C00366 /* particle_kind.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_kind.cpp; path = ../../graphics/particle_kind.cpp; sourceTree = SOURCE_ROOT; };
 		9542FD4B12D3E0D700C00366 /* particle_kind.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_kind.hpp; path = ../../graphics/particle_kind.hpp; sourceTree = SOURCE_ROOT; };
+		9543D58D14D36EE3000B0888 /* kart_gfx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = kart_gfx.cpp; path = ../../karts/kart_gfx.cpp; sourceTree = SOURCE_ROOT; };
+		9543D58E14D36EE3000B0888 /* kart_gfx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_gfx.hpp; path = ../../karts/kart_gfx.hpp; sourceTree = SOURCE_ROOT; };
 		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
 		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -2522,6 +2525,8 @@
 				95453AC911808B8700A155B9 /* emergency_animation.hpp */,
 				95C2B1180F296545000D3E5D /* kart.cpp */,
 				95C2B1190F296545000D3E5D /* kart.hpp */,
+				9543D58D14D36EE3000B0888 /* kart_gfx.cpp */,
+				9543D58E14D36EE3000B0888 /* kart_gfx.hpp */,
 				95C2B11B0F296545000D3E5D /* kart_model.cpp */,
 				95C2B11C0F296545000D3E5D /* kart_model.hpp */,
 				95C2B11D0F296545000D3E5D /* kart_properties.cpp */,
@@ -3213,6 +3218,7 @@
 				9593366B149EC9B10031FD41 /* overworld.cpp in Sources */,
 				957957A214A3CA3900E72497 /* custom_video_settings.cpp in Sources */,
 				95EF178E14AFBC91005FFEEB /* race_gui_overworld.cpp in Sources */,
+				9543D58F14D36EE3000B0888 /* kart_gfx.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
