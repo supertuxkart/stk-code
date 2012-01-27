@@ -35,7 +35,6 @@
 #include "modes/overworld.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/addons_screen.hpp"
-#include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/kart_selection.hpp"

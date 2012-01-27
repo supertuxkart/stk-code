@@ -324,8 +324,6 @@ supertuxkart_SOURCES = \
  replay/replay_player.hpp \
  replay/replay_recorder.cpp \
  replay/replay_recorder.hpp \
- states_screens/challenges.cpp \
- states_screens/challenges.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
  states_screens/dialogs/add_device_dialog.cpp \
