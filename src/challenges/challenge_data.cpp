@@ -159,7 +159,7 @@ ChallengeData::ChallengeData(const std::string& filename)
         }
         
         int time = -1;
-        if (requirements_node->get("time", &time)) m_time[d] = time;
+        if (requirements_node->get("time", &time)) m_time[d] = (float)time;
         
         if (m_time[d] < 0 && m_position[d] < 0) error("position/time");
 
