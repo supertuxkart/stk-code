@@ -39,6 +39,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
+#include "karts/kart_gfx.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -100,10 +101,6 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_terrain_particles    = NULL;
-    m_nitro                = NULL;
-    m_nitro_kind           = NULL;
-    m_zipper_fire          = NULL;
-    m_zipper_fire_kind     = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
@@ -125,7 +122,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_wheel_rotation          = 0;
 
     m_kart_model->setKart(this);
-    
+
     // Create SFXBase for each custom sound (TODO: add back when properly done)
     /*
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
@@ -186,6 +183,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     
     loadData(type, is_first_kart, track, animations);
 
+    m_kart_gfx = new KartGFX(this);
     reset();
 }   // Kart
 
@@ -429,14 +427,11 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
     sfx_manager->deleteSFX(m_beep_sound   );
+    delete m_kart_gfx;
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_terrain_particles)      delete m_terrain_particles;
-    if(m_nitro)                  delete m_nitro;
-    if(m_nitro_kind)             delete m_nitro_kind;
-    if(m_zipper_fire)            delete m_zipper_fire;
     if(m_collision_particles)    delete m_collision_particles;
-    if(m_zipper_fire_kind)       delete m_zipper_fire_kind;
     if(m_slipstream)             delete m_slipstream;
     if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
@@ -545,14 +540,10 @@ void Kart::reset()
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
-    if (m_nitro)
-    {
-        m_nitro->setCreationRate(0.0f);
-        m_nitro->clearParticles();
-    }
+    m_kart_gfx->reset();
     
-    m_zipper_fire->setCreationRate(0.0f);
-    if (m_collision_particles) m_collision_particles->setCreationRate(0.0f);
+    if (m_collision_particles) 
+        m_collision_particles->setCreationRateAbsolute(0.0f);
     m_powerup.reset();
 
     m_race_position        = m_initial_position;
@@ -813,7 +804,6 @@ void Kart::update(float dt)
 {
     if (m_eliminated)
     {
-        printf("a\n");
         EmergencyAnimation::update(dt);
         return;
     }
@@ -924,8 +914,7 @@ void Kart::update(float dt)
         }
     }  // UserConfigParams::m_graphical_effects
     
-    if (m_nitro) m_nitro->update(dt);
-    m_zipper_fire->update(dt);
+    m_kart_gfx->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
     
     updatePhysics(dt);
@@ -1056,7 +1045,7 @@ void Kart::update(float dt)
   */
 void Kart::showZipperFire()
 {
-    m_zipper_fire->setCreationRate(800.0f);
+    m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -1188,7 +1177,7 @@ void Kart::handleMaterialGFX()
             if(!pk) 
             {
                 // Disable potentially running particle effects
-                m_terrain_particles->setCreationRate(0);
+                m_terrain_particles->setCreationRateAbsolute(0);
                 return;  // no particle effect, return
             }
 
@@ -1206,7 +1195,7 @@ void Kart::handleMaterialGFX()
             }
             else
             {
-                m_terrain_particles->setCreationRate(0);
+                m_terrain_particles->setCreationRateAbsolute(0);
                 return;
             }
 
@@ -1217,7 +1206,7 @@ void Kart::handleMaterialGFX()
             // set the position after setParticleType
             m_terrain_particles->setPosition(xyz);
             
-            m_terrain_particles->setCreationRate(create);
+            m_terrain_particles->setCreationRateAbsolute(create);
         }
         
         return;
@@ -1252,7 +1241,7 @@ void Kart::handleMaterialGFX()
         const Material *surface_material;
         if(!getSurfaceInfo(from, &xyz, &surface_material))
         {
-            m_terrain_particles->setCreationRate(0);
+            m_terrain_particles->setCreationRateAbsolute(0);
             return;
         }
         const ParticleKind *pk = 
@@ -1279,7 +1268,7 @@ void Kart::handleMaterialGFX()
             {
                 create = 0.0f;
             }
-            m_terrain_particles->setCreationRate(create);
+            m_terrain_particles->setCreationRateAbsolute(create);
             
             
             const std::string s = surface_material->getSFXName();
@@ -1413,10 +1402,7 @@ float Kart::handleNitro(float dt)
 /** Activates a slipstream effect */
 void Kart::setSlipstreamEffect(float f)
 {
-    if (m_zipper_fire)
-    {
-        m_zipper_fire->setCreationRate(f);
-    }
+    m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, f);
 }   // setSlipstreamEffect
 
 // -----------------------------------------------------------------------------
@@ -2066,27 +2052,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     }
         
     Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
-    
-    try
-    {
-        m_nitro_kind = new ParticleKind(file_manager->getGfxFile("nitro.xml"));
-        m_nitro      = new ParticleEmitter(m_nitro_kind, position, getNode());
-    }
-    catch (std::runtime_error& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    
-    try
-    {
-        m_zipper_fire_kind = new ParticleKind(file_manager->getGfxFile("zipper_fire.xml"));
-        m_zipper_fire      = new ParticleEmitter(m_zipper_fire_kind, position, getNode());
-    }
-    catch (std::runtime_error& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    
+        
     m_slipstream = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
@@ -2175,34 +2141,22 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                -m_kart_model->getWheelGraphicsPosition(0).getY() );
     center_shift.setY(y);
     
-    if (m_nitro)
+    if (m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0)
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
-        const float min_rate = (float)(m_nitro->getParticlesInfo()->getMinRate());
-        const float max_rate = (float)(m_nitro->getParticlesInfo()->getMaxRate());
-        const float rate    = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
-        assert(rate >= 0.0f); // allow for rounding errors...
-        //assert(rate <= 2.0f); // max speed is not always respected it seems...
-        float calculated_rate = m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0
-                                ? (min_rate + rate*(max_rate - min_rate)) : 0;
-        
-        m_nitro->setCreationRate(calculated_rate);
-        
-        // the emitter box should spread from last frame's position to the current position
-        // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
-        m_nitro->resizeBox(std::max(0.25f, getSpeed()*dt));
+        float f = fabsf(getSpeed())/m_kart_properties->getMaxSpeed();
+        // The speed of the kart can be higher (due to powerups) than
+        // the normal maximum speed of the kart.
+        if(f>1.0f) f = 1.0f;
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO, f);
     }
+    else
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO, 0);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO, getSpeed(), dt);
 
-    if (m_zipper_fire)
-    {
-        if (m_zipper_fire->getCreationRate() > 0)
-        {
-            // the emitter box should spread from last frame's position to the current position
-            // if we want nitro to be emitted in a smooth, continuous flame and not in blobs
-            m_zipper_fire->resizeBox(std::max(0.25f, getSpeed()*dt));
-        }
-    }
+    m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
+
     Moveable::updateGraphics(dt, center_shift, 
                              btQuaternion(getVisualSkidOffset(), 0, 0));
     

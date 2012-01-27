@@ -79,7 +79,8 @@ public:
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
     virtual void update         (float dt);
-    void         setCreationRate(float f);
+    void         setCreationRateAbsolute(float fraction);
+    void         setCreationRateRelative(float f);
     int          getCreationRate();
     
     void         setPosition(const Vec3 &pos);

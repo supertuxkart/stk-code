@@ -44,6 +44,7 @@ class btUprightConstraint;
 
 class Camera;
 class Item;
+class KartGFX;
 class KartModel;
 class ParticleEmitter;
 class ParticleKind;
@@ -158,18 +159,9 @@ private:
 
     ParticleEmitter *m_sky_particles_emitter;
     
-    /** Graphical effect when using a nitro. */
-    ParticleEmitter *m_nitro;
+    /** All particle effects. */
+    KartGFX         *m_kart_gfx;
 
-    /** The particle kind for the nitro. */
-    ParticleKind    *m_nitro_kind;
-
-    /** Graphical effect when using a zipper. */
-    ParticleEmitter *m_zipper_fire;
-    
-    /** The particle kind for the nitro. */
-    ParticleKind    *m_zipper_fire_kind;
-    
     /** For collisions */
     ParticleEmitter *m_collision_particles;
 

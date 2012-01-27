@@ -229,7 +229,7 @@ void ParticleEmitter::update(float dt)
     if (m_emission_decay_rate > 0)
     {
         m_max_rate = m_min_rate = std::max(0.0f, (m_min_rate - m_emission_decay_rate*dt));
-        setCreationRate(m_min_rate);
+        setCreationRateAbsolute(m_min_rate);
     }
     
     // There seems to be no way to randomise the velocity for particles,
@@ -247,15 +247,31 @@ void ParticleEmitter::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Sets the creation rate as a relative fraction between minimum (f=0) and 
+ *  maximum (f=1) of the creation rates defined in the particle kind.
+ *  \param fraction Fraction to use.
+ */
+void ParticleEmitter::setCreationRateRelative(float fraction)
+{
+    assert(fraction >= 0.0f);
+    assert(fraction <= 1.0f);
+    const float min_rate = (float)(m_particle_type->getMinRate());
+    const float max_rate = (float)(m_particle_type->getMaxRate());
+    setCreationRateAbsolute(min_rate + fraction*(max_rate - min_rate));
+}   // setCreationRateRelative
 
-void ParticleEmitter::setCreationRate(float f)
+//-----------------------------------------------------------------------------
+/** Sets the absolute creation rate (in particles per second).
+ *  \param f The creation rate (in particles per second).
+ */
+void ParticleEmitter::setCreationRateAbsolute(float f)
 {
     m_emitter->setMinParticlesPerSecond(int(f));
     m_emitter->setMaxParticlesPerSecond(int(f));
     
     m_min_rate = f;
     m_max_rate = f;
-    
+ 
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
     //        the node has a method called "clearParticles" that should be cleaner than this
@@ -267,7 +283,7 @@ void ParticleEmitter::setCreationRate(float f)
     {
         m_node->setEmitter(m_emitter);
     }
-}   // setCreationRate
+}   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------
 

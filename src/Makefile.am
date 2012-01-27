@@ -223,6 +223,8 @@ supertuxkart_SOURCES = \
  karts/emergency_animation.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
+ karts/kart_gfx.cpp \
+ karts/kart_gfx.hpp \
  karts/kart_with_stats.cpp \
  karts/kart_with_stats.hpp \
  karts/kart_model.cpp \
