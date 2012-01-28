@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
@@ -32,10 +33,12 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
 {
     loadFromFile("select_challenge.stkgui");
     m_challenge_id = challenge_id;
+    World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 }
 
 SelectChallengeDialog::~SelectChallengeDialog()
 {
+    World::getWorld()->scheduleUnpause();
 }
 
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSource)
