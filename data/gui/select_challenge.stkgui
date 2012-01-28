@@ -1,0 +1,26 @@
+<stkgui>
+
+<div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
+
+    <header width="80%" text="Race Setup" align="center" text_align="center" />
+    
+    <spacer height="2%" width="1"/>
+    
+    <icon-button id="novice" icon="gui/difficulty_easy.png"
+            I18N="Difficulty" text="Novice" proportion="1"/>
+            
+    <spacer height="8%" width="1"/>
+    
+    <icon-button id="intermediate" icon="gui/difficulty_medium.png" 
+            I18N="Difficulty" text="Intermediate" proportion="1"/>
+            
+    <spacer height="8%" width="1"/>
+    
+    <icon-button id="expert" icon="gui/difficulty_hard.png"
+            I18N="Difficulty" text="Expert" proportion="1"/>
+
+    <spacer height="8%" width="1"/>
+
+</div>
+
+</stkgui>

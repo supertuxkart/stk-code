@@ -22,6 +22,7 @@
 #include "karts/kart.hpp"
 #include "modes/overworld.hpp"
 #include "network/network_manager.hpp"
+#include "states_screens/dialogs/select_challenge.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
 
@@ -91,53 +92,7 @@ void OverWorld::onFirePressed(Controller* who)
         
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {
-            core::rect<s32> pos(15,
-                                10, 
-                                15 + UserConfigParams::m_width/2,
-                                10 + GUIEngine::getTitleFontHeight());
-            
-            const ChallengeData* challenge = unlock_manager->getChallenge(challenges[n].m_challenge_id);
-            
-            if (challenge == NULL)
-            {
-                fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find challenge <%s>\n",
-                        challenges[n].m_challenge_id.c_str());
-                break;
-            }
-            
-            race_manager->exitRace();
-            //StateManager::get()->resetActivePlayers();
-            
-            // Use latest used device
-            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-            assert(device != NULL);
-            
-            // Set up race manager appropriately
-            race_manager->setNumLocalPlayers(1);
-            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-            
-            //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
-            input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-            
-            // ASSIGN should make sure that only input from assigned devices is read.
-            input_manager->getDeviceList()->setAssignMode(ASSIGN);
-            
-            // Go straight to the race
-            StateManager::get()->enterGameState();                
-            
-            // Initialise global data - necessary even in local games to avoid
-            // many if tests in other places (e.g. if network_game call 
-            // network_manager else call race_manager).
-            network_manager->initCharacterDataStructures();
-            
-            // TODO: allow user to select difficulty
-            // Launch challenge
-            challenge->setRace(RaceManager::RD_HARD);
-            
-            // Sets up kart info, including random list of kart for AI
-            network_manager->setupPlayerKartInfo();
-            race_manager->startNew();
-            return;
+            new SelectChallengeDialog(0.8f, 0.8f, challenges[n].m_challenge_id);
         } // end if
     } // end for
 }
