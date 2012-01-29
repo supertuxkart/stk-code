@@ -24,6 +24,8 @@
 #include <string>
 #include <map>
 
+#include <IShaderConstantSetCallBack.h>
+
 #define LIGHTMAP_VISUALISATION 0
 
 
@@ -70,6 +72,15 @@ public:
     };
     
 private:
+    
+    enum Shaders
+    {
+        NORMAL_MAP,
+        SPLATTING,
+        WATER_SHADER,
+        SHADER_COUNT
+    };
+    
     video::ITexture *m_texture;
     unsigned int     m_index;
     std::string      m_texname;
@@ -96,6 +107,7 @@ private:
     bool             m_zipper;
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
+    bool             m_water_shader;
     /** If a kart is rescued when crashing into this surface. */
     CollisionReaction m_collision_reaction;
     
@@ -192,12 +204,8 @@ private:
     /** If m_splatting is true, indicates the fourth splatting texture */
     std::string      m_splatting_texture_4;
     
-    /** Only used if normal maps are used */
-    NormalMapProvider* m_normal_map_provider;
-    
-    /** Only used if splatting is used */
-    SplattingProvider*  m_splatting_provider;
-    
+    irr::video::IShaderConstantSetCallBack* m_shaders[SHADER_COUNT];
+
     /** Only used if bubble effect is enabled */
     std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
     

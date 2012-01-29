@@ -72,6 +72,63 @@ public:
 
 //-----------------------------------------------------------------------------
 
+class WaterShaderProvider : public video::IShaderConstantSetCallBack
+{    
+    float m_dx_1, m_dy_1, m_dx_2, m_dy_2;
+    
+public:
+    LEAK_CHECK()
+    
+    
+    WaterShaderProvider()
+    {
+        m_dx_1 = 0.0f;
+        m_dy_1 = 0.0f;
+        m_dx_2 = 0.0f;
+        m_dy_2 = 0.0f;
+    }
+    
+    virtual void OnSetConstants(
+                                irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        m_dx_1 += GUIEngine::getLatestDt()/6.0f;
+        m_dy_1 += GUIEngine::getLatestDt()/6.0f;
+        
+        m_dx_2 += GUIEngine::getLatestDt()/15.0f;
+        m_dy_2 -= GUIEngine::getLatestDt()/15.0f;
+
+        if (m_dx_1 > 1.0f) m_dx_1 -= 1.0f;
+        if (m_dy_1 > 1.0f) m_dy_1 -= 1.0f;
+        if (m_dx_2 > 1.0f) m_dx_2 -= 1.0f;
+        if (m_dy_2 < 0.0f) m_dy_2 += 1.0f;
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int decaltex = 0;
+        services->setPixelShaderConstant("DecalTex", (float*)&decaltex, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int bumptex = 1;
+        services->setPixelShaderConstant("BumpTex1", (float*)&bumptex, 1);
+        
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        bumptex = 2;
+        services->setPixelShaderConstant("BumpTex2", (float*)&bumptex, 1);
+        
+        // We could calculate light direction as coming from the sun (then we'd need to
+        // transform it into camera space). But I find that pretending light
+        // comes from the camera gives good results
+        const float lightdir[] = {0.0f, 0.95f, -0.312f};
+        services->setVertexShaderConstant("lightdir", lightdir, 3);
+        
+        services->setVertexShaderConstant("delta1", &m_dx_1, 2);
+        services->setVertexShaderConstant("delta2", &m_dx_2, 2);
+    }
+};
+
+
+//-----------------------------------------------------------------------------
+
 #if 0
 #pragma mark -
 #endif
@@ -371,6 +428,8 @@ Material::Material(const XMLNode *node, int index)
         node->get("splatting-texture-4", &m_splatting_texture_4);
     }
     
+    node->get("water-shader", &m_water_shader);
+    
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
     for (unsigned int i=0; i<children_count; i++)
@@ -444,6 +503,7 @@ void Material::init(unsigned int index)
     m_collision_reaction        = NORMAL;
     m_add                       = false;
     m_disable_z_write           = false;
+    m_water_shader              = false;
     m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
@@ -463,9 +523,12 @@ void Material::init(unsigned int index)
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
-    m_normal_map_provider       = NULL;
-    m_splatting_provider        = NULL;
     m_splatting                 = false;
+    
+    for (int n=0; n<SHADER_COUNT; n++)
+    {
+        m_shaders[n] = NULL;
+    }
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -521,17 +584,14 @@ Material::~Material()
             irr_driver->removeTexture(m_texture);
     }
     
-    if (m_normal_map_provider != NULL)
+    for (int n=0; n<SHADER_COUNT; n++)
     {
-        m_normal_map_provider->drop();
-        m_normal_map_provider = NULL;
+        if (m_shaders[n] != NULL)
+        {
+            m_shaders[n]->drop();
+        }
     }
-    if (m_splatting_provider != NULL)
-    {
-        m_splatting_provider->drop();
-        m_splatting_provider = NULL;
-    }
-    
+        
     for (std::map<scene::IMeshBuffer*, BubbleEffectProvider*>::iterator it = m_bubble_provider.begin();
          it != m_bubble_provider.end(); it++)
     {
@@ -786,11 +846,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             }
             m->setTexture(1, tex);
             
-            if (m_normal_map_provider == NULL)
+            if (m_shaders[NORMAL_MAP] == NULL)
             {
-                m_normal_map_provider = new NormalMapProvider();
+                m_shaders[NORMAL_MAP] = new NormalMapProvider();
             }
-                        
+            
             const char* vertex_shader = "shaders/normalmap.vert";
             const char* pixel_shader  = "shaders/normalmap.frag";
 
@@ -804,7 +864,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                    (file_manager->getDataDir() + pixel_shader).c_str(), 
                                    "main",
                                    video::EPST_PS_2_0,
-                                   m_normal_map_provider,
+                                   m_shaders[NORMAL_MAP],
                                    video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             m->Lighting = false;
@@ -854,9 +914,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
         m->setTexture(4, tex);
         
-        if (m_splatting_provider == NULL)
+        if (m_shaders[SPLATTING] == NULL)
         {
-            m_splatting_provider = new SplattingProvider();
+            m_shaders[SPLATTING] = new SplattingProvider();
         }
         
         // Material and shaders
@@ -871,7 +931,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                                                       "shaders/splatting.frag").c_str(), 
                                                                      "main",
                                                                      video::EPST_PS_2_0,
-                                                                     m_splatting_provider,
+                                                                     m_shaders[SPLATTING],
                                                                      video::EMT_SOLID_2_LAYER );
         m->MaterialType = (E_MATERIAL_TYPE)material_type;
     }
@@ -911,6 +971,37 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 modes++;
             }
         }
+    }
+    
+    
+    if (m_water_shader)
+    {
+        printf("==== WATER SHADER ====\n");
+        if (m_shaders[WATER_SHADER] == NULL)
+        {
+            m_shaders[WATER_SHADER] = new WaterShaderProvider();
+        }
+        
+        m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
+        m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
+                      
+        const char* vertex_shader = "shaders/water.vert";
+        const char* pixel_shader  = "shaders/water.frag";
+        
+        // Material and shaders
+        IGPUProgrammingServices* gpu = 
+            irr_driver->getVideoDriver()->getGPUProgrammingServices();
+        s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                  (file_manager->getDataDir() + vertex_shader).c_str(),
+                                                  "main",
+                                                  video::EVST_VS_2_0,
+                                                  (file_manager->getDataDir() + pixel_shader).c_str(), 
+                                                  "main",
+                                                  video::EPST_PS_2_0,
+                                                  m_shaders[WATER_SHADER],
+                                                  video::EMT_SOLID_2_LAYER );
+        m->MaterialType = (E_MATERIAL_TYPE)material_type;
+        modes++;
     }
     
     if (modes > 1)
