@@ -34,6 +34,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     loadFromFile("select_challenge.stkgui");
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
+    
+    // TODO: select the previously selected difficulty
 }
 
 SelectChallengeDialog::~SelectChallengeDialog()
@@ -47,13 +49,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
     if (eventSource == "novice" || eventSource == "intermediate" ||
         eventSource == "expert")
     {
-        ModalDialog::dismiss();
-        
-        core::rect<s32> pos(15,
-                            10, 
-                            15 + UserConfigParams::m_width/2,
-                            10 + GUIEngine::getTitleFontHeight());
-        
         const ChallengeData* challenge = unlock_manager->getChallenge(m_challenge_id);
         
         if (challenge == NULL)
@@ -62,6 +57,13 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
                     m_challenge_id.c_str());
             return GUIEngine::EVENT_LET;
         }
+        
+        ModalDialog::dismiss();
+
+        core::rect<s32> pos(15,
+                            10, 
+                            15 + UserConfigParams::m_width/2,
+                            10 + GUIEngine::getTitleFontHeight());
         
         race_manager->exitRace();
         //StateManager::get()->resetActivePlayers();
@@ -111,6 +113,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         // Sets up kart info, including random list of kart for AI
         network_manager->setupPlayerKartInfo();
         race_manager->startNew();
+        return GUIEngine::EVENT_BLOCK;
     }
     
     return GUIEngine::EVENT_LET;

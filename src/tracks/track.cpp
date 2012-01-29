@@ -883,6 +883,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 if (c == NULL)
                 {
                     fprintf(stderr, "[WARNING] Cannot find challenge named <%s>\n", challenge.c_str());
+                    scene_node->remove();
                     continue;
                 }
                 
@@ -920,14 +921,18 @@ bool Track::loadMainTrack(const XMLNode &root)
                     }
                 }
                 
-                LODNode* lod_node = new LODNode("challenge_orb", scene_node->getParent(),
+                
+                LODNode* lod_node = new LODNode("challenge_orb",
+                                                irr_driver->getSceneManager()->getRootSceneNode(),
                                                 irr_driver->getSceneManager());
                 lod_node->add(50, scene_node, true /* reparent */);
-                scene_node = lod_node;
-            } // if (challenge.size() > 0)
-            
-            m_all_nodes.push_back( scene_node );
-
+                                
+                m_all_nodes.push_back( lod_node );
+            }
+            else
+            {
+                m_all_nodes.push_back( scene_node );
+            }
         }
 
     }   // for i
