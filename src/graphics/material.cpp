@@ -92,11 +92,11 @@ public:
                                 irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
-        m_dx_1 += GUIEngine::getLatestDt()/6.0f;
-        m_dy_1 += GUIEngine::getLatestDt()/6.0f;
+        m_dx_1 += GUIEngine::getLatestDt()/15.0f;
+        m_dy_1 += GUIEngine::getLatestDt()/15.0f;
         
-        m_dx_2 += GUIEngine::getLatestDt()/15.0f;
-        m_dy_2 -= GUIEngine::getLatestDt()/15.0f;
+        m_dx_2 += GUIEngine::getLatestDt()/25.0f;
+        m_dy_2 -= GUIEngine::getLatestDt()/25.0f;
 
         if (m_dx_1 > 1.0f) m_dx_1 -= 1.0f;
         if (m_dy_1 > 1.0f) m_dy_1 -= 1.0f;
@@ -118,7 +118,7 @@ public:
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
         // comes from the camera gives good results
-        const float lightdir[] = {0.0f, 0.95f, -0.312f};
+        const float lightdir[] = {-0.315f, 0.91f, -0.3f};
         services->setVertexShaderConstant("lightdir", lightdir, 3);
         
         services->setVertexShaderConstant("delta1", &m_dx_1, 2);
@@ -976,7 +976,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     
     if (m_water_shader)
     {
-        printf("==== WATER SHADER ====\n");
         if (m_shaders[WATER_SHADER] == NULL)
         {
             m_shaders[WATER_SHADER] = new WaterShaderProvider();

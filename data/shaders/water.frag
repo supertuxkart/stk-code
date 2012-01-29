@@ -47,13 +47,13 @@ void main()
     {
         // weak specular
         specular = specular*specular;
-        float specular_weak = specular*0.1;
+        specular = specular*specular;
+        float specular_weak = specular*0.05;
         gl_FragColor += vec4(specular_weak, specular_weak, specular_weak, 0.0);
         
         // strong specular
         specular = specular*specular;
-        specular = specular*specular;
-        float specular_strong = specular*0.4;
+        float specular_strong = specular*0.3;
         gl_FragColor += vec4(specular_strong, specular_strong, specular_strong, 0.0);
     }
 }
