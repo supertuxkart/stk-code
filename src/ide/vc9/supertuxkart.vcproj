@@ -1364,6 +1364,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\select_challenge.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\story_mode_new.cpp"
 						>
 					</File>
@@ -2499,6 +2503,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\select_challenge.hpp"
 						>
 					</File>
 					<File
