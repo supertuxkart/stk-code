@@ -17,25 +17,11 @@ void main()
 	normal = normalize (normal);
 	
 	// compute diffuse lighting
-	float lamberFactor= max (dot (lightVec, normal), 0.0) ;
+	float lamberFactor = max (dot (lightVec, normal), 0.0) ;
 	vec4 diffuseMaterial;
-	vec4 diffuseLight;
-	
-	// compute specular lighting
-	vec4 specularMaterial ;
-	vec4 specularLight ;
-	float shininess ;
   
-	// compute ambient
-	vec4 ambientLight = vec4(0.5, 0.5, 0.5, 1.0);	
-	
-	if (lamberFactor > 0.0)
-	{
-		diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
-		diffuseLight  = vec4(0.5, 0.5, 0.5, 1.0);
+    diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
 
-		gl_FragColor =	diffuseMaterial * diffuseLight * lamberFactor ;	
-	}
-	
-	gl_FragColor +=	ambientLight;
+    // 0.4 is the ambient light
+    gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5);
 }			
