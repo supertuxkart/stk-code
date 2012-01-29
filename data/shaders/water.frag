@@ -19,8 +19,8 @@ void main()
     vec3 normal2 = 2.0 * texture2D (BumpTex2, gl_TexCoord[0].st + delta2).rgb - 1.0;
     
     // scale normals
-    //normal.y = 4.0*normal.y;
-    //normal2.y = 4.0*normal2.y;
+    normal.y = 4.0*normal.y;
+    normal2.y = 4.0*normal2.y;
     
 	normal = (normalize(normal) + normalize(normal2))/2.0;
 	    
@@ -37,7 +37,7 @@ void main()
     //    lamberFactor = 0.0;
     //}
 
-    gl_FragColor =	diffuseMaterial * (lamberFactor);
+    gl_FragColor =	diffuseMaterial * (0.3 + lamberFactor*0.7);
     
     // specular (phong)
     vec3 R = normalize(reflect(lightVec, normal));
@@ -47,12 +47,13 @@ void main()
     {
         // weak specular
         specular = specular*specular;
-        float specular03 = specular*0.2;
-        gl_FragColor += vec4(specular03, specular03, specular03, 0.0);
+        float specular_weak = specular*0.1;
+        gl_FragColor += vec4(specular_weak, specular_weak, specular_weak, 0.0);
         
         // strong specular
-        specular = specular*specular*specular;
-        float specular06 = specular*0.5;
-        gl_FragColor += vec4(specular06, specular06, specular06, 0.0);
+        specular = specular*specular;
+        specular = specular*specular;
+        float specular_strong = specular*0.4;
+        gl_FragColor += vec4(specular_strong, specular_strong, specular_strong, 0.0);
     }
 }
