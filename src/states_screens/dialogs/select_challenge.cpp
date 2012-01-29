@@ -43,9 +43,9 @@ SelectChallengeDialog::~SelectChallengeDialog()
     World::getWorld()->scheduleUnpause();
 }
 
-GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
-    
+    std::string eventSource = eventSourceParam;
     if (eventSource == "novice" || eventSource == "intermediate" ||
         eventSource == "expert")
     {
