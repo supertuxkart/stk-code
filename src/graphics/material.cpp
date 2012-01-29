@@ -976,30 +976,36 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     
     if (m_water_shader)
     {
-        if (m_shaders[WATER_SHADER] == NULL)
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (UserConfigParams::m_pixel_shaders &&
+            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
-            m_shaders[WATER_SHADER] = new WaterShaderProvider();
+            if (m_shaders[WATER_SHADER] == NULL)
+            {
+                m_shaders[WATER_SHADER] = new WaterShaderProvider();
+            }
+            
+            m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
+            m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
+                          
+            const char* vertex_shader = "shaders/water.vert";
+            const char* pixel_shader  = "shaders/water.frag";
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = 
+                irr_driver->getVideoDriver()->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                      (file_manager->getDataDir() + vertex_shader).c_str(),
+                                                      "main",
+                                                      video::EVST_VS_2_0,
+                                                      (file_manager->getDataDir() + pixel_shader).c_str(), 
+                                                      "main",
+                                                      video::EPST_PS_2_0,
+                                                      m_shaders[WATER_SHADER],
+                                                      video::EMT_SOLID_2_LAYER );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
-        
-        m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
-        m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
-                      
-        const char* vertex_shader = "shaders/water.vert";
-        const char* pixel_shader  = "shaders/water.frag";
-        
-        // Material and shaders
-        IGPUProgrammingServices* gpu = 
-            irr_driver->getVideoDriver()->getGPUProgrammingServices();
-        s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                  (file_manager->getDataDir() + vertex_shader).c_str(),
-                                                  "main",
-                                                  video::EVST_VS_2_0,
-                                                  (file_manager->getDataDir() + pixel_shader).c_str(), 
-                                                  "main",
-                                                  video::EPST_PS_2_0,
-                                                  m_shaders[WATER_SHADER],
-                                                  video::EMT_SOLID_2_LAYER );
-        m->MaterialType = (E_MATERIAL_TYPE)material_type;
         modes++;
     }
     
