@@ -1771,7 +1771,9 @@ void Kart::updateSkidding(float dt)
                                                              &bonus_force);
         // Relative 0 means it will emitt the minimum rate, i.e. the rate
         // set to indicate that the bonus is now available.
-        if(level>0)
+        if(level>0 && 
+            // FIXME hiker: remove once the new skidding code is final
+            m_kart_properties->getSkidVisualTime()>0)
         {
             m_kart_gfx->setSkidLevel(level);
             m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
