@@ -718,22 +718,23 @@ float KartProperties::getMaxSteerAngle(float speed) const
 }   // getMaxSteerAngle
 
 // ----------------------------------------------------------------------------
-/** Returns the bonus force to be applied to a kart which has skidded for the
- *  specified amount of time.
+/** Determines the bonus force to be applied to a kart which has skidded for 
+ *  the specified amount of time. It returns which level of skid bonus to use.
  *  \param t Time the kart has skidded.
+ *  \return The 'level' of skid bonus: 0=no bonus, 1=level 1, 2=level 2 etc.
  */
-void KartProperties::getSkidBonus(float t, float *bonus_time, 
-                                  float *bonus_force) const
+unsigned int KartProperties::getSkidBonus(float t, float *bonus_time, 
+                                          float *bonus_force) const
 {
     *bonus_time = 0;
     *bonus_force = 0;
     for(unsigned int i=0; i<m_skid_bonus_force.size(); i++)
     {
-        if(t<=m_skid_time_till_bonus[i]) return ;
+        if(t<=m_skid_time_till_bonus[i]) return i;
         *bonus_force = m_skid_bonus_force[i];
         *bonus_time= m_skid_bonus_time[i];
     }
-    return;
+    return m_skid_bonus_force.size();
 }   // getSkidBonusForce
 
 // ----------------------------------------------------------------------------

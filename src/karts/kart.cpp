@@ -1765,6 +1765,17 @@ void Kart::updateSkidding(float dt)
             ang_vel =  m_kart_properties->getSkidAngularVelocity();
         else if (m_controls.m_steer<0)
             ang_vel =  -m_kart_properties->getSkidAngularVelocity();
+        float bonus_time, bonus_force;
+        unsigned int level = m_kart_properties->getSkidBonus(m_skid_time, 
+                                                             &bonus_time, 
+                                                             &bonus_force);
+        // Relative 0 means it will emitt the minimum rate, i.e. the rate
+        // set to indicate that the bonus is now available.
+        if(level>0)
+        {
+            m_kart_gfx->setSkidLevel(level);
+            m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
+        }
     }
     else if(m_skid_time>0 &&
         // FIXME hiker: remove once the new skidding code is finished.
@@ -1772,8 +1783,8 @@ void Kart::updateSkidding(float dt)
     {   
         // The kart just stopped skidding - see if a skid bonus applies
         float bonus_time, bonus_force;
-        m_kart_properties->getSkidBonus(m_skid_time, 
-                                        &bonus_time, &bonus_force);
+        int level = m_kart_properties->getSkidBonus(m_skid_time, 
+                                                    &bonus_time, &bonus_force);
         float t = (m_skid_time <= m_kart_properties->getSkidVisualTime())
                   ? m_skid_time
                   : m_kart_properties->getSkidVisualTime();
@@ -1787,15 +1798,21 @@ void Kart::updateSkidding(float dt)
         {
             MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_SKIDDING,
                                        10, bonus_time, 1);
+            m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
             // FIXME hiker: for now just misuse the zipper code
             handleZipper(0);
         }
+        else
+            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
     }
     else if (m_skid_time < 0)
     {
         m_skid_time += dt;
         if(m_skid_time>0) 
+        {
             m_skid_time = 0;
+            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
+        }
     }
     m_vehicle->setSkidAngularVelocity(ang_vel);
 }   // updateSkidding

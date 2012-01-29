@@ -39,10 +39,12 @@ public:
     enum KartGFXType { KGFX_NITRO=0,
                        KGFX_ZIPPER,
                        KGFX_SKID,
+                       KGFX_SKID1=KGFX_SKID,
+                       KGFX_SKID2,
                        KGFX_COUNT};
 
 private:
-    /** Vector of all particle kinds. */
+    /** Vector of all particle kinde. */
     std::vector<ParticleKind*> m_all_particle_kinds;
 
     /** Vector of all particle emitters. */
@@ -50,6 +52,9 @@ private:
 
     /** Pointer to the owner of this kart. */
     const Kart *m_kart;
+
+    /** Indicates the current skidding level, either skid1 or skid2. */
+    KartGFXType m_current_skid;
 
     void addEffect(KartGFXType type, const std::string &file_name, 
                    const Vec3 &position);
@@ -62,5 +67,6 @@ public:
     void setCreationRateAbsolute(KartGFXType type, float f);
     void setCreationRateRelative(KartGFXType type, float f);
     void resizeBox(KartGFXType type, float speed, float dt);
+    void setSkidLevel(unsigned int level);
 };   // KartWGFX
 #endif

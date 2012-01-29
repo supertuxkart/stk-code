@@ -293,7 +293,7 @@ private:
     float m_skid_increase;
     /** Skidding is multiplied by this when not skidding to decrease to 1.0. */
     float m_skid_decrease;
-    /**< Time till maximum skidding is reached. */
+    /** Time till maximum skidding is reached. */
     float m_time_till_max_skid;
     /** Additional rotation of 3d model when skidding. */
     float m_skid_visual;              
@@ -371,7 +371,8 @@ public:
 
     /** Returns the maximum steering angle (depending on speed). */
     float getMaxSteerAngle  (float speed) const;
-    void  getSkidBonus(float t, float *bonus_time, float *bonus_force) const;
+    unsigned int getSkidBonus(float t, float *bonus_time, 
+                              float *bonus_force) const;
 
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }

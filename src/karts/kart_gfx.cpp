@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-KartGFX::KartGFX(const Kart *kart)
+KartGFX::KartGFX(const Kart *kart) : m_current_skid(KGFX_SKID1)
 {
     if(!UserConfigParams::m_graphical_effects)
     {
@@ -47,7 +47,8 @@ KartGFX::KartGFX(const Kart *kart)
     // in the order of KartGFXType.
     addEffect(KGFX_NITRO,  "nitro.xml",       position);
     addEffect(KGFX_ZIPPER, "zipper_fire.xml", position);
-    addEffect(KGFX_SKID,   "nitro.xml",       position);
+    addEffect(KGFX_SKID1,  "skid1.xml",       position);
+    addEffect(KGFX_SKID2,  "skid2.xml",       position);
 
 }   // KartGFX
 
@@ -79,9 +80,12 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
     try
     {
         kind    = new ParticleKind(file_manager->getGfxFile(file_name));
-        emitter = new ParticleEmitter(kind, 
-                                      position, 
-                                      m_kart->getNode()                );
+        if(type==KGFX_SKID2)
+            emitter = NULL;  // skid2 is only used to store the emitter type
+        else
+            emitter = new ParticleEmitter(kind, 
+                                          position, 
+                                          m_kart->getNode());
     }
     catch (std::runtime_error& e)
     {
@@ -111,6 +115,21 @@ void KartGFX::reset()
         }
     }
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Selects the correct skidding particle type depending on skid bonus level.
+ *  \param type Must be either KGFX_SKID1 or KGFX_SKID2 - the particle type
+ *         to use corresponding to the bonus level.
+ */
+void KartGFX::setSkidLevel(unsigned int level)
+{
+    KartGFXType type = level==1 ? KGFX_SKID1 : KGFX_SKID2;
+    assert(type == KGFX_SKID1 || type==KGFX_SKID2);
+    m_current_skid = type;
+    if(m_all_emitters[KGFX_SKID1])
+        m_all_emitters[KGFX_SKID1]->setParticleType(
+                                                   m_all_particle_kinds[type]);
+}   // setSkidLevel
 
 // ----------------------------------------------------------------------------
 /** Updates all gfx.
