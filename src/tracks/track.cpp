@@ -22,6 +22,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <IBillboardTextSceneNode.h>
 
 using namespace irr;
 
@@ -492,6 +493,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         case scene::ESNT_SKY_BOX :
         case scene::ESNT_SKY_DOME:
         case scene::ESNT_PARTICLE_SYSTEM :
+        case scene::ESNT_TEXT:
             // These are non-physical
             return;
             break;
@@ -764,16 +766,17 @@ bool Track::loadMainTrack(const XMLNode &root)
                                 
                 assert(GUIEngine::getHighresDigitFont() != NULL);
                 
-                sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                                              msg.c_str(),
-                                              NULL,
-                                              core::dimension2df(textsize.Width/45.0f,
-                                                                 textsize.Height/45.0f),
-                                              xyz,
-                                              -1 /* id */,
-                                              video::SColor(255, 255, 225, 0),
-                                              video::SColor(255, 255, 89, 0));
-                
+                scene::ISceneNode* sn =
+                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
+                                                  msg.c_str(),
+                                                  NULL,
+                                                  core::dimension2df(textsize.Width/45.0f,
+                                                                     textsize.Height/45.0f),
+                                                  xyz,
+                                                  -1 /* id */,
+                                                  video::SColor(255, 255, 225, 0),
+                                                  video::SColor(255, 255, 89, 0));
+                m_all_nodes.push_back(sn);
                 if (!shown) continue;
             }
             else
