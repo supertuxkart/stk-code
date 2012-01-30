@@ -55,7 +55,11 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     setInvisibleCharacters ( L" " );
     
     io::IXMLReader* reader = file_manager->createXMLReader(filename.c_str());
-    load( reader );
+    if (!load( reader ))
+    {
+        fprintf(stderr, "[ScalableFont] Loading font failed\n");
+        assert(false);
+    }
     reader->drop();
     
     assert(Areas.size() > 0);
@@ -227,7 +231,10 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 bool ScalableFont::load(io::IXMLReader* xml)
 {
     if (!SpriteBank)
+    {
+        fprintf(stderr, "[ScalableFont::load] SpriteBank is NULL!!\n");
         return false;
+    }
 
     doReadXmlFile(xml);
     

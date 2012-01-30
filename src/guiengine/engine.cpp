@@ -662,6 +662,7 @@ namespace GUIEngine
         ScalableFont* g_font;
         ScalableFont* g_title_font;
         ScalableFont* g_small_font;
+        ScalableFont* g_digit_font;
         
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;
@@ -897,6 +898,8 @@ namespace GUIEngine
         //delete g_small_font;
         g_small_font->drop();
         g_small_font = NULL;
+        g_digit_font->drop();
+        g_digit_font = NULL;
         
         // nothing else to delete for now AFAIK, irrlicht will automatically 
         // kill everything along the device
@@ -982,6 +985,12 @@ namespace GUIEngine
         sfont->setKerningHeight(-5);
         g_font = sfont;
         
+        ScalableFont* digit_font =
+            new ScalableFont(g_env,
+                             file_manager->getFontFile("BigDigitFont.xml").c_str());
+        digit_font->lazyLoadTexture(0); // make sure the texture is loaded for this one
+        g_digit_font = digit_font;
+        
         Private::font_height = g_font->getDimension( L"X" ).Height;
         
         ScalableFont* sfont_smaller = sfont->getHollowCopy();
@@ -991,6 +1000,7 @@ namespace GUIEngine
         
         Private::small_font_height = 
             g_small_font->getDimension( L"X" ).Height;
+        
         
         ScalableFont* sfont2 = 
             new ScalableFont(g_env, 

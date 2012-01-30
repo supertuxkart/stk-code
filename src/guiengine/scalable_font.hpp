@@ -54,9 +54,7 @@ class ScalableFont : public IGUIFontBitmap
     };
     
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
-    
-    void lazyLoadTexture(int texID);
-    
+        
     void doReadXmlFile(io::IXMLReader* xml);
     
     bool m_is_hollow_copy;
@@ -98,6 +96,8 @@ public:
 
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
+
+    void lazyLoadTexture(int texID);
 
     //! draws an text and clips it to the specified rectangle if wanted
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,

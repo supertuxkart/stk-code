@@ -84,6 +84,7 @@ namespace GUIEngine
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
         extern irr::gui::ScalableFont* g_title_font;
+        extern irr::gui::ScalableFont* g_digit_font;
 
         extern irr::IrrlichtDevice* g_device;
         extern irr::video::IVideoDriver* g_driver;
@@ -134,6 +135,11 @@ namespace GUIEngine
       */
     inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
     
+    /**
+     * \return the "high-res digits" font (useful for big numbers)
+     */
+    inline irr::gui::ScalableFont*    getHighresDigitFont() { return Private::g_digit_font;  }
+
     /**
       * \return the "title" font (it's bigger and orange, useful for headers/captions)
       */

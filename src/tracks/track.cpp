@@ -754,13 +754,16 @@ bool Track::loadMainTrack(const XMLNode &root)
                 m_force_fields.push_back(OverworldForceField(xyz, shown, val));
                 
                 core::stringw msg = StringUtils::toWString(val);
-                core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(msg.c_str());
+                core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()->getDimension(msg.c_str());
                 scene::ISceneManager* sm = irr_driver->getSceneManager();
-                sm->addBillboardTextSceneNode(GUIEngine::getFont(),
+                                
+                assert(GUIEngine::getHighresDigitFont() != NULL);
+                
+                sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
                                               msg.c_str(),
                                               NULL,
-                                              core::dimension2df(textsize.Width/15.0f,
-                                                                 textsize.Height/15.0f),
+                                              core::dimension2df(textsize.Width/45.0f,
+                                                                 textsize.Height/45.0f),
                                               xyz,
                                               -1 /* id */,
                                               video::SColor(255, 255, 225, 0),
