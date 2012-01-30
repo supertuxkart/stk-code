@@ -865,7 +865,11 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 {
     video::ITexture* out;
     if(!is_premul && !is_prediv)
+    {
+        if (!complain_if_not_found) m_device->getLogger()->setLogLevel(ELL_NONE);
         out = m_video_driver->getTexture(filename.c_str());
+        if (!complain_if_not_found) m_device->getLogger()->setLogLevel(ELL_WARNING);
+    }
     else
     {
         // FIXME: can't we just do this externally, and just use the
