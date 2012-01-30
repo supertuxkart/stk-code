@@ -210,14 +210,15 @@ private:
     std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
     
     void  init    (unsigned int index);
-    void  install (bool is_full_path=false);
+    void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
     
 public:
           Material(const XMLNode *node, int index);
           Material(const std::string& fname, int index, 
-                   bool is_full_path=false);
+                   bool is_full_path=false,
+                   bool complain_if_not_found=true);
          ~Material ();
 
     void  setSFXSpeed(SFXBase *sfx, float speed) const;

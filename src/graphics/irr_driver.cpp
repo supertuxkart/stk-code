@@ -860,7 +860,8 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
  */
 video::ITexture *IrrDriver::getTexture(const std::string &filename,
                                        bool is_premul,
-                                       bool is_prediv)
+                                       bool is_prediv,
+                                       bool complain_if_not_found)
 {
     video::ITexture* out;
     if(!is_premul && !is_prediv)
@@ -923,13 +924,12 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         out = m_video_driver->addTexture(filename.c_str(), img, NULL);
     }   // if is_premul or is_prediv
 
-#ifndef NDEBUG
-    if (out == NULL)
+
+    if (complain_if_not_found && out == NULL)
     {
         printf("[IrrDriver] Texture '%s' not found; Put a breakpoint at line %s:%i to debug!\n",
                filename.c_str(), __FILE__, __LINE__);
     }
-#endif
     
     return out;
 }   // getTexture

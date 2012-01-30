@@ -144,7 +144,8 @@ public:
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename,
                                      bool is_premul=false,
-                                     bool is_prediv=false);
+                                     bool is_prediv=false,
+                                     bool complain_if_not_found=true);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 

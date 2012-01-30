@@ -539,7 +539,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if(t)
         {
             std::string image = std::string(core::stringc(t->getName()).c_str());
-            material=material_manager->getMaterial(StringUtils::getBasename(image));
+            
+            // the third boolean argument is false because at this point we're
+            // dealing physics, so it's useless to warn about missing textures,
+            // we'd just get duplicate/useless warnings
+            material=material_manager->getMaterial(StringUtils::getBasename(image),
+                                                   false, false, false);
             // Special gfx meshes will not be stored as a normal physics body,
             // but converted to a collision body only, so that ray tests
             // against them can be done.

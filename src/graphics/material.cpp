@@ -471,11 +471,12 @@ Material::Material(const XMLNode *node, int index)
  *  \param index Unique index in material_manager.
  *  \param is_full_path If the fname contains the full path.
  */
-Material::Material(const std::string& fname, int index, bool is_full_path)
+Material::Material(const std::string& fname, int index, bool is_full_path,
+                   bool complain_if_not_found)
 {
     m_texname = fname;
     init(index);
-    install(is_full_path);
+    install(is_full_path, complain_if_not_found);
 }   // Material
 
 //-----------------------------------------------------------------------------
@@ -537,19 +538,22 @@ void Material::init(unsigned int index)
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install(bool is_full_path)
+void Material::install(bool is_full_path, bool complain_if_not_found)
 {
     const std::string &full_path = is_full_path 
                                  ? m_texname
                                  : file_manager->getTextureFile(m_texname);
     
-    if (full_path.size() == 0)
+    if (complain_if_not_found && full_path.size() == 0)
     {
         fprintf(stderr, "[Material] WARNING, cannot find texture '%s'\n", m_texname.c_str());
     }
     
+    
     m_texture = irr_driver->getTexture(full_path,
-                                       isPreMul(), isPreDiv());
+                                       isPreMul(),
+                                       isPreDiv(),
+                                       complain_if_not_found);
 
     if (m_texture == NULL) return;
     

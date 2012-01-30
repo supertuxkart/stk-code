@@ -265,7 +265,8 @@ void MaterialManager::popTempMaterial()
  */
 Material *MaterialManager::getMaterial(const std::string& fname, 
                                        bool is_full_path,
-                                       bool make_permanent)
+                                       bool make_permanent,
+                                       bool complain_if_not_found)
 {
     if(fname=="")
     {
@@ -287,7 +288,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     // Add the new material
-    Material* m=new Material(fname, m_materials.size(), is_full_path);
+    Material* m=new Material(fname, m_materials.size(), is_full_path, complain_if_not_found);
     m_materials.push_back(m);
     if(make_permanent) 
     {

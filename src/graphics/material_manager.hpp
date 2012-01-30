@@ -62,8 +62,10 @@ public:
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
 
     int       addEntity        (Material *m);
-    Material *getMaterial      (const std::string& t, bool is_full_path=false,
-                                bool make_permanent=false);
+    Material *getMaterial      (const std::string& t,
+                                bool is_full_path=false,
+                                bool make_permanent=false,
+                                bool complain_if_not_found=true);
     void      addSharedMaterial(const std::string& filename);
     bool      pushTempMaterial (const std::string& filename);
     bool      pushTempMaterial (const XMLNode *root, const std::string& filename);
