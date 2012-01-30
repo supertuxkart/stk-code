@@ -114,9 +114,6 @@ private:
      *  determine startup boost. */
     bool         m_has_started;
 
-    /** For skidding smoke */
-    int          m_wheel_toggle;
-
     /**<Maximum engine rpm's for the current gear*/
     float        m_max_gear_rpm;
 
@@ -154,9 +151,6 @@ private:
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
     
-    /** Particle emitter used for terrain-specific effects (including but not limited too skidding). */
-    ParticleEmitter *m_terrain_particles;    
-
     ParticleEmitter *m_sky_particles_emitter;
     
     /** All particle effects. */
