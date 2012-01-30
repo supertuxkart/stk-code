@@ -107,7 +107,7 @@ void World::init()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
     m_num_players         = 0;
-
+    
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
     // do any rendering on texture.
@@ -132,7 +132,7 @@ void World::init()
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    m_track->loadTrackModel(this);
+    m_track->loadTrackModel(this, race_manager->getReverseTrack());
 
     for(unsigned int i=0; i<num_karts; i++)
     {

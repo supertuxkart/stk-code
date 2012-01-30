@@ -64,6 +64,14 @@ CheckManager::~CheckManager()
 
 // ----------------------------------------------------------------------------
 
+/** Reverse checks order. */
+void CheckManager::reverse()
+{
+  // FIXME
+}   // reverse
+
+// ----------------------------------------------------------------------------
+
 /** Resets all checks. */
 void CheckManager::reset(const Track &track)
 {

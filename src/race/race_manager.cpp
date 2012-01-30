@@ -351,7 +351,7 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
         World::setWorld(new FollowTheLeaderRace());
     else if(m_minor_mode==MINOR_MODE_NORMAL_RACE || 
-            m_minor_mode==MINOR_MODE_TIME_TRIAL)    
+            m_minor_mode==MINOR_MODE_TIME_TRIAL)
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
@@ -616,12 +616,14 @@ void RaceManager::startGP(const GrandPrixData* gp)
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startSingleRace(const std::string trackIdent, const int num_laps)
+void RaceManager::startSingleRace(const std::string trackIdent, 
+                                  const int num_laps, const bool reverse_track)
 {
     StateManager::get()->enterGameState();
     setTrack(trackIdent.c_str());
     
     if (num_laps != -1) setNumLaps( num_laps );
+    setReverseTrack(reverse_track);
     
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     

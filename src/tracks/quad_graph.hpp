@@ -85,7 +85,8 @@ private:
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
          QuadGraph     (const std::string &quad_file_name, 
-                        const std::string graph_file_name);
+                        const std::string graph_file_name,
+                        const bool reverse);
         ~QuadGraph     ();
 public:
     static const int UNKNOWN_SECTOR;
@@ -125,10 +126,11 @@ public:
     // ----------------------------------------------------------------------
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name, 
-                       const std::string graph_file_name)
+                       const std::string graph_file_name,
+                       const bool reverse)
     {
         assert(m_quad_graph==NULL);
-        m_quad_graph = new QuadGraph(quad_file_name, graph_file_name);
+        m_quad_graph = new QuadGraph(quad_file_name, graph_file_name, reverse);
     }   // create
     // ----------------------------------------------------------------------
     /** Cleans up the quad graph. It is possible that this function is called

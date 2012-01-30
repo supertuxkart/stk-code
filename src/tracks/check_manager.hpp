@@ -39,6 +39,7 @@ public:
         ~CheckManager();
     void update(float dt);
     void reset(const Track &track);
+    void reverse();
     
     int getCheckStructureCount() const { return m_all_checks.size(); }
     

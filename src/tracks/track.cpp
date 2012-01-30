@@ -86,6 +86,7 @@ Track::Track(const std::string &filename)
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
+    m_reverse_available     = false;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
@@ -298,6 +299,7 @@ void Track::loadTrackInfo()
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
+    root->get("reverse",               &m_reverse_available);
     
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -384,10 +386,11 @@ void Track::startMusic() const
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id)
+void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 {
     QuadGraph::create(m_root+"/"+m_all_modes[mode_id].m_quad_name,
-                      m_root+"/"+m_all_modes[mode_id].m_graph_name);
+                      m_root+"/"+m_all_modes[mode_id].m_graph_name,
+                      reverse);
 
     QuadGraph::get()->setupPaths();
 #ifdef DEBUG
@@ -1141,8 +1144,13 @@ void Track::createWater(const XMLNode &node)
  *         scene, quad, and graph file to load.
  */
 
-void Track::loadTrackModel(World* parent, unsigned int mode_id)
+void Track::loadTrackModel(World* parent, bool reverse_track, 
+			   unsigned int mode_id               )
 {
+    if(!m_reverse_available) 
+    {
+        reverse_track = false;
+    }
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
@@ -1206,7 +1214,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena) loadQuadGraph(mode_id);
+    if (!m_is_arena) loadQuadGraph(mode_id, reverse_track);
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -1308,6 +1316,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="checks")
         {
             m_check_manager = new CheckManager(*node, this);
+            if(reverse_track) {
+                m_check_manager->reverse();
+            }
         }
         else if (name=="particle-emitter")
         {

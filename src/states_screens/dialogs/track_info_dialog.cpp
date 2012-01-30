@@ -135,7 +135,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
         m_spinner->setText( _("%i laps") );
         
-        m_widgets.push_back(m_spinner);
+        //~ m_widgets.push_back(m_spinner);
         m_spinner->add();
         m_spinner->setValue( UserConfigParams::m_num_laps );
         m_spinner->getIrrlichtElement()->setTabStop(true);
@@ -144,6 +144,30 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     else
     {
         m_spinner = NULL;
+    }
+    
+    // Reverse track
+    const bool reverse_available = track->reverseAvailable();
+    if (reverse_available)
+    {
+        m_checkbox = new CheckBoxWidget();
+        m_checkbox->m_x = m_area.getWidth()/2 - 400;
+        m_checkbox->m_y = (y2+y3)/2.0;
+        m_checkbox->m_w = 60;
+        m_checkbox->m_h = 60;
+        m_checkbox->setParent(m_irrlicht_window);
+        m_checkbox->m_properties[PROP_ID] = "reversecheckbox";
+        m_checkbox->m_properties[PROP_WARP_AROUND] = "true";
+        m_checkbox->setText( _("Reverse track") );
+        m_widgets.push_back(m_checkbox);
+        m_checkbox->add();
+        m_checkbox->setState(false);
+        m_checkbox->getIrrlichtElement()->setTabStop(true);
+        m_checkbox->getIrrlichtElement()->setTabGroup(false);
+    }
+    else
+    {
+        m_checkbox = NULL;
     }
     
     // ---- Start button
@@ -290,7 +314,9 @@ void TrackInfoDialog::onEnterPressedInternal()
     ModalDialog::dismiss();
     
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-    race_manager->startSingleRace(m_track_ident, num_laps);
+    const bool reverse_track = m_checkbox == NULL ? false 
+                                                  : m_checkbox->getState();
+    race_manager->startSingleRace(m_track_ident, num_laps, reverse_track);
 }
 
 // ------------------------------------------------------------------------------------------------------   
@@ -302,9 +328,11 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         // Create a copy of member variables we still need, since they will
         // not be accessible after dismiss:
         const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
+        const bool reverse_track = m_checkbox == NULL ? false 
+                                                      : m_checkbox->getState();
         std::string track_ident = m_track_ident;
         ModalDialog::dismiss();
-        race_manager->startSingleRace(track_ident, num_laps);
+        race_manager->startSingleRace(track_ident, num_laps, reverse_track);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "lapcountspinner")

@@ -21,6 +21,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 
 static const int HIGHSCORE_COUNT = 3;
 
@@ -38,6 +39,7 @@ class TrackInfoDialog : public GUIEngine::ModalDialog
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
     GUIEngine::SpinnerWidget* m_spinner;
+    GUIEngine::CheckBoxWidget* m_checkbox;
     irr::gui::IGUIImage* m_kart_icons[HIGHSCORE_COUNT];
     irr::gui::IGUIStaticText* m_highscore_entries[HIGHSCORE_COUNT];
     

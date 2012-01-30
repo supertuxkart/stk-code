@@ -179,6 +179,9 @@ private:
       * in the track seelction screen
       */
     bool                     m_internal;
+    
+    /** Whether this track should be available in reverse version */
+    bool                     m_reverse_available;
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
@@ -282,7 +285,7 @@ private:
     void loadTrackInfo();
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                      bool drop);
-    void loadQuadGraph(unsigned int mode_id);
+    void loadQuadGraph(unsigned int mode_id, const bool reverse);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void createWater(const XMLNode &node);
@@ -293,6 +296,8 @@ private:
     void handleSky(const XMLNode &root, const std::string &filename);
 
 public:
+
+    bool reverseAvailable() { return m_reverse_available; }
 
     static const float NOHIT;
 
@@ -321,7 +326,9 @@ public:
     // ------------------------------------------------------------------------
     bool               isArena           () const { return m_is_arena; }
     // ------------------------------------------------------------------------
-    void               loadTrackModel  (World* parent, unsigned int mode_id=0);
+    void               loadTrackModel  (World* parent, 
+                                        bool reverse_track = false,
+                                        unsigned int mode_id=0);
     // ------------------------------------------------------------------------
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);     }
