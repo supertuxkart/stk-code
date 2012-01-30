@@ -7,12 +7,12 @@
                y="0.001"
                z="-0.003"         />
     
-    <material  file="nitro-particle.png"  />
+    <material  file="skid-particle1.png"  />
     
     <!-- Amount of particles emitted per second. The minimum rate
          is used to show that the skidding bonus is now available,
          the maximum is used when the skid bonus is applied to the kart -->
-    <rate      min="50"
+    <rate      min="200"
                max="600"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
