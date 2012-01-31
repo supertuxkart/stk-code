@@ -813,7 +813,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string challenge;
         n->get("challenge", &challenge);
         
-        lodLoader.check(n);
+        bool is_lod = lodLoader.check(n);
         
         if (tangent)
         {
@@ -849,7 +849,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (lodLoader.check(n))
+        else if (is_lod)
         {
             // nothing to do
         }
