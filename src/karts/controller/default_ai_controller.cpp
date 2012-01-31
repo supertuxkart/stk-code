@@ -39,6 +39,7 @@
 #  include "graphics/irr_driver.hpp"
 #endif
 #include "graphics/slip_stream.hpp"
+#include "items/attachment.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"

@@ -292,14 +292,52 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 }   // hitBanana
 
 //-----------------------------------------------------------------------------
-//** Moves a bomb from kart FROM to kart TO.
-void Attachment::moveBombFromTo(Kart *from, Kart *to)
+/** Updates the attachments in case of a kart-kart collision. This must only
+ *  be called for one of the karts in the collision, since it will update
+ *  the attachment for both karts.
+ *  \param other Pointer to the other kart hit.
+ */
+void Attachment::handleCollisionWithKart(Kart *other)
 {
-    to->getAttachment()->set(ATTACH_BOMB,
-                             from->getAttachment()->getTimeLeft()+
-                             stk_config->m_bomb_time_increase, from);
-    from->getAttachment()->clear();
-}   // moveBombFromTo
+    Attachment *attachment_other=other->getAttachment();
+
+    if(getType()==Attachment::ATTACH_BOMB)
+    {
+        // If both karts have a bomb, explode them immediately:
+        if(attachment_other->getType()==Attachment::ATTACH_BOMB)
+        {
+            setTimeLeft(0.0f);
+            attachment_other->setTimeLeft(0.0f);
+        }
+        else  // only this kart has a bomb, move it to the other
+        {
+            if(getPreviousOwner()!=other)
+            {
+                // Don't move if this bomb was from other kart originally
+                other->getAttachment()->set(ATTACH_BOMB,
+                                            getTimeLeft()+
+                                            stk_config->m_bomb_time_increase,
+                                            m_kart);
+                other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+                clear();
+            }
+        }
+    }   // type==BOMB
+    else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
+            attachment_other->getPreviousOwner()!=m_kart)
+    {
+        set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
+                         stk_config->m_bomb_time_increase, other);
+        other->getAttachment()->clear();
+        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+    }
+    else
+    {
+        m_kart->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        other->playCustomSFX(SFXManager::CUSTOM_CRASH);
+    }
+
+}   // handleCollisionWithKart
 
 //-----------------------------------------------------------------------------
 void Attachment::update(float dt)

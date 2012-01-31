@@ -28,7 +28,6 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/kart_control.hpp"
@@ -42,6 +41,7 @@
 class btKart;
 class btUprightConstraint;
 
+class Attachment;
 class Camera;
 class Item;
 class KartGFX;
@@ -205,6 +205,7 @@ private:
     void          updateEngineSFX();
 
     float         getVisualSkidOffset() const;
+    void          crashed();
 
 protected:
     const KartProperties *m_kart_properties;
@@ -242,7 +243,8 @@ public:
     void           handleZipper     (const Material *m=NULL, bool play_sound=false);
     void           setSquash        (float time, float slowdown);
 
-    void           crashed          (Kart *k, const Material *m=NULL);
+    void           crashed          (Kart *k, bool update_attachments);
+    void           crashed          (const Material *m);
     
     virtual void   update           (float dt);
     virtual void   finishedRace     (float time);

@@ -268,45 +268,17 @@ Physics::CollisionSide Physics::getCollisionSide(const btRigidBody *body,
  *  server and if no networking is used, and from race_state on the client to 
  *  replay what happened on the server.
  *  \param kart_a First kart involved in the collision.
+ *  \param contact_point_a Location of collision at first kart (in kart 
+ *         coordinates).
  *  \param kart_b Second kart involved in the collision.
+ *  \param contact_point_b Location of collision at second kart (in kart
+ *         coordinates).
  */
 void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
                                 Kart *kart_b, const Vec3 &contact_point_b)
 {
-    kart_a->crashed(kart_b);   // will play crash sound for player karts
-    kart_b->crashed(kart_a);
-    Attachment *attachmentA=kart_a->getAttachment();
-    Attachment *attachmentB=kart_b->getAttachment();
-
-    if(attachmentA->getType()==Attachment::ATTACH_BOMB)
-    {
-        // If both karts have a bomb, explode them immediately:
-        if(attachmentB->getType()==Attachment::ATTACH_BOMB)
-        {
-            attachmentA->setTimeLeft(0.0f);
-            attachmentB->setTimeLeft(0.0f);
-        }
-        else  // only A has a bomb, move it to B (unless it was from B)
-        {
-            if(attachmentA->getPreviousOwner()!=kart_b)
-            {
-                attachmentA->moveBombFromTo(kart_a, kart_b);
-                // Play appropriate SFX
-                kart_b->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-            }
-        }
-    }
-    else if(attachmentB->getType()==Attachment::ATTACH_BOMB &&
-            attachmentB->getPreviousOwner()!=kart_a)
-    {
-        attachmentB->moveBombFromTo(kart_b, kart_a);
-        kart_a->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-    }
-    else
-    {
-        kart_a->playCustomSFX(SFXManager::CUSTOM_CRASH);
-        kart_b->playCustomSFX(SFXManager::CUSTOM_CRASH);
-    }
+    kart_a->crashed(kart_b, /*handle_attachments*/true);
+    kart_b->crashed(kart_a, /*handle_attachments*/false);
 
     // If bouncing crashes is enabled, add an additional force to the
     // slower kart
@@ -470,7 +442,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(NULL, m);
+                kart->crashed(m);
             }
         }
         // 2) object a is a kart
@@ -485,7 +457,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(NULL, m);   // Kart hit track
+                kart->crashed(m);   // Kart hit track
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 // 2.1 projectile hits kart

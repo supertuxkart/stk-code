@@ -99,9 +99,9 @@ public:
     void  clear ();
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
-    void  moveBombFromTo(Kart *from, Kart *to);
-
+    void  handleCollisionWithKart(Kart *other);
     void  set (AttachmentType type, float time, Kart *previous_kart=NULL);
+
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */
     void  set (AttachmentType type) { set(type, m_time_left); }

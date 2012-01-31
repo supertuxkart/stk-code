@@ -138,7 +138,7 @@ private:
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;
-    CollisionList                    m_all_collisions;
+    CollisionList                    m_all_collisions;   
 
 public:
           Physics          ();

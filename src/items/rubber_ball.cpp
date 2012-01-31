@@ -20,6 +20,7 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"

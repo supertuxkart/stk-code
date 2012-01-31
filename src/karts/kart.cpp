@@ -42,6 +42,7 @@
 #include "karts/kart_gfx.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
+#include "items/attachment.hpp"
 #include "items/item_manager.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/kart_model.hpp"
@@ -1261,7 +1262,7 @@ void Kart::setCamera(Camera *camera)
     {
         m_rain->setCamera( camera->getCameraSceneNode() );
     }
-}
+}   // setCamera
 
 //-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be 
@@ -1354,44 +1355,64 @@ void Kart::setSlipstreamEffect(float f)
 }   // setSlipstreamEffect
 
 // -----------------------------------------------------------------------------
-/** Called when the kart crashes against the track (k=NULL) or another kart.
- *  \param k Either a kart if a kart was hit, or NULL if the track was hit.
- *  \param m 
+/** Called when the kart crashes against another kart.
+ *  \param k The kart that was hit.
+ *  \param update_attachments If true the attachment of this kart and the
+ *          other kart hit will be updated (e.g. bombs will be moved)
  */
-void Kart::crashed(Kart *k, const Material *m)
+void Kart::crashed(Kart *k, bool update_attachments)
+{
+    if(update_attachments)
+    {
+        assert(k);
+        getAttachment()->handleCollisionWithKart(k);
+    }
+    crashed();
+}   // crashed(Kart, update_attachments
+
+// -----------------------------------------------------------------------------
+/** Kart hits the track with a given material.
+ *  \param m Material hit, can be NULL if no specific material exists.
+ */
+void Kart::crashed(const Material *m)
 {
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
     // This makes it easier to see if a kart hit the track (esp.
     // after a jump).
     // FIXME: This should be removed once the physics are fixed.
-    if(!k && UserConfigParams::m_physics_debug)
+    if(UserConfigParams::m_physics_debug)
     {
         // Add a counter to make it easier to see if a new line of
         // output was added.
         static int counter=0;
-        printf("Kart %s hit track: %d.\n", getIdent().c_str(), counter++);
+        printf("Kart %s hit track: %d material %s.\n", 
+               getIdent().c_str(), counter++,
+               m->getTexFname().c_str());
     }
 #endif
 
-    m_controller->crashed();
     /** If a kart is crashing against the track, the collision is often
      *  reported more than once, resulting in a machine gun effect, and too
      *  long disabling of the engine. Therefore, this reaction is disabled
      *  for 0.5 seconds after a crash.
      */
-    if(m && m->getCollisionReaction() != Material::NORMAL && !playingEmergencyAnimation())
+    if(m && m->getCollisionReaction() != Material::NORMAL && 
+        !playingEmergencyAnimation())
     {
         std::string particles = m->getCrashResetParticles();
         if (particles.size() > 0)
         {
-            ParticleKind* kind = ParticleKindManager::get()->getParticles(particles);
+            ParticleKind* kind = 
+                ParticleKindManager::get()->getParticles(particles);
             if (kind != NULL)
             {
                 if (m_collision_particles == NULL)
                 {
-                    Vec3 position(-getKartWidth()*0.35f, 0.06f, getKartLength()*0.5f);
-                    m_collision_particles  = new ParticleEmitter(kind, position, getNode());
+                    Vec3 position(-getKartWidth()*0.35f, 0.06f, 
+                                  getKartLength()*0.5f);
+                    m_collision_particles  = 
+                        new ParticleEmitter(kind, position, getNode());
                 }
                 else
                 {
@@ -1413,14 +1434,24 @@ void Kart::crashed(Kart *k, const Material *m)
         {
             if (m_bounce_back_time <= 0.0f)
             {
-            btVector3 push = m_vehicle->getRigidBody()->getLinearVelocity().normalized();
-            push[1] = 0.1f;
-            m_vehicle->getRigidBody()->applyCentralImpulse( -4000.0f*push );
-            //m_vehicle->getRigidBody()->setLinearVelocity( -m_vehicle->getRigidBody()->getLinearVelocity() );
-            m_bounce_back_time = 2.0f;
+                btVector3 push = m_body->getLinearVelocity().normalized();
+                push[1] = 0.1f;
+                m_body->applyCentralImpulse( -4000.0f*push );
+                m_bounce_back_time = 2.0f;
             }
         }
     }
+
+    crashed();
+}   // crashed(Material)
+
+// -----------------------------------------------------------------------------
+/** Common code used when a kart or a material was hit.
+ */
+void Kart::crashed()
+{
+    m_controller->crashed();
+
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
     m_time_last_crash = World::getWorld()->getTime();

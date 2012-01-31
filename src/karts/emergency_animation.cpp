@@ -21,6 +21,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/stars.hpp"
+#include "items/attachment.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
