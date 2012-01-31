@@ -831,7 +831,8 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             convertTrackToBullet(scene_node);
             scene_node->remove();
-            
+            irr_driver->grabAllTextures(original_mesh);
+
             scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
             mesh->grab();
             irr_driver->grabAllTextures(mesh);
