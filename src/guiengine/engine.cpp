@@ -414,6 +414,10 @@ namespace GUIEngine
        is not what you're looking for; instead, add a stretching spacer before
        and after the widget(s) you want to center.
  
+ \note When applied to a label widget, this property will center the text
+       widget within its parent. To align the text inside the label widget,
+       see \ref prop4
+ 
  \n
  \subsection prop13 PROP_PROPORTION
  <em> Name in XML files: </em> \c "proportion"
