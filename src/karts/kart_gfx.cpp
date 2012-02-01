@@ -150,7 +150,7 @@ void KartGFX::setSkidLevel(const unsigned int level)
 void KartGFX::setParticleKind(const KartGFXType type, const ParticleKind *pk)
 {
     ParticleEmitter *pe = m_all_emitters[KGFX_TERRAIN];
-    if(pe) return;
+    if(!pe) return;
 
     pe->setParticleType(pk);
 }   // setParticleKind
