@@ -107,7 +107,18 @@ private:
     bool             m_zipper;
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
+    
+    /** If the water shader (simulating wave effects and reflexions) is enabled */
     bool             m_water_shader;
+    
+    /** Speed of the 'main' wave in the water shader. Only used if
+        m_water_shader is true */
+    float            m_water_shader_speed_1;
+    
+    /** Speed of the 'secondary' waves in the water shader. Only used if
+     m_water_shader is true */
+    float            m_water_shader_speed_2;
+    
     /** If a kart is rescued when crashing into this surface. */
     CollisionReaction m_collision_reaction;
     

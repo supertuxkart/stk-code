@@ -75,28 +75,34 @@ public:
 class WaterShaderProvider : public video::IShaderConstantSetCallBack
 {    
     float m_dx_1, m_dy_1, m_dx_2, m_dy_2;
+    float m_water_shader_speed_1;
+    float m_water_shader_speed_2;
     
 public:
     LEAK_CHECK()
     
     
-    WaterShaderProvider()
+    WaterShaderProvider(float water_shader_speed_1,
+                        float water_shader_speed_2)
     {
         m_dx_1 = 0.0f;
         m_dy_1 = 0.0f;
         m_dx_2 = 0.0f;
         m_dy_2 = 0.0f;
+        
+        m_water_shader_speed_1 = water_shader_speed_1/100.0f;
+        m_water_shader_speed_2 = water_shader_speed_2/100.0f;
     }
     
     virtual void OnSetConstants(
                                 irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
-        m_dx_1 += GUIEngine::getLatestDt()/15.0f;
-        m_dy_1 += GUIEngine::getLatestDt()/15.0f;
+        m_dx_1 += GUIEngine::getLatestDt()*m_water_shader_speed_1;
+        m_dy_1 += GUIEngine::getLatestDt()*m_water_shader_speed_1;
         
-        m_dx_2 += GUIEngine::getLatestDt()/25.0f;
-        m_dy_2 -= GUIEngine::getLatestDt()/25.0f;
+        m_dx_2 += GUIEngine::getLatestDt()*m_water_shader_speed_2;
+        m_dy_2 -= GUIEngine::getLatestDt()*m_water_shader_speed_2;
 
         if (m_dx_1 > 1.0f) m_dx_1 -= 1.0f;
         if (m_dy_1 > 1.0f) m_dy_1 -= 1.0f;
@@ -429,6 +435,11 @@ Material::Material(const XMLNode *node, int index)
     }
     
     node->get("water-shader", &m_water_shader);
+    if (m_water_shader)
+    {
+        node->get("water-shader-speed-1", &m_water_shader_speed_1);
+        node->get("water-shader-speed-2", &m_water_shader_speed_2);
+    }
     
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
@@ -505,6 +516,8 @@ void Material::init(unsigned int index)
     m_add                       = false;
     m_disable_z_write           = false;
     m_water_shader              = false;
+    m_water_shader_speed_1      = 6.6667f;
+    m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
@@ -987,7 +1000,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             if (m_shaders[WATER_SHADER] == NULL)
             {
-                m_shaders[WATER_SHADER] = new WaterShaderProvider();
+                m_shaders[WATER_SHADER] = new WaterShaderProvider(m_water_shader_speed_1,
+                                                                  m_water_shader_speed_2);
             }
             
             m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
