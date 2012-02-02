@@ -869,7 +869,6 @@ int handleCmdLine(int argc, char **argv)
                      || !strcmp(argv[i], "-N")                )
         {
             UserConfigParams::m_no_start_screen = true;
-            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0].getName());
         }
         else if (    !strcmp(argv[i], "--race-now")
                      || !strcmp(argv[i], "-R")                )
@@ -960,6 +959,9 @@ int handleCmdLine(int argc, char **argv)
             return 0;
         }
     }   // for i <argc
+    if(UserConfigParams::m_no_start_screen)
+        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                       .getName()                        );
     if(ProfileWorld::isProfileMode())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects 
