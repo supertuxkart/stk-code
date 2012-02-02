@@ -215,11 +215,10 @@ protected:
     KartModel*            m_kart_model;
     
 public:
-                   Kart(const std::string& ident, Track* track, int position,  bool is_first_kart,
+                   Kart(const std::string& ident, unsigned int world_kart_id,
+                       Track* track, int position,  bool is_first_kart,
                         const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
-    unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
-    void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData(RaceManager::KartType type, bool is_first_kart, Track* track,
                             bool animatedModel);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
@@ -252,6 +251,9 @@ public:
     void           showZipperFire   ();
     bool           playCustomSFX    (unsigned int type);
     void           setController(Controller *controller);
+    // ------------------------------------------------------------------------
+    /** Returns the index of this kart in world. */
+    unsigned int   getWorldKartId() const         { return m_world_kart_id;   }
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
     KartModel*     getKartModel()                 { return m_kart_model;      }

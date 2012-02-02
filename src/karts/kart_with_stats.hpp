@@ -65,7 +65,8 @@ private:
     float        m_skidding_time;
 
 public:
-                 KartWithStats(const std::string& ident, Track* track, 
+                 KartWithStats(const std::string& ident, 
+                               unsigned int world_kart_id, Track* track,
                                int position,  bool is_first_kart,
                                const btTransform& init_transform, 
                                RaceManager::KartType type);

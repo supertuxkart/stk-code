@@ -70,7 +70,8 @@
  *  \param is_first_kart   Indicates whether this is the first *player* kart
  *  \param init_transform  The initial position and rotation for this kart.
  */
-Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_kart,
+Kart::Kart (const std::string& ident, unsigned int world_kart_id, 
+            Track* track, int position, bool is_first_kart,
             const btTransform& init_transform, RaceManager::KartType type)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
@@ -92,6 +93,7 @@ Kart::Kart (const std::string& ident, Track* track, int position, bool is_first_
     m_kart_model           = m_kart_properties->getKartModelCopy();
     m_initial_position     = position;
     m_race_position        = position;
+    m_world_kart_id        = world_kart_id;
     m_collected_energy     = 0;
     m_finished_race        = false;
     m_finish_time          = 0.0f;

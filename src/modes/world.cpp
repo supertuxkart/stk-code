@@ -144,7 +144,6 @@ void World::init()
         Kart* newkart = createKart(kart_ident, i, local_player_id,  
                                    global_player_id);
         m_karts.push_back(newkart);
-        newkart->setWorldKartId(m_karts.size()-1);
         m_track->adjustForFog(newkart->getNode());
         
     }  // for i
@@ -190,7 +189,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, m_track, position, 
+    Kart *new_kart         = new Kart(kart_ident, index,m_track, position,
                                       (local_player_id == 0), init_pos,
                                       race_manager->getKartType(index));
     Controller *controller = NULL;
