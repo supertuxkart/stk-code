@@ -103,7 +103,7 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         kind    = NULL;
         emitter = NULL;
     }
-    assert(m_all_emitters.size()==type);
+    assert((int)m_all_emitters.size()==type);
     m_all_emitters.push_back(emitter);
     if(type==KGFX_SKID1)
         m_skid_kind1 = kind;
