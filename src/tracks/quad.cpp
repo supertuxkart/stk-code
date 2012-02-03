@@ -131,3 +131,14 @@ void Quad::transform(const btTransform &t, Quad *result) const
                                       std::min(result->m_p[2].getY(), 
                                                result->m_p[3].getY())  );
 }   // transform
+
+// ----------------------------------------------------------------------------
+/** Reverse the quad */
+void Quad::reverse()  {
+    Vec3 tmp = m_p[0];
+    m_p[0] = m_p[2];
+    m_p[2] = tmp;
+    tmp = m_p[1];
+    m_p[1] = m_p[3];
+    m_p[3] = tmp;
+}

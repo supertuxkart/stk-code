@@ -76,10 +76,14 @@ private:
 
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
+    
+    /** Wether the graph should be reverted or not */
+    bool                     m_reverse;
 
     void setDefaultSuccessors();
     void setChecklineRequirements(GraphNode* node, int latest_checkline);
     
+    void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,

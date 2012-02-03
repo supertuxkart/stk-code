@@ -44,13 +44,16 @@ QuadGraph *QuadGraph::m_quad_graph = NULL;
  */
 QuadGraph::QuadGraph(const std::string &quad_file_name, 
                      const std::string graph_file_name,
-                     const bool reverse)
+                     const bool reverse) : m_reverse(reverse)
 {
     m_node                 = NULL;
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
     m_all_quads            = new QuadSet(quad_file_name);
+    if(m_reverse) {
+        m_all_quads->reverse_all_quads();
+    }
     m_quad_filename        = quad_file_name;
     GraphNode::m_all_quads = m_all_quads;
     GraphNode::m_all_nodes = this;
@@ -70,6 +73,14 @@ QuadGraph::~QuadGraph()
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
+
+void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
+    if(m_reverse)
+        m_all_nodes[to]->addSuccessor(from);
+    else
+        m_all_nodes[from]->addSuccessor(to);
+}
+
 /** Loads a quad graph from a file.
  *  \param filename Name of the file to load.
  */
@@ -138,7 +149,8 @@ void QuadGraph::load(const std::string &filename)
             for(unsigned int i=from; i<=to; i++)
             {
                 assert(i!=to ? i+1 : from <m_all_nodes.size());
-                m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
+                addSuccessor(i,(i!=to ? i+1 : from));
+                //~ m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
             }
         }
         else if(xml_node->getName()=="edge-line")
@@ -149,7 +161,8 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to", &to);
             for(unsigned int i=from; i<to; i++)
             {
-                m_all_nodes[i]->addSuccessor(i+1);
+                addSuccessor(i,i+1);
+                //~ m_all_nodes[i]->addSuccessor(i+1);
             }
         }
         else if(xml_node->getName()=="edge")
@@ -159,7 +172,8 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("from", &from);
             xml_node->get("to", &to);
             assert(to<m_all_nodes.size());
-            m_all_nodes[from]->addSuccessor(to);
+            addSuccessor(from,to);
+            //~ m_all_nodes[from]->addSuccessor(to);
         }   // edge
         else
         {
@@ -281,7 +295,8 @@ void QuadGraph::setDefaultSuccessors()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         if(m_all_nodes[i]->getNumberOfSuccessors()==0) {
-            m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
+            addSuccessor(i,i+1>=m_all_nodes.size() ? 0 : i+1);
+            //~ m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors

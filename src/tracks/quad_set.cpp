@@ -19,6 +19,7 @@
 #include "tracks/quad_set.hpp"
 
 #include <stdlib.h>
+#include <algorithm>
 
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -44,6 +45,12 @@ QuadSet::~QuadSet()
 }   // ~QuadSet
 
 // -----------------------------------------------------------------------------
+void reverse_quad(Quad* q) {
+    q->reverse();
+}
+void QuadSet::reverse_all_quads() {
+    for_each(m_all_quads.begin(),m_all_quads.end(),reverse_quad);
+}
 /** This function interprets a point specification as an attribute in the 
     xml quadset file. It understands two different specifications:
     p1="n:p"      : get point p from square n (n, p integers)

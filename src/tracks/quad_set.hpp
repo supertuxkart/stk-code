@@ -47,6 +47,7 @@ public:
 
                  QuadSet       (const std::string& filename);
                 ~QuadSet       ();
+    void         reverse_all_quads();
     int          getCurrentQuad(const Vec3& p, int oldQuad)        const;
     const Quad&  getQuad(int n) const {return *(m_all_quads[n]); }
 
