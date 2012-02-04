@@ -135,7 +135,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
         m_spinner->setText( _("%i laps") );
         
-        //~ m_widgets.push_back(m_spinner);
+        m_widgets.push_back(m_spinner);
         m_spinner->add();
         m_spinner->setValue( UserConfigParams::m_num_laps );
         m_spinner->getIrrlichtElement()->setTabStop(true);
@@ -158,12 +158,20 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         m_checkbox->setParent(m_irrlicht_window);
         m_checkbox->m_properties[PROP_ID] = "reversecheckbox";
         m_checkbox->m_properties[PROP_WARP_AROUND] = "true";
-        m_checkbox->setText( _("Reverse track") );
+        //~ m_checkbox->setText( _("Reverse track") );
         m_widgets.push_back(m_checkbox);
         m_checkbox->add();
         m_checkbox->setState(false);
         m_checkbox->getIrrlichtElement()->setTabStop(true);
         m_checkbox->getIrrlichtElement()->setTabGroup(false);
+        stringw text_reverse = _("Reverse");
+
+        IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText(
+            text_reverse.c_str(),
+            core::rect< s32 >(m_checkbox->m_x+m_checkbox->m_w, m_checkbox->m_y+10, m_checkbox->m_x+200, m_checkbox->m_y+m_checkbox->m_h),
+            false , true , // border, word warp
+            m_irrlicht_window);
+        b->setTabStop(false);
     }
     else
     {
