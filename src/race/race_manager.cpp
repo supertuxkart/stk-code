@@ -617,13 +617,12 @@ void RaceManager::startGP(const GrandPrixData* gp)
 //-----------------------------------------------------------------------------
 
 void RaceManager::startSingleRace(const std::string trackIdent, 
-                                  const int num_laps, const bool reverse_track)
+                                  const int num_laps)
 {
     StateManager::get()->enterGameState();
     setTrack(trackIdent.c_str());
     
     if (num_laps != -1) setNumLaps( num_laps );
-    setReverseTrack(reverse_track);
     
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     

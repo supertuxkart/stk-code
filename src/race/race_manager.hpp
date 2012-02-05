@@ -496,10 +496,8 @@ public:
       * \param trackIdent Internal name of the track to race on
       * \param num_laps   Number of laps to race, or -1 if number of laps is 
       *        not relevant in current mode
-      * \param reverse_track True if the track should be driven reverse
       */
-    void         startSingleRace(const std::string trackIdent, const int num_laps, 
-                                 const bool reverse_track);
+    void         startSingleRace(const std::string trackIdent, const int num_laps);
 
     /** \} */
     

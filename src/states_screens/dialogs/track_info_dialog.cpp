@@ -168,7 +168,9 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
 
         IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText(
             text_reverse.c_str(),
-            core::rect< s32 >(m_checkbox->m_x+m_checkbox->m_w, m_checkbox->m_y+10, m_checkbox->m_x+200, m_checkbox->m_y+m_checkbox->m_h),
+            core::rect< s32 >(m_checkbox->m_x+m_checkbox->m_w, 
+                              m_checkbox->m_y+10, m_checkbox->m_x+200,
+                              m_checkbox->m_y+m_checkbox->m_h),
             false , true , // border, word warp
             m_irrlicht_window);
         b->setTabStop(false);
@@ -324,7 +326,8 @@ void TrackInfoDialog::onEnterPressedInternal()
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
     const bool reverse_track = m_checkbox == NULL ? false 
                                                   : m_checkbox->getState();
-    race_manager->startSingleRace(m_track_ident, num_laps, reverse_track);
+    race_manager->setReverseTrack(reverse_track);
+    race_manager->startSingleRace(m_track_ident, num_laps);
 }
 
 // ------------------------------------------------------------------------------------------------------   
@@ -336,12 +339,14 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         // Create a copy of member variables we still need, since they will
         // not be accessible after dismiss:
         const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-        const bool reverse_track = m_checkbox == NULL ? false 
-                                                      : m_checkbox->getState();
         std::string track_ident = m_track_ident;
         ModalDialog::dismiss();
-        race_manager->startSingleRace(track_ident, num_laps, reverse_track);
+        race_manager->startSingleRace(track_ident, num_laps);
         return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "reversecheckbox")
+    {
+        race_manager->setReverseTrack(m_checkbox->getState());
     }
     else if (eventSource == "lapcountspinner")
     {
