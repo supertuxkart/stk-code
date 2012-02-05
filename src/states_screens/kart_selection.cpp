@@ -36,6 +36,7 @@
 #include "items/item_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/overworld.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -1597,8 +1598,16 @@ void KartSelectionScreen::eventCallback(Widget* widget,
         playerConfirm(playerID);
     }
     else if (name == "back")
-    {    
-        StateManager::get()->escapePressed();
+    {
+        if (m_from_overworld)
+        {
+            m_from_overworld = false; // valid once
+            OverWorld::enterOverWorld();
+        }
+        else
+        {
+            StateManager::get()->escapePressed();
+        }
     }
     else
     {
@@ -1622,6 +1631,22 @@ void KartSelectionScreen::setMultiplayer(bool multiplayer)
 {
     m_multiplayer = multiplayer;
 }   // setMultiplayer
+
+// ----------------------------------------------------------------------------
+
+bool KartSelectionScreen::onEscapePressed()
+{
+    if (m_from_overworld)
+    {
+        m_from_overworld = false; // valid once
+        OverWorld::enterOverWorld();
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
 
 // ----------------------------------------------------------------------------
 
@@ -1747,7 +1772,16 @@ void KartSelectionScreen::allPlayersDone()
         input_manager->getDeviceList()->setSinglePlayer( NULL );
     }
     
-    StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+    // ---- Go to next screen or return to overworld
+    if (m_from_overworld)
+    {
+        m_from_overworld = false; // valid once
+        OverWorld::enterOverWorld();
+    }
+    else
+    {
+        StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+    }
 }   // allPlayersDone
 
 // ----------------------------------------------------------------------------

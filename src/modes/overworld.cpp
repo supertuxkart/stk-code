@@ -20,15 +20,57 @@
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
+/** Function to simplify the start process */
+void OverWorld::enterOverWorld()
+{
+    
+    race_manager->setNumLocalPlayers(1);
+    race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+    race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
+    race_manager->setNumKarts( 1 );
+    race_manager->setTrack( "overworld" );
+    race_manager->setDifficulty(RaceManager::RD_HARD);
+    
+    // Use keyboard 0 by default (FIXME: let player choose?)
+    InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+    
+    // Create player and associate player with keyboard
+    StateManager::get()->createActivePlayer( 
+                                            UserConfigParams::m_all_players.get(0), device );
+    
+    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    {
+        fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
+                UserConfigParams::m_default_kart.c_str());
+        UserConfigParams::m_default_kart.revertToDefaults();
+    }
+    race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    
+    // ASSIGN should make sure that only input from assigned devices
+    // is read.
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceList()
+    ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+    
+    StateManager::get()->enterGameState();
+    network_manager->setupPlayerKartInfo();
+    race_manager->startNew();
+    
+}
+
+//-----------------------------------------------------------------------------
 OverWorld::OverWorld() : LinearWorld()
 {
+    m_return_to_garage = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -60,6 +102,16 @@ void OverWorld::update(float dt)
     for(unsigned int n=0; n<kart_amount; n++)
     {
         m_karts[n]->setEnergy(100.0f);
+    }
+    
+    if (m_return_to_garage)
+    {
+        m_return_to_garage = false;
+        race_manager->exitRace();
+        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        s->setMultiplayer(false);
+        s->setFromOverworld(true);
+        StateManager::get()->resetAndGoToScreen(s);
     }
 }   // update
 

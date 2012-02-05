@@ -51,6 +51,9 @@ class KartSelectionScreen : public GUIEngine::Screen,
     
     bool m_multiplayer;
     
+    /** Whether this screen is being visited from overworld or not */
+    bool m_from_overworld;
+    
     KartSelectionScreen();
     
     /** Stores whether any player confirmed their choice; then, some things 
@@ -93,6 +96,9 @@ public:
     
     void setMultiplayer(bool multiplayer);
     
+    /** \brief Set whether this screen is being visited from overworld or not */
+    void setFromOverworld(bool from_overworld) { m_from_overworld = from_overworld; }
+    
     /** \brief Called when a player hits 'fire'/'select' on his device to 
      *  join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
@@ -122,4 +128,8 @@ public:
     /** \brief implement optional callback from parent 
      *  class GUIEngine::Screen */
     virtual void unloaded();
+    
+    /** \brief implement optional callback from parent 
+     *  class GUIEngine::Screen */
+    virtual bool onEscapePressed();
 };

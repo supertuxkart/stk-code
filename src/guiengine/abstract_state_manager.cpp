@@ -248,6 +248,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     
+    if (!screen->isLoaded()) screen->loadFromFile();
     m_menu_stack.push_back(name);
     setGameState(MENU);
     

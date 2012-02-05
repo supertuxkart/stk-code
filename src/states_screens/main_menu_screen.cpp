@@ -256,6 +256,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
+        s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "multiplayer")
@@ -283,41 +284,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        /*
-        StateManager::get()->pushScreen(ChallengesScreen::getInstance());
-         */
-        
-        race_manager->setNumLocalPlayers(1);
-        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-        race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
-        race_manager->setNumKarts( 1 );
-        race_manager->setTrack( "overworld" );
-        race_manager->setDifficulty(RaceManager::RD_HARD);
-        
-        // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
-        
-        // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer( 
-                                                UserConfigParams::m_all_players.get(0), device );
-        
-        if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-        {
-            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                    UserConfigParams::m_default_kart.c_str());
-            UserConfigParams::m_default_kart.revertToDefaults();
-        }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-        
-        // ASSIGN should make sure that only input from assigned devices
-        // is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        input_manager->getDeviceList()
-            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-        
-        StateManager::get()->enterGameState();
-        network_manager->setupPlayerKartInfo();
-        race_manager->startNew();
+        OverWorld::enterOverWorld();
     }
     else if (selection == "tutorial")
     {

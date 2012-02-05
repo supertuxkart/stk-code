@@ -38,6 +38,8 @@ protected:
     /** Override from base class */
     virtual void  createRaceGUI();
     
+    bool m_return_to_garage;
+    
 public:
                   OverWorld();
    /** call just after instanciating. can't be moved to the contructor as child
@@ -46,6 +48,8 @@ public:
     virtual void  init();
     virtual      ~OverWorld();
 
+    static void enterOverWorld();
+    
     virtual void  update(float delta);
     
     // ------------------------------------------------------------------------    
@@ -69,6 +73,8 @@ public:
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
     virtual bool computeChecklineRequirements() const { return false; }
+    // ------------------------------------------------------------------------    
+    void scheduleReturnToGarage() { m_return_to_garage = true; }
 };
 
 #endif

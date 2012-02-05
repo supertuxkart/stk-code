@@ -25,6 +25,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 
@@ -310,6 +311,15 @@ void TrackObject::onTriggerItemApproached(Item* who)
     }
     else if (m_action.size() > 0)
     {
-        printf("Action %s\n", m_action.c_str());
+        if (m_action == "garage")
+        {
+            World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
+            dynamic_cast<OverWorld*>(World::getWorld())->scheduleReturnToGarage();
+        }
+        else
+        {
+            fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
+                    m_action.c_str());
+        }
     }
 }
