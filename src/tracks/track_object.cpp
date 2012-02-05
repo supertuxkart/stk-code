@@ -57,12 +57,12 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
     xml_node.get("lod_group", &m_lod_group);
     
-    /** For sound effects */
-    bool trigger_when_near = false;
-    
-    /** For sound effects */
-    float trigger_distance = 1.0f;
+    std::string type;
+    xml_node.get("type",    &type );
 
+    bool trigger_when_near = false;
+    float trigger_distance = 1.0f;
+    
     // FIXME: at this time sound emitters are just disabled in multiplayer
     //        otherwise the sounds would be constantly heard
     if (sound.size() > 0 && race_manager->getNumLocalPlayers() == 1)
@@ -105,14 +105,27 @@ TrackObject::TrackObject(const XMLNode &xml_node)
                  "[TrackObject] Sound emitter object could not be created\n");
         }
     }
+    else if (type == "action-trigger")
+    {
+        trigger_when_near = true;
+        
+        xml_node.get("distance", &trigger_distance);
+        
+        xml_node.get("action", &m_action);
+
+        if (m_action.size() == 0)
+        {
+            fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
+        }
+    }
     
-    // Some animated objects (billboards, sound emitters) 
+    // Some animated objects (billboards, sound emitters, action triggers)
     // don't use this scene node
     if (model_name == "")
     {
         m_node = NULL;
         m_mesh = NULL;
-        
+                
         if (trigger_when_near)
         {
              item_manager->newItem(m_init_xyz, trigger_distance, this);
@@ -294,5 +307,9 @@ void TrackObject::onTriggerItemApproached(Item* who)
     if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
     {
         m_sound->play();
+    }
+    else if (m_action.size() > 0)
+    {
+        printf("Action %s\n", m_action.c_str());
     }
 }

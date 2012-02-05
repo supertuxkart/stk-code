@@ -83,6 +83,10 @@ void TrackObjectManager::add(const XMLNode &xml_node)
     {
         m_all_objects.push_back(new TrackObject(xml_node));
     }
+    else if(type=="action-trigger")
+    {
+        m_all_objects.push_back(new TrackObject(xml_node));
+    }
     else
     {
         fprintf(stderr, "Unknown track object: '%s' - ignored.\n", 
