@@ -152,7 +152,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     {
         m_checkbox = new CheckBoxWidget();
         m_checkbox->m_x = m_area.getWidth()/2 - 400;
-        m_checkbox->m_y = (y2+y3)/2.0;
+        m_checkbox->m_y = (y2+y3)/2;
         m_checkbox->m_w = 60;
         m_checkbox->m_h = 60;
         m_checkbox->setParent(m_irrlicht_window);
