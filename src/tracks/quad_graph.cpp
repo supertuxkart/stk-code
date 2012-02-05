@@ -330,8 +330,13 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                          float sidewards_distance,
                                          float upwards_distance) const
 {
-    // Node 0 is always the node on which the start line is.
-    int current_node          = getNode(0).getPredecessor();
+    // In non-reverse mode: node 0 is the node on which the start line is.
+    //                      So get its predecessor (which is therefore just
+    //                      before the start line) to find the first quad
+    //                      to place karts on.
+    // In reverse mode, karts can start to placed on quad 0.
+    int current_node          = m_reverse ? getNode(0).getIndex()
+                                          : getNode(0).getPredecessor();
     
     float distance_from_start = 0.1f+forwards_distance;
 
