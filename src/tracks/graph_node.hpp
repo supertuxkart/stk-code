@@ -109,13 +109,6 @@ class GraphNode
     std::vector< int > m_checkline_requirements;
     
 public:
-    /** Keep a shared pointer so that some asserts and tests can be 
-    *  done without adding additional parameters. */
-    static QuadSet   *m_all_quads;
-    /** Keep a shared pointer to the graph structure so that each node
-    *  has access to the actual quad to which a node points. */
-    static QuadGraph *m_all_nodes;
-
                  GraphNode(unsigned int quad_index, unsigned int node_index);
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
@@ -136,14 +129,14 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the quad of this graph node. */
-    const Quad& getQuad() const {return m_all_quads->getQuad(m_quad_index);}
+    const Quad& getQuad() const {return QuadSet::get()->getQuad(m_quad_index);}
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. ATM this just returns the vertices
      *  from the quads, but if necessary this method will also consider 
      *  rotated quads. So index 0 will always be lower left point, then 
      *  counterclockwise. */
     const Vec3& operator[](int i) const 
-                                {return m_all_quads->getQuad(m_quad_index)[i];}
+                             {return QuadSet::get()->getQuad(m_quad_index)[i];}
     // ------------------------------------------------------------------------
     /** Returns the distance to the j-th. successor. */
     float        getDistanceToSuccessor(unsigned int j) const
@@ -183,7 +176,7 @@ public:
      *  \param index Index of the successor. */
     bool        ignoreSuccessorForAI(unsigned int i) const
     {
-        return m_all_quads->getQuad(m_successor_node[i]).letAIIgnore();
+        return QuadSet::get()->getQuad(m_successor_node[i]).letAIIgnore();
     };
     // ------------------------------------------------------------------------
     /** Returns a predecessor for this node. */

@@ -50,13 +50,13 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_all_quads            = new QuadSet(quad_file_name);
+    QuadSet::create();
+    QuadSet::get()->init(quad_file_name);
     if(m_reverse) {
-        m_all_quads->reverse_all_quads();
+        QuadSet::get()->reverse_all_quads();
     }
     m_quad_filename        = quad_file_name;
-    GraphNode::m_all_quads = m_all_quads;
-    GraphNode::m_all_nodes = this;
+    m_quad_graph           = this;
     load(graph_file_name);
 }   // QuadGraph
 
@@ -64,7 +64,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
 /** Destructor, removes all nodes of the graph. */
 QuadGraph::~QuadGraph()
 {
-    delete m_all_quads;
+    QuadSet::destroy();
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         delete m_all_nodes[i];
     }
@@ -79,8 +79,9 @@ void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
         m_all_nodes[to]->addSuccessor(from);
     else
         m_all_nodes[from]->addSuccessor(to);
-}
+}   // addSuccessor
 
+// -----------------------------------------------------------------------------
 /** Loads a quad graph from a file.
  *  \param filename Name of the file to load.
  */
@@ -93,7 +94,7 @@ void QuadGraph::load(const std::string &filename)
         // No graph file exist, assume a default loop X -> X+1
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
-        for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+        for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
             m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
@@ -448,7 +449,7 @@ void QuadGraph::createMesh(bool show_invisible,
         ind[6*i+4] = 4*i+2;
         ind[6*i+5] = 4*i+3;
         i++;
-    }   // for i=1; i<m_all_quads
+    }   // for i=1; i<QuadSet::get()
     
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
 
@@ -462,7 +463,7 @@ void QuadGraph::createMesh(bool show_invisible,
         // Now scale the length (distance between vertix 0 and 3
         // and between 1 and 2) to be 'length':
         Vec3 bb_min, bb_max;
-        m_all_quads->getBoundingBox(&bb_min, &bb_max);
+        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
         // Length of the lap line about 3% of the 'height'
         // of the track.
         const float length=(bb_max.getZ()-bb_min.getZ())*0.03f;
@@ -794,7 +795,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     // ---------------
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     Vec3 bb_min, bb_max;
-    m_all_quads->getBoundingBox(&bb_min, &bb_max);
+    QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
 
     float dx = bb_max.getX()-bb_min.getX();

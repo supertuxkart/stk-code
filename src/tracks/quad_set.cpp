@@ -25,11 +25,14 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
-/** Constructor, loads the quad set from a file.
- *  \param filename filename to load.
+QuadSet *QuadSet::m_quad_set = NULL;
+
+/** Constructor, loads the quad set from a file. Assigns a pointer
+ *  to this instance to m_quad_set, so that it can be accessed using get().
  */
-QuadSet::QuadSet(const std::string& filename) {
-    load(filename);
+QuadSet::QuadSet() 
+{
+    m_quad_set = this;
 }   // QuadSet
 
 // -----------------------------------------------------------------------------
@@ -42,6 +45,7 @@ QuadSet::~QuadSet()
         delete m_all_quads[i];
     }
     m_all_quads.clear();
+    m_quad_set = NULL;
 }   // ~QuadSet
 
 // -----------------------------------------------------------------------------
@@ -76,7 +80,10 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 
 }   // getPoint 
 // -----------------------------------------------------------------------------
-void QuadSet::load(const std::string &filename)
+/** Loads the set of all quads from the speciified filename.
+ *  \param filename The absolute filename to load the quad file from.
+ */
+void QuadSet::init(const std::string &filename)
 {
     m_min = Vec3( 99999,  99999,  99999);
     m_max = Vec3(-99999, -99999, -99999);

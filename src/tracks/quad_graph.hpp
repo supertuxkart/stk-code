@@ -56,8 +56,6 @@ private:
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
-    /** The set of all quads. */
-    QuadSet                 *m_all_quads;
     /** For debug mode only: the node of the debug mesh. */
     scene::ISceneNode       *m_node;
     /** For debug only: the mesh of the debug mesh. */
@@ -134,7 +132,9 @@ public:
                        const bool reverse)
     {
         assert(m_quad_graph==NULL);
-        m_quad_graph = new QuadGraph(quad_file_name, graph_file_name, reverse);
+        // assignment to m_quad_graph is done in the constructor, since
+        // functions called from the constructor need it to be defined.
+        new QuadGraph(quad_file_name, graph_file_name, reverse);
     }   // create
     // ----------------------------------------------------------------------
     /** Cleans up the quad graph. It is possible that this function is called
@@ -167,7 +167,7 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     const Quad&  getQuadOfNode(unsigned int j) const
-                 { return m_all_quads->getQuad(m_all_nodes[j]->getIndex()); }
+              { return QuadSet::get()->getQuad(m_all_nodes[j]->getIndex()); }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }

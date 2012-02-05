@@ -25,28 +25,19 @@
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 
-
-// A static variable that gives a single graph node easy access to 
-// all quads and avoids unnecessary parameters in many calls.
-QuadSet *GraphNode::m_all_quads=NULL;
-
-// This static variable gives a node access to the graph, and therefore
-// to the quad to which a graph node index belongs.
-QuadGraph *GraphNode::m_all_nodes=NULL;
-
 // ----------------------------------------------------------------------------
 /** Constructor. Saves the quad index which belongs to this graph node.
- *  \param index Index of the quad to use for this node (in m_all_quads).
+ *  \param index Index of the quad to use for this node (in QuadSet).
  */
 GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
 { 
-    assert(quad_index<m_all_quads->getNumberOfQuads());
+    assert(quad_index<QuadSet::get()->getNumberOfQuads());
     m_quad_index          = quad_index;
     m_node_index          = node_index;
     m_predecessor         = -1;
     m_distance_from_start = 0;
 
-    const Quad &quad      = m_all_quads->getQuad(m_quad_index);
+    const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
     // FIXME: the following values should depend on the actual orientation 
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
     // and 2,3 are the upper end.
@@ -75,17 +66,17 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
 void GraphNode::addSuccessor(unsigned int to)
 {
     m_successor_node.push_back(to);
-    // m_quad_index is the quad index, so we use m_all_quads
-    const Quad &this_quad = m_all_quads->getQuad(m_quad_index);
-    // to is the graph node, so we have to use m_all_nodes to get the right quad
-    GraphNode &gn = m_all_nodes->getNode(to);
-    const Quad &next_quad = m_all_nodes->getQuadOfNode(to);
+    // m_quad_index is the quad index
+    const Quad &this_quad = QuadSet::get()->getQuad(m_quad_index);
+    // to is the graph node
+    GraphNode &gn = QuadGraph::get()->getNode(to);
+    const Quad &next_quad = QuadGraph::get()->getQuadOfNode(to);
 
     // Keep the first predecessor, which is usually the most 'natural' one.
     if(gn.m_predecessor==-1)
         gn.m_predecessor = m_node_index;
     core::vector2df d2    = m_lower_center_2d
-                          - m_all_nodes->getNode(to).m_lower_center_2d;
+                          - QuadGraph::get()->getNode(to).m_lower_center_2d;
 
     Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
     m_distance_to_next.push_back(d2.getLength());
@@ -107,16 +98,17 @@ void GraphNode::addSuccessor(unsigned int to)
         // from start of the last node) could be smaller than some of the 
         // paths. This can result in incorrect results for the arrival time
         // estimation of the AI karts. See trac #354 for details.
-        if(m_all_nodes->getNode(to).m_distance_from_start==0)
+        if(QuadGraph::get()->getNode(to).m_distance_from_start==0)
         {
-            m_all_nodes->getNode(to).m_distance_from_start = distance_for_next;
+            QuadGraph::get()->getNode(to).m_distance_from_start 
+                = distance_for_next;
         }
-        else if(m_all_nodes->getNode(to).m_distance_from_start
+        else if(QuadGraph::get()->getNode(to).m_distance_from_start
                    <  distance_for_next)
         {
             float delta = distance_for_next
-                        - m_all_nodes->getNode(to).getDistanceFromStart();
-            m_all_nodes->updateDistancesForAllSuccessors(to, delta);
+                        - QuadGraph::get()->getNode(to).getDistanceFromStart();
+            QuadGraph::get()->updateDistancesForAllSuccessors(to, delta);
         }
     }
 }   // addSuccessor
