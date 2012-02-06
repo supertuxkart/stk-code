@@ -594,13 +594,10 @@ void World::updateWorld(float dt)
         m_phase == IN_GAME_MENU_PHASE      )  
         return;
 
+    update(dt);
     if( (!isFinishPhase()) && isRaceOver())
     {
         enterRaceOverState();
-    }
-    else
-    {
-        update(dt);
     }
 }   // updateWorld
 
