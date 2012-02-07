@@ -146,6 +146,11 @@ protected:
     
     Phase m_scheduled_pause_phase;
     
+    /** Set when the world needs to be deleted but you can't do it immediately
+     * because you are e.g. within World::update()
+     */
+    bool m_self_destruct;
+    
 public:
                     World();
     virtual        ~World();
@@ -276,10 +281,12 @@ public:
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}
-    
+    // ------------------------------------------------------------------------
     /** Whether to compute checkline requirements for each world on the
       * quadgraph. Override to change value. */
     virtual bool computeChecklineRequirements() const { return false; }
+    // ------------------------------------------------------------------------
+    void delayedSelfDestruct();
     
 };   // World
 

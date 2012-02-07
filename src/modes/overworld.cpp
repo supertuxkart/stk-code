@@ -98,7 +98,7 @@ void OverWorld::update(float dt)
     
     const unsigned int kart_amount  = m_karts.size();
 
-    // isn't cool, on the overworld nitro is free!
+    // isn't it cool, on the overworld nitro is free!
     for(unsigned int n=0; n<kart_amount; n++)
     {
         m_karts[n]->setEnergy(100.0f);
@@ -107,7 +107,8 @@ void OverWorld::update(float dt)
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
-        race_manager->exitRace();
+        delayedSelfDestruct();
+        race_manager->exitRace(false);
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);

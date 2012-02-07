@@ -313,7 +313,6 @@ void TrackObject::onTriggerItemApproached(Item* who)
     {
         if (m_action == "garage")
         {
-            World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
             dynamic_cast<OverWorld*>(World::getWorld())->scheduleReturnToGarage();
         }
         else

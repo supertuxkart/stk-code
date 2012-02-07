@@ -489,7 +489,7 @@ void RaceManager::computeGPRanks()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::exitRace()
+void RaceManager::exitRace(bool delete_world)
 {
     // Only display the grand prix result screen if all tracks 
     // were finished, and not when a race is aborted.
@@ -558,7 +558,8 @@ void RaceManager::exitRace()
         }
     }
 
-    World::deleteWorld();
+    if (delete_world) World::deleteWorld();
+    
     m_track_number = 0;
 }   // exitRace
 
