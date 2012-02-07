@@ -83,6 +83,7 @@ private:
     
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
+    void computeDistanceFromStart(unsigned int start_node, float distance);
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
@@ -179,7 +180,9 @@ public:
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
     // ----------------------------------------------------------------------
-    
+    /** Returns true if the graph is to be reversed. */
+    bool         isReverse() const {return m_reverse; }
+    // ----------------------------------------------------------------------
     void         setChecklineRequirements()
     {
         setChecklineRequirements(m_all_nodes[0], -1);

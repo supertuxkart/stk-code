@@ -35,7 +35,7 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     m_quad_index          = quad_index;
     m_node_index          = node_index;
     m_predecessor         = -1;
-    m_distance_from_start = 0;
+    m_distance_from_start = -1.0f;
 
     const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
     // FIXME: the following values should depend on the actual orientation 
@@ -75,42 +75,13 @@ void GraphNode::addSuccessor(unsigned int to)
     // Keep the first predecessor, which is usually the most 'natural' one.
     if(gn.m_predecessor==-1)
         gn.m_predecessor = m_node_index;
-    core::vector2df d2    = m_lower_center_2d
-                          - QuadGraph::get()->getNode(to).m_lower_center_2d;
 
-    Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
-    m_distance_to_next.push_back(d2.getLength());
-    
-    float theta = atan2(diff.getX(), diff.getZ());
-    m_angle_to_next.push_back(theta);
+    Vec3 d = m_lower_center - QuadGraph::get()->getNode(to).m_lower_center;
+    m_distance_to_next.push_back(d.length());
 
-    // The length of this quad is the average of the left and right side
-    float distance_to_next = (   this_quad[2].distance(this_quad[1])
-                               + this_quad[3].distance(this_quad[0]) ) *0.5f;
-    // The distance from start for the successor node 
-    if(to!=0)
-    {
-        float distance_for_next = m_distance_from_start+distance_to_next;
-        // If the successor node does not have a distance from start defined,
-        // update its distance. Otherwise if the node already has a distance,
-        // it is potentially necessary to update its distance from start:
-        // without this the length of the track (as taken by the distance
-        // from start of the last node) could be smaller than some of the 
-        // paths. This can result in incorrect results for the arrival time
-        // estimation of the AI karts. See trac #354 for details.
-        if(QuadGraph::get()->getNode(to).m_distance_from_start==0)
-        {
-            QuadGraph::get()->getNode(to).m_distance_from_start 
-                = distance_for_next;
-        }
-        else if(QuadGraph::get()->getNode(to).m_distance_from_start
-                   <  distance_for_next)
-        {
-            float delta = distance_for_next
-                        - QuadGraph::get()->getNode(to).getDistanceFromStart();
-            QuadGraph::get()->updateDistancesForAllSuccessors(to, delta);
-        }
-    }
+    Vec3 diff = next_quad.getCenter() - this_quad.getCenter();
+    m_angle_to_next.push_back(atan2(diff.getX(), diff.getZ()));
+
 }   // addSuccessor
 
 // ----------------------------------------------------------------------------
@@ -196,6 +167,7 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
     result->setZ( m_distance_from_start + (closest-m_lower_center_2d).getLength());
+    printf("get distances %f %f\n", result->getX(), result->getZ());
 }   // getDistances
 
 // ----------------------------------------------------------------------------

@@ -185,21 +185,28 @@ void QuadGraph::load(const std::string &filename)
     }
     delete xml;
 
-    // Define the track length
+    setDefaultSuccessors();    
+
+    // The track exporter always exports quad 0 as first quad after (or at)
+    // the start line (start line is lower side of quad 0). In reverse mode
+    // the start quad is the predecessor of node 0.
+    unsigned int start_node = m_reverse ? m_all_nodes[0]->getPredecessor() 
+                                        : 0;
+    computeDistanceFromStart(start_node, 0.0f);
+
+    // Define the track length as the maximum at the end of a quad
+    // (i.e. distance_from_start + length till successor 0).
+    m_lap_length = -1;
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        if(m_all_nodes[i]->getSuccessor(0)==0)
-        {
-            m_lap_length = m_all_nodes[i]->getDistanceFromStart()
+        float l = m_all_nodes[i]->getDistanceFromStart()
                 + m_all_nodes[i]->getDistanceToSuccessor(0);
-            break;
-        }
+        if(l > m_lap_length)
+            m_lap_length = l;
     }
-    setDefaultSuccessors();    
 }   // load
 
 // ----------------------------------------------------------------------------
-
 /**
   * Finds which checklines must be visited before driving on this quad
   * (useful for rescue)
@@ -581,7 +588,52 @@ void QuadGraph::getSuccessors(int node_number,
 }   // getSuccessors
 
 // ----------------------------------------------------------------------------
-/** Increases 
+void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
+{
+    GraphNode *gn = m_all_nodes[node];
+    float current_distance = gn->getDistanceFromStart();
+
+    // If this node already has a distance defined, check if the new distance
+    // is longer, and if so adjust all following nodes. Without this the 
+    // length of the track (as taken by the distance from start of the last 
+    // node) could be smaller than some of the paths. This can result in 
+    // incorrect results for the arrival time estimation of the AI karts. 
+    // See trac #354 for details.
+    // Then there is no need to test/adjust any more nodes.
+    if(current_distance>=0)
+    {
+        if(current_distance<new_distance)
+        {
+            float delta = new_distance - current_distance;
+            updateDistancesForAllSuccessors(gn->getIndex(), delta);
+        }
+        return;
+    }
+
+    // Otherwise this node has no distance defined yet. Set the new 
+    // distance, and recursively update all following nodes.
+    gn->setDistanceFromStart(new_distance);
+
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
+    {
+        GraphNode *gn_next = m_all_nodes[gn->getSuccessor(i)];
+        // The start node (only node with distance 0) is reached again,
+        // recursion can stop now
+        if(gn_next->getDistanceFromStart()==0)
+            continue;
+
+        computeDistanceFromStart(gn_next->getIndex(), 
+                                 new_distance + gn->getDistanceToSuccessor(i));
+    }   // for i
+}   // computeDistanceFromStart
+
+// ----------------------------------------------------------------------------
+/** Increases the distance from start for all nodes that are directly or
+ *  indirectly a successor of the given node. This code is used when two
+ *  branches merge together, but since the latest 'fork' indicates a longer
+ *  distance from start.
+ *  \param indx Index of the node for which to increase the distance.
+ *  \param delta Amount by which to increase the distance.
  */
 void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
 {
@@ -590,11 +642,9 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
     for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
     {
         GraphNode &g_next = getNode(g.getSuccessor(i));
-        // If we reach the beginning of the graph (usually node with index 0,
-        // but just in case also test for nodes with distance 0), all nodes
-        // are updated, so no need to recurse any further.
-        if(g_next.getIndex()==0 ||
-            g_next.getDistanceFromStart()==0)
+        // Stop when we reach the start node, i.e. the only node with a 
+        // distance of 0
+        if(g_next.getDistanceFromStart()==0)
             continue;
 
         // Only increase the distance from start of a successor node, if 
