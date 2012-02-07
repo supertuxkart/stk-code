@@ -38,9 +38,9 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     m_distance_from_start = -1.0f;
 
     const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
-    // FIXME: the following values should depend on the actual orientation 
+    // The following values should depend on the actual orientation 
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
-    // and 2,3 are the upper end.
+    // and 2,3 are the upper end (or the reverse if reverse mode is selected).
     // The width is the average width at the beginning and at the end.
     m_width = (  (quad[1]-quad[0]).length() 
                + (quad[3]-quad[2]).length() ) * 0.5f;
