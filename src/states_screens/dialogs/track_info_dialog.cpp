@@ -161,7 +161,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         //~ m_checkbox->setText( _("Reverse track") );
         m_widgets.push_back(m_checkbox);
         m_checkbox->add();
-        m_checkbox->setState(false);
+        m_checkbox->setState(race_manager->getReverseTrack());
         m_checkbox->getIrrlichtElement()->setTabStop(true);
         m_checkbox->getIrrlichtElement()->setTabGroup(false);
         stringw text_reverse = _("Reverse");
@@ -178,6 +178,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     else
     {
         m_checkbox = NULL;
+        race_manager->setReverseTrack(false);
     }
     
     // ---- Start button
