@@ -52,8 +52,6 @@ public:
     static const int QUAD_NONE=-1;
 
     void init    (const std::string &filename);
-    void         reverse_all_quads();
-    int          getCurrentQuad(const Vec3& p, int oldQuad)        const;
     // ------------------------------------------------------------------------
     /** Creates one instance of the quad set. */
     static void create()

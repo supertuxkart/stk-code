@@ -52,9 +52,6 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_lap_length           = 0;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
-    if(m_reverse) {
-        QuadSet::get()->reverse_all_quads();
-    }
     m_quad_filename        = quad_file_name;
     m_quad_graph           = this;
     load(graph_file_name);

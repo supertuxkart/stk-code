@@ -193,10 +193,6 @@ public:
         return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
     }   // getSuccesorToReach
     // ------------------------------------------------------------------------
-    /** Returns a vector from the center of the node to the middle of the
-     *  right side. */
-    const Vec3 &getCenterToRightVector() const { return m_center_to_right; }
-    // ------------------------------------------------------------------------
     /** Returns the checkline requirements of this graph node. */
     const std::vector<int>& getChecklineRequirements() const 
                                            { return m_checkline_requirements; }

@@ -48,13 +48,7 @@ QuadSet::~QuadSet()
     m_quad_set = NULL;
 }   // ~QuadSet
 
-// -----------------------------------------------------------------------------
-void reverse_quad(Quad* q) {
-    q->reverse();
-}
-void QuadSet::reverse_all_quads() {
-    for_each(m_all_quads.begin(),m_all_quads.end(),reverse_quad);
-}
+// -----------------------------------------------------------------------------}
 /** This function interprets a point specification as an attribute in the 
     xml quadset file. It understands two different specifications:
     p1="n:p"      : get point p from square n (n, p integers)

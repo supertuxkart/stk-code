@@ -44,17 +44,22 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     // The width is the average width at the beginning and at the end.
     m_width = (  (quad[1]-quad[0]).length() 
                + (quad[3]-quad[2]).length() ) * 0.5f;
-    m_lower_center = (quad[0]+quad[1]) * 0.5f;
-    m_upper_center = (quad[2]+quad[3]) * 0.5f;
+    if(QuadGraph::get()->isReverse())
+    {
+        m_lower_center = (quad[2]+quad[3]) * 0.5f;
+        m_upper_center = (quad[0]+quad[1]) * 0.5f;
+    }
+    else
+    {
+        m_lower_center = (quad[0]+quad[1]) * 0.5f;
+        m_upper_center = (quad[2]+quad[3]) * 0.5f;
+    }
     m_line     = core::line2df(m_lower_center.getX(), m_lower_center.getZ(),
                                m_upper_center.getX(), m_upper_center.getZ() );
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(), 
                                         m_lower_center.getZ() );
 
-    // The vector from the center of the quad to the middle of the right
-    // side of the quad
-    m_center_to_right = (quad[1]+quad[2])*0.5f - quad.getCenter();
 }   // GraphNode
 
 // ----------------------------------------------------------------------------
@@ -166,8 +171,8 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
         result->setX( (closest-xyz2d).getLength());   // to the right
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
-    result->setZ( m_distance_from_start + (closest-m_lower_center_2d).getLength());
-    printf("get distances %f %f\n", result->getX(), result->getZ());
+    result->setZ( m_distance_from_start + 
+                  (closest-m_lower_center_2d).getLength());
 }   // getDistances
 
 // ----------------------------------------------------------------------------

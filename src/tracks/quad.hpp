@@ -76,7 +76,5 @@ public:
     /** True if this quad should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
     
-    /** Reverse the quad */
-    void        reverse();
 };   // class Quad
 #endif
