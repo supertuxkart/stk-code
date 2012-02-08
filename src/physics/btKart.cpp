@@ -438,8 +438,11 @@ void btKart::updateVehicle( btScalar step )
 
     if(m_time_additional_impulse>0)
     {
-        m_time_additional_impulse -= step;
-        m_chassisBody->applyCentralImpulse(m_additional_impulse);
+        float dt = step > m_time_additional_impulse 
+                 ? m_time_additional_impulse
+                 : step;
+        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt);
+        m_time_additional_impulse -= dt;
     }
 
     if(m_time_additional_rotation>0)
@@ -461,7 +464,7 @@ void btKart::updateVehicle( btScalar step )
         // kart, or a strongly 'visual jolt' of the kart
         btTransform &iwt=m_chassisBody->getInterpolationWorldTransform();
         iwt.setRotation(iwt.getRotation()*add_rot);
-        m_time_additional_rotation -= step;
+        m_time_additional_rotation -= dt;
     }
 }   // updateVehicle
 
@@ -724,30 +727,33 @@ void btKart::updateFriction(btScalar timeStep)
                 rollingFriction=0;
         }
 
-        //switch between active rolling (throttle), braking and non-active 
-        // rolling friction (no throttle/break)
-
-        m_wheelInfo[wheel].m_skidInfo= btScalar(1.);
-
-        btScalar maximp         = wheelInfo.m_wheelsSuspensionForce 
-                                  * timeStep * wheelInfo.m_frictionSlip;
-        btScalar maximpSide     = maximp;
-        btScalar maximpSquared  = maximp * maximpSide;
         m_forwardImpulse[wheel] = rollingFriction;
-
-        btScalar x = (m_forwardImpulse[wheel] ) * fwdFactor;
-        btScalar y = (m_sideImpulse[wheel]    ) * sideFactor;
-
-        btScalar impulseSquared = (x*x + y*y);
-
-        if (impulseSquared > maximpSquared)
+        if(m_time_additional_impulse>0)
         {
             sliding = true;
-            btScalar factor = maximp / btSqrt(impulseSquared);
-            m_wheelInfo[wheel].m_skidInfo *= factor;
-        }   // if impulseSquared > maximpSquared
+            m_wheelInfo[wheel].m_skidInfo = 0.0f;
+        }
+        else
+        {
+            btScalar maximp         = wheelInfo.m_wheelsSuspensionForce 
+                                    * timeStep * wheelInfo.m_frictionSlip;
+            btScalar maximpSide     = maximp;
+            btScalar maximpSquared  = maximp * maximpSide;
 
-    }   //     for (int wheel=0; wheel<getNumWheels(); wheel++)
+            btScalar x = (m_forwardImpulse[wheel] ) * fwdFactor;
+            btScalar y = (m_sideImpulse[wheel]    ) * sideFactor;
+
+            btScalar impulseSquared = (x*x + y*y);
+
+            if (impulseSquared > maximpSquared)
+            {
+                sliding = true;
+                btScalar factor = maximp / btSqrt(impulseSquared);
+                m_wheelInfo[wheel].m_skidInfo *= factor;
+            }   // if impulseSquared > maximpSquared
+        }   // else (!m_timed_impulse 
+    }   // for (int wheel=0; wheel<getNumWheels(); wheel++)
+
 
     m_zipper_active   = false;
     m_zipper_velocity = 0;
@@ -779,7 +785,7 @@ void btKart::updateFriction(btScalar timeStep)
         av.setY(m_skid_angular_velocity);
         m_chassisBody->setAngularVelocity(av);
     }
-    else if (sliding && m_allow_sliding)
+    else if (sliding && (m_allow_sliding || m_time_additional_impulse>0) )
     {
         for (int wheel = 0; wheel < getNumWheels(); wheel++)
         {

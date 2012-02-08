@@ -230,7 +230,7 @@ public:
     }   // setTimedImpulse
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
-    float getImpulseTime() const { return m_time_additional_impulse; }
+    float getCentralImpulseTime() const { return m_time_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
