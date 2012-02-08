@@ -19,6 +19,7 @@
 #include "tracks/check_manager.hpp"
 
 #include <string>
+#include <algorithm>
 
 #include "io/xml_node.hpp"
 #include "tracks/ambient_light_sphere.hpp"
@@ -67,7 +68,26 @@ CheckManager::~CheckManager()
 /** Reverse checks order. */
 void CheckManager::reverse()
 {
-  // FIXME
+    std::map<unsigned int, std::vector<unsigned int> > structures_to_change_state;
+    std::vector<CheckStructure*>::iterator it;
+    for(unsigned int i=0;i<m_all_checks.size(); ++i)
+    {
+        for(std::vector<int>::const_iterator it = m_all_checks[i]->m_check_structures_to_change_state.begin();
+            it != m_all_checks[i]->m_check_structures_to_change_state.end(); ++it)
+        {
+            if(*it>=0)
+            {
+                structures_to_change_state[*it].push_back(i);
+            }
+        }
+    }
+    for(unsigned int i=0;i<m_all_checks.size(); ++i)
+    {
+        m_all_checks[i]->m_check_structures_to_change_state.clear();
+        m_all_checks[i]->m_check_structures_to_change_state.resize(structures_to_change_state[i].size());
+        copy(structures_to_change_state[i].begin(),structures_to_change_state[i].end(),
+             m_all_checks[i]->m_check_structures_to_change_state.begin());
+    }
 }   // reverse
 
 // ----------------------------------------------------------------------------

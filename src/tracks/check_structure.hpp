@@ -47,6 +47,7 @@ class CheckManager;
  */
 class CheckStructure
 {
+friend class CheckManager;
 public:
     /** Different types of check structures: 
      *  ACTIVATE: Activates another check structure (independent of
