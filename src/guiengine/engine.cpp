@@ -372,6 +372,9 @@ namespace GUIEngine
  Another possible value is "fit", which will make a \<div\> fit to its
  contents.
  
+ Another possible value is "font", which will use the size of the font
+ (useful to insert widgets inside text)
+ 
  \n
  \subsection prop9 PROP_MAX_WIDTH, PROP_MAX_HEIGHT    
  <em> Names in XML files: </em> \c "max_width", \c "max_height" 

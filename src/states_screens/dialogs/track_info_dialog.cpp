@@ -20,6 +20,8 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
@@ -49,52 +51,32 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
                                  const irr::core::stringw& trackName, ITexture* screenshot,
                                  const float w, const float h) : ModalDialog(w, h)
 {
+    loadFromFile("track_info_dialog.stkgui");
+
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
-    
-    const int y1 = m_area.getHeight()/7;
-    const int y2 = m_area.getHeight()*5/7;
-    const int y3 = m_area.getHeight()*6/7;
     
     m_track_ident = trackIdent;
     m_ribbon_item = ribbonItem;
 
-    // ---- Track title
-    core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
-    IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( trackName.c_str(),
-                                                               area_top, false, true, // border, word warp
-                                                               m_irrlicht_window);
-    a->setTabStop(false);
-
-    const int hscores_y_from = y1;
-    const int hscores_y_to = y1 + (y2 - y1)*2/3;
+    getWidget<LabelWidget>("name")->setText(trackName.c_str(), false);
     
-    // ---- Track credits
     Track* track = track_manager->getTrack(trackIdent);
-    
-    core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
-    
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-    stringw text = _("Track by %s", track->getDesigner().c_str());
+    getWidget<LabelWidget>("author")->setText( _("Track by %s", track->getDesigner().c_str()), false );
 
-    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
-                                               creator_info_area, false , true , // border, word warp
-                                               m_irrlicht_window);
-    b->setTabStop(false);
-
-    
     
     // ---- Track screenshot
+    Widget* screenshot_div = getWidget("screenshot_div");
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false /* tab stop */, false /* focusable */);
     // images are saved squared, but must be stretched to 4:
     screenshotWidget->setCustomAspectRatio(4.0f / 3.0f);
-    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     
-    screenshotWidget->m_x = area_right.UpperLeftCorner.X;
-    screenshotWidget->m_y = area_right.UpperLeftCorner.Y;
-    screenshotWidget->m_w = area_right.getWidth();
-    screenshotWidget->m_h = area_right.getHeight();
+    screenshotWidget->m_x = screenshot_div->m_x;
+    screenshotWidget->m_y = screenshot_div->m_y;
+    screenshotWidget->m_w = screenshot_div->m_w;
+    screenshotWidget->m_h = screenshot_div->m_h;
     
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
@@ -107,70 +89,60 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     }
     m_widgets.push_back(screenshotWidget);
     
-    a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    
+
     // ---- Lap count m_spinner
     if (has_laps)
     {
-        m_spinner = new SpinnerWidget();
-        m_spinner->m_x = m_area.getWidth()/2 - 200;
-        m_spinner->m_y = y2;
-        m_spinner->m_w = 400;
-        m_spinner->m_h = y3 - y2 - 15;
-        m_spinner->setParent(m_irrlicht_window);
+        m_spinner = getWidget<SpinnerWidget>("lapcountspinner");
         
         m_spinner->m_properties[PROP_ID] = "lapcountspinner";
         if (UserConfigParams::m_artist_debug_mode)
         {
-            m_spinner->m_properties[PROP_MIN_VALUE] = "0";
+            m_spinner->setMin(0);
         }
-        else
-        {
-            m_spinner->m_properties[PROP_MIN_VALUE] = "1";
-        }
-        m_spinner->m_properties[PROP_MAX_VALUE] = "99";
-        m_spinner->m_properties[PROP_WARP_AROUND] = "true";
         
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
-        m_spinner->setText( _("%i laps") );
-        
-        m_widgets.push_back(m_spinner);
-        m_spinner->add();
+        //m_spinner->setText( _("%i laps") );
         m_spinner->setValue( UserConfigParams::m_num_laps );
-        m_spinner->getIrrlichtElement()->setTabStop(true);
-        m_spinner->getIrrlichtElement()->setTabGroup(false);
+        //m_spinner->getIrrlichtElement()->setTabStop(true);
+        //m_spinner->getIrrlichtElement()->setTabGroup(false);
+        
+        const int num_laps = m_spinner->getValue();
+        race_manager->setNumLaps(num_laps);
     }
     else
     {
         m_spinner = NULL;
     }
-    
-    // ---- Start button
-    ButtonWidget* okBtn = new ButtonWidget();
-    okBtn->m_properties[PROP_ID] = "start";
-    okBtn->setText( _("Start Race") );
-    okBtn->m_x = m_area.getWidth()/2 - 200;
-    okBtn->m_y = y3;
-    okBtn->m_w = 400;
-    okBtn->m_h = m_area.getHeight() - y3 - 15;
-    okBtn->setParent(m_irrlicht_window);
-    m_widgets.push_back(okBtn);
-    okBtn->add();
-    okBtn->getIrrlichtElement()->setTabStop(true);
-    okBtn->getIrrlichtElement()->setTabGroup(false);
+
     
     // ---- High Scores
     if (has_highscores)
     {
-        addHighScoreWidgets(hscores_y_from, hscores_y_to);
-        const int num_laps = m_spinner->getValue();
-        race_manager->setNumLaps(num_laps);
+        m_kart_icons[0] = getWidget<IconButtonWidget>("iconscore1");
+        m_kart_icons[1] = getWidget<IconButtonWidget>("iconscore2");
+        m_kart_icons[2] = getWidget<IconButtonWidget>("iconscore3");
+
+        m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
+        m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
+        m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+
         updateHighScores();
+
+    }
+    else
+    {
+        getWidget<IconButtonWidget>("iconscore1")->setVisible(false);
+        getWidget<IconButtonWidget>("iconscore2")->setVisible(false);
+        getWidget<IconButtonWidget>("iconscore3")->setVisible(false);
+        
+        getWidget<LabelWidget>("highscores")->setVisible(false);
+        getWidget<LabelWidget>("highscore1")->setVisible(false);
+        getWidget<LabelWidget>("highscore2")->setVisible(false);
+        getWidget<LabelWidget>("highscore3")->setVisible(false);
     }
     
-    
-    okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+    getWidget<ButtonWidget>("start")->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
 }
 
@@ -186,44 +158,6 @@ TrackInfoDialog::~TrackInfoDialog()
         ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);
     }
     
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void TrackInfoDialog::addHighScoreWidgets(const int hscores_y_from, const int hscores_y_to)
-{
-    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
-
-    core::rect< s32 > hiscores_title_area(5, hscores_y_from, m_area.getWidth()/2, hscores_y_from + 30);
-    stringw text = _("= Highscores =");
-    IGUIStaticText* hscores_header = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), hiscores_title_area,
-                                                                           false , true , // border, word warp
-                                                                           m_irrlicht_window);
-    hscores_header->setTextRestrainedInside(false);
-    hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    
-    // fill highscore entries
-    for (int n=0; n<HIGHSCORE_COUNT; n++)
-    {
-        const int from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+1)/(HIGHSCORE_COUNT+1);
-        const int next_from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+2)/(HIGHSCORE_COUNT+1);
-        
-        const int gap = 3;
-        const int icon_size = next_from_y - from_y - gap*2;
-        
-        core::rect< s32 > icon_area(5, from_y + gap, 5 + icon_size, from_y + icon_size);
-        
-        m_kart_icons[n] = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
-        m_kart_icons[n]->setImage(texture);
-        m_kart_icons[n]->setScaleImage(true);
-        m_kart_icons[n]->setTabStop(false);
-        m_kart_icons[n]->setUseAlphaChannel(true);
-
-        core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
-        m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( L"", entry_area,
-                                                               false , true , // border, word warp
-                                                               m_irrlicht_window);
-    }
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -270,7 +204,6 @@ void TrackInfoDialog::updateHighScores()
         {
             //I18N: for empty highscores entries
             line = _("(Empty)");
-            line += "\n";
             
             ITexture* no_kart_texture = irr_driver->getTexture(
                     (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
@@ -278,7 +211,7 @@ void TrackInfoDialog::updateHighScores()
 
         }
         
-        m_highscore_entries[n]->setText( line.c_str() );
+        m_highscore_entries[n]->setText( line.c_str(), false );
         
     }    
 }

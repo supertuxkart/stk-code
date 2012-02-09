@@ -153,6 +153,8 @@ namespace GUIEngine
           */
         int  getMin()   const { return m_min;   }
         
+        void setMin(int n) { m_min = n; }
+        
         /** Override method from base class Widget */
         virtual void setActivated();
         
