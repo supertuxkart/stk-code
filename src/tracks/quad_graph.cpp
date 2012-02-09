@@ -187,7 +187,7 @@ void QuadGraph::load(const std::string &filename)
     // The track exporter always exports quad 0 as first quad after (or at)
     // the start line (start line is lower side of quad 0). In reverse mode
     // the start quad is the predecessor of node 0.
-    unsigned int start_node = m_reverse ? m_all_nodes[0]->getPredecessor() 
+    unsigned int start_node = m_reverse ? m_all_nodes[0]->getSuccessor(0) 
                                         : 0;
     computeDistanceFromStart(start_node, 0.0f);
 
