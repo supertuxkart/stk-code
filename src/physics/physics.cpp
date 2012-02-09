@@ -287,7 +287,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     kart_a->crashed(kart_b, /*handle_attachments*/true);
     kart_b->crashed(kart_a, /*handle_attachments*/false);
 
-    Kart *push_left, *push_right;
+    Kart *left_kart, *right_kart;
 
     // Determine which kart is pushed to the left, and which one to the
     // right. Ideally the sign of the X coordinate of the local conact point 
@@ -299,61 +299,92 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     // - pun intended ;) ).
     if(contact_point_a.getX() < contact_point_b.getX())
     {
-        push_right = kart_a;
-        push_left  = kart_b;
+        left_kart  = kart_a;
+        right_kart = kart_b;
     }
     else
     {
-        push_right = kart_b;
-        push_left  = kart_a;
+        left_kart  = kart_b;
+        right_kart = kart_a;
     }
 
     // Add a scaling factor depending on the mass (avoid div by zero)
-    float f_left =  push_left->getKartProperties()->getMass() > 0 
-                    ? push_right->getKartProperties()->getMass() 
-                      / push_left->getKartProperties()->getMass()
-                    : 1.5f;
+    float f_right =  right_kart->getKartProperties()->getMass() > 0 
+                     ? left_kart->getKartProperties()->getMass() 
+                       / right_kart->getKartProperties()->getMass()
+                     : 1.5f;
     // Add a scaling factor depending on speed (avoid div by 0)
-    f_left *= push_left->getSpeed() > 0 
-              ? push_right->getSpeed()
-                 / push_left->getSpeed()
+    f_right *= right_kart->getSpeed() > 0 
+               ? left_kart->getSpeed()
+                  / right_kart->getSpeed()
                : 1.5f;
-    // Cap left to [0.8,1.25], which results in f_right being
+    // Cap f_right to [0.8,1.25], which results in f_left being
     // capped in the same interval
-    if(f_left > 1.25f)
-        f_left = 1.25f;
-    else if(f_left < 0.8f)
-        f_left = 0.8f;
+    if(f_right > 1.25f)
+        f_right = 1.25f;
+    else if(f_right< 0.8f)
+        f_right = 0.8f;
+    float f_left = f_right ==0 ? 1.5f : 1/f_right;
 
-    float f_right = f_left ==0 ? 1.5f : 1/f_left;
-    f_left  = f_left  * f_left  * f_left;
-    f_right = f_right * f_right * f_right;
+    // Check if a kart is more 'actively' trying to push another kart
+    // by checking its local sidewards velocity
+    float vel_left  = left_kart->getVelocityLC().getX();
+    float vel_right = right_kart->getVelocityLC().getX();
+
+    // Use the difference in speed to determine which kart gets a 
+    // ramming bonus. Normally vel_right and vel_left will have
+    // a different sign: right kart will be driving to the left,
+    // and left kart to the right (both pushing at each other).
+    // By using the sum we get the intended effect: if both karts
+    // are pushing with the same speed, vel_diff is 0, if the right
+    // kart is driving faster vel_diff will be < 0. If both velocities
+    // have the same sign, one kart is trying to steer away from the
+    // other, in which case it gets an even bigger push.
+    float vel_diff = vel_right + vel_left;
+
+    // More driving towards left --> left kart gets bigger impulse
+    if(vel_diff<0)
+    {
+        f_right *= vel_left == 0 ? 2.0f : (1.0f - vel_diff/fabsf(vel_left));
+        if(f_right > 2.0f)
+            f_right = 2.0f;
+    }
+    else
+    {
+        f_left *= vel_right == 0 ? 2.0f : (1.0f + vel_diff/fabsf(vel_right));
+        if(f_left > 2.0f)
+            f_left = 2.0f;
+    }
+
+    // Increase the effect somewhat by squaring the factors
+    f_left  = f_left  * f_left;
+    f_right = f_right * f_right;
 
     // First push one kart to the left (if there is not already
     // an impulse happening - one collision might cause more
     // than one impulse otherwise)
-    if(push_left->getVehicle()->getCentralImpulseTime()<=0)
+    if(right_kart->getVehicle()->getCentralImpulseTime()<=0)
     {
-        const KartProperties *kp = push_right->getKartProperties();
+        const KartProperties *kp = left_kart->getKartProperties();
         Vec3 impulse(-kp->getCollisionImpulse()*f_left, 0, 0);
-        impulse = push_left->getTrans().getBasis() * impulse;
-        push_left->getVehicle()
+        impulse = right_kart->getTrans().getBasis() * impulse;
+        right_kart->getVehicle()
                  ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
                                           impulse);
-        push_left ->getBody()->setAngularVelocity(btVector3(0,0,0));
+        right_kart ->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 
     // Then push the other kart to the right (if there is no
     // impulse happening atm).
-    if(push_right->getVehicle()->getCentralImpulseTime()<=0)
+    if(left_kart->getVehicle()->getCentralImpulseTime()<=0)
     {
-        const KartProperties *kp = push_left->getKartProperties();
+        const KartProperties *kp = right_kart->getKartProperties();
         Vec3 impulse = Vec3(kp->getCollisionImpulse()*f_right, 0, 0);
-        impulse = push_right->getTrans().getBasis() * impulse;
-        push_right->getVehicle()
+        impulse = left_kart->getTrans().getBasis() * impulse;
+        left_kart->getVehicle()
                   ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
                                            impulse);
-        push_right->getBody()->setAngularVelocity(btVector3(0,0,0));
+        left_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 
 }   // KartKartCollision
