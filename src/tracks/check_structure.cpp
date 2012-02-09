@@ -33,6 +33,13 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
 {
     m_index              = index;
     m_check_manager      = check_manager;
+    m_check_type         = CT_NEW_LAP;
+
+    // This structure is actually filled by the check manager (necessary
+    // in order to support track reversing).
+    m_check_structures_to_change_state.clear();
+    m_same_group.clear();
+
     std::string kind;
     node.get("kind", &kind);
     if(kind=="lap")
@@ -47,14 +54,7 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
     {
         printf("Unknown check structure '%s' - ignored.\n", kind.c_str());
     }
-    m_check_structures_to_change_state.clear();
-    node.get("other-ids", &m_check_structures_to_change_state);
-    // Backwards compatibility to tracks exported with older versions of
-    // the track exporter
-    if(m_check_structures_to_change_state.size()==0)
-        node.get("other-id", &m_check_structures_to_change_state);
 
-    m_same_group.clear();
     node.get("same-group", &m_same_group);
     // Make sure that the index of this check structure is included in
     // the same_group list. While this should be guaranteed by the

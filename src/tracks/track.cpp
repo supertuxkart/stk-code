@@ -1316,9 +1316,6 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         else if(name=="checks")
         {
             m_check_manager = new CheckManager(*node, this);
-            if(reverse_track) {
-                m_check_manager->reverse();
-            }
         }
         else if (name=="particle-emitter")
         {

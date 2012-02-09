@@ -52,6 +52,32 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         else
             printf("Unknown check structure '%s' - ignored.\n", type.c_str());
     }   // for i<node.getNumNodes
+
+    // Now set all 'successors', i.e. check structures that need to get a
+    // state change when a check structure is triggered. This can't be
+    // done in the CheckStructures easily, since reversing a track changes
+    // the direction of the dependencies.
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *check_node = node.getNode(i);
+        std::vector<int> check_structures_to_change_state;
+
+        check_node->get("other-ids", &check_structures_to_change_state);
+        // Backwards compatibility to tracks exported with older versions of
+        // the track exporter
+        if(check_structures_to_change_state.size()==0)
+            check_node->get("other-id", &check_structures_to_change_state);
+        std::vector<int>::iterator it;
+        for(it=check_structures_to_change_state.begin();
+            it != check_structures_to_change_state.end(); it++)
+        {
+            if(QuadGraph::get()->isReverse())
+                m_all_checks[*it]->addSuccessor(i);
+            else
+                m_all_checks[i]->addSuccessor(*it);
+        }
+
+    }
 }   // CheckManager
 
 // ----------------------------------------------------------------------------
@@ -62,33 +88,6 @@ CheckManager::~CheckManager()
         delete m_all_checks[i];
     }
 }   // ~CheckManager
-
-// ----------------------------------------------------------------------------
-
-/** Reverse checks order. */
-void CheckManager::reverse()
-{
-    std::map<unsigned int, std::vector<unsigned int> > structures_to_change_state;
-    std::vector<CheckStructure*>::iterator it;
-    for(unsigned int i=0;i<m_all_checks.size(); ++i)
-    {
-        for(std::vector<int>::const_iterator it = m_all_checks[i]->m_check_structures_to_change_state.begin();
-            it != m_all_checks[i]->m_check_structures_to_change_state.end(); ++it)
-        {
-            if(*it>=0)
-            {
-                structures_to_change_state[*it].push_back(i);
-            }
-        }
-    }
-    for(unsigned int i=0;i<m_all_checks.size(); ++i)
-    {
-        m_all_checks[i]->m_check_structures_to_change_state.clear();
-        m_all_checks[i]->m_check_structures_to_change_state.resize(structures_to_change_state[i].size());
-        copy(structures_to_change_state[i].begin(),structures_to_change_state[i].end(),
-             m_all_checks[i]->m_check_structures_to_change_state.begin());
-    }
-}   // reverse
 
 // ----------------------------------------------------------------------------
 
