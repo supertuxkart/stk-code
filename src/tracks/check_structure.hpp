@@ -73,9 +73,6 @@ protected:
     bool              m_active_at_reset;
 
 private:
-    /** Stores a pointer to the check manager. */
-    CheckManager      *m_check_manager;
-
     /** The type of this checkline. */
     CheckType         m_check_type;
 
@@ -100,8 +97,7 @@ private:
                       ChangeState change_state);
 
 public:
-                CheckStructure(CheckManager *check_manager, const XMLNode &node,
-                               unsigned int index);
+                CheckStructure(const XMLNode &node, unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     virtual void changeDebugColor(bool is_active) {}

@@ -64,8 +64,7 @@ private:
      *  quad and still considered to be able to cross it. */
     static const int m_over_min_height  = 4;
 public:
-                 CheckLine(CheckManager *check_manager, const XMLNode &node,
-                           unsigned int index);
+                 CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);

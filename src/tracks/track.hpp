@@ -279,9 +279,6 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
-    /** Checkline manager. */
-    CheckManager             *m_check_manager;
-
     void loadTrackInfo();
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                      bool drop);
@@ -312,7 +309,7 @@ public:
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
     void               adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node);
-    
+    const core::vector3df& getSunRotation();
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,
                                        unsigned int k);
@@ -430,17 +427,13 @@ public:
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
     bool isFogEnabled() const { return m_use_fog; }
-    
-    CheckManager* getCheckManager() { return m_check_manager; }
-
+    // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
-     * in the track seelction screen
-     */
+     * in the track seelction screen. */
     bool isInternal() const { return m_internal; }
-    
-    core::vector3df getSunRotation();
-    
-    TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
+        
+    // ------------------------------------------------------------------------
+    TrackObjectManager* getTrackObjectManager() {return m_track_object_manager;}
     
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const

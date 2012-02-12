@@ -37,8 +37,7 @@ private:
     std::vector<float> m_previous_distance;
 
 public:
-                 CheckLap(CheckManager *check_manager, const XMLNode &node,
-                          unsigned int index);
+                 CheckLap(const XMLNode &node, unsigned int index);
     virtual     ~CheckLap() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
                              int indx);

@@ -27,13 +27,11 @@
 #include "race/race_manager.hpp"
 
 /** Constructor for a checkline. 
- *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
+ *  \param index Index of this check structure in the check manager.
  */
-CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node, 
-                     unsigned int index) 
-         : CheckStructure(check_manager, node, index)
+CheckLine::CheckLine(const XMLNode &node,  unsigned int index) 
+         : CheckStructure(node, index)
 {
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()

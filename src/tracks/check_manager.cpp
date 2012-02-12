@@ -28,7 +28,11 @@
 #include "tracks/check_structure.hpp"
 #include "tracks/track.hpp"
 
-CheckManager::CheckManager(const XMLNode &node, Track *track)
+CheckManager *CheckManager::m_check_manager = NULL;
+
+/** Loads all check structure informaiton from the specified xml file.
+ */
+void CheckManager::load(const XMLNode &node)
 {
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
@@ -36,16 +40,16 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         const std::string &type = check_node->getName();
         if(type=="check-line")
         {
-            CheckLine *cl = new CheckLine(this, *check_node, i);
+            CheckLine *cl = new CheckLine(*check_node, i);
             m_all_checks.push_back(cl);
         }   // checkline
         else if(type=="check-lap")
         {
-            m_all_checks.push_back(new CheckLap(this, *check_node, i));
+            m_all_checks.push_back(new CheckLap(*check_node, i));
         }
         else if(type=="check-sphere")
         {
-            AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node,
+            AmbientLightSphere *cs = new AmbientLightSphere(*check_node,
                                                             i);
             m_all_checks.push_back(cs);
         }   // checksphere
@@ -78,15 +82,19 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         }
 
     }
-}   // CheckManager
+}   // load
 
 // ----------------------------------------------------------------------------
+/** Private destructor (to make sure it is only called using the static
+ *  destroy function). Frees all check structures.
+ */
 CheckManager::~CheckManager()
 {
     for(unsigned int i=0; i<m_all_checks.size(); i++)
     {
         delete m_all_checks[i];
     }
+    m_check_manager = NULL;
 }   // ~CheckManager
 
 // ----------------------------------------------------------------------------

@@ -211,7 +211,7 @@ void QuadGraph::load(const std::string &filename)
 void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
 {
     Track* t = World::getWorld()->getTrack();
-    CheckManager* cm = t->getCheckManager();
+    CheckManager* cm = CheckManager::get();
     assert(cm != NULL);
     
     // Find lapline

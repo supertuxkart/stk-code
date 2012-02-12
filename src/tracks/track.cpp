@@ -91,7 +91,6 @@ Track::Track(const std::string &filename)
     m_all_cached_meshes.clear();
     m_is_arena              = false;
     m_camera_far            = 1000.0f;
-    m_check_manager         = NULL;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -121,8 +120,7 @@ Track::~Track()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    if(m_check_manager)
-        m_check_manager->reset(*this);
+    CheckManager::get()->reset(*this);
     item_manager->reset();
     m_track_object_manager->reset();
 }   // reset
@@ -152,11 +150,7 @@ void Track::cleanup()
     
     m_all_emitters.clearAndDeleteAll();
     
-    if(m_check_manager)
-    {
-        delete m_check_manager;
-        m_check_manager=NULL;
-    }
+    CheckManager::destroy();
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
@@ -197,7 +191,7 @@ void Track::cleanup()
     m_all_cached_meshes.clear();
 
     QuadGraph::destroy();
-    if(m_check_manager) delete m_check_manager;
+
     if(m_mini_map)      
     {
         assert(m_mini_map->getReferenceCount()==1);
@@ -1050,8 +1044,7 @@ void Track::update(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    if(m_check_manager)
-        m_check_manager->update(dt);
+    CheckManager::get()->update(dt);
     item_manager->update(dt);
 
 }   // update
@@ -1151,6 +1144,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     {
         reverse_track = false;
     }
+    CheckManager::create();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
@@ -1315,7 +1309,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         }
         else if(name=="checks")
         {
-            m_check_manager = new CheckManager(*node, this);
+            CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {
@@ -1549,7 +1543,8 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if(!m_check_manager && race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(CheckManager::get()->getCheckStructureCount()==0  &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
         printf("WARNING: no check lines found in track '%s'.\n", 
                m_ident.c_str());
@@ -1843,8 +1838,8 @@ std::vector< std::vector<float> > Track::buildHeightMap()
 }
 
 // ----------------------------------------------------------------------------
-
-core::vector3df Track::getSunRotation()
+/** Returns the rotation of the sun. */
+const core::vector3df& Track::getSunRotation()
 {
     return m_sun->getRotation();
 }
