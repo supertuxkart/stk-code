@@ -472,7 +472,8 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         node = ((LODNode*)node)->getFirstNode();
         if (node == NULL)
         {
-            fprintf(stderr, "[Track] WARNING: this track contains an empty LOD group\n");
+            fprintf(stderr, "[Track] WARNING: this track contains an empty LOD group : '%s'\n",
+                    ((LODNode*)node)->getGroupName().c_str());
             return;
         }
     }

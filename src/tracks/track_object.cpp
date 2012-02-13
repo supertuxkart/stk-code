@@ -45,6 +45,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_enabled    = true;
     m_is_looped  = false;
     m_sound      = NULL;
+    m_mesh       = NULL;
 
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
@@ -136,6 +137,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     {
         std::string full_path = 
             World::getWorld()->getTrack()->getTrackFile(model_name);
+        
         if(file_manager->fileExists(full_path))
         {
             m_mesh = irr_driver->getAnimatedMesh(full_path);
@@ -146,11 +148,12 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             // in STK's model directory.
             full_path = file_manager->getModelFile(model_name);
             m_mesh      = irr_driver->getAnimatedMesh(full_path);
+            
             if(!m_mesh)
             {
                 fprintf(stderr, 
-                        "Warning: '%s' in '%s' not found and is ignored.\n",
-                        xml_node.getName().c_str(), model_name.c_str());
+                        "Warning: model '%s' in node '%s' not found and is ignored.\n",
+                        model_name.c_str(), xml_node.getName().c_str());
                 return;
             }   // if(!m_mesh)
         }
