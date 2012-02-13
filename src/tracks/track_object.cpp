@@ -46,6 +46,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_is_looped  = false;
     m_sound      = NULL;
     m_mesh       = NULL;
+    m_node       = NULL;
 
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
