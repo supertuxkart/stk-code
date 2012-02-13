@@ -152,11 +152,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             
             if(!m_mesh)
             {
-                fprintf(stderr, 
-                        "Warning: model '%s' in node '%s' not found and is ignored.\n",
-                        model_name.c_str(), xml_node.getName().c_str());
-                return;
-            }   // if(!m_mesh)
+                throw std::runtime_error("Model '" + model_name + "' cannot be found");
+            }
         }
 
         m_mesh->grab();
