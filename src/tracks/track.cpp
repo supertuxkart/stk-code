@@ -470,6 +470,11 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
+        if (node == NULL)
+        {
+            fprintf(stderr, "[Track] WARNING: this track contains an empty LOD group\n");
+            return;
+        }
     }
     
     const core::vector3df &pos   = node->getPosition();

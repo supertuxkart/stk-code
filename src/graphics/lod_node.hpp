@@ -92,7 +92,11 @@ public:
     void add(int level, scene::ISceneNode* node, bool reparent);
     
     /** Get the highest level of detail node */
-    scene::ISceneNode* getFirstNode() { assert(m_nodes.size() > 0); return m_nodes[0]; }
+    scene::ISceneNode* getFirstNode()
+    {
+        if (m_nodes.size() > 0) return m_nodes[0];
+        else                    return NULL;
+    }
     
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
     
