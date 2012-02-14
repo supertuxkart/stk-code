@@ -68,7 +68,7 @@ public:
     virtual void onFirePressed(Controller* who);
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
-    virtual bool computeChecklineRequirements() const { return false; }
+    virtual bool useChecklineRequirements() const { return false; }
 };
 
 #endif

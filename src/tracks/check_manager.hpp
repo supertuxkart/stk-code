@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 
-class XMLNode;
 class CheckStructure;
 class Track;
+class XMLNode;
+class Vec3;
 
 /**
   * \brief Controls all checks structures of a track.
@@ -46,6 +47,8 @@ public:
     void   load(const XMLNode &node);
     void   update(float dt);
     void   reset(const Track &track);
+    unsigned int getLapLineIndex() const;
+    int    getChecklineTriggering(const Vec3 &from, const Vec3 &to) const;
     // ------------------------------------------------------------------------
     /** Creates an instance of the check manager. */
     static void create()
@@ -61,10 +64,10 @@ public:
     static void destroy() { delete m_check_manager; m_check_manager = NULL; }
     // ------------------------------------------------------------------------
     /** Returns the number of check structures defined. */
-    int getCheckStructureCount() const { return m_all_checks.size(); }
+    unsigned int getCheckStructureCount() const { return m_all_checks.size(); }
     // ------------------------------------------------------------------------
     /** Returns the nth. check structure. */
-    CheckStructure *getCheckStructure(unsigned int n) 
+    CheckStructure *getCheckStructure(unsigned int n) const
     {
         assert(n < m_all_checks.size());
         return m_all_checks[n];

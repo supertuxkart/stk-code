@@ -118,3 +118,41 @@ void CheckManager::update(float dt)
         (*i)->update(dt);
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Returns the index of the first check structures that triggers a new
+ *  lap to be counted. It aborts if no lap structure is defined.
+ */
+unsigned int CheckManager::getLapLineIndex() const
+{
+    for (unsigned int i=0; i<getCheckStructureCount(); i++)
+    {
+        CheckStructure* c = getCheckStructure(i);
+
+        if (dynamic_cast<CheckLap*>(c) != NULL) return i;
+    }
+
+    fprintf(stderr, "Error, no lap line for track found, aborting.\n");
+    exit(-1);
+}   // getLapLineIndex
+
+// ----------------------------------------------------------------------------
+/** Returns the check line index that is triggered when going from 'from' 
+ *  to 'to'. If no check line is triggered, -1 will be returned.
+ *  \param from Coordinates to start from.
+ *  \param to Coordinates to go to.
+ */
+int CheckManager::getChecklineTriggering(const Vec3 &from, 
+                                         const Vec3 &to) const
+{
+    for (unsigned int i=0; i<getCheckStructureCount(); i++)
+    {
+        CheckStructure* c = getCheckStructure(i);
+
+        // FIXME: why is the lapline skipped?
+        if (dynamic_cast<CheckLap*>(c) != NULL) continue;
+
+        if (c->isTriggered(from, to, 0 /* kart id */))
+            return i;
+    }
+    return -1;
+}   // getChecklineTriggering

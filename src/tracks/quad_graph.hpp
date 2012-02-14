@@ -79,7 +79,7 @@ private:
     bool                     m_reverse;
 
     void setDefaultSuccessors();
-    void setChecklineRequirements(GraphNode* node, int latest_checkline);
+    void computeChecklineRequirements(GraphNode* node, int latest_checkline);
     
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
@@ -87,6 +87,7 @@ private:
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
+    unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name, 
                         const std::string graph_file_name,
                         const bool reverse);
@@ -120,7 +121,8 @@ public:
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
     void         setupPaths();
-    // ----------------------------------------------------------------------
+    void         computeChecklineRequirements();
+// ----------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have
      *  a quad graph), so we don't assert that an instance exist, and we
@@ -182,11 +184,6 @@ public:
     // ----------------------------------------------------------------------
     /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
-    // ----------------------------------------------------------------------
-    void         setChecklineRequirements()
-    {
-        setChecklineRequirements(m_all_nodes[0], -1);
-    }
 
 };   // QuadGraph
 

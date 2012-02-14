@@ -183,13 +183,7 @@ void QuadGraph::load(const std::string &filename)
     delete xml;
 
     setDefaultSuccessors();    
-
-    // The track exporter always exports quad 0 as first quad after (or at)
-    // the start line (start line is lower side of quad 0). In reverse mode
-    // the start quad is the predecessor of node 0.
-    unsigned int start_node = m_reverse ? m_all_nodes[0]->getSuccessor(0) 
-                                        : 0;
-    computeDistanceFromStart(start_node, 0.0f);
+    computeDistanceFromStart(getStartNode(), 0.0f);
 
     // Define the track length as the maximum at the end of a quad
     // (i.e. distance_from_start + length till successor 0).
@@ -204,55 +198,46 @@ void QuadGraph::load(const std::string &filename)
 }   // load
 
 // ----------------------------------------------------------------------------
-/**
-  * Finds which checklines must be visited before driving on this quad
-  * (useful for rescue)
-  */
-void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
+/** Returns the index of the first graph node (i.e. the graph node which
+ *  will trigger a new lap when a kart first enters it). This is always 
+ *  0 for normal direction (this is guaranteed by the track exporter),
+ *  but in reverse mode (where node 0 is actually the end of the track)
+ *  this is 0's successor.
+ */
+unsigned int QuadGraph::getStartNode() const
 {
-    Track* t = World::getWorld()->getTrack();
-    CheckManager* cm = CheckManager::get();
-    assert(cm != NULL);
-    
-    // Find lapline
-    if (latest_checkline == -1)
-    {
-        for (int i=0; i<cm->getCheckStructureCount(); i++)
-        {
-            CheckStructure* c = cm->getCheckStructure(i);
-            
-            if (dynamic_cast<CheckLap*>(c) != NULL)
-            {
-                latest_checkline = i;
-                break;
-            }
-        }
-    }
-    
+    return m_reverse ? m_all_nodes[0]->getSuccessor(0) 
+                     : 0;
+}   // getStartNode
+
+// ----------------------------------------------------------------------------
+void QuadGraph::computeChecklineRequirements()
+{
+    computeChecklineRequirements(m_all_nodes[0], 
+                                 CheckManager::get()->getLapLineIndex());
+}   // computeChecklineRequirements
+
+// ----------------------------------------------------------------------------
+/** Finds which checklines must be visited before driving on this quad
+ *  (useful for rescue)
+ */
+void QuadGraph::computeChecklineRequirements(GraphNode* node, 
+                                             int latest_checkline)
+{        
     for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
     {
         const int succ_id = node->getSuccessor(n);
         
         // warp-around
         if (succ_id == 0) break;
-        
-        int new_latest_checkline = latest_checkline;
-        
-        GraphNode* succ = m_all_nodes[succ_id];
-        for (int i=0; i<cm->getCheckStructureCount(); i++)
-        {
-            CheckStructure* c = cm->getCheckStructure(i);
 
-            // skip lapline
-            if (dynamic_cast<CheckLap*>(c) != NULL) continue;
-            
-            if (c->isTriggered(node->getCenter(), succ->getCenter(), 0 /* kart id */))
-            {
-                new_latest_checkline = i;
-                break;
-            }
-        }
-        
+        GraphNode* succ = m_all_nodes[succ_id];        
+        int new_latest_checkline = 
+            CheckManager::get()->getChecklineTriggering(node->getCenter(), 
+                                                        succ->getCenter() );
+        if(new_latest_checkline==-1)
+            new_latest_checkline = latest_checkline;
+
         /*
         printf("Quad %i : checkline %i\n", succ_id, new_latest_checkline);
 
@@ -266,9 +251,9 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
         if (new_latest_checkline != -1)
             succ->setChecklineRequirements(new_latest_checkline);
         
-        setChecklineRequirements(succ, new_latest_checkline);
+        computeChecklineRequirements(succ, new_latest_checkline);
     }
-}
+}   // computeChecklineRequirements
 
 // ----------------------------------------------------------------------------
 /** This function defines the "path-to-nodes" for each graph node that has 
@@ -334,13 +319,9 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                          float sidewards_distance,
                                          float upwards_distance) const
 {
-    // In non-reverse mode: node 0 is the node on which the start line is.
-    //                      So get its predecessor (which is therefore just
-    //                      before the start line) to find the first quad
-    //                      to place karts on.
-    // In reverse mode, karts can start to placed on quad 0.
-    int current_node          = m_reverse ? getNode(0).getIndex()
-                                          : getNode(0).getPredecessor();
+    // We start just before the start node (which will trigger lap
+    // counting when reached).
+    int current_node = m_all_nodes[getStartNode()]->getPredecessor();
     
     float distance_from_start = 0.1f+forwards_distance;
 
@@ -585,6 +566,11 @@ void QuadGraph::getSuccessors(int node_number,
 }   // getSuccessors
 
 // ----------------------------------------------------------------------------
+/** Recursively determines the distance the beginning (lower end) of the quads
+ *  have from the start of the track.
+ *  \param node The node index for which to set the distance from start.
+ *  \param new_distance The new distance for the specified graph node.
+ */
 void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
 {
     GraphNode *gn = m_all_nodes[node];

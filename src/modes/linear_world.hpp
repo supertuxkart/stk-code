@@ -137,7 +137,7 @@ public:
     virtual bool  haveBonusBoxes(){ return true; }
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
-    virtual bool computeChecklineRequirements() const { return true; }
+    virtual bool useChecklineRequirements() const { return true; }
     // ------------------------------------------------------------------------    
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart. */

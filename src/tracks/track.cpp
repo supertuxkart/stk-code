@@ -1557,9 +1557,9 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
-    if (World::getWorld()->computeChecklineRequirements())
+    if (World::getWorld()->useChecklineRequirements())
     {
-        QuadGraph::get()->setChecklineRequirements();
+        QuadGraph::get()->computeChecklineRequirements();
     }
 }   // loadTrackModel
 
