@@ -496,12 +496,10 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     // In case that a kart is rescued behind start line, or ...
     if(distance_covered<0) distance_covered =1.0f;
 
-    const float full_distance = race_manager->getNumLaps()
-                              * m_track->getTrackLength();
-    const float average_speed = distance_covered/getTime();
-
-    // Finish time is the time needed for the whole race with
-    // the average speed computed above.
+    float full_distance = race_manager->getNumLaps()
+                        * m_track->getTrackLength();
+    if(full_distance == 0)
+        full_distance = 1;  // For 0 lap races avoid warning below
 #ifdef DEBUG
     if(full_distance < distance_covered)
     {
@@ -510,9 +508,17 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
         printf("%f < %f\n", full_distance, distance_covered);
     }
 #endif
+    // Avoid potential problems (floating point issues, coding bug?) if a 
+    // kart has driven more than the full distance, but not finished:
+    // Return the current time plus initial position to spread arrival
+    // times a bit. This code should generally not be used at all, it's
+    // just here to avoid invalid finishing times.
     if(full_distance < distance_covered)
         return getTime() + kart->getInitialPosition();
     
+    // Finish time is the time needed for the whole race with
+    // the computed average speed computed.
+    const float average_speed = distance_covered/getTime();
     return getTime() + (full_distance - distance_covered)  / average_speed;
 
 }   // estimateFinishTimeForKart
