@@ -114,7 +114,12 @@ void Camera::readEndCamera(const XMLNode &root)
     m_end_cameras.clear();
     for(unsigned int i=0; i<root.getNumNodes(); i++)
     {
-        const XMLNode *node = root.getNode(i);
+        unsigned int index = i;
+        // In reverse mode, reverse the order in which the 
+        // end cameras are read.
+        if(QuadGraph::get()->isReverse())
+            index = root.getNumNodes() - 1 - i;
+        const XMLNode *node = root.getNode(index);
         EndCameraInformation eci;
         if(!eci.readXML(*node)) continue;
         m_end_cameras.push_back(eci);
