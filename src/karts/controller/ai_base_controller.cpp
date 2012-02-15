@@ -78,6 +78,14 @@ void AIBaseController::computePath()
         next.clear();
         // Get all successors the AI is allowed to take.
         QuadGraph::get()->getSuccessors(i, next, /*for_ai*/true);
+        // In case of short cuts hidden for the AI it can be that a node
+        // might not have a successor (since the first and last edge of
+        // a hidden shortcut is ignored). Since in the case that the AI
+        // ends up on a short cut (e.g. by accident) and doesn't have an
+        // allowed way to drive, it should still be able to drive, so add 
+        // the non-AI successors of that node in this case.
+        if(next.size()==0)
+            QuadGraph::get()->getSuccessors(i, next, /*for_ai*/false);
         // For now pick one part on random, which is not adjusted during the 
         // race. Long term statistics might be gathered to determine the
         // best way, potentially depending on race position etc.
