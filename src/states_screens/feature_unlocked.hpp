@@ -21,6 +21,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/screen.hpp"
+#include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace irr { 
@@ -47,6 +48,8 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
         /** Will be non-null if this unlocked thing is a kart */
         KartProperties* m_unlocked_kart;
         
+        std::string m_unlock_model;
+        
         /** Will be non-empty if this unlocked thing is one or many pictures */
         std::vector<irr::video::ITexture*> m_pictures;
         /** Will be set if this unlocked thing is a picture */
@@ -59,6 +62,8 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
         
         irr::core::stringw m_unlock_message;
         
+        UnlockedThing(std::string model, irr::core::stringw msg);
+
         UnlockedThing(KartProperties* kart, irr::core::stringw msg);
         
         /**
@@ -136,21 +141,28 @@ public:
     
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
+    // unused for now, maybe will be useful later?
+    //void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
+    // unused for now, maybe will be useful later?
+    //void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture slideshow come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
-                             float w, float h, irr::core::stringw msg);
+    // unused for now, maybe will be useful later?
+    //void addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
+    //                         float w, float h, irr::core::stringw msg);
     
     /** Call before showing up the screen to make whatever the passed challenges unlocked
       * come out of the chest */
+    // unused for now... maybe this could could useful later?
+    /*
     void addUnlockedThings(const std::vector<const ChallengeData*> unlocked);
+    */
     
+    void addTrophy(RaceManager::Difficulty difficulty);
     
     /** override from base class to handle escape press */
     virtual bool onEscapePressed();

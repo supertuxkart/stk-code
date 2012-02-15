@@ -25,6 +25,8 @@
 #include <vector>
 #include <irrString.h>
 
+#include "race/race_manager.hpp"
+
 class ChallengeData;
 class Challenge;
 class XMLWriter;
@@ -70,26 +72,17 @@ public:
     /** Returns the list of recently unlocked features (e.g. call at the end of a
      race to know if any features were unlocked) */
     const std::vector<const ChallengeData*> 
-        getRecentlyUnlockedFeatures() {return m_unlocked_features;}
+        getRecentlyCompletedChallenges() {return m_unlocked_features;}
     
     /** Clear the list of recently unlocked challenges */
     void       clearUnlocked     () {m_unlocked_features.clear(); }
-    
-    
-    /** Returns a complete list of all solved challenges */
-    const std::vector<const ChallengeData*>   getUnlockedFeatures();
-    
-    /** Returns the list of currently inaccessible (locked) challenges */
-    const std::vector<const ChallengeData*>   getLockedChallenges();
     
     bool       isLocked          (const std::string& feature);
     
     void       lockFeature       (Challenge *challenge);
     
-    void       unlockFeature     (Challenge* c, bool do_save=true);
-    
-    std::vector<const ChallengeData*> getActiveChallenges();
-    
+    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d, bool do_save=true);
+        
     void       raceFinished      ();
     void       grandPrixFinished ();
     

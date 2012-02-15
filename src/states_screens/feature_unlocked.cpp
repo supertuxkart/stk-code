@@ -54,6 +54,18 @@ DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
 #pragma mark FeatureUnlockedCutScene::UnlockedThing
 #endif
 
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
+                                                      irr::core::stringw msg)
+{
+    m_unlocked_kart      = NULL;
+    m_unlock_message     = msg;
+    m_unlock_model       = model;
+    m_curr_image         = -1;
+}
+
+// -------------------------------------------------------------------------------------
+
+
 FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart, 
                                                       irr::core::stringw msg)
 {
@@ -125,6 +137,48 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 // ----------------------------------------------------------------------------
 
+void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
+{
+    core::stringw msg;
+    switch (difficulty)
+    {
+        case RaceManager::RD_EASY:
+            msg = _("You completed the easy challenge!");
+            break;
+        case RaceManager::RD_MEDIUM:
+            msg = _("You completed the intermediate challenge!");
+            break;
+        case RaceManager::RD_HARD:
+            msg = _("You completed the difficult challenge!");
+            break;
+        default:
+            assert(false);
+    }
+    
+    std::string model;
+    switch (difficulty)
+    {
+        case RaceManager::RD_EASY:
+            model = file_manager->getModelFile("trophy_bronze.b3d");
+            break;
+        case RaceManager::RD_MEDIUM:
+            model = file_manager->getModelFile("trophy_silver.b3d");
+            break;
+        case RaceManager::RD_HARD:
+            model = file_manager->getModelFile("trophy_gold.b3d");
+            break;
+        default:
+            assert(false);
+            return;
+    }
+    
+    
+    m_unlocked_stuff.push_back( new UnlockedThing(model, msg) );
+}
+
+// ----------------------------------------------------------------------------
+// unused for now, maybe will be useful later?
+/*
 void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, 
                                               irr::core::stringw msg)
 {
@@ -159,7 +213,7 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
     
     m_unlocked_stuff.push_back( new UnlockedThing(pictures, w, h, msg) );
 }   // addUnlockedPictures
-
+*/
 // ----------------------------------------------------------------------------
 
 const float CAMERA_INITIAL_X = 0.0f;
@@ -232,7 +286,11 @@ void FeatureUnlockedCutScene::init()
     m_all_kart_models.clearAndDeleteAll();
     for (int n=0; n<unlockedStuffCount; n++)
     {
-        if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
+        if (m_unlocked_stuff[n].m_unlock_model.size() > 0)
+        {
+            m_unlocked_stuff[n].m_root_gift_node = irr_driver->addMesh( irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model) );
+        }
+        else if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
             KartModel *kart_model = 
                 m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
@@ -499,6 +557,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
 
 // ----------------------------------------------------------------------------
 
+// unused for now... maybe this could could useful later?
+/*
 void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const ChallengeData*> unlocked)
 {
     for (unsigned int n=0; n<unlocked.size(); n++)
@@ -613,6 +673,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
         } // next feature
     } // next challenge
 }   // addUnlockedThings
+*/
 
 // ----------------------------------------------------------------------------
 

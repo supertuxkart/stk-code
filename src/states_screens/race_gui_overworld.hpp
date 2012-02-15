@@ -61,11 +61,13 @@ private:
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
     
-    video::ITexture *m_trophy;
+    video::ITexture *m_trophy1;
+    video::ITexture *m_trophy2;
+    video::ITexture *m_trophy3;
     video::ITexture *m_lock;
     video::ITexture *m_open_challenge;
 
-    video::ITexture* m_icons[3];
+    video::ITexture* m_icons[5];
     
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
@@ -95,8 +97,6 @@ private:
     
     int              m_trophy_points_width;
     
-    std::set<const ChallengeData*> m_locked_challenges;
-
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const Kart *kart,
                                 const core::recti &viewport, 
