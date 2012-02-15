@@ -9,11 +9,11 @@
     </hard>
     <medium>
         <karts number="1"/>
-        <requirements energy="10" time="105"/>
+        <requirements energy="10" time="65"/>
     </medium>
     <easy>
         <karts number="1"/>
-        <requirements energy="6" time="115"/>
+        <requirements energy="6" time="80"/>
     </easy>
 </challenge>
 
