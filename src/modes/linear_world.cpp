@@ -216,10 +216,15 @@ void LinearWorld::newLap(unsigned int kart_index)
     KartInfo &kart_info = m_kart_info[kart_index];
     Kart    *kart       = m_karts[kart_index];
 
-    // Don't do anything if a kart that has already finished the race
-    // crosses the start line again. This avoids 'fastest lap' messages
-    // if the end controller does a fastest lap.
-    if(kart->hasFinishedRace()) return;
+    // Only update the kart controller if a kart that has already finished 
+    // the race crosses the start line again. This avoids 'fastest lap' 
+    // messages if the end controller does a fastest lap, but especially
+    // allows the end controller to switch end cameras
+    if(kart->hasFinishedRace()) 
+    {
+        kart->getController()->newLap(kart_info.m_race_lap);
+        return;
+    }
 
     const int lap_count = race_manager->getNumLaps();
     

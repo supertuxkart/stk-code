@@ -225,12 +225,8 @@ void Camera::setMode(Mode mode)
     {
         m_next_end_camera    = m_end_cameras.size()>1 ? 1 : 0;
         m_current_end_camera = 0;
-        if(m_end_cameras.size()>0 && 
-            m_end_cameras[0].m_type==EndCameraInformation::EC_STATIC_FOLLOW_KART)
-        {
-            m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
-            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
-        }
+        m_camera->setFOV(m_fov);
+        handleEndCamera(0);
     }   // mode==CM_FINAL
 
     m_mode = mode;
@@ -496,7 +492,8 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         
         if (race_manager->getNumLocalPlayers() < 2)
         {
-            sfx_manager->positionListener(m_camera->getPosition(),  wanted_target - m_camera->getPosition());
+            sfx_manager->positionListener(m_camera->getPosition(),  
+                                      wanted_target - m_camera->getPosition());
         }
     }
 
