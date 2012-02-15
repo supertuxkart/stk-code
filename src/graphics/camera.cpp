@@ -256,8 +256,9 @@ void Camera::reset()
  */
 void Camera::setInitialTransform()
 {
-    m_camera->setPosition(  m_kart->getXYZ().toIrrVector() 
-                          + core::vector3df(0, 25, -50)   );
+    Vec3 start_offset(0, 25, -50);
+    Vec3 xx = m_kart->getTrans()(start_offset);
+    m_camera->setPosition(  xx.toIrrVector());
     // Reset the target from the previous target (in case of a restart
     // of a race) - otherwise the camera will initially point in the wrong
     // direction till smoothMoveCamera has corrected this. Setting target
