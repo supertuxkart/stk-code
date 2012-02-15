@@ -172,6 +172,7 @@ void LODNode::OnRegisterSceneNode()
             {
                 scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
                 video::ITexture* t = mb->getMaterial().getTexture(0);
+                if(!t) continue;
                 Material* m = material_manager->getMaterialFor(t, mb);
                 if (m != NULL)
                 {
