@@ -143,7 +143,8 @@ void EndController::reset()
 void  EndController::newLap(int lap)
 {
     // This will implicitely trigger setting the first end camera to be active.
-    m_kart->getCamera()->setMode(Camera::CM_FINAL);
+    if(m_kart->getCamera())
+        m_kart->getCamera()->setMode(Camera::CM_FINAL);
 }   // newLap
 
 //-----------------------------------------------------------------------------
