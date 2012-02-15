@@ -77,6 +77,8 @@ public:
     // ------------------------------------------------------------------------
     void  setActive(RaceManager::Difficulty d)      {m_state[d] = CH_ACTIVE;        }
     // ------------------------------------------------------------------------
-    ChallengeData*  getData() { return m_data; }
+    
+    ChallengeData*        getData()       { return m_data; }
+    const ChallengeData*  getData() const { return m_data; }
 };
 #endif

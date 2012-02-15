@@ -18,9 +18,11 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -79,16 +81,38 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
             break;
     }
-    
-    const ChallengeData* c = unlock_manager->getChallenge(challenge_id);
 
+    const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenge_id);
+
+    if (c->isSolved(RaceManager::RD_EASY))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("novice");
+        btn->setImage(file_manager->getTextureFile("cup_bronze.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    
+    if (c->isSolved(RaceManager::RD_MEDIUM))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("intermediate");
+        btn->setImage(file_manager->getTextureFile("cup_silver.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    
+    if (c->isSolved(RaceManager::RD_HARD))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("expert");
+        btn->setImage(file_manager->getTextureFile("cup_gold.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+
+    
     LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
     LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
     LabelWidget* expert_label = getWidget<LabelWidget>("difficult_label");
     
-    novice_label->setText( getLabel(RaceManager::RD_EASY,   c), false );
-    medium_label->setText( getLabel(RaceManager::RD_MEDIUM, c), false );
-    expert_label->setText( getLabel(RaceManager::RD_HARD,   c), false );
+    novice_label->setText( getLabel(RaceManager::RD_EASY,   c->getData()), false );
+    medium_label->setText( getLabel(RaceManager::RD_MEDIUM, c->getData()), false );
+    expert_label->setText( getLabel(RaceManager::RD_HARD,   c->getData()), false );
 }
 
 // ----------------------------------------------------------------------------
