@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define DEBUG_MENU_ITEM 1
+#define DEBUG_MENU_ITEM 0
 
 #include "states_screens/main_menu_screen.hpp"
 
@@ -189,7 +189,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         FeatureUnlockedCutScene* scene = 
             FeatureUnlockedCutScene::getInstance();
         
-        scene->addTrophy(RaceManager::RD_HARD);
+        scene->addTrophy(RaceManager::RD_EASY);
         StateManager::get()->pushScreen(scene);
         
         /*
