@@ -289,6 +289,7 @@ void FeatureUnlockedCutScene::init()
         if (m_unlocked_stuff[n].m_unlock_model.size() > 0)
         {
             m_unlocked_stuff[n].m_root_gift_node = irr_driver->addMesh( irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model) );
+            m_unlocked_stuff[n].m_root_gift_node->setScale( core::vector3df(0.5f, 0.5f, 0.5f) );
         }
         else if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
@@ -451,23 +452,24 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
             }
             else
             {
-                pos.X += 2.0f*dt;
+                //pos.X -= 2.0f*dt;
             }
             
-            if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z += 5.0f*dt;
+            if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z += 6.0f*dt;
 
             m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
             
             core::vector3df scale = 
                 m_unlocked_stuff[n].m_root_gift_node->getScale();
-            scale.X += 2.0f*dt;
-            scale.Y += 2.0f*dt;
-            scale.Z += 2.0f*dt;
+            scale.X += 0.9f*dt;
+            scale.Y += 0.9f*dt;
+            scale.Z += 0.9f*dt;
             m_unlocked_stuff[n].m_root_gift_node->setScale(scale);
         }
         
         core::vector3df campos = m_camera->getPosition();
-        campos.X += 2.0f*dt;
+        campos.X -= 8.0f*dt;
+        campos.Y += 5.0f*dt;
         campos.Z += 5.0f*dt;
         
         m_camera->setPosition(campos);
@@ -482,6 +484,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
     for (int n=0; n<unlockedStuffCount; n++)
     {
         if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
+        
+        m_unlocked_stuff[n].m_root_gift_node->setRotation(m_unlocked_stuff[n].m_root_gift_node->getRotation() + core::vector3df(0.0f, dt*25.0f, 0.0f));
         
         if (!m_unlocked_stuff[n].m_pictures.empty())
         {
