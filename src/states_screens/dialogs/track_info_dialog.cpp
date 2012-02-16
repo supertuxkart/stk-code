@@ -240,7 +240,6 @@ void TrackInfoDialog::onEnterPressedInternal()
     const bool reverse_track = m_checkbox == NULL ? false 
                                                   : m_checkbox->getState();
     race_manager->setReverseTrack(reverse_track);
-    printf("Reverse: %d\n", reverse_track);
     std::string track_ident = m_track_ident;
     ModalDialog::dismiss();
     race_manager->startSingleRace(track_ident, num_laps);
