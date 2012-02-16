@@ -125,6 +125,8 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     }
     else
     {
+        getWidget<CheckBoxWidget>("reverse")->setVisible(false);
+        getWidget<LabelWidget>("reverse-text")->setVisible(false);
         m_checkbox = NULL;
         race_manager->setReverseTrack(false);
     }

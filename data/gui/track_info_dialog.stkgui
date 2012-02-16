@@ -49,7 +49,7 @@
             <spacer width="40" height="2" />
             <checkbox id="reverse"/>
             <spacer width="20" height="2" />
-            <label height="100%" I18N="Drive the track reverse" text="Reverse"/>
+            <label id="reverse-text" height="100%" I18N="Drive the track reverse" text="Reverse"/>
         </div>
         
     </div>
