@@ -86,7 +86,7 @@ Track::Track(const std::string &filename)
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
-    m_reverse_available     = false;
+    m_reverse_available     = true;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
