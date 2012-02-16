@@ -372,6 +372,9 @@ namespace GUIEngine
  Another possible value is "fit", which will make a \<div\> fit to its
  contents.
  
+ Another possible value is "font", which will use the size of the font
+ (useful to insert widgets inside text)
+ 
  \n
  \subsection prop9 PROP_MAX_WIDTH, PROP_MAX_HEIGHT    
  <em> Names in XML files: </em> \c "max_width", \c "max_height" 
@@ -413,6 +416,10 @@ namespace GUIEngine
        or vertically center widgets in a vertical-row layout, this property
        is not what you're looking for; instead, add a stretching spacer before
        and after the widget(s) you want to center.
+ 
+ \note When applied to a label widget, this property will center the text
+       widget within its parent. To align the text inside the label widget,
+       see \ref prop4
  
  \n
  \subsection prop13 PROP_PROPORTION

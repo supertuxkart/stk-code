@@ -51,7 +51,9 @@ using namespace irr;
 
 const int LOCKED = 0;
 const int OPEN = 1;
-const int COMPLETED = 2;
+const int COMPLETED_EASY = 2;
+const int COMPLETED_MEDIUM = 3;
+const int COMPLETED_HARD = 4;
 
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
@@ -60,8 +62,10 @@ const int COMPLETED = 2;
 RaceGUIOverworld::RaceGUIOverworld()
 {    
     m_enabled = true;
-    m_trophy  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
-    
+    m_trophy1  = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
+    m_trophy2  = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
+    m_trophy3  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
+
     const float scaling = irr_driver->getFrameSize().Height / 420.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
@@ -101,18 +105,14 @@ RaceGUIOverworld::RaceGUIOverworld()
     gui::ScalableFont* font = GUIEngine::getFont(); 
     m_trophy_points_width = font->getDimension(L"100").Width;
     
-    const std::vector<const ChallengeData*>& v = unlock_manager->getCurrentSlot()->getLockedChallenges();
-    for (unsigned int n=0; n<v.size(); n++)
-    {
-        m_locked_challenges.insert(v[n]);
-    }
-    
     m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
     m_open_challenge = irr_driver->getTexture( file_manager->getGUIDir() + "challenge.png" );
     
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;
-    m_icons[2] = m_trophy;
+    m_icons[2] = m_trophy1;
+    m_icons[3] = m_trophy2;
+    m_icons[4] = m_trophy3;
 }   // RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
@@ -217,9 +217,9 @@ void RaceGUIOverworld::drawTrophyPoints()
     const int size = UserConfigParams::m_width/20;
     core::rect<s32> dest(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
                          pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
-    core::rect<s32> source(core::position2di(0, 0), m_trophy->getSize());
+    core::rect<s32> source(core::position2di(0, 0), m_trophy3->getSize());
     
-    irr_driver->getVideoDriver()->draw2DImage(m_trophy, dest, source, NULL,
+    irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
                                               NULL, true /* alpha */);
     
     pos.LowerRightCorner.Y = dest.LowerRightCorner.Y;
@@ -321,8 +321,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         int state = (challenges[n].m_force_field.m_is_locked ? LOCKED : OPEN);
         
         const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenges[n].m_challenge_id);
-        if (c->isSolved()) state = COMPLETED;
-            
+        if (c->isSolved(RaceManager::RD_HARD))        state = COMPLETED_HARD;
+        else if (c->isSolved(RaceManager::RD_MEDIUM)) state = COMPLETED_MEDIUM;
+        else if (c->isSolved(RaceManager::RD_EASY))   state = COMPLETED_EASY;
+
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_icons[state]->getOriginalSize());
         

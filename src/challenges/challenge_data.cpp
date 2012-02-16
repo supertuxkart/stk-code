@@ -356,12 +356,13 @@ bool ChallengeData::raceFinished()
     
     int d = race_manager->getDifficulty();
     
+    Kart* kart = world->getPlayerKart(0);
+
     if (track_name != m_track_id                                ) return false;
     if ((int)world->getNumKarts() < m_num_karts[d]              ) return false;
-    Kart* kart = world->getPlayerKart(0);
     if (m_energy[d] > 0   && kart->getEnergy() < m_energy[d]    ) return false;
     if (m_position[d] > 0 && kart->getPosition() > m_position[d]) return false;
-
+    
     // Follow the leader
     // -----------------
     if(m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER)

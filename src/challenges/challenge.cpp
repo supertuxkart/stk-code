@@ -45,19 +45,50 @@ void Challenge::load(const XMLNode* challengesNode)
                 m_data->getId().c_str());
         return;
     }
-    
-    // See if the challenge is solved (it's activated later from the
-    // unlock_manager).
-    bool finished=false;    
-    node->get("solved", &finished);
+    const XMLNode* easy   = node->getNode("easy");
+    const XMLNode* medium = node->getNode("medium");
+    const XMLNode* hard   = node->getNode("hard");
+
+    m_state[0] = CH_INACTIVE;
+    m_state[1] = CH_INACTIVE;
+    m_state[2] = CH_INACTIVE;
+
+    if (easy != NULL)
+    {
+        bool finished = false;    
+        easy->get("solved", &finished);
         
-    m_state = finished ? CH_SOLVED : CH_INACTIVE;
+        if (finished) m_state[0] = CH_SOLVED;
+    }
+    if (medium != NULL)
+    {
+        bool finished = false;    
+        medium->get("solved", &finished);
+        
+        if (finished) m_state[1] = CH_SOLVED;
+    }
+    if (hard != NULL)
+    {
+        bool finished = false;    
+        hard->get("solved", &finished);
+        
+        if (finished) m_state[2] = CH_SOLVED;
+    }
 }   // load
 
 //-----------------------------------------------------------------------------
+
+
+const wchar_t* boolstr(bool b)
+{
+    return (b ? L"true" : L"false");
+}
+
 void Challenge::save(XMLWriter& writer)
 {
-    writer << L"        <" << core::stringw(m_data->getId().c_str()) << L" solved=\"" 
-           << (isSolved() ? L"true" : L"false") << L"\"";
-    writer << L" />\n";
+    writer << L"        <" << core::stringw(m_data->getId().c_str()) << L">\n"
+           << L"            <easy   solved=\"" << boolstr(isSolved(RaceManager::RD_EASY))   << L"\"/>\n"
+           << L"            <medium solved=\"" << boolstr(isSolved(RaceManager::RD_MEDIUM)) << L"\"/>\n"
+           << L"            <hard   solved=\"" << boolstr(isSolved(RaceManager::RD_HARD))   << L"\"/>\n"
+           << L"        </" << core::stringw(m_data->getId().c_str()) << L">\n";
 }   // save

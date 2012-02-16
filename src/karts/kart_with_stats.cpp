@@ -20,11 +20,12 @@
 
 #include "items/item.hpp"
 
-KartWithStats::KartWithStats(const std::string& ident, Track* track, 
+KartWithStats::KartWithStats(const std::string& ident, 
+                             unsigned int world_kart_id, Track* track,
                              int position,  bool is_first_kart,
                              const btTransform& init_transform, 
                              RaceManager::KartType type)
-             : Kart(ident, track, position, is_first_kart, 
+             : Kart(ident, world_kart_id, track, position, is_first_kart, 
                     init_transform, type)
 {
     reset();

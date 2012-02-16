@@ -88,6 +88,9 @@ protected:
     /** LOD group this object is part of, if it is LOD */
     std::string                    m_lod_group;
     
+    /** For action trigger objects */
+    std::string                    m_action;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject(const core::vector3df& pos, const core::vector3df& hpr,

@@ -29,35 +29,6 @@ bool GameSlot::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
-   //-----------------------------------------------------------------------------
-
-const std::vector<const ChallengeData*> GameSlot::getUnlockedFeatures()
-{
-    std::vector<const ChallengeData*> out;
-    
-    std::map<std::string, Challenge*>::const_iterator i;
-    for(i = m_challenges_state.begin(); 
-        i != m_challenges_state.end();  i++)
-    {
-        if (i->second->isSolved()) out.push_back(i->second->getData());
-    }
-    
-    return out;
-}
-//-----------------------------------------------------------------------------
-const std::vector<const ChallengeData*> GameSlot::getLockedChallenges()
-{    
-    std::vector<const ChallengeData*> out;
-    
-    std::map<std::string, Challenge*>::const_iterator i;
-    for(i = m_challenges_state.begin(); 
-        i != m_challenges_state.end();  i++)
-    {
-        if (!i->second->isSolved()) out.push_back(i->second->getData());
-    }
-    
-    return out;
-}
 
 //-----------------------------------------------------------------------------
 void GameSlot::computeActive()
@@ -70,21 +41,53 @@ void GameSlot::computeActive()
     {
         // Changed challenge
         // -----------------
-        if((i->second)->isSolved()) 
+        if((i->second)->isSolvedAtAnyDifficulty()) 
         {
             // The constructor calls computeActive, which actually locks 
             // all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
             
-            unlockFeature(i->second, /*save*/ false);
+            if (i->second->isSolved(RaceManager::RD_EASY))
+            {
+                unlockFeature(i->second, RaceManager::RD_EASY, /*save*/ false);
+            }
+            if (i->second->isSolved(RaceManager::RD_MEDIUM))
+            {
+                unlockFeature(i->second, RaceManager::RD_MEDIUM, /*save*/ false);
+            }
+            if (i->second->isSolved(RaceManager::RD_HARD))
+            {
+                unlockFeature(i->second, RaceManager::RD_HARD, /*save*/ false);
+            }
             m_points++;
-            continue;
+        }
+        else
+        {
+            // Otherwise lock the feature
+            // --------------------------
+            lockFeature(i->second);
         }
         
-        // Otherwise lock the feature
-        // --------------------------
-        lockFeature(i->second);
-        i->second->setActive();
+        if (i->second->isSolved(RaceManager::RD_HARD))
+        {
+            // challenge beaten at hardest, nothing more to do here
+            continue;
+        }
+        else if (i->second->isSolved(RaceManager::RD_MEDIUM))
+        {
+            i->second->setActive(RaceManager::RD_HARD);
+        }
+        else if (i->second->isSolved(RaceManager::RD_EASY))
+        {
+            i->second->setActive(RaceManager::RD_HARD);
+            i->second->setActive(RaceManager::RD_MEDIUM);
+        }
+        else
+        {
+            i->second->setActive(RaceManager::RD_HARD);
+            i->second->setActive(RaceManager::RD_MEDIUM);
+            i->second->setActive(RaceManager::RD_EASY);
+        }
     }   // for i
     clearUnlocked();
 }   // computeActive
@@ -102,7 +105,7 @@ void GameSlot::lockFeature(Challenge *challenge)
 
 //-----------------------------------------------------------------------------
 
-void GameSlot::unlockFeature(Challenge* c, bool do_save)
+void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, bool do_save)
 {
     const unsigned int amount = (unsigned int)c->getData()->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
@@ -120,29 +123,11 @@ void GameSlot::unlockFeature(Challenge* c, bool do_save)
     
     // Add to list of recently unlocked features
     m_unlocked_features.push_back(c->getData());
-    c->setSolved();  // reset isActive flag
+    c->setSolved(d);  // reset isActive flag
     
     // Save the new unlock information
     if(do_save) unlock_manager->save();
 }   // unlockFeature
-
-//-----------------------------------------------------------------------------
-
-std::vector<const ChallengeData*> GameSlot::getActiveChallenges()
-{
-    computeActive();
-
-    std::vector<const ChallengeData*> out;
-    
-    std::map<std::string, Challenge*>::const_iterator i;
-    for(i = m_challenges_state.begin(); 
-        i != m_challenges_state.end();  i++)
-    {
-        if (i->second->isActive()) out.push_back(i->second->getData());
-    }
-    
-    return out;
-}   // getActiveChallenges
 
 //-----------------------------------------------------------------------------
 
@@ -156,9 +141,9 @@ void GameSlot::raceFinished()
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
     {
-        if(i->second->isActive() && i->second->getData()->raceFinished())
+        if(i->second->isActive(race_manager->getDifficulty()) && i->second->getData()->raceFinished())
         {
-            unlockFeature(i->second);
+            unlockFeature(i->second, race_manager->getDifficulty());
         }   // if isActive && challenge solved
     }
     //race_manager->setCoinTarget(0);  //reset
@@ -172,10 +157,11 @@ void GameSlot::grandPrixFinished()
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
     {
-        if(i->second->isActive() && i->second->getData()->grandPrixFinished())
+        if(i->second->isActive(race_manager->getDifficulty()) &&
+           i->second->getData()->grandPrixFinished())
         {
             printf("===== A FEATURE WAS UNLOCKED BECAUSE YOU WON THE GP!! ==\n");
-            unlockFeature(i->second);
+            unlockFeature(i->second, race_manager->getDifficulty());
         }
     }
     race_manager->setCoinTarget(0);

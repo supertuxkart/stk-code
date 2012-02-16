@@ -312,7 +312,7 @@
            bevelling, and uses a simple box shape.
            As an example, a value of 1 for x and z will result in a 
            sharp 'arrow' like shape.  -->
-    <collision impulse="150" impulse-time="0.1" side-impulse="600"
+    <collision impulse="12000" impulse-time="0.1" side-impulse="600"
                restitution="1.0" bevel-factor="0.5 0.0 0.5" />
 
     <!-- Kart-specific plunger and rubber band handling: max-length is

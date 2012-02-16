@@ -25,6 +25,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 
@@ -44,6 +45,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_enabled    = true;
     m_is_looped  = false;
     m_sound      = NULL;
+    m_mesh       = NULL;
+    m_node       = NULL;
 
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
@@ -57,12 +60,12 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
     xml_node.get("lod_group", &m_lod_group);
     
-    /** For sound effects */
-    bool trigger_when_near = false;
-    
-    /** For sound effects */
-    float trigger_distance = 1.0f;
+    std::string type;
+    xml_node.get("type",    &type );
 
+    bool trigger_when_near = false;
+    float trigger_distance = 1.0f;
+    
     // FIXME: at this time sound emitters are just disabled in multiplayer
     //        otherwise the sounds would be constantly heard
     if (sound.size() > 0 && race_manager->getNumLocalPlayers() == 1)
@@ -105,14 +108,27 @@ TrackObject::TrackObject(const XMLNode &xml_node)
                  "[TrackObject] Sound emitter object could not be created\n");
         }
     }
+    else if (type == "action-trigger")
+    {
+        trigger_when_near = true;
+        
+        xml_node.get("distance", &trigger_distance);
+        
+        xml_node.get("action", &m_action);
+
+        if (m_action.size() == 0)
+        {
+            fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
+        }
+    }
     
-    // Some animated objects (billboards, sound emitters) 
+    // Some animated objects (billboards, sound emitters, action triggers)
     // don't use this scene node
     if (model_name == "")
     {
         m_node = NULL;
         m_mesh = NULL;
-        
+                
         if (trigger_when_near)
         {
              item_manager->newItem(m_init_xyz, trigger_distance, this);
@@ -122,6 +138,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     {
         std::string full_path = 
             World::getWorld()->getTrack()->getTrackFile(model_name);
+        
         if(file_manager->fileExists(full_path))
         {
             m_mesh = irr_driver->getAnimatedMesh(full_path);
@@ -132,13 +149,11 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             // in STK's model directory.
             full_path = file_manager->getModelFile(model_name);
             m_mesh      = irr_driver->getAnimatedMesh(full_path);
+            
             if(!m_mesh)
             {
-                fprintf(stderr, 
-                        "Warning: '%s' in '%s' not found and is ignored.\n",
-                        xml_node.getName().c_str(), model_name.c_str());
-                return;
-            }   // if(!m_mesh)
+                throw std::runtime_error("Model '" + model_name + "' cannot be found");
+            }
         }
 
         m_mesh->grab();
@@ -294,5 +309,17 @@ void TrackObject::onTriggerItemApproached(Item* who)
     if (m_sound != NULL && m_sound->getStatus() != SFXManager::SFX_PLAYING)
     {
         m_sound->play();
+    }
+    else if (m_action.size() > 0)
+    {
+        if (m_action == "garage")
+        {
+            dynamic_cast<OverWorld*>(World::getWorld())->scheduleReturnToGarage();
+        }
+        else
+        {
+            fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
+                    m_action.c_str());
+        }
     }
 }

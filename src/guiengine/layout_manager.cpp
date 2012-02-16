@@ -259,7 +259,8 @@ void LayoutManager::readCoords(Widget* self)
     // width
     {
         int abs_w = -1, percent_w = -1;
-        if (convertToCoord(width, &abs_w, &percent_w ))
+        if (width == "font") self->m_absolute_w = GUIEngine::getFontHeight();
+        else if (convertToCoord(width, &abs_w, &percent_w ))
         {
             if      (abs_w > -1)     self->m_absolute_w = abs_w;
             else if (percent_w > -1) self->m_relative_w = (float)percent_w;
@@ -271,7 +272,8 @@ void LayoutManager::readCoords(Widget* self)
     // height
     {
         int abs_h = -1, percent_h = -1;
-        if (convertToCoord(height, &abs_h, &percent_h ))
+        if (height == "font") self->m_absolute_h = GUIEngine::getFontHeight();
+        else if (convertToCoord(height, &abs_h, &percent_h ))
         {
             if      (abs_h > -1)     self->m_absolute_h = abs_h;
             else if (percent_h > -1) self->m_relative_h = (float)percent_h;

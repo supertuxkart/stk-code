@@ -221,6 +221,11 @@ bool Physics::projectKartDownwards(const Kart *k)
 Physics::CollisionSide Physics::getCollisionSide(const btRigidBody *body,
                                                  const Vec3 &contact_point)
 {
+    if(contact_point.getX()>0)
+        return COL_RIGHT;
+    else
+        return COL_LEFT;
+
     btVector3 aabb_min, aabb_max;
     static btTransform zero_trans(btQuaternion(0, 0, 0));
     body->getCollisionShape()->getAabb(zero_trans, aabb_min, aabb_max);
@@ -268,135 +273,118 @@ Physics::CollisionSide Physics::getCollisionSide(const btRigidBody *body,
  *  server and if no networking is used, and from race_state on the client to 
  *  replay what happened on the server.
  *  \param kart_a First kart involved in the collision.
+ *  \param contact_point_a Location of collision at first kart (in kart 
+ *         coordinates).
  *  \param kart_b Second kart involved in the collision.
+ *  \param contact_point_b Location of collision at second kart (in kart
+ *         coordinates).
  */
 void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
                                 Kart *kart_b, const Vec3 &contact_point_b)
 {
-    kart_a->crashed(kart_b);   // will play crash sound for player karts
-    kart_b->crashed(kart_a);
-    Attachment *attachmentA=kart_a->getAttachment();
-    Attachment *attachmentB=kart_b->getAttachment();
+    // Only one kart needs to handle the attachments, it will
+    // fix the attachments for the other kart.
+    kart_a->crashed(kart_b, /*handle_attachments*/true);
+    kart_b->crashed(kart_a, /*handle_attachments*/false);
 
-    if(attachmentA->getType()==Attachment::ATTACH_BOMB)
+    Kart *left_kart, *right_kart;
+
+    // Determine which kart is pushed to the left, and which one to the
+    // right. Ideally the sign of the X coordinate of the local conact point 
+    // could decide the direction (negative X --> was hit on left side, gets
+    // push to right), but that can lead to both karts being pushed in the
+    // same direction (front left of kart hits rear left).
+    // So we just use a simple test (which does the right thing in ideal
+    // crashes, but avoids pushing both karts in corner cases 
+    // - pun intended ;) ).
+    if(contact_point_a.getX() < contact_point_b.getX())
     {
-        // If both karts have a bomb, explode them immediately:
-        if(attachmentB->getType()==Attachment::ATTACH_BOMB)
-        {
-            attachmentA->setTimeLeft(0.0f);
-            attachmentB->setTimeLeft(0.0f);
-        }
-        else  // only A has a bomb, move it to B (unless it was from B)
-        {
-            if(attachmentA->getPreviousOwner()!=kart_b)
-            {
-                attachmentA->moveBombFromTo(kart_a, kart_b);
-                // Play appropriate SFX
-                kart_b->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-            }
-        }
-    }
-    else if(attachmentB->getType()==Attachment::ATTACH_BOMB &&
-            attachmentB->getPreviousOwner()!=kart_a)
-    {
-        attachmentB->moveBombFromTo(kart_b, kart_a);
-        kart_a->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        left_kart  = kart_a;
+        right_kart = kart_b;
     }
     else
     {
-        kart_a->playCustomSFX(SFXManager::CUSTOM_CRASH);
-        kart_b->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        left_kart  = kart_b;
+        right_kart = kart_a;
     }
 
-    // If bouncing crashes is enabled, add an additional force to the
-    // slower kart
-    Kart *faster_kart, *slower_kart;
-    Vec3 faster_cp, slower_cp;
-    if(kart_a->getSpeed()>=kart_b->getSpeed())
-    {
-        faster_kart = kart_a;
-        faster_cp   = contact_point_a;
-        slower_kart = kart_b;
-        slower_cp   = contact_point_b;
-    }
-    else
-    {
-        faster_kart = kart_b;
-        faster_cp   = contact_point_b;
-        slower_kart = kart_a;
-        slower_cp   = contact_point_a;
-    }
+    // Add a scaling factor depending on the mass (avoid div by zero)
+    float f_right =  right_kart->getKartProperties()->getMass() > 0 
+                     ? left_kart->getKartProperties()->getMass() 
+                       / right_kart->getKartProperties()->getMass()
+                     : 1.5f;
+    // Add a scaling factor depending on speed (avoid div by 0)
+    f_right *= right_kart->getSpeed() > 0 
+               ? left_kart->getSpeed()
+                  / right_kart->getSpeed()
+               : 1.5f;
+    // Cap f_right to [0.8,1.25], which results in f_left being
+    // capped in the same interval
+    if(f_right > 1.25f)
+        f_right = 1.25f;
+    else if(f_right< 0.8f)
+        f_right = 0.8f;
+    float f_left = f_right ==0 ? 1.5f : 1/f_right;
 
-    CollisionSide faster_side = getCollisionSide(faster_kart->getBody(), 
-                                                 faster_cp);
-    CollisionSide slower_side = getCollisionSide(slower_kart->getBody(), 
-                                                 slower_cp);
+    // Check if a kart is more 'actively' trying to push another kart
+    // by checking its local sidewards velocity
+    float vel_left  = left_kart->getVelocityLC().getX();
+    float vel_right = right_kart->getVelocityLC().getX();
 
-    // This probably needs adjusting once we have different kart properties.
-    // E.g. besides speed we might also want to take mass into account(?)
-    if(faster_side==COL_FRONT)
+    // Use the difference in speed to determine which kart gets a 
+    // ramming bonus. Normally vel_right and vel_left will have
+    // a different sign: right kart will be driving to the left,
+    // and left kart to the right (both pushing at each other).
+    // By using the sum we get the intended effect: if both karts
+    // are pushing with the same speed, vel_diff is 0, if the right
+    // kart is driving faster vel_diff will be < 0. If both velocities
+    // have the same sign, one kart is trying to steer away from the
+    // other, in which case it gets an even bigger push.
+    float vel_diff = vel_right + vel_left;
+
+    // More driving towards left --> left kart gets bigger impulse
+    if(vel_diff<0)
     {
-        // Special case: the faster kart hits a kart front on. In this case
-        // the slower kart will be pushed out of the faster kart's way
-        Vec3 dir = faster_kart->getVelocity();
-
-        // The direction in which the impulse will be applied depends on 
-        // which side of the faster kart was hitting it: if the hit is
-        // on the right side of the faster kart, it will push the slower
-        // kart to the right and vice versa. This is based on the 
-        // assumption that a hit to the right indicates that it's
-        // shorter to push the slower kart to the right.
-        Vec3 impulse;
-        if(faster_cp.getX()>0)
-            impulse = Vec3( dir.getZ(), 0, -dir.getX());
-        else
-            impulse = Vec3(-dir.getZ(), 0,  dir.getX());
-        impulse.normalize();
-        impulse *= faster_kart->getKartProperties()->getCollisionImpulse();
-        float t = 
-            faster_kart->getKartProperties()->getCollisionImpulseTime();
-        if(t>0)
-            slower_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
-        else
-            slower_kart->getBody()->applyCentralImpulse(impulse);
-        slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        // Apply some impulse to the slower kart as well?
+        f_right *= vel_left == 0 ? 2.0f : (1.0f - vel_diff/fabsf(vel_left));
+        if(f_right > 2.0f)
+            f_right = 2.0f;
     }
     else
     {
-        // Non-frontal collision, push the two karts away from each other
-        // First the faster kart
-        Vec3 dir = faster_kart->getVelocity();
-        Vec3 impulse;
-        if(faster_cp.getX()>0)
-            impulse = Vec3(-dir.getZ(), 0,  dir.getX());
-        else
-            impulse = Vec3( dir.getZ(), 0, -dir.getX());
-        impulse.normalize();
-        impulse *= slower_kart->getKartProperties()->getCollisionImpulse();
-        float t = 
-            faster_kart->getKartProperties()->getCollisionImpulseTime();
-        if(t>0)
-            faster_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
-        else
-            faster_kart->getBody()->applyCentralImpulse(impulse);
-        faster_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        f_left *= vel_right == 0 ? 2.0f : (1.0f + vel_diff/fabsf(vel_right));
+        if(f_left > 2.0f)
+            f_left = 2.0f;
+    }
 
-        // Then the slower kart
-        dir = slower_kart->getVelocity();
-        if(slower_cp.getX()>0)
-            impulse = Vec3(-dir.getZ(), 0,  dir.getX());
-        else
-            impulse = Vec3( dir.getZ(), 0, -dir.getX());
+    // Increase the effect somewhat by squaring the factors
+    f_left  = f_left  * f_left;
+    f_right = f_right * f_right;
 
-        impulse.normalize();
-        impulse *= faster_kart->getKartProperties()->getCollisionImpulse();
-        t = faster_kart->getKartProperties()->getCollisionImpulseTime();
-        if(t>0)
-            slower_kart->getVehicle()->setTimedCentralImpulse(t, impulse);
-        else
-            slower_kart->getBody()->applyCentralImpulse(impulse);
-        slower_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+    // First push one kart to the left (if there is not already
+    // an impulse happening - one collision might cause more
+    // than one impulse otherwise)
+    if(right_kart->getVehicle()->getCentralImpulseTime()<=0)
+    {
+        const KartProperties *kp = left_kart->getKartProperties();
+        Vec3 impulse(-kp->getCollisionImpulse()*f_left, 0, 0);
+        impulse = right_kart->getTrans().getBasis() * impulse;
+        right_kart->getVehicle()
+                 ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
+                                          impulse);
+        right_kart ->getBody()->setAngularVelocity(btVector3(0,0,0));
+    }
+
+    // Then push the other kart to the right (if there is no
+    // impulse happening atm).
+    if(left_kart->getVehicle()->getCentralImpulseTime()<=0)
+    {
+        const KartProperties *kp = right_kart->getKartProperties();
+        Vec3 impulse = Vec3(kp->getCollisionImpulse()*f_right, 0, 0);
+        impulse = left_kart->getTrans().getBasis() * impulse;
+        left_kart->getVehicle()
+                  ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
+                                           impulse);
+        left_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 
 }   // KartKartCollision
@@ -470,7 +458,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(NULL, m);
+                kart->crashed(m);
             }
         }
         // 2) object a is a kart
@@ -485,7 +473,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(NULL, m);   // Kart hit track
+                kart->crashed(m);   // Kart hit track
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 // 2.1 projectile hits kart

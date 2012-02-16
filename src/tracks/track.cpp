@@ -190,6 +190,14 @@ void Track::cleanup()
     }
     m_all_cached_meshes.clear();
 
+    // Now free meshes that are not associated to any scene node.
+    for (unsigned int i=0; i<m_detached_cached_meshes.size(); i++)
+    {
+        irr_driver->dropAllTextures(m_detached_cached_meshes[i]);
+        irr_driver->removeMeshFromCache(m_detached_cached_meshes[i]);
+    }
+    m_detached_cached_meshes.clear();
+    
     QuadGraph::destroy();
 
     if(m_mini_map)      
@@ -459,6 +467,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
+        if (node == NULL)
+        {
+            fprintf(stderr, "[Track] WARNING: this track contains an empty LOD group : '%s'\n",
+                    ((LODNode*)node)->getGroupName().c_str());
+            return;
+        }
     }
     
     const core::vector3df &pos   = node->getPosition();
@@ -810,13 +824,20 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string challenge;
         n->get("challenge", &challenge);
         
-        lodLoader.check(n);
+        bool is_lod = lodLoader.check(n);
         
         if (tangent)
         {
             scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
             
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
+            
+            if (std::find(m_detached_cached_meshes.begin(),
+                          m_detached_cached_meshes.end(),
+                          original_mesh) == m_detached_cached_meshes.end())
+            {
+                m_detached_cached_meshes.push_back(original_mesh);
+            }
             
             // create a node out of this mesh just for bullet; delete it after, normal maps are special
             // and require tangent meshes
@@ -828,10 +849,12 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             convertTrackToBullet(scene_node);
             scene_node->remove();
-            
+            irr_driver->grabAllTextures(original_mesh);
+
             scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
             mesh->grab();
             irr_driver->grabAllTextures(mesh);
+
             m_all_cached_meshes.push_back(mesh);
             scene_node = irr_driver->addMesh(mesh);
             scene_node->setPosition(xyz);
@@ -846,7 +869,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (lodLoader.check(n))
+        else if (is_lod)
         {
             // nothing to do
         }

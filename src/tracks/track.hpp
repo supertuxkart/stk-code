@@ -136,6 +136,12 @@ private:
      *  that those meshes are being cached by irrlicht, and need to be freed. */
     std::vector<scene::IMesh*>      m_all_cached_meshes;
 
+    /**
+      * m_all_cached_meshes assumes meshes are attached to a scene node.
+      * This one assumes the mesh is NOT connected to any node.
+      */
+    std::vector<scene::IMesh*>      m_detached_cached_meshes;
+    
     /** A list of all textures loaded by the track, so that they can
      *  be removed from the cache at cleanup time. */
     std::vector<video::ITexture*>   m_all_cached_textures;

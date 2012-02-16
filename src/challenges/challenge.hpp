@@ -30,6 +30,7 @@
 #include <fstream>
 #include <irrString.h>
 
+#include "race/race_manager.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/translation.hpp"
 
@@ -46,26 +47,38 @@ class Challenge : public NoCopy
 private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
-          CH_SOLVED}         m_state;  // challenge was solved
-
+          CH_SOLVED}                   // challenge was solved
+    m_state[RaceManager::DIFFICULTY_COUNT];
+    
     ChallengeData* m_data;
     
 public:
-             Challenge(ChallengeData* data) : m_state(CH_INACTIVE)
-    { m_data = data; }
+             Challenge(ChallengeData* data)
+    {
+        m_data = data;
+        m_state[RaceManager::RD_EASY]   = CH_INACTIVE;
+        m_state[RaceManager::RD_MEDIUM] = CH_INACTIVE;
+        m_state[RaceManager::RD_HARD]   = CH_INACTIVE;
+    }
     virtual ~Challenge() {};
     void  load(const XMLNode* config);
     void  save(XMLWriter& writer);
 
     // ------------------------------------------------------------------------
-    bool  isSolved() const                       {return m_state==CH_SOLVED;  }
+    bool  isSolved(RaceManager::Difficulty d) const {return m_state[d]==CH_SOLVED;  }
     // ------------------------------------------------------------------------
-    bool  isActive() const                       {return m_state==CH_ACTIVE;  }
+    bool  isSolvedAtAnyDifficulty()           const {return m_state[0]==CH_SOLVED ||
+                                                            m_state[1]==CH_SOLVED ||
+                                                            m_state[2]==CH_SOLVED;  }
     // ------------------------------------------------------------------------
-    void  setSolved()                            {m_state = CH_SOLVED;        }
+    bool  isActive(RaceManager::Difficulty d) const {return m_state[d]==CH_ACTIVE;  }
     // ------------------------------------------------------------------------
-    void  setActive()                            {m_state = CH_ACTIVE;        }
+    void  setSolved(RaceManager::Difficulty d)      {m_state[d] = CH_SOLVED;        }
     // ------------------------------------------------------------------------
-    ChallengeData*  getData() { return m_data; }
+    void  setActive(RaceManager::Difficulty d)      {m_state[d] = CH_ACTIVE;        }
+    // ------------------------------------------------------------------------
+    
+    ChallengeData*        getData()       { return m_data; }
+    const ChallengeData*  getData() const { return m_data; }
 };
 #endif

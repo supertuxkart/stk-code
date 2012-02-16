@@ -483,7 +483,7 @@ public:
       * \note In GP, displays the GP result screen first
       * \note Deletes the world.
       */
-    void         exitRace();
+    void         exitRace(bool delete_world=true);
     
     /**
       * \brief Higher-level method to start a GP without having to care about the exact startup sequence

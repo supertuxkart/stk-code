@@ -63,6 +63,7 @@ void LODNode::render()
 void LODNode::OnRegisterSceneNode()
 {
     if (!isVisible()) return;
+    if (m_nodes.size() == 0) return;
     
     // TODO: optimize this, there is no need to check every frame
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();

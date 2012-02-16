@@ -89,6 +89,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_clear_back_buffer  = false;
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
+    m_self_destruct      = false;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
@@ -144,7 +145,6 @@ void World::init()
         Kart* newkart = createKart(kart_ident, i, local_player_id,  
                                    global_player_id);
         m_karts.push_back(newkart);
-        newkart->setWorldKartId(m_karts.size()-1);
         m_track->adjustForFog(newkart->getNode());
         
     }  // for i
@@ -190,7 +190,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, m_track, position, 
+    Kart *new_kart         = new Kart(kart_ident, index,m_track, position,
                                       (local_player_id == 0), init_pos,
                                       race_manager->getKartType(index));
     Controller *controller = NULL;
@@ -590,6 +590,12 @@ void World::updateWorld(float dt)
         m_schedule_unpause = false;
     }
     
+    if (m_self_destruct)
+    {
+        delete this;
+        return;
+    }
+    
     // Don't update world if a menu is shown or the race is over.
     if( m_phase == FINISH_PHASE         ||
         m_phase == IN_GAME_MENU_PHASE      )  
@@ -600,7 +606,6 @@ void World::updateWorld(float dt)
     {
         enterRaceOverState();
     }
-
 }   // updateWorld
 
 #define MEASURE_FPS 0
@@ -947,5 +952,14 @@ void World::unpause()
             pc->resetInputState();
     }
 }   // pause
+
+//-----------------------------------------------------------------------------
+/** Call when the world needs to be deleted but you can't do it immediately
+ * because you are e.g. within World::update()
+ */
+void World::delayedSelfDestruct()
+{
+    m_self_destruct = true;
+}
 
 /* EOF */

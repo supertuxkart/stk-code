@@ -28,7 +28,6 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/kart_control.hpp"
@@ -42,6 +41,7 @@
 class btKart;
 class btUprightConstraint;
 
+class Attachment;
 class Camera;
 class Item;
 class KartGFX;
@@ -114,9 +114,6 @@ private:
      *  determine startup boost. */
     bool         m_has_started;
 
-    /** For skidding smoke */
-    int          m_wheel_toggle;
-
     /**<Maximum engine rpm's for the current gear*/
     float        m_max_gear_rpm;
 
@@ -154,9 +151,6 @@ private:
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
     
-    /** Particle emitter used for terrain-specific effects (including but not limited too skidding). */
-    ParticleEmitter *m_terrain_particles;    
-
     ParticleEmitter *m_sky_particles_emitter;
     
     /** All particle effects. */
@@ -211,6 +205,7 @@ private:
     void          updateEngineSFX();
 
     float         getVisualSkidOffset() const;
+    void          crashed();
 
 protected:
     const KartProperties *m_kart_properties;
@@ -220,11 +215,10 @@ protected:
     KartModel*            m_kart_model;
     
 public:
-                   Kart(const std::string& ident, Track* track, int position,  bool is_first_kart,
+                   Kart(const std::string& ident, unsigned int world_kart_id,
+                       Track* track, int position,  bool is_first_kart,
                         const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
-    unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
-    void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData(RaceManager::KartType type, bool is_first_kart, Track* track,
                             bool animatedModel);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
@@ -248,7 +242,8 @@ public:
     void           handleZipper     (const Material *m=NULL, bool play_sound=false);
     void           setSquash        (float time, float slowdown);
 
-    void           crashed          (Kart *k, const Material *m=NULL);
+    void           crashed          (Kart *k, bool update_attachments);
+    void           crashed          (const Material *m);
     
     virtual void   update           (float dt);
     virtual void   finishedRace     (float time);
@@ -256,6 +251,9 @@ public:
     void           showZipperFire   ();
     bool           playCustomSFX    (unsigned int type);
     void           setController(Controller *controller);
+    // ------------------------------------------------------------------------
+    /** Returns the index of this kart in world. */
+    unsigned int   getWorldKartId() const         { return m_world_kart_id;   }
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
     KartModel*     getKartModel()                 { return m_kart_model;      }

@@ -2,6 +2,7 @@
 # Always edit 'CMakeLists.in.txt' and not 'CMakeLists.txt', the latter is automatically generated
 
 cmake_minimum_required(VERSION 2.8.1)
+include (CheckCXXSourceCompiles)
 
 project(SuperTuxKart)
 
@@ -118,8 +119,24 @@ else()
     
     if(HAVE_IRRLICHT)
 	    message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
-	    #include_directories(${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
 	    include_directories(${HAVE_IRRLICHT})
+        find_library(IRRLICHT_LIB /usr/lib /usr/local/lib ${IRRLICHT_DIR}/lib/Linux)
+        
+        set(CMAKE_REQUIRED_INCLUDES ${HAVE_IRRLICHT})
+        set(CMAKE_REQUIRED_LIBRARIES ${IRRLICHT_LIB})
+        CHECK_CXX_SOURCE_COMPILES("#include <IrrCompileConfig.h>
+                                  int main(int argc, char** argv) {
+                                  #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
+                                  // ok
+                                  #else
+                                  #error Your irrlicht is too old
+                                  #endif
+                                  }" IRRLICHT_RECENT_ENOUGH)
+        if(IRRLICHT_RECENT_ENOUGH)
+            # OK
+        else()
+            message(FATAL_ERROR "\n  --  This irrlicht is too old, please use irrlicht 1.8 (SVN)")
+        endif()
     else()
 	    message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
     endif()
@@ -325,5 +342,3 @@ add_custom_target(GenerateDesktopFile
                   COMMAND sed 's\#PREFIX\#${CMAKE_INSTALL_PREFIX}\#' ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart_desktop.template | sed 's\#VERSION\#${PROJECT_VERSION}\#' > ${CMAKE_CURRENT_SOURCE_DIR}/data/supertuxkart.desktop
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 ADD_DEPENDENCIES(supertuxkart GenerateDesktopFile)
-
-

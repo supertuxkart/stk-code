@@ -18,13 +18,47 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 
+using namespace GUIEngine;
+
+// ----------------------------------------------------------------------------
+
+core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* c)
+{
+    core::stringw label = _("Number of AI Karts : %i",
+                            c->getNumKarts(difficulty) - 1);
+    
+    if (c->getPosition(difficulty) != -1)
+    {
+        label.append(L"\n");
+        label.append( _("Required Rank : %i", c->getPosition(difficulty)) );
+    }
+    if (c->getTime(difficulty) > 0)
+    {
+        label.append(L"\n");
+        label.append( _("Required Time : %i",
+                        StringUtils::timeToString(c->getTime(difficulty)).c_str()) );
+    }
+    if (c->getEnergy(difficulty) > 0)
+    {
+        label.append(L"\n");
+        label.append( _("Required Nitro Points : %i", c->getEnergy(difficulty)) );
+    }
+    
+    return label;
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                                              const float percentHeight,
@@ -35,13 +69,60 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
     
-    // TODO: select the previously selected difficulty
+    switch (UserConfigParams::m_difficulty)
+    {
+        case 0:
+            getWidget("novice")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        case 1:
+            getWidget("intermediate")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        case 2:
+            getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+    }
+
+    const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenge_id);
+
+    if (c->isSolved(RaceManager::RD_EASY))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("novice");
+        btn->setImage(file_manager->getTextureFile("cup_bronze.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    
+    if (c->isSolved(RaceManager::RD_MEDIUM))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("intermediate");
+        btn->setImage(file_manager->getTextureFile("cup_silver.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    
+    if (c->isSolved(RaceManager::RD_HARD))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("expert");
+        btn->setImage(file_manager->getTextureFile("cup_gold.png").c_str(),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+
+    
+    LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
+    LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
+    LabelWidget* expert_label = getWidget<LabelWidget>("difficult_label");
+    
+    novice_label->setText( getLabel(RaceManager::RD_EASY,   c->getData()), false );
+    medium_label->setText( getLabel(RaceManager::RD_MEDIUM, c->getData()), false );
+    expert_label->setText( getLabel(RaceManager::RD_HARD,   c->getData()), false );
 }
+
+// ----------------------------------------------------------------------------
 
 SelectChallengeDialog::~SelectChallengeDialog()
 {
     World::getWorld()->scheduleUnpause();
 }
+
+// ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
@@ -94,14 +175,17 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         if (eventSource == "novice")
         {
             challenge->setRace(RaceManager::RD_EASY);
+            UserConfigParams::m_difficulty = 0;
         }
         else if (eventSource == "intermediate")
         {
             challenge->setRace(RaceManager::RD_MEDIUM);
+            UserConfigParams::m_difficulty = 1;
         }
         else if (eventSource == "expert")
         {
             challenge->setRace(RaceManager::RD_HARD);
+            UserConfigParams::m_difficulty = 2;
         }
         else
         {
@@ -118,4 +202,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
     
     return GUIEngine::EVENT_LET;
 }
+
+// ----------------------------------------------------------------------------
 

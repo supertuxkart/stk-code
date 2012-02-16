@@ -7,7 +7,7 @@
                y="0.001"
                z="-0.003"         />
     
-    <material  file="nitro-particle.png"  />
+    <material  file="skid-particle2.png"  />
     
     <!-- Amount of particles emitted per second. The minimum rate
          is used to show that the skidding bonus is now available,
