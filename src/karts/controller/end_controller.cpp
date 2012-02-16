@@ -135,6 +135,19 @@ void EndController::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Callback when a new lap is triggered. It is used to switch to the first
+ *  end camera (which is esp. useful in fixing up end cameras in reverse mode,
+ *  since otherwise the switch to the first end camera usually happens way too
+ *  late)
+ */
+void  EndController::newLap(int lap)
+{
+    // This will implicitely trigger setting the first end camera to be active.
+    if(m_kart->getCamera())
+        m_kart->getCamera()->setMode(Camera::CM_FINAL);
+}   // newLap
+
+//-----------------------------------------------------------------------------
 /** The end controller must forward 'fire' presses to the race gui.
  */
 void EndController::action(PlayerAction action, int value)

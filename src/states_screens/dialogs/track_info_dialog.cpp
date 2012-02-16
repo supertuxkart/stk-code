@@ -116,6 +116,21 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     }
 
     
+    // Reverse track
+    const bool reverse_available = track->reverseAvailable();
+    if (reverse_available)
+    {
+        m_checkbox = getWidget<CheckBoxWidget>("reverse");
+        m_checkbox->setState(race_manager->getReverseTrack());
+    }
+    else
+    {
+        getWidget<CheckBoxWidget>("reverse")->setVisible(false);
+        getWidget<LabelWidget>("reverse-text")->setVisible(false);
+        m_checkbox = NULL;
+        race_manager->setReverseTrack(false);
+    }
+    
     // ---- High Scores
     if (has_highscores)
     {
@@ -144,7 +159,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     
     getWidget<ButtonWidget>("start")->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
-}
+}   // TrackInfoDialog
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -158,7 +173,7 @@ TrackInfoDialog::~TrackInfoDialog()
         ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);
     }
     
-}
+}   // ~TrackInfoDialog
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -214,17 +229,23 @@ void TrackInfoDialog::updateHighScores()
         m_highscore_entries[n]->setText( line.c_str(), false );
         
     }    
-}
+}   // updateHighScores
 
 // ------------------------------------------------------------------------------------------------------
 
 void TrackInfoDialog::onEnterPressedInternal()
 {
-    ModalDialog::dismiss();
     
+    // Create a copy of member variables we still need, since they will
+    // not be accessible after dismiss:
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-    race_manager->startSingleRace(m_track_ident, num_laps);
-}
+    const bool reverse_track = m_checkbox == NULL ? false 
+                                                  : m_checkbox->getState();
+    race_manager->setReverseTrack(reverse_track);
+    std::string track_ident = m_track_ident;
+    ModalDialog::dismiss();
+    race_manager->startSingleRace(track_ident, num_laps);
+}   // onEnterPressedInternal
 
 // ------------------------------------------------------------------------------------------------------   
 
@@ -232,13 +253,12 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
 {
     if (eventSource == "start" )
     {
-        // Create a copy of member variables we still need, since they will
-        // not be accessible after dismiss:
-        const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-        std::string track_ident = m_track_ident;
-        ModalDialog::dismiss();
-        race_manager->startSingleRace(track_ident, num_laps);
+        onEnterPressedInternal();
         return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "reversecheckbox")
+    {
+        race_manager->setReverseTrack(m_checkbox->getState());
     }
     else if (eventSource == "lapcountspinner")
     {
@@ -250,6 +270,6 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
     }
     
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // ------------------------------------------------------------------------------------------------------

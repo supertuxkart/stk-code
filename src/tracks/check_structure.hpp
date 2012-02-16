@@ -73,9 +73,6 @@ protected:
     bool              m_active_at_reset;
 
 private:
-    /** Stores a pointer to the check manager. */
-    CheckManager      *m_check_manager;
-
     /** The type of this checkline. */
     CheckType         m_check_type;
 
@@ -100,8 +97,7 @@ private:
                       ChangeState change_state);
 
 public:
-                CheckStructure(CheckManager *check_manager, const XMLNode &node,
-                               unsigned int index);
+                CheckStructure(const XMLNode &node, unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     virtual void changeDebugColor(bool is_active) {}
@@ -112,13 +108,20 @@ public:
      *  \param indx     Index of the kart, can be used to store kart specific
      *                  additional data.
      */
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                             int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
 
+    // ------------------------------------------------------------------------
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }
-    
+    // ------------------------------------------------------------------------
+    /** Adds the index of a successor check structure which will get triggered
+     *  by this check structure. */
+    void addSuccessor(unsigned int i) {
+        m_check_structures_to_change_state.push_back(i);
+    }   // addSuccessor
 };   // CheckStructure
 
 #endif

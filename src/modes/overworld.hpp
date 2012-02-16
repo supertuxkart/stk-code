@@ -72,7 +72,7 @@ public:
     virtual void onFirePressed(Controller* who);
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
-    virtual bool computeChecklineRequirements() const { return false; }
+    virtual bool useChecklineRequirements() const { return false; }
     // ------------------------------------------------------------------------    
     void scheduleReturnToGarage() { m_return_to_garage = true; }
 };

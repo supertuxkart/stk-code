@@ -56,8 +56,6 @@ private:
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
-    /** The set of all quads. */
-    QuadSet                 *m_all_quads;
     /** For debug mode only: the node of the debug mesh. */
     scene::ISceneNode       *m_node;
     /** For debug only: the mesh of the debug mesh. */
@@ -76,16 +74,23 @@ private:
 
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
+    
+    /** Wether the graph should be reverted or not */
+    bool                     m_reverse;
 
     void setDefaultSuccessors();
-    void setChecklineRequirements(GraphNode* node, int latest_checkline);
+    void computeChecklineRequirements(GraphNode* node, int latest_checkline);
     
+    void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
+    void computeDistanceFromStart(unsigned int start_node, float distance);
     void createMesh(bool show_invisible=true, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
+    unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name, 
-                        const std::string graph_file_name);
+                        const std::string graph_file_name,
+                        const bool reverse);
         ~QuadGraph     ();
 public:
     static const int UNKNOWN_SECTOR;
@@ -116,7 +121,8 @@ public:
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
     void         setupPaths();
-    // ----------------------------------------------------------------------
+    void         computeChecklineRequirements();
+// ----------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have
      *  a quad graph), so we don't assert that an instance exist, and we
@@ -125,10 +131,13 @@ public:
     // ----------------------------------------------------------------------
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name, 
-                       const std::string graph_file_name)
+                       const std::string graph_file_name,
+                       const bool reverse)
     {
         assert(m_quad_graph==NULL);
-        m_quad_graph = new QuadGraph(quad_file_name, graph_file_name);
+        // assignment to m_quad_graph is done in the constructor, since
+        // functions called from the constructor need it to be defined.
+        new QuadGraph(quad_file_name, graph_file_name, reverse);
     }   // create
     // ----------------------------------------------------------------------
     /** Cleans up the quad graph. It is possible that this function is called
@@ -161,7 +170,7 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     const Quad&  getQuadOfNode(unsigned int j) const
-                 { return m_all_quads->getQuad(m_all_nodes[j]->getIndex()); }
+              { return QuadSet::get()->getQuad(m_all_nodes[j]->getIndex()); }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }
@@ -173,11 +182,8 @@ public:
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
     // ----------------------------------------------------------------------
-    
-    void         setChecklineRequirements()
-    {
-        setChecklineRequirements(m_all_nodes[0], -1);
-    }
+    /** Returns true if the graph is to be reversed. */
+    bool         isReverse() const {return m_reverse; }
 
 };   // QuadGraph
 

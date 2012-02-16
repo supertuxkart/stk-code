@@ -225,22 +225,7 @@ void RubberBall::getNextControlPoint()
     m_length_cp_2_3         = dist;
     const Quad &quad        = 
         QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node);
-    Vec3 aim                = quad.getCenter();
-    // If we are close enough for the ball to hop faster, adjust the position
-    // relative to the center of the track depending on where the target is:
-
-    //    if(m_fast_ping)
-    if(0)
-    {
-        LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-        float r = world->getTrackSector(m_target->getWorldKartId())
-                        .getRelativeDistanceToCenter();
-        aim -= m_st_early_target_factor * r 
-             * QuadGraph::get()->getNode(m_last_aimed_graph_node)
-                                .getCenterToRightVector();
-    }
-
-    m_control_points[3]     = aim;
+    m_control_points[3]     = quad.getCenter();
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------

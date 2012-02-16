@@ -28,14 +28,11 @@
 #include "tracks/track.hpp"
 
 /** Constructor for a checksphere.
- *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
  */
-AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager, 
-                                       const XMLNode &node, 
+AmbientLightSphere::AmbientLightSphere(const XMLNode &node, 
                                        unsigned int index) 
-                  : CheckSphere(check_manager, node, index)
+                  : CheckSphere(node, index)
 {
     m_ambient_color = video::SColor(255, 0, 255, 0);   // green
     m_inner_radius2 = 1;

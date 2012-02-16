@@ -131,3 +131,4 @@ void Quad::transform(const btTransform &t, Quad *result) const
                                       std::min(result->m_p[2].getY(), 
                                                result->m_p[3].getY())  );
 }   // transform
+

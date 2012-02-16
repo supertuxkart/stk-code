@@ -284,7 +284,7 @@ public:
     // ------------------------------------------------------------------------
     /** Whether to compute checkline requirements for each world on the
       * quadgraph. Override to change value. */
-    virtual bool computeChecklineRequirements() const { return false; }
+    virtual bool useChecklineRequirements() const { return false; }
     // ------------------------------------------------------------------------
     void delayedSelfDestruct();
     

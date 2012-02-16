@@ -55,6 +55,7 @@ RaceManager::RaceManager()
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_track_number       = 0;
     m_coin_target        = 0;
+    setReverseTrack(false);
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumLocalPlayers(0);
@@ -351,7 +352,7 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
         World::setWorld(new FollowTheLeaderRace());
     else if(m_minor_mode==MINOR_MODE_NORMAL_RACE || 
-            m_minor_mode==MINOR_MODE_TIME_TRIAL)    
+            m_minor_mode==MINOR_MODE_TIME_TRIAL)
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
@@ -617,7 +618,8 @@ void RaceManager::startGP(const GrandPrixData* gp)
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startSingleRace(const std::string trackIdent, const int num_laps)
+void RaceManager::startSingleRace(const std::string trackIdent, 
+                                  const int num_laps)
 {
     StateManager::get()->enterGameState();
     setTrack(trackIdent.c_str());

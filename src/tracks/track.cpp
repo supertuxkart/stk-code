@@ -86,11 +86,11 @@ Track::Track(const std::string &filename)
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
+    m_reverse_available     = true;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
     m_camera_far            = 1000.0f;
-    m_check_manager         = NULL;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -120,8 +120,7 @@ Track::~Track()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    if(m_check_manager)
-        m_check_manager->reset(*this);
+    CheckManager::get()->reset(*this);
     item_manager->reset();
     m_track_object_manager->reset();
 }   // reset
@@ -151,11 +150,7 @@ void Track::cleanup()
     
     m_all_emitters.clearAndDeleteAll();
     
-    if(m_check_manager)
-    {
-        delete m_check_manager;
-        m_check_manager=NULL;
-    }
+    CheckManager::destroy();
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
@@ -204,7 +199,7 @@ void Track::cleanup()
     m_detached_cached_meshes.clear();
     
     QuadGraph::destroy();
-    if(m_check_manager) delete m_check_manager;
+
     if(m_mini_map)      
     {
         assert(m_mini_map->getReferenceCount()==1);
@@ -306,6 +301,7 @@ void Track::loadTrackInfo()
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
+    root->get("reverse",               &m_reverse_available);
     
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -392,10 +388,11 @@ void Track::startMusic() const
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id)
+void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 {
     QuadGraph::create(m_root+"/"+m_all_modes[mode_id].m_quad_name,
-                      m_root+"/"+m_all_modes[mode_id].m_graph_name);
+                      m_root+"/"+m_all_modes[mode_id].m_graph_name,
+                      reverse);
 
     QuadGraph::get()->setupPaths();
 #ifdef DEBUG
@@ -1070,8 +1067,7 @@ void Track::update(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    if(m_check_manager)
-        m_check_manager->update(dt);
+    CheckManager::get()->update(dt);
     item_manager->update(dt);
 
 }   // update
@@ -1164,8 +1160,14 @@ void Track::createWater(const XMLNode &node)
  *         scene, quad, and graph file to load.
  */
 
-void Track::loadTrackModel(World* parent, unsigned int mode_id)
+void Track::loadTrackModel(World* parent, bool reverse_track, 
+			   unsigned int mode_id               )
 {
+    if(!m_reverse_available) 
+    {
+        reverse_track = false;
+    }
+    CheckManager::create();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
@@ -1229,7 +1231,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena) loadQuadGraph(mode_id);
+    if (!m_is_arena) loadQuadGraph(mode_id, reverse_track);
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -1330,7 +1332,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if(name=="checks")
         {
-            m_check_manager = new CheckManager(*node, this);
+            CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {
@@ -1564,7 +1566,8 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if(!m_check_manager && race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(CheckManager::get()->getCheckStructureCount()==0  &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
         printf("WARNING: no check lines found in track '%s'.\n", 
                m_ident.c_str());
@@ -1577,9 +1580,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
-    if (World::getWorld()->computeChecklineRequirements())
+    if (World::getWorld()->useChecklineRequirements())
     {
-        QuadGraph::get()->setChecklineRequirements();
+        QuadGraph::get()->computeChecklineRequirements();
     }
 }   // loadTrackModel
 
@@ -1858,8 +1861,8 @@ std::vector< std::vector<float> > Track::buildHeightMap()
 }
 
 // ----------------------------------------------------------------------------
-
-core::vector3df Track::getSunRotation()
+/** Returns the rotation of the sun. */
+const core::vector3df& Track::getSunRotation()
 {
     return m_sun->getRotation();
 }

@@ -30,9 +30,8 @@
  *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
  */
-CheckSphere::CheckSphere(CheckManager *check_manager, const XMLNode &node,
-                         unsigned int index) 
-           : CheckStructure(check_manager, node, index)
+CheckSphere::CheckSphere(const XMLNode &node, unsigned int index) 
+           : CheckStructure(node, index)
 {
     m_radius2     = 1;
 

@@ -216,10 +216,15 @@ void LinearWorld::newLap(unsigned int kart_index)
     KartInfo &kart_info = m_kart_info[kart_index];
     Kart    *kart       = m_karts[kart_index];
 
-    // Don't do anything if a kart that has already finished the race
-    // crosses the start line again. This avoids 'fastest lap' messages
-    // if the end controller does a fastest lap.
-    if(kart->hasFinishedRace()) return;
+    // Only update the kart controller if a kart that has already finished 
+    // the race crosses the start line again. This avoids 'fastest lap' 
+    // messages if the end controller does a fastest lap, but especially
+    // allows the end controller to switch end cameras
+    if(kart->hasFinishedRace()) 
+    {
+        kart->getController()->newLap(kart_info.m_race_lap);
+        return;
+    }
 
     const int lap_count = race_manager->getNumLaps();
     
@@ -496,12 +501,10 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     // In case that a kart is rescued behind start line, or ...
     if(distance_covered<0) distance_covered =1.0f;
 
-    const float full_distance = race_manager->getNumLaps()
-                              * m_track->getTrackLength();
-    const float average_speed = distance_covered/getTime();
-
-    // Finish time is the time needed for the whole race with
-    // the average speed computed above.
+    float full_distance = race_manager->getNumLaps()
+                        * m_track->getTrackLength();
+    if(full_distance == 0)
+        full_distance = 1;  // For 0 lap races avoid warning below
 #ifdef DEBUG
     if(full_distance < distance_covered)
     {
@@ -510,9 +513,17 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
         printf("%f < %f\n", full_distance, distance_covered);
     }
 #endif
+    // Avoid potential problems (floating point issues, coding bug?) if a 
+    // kart has driven more than the full distance, but not finished:
+    // Return the current time plus initial position to spread arrival
+    // times a bit. This code should generally not be used at all, it's
+    // just here to avoid invalid finishing times.
     if(full_distance < distance_covered)
         return getTime() + kart->getInitialPosition();
     
+    // Finish time is the time needed for the whole race with
+    // the computed average speed computed.
+    const float average_speed = distance_covered/getTime();
     return getTime() + (full_distance - distance_covered)  / average_speed;
 
 }   // estimateFinishTimeForKart

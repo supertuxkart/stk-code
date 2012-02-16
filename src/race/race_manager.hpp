@@ -250,6 +250,9 @@ private:
     /** The number of laps for each track of a GP (only one element
      *  is used if only a single track is used. */
     std::vector<int>                 m_num_laps;
+    
+    /** Whether a track should be reversed */
+    std::vector<bool>                m_reverse_track;
 
     /** The points given to a kart on a given position (index is
      *  0 based, so using race-position - 1. */
@@ -315,6 +318,10 @@ public:
     
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
+    
+    void         setReverseTrack(bool r_t)      { m_reverse_track.clear();
+                                                  m_reverse_track.push_back(r_t);   }
+                                                  
     void         setMajorMode(MajorRaceModeType mode)
                                                 { m_major_mode = mode;              }
     void         setMinorMode(MinorRaceModeType mode)
@@ -358,6 +365,9 @@ public:
             return 9999;
         return m_num_laps[m_track_number];
     }   // getNumLaps
+    // ------------------------------------------------------------------------    
+    /** \return whether the track should be reversed */
+    bool getReverseTrack() const { return m_reverse_track[m_track_number]; }
     
     Difficulty   getDifficulty()          const { return m_difficulty;              }
     const std::string& getTrackName()     const { return m_tracks[m_track_number];  }
@@ -481,9 +491,11 @@ public:
     void         startGP(const GrandPrixData* gp);
 
     /**
-      * \brief Higher-level method to start a GP without having to care about the exact startup sequence
+      * \brief Higher-level method to start a GP without having to care about 
+      *  the exact startup sequence.
       * \param trackIdent Internal name of the track to race on
-      * \param num_laps   Number of laps to race, or -1 if number of laps is not relevant in current mode
+      * \param num_laps   Number of laps to race, or -1 if number of laps is 
+      *        not relevant in current mode
       */
     void         startSingleRace(const std::string trackIdent, const int num_laps);
 

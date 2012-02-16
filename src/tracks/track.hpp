@@ -185,6 +185,9 @@ private:
       * in the track seelction screen
       */
     bool                     m_internal;
+    
+    /** Whether this track should be available in reverse version */
+    bool                     m_reverse_available;
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
@@ -282,13 +285,10 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
-    /** Checkline manager. */
-    CheckManager             *m_check_manager;
-
     void loadTrackInfo();
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                      bool drop);
-    void loadQuadGraph(unsigned int mode_id);
+    void loadQuadGraph(unsigned int mode_id, const bool reverse);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void createWater(const XMLNode &node);
@@ -299,6 +299,8 @@ private:
     void handleSky(const XMLNode &root, const std::string &filename);
 
 public:
+
+    bool reverseAvailable() { return m_reverse_available; }
 
     static const float NOHIT;
 
@@ -313,7 +315,7 @@ public:
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
     void               adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node);
-    
+    const core::vector3df& getSunRotation();
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,
                                        unsigned int k);
@@ -327,7 +329,9 @@ public:
     // ------------------------------------------------------------------------
     bool               isArena           () const { return m_is_arena; }
     // ------------------------------------------------------------------------
-    void               loadTrackModel  (World* parent, unsigned int mode_id=0);
+    void               loadTrackModel  (World* parent, 
+                                        bool reverse_track = false,
+                                        unsigned int mode_id=0);
     // ------------------------------------------------------------------------
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);     }
@@ -429,17 +433,13 @@ public:
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
     bool isFogEnabled() const { return m_use_fog; }
-    
-    CheckManager* getCheckManager() { return m_check_manager; }
-
+    // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
-     * in the track seelction screen
-     */
+     * in the track seelction screen. */
     bool isInternal() const { return m_internal; }
-    
-    core::vector3df getSunRotation();
-    
-    TrackObjectManager* getTrackObjectManager() { return m_track_object_manager; }
+        
+    // ------------------------------------------------------------------------
+    TrackObjectManager* getTrackObjectManager() {return m_track_object_manager;}
     
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const

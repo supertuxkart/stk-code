@@ -19,33 +19,57 @@
 #ifndef HEADER_CHECK_MANAGER_HPP
 #define HEADER_CHECK_MANAGER_HPP
 
-#include <vector>
-#include <string>
+#include "utils/no_copy.hpp"
 
-class XMLNode;
+#include <assert.h>
+#include <string>
+#include <vector>
+
 class CheckStructure;
 class Track;
+class XMLNode;
+class Vec3;
 
 /**
   * \brief Controls all checks structures of a track.
   * \ingroup tracks
   */
-class CheckManager
+class CheckManager : public NoCopy
 {
 private:
     std::vector<CheckStructure*> m_all_checks;
+    static CheckManager         *m_check_manager;
+           /** Private constructor, to make sure it is only called via
+            *  the static create function. */
+           CheckManager()       {m_all_checks.clear();};
+          ~CheckManager();
 public:
-         CheckManager(const XMLNode &node, Track *track);
-        ~CheckManager();
-    void update(float dt);
-    void reset(const Track &track);
-    
-    int getCheckStructureCount() const { return m_all_checks.size(); }
-    
-    /** Returns the nth. check structure. */
-    CheckStructure *getCheckStructure(unsigned int n) 
+    void   load(const XMLNode &node);
+    void   update(float dt);
+    void   reset(const Track &track);
+    unsigned int getLapLineIndex() const;
+    int    getChecklineTriggering(const Vec3 &from, const Vec3 &to) const;
+    // ------------------------------------------------------------------------
+    /** Creates an instance of the check manager. */
+    static void create()
     {
-        if (n >= m_all_checks.size()) return NULL;
+        assert(!m_check_manager);
+        m_check_manager = new CheckManager();
+    }   // create
+    // ------------------------------------------------------------------------
+    /** Returns the instance of the check manager. */
+    static CheckManager* get() { return m_check_manager; }
+    // ------------------------------------------------------------------------
+    /** Destroys the check manager. */
+    static void destroy() { delete m_check_manager; m_check_manager = NULL; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of check structures defined. */
+    unsigned int getCheckStructureCount() const { return m_all_checks.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns the nth. check structure. */
+    CheckStructure *getCheckStructure(unsigned int n) const
+    {
+        assert(n < m_all_checks.size());
         return m_all_checks[n];
     }
 };   // CheckManager

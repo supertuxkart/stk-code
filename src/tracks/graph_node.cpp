@@ -25,45 +25,41 @@
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 
-
-// A static variable that gives a single graph node easy access to 
-// all quads and avoids unnecessary parameters in many calls.
-QuadSet *GraphNode::m_all_quads=NULL;
-
-// This static variable gives a node access to the graph, and therefore
-// to the quad to which a graph node index belongs.
-QuadGraph *GraphNode::m_all_nodes=NULL;
-
 // ----------------------------------------------------------------------------
 /** Constructor. Saves the quad index which belongs to this graph node.
- *  \param index Index of the quad to use for this node (in m_all_quads).
+ *  \param index Index of the quad to use for this node (in QuadSet).
  */
 GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
 { 
-    assert(quad_index<m_all_quads->getNumberOfQuads());
+    assert(quad_index<QuadSet::get()->getNumberOfQuads());
     m_quad_index          = quad_index;
     m_node_index          = node_index;
     m_predecessor         = -1;
-    m_distance_from_start = 0;
+    m_distance_from_start = -1.0f;
 
-    const Quad &quad      = m_all_quads->getQuad(m_quad_index);
-    // FIXME: the following values should depend on the actual orientation 
+    const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
+    // The following values should depend on the actual orientation 
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
-    // and 2,3 are the upper end.
+    // and 2,3 are the upper end (or the reverse if reverse mode is selected).
     // The width is the average width at the beginning and at the end.
     m_width = (  (quad[1]-quad[0]).length() 
                + (quad[3]-quad[2]).length() ) * 0.5f;
-    m_lower_center = (quad[0]+quad[1]) * 0.5f;
-    m_upper_center = (quad[2]+quad[3]) * 0.5f;
+    if(QuadGraph::get()->isReverse())
+    {
+        m_lower_center = (quad[2]+quad[3]) * 0.5f;
+        m_upper_center = (quad[0]+quad[1]) * 0.5f;
+    }
+    else
+    {
+        m_lower_center = (quad[0]+quad[1]) * 0.5f;
+        m_upper_center = (quad[2]+quad[3]) * 0.5f;
+    }
     m_line     = core::line2df(m_lower_center.getX(), m_lower_center.getZ(),
                                m_upper_center.getX(), m_upper_center.getZ() );
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(), 
                                         m_lower_center.getZ() );
 
-    // The vector from the center of the quad to the middle of the right
-    // side of the quad
-    m_center_to_right = (quad[1]+quad[2])*0.5f - quad.getCenter();
 }   // GraphNode
 
 // ----------------------------------------------------------------------------
@@ -75,50 +71,22 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
 void GraphNode::addSuccessor(unsigned int to)
 {
     m_successor_node.push_back(to);
-    // m_quad_index is the quad index, so we use m_all_quads
-    const Quad &this_quad = m_all_quads->getQuad(m_quad_index);
-    // to is the graph node, so we have to use m_all_nodes to get the right quad
-    GraphNode &gn = m_all_nodes->getNode(to);
-    const Quad &next_quad = m_all_nodes->getQuadOfNode(to);
+    // m_quad_index is the quad index
+    const Quad &this_quad = QuadSet::get()->getQuad(m_quad_index);
+    // to is the graph node
+    GraphNode &gn = QuadGraph::get()->getNode(to);
+    const Quad &next_quad = QuadGraph::get()->getQuadOfNode(to);
 
     // Keep the first predecessor, which is usually the most 'natural' one.
     if(gn.m_predecessor==-1)
         gn.m_predecessor = m_node_index;
-    core::vector2df d2    = m_lower_center_2d
-                          - m_all_nodes->getNode(to).m_lower_center_2d;
 
-    Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
-    m_distance_to_next.push_back(d2.getLength());
-    
-    float theta = atan2(diff.getX(), diff.getZ());
-    m_angle_to_next.push_back(theta);
+    Vec3 d = m_lower_center - QuadGraph::get()->getNode(to).m_lower_center;
+    m_distance_to_next.push_back(d.length());
 
-    // The length of this quad is the average of the left and right side
-    float distance_to_next = (   this_quad[2].distance(this_quad[1])
-                               + this_quad[3].distance(this_quad[0]) ) *0.5f;
-    // The distance from start for the successor node 
-    if(to!=0)
-    {
-        float distance_for_next = m_distance_from_start+distance_to_next;
-        // If the successor node does not have a distance from start defined,
-        // update its distance. Otherwise if the node already has a distance,
-        // it is potentially necessary to update its distance from start:
-        // without this the length of the track (as taken by the distance
-        // from start of the last node) could be smaller than some of the 
-        // paths. This can result in incorrect results for the arrival time
-        // estimation of the AI karts. See trac #354 for details.
-        if(m_all_nodes->getNode(to).m_distance_from_start==0)
-        {
-            m_all_nodes->getNode(to).m_distance_from_start = distance_for_next;
-        }
-        else if(m_all_nodes->getNode(to).m_distance_from_start
-                   <  distance_for_next)
-        {
-            float delta = distance_for_next
-                        - m_all_nodes->getNode(to).getDistanceFromStart();
-            m_all_nodes->updateDistancesForAllSuccessors(to, delta);
-        }
-    }
+    Vec3 diff = next_quad.getCenter() - this_quad.getCenter();
+    m_angle_to_next.push_back(atan2(diff.getX(), diff.getZ()));
+
 }   // addSuccessor
 
 // ----------------------------------------------------------------------------
@@ -203,7 +171,8 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
         result->setX( (closest-xyz2d).getLength());   // to the right
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
-    result->setZ( m_distance_from_start + (closest-m_lower_center_2d).getLength());
+    result->setZ( m_distance_from_start + 
+                  (closest-m_lower_center_2d).getLength());
 }   // getDistances
 
 // ----------------------------------------------------------------------------

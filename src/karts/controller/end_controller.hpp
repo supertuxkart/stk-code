@@ -86,6 +86,7 @@ public:
      *  to the right player. */
     virtual bool isPlayerController () const {return m_player!=NULL;}
     virtual void  action             (PlayerAction action, int value);
+    virtual void  newLap             (int lap);
 
 };   // EndKart
 

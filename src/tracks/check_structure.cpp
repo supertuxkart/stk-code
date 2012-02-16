@@ -28,11 +28,16 @@
 #include "tracks/check_manager.hpp"
 
 
-CheckStructure::CheckStructure(CheckManager *check_manager, 
-                               const XMLNode &node, unsigned int index)
+CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
 {
     m_index              = index;
-    m_check_manager      = check_manager;
+    m_check_type         = CT_NEW_LAP;
+
+    // This structure is actually filled by the check manager (necessary
+    // in order to support track reversing).
+    m_check_structures_to_change_state.clear();
+    m_same_group.clear();
+
     std::string kind;
     node.get("kind", &kind);
     if(kind=="lap")
@@ -47,14 +52,7 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
     {
         printf("Unknown check structure '%s' - ignored.\n", kind.c_str());
     }
-    m_check_structures_to_change_state.clear();
-    node.get("other-ids", &m_check_structures_to_change_state);
-    // Backwards compatibility to tracks exported with older versions of
-    // the track exporter
-    if(m_check_structures_to_change_state.size()==0)
-        node.get("other-id", &m_check_structures_to_change_state);
 
-    m_same_group.clear();
     node.get("same-group", &m_same_group);
     // Make sure that the index of this check structure is included in
     // the same_group list. While this should be guaranteed by the
@@ -115,7 +113,7 @@ void CheckStructure::update(float dt)
 // ----------------------------------------------------------------------------
 /** Changes the status (active/inactive) of all check structures contained
  *  in the index list indices.
- *  \param indices List of index of check structures in check_manager that
+ *  \param indices List of index of check structures in the CheckManager that
  *                 are to be changed.
  *  \param int kart_index For which the status should be changed.
  *  \param change_state How to change the state (active, deactivate, toggle).
@@ -131,7 +129,7 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
     for(unsigned int i=0; i<indices.size(); i++)
     {
         CheckStructure *cs = 
-            m_check_manager->getCheckStructure(indices[i]);
+            CheckManager::get()->getCheckStructure(indices[i]);
         if (cs == NULL) continue;
         
         switch(change_state)
@@ -177,9 +175,9 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
     
     /*
     printf("--------\n");
-    for (int n=0; n<m_check_manager->getCheckStructureCount(); n++)
+    for (int n=0; n<CheckManager::get()->getCheckStructureCount(); n++)
     {
-        CheckStructure *cs = m_check_manager->getCheckStructure(n);
+        CheckStructure *cs = CheckManager::get()->getCheckStructure(n);
         if (dynamic_cast<CheckLap*>(cs) != NULL)
             printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index]);
         else

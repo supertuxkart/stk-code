@@ -43,16 +43,17 @@ QuadGraph *QuadGraph::m_quad_graph = NULL;
  *  \param graph_file_name Name of the file describing the actual graph
  */
 QuadGraph::QuadGraph(const std::string &quad_file_name, 
-                     const std::string graph_file_name)
+                     const std::string graph_file_name,
+                     const bool reverse) : m_reverse(reverse)
 {
     m_node                 = NULL;
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_all_quads            = new QuadSet(quad_file_name);
+    QuadSet::create();
+    QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
-    GraphNode::m_all_quads = m_all_quads;
-    GraphNode::m_all_nodes = this;
+    m_quad_graph           = this;
     load(graph_file_name);
 }   // QuadGraph
 
@@ -60,13 +61,22 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
 /** Destructor, removes all nodes of the graph. */
 QuadGraph::~QuadGraph()
 {
-    delete m_all_quads;
+    QuadSet::destroy();
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         delete m_all_nodes[i];
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
 }   // ~QuadGraph
+
+// -----------------------------------------------------------------------------
+
+void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
+    if(m_reverse)
+        m_all_nodes[to]->addSuccessor(from);
+    else
+        m_all_nodes[from]->addSuccessor(to);
+}   // addSuccessor
 
 // -----------------------------------------------------------------------------
 /** Loads a quad graph from a file.
@@ -81,7 +91,7 @@ void QuadGraph::load(const std::string &filename)
         // No graph file exist, assume a default loop X -> X+1
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
-        for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+        for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
             m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
@@ -137,7 +147,8 @@ void QuadGraph::load(const std::string &filename)
             for(unsigned int i=from; i<=to; i++)
             {
                 assert(i!=to ? i+1 : from <m_all_nodes.size());
-                m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
+                addSuccessor(i,(i!=to ? i+1 : from));
+                //~ m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
             }
         }
         else if(xml_node->getName()=="edge-line")
@@ -148,7 +159,8 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to", &to);
             for(unsigned int i=from; i<to; i++)
             {
-                m_all_nodes[i]->addSuccessor(i+1);
+                addSuccessor(i,i+1);
+                //~ m_all_nodes[i]->addSuccessor(i+1);
             }
         }
         else if(xml_node->getName()=="edge")
@@ -158,7 +170,8 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("from", &from);
             xml_node->get("to", &to);
             assert(to<m_all_nodes.size());
-            m_all_nodes[from]->addSuccessor(to);
+            addSuccessor(from,to);
+            //~ m_all_nodes[from]->addSuccessor(to);
         }   // edge
         else
         {
@@ -169,70 +182,62 @@ void QuadGraph::load(const std::string &filename)
     }
     delete xml;
 
-    // Define the track length
+    setDefaultSuccessors();    
+    computeDistanceFromStart(getStartNode(), 0.0f);
+
+    // Define the track length as the maximum at the end of a quad
+    // (i.e. distance_from_start + length till successor 0).
+    m_lap_length = -1;
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        if(m_all_nodes[i]->getSuccessor(0)==0)
-        {
-            m_lap_length = m_all_nodes[i]->getDistanceFromStart()
+        float l = m_all_nodes[i]->getDistanceFromStart()
                 + m_all_nodes[i]->getDistanceToSuccessor(0);
-            break;
-        }
+        if(l > m_lap_length)
+            m_lap_length = l;
     }
-    setDefaultSuccessors();    
 }   // load
 
 // ----------------------------------------------------------------------------
-
-/**
-  * Finds which checklines must be visited before driving on this quad
-  * (useful for rescue)
-  */
-void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
+/** Returns the index of the first graph node (i.e. the graph node which
+ *  will trigger a new lap when a kart first enters it). This is always 
+ *  0 for normal direction (this is guaranteed by the track exporter),
+ *  but in reverse mode (where node 0 is actually the end of the track)
+ *  this is 0's successor.
+ */
+unsigned int QuadGraph::getStartNode() const
 {
-    Track* t = World::getWorld()->getTrack();
-    CheckManager* cm = t->getCheckManager();
-    assert(cm != NULL);
-    
-    // Find lapline
-    if (latest_checkline == -1)
-    {
-        for (int i=0; i<cm->getCheckStructureCount(); i++)
-        {
-            CheckStructure* c = cm->getCheckStructure(i);
-            
-            if (dynamic_cast<CheckLap*>(c) != NULL)
-            {
-                latest_checkline = i;
-                break;
-            }
-        }
-    }
-    
+    return m_reverse ? m_all_nodes[0]->getSuccessor(0) 
+                     : 0;
+}   // getStartNode
+
+// ----------------------------------------------------------------------------
+void QuadGraph::computeChecklineRequirements()
+{
+    computeChecklineRequirements(m_all_nodes[0], 
+                                 CheckManager::get()->getLapLineIndex());
+}   // computeChecklineRequirements
+
+// ----------------------------------------------------------------------------
+/** Finds which checklines must be visited before driving on this quad
+ *  (useful for rescue)
+ */
+void QuadGraph::computeChecklineRequirements(GraphNode* node, 
+                                             int latest_checkline)
+{        
     for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
     {
         const int succ_id = node->getSuccessor(n);
         
         // warp-around
         if (succ_id == 0) break;
-        
-        int new_latest_checkline = latest_checkline;
-        
-        GraphNode* succ = m_all_nodes[succ_id];
-        for (int i=0; i<cm->getCheckStructureCount(); i++)
-        {
-            CheckStructure* c = cm->getCheckStructure(i);
 
-            // skip lapline
-            if (dynamic_cast<CheckLap*>(c) != NULL) continue;
-            
-            if (c->isTriggered(node->getCenter(), succ->getCenter(), 0 /* kart id */))
-            {
-                new_latest_checkline = i;
-                break;
-            }
-        }
-        
+        GraphNode* succ = m_all_nodes[succ_id];        
+        int new_latest_checkline = 
+            CheckManager::get()->getChecklineTriggering(node->getCenter(), 
+                                                        succ->getCenter() );
+        if(new_latest_checkline==-1)
+            new_latest_checkline = latest_checkline;
+
         /*
         printf("Quad %i : checkline %i\n", succ_id, new_latest_checkline);
 
@@ -246,9 +251,9 @@ void QuadGraph::setChecklineRequirements(GraphNode* node, int latest_checkline)
         if (new_latest_checkline != -1)
             succ->setChecklineRequirements(new_latest_checkline);
         
-        setChecklineRequirements(succ, new_latest_checkline);
+        computeChecklineRequirements(succ, new_latest_checkline);
     }
-}
+}   // computeChecklineRequirements
 
 // ----------------------------------------------------------------------------
 /** This function defines the "path-to-nodes" for each graph node that has 
@@ -280,7 +285,8 @@ void QuadGraph::setDefaultSuccessors()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         if(m_all_nodes[i]->getNumberOfSuccessors()==0) {
-            m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
+            addSuccessor(i,i+1>=m_all_nodes.size() ? 0 : i+1);
+            //~ m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors
@@ -313,8 +319,9 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                          float sidewards_distance,
                                          float upwards_distance) const
 {
-    // Node 0 is always the node on which the start line is.
-    int current_node          = getNode(0).getPredecessor();
+    // We start just before the start node (which will trigger lap
+    // counting when reached).
+    int current_node = m_all_nodes[getStartNode()]->getPredecessor();
     
     float distance_from_start = 0.1f+forwards_distance;
 
@@ -432,7 +439,7 @@ void QuadGraph::createMesh(bool show_invisible,
         ind[6*i+4] = 4*i+2;
         ind[6*i+5] = 4*i+3;
         i++;
-    }   // for i=1; i<m_all_quads
+    }   // for i=1; i<QuadSet::get()
     
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
 
@@ -446,7 +453,7 @@ void QuadGraph::createMesh(bool show_invisible,
         // Now scale the length (distance between vertix 0 and 3
         // and between 1 and 2) to be 'length':
         Vec3 bb_min, bb_max;
-        m_all_quads->getBoundingBox(&bb_min, &bb_max);
+        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
         // Length of the lap line about 3% of the 'height'
         // of the track.
         const float length=(bb_max.getZ()-bb_min.getZ())*0.03f;
@@ -559,7 +566,57 @@ void QuadGraph::getSuccessors(int node_number,
 }   // getSuccessors
 
 // ----------------------------------------------------------------------------
-/** Increases 
+/** Recursively determines the distance the beginning (lower end) of the quads
+ *  have from the start of the track.
+ *  \param node The node index for which to set the distance from start.
+ *  \param new_distance The new distance for the specified graph node.
+ */
+void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
+{
+    GraphNode *gn = m_all_nodes[node];
+    float current_distance = gn->getDistanceFromStart();
+
+    // If this node already has a distance defined, check if the new distance
+    // is longer, and if so adjust all following nodes. Without this the 
+    // length of the track (as taken by the distance from start of the last 
+    // node) could be smaller than some of the paths. This can result in 
+    // incorrect results for the arrival time estimation of the AI karts. 
+    // See trac #354 for details.
+    // Then there is no need to test/adjust any more nodes.
+    if(current_distance>=0)
+    {
+        if(current_distance<new_distance)
+        {
+            float delta = new_distance - current_distance;
+            updateDistancesForAllSuccessors(gn->getIndex(), delta);
+        }
+        return;
+    }
+
+    // Otherwise this node has no distance defined yet. Set the new 
+    // distance, and recursively update all following nodes.
+    gn->setDistanceFromStart(new_distance);
+
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
+    {
+        GraphNode *gn_next = m_all_nodes[gn->getSuccessor(i)];
+        // The start node (only node with distance 0) is reached again,
+        // recursion can stop now
+        if(gn_next->getDistanceFromStart()==0)
+            continue;
+
+        computeDistanceFromStart(gn_next->getIndex(), 
+                                 new_distance + gn->getDistanceToSuccessor(i));
+    }   // for i
+}   // computeDistanceFromStart
+
+// ----------------------------------------------------------------------------
+/** Increases the distance from start for all nodes that are directly or
+ *  indirectly a successor of the given node. This code is used when two
+ *  branches merge together, but since the latest 'fork' indicates a longer
+ *  distance from start.
+ *  \param indx Index of the node for which to increase the distance.
+ *  \param delta Amount by which to increase the distance.
  */
 void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
 {
@@ -568,11 +625,9 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
     for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
     {
         GraphNode &g_next = getNode(g.getSuccessor(i));
-        // If we reach the beginning of the graph (usually node with index 0,
-        // but just in case also test for nodes with distance 0), all nodes
-        // are updated, so no need to recurse any further.
-        if(g_next.getIndex()==0 ||
-            g_next.getDistanceFromStart()==0)
+        // Stop when we reach the start node, i.e. the only node with a 
+        // distance of 0
+        if(g_next.getDistanceFromStart()==0)
             continue;
 
         // Only increase the distance from start of a successor node, if 
@@ -778,7 +833,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     // ---------------
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     Vec3 bb_min, bb_max;
-    m_all_quads->getBoundingBox(&bb_min, &bb_max);
+    QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
 
     float dx = bb_max.getX()-bb_min.getX();
