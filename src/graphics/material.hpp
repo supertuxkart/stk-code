@@ -78,6 +78,7 @@ private:
         NORMAL_MAP,
         SPLATTING,
         WATER_SHADER,
+        SPHERE_MAP,
         SHADER_COUNT
     };
     
@@ -147,6 +148,7 @@ private:
     
     bool             m_lighting;
     bool             m_sphere_map;
+    bool             m_smooth_reflection_shader;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
     bool             m_alpha_to_coverage;

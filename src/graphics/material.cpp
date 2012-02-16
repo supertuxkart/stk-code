@@ -70,6 +70,7 @@ public:
     }
 };
 
+
 //-----------------------------------------------------------------------------
 
 class WaterShaderProvider : public video::IShaderConstantSetCallBack
@@ -187,6 +188,37 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#endif
+
+class SphereMapProvider: public video::IShaderConstantSetCallBack
+{
+    core::vector3df m_light_direction;
+    
+public:
+    LEAK_CHECK()
+    
+    SphereMapProvider()
+    {
+        m_light_direction = core::vector3df(-0.6f, -0.5f, -0.63f);
+        //m_light_direction = core::vector3df(-0.315f, 0.91f, -0.3f);
+    }
+    
+    virtual void OnSetConstants(
+                                irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        // Irrlicht knows this is actually a GLint and makes the conversion
+        int texture = 0;
+        services->setPixelShaderConstant("texture", (float*)&texture, 1);
+        
+        services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
+    }
+};
+
+//-----------------------------------------------------------------------------
 #if 0
 #pragma mark -
 #endif
@@ -290,6 +322,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
+    node->get("smooth-reflection",&m_smooth_reflection_shader);
     node->get("high-adhesion",    &m_high_tire_adhesion);
     node->get("reset",            &m_drive_reset       );
     
@@ -506,6 +539,7 @@ void Material::init(unsigned int index)
     m_lighting                  = true;
     m_backface_culling          = true;
     m_sphere_map                = false;
+    m_smooth_reflection_shader  = false;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
     m_falling_effect            = false;
@@ -806,10 +840,53 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         
         modes++;
     }
+    if (m_smooth_reflection_shader) 
+    {
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (UserConfigParams::m_pixel_shaders &&
+            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+        {
+            if (m_shaders[SPHERE_MAP] == NULL)
+            {
+                m_shaders[SPHERE_MAP] = new SphereMapProvider();
+            }
+            // Material and shaders
+            IGPUProgrammingServices* gpu = 
+            irr_driver->getVideoDriver()->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                                                                         (file_manager->getDataDir() + 
+                                                                          "shaders/spheremap.vert").c_str(), 
+                                                                         "main",
+                                                                         video::EVST_VS_2_0,
+                                                                         (file_manager->getDataDir() + 
+                                                                          "shaders/spheremap.frag").c_str(), 
+                                                                         "main",
+                                                                         video::EPST_PS_2_0,
+                                                                         m_shaders[SPHERE_MAP],
+                                                                         video::EMT_SOLID_2_LAYER );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+        }
+        else
+        {
+            m->MaterialType = video::EMT_SPHERE_MAP;
+            
+            // sphere map + alpha blending is a supported combination so in
+            // this case don't increase mode count
+            if (m_alpha_blending)
+            {
+                m->BlendOperation = video::EBO_ADD;
+            }
+            else
+            {
+                modes++;
+            }
+        }
+    }
     if (m_sphere_map) 
     {
         m->MaterialType = video::EMT_SPHERE_MAP;
-        
+
         // sphere map + alpha blending is a supported combination so in
         // this case don't increase mode count
         if (m_alpha_blending)
@@ -853,8 +930,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
             video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
-            video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)

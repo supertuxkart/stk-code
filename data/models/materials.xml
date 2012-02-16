@@ -3,7 +3,10 @@
   <material name="banana.png"/>
   <material name="gift-box.png"/>
   <material name="gift-loop.png"  sphere="Y"/>
-  <material name="gold.png"  light="Y" sphere="Y"/>
+  <material name="gold.png"  light="Y" smooth-reflection="Y"/>
+  <material name="silver.png"  light="Y" smooth-reflection="Y"/>
+  <material name="bronze.png"  light="Y" smooth-reflection="Y"/>
+
   <material name="nitro-tank.png" transparency="Y"/>
   <material name="tank-blue.png"  sphere="Y"/>
   <material name="tank-green.png"  sphere="Y"/>
