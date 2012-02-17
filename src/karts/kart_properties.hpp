@@ -251,9 +251,8 @@ private:
     float m_suspension_rest;
     float m_suspension_travel_cm;
 
-    /** An additional artifical side-impulse that pushes the slower kart
-     *  out of the way of the faster kart in case of a frontal collision. */
-    float m_collision_side_impulse;
+    /** An additional impulse to push a kart away if it hits terrain */
+    float m_collision_terrain_impulse;
 
     /** An additiojnal artificial impulse that pushes two karts in a 
      *  side-side collision away from each other. */
@@ -528,9 +527,10 @@ public:
     /** Returns if the spring should be exponentially dampened. */
     bool getExpSpringResponse() const {return m_exp_spring_response; }
 
-    /** Returns the (artificial) collision side impulse this kart will apply
-     *  to a slower kart in case of a collision. */
-    float getCollisionSideImpulse   () const {return m_collision_side_impulse;}
+    /** Returns an artificial impulse to push karts away from the terrain 
+     *  it hits. */
+    float getCollisionTerrainImpulse() const 
+                                          {return m_collision_terrain_impulse;}
 
     /** Returns the (artificial) collision impulse this kart will apply
      *  to another kart in case of a non-frontal collision. */
