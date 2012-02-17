@@ -56,7 +56,7 @@
 * thunderbird model
     by Funto & Kinsu, released under CC-BY-SA 3.0
 
-* thunderbird texture
+* thunderbird texture, bomb texture
     by Fraag, released under CC-BY-SA 3.0
 
 Others are GPL, by the original (super)TuxKart team
