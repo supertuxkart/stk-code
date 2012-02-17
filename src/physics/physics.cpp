@@ -212,61 +212,6 @@ bool Physics::projectKartDownwards(const Kart *k)
 } //projectKartsDownwards
 
 //-----------------------------------------------------------------------------
-/** Determines the side (left, front, ...) of a rigid body with a box 
- *  collision shape that has a given contact point.
- *  \param body The rigid body (box shape).
- *  \param contact_point The contact point (in local coordinates) of the 
- *         contact point.
- */
-Physics::CollisionSide Physics::getCollisionSide(const btRigidBody *body,
-                                                 const Vec3 &contact_point)
-{
-    if(contact_point.getX()>0)
-        return COL_RIGHT;
-    else
-        return COL_LEFT;
-
-    btVector3 aabb_min, aabb_max;
-    static btTransform zero_trans(btQuaternion(0, 0, 0));
-    body->getCollisionShape()->getAabb(zero_trans, aabb_min, aabb_max);
-    btVector3 extend = 0.5f*(aabb_max - aabb_min);
-
-    CollisionSide result = COL_LEFT;
-    if(contact_point.getX()>0) // --> right side
-    {
-        if(contact_point.getZ()>0) // --> front or right side
-        {
-            result = fabsf(extend.getX() - contact_point.getX()) <
-                     fabsf(extend.getZ() - contact_point.getZ()) ? COL_RIGHT 
-                                                                 : COL_FRONT; 
-        }
-        else   // getZ()<0  --> back or right side
-        {
-            result = fabsf( extend.getX() - contact_point.getX()) <
-                     fabsf( extend.getZ() + contact_point.getZ()) ? COL_RIGHT 
-                                                                  : COL_BACK; 
-        }
-    }
-    else   // getX() < 0 --> left side
-    {
-        if(contact_point.getZ()>0) // --> front or left side
-        {
-            result = fabsf(extend.getX() + contact_point.getX()) <
-                     fabsf(extend.getZ() - contact_point.getZ()) ? COL_LEFT 
-                                                                 : COL_FRONT; 
-        }
-        else   // --> back or left side
-        {
-            result = fabsf(extend.getX() + contact_point.getX()) <
-                     fabsf(extend.getZ() + contact_point.getZ()) ? COL_LEFT 
-                                                                 : COL_BACK; 
-        }
-    }
-
-    return result;
-}   // getCollisionSide
-
-//-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which 
  *  means that bombs must be passed on. If both karts have a bomb, they'll 
  *  explode immediately. This function is called from physics::update() on the 

@@ -43,12 +43,6 @@ class Vec3;
 class Physics : public btSequentialImpulseConstraintSolver
 {
 private:
-    /** Which side of a rigid body has a collision. */
-    enum CollisionSide {COL_LEFT, COL_FRONT, COL_RIGHT, COL_BACK};
-
-    CollisionSide getCollisionSide(const btRigidBody *body,
-                                   const Vec3 &contact_point);
-
     /** Bullet can report the same collision more than once (up to 4
      *  contact points per collision. Additionally, more than one internal
      *  substep might be taken, resulting in potentially even more
