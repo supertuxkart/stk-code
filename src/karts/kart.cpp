@@ -47,6 +47,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/linear_world.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
@@ -1394,6 +1395,32 @@ void Kart::crashed(const Material *m)
     }
 #endif
 
+    // If there is a quad graph, push the kart towards the previous
+    // graph node center (we have to use the previous point since the
+    // kart might have only now reached the new quad, meaning the kart
+    // would be pushed forward).
+    // FIXME: or should we try to add a 'proper' reflection, i.e. an
+    // impulse depending on the vector and normal at the hit point?
+    const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if(lw)
+    {
+        if(m_vehicle->getCentralImpulseTime()<=0)
+        {
+            int sector = lw->getSectorForKart(m_world_kart_id);
+            const GraphNode &gn = QuadGraph::get()->getNode(
+                QuadGraph::get()->getNode(sector).getPredecessor());
+            Vec3 impulse = gn.getCenter() - getXYZ();
+            impulse.setY(0);
+            if(impulse.getX() || impulse.getZ())
+                impulse.normalize();
+            else
+                impulse = Vec3(0, 0, -1); // Arbitrary
+            impulse *= m_kart_properties->getCollisionTerrainImpulse();
+            m_bounce_back_time = 0.2f;
+            m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        }
+
+    }
     /** If a kart is crashing against the track, the collision is often
      *  reported more than once, resulting in a machine gun effect, and too
      *  long disabling of the engine. Therefore, this reaction is disabled
