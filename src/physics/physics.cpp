@@ -244,16 +244,18 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     // - pun intended ;) ).
     if(contact_point_a.getX() < contact_point_b.getX())
     {
-        left_kart  = kart_a;
-        right_kart = kart_b;
-    }
-    else
-    {
         left_kart  = kart_b;
         right_kart = kart_a;
     }
+    else
+    {
+        left_kart  = kart_a;
+        right_kart = kart_b;
+    }
 
-    // Add a scaling factor depending on the mass (avoid div by zero)
+    // Add a scaling factor depending on the mass (avoid div by zero).
+    // The value of f_right is applied to the right kart, and f_left
+    // to the left kart. f_left = 1 / f_right
     float f_right =  right_kart->getKartProperties()->getMass() > 0 
                      ? left_kart->getKartProperties()->getMass() 
                        / right_kart->getKartProperties()->getMass()
@@ -290,15 +292,15 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     // More driving towards left --> left kart gets bigger impulse
     if(vel_diff<0)
     {
-        f_right *= vel_left == 0 ? 2.0f : (1.0f - vel_diff/fabsf(vel_left));
-        if(f_right > 2.0f)
-            f_right = 2.0f;
+        f_left *= vel_left == 0 ? 2.0f : (1.0f - vel_diff/fabsf(vel_left));
+        if(f_left > 2.0f)
+            f_left = 2.0f;
     }
     else
     {
-        f_left *= vel_right == 0 ? 2.0f : (1.0f + vel_diff/fabsf(vel_right));
-        if(f_left > 2.0f)
-            f_left = 2.0f;
+        f_right *= vel_right == 0 ? 2.0f : (1.0f + vel_diff/fabsf(vel_right));
+        if(f_right > 2.0f)
+            f_right = 2.0f;
     }
 
     // Increase the effect somewhat by squaring the factors
@@ -311,7 +313,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     if(right_kart->getVehicle()->getCentralImpulseTime()<=0)
     {
         const KartProperties *kp = left_kart->getKartProperties();
-        Vec3 impulse(-kp->getCollisionImpulse()*f_left, 0, 0);
+        Vec3 impulse(kp->getCollisionImpulse()*f_right, 0, 0);
         impulse = right_kart->getTrans().getBasis() * impulse;
         right_kart->getVehicle()
                  ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
@@ -324,7 +326,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     if(left_kart->getVehicle()->getCentralImpulseTime()<=0)
     {
         const KartProperties *kp = right_kart->getKartProperties();
-        Vec3 impulse = Vec3(kp->getCollisionImpulse()*f_right, 0, 0);
+        Vec3 impulse = Vec3(-kp->getCollisionImpulse()*f_left, 0, 0);
         impulse = left_kart->getTrans().getBasis() * impulse;
         left_kart->getVehicle()
                   ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
