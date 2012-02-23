@@ -76,6 +76,9 @@ private:
     /** Features to unlock. */
     std::vector<UnlockableFeature> m_feature;
 
+    /** Number of trophies required to access this challenge */
+    int m_num_trophies;
+    
     irr::core::stringw m_challenge_description;
     
 public:
@@ -110,6 +113,9 @@ public:
 
     int   getNumLaps() const                   { return m_num_laps;        }
 
+    /** get number of required trophies to start this challenge */
+    int   getNumTrophies() const               { return m_num_trophies;    }
+    
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
                               const irr::core::stringw &user_mode_name);

@@ -2,6 +2,7 @@
 <challenge version="2">
     <track id="startrack" laps="3"/>
     <mode major="single" minor="followtheleader"/>
+    <requirements trophies="5"/>
     
     <hard>
         <karts number="6"/>

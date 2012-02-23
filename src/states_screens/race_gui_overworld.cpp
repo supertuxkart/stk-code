@@ -318,7 +318,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         
         //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
-        int state = (challenges[n].m_force_field.m_is_locked ? LOCKED : OPEN);
+        int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
         
         const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenges[n].m_challenge_id);
         if (c->isSolved(RaceManager::RD_HARD))        state = COMPLETED_HARD;
@@ -340,7 +340,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // ---- Draw nearby challenge if any
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].m_force_field.m_is_locked) continue;
+        if (challenges[n].getForceField().m_is_locked) continue;
 
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {

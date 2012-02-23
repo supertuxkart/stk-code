@@ -141,7 +141,7 @@ void OverWorld::onFirePressed(Controller* who)
     Vec3 kart_xyz = getKart(0)->getXYZ();
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].m_force_field.m_is_locked) continue;
+        if (challenges[n].getForceField().m_is_locked) continue;
         
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {

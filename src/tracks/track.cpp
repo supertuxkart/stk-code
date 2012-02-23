@@ -748,53 +748,60 @@ bool Track::loadMainTrack(const XMLNode &root)
         {
             if (!irr_driver->supportsSplatting()) continue;
         }
-        else if (condition.find("trophies") == 0)
-        {
-            std::vector<std::string> split = StringUtils::split(condition, ' ');
-            if (split.size() != 3)
+        else if (condition == "trophies")
+        {           
+            // Associate force fields and challenges
+            // FIXME: this assumes that challenges will appear before force fields in scene.xml
+            //        (which however seems to be the case atm)
+            int f = m_force_fields.size() - 1;
+            int closest_challenge_id = -1;
+            float closest_distance = 99999.0f;
+            for (unsigned int c=0; c<m_challenges.size(); c++)
             {
-                fprintf(stderr, "[Track] WARNING: unexpected number of tokens in '%s'\n", condition.c_str());
+                
+                float dist = xyz.getDistanceFromSQ(m_challenges[c].m_position);
+                if (closest_challenge_id == -1 || dist < closest_distance)
+                {
+                    closest_challenge_id = c;
+                    closest_distance = dist;
+                }
+            }
+            
+            assert(closest_challenge_id >= 0);
+            assert(closest_challenge_id < (int)m_challenges.size());
+            
+            const ChallengeData* challenge = unlock_manager->getChallenge(m_challenges[closest_challenge_id].m_challenge_id);
+            if (challenge == NULL)
+            {
+                fprintf(stderr, "[Track] WARNING: Cannot find challenge named '%s'\n",
+                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
                 continue;
             }
-            const std::string& op = split[1];
-            int val = -1;
-            if (StringUtils::fromString(split[2], val))
-            {
-                // only 'lt' is supported atm
-                if (op != "lt")
-                {
-                    fprintf(stderr, "[Track] WARNING: operator '%s' not supported in '%s'\n", op.c_str(),
-                            condition.c_str());
-                }
-                
-                bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
-                
-                m_force_fields.push_back(OverworldForceField(xyz, shown, val));
-                
-                core::stringw msg = StringUtils::toWString(val);
-                core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()->getDimension(msg.c_str());
-                scene::ISceneManager* sm = irr_driver->getSceneManager();
-                                
-                assert(GUIEngine::getHighresDigitFont() != NULL);
-                
-                scene::ISceneNode* sn =
-                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                                                  msg.c_str(),
-                                                  NULL,
-                                                  core::dimension2df(textsize.Width/45.0f,
-                                                                     textsize.Height/45.0f),
-                                                  xyz,
-                                                  -1 /* id */,
-                                                  video::SColor(255, 255, 225, 0),
-                                                  video::SColor(255, 255, 89, 0));
-                m_all_nodes.push_back(sn);
-                if (!shown) continue;
-            }
-            else
-            {
-                fprintf(stderr, "[Track] WARNING: token '%s' in '%s' should have been a number\n",
-                        split[2].c_str(), condition.c_str());
-            }
+            
+            const int val = challenge->getNumTrophies();
+            bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
+            m_force_fields.push_back(OverworldForceField(xyz, shown, val));
+            
+            m_challenges[closest_challenge_id].setForceField(m_force_fields[f]);
+            
+            core::stringw msg = StringUtils::toWString(val);
+            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()->getDimension(msg.c_str());
+            scene::ISceneManager* sm = irr_driver->getSceneManager();
+                            
+            assert(GUIEngine::getHighresDigitFont() != NULL);
+            
+            scene::ISceneNode* sn =
+                sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
+                                              msg.c_str(),
+                                              NULL,
+                                              core::dimension2df(textsize.Width/45.0f,
+                                                                 textsize.Height/45.0f),
+                                              xyz,
+                                              -1 /* id */,
+                                              video::SColor(255, 255, 225, 0),
+                                              video::SColor(255, 255, 89, 0));
+            m_all_nodes.push_back(sn);
+            if (!shown) continue;
         }
         else if (condition.size() > 0)
         {
@@ -967,26 +974,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
 
     }   // for i
-    
-    // Associate force fields and challenges
-    for (unsigned int c=0; c<m_challenges.size(); c++)
-    {
-        int closest_field_id = -1;
-        float closest_distance = 99999.0f;
-        for (unsigned int f=0; f<m_force_fields.size(); f++)
-        {
-            float dist = m_force_fields[f].m_position.getDistanceFromSQ(m_challenges[c].m_position);
-            if (closest_field_id == -1 || dist < closest_distance)
-            {
-                closest_field_id = f;
-                closest_distance = dist;
-            }
-        }
-        
-        assert(closest_field_id >= 0);
-        assert(closest_field_id < (int)m_force_fields.size());
-        m_challenges[c].m_force_field = m_force_fields[closest_field_id];
-    }
     
     // Create LOD nodes
     std::vector<LODNode*> lod_nodes;

@@ -83,14 +83,38 @@ struct OverworldForceField
 };
 struct OverworldChallenge
 {
+private:
+    OverworldForceField m_force_field;
+    bool m_force_field_set;
+public:
+    
     core::vector3df m_position;
     std::string m_challenge_id;
-    OverworldForceField m_force_field;
     
     OverworldChallenge(core::vector3df position, std::string challenge_id)
     {
         m_position = position;
         m_challenge_id = challenge_id;
+        m_force_field_set = false;
+    }
+    
+    void setForceField(OverworldForceField f)
+    {
+        m_force_field = f;
+        m_force_field_set = true;
+    }
+    
+    OverworldForceField& getForceField()
+    {
+        assert(m_force_field_set);
+        return m_force_field;
+    }
+    
+    
+    const OverworldForceField& getForceField() const
+    {
+        assert(m_force_field_set);
+        return m_force_field;
     }
 };
 

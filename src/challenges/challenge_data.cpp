@@ -35,13 +35,14 @@ ChallengeData::ChallengeData(const std::string& filename)
                                                       throw(std::runtime_error)
 #endif
 {
-    m_filename    = filename;
-    m_major       = RaceManager::MAJOR_MODE_SINGLE;
-    m_minor       = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_num_laps    = -1;
-    m_track_id    = "";
-    m_gp_id       = "";
-    m_version     = 0;
+    m_filename     = filename;
+    m_major        = RaceManager::MAJOR_MODE_SINGLE;
+    m_minor        = RaceManager::MINOR_MODE_NORMAL_RACE;
+    m_num_laps     = -1;
+    m_track_id     = "";
+    m_gp_id        = "";
+    m_version      = 0;
+    m_num_trophies = 0;
 
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
@@ -96,6 +97,15 @@ ChallengeData::ChallengeData(const std::string& filename)
     {
         error("laps");
     }
+    
+    
+    const XMLNode* requirements_node = root->getNode("requirements");
+    if (requirements_node == NULL)
+    {
+        throw std::runtime_error("Challenge file " + filename + " has no <requirements> node!");
+    }
+    requirements_node->get("trophies", &m_num_trophies);
+    
     
     const XMLNode* mode_node = root->getNode("mode");
     if (mode_node == NULL)
