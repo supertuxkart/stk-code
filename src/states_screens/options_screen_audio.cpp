@@ -129,20 +129,14 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
         
-        if (sample_sound == NULL) sample_sound = sfx_manager->createSoundSource( "skid" );
+        if (sample_sound == NULL) sample_sound = sfx_manager->createSoundSource( "pre_start_race" );
         sample_sound->volume(1);
         
         sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
         UserConfigParams::m_sfx_volume = w->getValue()/10.0f;
         
         // play a sample sound to show the user what this volume is like
-        sample_sound->position ( Vec3(0,0,0) );
-        
-        if(sample_sound->getStatus() != SFXManager::SFX_PLAYING)
-        {
-            sample_sound->play();
-        }
-        
+        sample_sound->play();
     }
     else if(name == "music_enabled")
     {
