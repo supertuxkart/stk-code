@@ -597,9 +597,6 @@
     <ClCompile Include="..\..\states_screens\arenas_screen.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\states_screens\challenges.cpp">
-      <Filter>Source Files\states_screens</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\states_screens\credits.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
@@ -824,6 +821,12 @@
     </ClCompile>
     <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp">
       <Filter>Source Files\states_screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\kart_gfx.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp">
+      <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1319,9 +1322,6 @@
     <ClInclude Include="..\..\states_screens\arenas_screen.hpp">
       <Filter>Header Files\states_screens</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\states_screens\challenges.hpp">
-      <Filter>Header Files\states_screens</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\states_screens\credits.hpp">
       <Filter>Header Files\states_screens</Filter>
     </ClInclude>
@@ -1570,6 +1570,12 @@
     </ClInclude>
     <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp">
       <Filter>Header Files\states_screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\kart_gfx.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp">
+      <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

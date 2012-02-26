@@ -124,6 +124,7 @@
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
+    <ClCompile Include="..\..\karts\kart_gfx.cpp" />
     <ClCompile Include="..\..\karts\kart_with_stats.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\..\modes\overworld.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
+    <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
@@ -295,7 +297,6 @@
     <ClCompile Include="..\..\animations\three_d_animation.cpp" />
     <ClCompile Include="..\..\states_screens\addons_screen.cpp" />
     <ClCompile Include="..\..\states_screens\arenas_screen.cpp" />
-    <ClCompile Include="..\..\states_screens\challenges.cpp" />
     <ClCompile Include="..\..\states_screens\credits.cpp" />
     <ClCompile Include="..\..\states_screens\feature_unlocked.cpp" />
     <ClCompile Include="..\..\states_screens\grand_prix_lose.cpp" />
@@ -352,6 +353,7 @@
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
+    <ClInclude Include="..\..\karts\kart_gfx.hpp" />
     <ClInclude Include="..\..\karts\kart_with_stats.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
@@ -402,6 +404,7 @@
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
+    <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
     <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
@@ -544,7 +547,6 @@
     <ClInclude Include="..\..\animations\three_d_animation.hpp" />
     <ClInclude Include="..\..\states_screens\addons_screen.hpp" />
     <ClInclude Include="..\..\states_screens\arenas_screen.hpp" />
-    <ClInclude Include="..\..\states_screens\challenges.hpp" />
     <ClInclude Include="..\..\states_screens\credits.hpp" />
     <ClInclude Include="..\..\states_screens\feature_unlocked.hpp" />
     <ClInclude Include="..\..\states_screens\grand_prix_lose.hpp" />
