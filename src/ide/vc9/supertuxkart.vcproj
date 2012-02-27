@@ -1112,22 +1112,6 @@
 					RelativePath="..\..\replay\replay.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\replay\replay_base.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_buffers.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_player.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_recorder.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="io"
@@ -2224,26 +2208,6 @@
 				>
 				<File
 					RelativePath="..\..\replay\replay.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_base.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_buffer_tpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_buffers.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_player.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_recorder.hpp"
 					>
 				</File>
 			</Filter>
