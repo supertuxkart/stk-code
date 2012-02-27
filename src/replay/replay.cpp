@@ -18,7 +18,6 @@
 
 #include "replay/replay.hpp"
 
-#include <stdio.h>
 
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
@@ -28,6 +27,9 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+
+#include <stdio.h>
+#include <string>
 
 bool    Replay::m_do_replay = false;
 Replay *Replay::m_replay    = NULL;
@@ -211,7 +213,7 @@ void Replay::Load()
         fd = fopen(filename.c_str(), "r");
         if(!fd)
         {
-            printf("Can't read '%', ghost replay disabled.\n", 
+            printf("Can't read '%s', ghost replay disabled.\n", 
                    filename.c_str());
             m_do_replay = false;
             initRecording();
@@ -320,7 +322,7 @@ void Replay::Load()
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
-        if(sscanf(s, "0 %f  %d %f  %f %f %f  %f %f %f %f\n",
+        if(sscanf(s, "0 %f  %d   %f %f %f  %f %f %f %f\n",
                     &time, &kart_id,
                     &x, &y, &z,
                     &rx, &ry, &rz, &rw

@@ -22,6 +22,7 @@
 #include "LinearMath/btTransform.h"
 #include "utils/no_copy.hpp"
 
+#include <string>
 #include <vector>
 
 class GhostKart;
@@ -39,16 +40,8 @@ private:
         /** Time at which this event happens. */
         float        m_time;
         enum {EV_TRANSFORM, EV_NONE} m_type;
-        union
-        {
-            struct
-            {
+        struct {
                 btTransform m_t;
-            };
-            struct
-            {
-                int m_int_test; int a; int b;
-            };
         } m_event;   // union
     };   // ReplayEvent
     // ------------------------------------------------------------------------
