@@ -121,10 +121,6 @@
 		9551C8CC0FC1B72500DB481B /* btKart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1800F296545000D3E5D /* btKart.cpp */; };
 		9551C8CD0FC1B72500DB481B /* btUprightConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */; };
 		9551C8CE0FC1B72500DB481B /* physics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1870F296545000D3E5D /* physics.cpp */; };
-		9551C8D00FC1B72500DB481B /* replay_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B19D0F296545000D3E5D /* replay_base.cpp */; };
-		9551C8D10FC1B72500DB481B /* replay_buffers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A00F296545000D3E5D /* replay_buffers.cpp */; };
-		9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A20F296545000D3E5D /* replay_player.cpp */; };
-		9551C8D30FC1B72500DB481B /* replay_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A40F296545000D3E5D /* replay_recorder.cpp */; };
 		9551C8D70FC1B72500DB481B /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1CF0F296545000D3E5D /* track.cpp */; };
 		9551C8D80FC1B72500DB481B /* track_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D10F296545000D3E5D /* track_manager.cpp */; };
 		9551C8DA0FC1B72500DB481B /* random_generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E20F296546000D3E5D /* random_generator.cpp */; };
@@ -343,6 +339,8 @@
 		9598A5B613CFBA83000B83EA /* hardware_skinning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9598A5B413CFBA83000B83EA /* hardware_skinning.cpp */; };
 		959DE0C613C297B90068ED78 /* swatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959DE0C413C297B90068ED78 /* swatter.cpp */; };
 		95A0BA2413E63F6700620EA6 /* kart_with_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A0BA2213E63F6700620EA6 /* kart_with_stats.cpp */; };
+		95A1965D14FC33DF0074B892 /* replay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1965B14FC33DF0074B892 /* replay.cpp */; };
+		95A1966214FC422D0074B892 /* ghost_kart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1966014FC422D0074B892 /* ghost_kart.cpp */; };
 		95AA4C67148AF2CC0053771D /* lod_node_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AA4C65148AF2CC0053771D /* lod_node_loader.cpp */; };
 		95AAD98012BAD36300B7B8A3 /* tutorial_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95AAD97E12BAD36300B7B8A3 /* tutorial_screen.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
@@ -1159,6 +1157,10 @@
 		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = ../../input/input_device.hpp; sourceTree = SOURCE_ROOT; };
 		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = ../../input/device_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95A1965B14FC33DF0074B892 /* replay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay.cpp; path = ../../replay/replay.cpp; sourceTree = SOURCE_ROOT; };
+		95A1965C14FC33DF0074B892 /* replay.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay.hpp; path = ../../replay/replay.hpp; sourceTree = SOURCE_ROOT; };
+		95A1966014FC422D0074B892 /* ghost_kart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ghost_kart.cpp; path = ../../karts/ghost_kart.cpp; sourceTree = SOURCE_ROOT; };
+		95A1966114FC422D0074B892 /* ghost_kart.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ghost_kart.hpp; path = ../../karts/ghost_kart.hpp; sourceTree = SOURCE_ROOT; };
 		95A5402D1481BD950086FE38 /* inetwork_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = inetwork_http.hpp; path = ../../addons/inetwork_http.hpp; sourceTree = SOURCE_ROOT; };
 		95A540411481BEB60086FE38 /* dummy_network_http.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_network_http.hpp; path = ../../addons/dummy_network_http.hpp; sourceTree = SOURCE_ROOT; };
 		95A540581481C4760086FE38 /* dummy_sfx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dummy_sfx.hpp; path = ../../audio/dummy_sfx.hpp; sourceTree = SOURCE_ROOT; };
@@ -1285,15 +1287,6 @@
 		95C2B1840F296545000D3E5D /* kart_motion_state.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_motion_state.hpp; path = ../../physics/kart_motion_state.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1870F296545000D3E5D /* physics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physics.cpp; path = ../../physics/physics.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1880F296545000D3E5D /* physics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physics.hpp; path = ../../physics/physics.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B19D0F296545000D3E5D /* replay_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_base.cpp; path = ../../replay/replay_base.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B19E0F296545000D3E5D /* replay_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_base.hpp; path = ../../replay/replay_base.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B19F0F296545000D3E5D /* replay_buffer_tpl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_buffer_tpl.hpp; path = ../../replay/replay_buffer_tpl.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A00F296545000D3E5D /* replay_buffers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_buffers.cpp; path = ../../replay/replay_buffers.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A10F296545000D3E5D /* replay_buffers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_buffers.hpp; path = ../../replay/replay_buffers.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A20F296545000D3E5D /* replay_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_player.cpp; path = ../../replay/replay_player.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A30F296545000D3E5D /* replay_player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_player.hpp; path = ../../replay/replay_player.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A40F296545000D3E5D /* replay_recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_recorder.cpp; path = ../../replay/replay_recorder.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1A50F296545000D3E5D /* replay_recorder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_recorder.hpp; path = ../../replay/replay_recorder.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1CF0F296545000D3E5D /* track.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track.cpp; path = ../../tracks/track.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D00F296545000D3E5D /* track.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track.hpp; path = ../../tracks/track.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D10F296545000D3E5D /* track_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_manager.cpp; path = ../../tracks/track_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -2370,6 +2363,16 @@
 			path = ../../input;
 			sourceTree = SOURCE_ROOT;
 		};
+		95A1965A14FC33DF0074B892 /* replay */ = {
+			isa = PBXGroup;
+			children = (
+				95A1965B14FC33DF0074B892 /* replay.cpp */,
+				95A1965C14FC33DF0074B892 /* replay.hpp */,
+			);
+			name = replay;
+			path = ../../replay;
+			sourceTree = SOURCE_ROOT;
+		};
 		95C2ABA60F29653F000D3E5D /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -2390,7 +2393,7 @@
 				95C2B1590F296545000D3E5D /* network */,
 				95C2B17F0F296545000D3E5D /* physics */,
 				95263DDF0FD7471900CF5F92 /* race */,
-				95C2B19C0F296545000D3E5D /* replay */,
+				95A1965A14FC33DF0074B892 /* replay */,
 				958330C110122B4A00C5137E /* states_screens */,
 				958444891330F89100CEA60A /* tinygettext */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
@@ -2528,6 +2531,8 @@
 				956C6EC71128D3FB004336C8 /* controller */,
 				95453AC811808B8700A155B9 /* emergency_animation.cpp */,
 				95453AC911808B8700A155B9 /* emergency_animation.hpp */,
+				95A1966014FC422D0074B892 /* ghost_kart.cpp */,
+				95A1966114FC422D0074B892 /* ghost_kart.hpp */,
 				95C2B1180F296545000D3E5D /* kart.cpp */,
 				95C2B1190F296545000D3E5D /* kart.hpp */,
 				9543D58D14D36EE3000B0888 /* kart_gfx.cpp */,
@@ -2632,23 +2637,6 @@
 			);
 			name = physics;
 			path = ../../physics;
-			sourceTree = SOURCE_ROOT;
-		};
-		95C2B19C0F296545000D3E5D /* replay */ = {
-			isa = PBXGroup;
-			children = (
-				95C2B19D0F296545000D3E5D /* replay_base.cpp */,
-				95C2B19E0F296545000D3E5D /* replay_base.hpp */,
-				95C2B19F0F296545000D3E5D /* replay_buffer_tpl.hpp */,
-				95C2B1A00F296545000D3E5D /* replay_buffers.cpp */,
-				95C2B1A10F296545000D3E5D /* replay_buffers.hpp */,
-				95C2B1A20F296545000D3E5D /* replay_player.cpp */,
-				95C2B1A30F296545000D3E5D /* replay_player.hpp */,
-				95C2B1A40F296545000D3E5D /* replay_recorder.cpp */,
-				95C2B1A50F296545000D3E5D /* replay_recorder.hpp */,
-			);
-			name = replay;
-			path = ../../replay;
 			sourceTree = SOURCE_ROOT;
 		};
 		95C2B1CE0F296545000D3E5D /* tracks */ = {
@@ -2928,10 +2916,6 @@
 				9551C8CC0FC1B72500DB481B /* btKart.cpp in Sources */,
 				9551C8CD0FC1B72500DB481B /* btUprightConstraint.cpp in Sources */,
 				9551C8CE0FC1B72500DB481B /* physics.cpp in Sources */,
-				9551C8D00FC1B72500DB481B /* replay_base.cpp in Sources */,
-				9551C8D10FC1B72500DB481B /* replay_buffers.cpp in Sources */,
-				9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */,
-				9551C8D30FC1B72500DB481B /* replay_recorder.cpp in Sources */,
 				9551C8D70FC1B72500DB481B /* track.cpp in Sources */,
 				9551C8D80FC1B72500DB481B /* track_manager.cpp in Sources */,
 				9551C8DA0FC1B72500DB481B /* random_generator.cpp in Sources */,
@@ -3225,6 +3209,8 @@
 				95EF178E14AFBC91005FFEEB /* race_gui_overworld.cpp in Sources */,
 				9543D58F14D36EE3000B0888 /* kart_gfx.cpp in Sources */,
 				9543D59E14D38831000B0888 /* select_challenge.cpp in Sources */,
+				95A1965D14FC33DF0074B892 /* replay.cpp in Sources */,
+				95A1966214FC422D0074B892 /* ghost_kart.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
