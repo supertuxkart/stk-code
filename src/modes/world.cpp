@@ -46,6 +46,7 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "replay/replay.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui.hpp"
@@ -128,7 +129,6 @@ void World::init()
     m_physics = new Physics();
 
     unsigned int num_karts = race_manager->getNumberOfKarts();
-
     assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
@@ -137,18 +137,22 @@ void World::init()
 
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const std::string& kart_ident = 
-             history->replayHistory() ? history->getKartIdent(i)
-                                      : race_manager->getKartIdent(i);
-        int local_player_id           = race_manager->getKartLocalPlayerId(i);
-        int global_player_id          = race_manager->getKartGlobalPlayerId(i);
+        std::string kart_ident = history->replayHistory() 
+                               ? history->getKartIdent(i)
+                               : race_manager->getKartIdent(i);
+        int local_player_id  = race_manager->getKartLocalPlayerId(i);
+        int global_player_id = race_manager->getKartGlobalPlayerId(i);
         Kart* newkart = createKart(kart_ident, i, local_player_id,  
-                                   global_player_id);
+                                   global_player_id, 
+                                   race_manager->getKartType(i));
         m_karts.push_back(newkart);
         m_track->adjustForFog(newkart->getNode());
         
     }  // for i
     
+    if(Replay::get()->isReplay())
+        Replay::get()->Load();
+
     resetAllKarts();
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
@@ -156,6 +160,7 @@ void World::init()
     m_track->reset();
 
     if(!history->replayHistory()) history->initRecording();
+    if(!Replay::get()->isReplay()) Replay::get()->initRecording();
     network_manager->worldLoaded();
     
     powerup_manager->updateWeightsForRace(num_karts);
@@ -186,15 +191,16 @@ void World::createRaceGUI()
  *         this player globally (i.e. including network players).
  */
 Kart *World::createKart(const std::string &kart_ident, int index,
-                        int local_player_id, int global_player_id)
+                        int local_player_id, int global_player_id,
+                        RaceManager::KartType kart_type)
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, index,m_track, position,
+    Kart *new_kart         = new Kart(kart_ident, index, position,
                                       (local_player_id == 0), init_pos,
                                       race_manager->getKartType(index));
     Controller *controller = NULL;
-    switch(race_manager->getKartType(index))
+    switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
         controller = new PlayerController(new_kart, 
@@ -629,6 +635,7 @@ void World::update(float dt)
 #endif
 
     history->update(dt);
+    Replay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     // Clear race state so that new information can be stored
@@ -905,7 +912,8 @@ void World::restartRace()
     {
         (*i)->reset();
     }
-
+    if(Replay::get()->isReplay())
+        Replay::get()->reset();
     resetAllKarts();
 
     // Start music from beginning
@@ -919,6 +927,7 @@ void World::restartRace()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
+    if(!Replay::get()->isReplay()) Replay::get()->initRecording();
 
 }   // restartRace
 

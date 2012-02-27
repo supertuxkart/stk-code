@@ -833,6 +833,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\ghost_kart.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\kart.cpp"
 					>
 				</File>
@@ -1104,6 +1108,10 @@
 			<Filter
 				Name="replay"
 				>
+				<File
+					RelativePath="..\..\replay\replay.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\replay\replay_base.cpp"
 					>
@@ -1971,6 +1979,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\ghost_kart.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\kart.hpp"
 					>
 				</File>
@@ -2210,6 +2222,10 @@
 			<Filter
 				Name="replay"
 				>
+				<File
+					RelativePath="..\..\replay\replay.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\replay\replay_base.hpp"
 					>

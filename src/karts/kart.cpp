@@ -72,7 +72,7 @@
  *  \param init_transform  The initial position and rotation for this kart.
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id, 
-            Track* track, int position, bool is_first_kart,
+            int position, bool is_first_kart,
             const btTransform& init_transform, RaceManager::KartType type)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
@@ -183,7 +183,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         animations = false;
     }
     
-    loadData(type, is_first_kart, track, animations);
+    loadData(type, is_first_kart, animations);
 
     m_kart_gfx = new KartGFX(this);
     reset();
@@ -2019,7 +2019,7 @@ void Kart::updateFlying()
  *  effects (particle systems etc.)
  */
 void Kart::loadData(RaceManager::KartType type, bool is_first_kart, 
-                    Track* track, bool is_animated_model)
+                    bool is_animated_model)
 {
 
     m_node = m_kart_model->attachModel(is_animated_model);
@@ -2037,15 +2037,17 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
 
     // Attach Particle System
     
-    if (type == RaceManager::KT_PLAYER && UserConfigParams::m_weather_effects &&
+    Track *track = World::getWorld()->getTrack();
+    if (type == RaceManager::KT_PLAYER      && 
+        UserConfigParams::m_weather_effects &&
         track->getSkyParticles() != NULL)
     {
-        track->getSkyParticles()->setBoxSizeX(150.0f);
-        track->getSkyParticles()->setBoxSizeZ(150.0f);
+        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
         
-        m_sky_particles_emitter = new ParticleEmitter(track->getSkyParticles(),
-                                          core::vector3df(0.0f, 40.0f, 100.0f),
-                                          getNode());
+        m_sky_particles_emitter = 
+            new ParticleEmitter(track->getSkyParticles(),
+                                core::vector3df(0.0f, 40.0f, 100.0f),
+                                getNode());
         
         // FIXME: in multiplayer mode, this will result in several instances
         //        of the heightmap being calculated and kept in memory

@@ -216,14 +216,14 @@ protected:
     
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
-                       Track* track, int position,  bool is_first_kart,
+                        int position,  bool is_first_kart,
                         const btTransform& init_transform, RaceManager::KartType type);
     virtual       ~Kart();
-    void           loadData(RaceManager::KartType type, bool is_first_kart, Track* track,
+    void           loadData(RaceManager::KartType type, bool is_first_kart,
                             bool animatedModel);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
-    void           createPhysics    ();
+    virtual void   createPhysics    ();
     bool           isInRest         () const;
     void           setSuspensionLength();
     void           applyEngineForce (float force);

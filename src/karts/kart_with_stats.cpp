@@ -21,11 +21,11 @@
 #include "items/item.hpp"
 
 KartWithStats::KartWithStats(const std::string& ident, 
-                             unsigned int world_kart_id, Track* track,
+                             unsigned int world_kart_id,
                              int position,  bool is_first_kart,
                              const btTransform& init_transform, 
                              RaceManager::KartType type)
-             : Kart(ident, world_kart_id, track, position, is_first_kart, 
+             : Kart(ident, world_kart_id, position, is_first_kart, 
                     init_transform, type)
 {
     reset();

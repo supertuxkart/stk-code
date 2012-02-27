@@ -134,9 +134,7 @@ public:
     float     getFadeAwayStart() const { return m_fade_away_start; }
     float     getFadeAwayEnd  () const { return m_fade_away_end;   }
     
-    void      setBoxSizeX    (float newVal) { m_box_x = newVal;    }
-    void      setBoxSizeY    (float newVal) { m_box_y = newVal;    }
-    void      setBoxSizeZ    (float newVal) { m_box_z = newVal;    }
+    void      setBoxSizeXZ    (float x, float z) { m_box_x = x; m_box_z = z;   }
     
     int       getEmissionDecayRate() const { return m_emission_decay_rate; }
     

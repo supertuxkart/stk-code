@@ -24,11 +24,11 @@
     from the network manager.
     */
 NetworkKart::NetworkKart(const std::string &kart_name, 
-                         unsigned int world_kart_id, Track* track, 
-                         int position,
-                         const btTransform &init_transform, int global_player_id,
+                         unsigned int world_kart_id, int position,
+                         const btTransform &init_transform, 
+                         int global_player_id,
                          RaceManager::KartType type)
-                         : Kart(kart_name, world_kart_id, track, position, 
+                         : Kart(kart_name, world_kart_id, position, 
                                 /*is_first_kart*/false, init_transform, type)
 {
     m_global_player_id = global_player_id;

@@ -44,7 +44,7 @@ History::History()
 void History::startReplay()
 {
     Load();
-}   // initReplay
+}   // startReplay
 
 //-----------------------------------------------------------------------------
 /** Initialise the history for a new recording. It especially allocates memory

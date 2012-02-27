@@ -66,7 +66,7 @@ private:
 
 public:
                  KartWithStats(const std::string& ident, 
-                               unsigned int world_kart_id, Track* track,
+                               unsigned int world_kart_id,
                                int position,  bool is_first_kart,
                                const btTransform& init_transform, 
                                RaceManager::KartType type);

@@ -172,6 +172,7 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "replay/replay.hpp"
 #include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -390,6 +391,7 @@ void cmdLineHelp (char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --ghost            Replay ghost data together with one player kart."
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
@@ -911,6 +913,13 @@ int handleCmdLine(int argc, char **argv)
                 race_manager->setNumLaps(1);
             }
         }
+        else if( !strcmp(argv[i], "--ghost"))
+        {
+            Replay::get()->doReplay();
+            // Force the no-start screen flag, since this initialises
+            // the player structures correctly.
+            UserConfigParams::m_no_start_screen = true;
+        }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
             history->doReplayHistory( (History::HistoryReplayMode)n);
@@ -1049,6 +1058,7 @@ void initRest()
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
+    Replay::create();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
     kart_properties_manager = new KartPropertiesManager();
@@ -1112,6 +1122,7 @@ void cleanSuperTuxKart()
     if(track_manager)           delete track_manager;
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
+    Replay::destroy();
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();

@@ -195,8 +195,7 @@ public:
     static const int DIFFICULTY_COUNT = 3;
     
     /** Different kart types: A local player, a player connected via network,
-     *  an AI kart, the leader kart (currently not used), a ghost kart 
-     *  (currently not used). */
+     *  an AI kart, the leader kart (currently not used), a ghost kart. */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
 

@@ -35,6 +35,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
+#include "replay/replay.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_input2.hpp"
 #include "states_screens/state_manager.hpp"
@@ -234,7 +235,13 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_F10:
-            if(world && value) history->Save();
+            if(world && value)
+            {
+                if(control_is_pressed)
+                    Replay::get()->Save();
+                else
+                    history->Save();
+            }
             break;
             
         case KEY_F11:

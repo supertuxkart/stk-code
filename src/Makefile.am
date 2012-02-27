@@ -221,6 +221,8 @@ supertuxkart_SOURCES = \
  karts/controller/player_controller.hpp \
  karts/emergency_animation.cpp \
  karts/emergency_animation.hpp \
+ karts/ghost_kart.cpp \
+ karts/ghost_lart.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
  karts/kart_gfx.cpp \
@@ -317,6 +319,8 @@ supertuxkart_SOURCES = \
  race/history.hpp \
  race/race_manager.cpp \
  race/race_manager.hpp \
+ replay/replay.cpp \
+ replay/replay.hpp \
  replay/replay_base.cpp \
  replay/replay_base.hpp \
  replay/replay_buffer_tpl.hpp \
