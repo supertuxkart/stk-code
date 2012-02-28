@@ -1402,11 +1402,11 @@ void Kart::crashed(const Material *m)
     // FIXME: or should we try to add a 'proper' reflection, i.e. an
     // impulse depending on the vector and normal at the hit point?
     const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(lw)
+    if(lw && m_vehicle->getCentralImpulseTime()<=0)
     {
-        if(m_vehicle->getCentralImpulseTime()<=0)
+        int sector = lw->getSectorForKart(m_world_kart_id);
+        if(sector!=QuadGraph::UNKNOWN_SECTOR)
         {
-            int sector = lw->getSectorForKart(m_world_kart_id);
             const GraphNode &gn = QuadGraph::get()->getNode(
                 QuadGraph::get()->getNode(sector).getPredecessor());
             Vec3 impulse = gn.getCenter() - getXYZ();

@@ -339,9 +339,19 @@ void LinearWorld::newLap(unsigned int kart_index)
 }   // newLap
 
 //-----------------------------------------------------------------------------
+/** Gets the sector a kart is on. This return UNKNOWN_SECTOR if the kart_id
+ *  is larger than the current kart info. This is necessary in the case that
+ *  a collision with the track happens during resetAllKarts: at this time 
+ *  m_kart_info is not initialised (and has size 0), so it would trigger this
+ *  assert. While this normally does not happen, it is useful for track 
+ *  designers that STK does not crash.
+ *  \param kart_id The world kart id of the kart for which to return 
+ *                 the sector.
+ */
 int LinearWorld::getSectorForKart(const int kart_id) const
 {
-    assert(kart_id < (int)m_kart_info.size());
+    if(kart_id>=(int)m_kart_info.size())
+        return QuadGraph::UNKNOWN_SECTOR;
     return m_kart_info[kart_id].getSector()->getCurrentGraphNode();
 }   // getSectorForKart
 
