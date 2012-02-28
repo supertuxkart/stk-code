@@ -119,8 +119,21 @@ public:
      *  position is computed. */
     std::vector<int> m_score_increase;
 
+    /** Filename of the title music to play.*/
     MusicInformation
-         *m_title_music;             /**<Filename of the title music to play.*/
+         *m_title_music;
+
+    /** Minimum time between consecutive saved tranform events.  */
+    float m_replay_dt;
+
+    /** Maximum difference between interpolated and actual position. If the
+     *  difference is larger than this, a new event is generated. */
+    float m_replay_delta_pos2;
+
+    /** A heading difference of more than that will trigger a new event to
+     *  be generated. */
+    float m_replay_delta_angle;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

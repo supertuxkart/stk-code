@@ -52,6 +52,15 @@
   <!-- Mostly for debugging: maximum number of history entries -->
   <history max-frames="10000"/>
 
+  <!--  Replay related values, mostly concerned with saving less data
+        and using interpolation instead.
+        delta-t Minumum time between saving consecutive transform events.
+        delta-pos If the interpolated position is within this delta, a
+                transform event is not generated.
+        delta-angle If the interpolated angle is within this delta,
+                a transform event is not generated. -->
+  <replay delta-t="0.05"  delta-pos="0.1" delta-angle="0.5" />
+
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. -->
   <skid-marks max-number="100"  fadeout-time="60"/>   

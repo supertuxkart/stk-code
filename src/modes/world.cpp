@@ -46,7 +46,8 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "replay/replay.hpp"
+#include "replay/replay_play.hpp"
+#include "replay/replay_recorder.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui.hpp"
@@ -150,8 +151,8 @@ void World::init()
         
     }  // for i
     
-    if(Replay::get()->isReplay())
-        Replay::get()->Load();
+    if(ReplayPlay::get())
+        ReplayPlay::get()->Load();
 
     resetAllKarts();
     // Note: track reset must be called after all karts exist, since check
@@ -160,7 +161,7 @@ void World::init()
     m_track->reset();
 
     if(!history->replayHistory()) history->initRecording();
-    if(!Replay::get()->isReplay()) Replay::get()->initRecording();
+    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
     network_manager->worldLoaded();
     
     powerup_manager->updateWeightsForRace(num_karts);
@@ -635,7 +636,8 @@ void World::update(float dt)
 #endif
 
     history->update(dt);
-    Replay::get()->update(dt);
+    if(ReplayRecorder::get()) ReplayRecorder::get()->update(dt);
+    if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     // Clear race state so that new information can be stored
@@ -912,8 +914,8 @@ void World::restartRace()
     {
         (*i)->reset();
     }
-    if(Replay::get()->isReplay())
-        Replay::get()->reset();
+    if(ReplayPlay::get())
+        ReplayPlay::get()->reset();
     resetAllKarts();
 
     // Start music from beginning
@@ -927,7 +929,7 @@ void World::restartRace()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(!Replay::get()->isReplay()) Replay::get()->initRecording();
+    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
 
 }   // restartRace
 

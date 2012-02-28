@@ -138,7 +138,12 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
+    CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
+    CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
+    CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
 
+    // Square distance to make distance checks cheaper (no sqrt)
+    m_replay_delta_pos2 *= m_replay_delta_pos2;
     m_default_kart_properties->checkAllSet(filename);
 }   // load
 
@@ -167,6 +172,9 @@ void STKConfig::init_defaults()
     m_min_track_version        = -100;
     m_max_track_version        = -100;
     m_max_display_news         = -100;
+    m_replay_delta_angle       = -100;
+    m_replay_delta_pos2        = -100;
+    m_replay_dt                = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
     m_smooth_normals           = false;
@@ -345,6 +353,12 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *networking_node= root->getNode("networking"))
         networking_node->get("enable", &m_enable_networking);
 
+    if(const XMLNode *replay_node = root->getNode("replay"))
+    {
+        replay_node->get("delta-angle", &m_replay_delta_angle);
+        replay_node->get("delta-pos",   &m_replay_delta_pos2 );
+        replay_node->get("delta-t",     &m_replay_dt         );
+    }
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");

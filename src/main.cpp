@@ -172,7 +172,8 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "replay/replay.hpp"
+#include "replay/replay_play.hpp"
+#include "replay/replay_recorder.hpp"
 #include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -915,7 +916,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--ghost"))
         {
-            Replay::get()->doReplay();
+            ReplayPlay::create();
             // Force the no-start screen flag, since this initialises
             // the player structures correctly.
             UserConfigParams::m_no_start_screen = true;
@@ -1058,7 +1059,7 @@ void initRest()
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
-    Replay::create();
+    ReplayRecorder::create();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
     kart_properties_manager = new KartPropertiesManager();
@@ -1122,7 +1123,7 @@ void cleanSuperTuxKart()
     if(track_manager)           delete track_manager;
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
-    Replay::destroy();
+    ReplayRecorder::destroy();
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();

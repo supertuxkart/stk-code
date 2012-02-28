@@ -1109,7 +1109,15 @@
 				Name="replay"
 				>
 				<File
-					RelativePath="..\..\replay\replay.cpp"
+					RelativePath="..\..\replay\replay_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_play.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_recorder.cpp"
 					>
 				</File>
 			</Filter>
@@ -2207,7 +2215,15 @@
 				Name="replay"
 				>
 				<File
-					RelativePath="..\..\replay\replay.hpp"
+					RelativePath="..\..\replay\replay_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_play.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_recorder.hpp"
 					>
 				</File>
 			</Filter>

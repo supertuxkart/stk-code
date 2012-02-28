@@ -68,7 +68,7 @@ void GhostKart::update(float dt)
     {
           m_current ++;
     }
-    if(m_current+1==m_all_times.size())
+    if(m_current+1>=m_all_times.size())
     {
         m_node->setVisible(false);
         return;
