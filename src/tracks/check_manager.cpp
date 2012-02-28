@@ -124,14 +124,24 @@ void CheckManager::update(float dt)
  */
 unsigned int CheckManager::getLapLineIndex() const
 {
+    // If possible find a proper check-lap structure:
     for (unsigned int i=0; i<getCheckStructureCount(); i++)
     {
         CheckStructure* c = getCheckStructure(i);
 
         if (dynamic_cast<CheckLap*>(c) != NULL) return i;
     }
+    fprintf(stderr, 
+           "No check-lap structure found! This can cause incorrect kart\n");
+    fprintf(stderr,
+           "ranking when crossing the line, but can otherwise be ignored.\n");
+    for (unsigned int i=0; i<getCheckStructureCount(); i++)
+    {
+        if(getCheckStructure(i)->getType()==CheckStructure::CT_NEW_LAP)
+            return i;
+    }
 
-    fprintf(stderr, "Error, no lap line for track found, aborting.\n");
+    fprintf(stderr, "Error, no kind of lap line for track found, aborting.\n");
     exit(-1);
 }   // getLapLineIndex
 
