@@ -88,7 +88,6 @@ void ReplayPlay::Load()
     }
     m_ghost_karts.clear();
     char s[1024], s1[1024];
-    int  n;
 
     FILE *fd = openReplayFile(/*writeable*/false);
     if(!fd)
@@ -108,7 +107,7 @@ void ReplayPlay::Load()
         exit(-2);
     }
     
-    int version;
+    unsigned int version;
     if (sscanf(s,"Version: %d", &version)!=1)
     {
         fprintf(stderr, "ERROR: no Version information found in replay file"
@@ -119,7 +118,7 @@ void ReplayPlay::Load()
     if (version!=getReplayVersion())
     {
         fprintf(stderr, "WARNING: replay is version '%d'\n",version);
-        fprintf(stderr, "         STK version is '%s'\n",getReplayVersion());
+        fprintf(stderr, "         STK version is '%d'\n",getReplayVersion());
         fprintf(stderr, "         We try to proceed, but it may fail.\n");
     }
     
@@ -130,6 +129,7 @@ void ReplayPlay::Load()
         exit(-2);
     }
     
+    int  n;
     if(sscanf(s, "difficulty: %d",&n)!=1)
     {
         fprintf(stderr,"WARNING: No difficulty found in replay file.\n");
@@ -169,18 +169,19 @@ void ReplayPlay::Load()
     for(unsigned int k=0; k<num_ghost_karts; k++)
     {
         fgets(s, 1023, fd);
-        if(sscanf(s, "model %d: %s",&n, s1)!=2)
+	unsigned int kart_id;
+        if(sscanf(s, "model %d: %s",&kart_id, s1)!=2)
         {
             fprintf(stderr,
                     "WARNING: No model information for kart %d found.\n",
                     k);
             exit(-2);
         }
-        if(n != k)
+        if(kart_id != k)
         {
             fprintf(stderr, 
                     "WARNING: Expected kart id %d, got %d - ignored.\n",
-                    k, n);
+                    k, kart_id);
         }
         m_ghost_karts.push_back(new GhostKart(std::string(s1)));
 

@@ -87,7 +87,7 @@ void ReplayRecorder::update(float dt)
     float time = world->getTime();
     // Once we use interpolate results, we don't have to increase
     // m_next by num_karts, so count how often to increase
-    unsigned int count = 0;
+
     for(unsigned int i=0; i<num_karts; i++)
     {
 #ifdef DEBUG
