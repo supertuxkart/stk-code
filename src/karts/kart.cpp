@@ -1614,7 +1614,7 @@ void Kart::updatePhysics(float dt)
     }
     else if(m_controls.m_drift)
     {
-        steering *= m_kart_properties->getSkidReduceTurn()
+        steering *= m_kart_properties->getSkidReduceTurnMin()
                   * sqrt(m_kart_properties->getMaxSkid()/m_skidding);
     }
     else
@@ -1721,10 +1721,6 @@ void Kart::updateEngineSFX()
  */
 void Kart::updateSkidding(float dt)
 {
-    // Skid a little when hitting a bubblegum (just enough to make the 
-    // skiding sound)
-    if (m_bubblegum_time > 0.0f) m_skidding *= 1.08f;
-
     // Still going forward while braking: skid a little when the brakes
     // are hit (just enough to make the skiding sound)
     if(!m_controls.m_accel && m_controls.m_brake && m_speed > 0.0f)
@@ -1752,7 +1748,11 @@ void Kart::updateSkidding(float dt)
     else 
         if(m_skidding<1.0f) m_skidding=1.0f;
 
-    if(m_skidding>1.0f)
+    // The skidding sound is played when the kart is actually skidding,
+    // when it is slowed down due to bubble gum, or when the kart is
+    // breaking.
+    if(m_skidding>1.0f || m_bubblegum_time>0 ||
+       (!m_controls.m_accel && m_controls.m_brake && m_speed > 0.0f) )
     {
         if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
             m_kart_properties->hasSkidmarks())
@@ -1763,33 +1763,29 @@ void Kart::updateSkidding(float dt)
         m_skid_sound->stop();
     }
 
-    // Handle skidding
-    float ang_vel = 0;
+    // FIXME hiker: remove once the new skidding code is finished.
+    if(m_kart_properties->getSkidVisualTime()<=0)
+        return;
+    // This is only reached if the new skidding is enabled
+    // ---------------------------------------------------
     if(m_controls.m_drift)
     {
         if(m_skid_time<0) m_skid_time = 0;
         m_skid_time += dt;
-        if(m_controls.m_steer>0)
-            ang_vel =  m_kart_properties->getSkidAngularVelocity();
-        else if (m_controls.m_steer<0)
-            ang_vel =  -m_kart_properties->getSkidAngularVelocity();
         float bonus_time, bonus_force;
         unsigned int level = m_kart_properties->getSkidBonus(m_skid_time, 
                                                              &bonus_time, 
                                                              &bonus_force);
-        // Relative 0 means it will emitt the minimum rate, i.e. the rate
-        // set to indicate that the bonus is now available.
-        if(level>0 && 
-            // FIXME hiker: remove once the new skidding code is final
-            m_kart_properties->getSkidVisualTime()>0)
+        // If at least level 1 bonus is reached, show appropriate gfx
+        if(level>0)
         {
             m_kart_gfx->setSkidLevel(level);
+            // Relative 0 means it will emitt the minimum rate, i.e. the rate
+            // set to indicate that the bonus is now available.
             m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
         }
     }
-    else if(m_skid_time>0 &&
-        // FIXME hiker: remove once the new skidding code is finished.
-        m_kart_properties->getSkidVisualTime()>0)
+    else if(m_skid_time>0)
     {   
         // The kart just stopped skidding - see if a skid bonus applies
         float bonus_time, bonus_force;
@@ -1824,7 +1820,6 @@ void Kart::updateSkidding(float dt)
             m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
         }
     }
-    m_vehicle->setSkidAngularVelocity(ang_vel);
 }   // updateSkidding
 
 //-----------------------------------------------------------------------------

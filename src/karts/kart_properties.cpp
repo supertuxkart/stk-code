@@ -83,8 +83,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
-        m_time_till_max_skid = m_skid_angular_velocity = 
-        m_post_skid_rotate_factor = m_skid_reduce_turn =
+        m_time_till_max_skid = m_post_skid_rotate_factor = 
+        m_skid_reduce_turn_min = m_skid_reduce_turn_max =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_skid_visual_time = m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
@@ -305,9 +305,9 @@ void KartProperties::getAllData(const XMLNode * root)
         skid_node->get("time-till-bonus",        &m_skid_time_till_bonus   );
         skid_node->get("bonus-force",            &m_skid_bonus_force       );
         skid_node->get("bonus-time",             &m_skid_bonus_time        );
-        skid_node->get("angular-velocity",       &m_skid_angular_velocity  );
         skid_node->get("post-skid-rotate-factor",&m_post_skid_rotate_factor);
-        skid_node->get("reduce-turn",            &m_skid_reduce_turn       );
+        skid_node->get("reduce-turn-min",        &m_skid_reduce_turn_min   );
+        skid_node->get("reduce-turn-max",        &m_skid_reduce_turn_max   );
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
@@ -635,9 +635,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_max,                   "skid max"                      );
     CHECK_NEG(m_skid_visual,                "skid visual"                   );
     CHECK_NEG(m_skid_visual_time,           "skid visual-time"              );
-    CHECK_NEG(m_skid_angular_velocity,      "skid angular-velocity"         );
     CHECK_NEG(m_post_skid_rotate_factor,    "skid post-skid-rotate-factor"  );
-    CHECK_NEG(m_skid_reduce_turn,           "skid reduce-turn"              );
+    CHECK_NEG(m_skid_reduce_turn_min,       "skid reduce-turn-min"          );
+    CHECK_NEG(m_skid_reduce_turn_max,       "skid reduce-turn-max"          );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
