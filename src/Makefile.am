@@ -319,8 +319,12 @@ supertuxkart_SOURCES = \
  race/history.hpp \
  race/race_manager.cpp \
  race/race_manager.hpp \
- replay/replay.cpp \
- replay/replay.hpp \
+ replay/replay_base.cpp \
+ replay/replay_base.hpp \
+ replay/replay_play.cpp \
+ replay/replay_play.hpp \
+ replay/replay_recorder.cpp \
+ replay/replay_recorder.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
  states_screens/dialogs/add_device_dialog.cpp \
