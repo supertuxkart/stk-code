@@ -113,7 +113,8 @@ void ReplayRecorder::update(float dt)
         }
         TransformEvent *p = &(m_transform_events[i][m_count_transforms[i]-1]);
         p->m_time      = World::getWorld()->getTime();
-        p->m_transform = kart->getTrans();
+        p->m_transform.setOrigin(kart->getXYZ());
+        p->m_transform.setRotation(kart->getVisualRotation());
     }   // for i
 }   // updateRecording
 
