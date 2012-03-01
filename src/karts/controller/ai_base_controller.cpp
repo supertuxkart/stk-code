@@ -309,6 +309,11 @@ void AIBaseController::setSteering(float angle, float dt)
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
     m_controls->m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
     if(m_kart->hasViewBlockedByPlunger()) m_controls->m_drift = false;
+    // FIXME: Disable skidding for now if the new skidding
+    // code is activated, since the AI can not handle this
+    // properly.
+    if(m_kart->getKartProperties()->getSkidVisualTime()<=0)
+        m_controls->m_drift = false;
     float old_steer      = m_controls->m_steer;
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
