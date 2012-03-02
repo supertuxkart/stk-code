@@ -47,6 +47,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
@@ -186,6 +187,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     loadData(type, is_first_kart, animations);
 
     m_kart_gfx = new KartGFX(this);
+    m_skidding = new Skidding(this);
+
     reset();
 }   // Kart
 
@@ -542,6 +545,8 @@ void Kart::reset()
     m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
     m_kart_gfx->reset();
+    m_skidding->reset();
+
     
     if (m_collision_particles) 
         m_collision_particles->setCreationRateAbsolute(0.0f);
@@ -553,13 +558,11 @@ void Kart::reset()
     m_bubblegum_time       = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
-    m_skid_time            = 0.0f;
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_has_started          = false;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
-    m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
@@ -583,7 +586,7 @@ void Kart::reset()
     m_controls.m_accel     = 0.0f;
     m_controls.m_brake     = false;
     m_controls.m_nitro     = false;
-    m_controls.m_drift     = false;
+    m_controls.m_skid      = false;
     m_controls.m_fire      = false;
     m_controls.m_look_back = false;
     m_slipstream->reset();
@@ -1160,7 +1163,7 @@ void Kart::handleMaterialGFX()
         // Get the appropriate particle data depending on
         // wether the kart is skidding or driving.
         const ParticleKind* pk = 
-            material->getParticlesWhen(m_skidding > 1.0f
+            material->getParticlesWhen(m_skidding->isSkidding()
                                                     ? Material::EMIT_ON_SKID
                                                     : Material::EMIT_ON_DRIVE);
         if(!pk) 
@@ -1602,7 +1605,8 @@ void Kart::updatePhysics(float dt)
     if (m_flying)
         updateFlying();    
     
-    updateSkidding(dt);
+    m_skidding->update(dt, isOnGround(), m_controls.m_steer, 
+                       m_controls.m_skid);
     updateSliding();
 
     float steering = getMaxSteerAngle() * m_controls.m_steer;
@@ -1610,15 +1614,16 @@ void Kart::updatePhysics(float dt)
     //        skidding code
     if(m_kart_properties->getSkidVisualTime()==0)
     {
-        steering *= m_skidding;
+        steering *= m_skidding->getSkidFactor();
     }
-    else if(m_controls.m_drift)
+    else if(m_controls.m_skid)
     {
-        steering *= m_kart_properties->getSkidReduceTurnMin()
-                  * sqrt(m_kart_properties->getMaxSkid()/m_skidding);
+     steering *= m_kart_properties->getSkidReduceTurnMin()
+              * sqrt(m_kart_properties->getMaxSkid()
+                     / m_skidding->getSkidFactor());
     }
     else
-        steering *= m_skidding;
+        steering *= m_skidding->getSkidFactor();
 
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
@@ -1717,112 +1722,6 @@ void Kart::updateEngineSFX()
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
-/** Handles skidding.
- */
-void Kart::updateSkidding(float dt)
-{
-    // Still going forward while braking: skid a little when the brakes
-    // are hit (just enough to make the skiding sound)
-    if(!m_controls.m_accel && m_controls.m_brake && m_speed > 0.0f)
-        m_skidding *= 1.08f;
-
-    if (isOnGround())
-    {
-        if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
-        {
-            m_skidding +=  m_kart_properties->getSkidIncrease()
-                          *dt/m_kart_properties->getTimeTillMaxSkid();
-        }
-        else if(m_skidding>1.0f)
-        {
-            m_skidding *= m_kart_properties->getSkidDecrease();
-        }
-    }
-    else
-    {
-        m_skidding = 1.0f; // Lose any skid factor as soon as we fly
-    }
-
-    if(m_skidding>m_kart_properties->getMaxSkid())
-        m_skidding = m_kart_properties->getMaxSkid();
-    else 
-        if(m_skidding<1.0f) m_skidding=1.0f;
-
-    // The skidding sound is played when the kart is actually skidding,
-    // when it is slowed down due to bubble gum, or when the kart is
-    // breaking.
-    if(m_skidding>1.0f || m_bubblegum_time>0 ||
-       (!m_controls.m_accel && m_controls.m_brake && m_speed > 0.0f) )
-    {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
-            m_kart_properties->hasSkidmarks())
-            m_skid_sound->play();
-    }
-    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
-    {
-        m_skid_sound->stop();
-    }
-
-    // FIXME hiker: remove once the new skidding code is finished.
-    if(m_kart_properties->getSkidVisualTime()<=0)
-        return;
-    // This is only reached if the new skidding is enabled
-    // ---------------------------------------------------
-    if(m_controls.m_drift)
-    {
-        if(m_skid_time<0) m_skid_time = 0;
-        m_skid_time += dt;
-        float bonus_time, bonus_force;
-        unsigned int level = m_kart_properties->getSkidBonus(m_skid_time, 
-                                                             &bonus_time, 
-                                                             &bonus_force);
-        // If at least level 1 bonus is reached, show appropriate gfx
-        if(level>0)
-        {
-            m_kart_gfx->setSkidLevel(level);
-            // Relative 0 means it will emitt the minimum rate, i.e. the rate
-            // set to indicate that the bonus is now available.
-            m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
-        }
-    }
-    else if(m_skid_time>0)
-    {   
-        // The kart just stopped skidding - see if a skid bonus applies
-        float bonus_time, bonus_force;
-        int level = m_kart_properties->getSkidBonus(m_skid_time, 
-                                                    &bonus_time, &bonus_force);
-        float t = (m_skid_time <= m_kart_properties->getSkidVisualTime())
-                  ? m_skid_time
-                  : m_kart_properties->getSkidVisualTime();
-        float vso = getVisualSkidOffset();
-        btVector3 rot(0, vso*m_kart_properties->getPostSkidRotateFactor(), 0);
-        m_vehicle->setTimedRotation(t, rot);
-        // Set skid_time to a negative value indicating how long an
-        // additional rotation is going to be applied to the chassis
-        m_skid_time = -t;
-        if(bonus_time>0)
-        {
-            MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_SKIDDING,
-                                       10, bonus_time, 1);
-            m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
-            // FIXME hiker: for now just misuse the zipper code
-            handleZipper(0);
-        }
-        else
-            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
-    }
-    else if (m_skid_time < 0)
-    {
-        m_skid_time += dt;
-        if(m_skid_time>0) 
-        {
-            m_skid_time = 0;
-            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
-        }
-    }
-}   // updateSkidding
-
-//-----------------------------------------------------------------------------
 /** Sets the engine power. It considers the engine specs, items that influence
  *  the available power, and braking/steering.
  */
@@ -1855,7 +1754,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the adventage
-        if(m_controls.m_drift)
+        if(m_controls.m_skid)
             engine_power *= 0.5f;
 
         applyEngineForce(engine_power*m_controls.m_accel);
@@ -1911,7 +1810,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
     }   // not accelerating
 }   // updateEnginePowerAndBrakes
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Handles sliding, i.e. the kart sliding off terrain that is too steep.
  */
 void Kart::updateSliding()
@@ -1923,9 +1822,9 @@ void Kart::updateSliding()
     float friction = 1.0f;
     bool enable_sliding = false;
     
-    // This way the current skidding
-    // handling can be disabled for certain material (e.g. the
-    // curve in skyline on which otherwise karts could not drive).
+    // This way the current handling of sliding can be disabled 
+    // for certain material (e.g. the curve in skyline on which otherwise 
+    // karts could not drive).
     // We also had a crash reported here, which was caused by not
     // having a material here - no idea how this could have happened,
     // but this problem is now avoided by testing if there is a material
@@ -1963,7 +1862,7 @@ void Kart::updateSliding()
     m_vehicle->setSliding(enable_sliding);
 }   // updateSliding
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Adjusts kart translation if the kart is flying (in debug mode).
  */
 void Kart::updateFlying()
@@ -2063,7 +1962,9 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     if(m_kart_properties->hasSkidmarks())
     {
         m_skidmarks = new SkidMarks(*this);
-        m_skidmarks->adjustFog( track_manager->getTrack( race_manager->getTrackName() )->isFogEnabled() );
+        m_skidmarks->adjustFog( 
+            track_manager->getTrack(race_manager->getTrackName())
+                         ->isFogEnabled() );
     }
     
     m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
@@ -2075,7 +1976,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Stores the current suspension length. This function is called from world
  *  after all karts are in resting position (see World::resetAllKarts), so
  *  that the default suspension rest length can be stored. This is then used
@@ -2163,7 +2064,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
     Moveable::updateGraphics(dt, center_shift, 
-                             btQuaternion(getVisualSkidOffset(), 0, 0));
+                             btQuaternion(m_skidding->getVisualSkidOffset(), 
+                                          0, 0));
     
     /*
     // cheap wheelie effect
@@ -2196,34 +2098,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 // ----------------------------------------------------------------------------
 btQuaternion Kart::getVisualRotation() const
 {
-    return getRotation() * btQuaternion(getVisualSkidOffset(), 0, 0);
+    return getRotation() * btQuaternion(m_skidding->getVisualSkidOffset(), 0, 0);
 }   // getVisualRotation
 
-// ----------------------------------------------------------------------------
-/** Determines how much the graphics model of the kart should be rotated
- *  additionally (for skidding), depending on how long the kart has been
- *  skidding etc.
- *  \return Returns the angle of the additional rotation of the kart.
- */
-float Kart::getVisualSkidOffset() const
-{
-    if(m_kart_properties->getSkidVisualTime()==0)
-    {
-        float speed_ratio = getSpeed()/MaxSpeed::getCurrentMaxSpeed();
-        float r = m_skidding / m_kart_properties->getMaxSkid();
-        return getSteerPercent() * speed_ratio * r;
-    }
-
-    // New skidding code
-    float f = m_kart_properties->getSkidVisual() * getSteerPercent();
-    if(getSpeed() < m_kart_properties->getMaxSpeed())
-        f *= getSpeed()/m_kart_properties->getMaxSpeed();
-    float st = fabsf(m_skid_time);
-    if(st<m_kart_properties->getSkidVisualTime())
-        f *= st/m_kart_properties->getSkidVisualTime();
-
-    return f;
-
-}   // getVisualSkidOffset
 
 /* EOF */

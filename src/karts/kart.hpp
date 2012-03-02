@@ -51,6 +51,7 @@ class ParticleKind;
 class Rain;
 class SFXBase;
 class Shadow;
+class Skidding;
 class SkidMarks;
 class SlipStream;
 
@@ -67,19 +68,17 @@ class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
              public MaxSpeed
 {
 private:
-    
+    /** True if kart is flying (for debug purposes only). */
     bool m_flying;
     
     /** Reset position. */
     btTransform  m_reset_transform;
+
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
-    /** Accumulated skidding factor. */
-    float        m_skidding;
 
-    /** Keeps track on how long a kart has been skidding, in order to
-     *  trigger the skidding bonus. */
-    float        m_skid_time;
+    /** This object handles all skidding. */
+    Skidding *m_skidding;
 
     /** The main controller of this object, used for driving. This 
      *  controller is used to run the kart. It will be replaced
@@ -200,11 +199,9 @@ private:
     void          handleMaterialGFX();
     void          updateFlying();
     void          updateSliding();
-    void          updateSkidding(float dt);
     void          updateEnginePowerAndBrakes(float dt);
     void          updateEngineSFX();
 
-    float         getVisualSkidOffset() const;
     void          crashed();
 
 protected:
@@ -257,6 +254,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
     KartModel*     getKartModel()                 { return m_kart_model;      }
+    // ------------------------------------------------------------------------
+    /** Returns a points to this kart's graphical effects. */
+    KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
     const KartProperties*
@@ -348,8 +348,9 @@ public:
     float getMaxSteerAngle () const
                     { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
-    /** Returns the amount of skidding for this kart. */
-    float getSkidding() const { return m_skidding; }
+    /** Returns the skidding object for this kart (which can be used to query
+     *  skidding related values). */
+    const Skidding *getSkidding() const { return m_skidding; }
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
     float getSteerPercent() const { return m_controls.m_steer;  }

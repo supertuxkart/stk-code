@@ -24,6 +24,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
 #include <iostream>
@@ -139,6 +140,9 @@ void KartGFX::setSkidLevel(const unsigned int level)
     const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
     if(m_all_emitters[KGFX_SKID1])
         m_all_emitters[KGFX_SKID1]->setParticleType(pk);
+    // Relative 0 means it will emitt the minimum rate, i.e. the rate
+    // set to indicate that the bonus is now available.
+    setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
 }   // setSkidLevel
 
 // ----------------------------------------------------------------------------
@@ -238,7 +242,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     // Now compute the particle creation rate:
     float rate           = 0;
     const float speed    = fabsf(m_kart->getSpeed());
-    const float skidding = m_kart->getSkidding();
+    const float skidding = m_kart->getSkidding()->getSkidFactor();
     if (skidding > 1.0f)
         rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f)

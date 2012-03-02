@@ -868,6 +868,10 @@
 					RelativePath="..\..\karts\moveable.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\karts\skidding.cpp"
+					>
+				</File>
 				<Filter
 					Name="controller"
 					>
@@ -1979,10 +1983,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\kart_control.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\karts\kart_gfx.hpp"
 					>
 				</File>
@@ -2010,6 +2010,10 @@
 					RelativePath="..\..\karts\moveable.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\karts\skidding.hpp"
+					>
+				</File>
 				<Filter
 					Name="controller"
 					>
@@ -2027,6 +2031,10 @@
 					</File>
 					<File
 						RelativePath="..\..\karts\controller\end_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\kart_control.hpp"
 						>
 					</File>
 					<File

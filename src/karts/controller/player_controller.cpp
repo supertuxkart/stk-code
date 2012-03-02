@@ -100,7 +100,7 @@ void PlayerController::resetInputState()
     m_prev_accel            = 0;
     m_controls->m_accel     = 0.0f;
     m_controls->m_brake     = false;
-    m_controls->m_drift     = false;
+    m_controls->m_skid      = false;
     m_controls->m_fire      = false;
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
@@ -186,7 +186,7 @@ void PlayerController::action(PlayerAction action, int value)
         m_controls->m_look_back = (value!=0);
         break;
     case PA_DRIFT:
-        m_controls->m_drift = (value!=0);
+        m_controls->m_skid = (value!=0);
         break;
     case PA_PAUSE_RACE:
         if (value != 0) StateManager::get()->escapePressed();

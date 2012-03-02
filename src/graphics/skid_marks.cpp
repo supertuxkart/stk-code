@@ -107,7 +107,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
             // ---------------------------------------------------------
             if (!force_skid_marks                                     && 
                   (!raycast_right.m_isInContact                  ||
-                    !m_kart.getControls().m_drift                ||
+                    !m_kart.getControls().m_skid                 ||
                     fabsf(m_kart.getControls().m_steer) < 0.001f ||
                     delta.length2()<0.0001                         )     )
             {
@@ -143,7 +143,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         // -------------------------
         if (!force_skid_marks)
         {
-            if((!m_kart.getControls().m_drift) ||
+            if((!m_kart.getControls().m_skid) ||
                 (fabsf(m_kart.getControls().m_steer) < 0.001f)) 
                 return;   // not skidmarking
             

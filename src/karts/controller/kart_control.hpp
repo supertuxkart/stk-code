@@ -31,13 +31,13 @@ public:
     float m_accel;
     bool  m_brake;
     bool  m_nitro;
-    bool  m_drift;
+    bool  m_skid;
     bool  m_rescue;
     bool  m_fire;
     bool  m_look_back;
 
     KartControl() : m_steer(0.0f), m_accel(0.0f), m_brake(false),
-                    m_nitro(false), m_drift(false),  m_rescue(false), 
+                    m_nitro(false), m_skid(false),  m_rescue(false), 
                     m_fire(false), m_look_back(false)
     {
     }
@@ -74,7 +74,7 @@ public:
     {
         return  m_brake     ?  1 : 0
               + m_nitro     ?  2 : 0
-              + m_drift     ?  4 : 0
+              + m_skid      ?  4 : 0
               + m_rescue    ?  8 : 0
               + m_fire      ? 16 : 0
               + m_look_back ? 32 : 0;
@@ -87,7 +87,7 @@ public:
     {
         m_brake     = (c &  1) != 0;
         m_nitro     = (c &  2) != 0;
-        m_drift     = (c &  4) != 0;
+        m_skid      = (c &  4) != 0;
         m_rescue    = (c &  8) != 0;
         m_fire      = (c & 16) != 0;
         m_look_back = (c & 32) != 0;

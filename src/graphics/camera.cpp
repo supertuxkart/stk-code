@@ -30,6 +30,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart.hpp"
+#include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -320,7 +321,8 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     // towards where the kart is turning (and turning even more while skidding).
     // The skidding effect is dampened.
     float steering = m_kart->getSteerPercent() 
-                   * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+                   * (1.0f + (m_kart->getSkidding()->getSkidFactor() - 1.0f)
+                             /2.3f );
     // quadratically to dampen small variations (but keep sign)
     float dampened_steer =  fabsf(steering) * steering; 
 
@@ -362,7 +364,8 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
         {
             *above_kart    = 0.75f;
             float steering = m_kart->getSteerPercent() 
-                           * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+                           * (1.0f + (m_kart->getSkidding()->getSkidFactor()
+                                      - 1.0f)/2.3f );
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering; 
             *cam_angle           = kp->getCameraForwardUpAngle();
@@ -386,7 +389,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             *cam_angle  = 20.0f*DEGREE_TO_RAD;
             *sideway    = m_rotation_range 
                         * m_kart->getSteerPercent()
-                        * m_kart->getSkidding();
+                        * m_kart->getSkidding()->getSkidFactor();
             *distance   = -0.5f*m_distance;
             *smoothing  = false;
             break;

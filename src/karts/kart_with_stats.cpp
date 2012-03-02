@@ -58,7 +58,7 @@ void KartWithStats::update(float dt)
 {
     Kart::update(dt);
     if(getSpeed()>m_top_speed) m_top_speed = getSpeed();
-    if(getControls().m_drift)
+    if(getControls().m_skid)
         m_skidding_time += dt;
 }   // update
 

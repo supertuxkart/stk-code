@@ -682,6 +682,7 @@ public:
     /** Returns the factor by which to recude the amount of steering while 
         skidding. */
     float getSkidReduceTurnMin     () const { return m_skid_reduce_turn_min;  }
+    float getSkidReduceTurnMax     () const { return m_skid_reduce_turn_max;  }
 
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks               () const {return m_has_skidmarks;         }
