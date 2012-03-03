@@ -1073,24 +1073,30 @@ void IrrDriver::displayFPS()
     static bool prev_state = false;
     static int min         = 999; // Absurd values for start will print first time
     static int max         = 0;   // but no big issue, maybe even "invisible"
+    static float low       = 1000000.0f; // These two are for polycount stats
+    static float high      = 0.0f;       // just like FPS, but in KTris
 
     // Reset limits if state changes
     if (prev_state != current_state)
     {
         min = 999;
         max = 0;
+        low = 1000000.0f;
+        high = 0.0f;
         no_trust = NO_TRUST_COUNT;
         prev_state = current_state;
     }
 
     if (min > fps && fps > 1) min = fps; // Start moments sometimes give useless 1
     if (max < fps) max = fps;
-    
-    static char buffer[32];
+    if (low > kilotris) low = kilotris;
+    if (high < kilotris) high = kilotris;
+
+    static char buffer[64];
     
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f KTris", min, fps, max, kilotris);
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris", min, fps, max, low, kilotris, high);
     }
     else
     {
