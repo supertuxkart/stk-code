@@ -753,7 +753,6 @@ bool Track::loadMainTrack(const XMLNode &root)
             // Associate force fields and challenges
             // FIXME: this assumes that challenges will appear before force fields in scene.xml
             //        (which however seems to be the case atm)
-            int f = m_force_fields.size() - 1;
             int closest_challenge_id = -1;
             float closest_distance = 99999.0f;
             for (unsigned int c=0; c<m_challenges.size(); c++)
@@ -782,7 +781,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
             
-            m_challenges[closest_challenge_id].setForceField(m_force_fields[f]);
+            m_challenges[closest_challenge_id].setForceField(m_force_fields[m_force_fields.size() - 1]);
             
             core::stringw msg = StringUtils::toWString(val);
             core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()->getDimension(msg.c_str());
