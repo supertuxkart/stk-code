@@ -6,11 +6,19 @@ include (CheckCXXSourceCompiles)
 
 project(SuperTuxKart)
 
+if (NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type selected, default to Release")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 set(PROJECT_VERSION "0.7.3")
+
+set(CMAKE_CXX_FLAGS_RELEASE -O2)
 
 # Tweakable values
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -183,7 +191,6 @@ if(DEBUG)
 	add_definitions(-DDEBUG)
 else()
 	add_definitions(-DNDEBUG)
-	add_definitions(-O2)
 endif()
 
 find_package(Freetype)
