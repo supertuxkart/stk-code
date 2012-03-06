@@ -1,9 +1,9 @@
 # root CMakeLists for the SuperTuxKart project
+project(SuperTuxKart)
+set(PROJECT_VERSION "0.7.3")
 
 cmake_minimum_required(VERSION 2.8.1)
-include (CheckCXXSourceCompiles)
-
-project(SuperTuxKart)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to Release")
@@ -11,11 +11,12 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 
+find_package(Irrlicht 1.8 REQUIRED)
+include_directories(${IRRLICHT_INCLUDE_DIRS})
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 set(STK_SOURCE_DIR "src")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-set(PROJECT_VERSION "0.7.3")
 
 set(CMAKE_CXX_FLAGS_RELEASE -O2)
 
@@ -29,7 +30,6 @@ endif()
 option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(FONT_TOOL "Compile font tool" OFF)
-set(IRRLICHT_DIR "/path/to/irrlicht" CACHE STRING "Path to Irrlicht")
 
 # Build the Bullet physics library
 add_subdirectory("${STK_SOURCE_DIR}/bullet")
@@ -52,8 +52,6 @@ endif()
 
 if(APPLE)
 	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	include_directories("/Library/Frameworks/IrrFramework.framework/Versions/A/Headers/")
-	include_directories("/Library/Frameworks/fribidi.framework/Headers")
 	include_directories("/Library/Frameworks/Ogg.framework/Headers")
 	include_directories("/Library/Frameworks/Vorbis.framework/Headers")
 	include_directories("/usr/local/include")
@@ -63,16 +61,6 @@ if(APPLE)
 endif()
 
 # Set lib paths
-if(APPLE)
-	# nothing to add
-elseif(UNIX)
-	link_directories("${IRRLICHT_DIR}/lib/Linux")
-elseif(MSVC)
-	link_directories("${IRRLICHT_DIR}/lib/Win32-visualstudio")
-else()
-	link_directories("${IRRLICHT_DIR}/lib/Win32-gcc")
-endif()
-
 link_directories("${STK_SOURCE_DIR}/bullet")
 
 if(USE_WIIUSE)
@@ -80,29 +68,8 @@ if(USE_WIIUSE)
 endif()
 
 # OpenGL
-if(APPLE)
-    find_library(OpenGL /System/Library/Frameworks/OpenGL.framework /System/Library/Frameworks/AGL.framework)
-else()
-    find_package(OpenGL)
-    
-    if(OPENGL_FOUND)
-	    message(STATUS "OpenGL found (include dir: ${OPENGL_INCLUDE_DIR})")
-	    include_directories(${OPENGL_INCLUDE_DIR})
-    else()
-	    message(FATAL_ERROR "OpenGL not found.")
-    endif()
-    
-    if(UNIX)
-	    # X11, stk requires xf86vm
-	    find_package(X11)
-    
-	    if(X11_FOUND)
-		    message("-- X11 libs found")
-	    else()
-		    message(FATAL_ERROR "X11 not found.")
-	    endif()
-    endif()
-endif()
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 # OpenAL
 if(APPLE)
@@ -118,60 +85,19 @@ else()
     endif()
 endif()
 
-# Check if we finally got irrlicht
-if(APPLE)
-    find_library(Irrlicht /Library/Frameworks/IrrFramework.framework)
-else()
-    find_path(HAVE_IRRLICHT irrlicht.h PATHS ${IRRLICHT_DIR} ${IRRLICHT_DIR}/include /usr/include/irrlicht/ /usr/local/include/irrlicht/)
-    
-    if(HAVE_IRRLICHT)
-	    message("-- Irrlicht found (in ${HAVE_IRRLICHT}/irrlicht.h)")
-	    include_directories(${HAVE_IRRLICHT})
-        find_library(IRRLICHT_LIB /usr/lib /usr/local/lib ${IRRLICHT_DIR}/lib/Linux)
-        
-        set(CMAKE_REQUIRED_INCLUDES ${HAVE_IRRLICHT})
-        set(CMAKE_REQUIRED_LIBRARIES ${IRRLICHT_LIB})
-        CHECK_CXX_SOURCE_COMPILES("#include <IrrCompileConfig.h>
-                                  int main(int argc, char** argv) {
-                                  #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-                                  // ok
-                                  #else
-                                  #error Your irrlicht is too old
-                                  #endif
-                                  }" IRRLICHT_RECENT_ENOUGH)
-        if(IRRLICHT_RECENT_ENOUGH)
-            # OK
-        else()
-            message(FATAL_ERROR "\n  --  This irrlicht is too old, please use irrlicht 1.8 (SVN)")
-        endif()
-    else()
-	    message(FATAL_ERROR "\n  --  Irrlicht not found (can't locate irrlicht.h)\n Use -DIRRLICHT_DIR=/path/to/irrlicht")
-    endif()
-endif()
-
-include_directories(${HAVE_IRRLICHT})
-
 # CURL
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
 # Fribidi
 if(USE_FRIBIDI)
-    FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
-      /usr/local/include
-      /usr/include
-      )
-
-    SET(FRIBIDI_NAMES ${FRIBIDI_NAMES} fribidi libfribidi)
-    FIND_LIBRARY(FRIBIDI_LIBRARY
-      NAMES ${FRIBIDI_NAMES}
-      PATHS /usr/lib /usr/local/lib
-      )
-
-    IF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
-        message(STATUS "Fribidi found")
+    find_package(Fribidi)
+    if(FRIBIDI_FOUND)
+        include_directories(${FRIBIDI_INCLUDE_DIRS})
     else()
-        message(FATAL_ERROR "Fribidi not found. Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 (if you don't use a right-to-left language then you don't need this).")
+        message(FATAL_ERROR "Fribidi not found. "
+            "Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 "
+            "(if you don't use a right-to-left language then you don't need this).")
     endif()
 endif()
    
@@ -204,7 +130,7 @@ if(FONT_TOOL)
 	    target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
 	    target_link_libraries(font_tool ${X11_Xft_LIB})
 	    target_link_libraries(font_tool ${OPENGL_LIBRARIES})
-	    target_link_libraries(font_tool Irrlicht)
+	    target_link_libraries(font_tool ${IRRLICHT_LIBRARIES})
     else()
 	    message(STATUS "Freetype was not found, the font tool won't be built (only useful for developers)")
     endif()
@@ -231,18 +157,17 @@ if (APPLE)
 	    enet
 	    ${CURL_LIBRARIES}
 	    # We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	    /Library/Frameworks/IrrFramework.framework
+	    ${IRRLICHT_LIBRARIES}
+	    ${OPENGL_LIBRARIES}
 	    /Library/Frameworks/Ogg.framework
 	    /Library/Frameworks/OpenAL.framework
 	    /Library/Frameworks/Vorbis.framework
 	    # TODO: allow linking against frameworks from a SDK.
-	    /System/Library/Frameworks/AGL.framework
 	    /System/Library/Frameworks/IOKit.framework
 	    /System/Library/Frameworks/QuickTime.framework
 	    /System/Library/Frameworks/Carbon.framework
 	    /System/Library/Frameworks/AudioUnit.framework
-	    /System/Library/Frameworks/Cocoa.framework
-	    /System/Library/Frameworks/OpenGL.framework)
+	    /System/Library/Frameworks/Cocoa.framework)
 	    
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
@@ -257,7 +182,7 @@ else()
     add_executable(supertuxkart ${SRCS})
 
     target_link_libraries(supertuxkart
-	    Irrlicht
+	    ${IRRLICHT_LIBRARIES}
 	    bulletdynamics
 	    bulletcollision
 	    bulletmath
@@ -270,11 +195,7 @@ else()
 endif()
 
 if(USE_FRIBIDI)
-    if(APPLE)
-	    target_link_libraries(supertuxkart /Library/Frameworks/fribidi.framework)
-    else()
-        target_link_libraries(supertuxkart fribidi)
-    endif()
+    target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
     add_definitions(-DENABLE_BIDI=1)
 endif()
 
@@ -287,18 +208,15 @@ if(UNIX AND NOT APPLE)
 	target_link_libraries(supertuxkart Xxf86vm)
 elseif(APPLE)
 	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	target_link_libraries(supertuxkart /Library/Frameworks/IrrFramework.framework)
 	target_link_libraries(supertuxkart /Library/Frameworks/Ogg.framework)
 	target_link_libraries(supertuxkart /Library/Frameworks/OpenAL.framework)
 	target_link_libraries(supertuxkart /Library/Frameworks/Vorbis.framework)
 
-	target_link_libraries(supertuxkart /System/Library/Frameworks/AGL.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/IOKit.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/QuickTime.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/Carbon.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/AudioUnit.framework)
 	target_link_libraries(supertuxkart /System/Library/Frameworks/Cocoa.framework)
-	target_link_libraries(supertuxkart /System/Library/Frameworks/OpenGL.framework)
 endif()
 
 # ==== Make dist target ====
