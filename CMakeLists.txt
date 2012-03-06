@@ -16,6 +16,7 @@ include_directories(${IRRLICHT_INCLUDE_DIRS})
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 set(STK_SOURCE_DIR "src")
+set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 set(CMAKE_CXX_FLAGS_RELEASE -O2)
@@ -232,30 +233,8 @@ add_custom_target(dist
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 # ==== Install target ====
-MACRO(installfilemacro filepath)
-    set(source_regex "(.*)/data/(.*)")
-    set(svn_regex "(.*).svn(.*)")
-    
-    string(REGEX MATCH "${svn_regex}" is_svn_dir "${curr}")
-    if(is_svn_dir)
-        # don't install SVN files
-    else()
-        string(REGEX MATCH "${source_regex}" source_path "${curr}")
-        if(source_path)
-            string(REGEX REPLACE "${source_regex}" "\\2" after_source "${source_path}")
-            get_filename_component(install_location ${after_source} PATH)
-            install(FILES ${filepath} DESTINATION "share/games/supertuxkart/data/${install_location}")
-        endif(source_path)
-    endif()
-ENDMACRO(installfilemacro)
-
-FILE(GLOB_RECURSE datafiles "${CMAKE_CURRENT_SOURCE_DIR}/data/*")
-foreach(curr ${datafiles})
-    installfilemacro(${curr})
-endforeach()
-
-
 install(TARGETS supertuxkart RUNTIME DESTINATION games BUNDLE DESTINATION .)
+install(DIRECTORY "${STK_DATA_DIR}/" DESTINATION "share/games/supertuxkart/data" PATTERN ".svn" EXCLUDE)
 install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
 
