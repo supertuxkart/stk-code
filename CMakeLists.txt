@@ -51,16 +51,6 @@ if(USE_WIIUSE)
 	include_directories("${STK_SOURCE_DIR}/wiiuse")
 endif()
 
-if(APPLE)
-	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	include_directories("/Library/Frameworks/Ogg.framework/Headers")
-	include_directories("/Library/Frameworks/Vorbis.framework/Headers")
-	include_directories("/usr/local/include")
-	include_directories("/usr/include")
-	find_library(Ogg /Library/Frameworks/Ogg.framework)
-	find_library(Vorbis /Library/Frameworks/Vorbis.framework)
-endif()
-
 # Set lib paths
 link_directories("${STK_SOURCE_DIR}/bullet")
 
@@ -73,18 +63,12 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 # OpenAL
-if(APPLE)
-    find_library(OpenAL /Library/Frameworks/OpenAL.framework)
-else()
-    find_package(OpenAL)
-    
-    if(OPENAL_FOUND)
-	    message(STATUS "OpenAL found (include dir: ${OPENAL_INCLUDE_DIR})")
-	    include_directories(${OPENAL_INCLUDE_DIR})
-    else()
-	    message(FATAL_ERROR "OpenAL not found.")
-    endif()
-endif()
+find_package(OpenAL REQUIRED)
+include_directories(${OPENAL_INCLUDE_DIR})
+
+# OggVorbis
+find_package(OggVorbis REQUIRED)
+include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
 # CURL
 find_package(CURL REQUIRED)
@@ -151,25 +135,19 @@ if (APPLE)
     # build the executable and create an app bundle
     add_executable(supertuxkart MACOSX_BUNDLE ${SRCS} )
     
+    find_library(IOKIT_LIBRARY IOKit)
+    find_library(QUICKTIME_LIBRARY QuickTime)
+    find_library(CARBON_LIBRARY Carbon)
+    find_library(AUDIOUNIT_LIBRARY AudioUnit)
+    find_library(COCOA_LIBRARY Cocoa)
+    
     target_link_libraries(supertuxkart
-	    bulletdynamics
-	    bulletcollision
-	    bulletmath
-	    enet
-	    ${CURL_LIBRARIES}
-	    # We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	    ${IRRLICHT_LIBRARIES}
-	    ${OPENGL_LIBRARIES}
-	    /Library/Frameworks/Ogg.framework
-	    /Library/Frameworks/OpenAL.framework
-	    /Library/Frameworks/Vorbis.framework
-	    # TODO: allow linking against frameworks from a SDK.
-	    /System/Library/Frameworks/IOKit.framework
-	    /System/Library/Frameworks/QuickTime.framework
-	    /System/Library/Frameworks/Carbon.framework
-	    /System/Library/Frameworks/AudioUnit.framework
-	    /System/Library/Frameworks/Cocoa.framework)
-	    
+         ${IOKIT_LIBRARY}
+         ${QUICKTIME_LIBRARY}
+         ${CARBON_LIBRARY}
+         ${AUDIOUNIT_LIBRARY}
+         ${COCOA_LIBRARY})
+    
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
   
@@ -182,22 +160,26 @@ else()
     # Build the final executable
     add_executable(supertuxkart ${SRCS})
 
-    target_link_libraries(supertuxkart
-	    ${IRRLICHT_LIBRARIES}
-	    bulletdynamics
-	    bulletcollision
-	    bulletmath
-	    enet
-	    pthread
-	    ${CURL_LIBRARIES}
-	    ${OPENGL_LIBRARIES}
-	    ${OPENAL_LIBRARY}
-	    vorbisfile)
+    if(UNIX)
+        target_link_libraries(supertuxkart pthread Xxf86vm)
+    endif()
 endif()
+
+# Common library dependencies
+target_link_libraries(supertuxkart
+    bulletdynamics
+    bulletcollision
+    bulletmath
+    enet
+    ${CURL_LIBRARIES}
+    ${IRRLICHT_LIBRARIES}
+    ${OGGVORBIS_LIBRARIES}
+    ${OPENAL_LIBRARY}
+    ${OPENGL_LIBRARIES})
 
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
-    add_definitions(-DENABLE_BIDI=1)
+    add_definitions(-DENABLE_BIDI)
 endif()
 
 if(USE_WIIUSE)
