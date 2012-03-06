@@ -172,20 +172,6 @@ if(USE_WIIUSE)
 	add_definitions(-DENABLE_WIIUSE)
 endif()
 
-if(UNIX AND NOT APPLE)
-	target_link_libraries(supertuxkart Xxf86vm)
-elseif(APPLE)
-	# We could use smarter detection of the frameworks but supporting a single official setup makes things easy...
-	target_link_libraries(supertuxkart /Library/Frameworks/Ogg.framework)
-	target_link_libraries(supertuxkart /Library/Frameworks/OpenAL.framework)
-	target_link_libraries(supertuxkart /Library/Frameworks/Vorbis.framework)
-
-	target_link_libraries(supertuxkart /System/Library/Frameworks/IOKit.framework)
-	target_link_libraries(supertuxkart /System/Library/Frameworks/QuickTime.framework)
-	target_link_libraries(supertuxkart /System/Library/Frameworks/Carbon.framework)
-	target_link_libraries(supertuxkart /System/Library/Frameworks/AudioUnit.framework)
-	target_link_libraries(supertuxkart /System/Library/Frameworks/Cocoa.framework)
-endif()
 
 # ==== Make dist target ====
 add_custom_target(dist
