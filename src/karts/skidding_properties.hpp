@@ -25,6 +25,7 @@
 class Kart;
 class XMLNode;
 
+#include <string>
 #include <vector>
 
 /** A simple class that stores all skidding related properties. It acts as
@@ -97,7 +98,7 @@ public:
          SkiddingProperties();
     void load(const XMLNode *skid_node);
     void copyFrom(const SkiddingProperties *destination);
-    void SkiddingProperties::checkAllSet(const std::string &filename) const;
+    void checkAllSet(const std::string &filename) const;
     // ------------------------------------------------------------------------
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks() const { return m_has_skidmarks; }

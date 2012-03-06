@@ -56,8 +56,7 @@ private:
     /** A read-only pointer to the kart's properties. */
     Kart *m_kart;
 
-    unsigned int Skidding::getSkidBonus(float *bonus_time, 
-                                        float *bonus_speed) const;
+    unsigned int getSkidBonus(float *bonus_time, float *bonus_speed) const;
 
 public:
            Skidding(Kart *kart, const SkiddingProperties *sp);
