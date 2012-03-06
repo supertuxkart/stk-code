@@ -17,9 +17,9 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Fribidi DEFAULT_MSG FRIBIDI_INCLUDE_DIR FRIBIDI_LIBRARY)
 
 
-#if(APPLE)
-#set(FRIBIDI_INCLUDE_DIR "/Library/Frameworks/fribidi.framework/Headers")
-#endif()
+if(APPLE)
+set(FRIBIDI_INCLUDE_DIR "/Library/Frameworks/fribidi.framework/Headers")
+endif()
 
 # Publish variables
 set(FRIBIDI_INCLUDE_DIRS ${FRIBIDI_INCLUDE_DIR})
