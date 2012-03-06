@@ -106,8 +106,9 @@ struct STriangleList
 		}
 
 		u32 ia=0xffffffff, ib=0xffffffff, ic=0xffffffff;
+		const u32 max_u32 = 0xffffffff;
 		// no duplicate vertex positions allowed...
-		for (u32 i=0; i < positions.size() && (ia==-1||ib==-1||ic==-1) ; ++i)
+		for (u32 i=0; i < positions.size() && (ia==max_u32||ib==max_u32||ic==max_u32) ; ++i)
 		{
 			if (positions[i] == a)
 				ia = i;

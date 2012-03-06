@@ -28,7 +28,9 @@
 using namespace irr;
 using namespace gui;
 
-#pragma comment(lib, "Irrlicht.lib")
+#ifdef _MSC_VER
+#	pragma comment(lib, "Irrlicht.lib")
+#endif
 
 const s32 texturesizes[] = {128, 256, 512, 1024, 2048, 4096, 0};
 
@@ -55,7 +57,7 @@ const wchar_t *warntext = L"Legal Notice\n"
 					L"Some free fonts can be found here- www.openfontlibrary.org\n"
 					L"http://savannah.nongnu.org/projects/freefont/";
 
-wchar_t *helptext = L"This tool creates bitmap fonts for the Irrlicht Engine\n\n"
+const wchar_t *helptext = L"This tool creates bitmap fonts for the Irrlicht Engine\n\n"
 
 					L"First select a character encoding from the list, then choose the font, "
 					L"size, and whether you'd like bold, italic, antialiasing and an alpha channel. "
@@ -78,9 +80,9 @@ wchar_t *helptext = L"This tool creates bitmap fonts for the Irrlicht Engine\n\n
 					L"That's all, have fun :-)";
 
 #ifdef _IRR_WINDOWS
-					wchar_t *completeText = L"Font created"
+					const wchar_t *completeText = L"Font created"
 #else
-					wchar_t *completeText = L"Font created\n\n"
+					const wchar_t *completeText = L"Font created\n\n"
 							L"Please note that anti-aliasing under X11 is controlled by the system "
 							L"configuration, so if your system is set to use anti-aliasing, then so "
 							L"will any fonts you create with FontTool";
@@ -107,12 +109,6 @@ enum MYGUI
 	MYGUI_HELPBUTTON
 };
 
-inline void PrintWStr(const wchar_t *s){
-	HANDLE h=GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsoleW(h,s,wcslen(s),NULL,NULL);
-	int i=L'\n';
-	WriteConsoleW(h,&i,1,NULL,NULL);
-}
 
 // event reciever
 class MyEventReceiver : public IEventReceiver
@@ -122,7 +118,6 @@ public:
 	MyEventReceiver(IrrlichtDevice* device, CFontTool*& fonttool, CVectorFontTool* &vectool) :
 		Device(device), FontTool(fonttool), VecTool(vectool)
 	{
-		device->setEventReceiver(this);
 	}
 
 	virtual bool OnEvent(const SEvent &event)
@@ -164,7 +159,7 @@ public:
 				}
 				else if(id==MYGUI_FONTNAME){
 					IGUIComboBox* cbo = (IGUIComboBox*)event.GUIEvent.Caller;
-					PrintWStr(FontTool->FontNames[cbo->getSelected()].c_str());
+					std::cout << FontTool->FontNames[cbo->getSelected()].c_str() << std::endl;
 				}
 				break;
 			case EGET_CHECKBOX_CHANGED:
@@ -304,8 +299,9 @@ public:
 					core::stringc format = fmt->getItem(fmt->getSelected());
 
 					// vector fonts disabled
-					IGUICheckBox *chk = (IGUICheckBox*)env->getRootGUIElement()->getElementFromId(MYGUI_VECTOR,true);
-					bool vec = false; // chk->isChecked();
+					// IGUICheckBox *chk = (IGUICheckBox*)env->getRootGUIElement()->getElementFromId(MYGUI_VECTOR,true);
+					// bool vec = chk->isChecked();
+					bool vec = false;
 
 					if (vec && VecTool)
 						VecTool->saveVectorFont(name.c_str(), format.c_str());
@@ -321,6 +317,9 @@ public:
 					return true;
 				}
 
+				break;
+
+			default:
 				break;
 			}
 		}
@@ -512,7 +511,8 @@ int main(int argc,char **argv)
 	CFontTool *fc = new CFontTool(device);
 	CVectorFontTool *vc = 0;
 
-	IEventReceiver *events = new MyEventReceiver(device,fc,vc);
+	MyEventReceiver events(device,fc,vc);
+	device->setEventReceiver(&events);
 
 	createGUI(device, fc);
 
@@ -523,7 +523,7 @@ int main(int argc,char **argv)
 
 	while(device->run())
 	{
-		Sleep(50);
+		device->sleep(50);
 		if (device->isWindowActive())
 		{
 
