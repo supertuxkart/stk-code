@@ -456,7 +456,7 @@ bool LoadPoFiles(const char* sListFileName){
 		/* Get a list of the font foundries, storing them in a set to sort */
 		std::set<core::stringw> foundries;
 		Display* display = (Display*)Device->getVideoDriver()->getExposedVideoData().OpenGLLinux.X11Display;
-		XftFontSet* fonts = XftListFonts(display, DefaultScreen(display), 0, XFT_FOUNDRY, 0);
+		XftFontSet* fonts = XftListFonts(display, DefaultScreen(display), 0, XFT_FOUNDRY, NULL);
 		for (int i = 0; i < fonts->nfont; i++)
 		{
 			char *foundry;

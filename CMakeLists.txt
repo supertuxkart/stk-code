@@ -13,7 +13,6 @@ endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
-option(FONT_TOOL "Compile font tool" OFF)
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
@@ -84,30 +83,6 @@ else()
 	add_definitions(-DNDEBUG)
 endif()
 
-find_package(Freetype)
-
-if(FONT_TOOL)
-    if(FREETYPE_FOUND)
-	    message(STATUS "Freetype found")
-	    find_package(X11)
-	    include_directories(${FREETYPE_INCLUDE_DIRS})
-	    add_executable(font_tool
-		    tools/font_tool/CFontTool.cpp
-		    tools/font_tool/CFontTool.h
-		    tools/font_tool/CVectorFontTool.h
-		    tools/font_tool/main.cpp
-	    )
-	    target_link_libraries(font_tool ${FREETYPE_LIBRARIES})
-	    target_link_libraries(font_tool ${X11_Xft_LIB})
-	    target_link_libraries(font_tool ${OPENGL_LIBRARIES})
-	    target_link_libraries(font_tool ${IRRLICHT_LIBRARIES})
-    else()
-	    message(STATUS "Freetype was not found, the font tool won't be built (only useful for developers)")
-    endif()
-else()
-    message(STATUS "Font tool deactivated, the font tool won't be built (only useful for developers)")
-endif()
-
 
 # Provides list of source files in STK_SOURCES
 include(sources.cmake)
@@ -171,6 +146,9 @@ if(USE_WIIUSE)
 	target_link_libraries(supertuxkart wiiuse bluetooth)
 	add_definitions(-DENABLE_WIIUSE)
 endif()
+
+# Optional tools
+add_subdirectory(tools/font_tool)
 
 
 # ==== Make dist target ====
