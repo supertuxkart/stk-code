@@ -5,9 +5,10 @@ set(PROJECT_VERSION "0.7.3")
 cmake_minimum_required(VERSION 2.8.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
+include(BuildTypeSTKRelease)
 if (NOT CMAKE_BUILD_TYPE)
-    message(STATUS "No build type selected, default to Release")
-    set(CMAKE_BUILD_TYPE "Release")
+    message(STATUS "No build type selected, default to STKRelease")
+    set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
 
@@ -19,7 +20,6 @@ set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
-set(CMAKE_CXX_FLAGS_RELEASE -O2)
 
 # Tweakable values
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
