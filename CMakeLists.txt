@@ -172,8 +172,8 @@ if (APPLE)
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
   
-    add_definitions(`ln -sf ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources`)
-
+    add_custom_command(TARGET supertuxkart PRE_BUILD COMMAND ln -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
+    
 else()
 
     add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
