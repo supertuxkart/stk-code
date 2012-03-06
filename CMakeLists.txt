@@ -11,52 +11,35 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-
-find_package(Irrlicht 1.8 REQUIRED)
-include_directories(${IRRLICHT_INCLUDE_DIRS})
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+option(USE_WIIUSE "Support for wiimote input devices" OFF)
+option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(FONT_TOOL "Compile font tool" OFF)
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 
-# Tweakable values
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-	set(DEBUG ON)
-else()
-	set(DEBUG OFF)
-endif()
-
-option(USE_WIIUSE "Support for wiimote input devices" OFF)
-option(USE_FRIBIDI "Support for right-to-left languages" ON)
-option(FONT_TOOL "Compile font tool" OFF)
-
 # Build the Bullet physics library
 add_subdirectory("${STK_SOURCE_DIR}/bullet")
+include_directories("${STK_SOURCE_DIR}/bullet/src")
 
 # Build the ENet UDP network library
 add_subdirectory("${STK_SOURCE_DIR}/enet")
+include_directories("${STK_SOURCE_DIR}/enet/include")
 
 # Build the Wiiuse library
 if(USE_WIIUSE)
 	add_subdirectory("${STK_SOURCE_DIR}/wiiuse")
-endif()
-
-# Set include paths
-include_directories("${STK_SOURCE_DIR}")
-include_directories("${STK_SOURCE_DIR}/enet/include")
-include_directories("${STK_SOURCE_DIR}/bullet/src")
-if(USE_WIIUSE)
 	include_directories("${STK_SOURCE_DIR}/wiiuse")
 endif()
 
-# Set lib paths
-link_directories("${STK_SOURCE_DIR}/bullet")
+# Set include paths
+include_directories(${STK_SOURCE_DIR})
 
-if(USE_WIIUSE)
-	link_directories("${STK_SOURCE_DIR}/wiiuse")
-endif()
+# Irrlicht
+find_package(Irrlicht 1.8 REQUIRED)
+include_directories(${IRRLICHT_INCLUDE_DIRS})
 
 # OpenGL
 find_package(OpenGL REQUIRED)
@@ -85,15 +68,17 @@ if(USE_FRIBIDI)
             "(if you don't use a right-to-left language then you don't need this).")
     endif()
 endif()
-   
+
+
 # Set some compiler options
 if(UNIX)
 	add_definitions(-Wall)
 endif()
 
-add_definitions(-DHAVE_OGGVORBIS)	# TODO: remove this switch
+# TODO: remove this switch
+add_definitions(-DHAVE_OGGVORBIS)
 
-if(DEBUG)
+if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions(-DDEBUG)
 else()
 	add_definitions(-DNDEBUG)
@@ -123,17 +108,18 @@ else()
     message(STATUS "Font tool deactivated, the font tool won't be built (only useful for developers)")
 endif()
 
-include(sources.cmake)
-set(SRCS ${SRCS} ${STK_SOURCES})
 
-if (APPLE)		
+# Provides list of source files in STK_SOURCES
+include(sources.cmake)
+
+if(APPLE)
     # icon files to copy in the bundle
-    set( OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/src/ide/Xcode/stk.icns)
-    set_source_files_properties( ${OSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    set( SRCS ${SRCS} ${OSX_ICON_FILES} )
+    set(OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/src/ide/Xcode/stk.icns)
+    set_source_files_properties(${OSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(STK_SOURCES ${STK_SOURCES} ${OSX_ICON_FILES})
     
     # build the executable and create an app bundle
-    add_executable(supertuxkart MACOSX_BUNDLE ${SRCS} )
+    add_executable(supertuxkart MACOSX_BUNDLE ${STK_SOURCES})
     
     find_library(IOKIT_LIBRARY IOKit)
     find_library(QUICKTIME_LIBRARY QuickTime)
@@ -149,17 +135,16 @@ if (APPLE)
          ${COCOA_LIBRARY})
     
     # configure CMake to use a custom Info.plist
-    set_target_properties(supertuxkart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist )
+    set_target_properties(supertuxkart PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist)
   
-    add_custom_command(TARGET supertuxkart PRE_BUILD COMMAND ln -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
-    
+    add_custom_command(TARGET supertuxkart PRE_BUILD
+        COMMAND ln -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
 else()
-
     add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
 
     # Build the final executable
-    add_executable(supertuxkart ${SRCS})
-
+    add_executable(supertuxkart ${STK_SOURCES})
     if(UNIX)
         target_link_libraries(supertuxkart pthread Xxf86vm)
     endif()
