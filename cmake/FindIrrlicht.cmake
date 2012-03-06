@@ -27,7 +27,7 @@ endif()
 # Find include directory and library
 find_path(IRRLICHT_INCLUDE_DIR NAMES irrlicht.h
     PATHS ${IRRLICHT_DIR} /Library/Frameworks/IrrFramework.framework/Versions/A/Headers/
-    PATH_SUFFIXES include)
+    PATH_SUFFIXES include irrlicht)
 
 if(APPLE)
     find_library(IRRLICHT_LIBRARY NAMES IrrFramework PATHS ${IRRLICHT_LIBRARY_DIR})
