@@ -22,4 +22,4 @@ dist_icon_DATA = supertuxkart_32.xpm supertuxkart_64.xpm
 EXTRA_DIST = supertuxkart_desktop.template
 CLEANFILES = supertuxkart.desktop
 supertuxkart.desktop: Makefile supertuxkart_desktop.template
-	sed 's#PREFIX#$(prefix)#' '$(srcdir)/supertuxkart_desktop.template' >supertuxkart.desktop
+	sed 's#@PREFIX@#$(prefix)#' '$(srcdir)/supertuxkart_desktop.template' >supertuxkart.desktop
