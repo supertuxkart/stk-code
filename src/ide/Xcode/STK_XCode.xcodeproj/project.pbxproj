@@ -375,6 +375,7 @@
 		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
 		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
 		95EF178E14AFBC91005FFEEB /* race_gui_overworld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95EF178C14AFBC91005FFEEB /* race_gui_overworld.cpp */; };
+		95EF1E0A1506D6CF0041AC79 /* skidding_properties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95EF1E081506D6CF0041AC79 /* skidding_properties.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1373,6 +1374,8 @@
 		95ECA13C10124E6900D47C5F /* widgets.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widgets.hpp; path = ../../guiengine/widgets.hpp; sourceTree = SOURCE_ROOT; };
 		95EF178C14AFBC91005FFEEB /* race_gui_overworld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui_overworld.cpp; path = ../../states_screens/race_gui_overworld.cpp; sourceTree = SOURCE_ROOT; };
 		95EF178D14AFBC91005FFEEB /* race_gui_overworld.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui_overworld.hpp; path = ../../states_screens/race_gui_overworld.hpp; sourceTree = SOURCE_ROOT; };
+		95EF1E081506D6CF0041AC79 /* skidding_properties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skidding_properties.cpp; path = ../../karts/skidding_properties.cpp; sourceTree = SOURCE_ROOT; };
+		95EF1E091506D6CF0041AC79 /* skidding_properties.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skidding_properties.hpp; path = ../../karts/skidding_properties.hpp; sourceTree = SOURCE_ROOT; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
@@ -2564,6 +2567,8 @@
 				95C2B1220F296545000D3E5D /* moveable.hpp */,
 				95A197931502E5320074B892 /* skidding.cpp */,
 				95A197941502E5320074B892 /* skidding.hpp */,
+				95EF1E081506D6CF0041AC79 /* skidding_properties.cpp */,
+				95EF1E091506D6CF0041AC79 /* skidding_properties.hpp */,
 			);
 			name = karts;
 			path = ../../karts;
@@ -3229,6 +3234,7 @@
 				95A1978F1502E5020074B892 /* replay_play.cpp in Sources */,
 				95A197901502E5020074B892 /* replay_recorder.cpp in Sources */,
 				95A197951502E5320074B892 /* skidding.cpp in Sources */,
+				95EF1E0A1506D6CF0041AC79 /* skidding_properties.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
