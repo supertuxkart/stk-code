@@ -296,7 +296,7 @@ void SFXManager::dump()
 {
     for(int n=0; n<(int)m_all_sfx.size(); n++)
     {
-        printf("Sound %i : %s \n", n, ((SFXOpenAL*)m_all_sfx[n])->getBuffer()->getFileName().c_str());
+        printf("Sound %i : %s \n", n, m_all_sfx[n]->getBuffer()->getFileName().c_str());
     }
 }
 
