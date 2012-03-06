@@ -31,6 +31,7 @@
 class DummySFX : public SFXBase
 {
 public:
+                       DummySFX(SFXBuffer* buffer, bool positional, float gain) {}
     virtual           ~DummySFX()                     {}
     
     /** Late creation, if SFX was initially disabled */
@@ -48,7 +49,7 @@ public:
     virtual void       onSoundEnabledBack()           {}
     virtual void       setRolloff(float rolloff)      {}
     
-    virtual const SFXBuffer* getBuffer()              { return NULL; }
+    virtual const SFXBuffer* getBuffer() const        { return NULL; }
     
 };   // DummySFX
 
