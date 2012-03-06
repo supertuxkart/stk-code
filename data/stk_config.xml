@@ -184,7 +184,7 @@
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
           visual="1.0" visual-time="0"
           time-till-bonus="1.5 2.5"
-          bonus-force="100 200" bonus-time="3.0 4.0" 
+          bonus-speed="100 200" bonus-time="3.0 4.0" 
           post-skid-rotate-factor="1" reduce-turn-min="0.6"
           reduce-turn-max="0.8"/>
 

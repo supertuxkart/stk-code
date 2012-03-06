@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "karts/kart.hpp"
+#include "karts/skidding_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -312,7 +313,7 @@ void AIBaseController::setSteering(float angle, float dt)
     // FIXME: Disable skidding for now if the new skidding
     // code is activated, since the AI can not handle this
     // properly.
-    if(m_kart->getKartProperties()->getSkidVisualTime()>0)
+    if(m_kart->getKartProperties()->getSkiddingProperties()->getSkidVisualTime()>0)
         m_controls->m_skid = false;
     float old_steer      = m_controls->m_steer;
 

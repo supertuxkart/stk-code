@@ -25,9 +25,10 @@
 
 /** Constructor of the skidding object.
  */
-Skidding::Skidding(Kart *kart)
+Skidding::Skidding(Kart *kart, const SkiddingProperties *sp)
 {
-    m_kart = kart;
+    m_kart             = kart;
+    copyFrom(sp);
     reset();
 }   // Skidding
 
@@ -37,7 +38,7 @@ Skidding::Skidding(Kart *kart)
 void Skidding::reset()
 {
     m_skid_time   = 0.0f;
-    m_skid_state  = SKID_NONE;
+    m_skid_state  = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
     m_skid_factor = 1.0f;
 }   // reset
 
@@ -56,12 +57,11 @@ void Skidding::update(float dt, bool is_on_ground,
     {
         if((fabs(steering) > 0.001f) && skidding)
         {
-            m_skid_factor +=  m_kart->getKartProperties()->getSkidIncrease()
-                         *dt/m_kart->getKartProperties()->getTimeTillMaxSkid();
+            m_skid_factor +=  m_skid_increase *dt/m_time_till_max_skid;
         }
         else if(m_skid_factor>1.0f)
         {
-            m_skid_factor *= m_kart->getKartProperties()->getSkidDecrease();
+            m_skid_factor *= m_skid_decrease;
         }
     }
     else
@@ -69,13 +69,13 @@ void Skidding::update(float dt, bool is_on_ground,
         m_skid_factor = 1.0f; // Lose any skid factor as soon as we fly
     }
 
-    if(m_skid_factor>m_kart->getKartProperties()->getMaxSkid())
-        m_skid_factor = m_kart->getKartProperties()->getMaxSkid();
+    if(m_skid_factor>m_skid_max)
+        m_skid_factor = m_skid_max;
     else 
         if(m_skid_factor<1.0f) m_skid_factor = 1.0f;
 
     // FIXME hiker: remove once the new skidding code is finished.
-    if(m_kart->getKartProperties()->getSkidVisualTime()<=0)
+    if(m_skid_state == SKID_OLD)
         return;
 
     // This is only reached if the new skidding is enabled
@@ -113,10 +113,8 @@ void Skidding::update(float dt, bool is_on_ground,
         {
             m_skid_time += dt;
             float bonus_time, bonus_force;
-            unsigned int level = 
-                m_kart->getKartProperties()->getSkidBonus(m_skid_time,
-                                                          &bonus_time, 
-                                                          &bonus_force);
+            unsigned int level = getSkidBonus(&bonus_time, 
+                                              &bonus_force);
             // If at least level 1 bonus is reached, show appropriate gfx
             if(level>0) m_kart->getKartGFX()->setSkidLevel(level);
             // If player stops skidding, trigger bonus, and change state to
@@ -124,15 +122,11 @@ void Skidding::update(float dt, bool is_on_ground,
             if(!skidding) 
             {
                 m_skid_state = SKID_SHOW_GFX;
-                float t = (m_skid_time <= m_kart->getKartProperties()
-                                          ->getSkidVisualTime())
+                float t = (m_skid_time <= m_skid_visual_time)
                         ? m_skid_time
-                        : m_kart->getKartProperties()->getSkidVisualTime();
+                        : m_skid_visual_time;
                 float vso = getVisualSkidOffset();
-                btVector3 rot(0, 
-                              vso*m_kart->getKartProperties()
-                                        ->getPostSkidRotateFactor(),
-                              0);
+                btVector3 rot(0, vso*m_post_skid_rotate_factor, 0);
                 m_kart->getVehicle()->setTimedRotation(t, rot);
                 // skid_time is used to count backwards for the GFX
                 m_skid_time = t;
@@ -161,7 +155,28 @@ void Skidding::update(float dt, bool is_on_ground,
             m_skid_state = SKID_NONE;
         }
     }   // switch
-}   // updateSkidding
+}   // update
+
+// ----------------------------------------------------------------------------
+/** Determines the bonus time and speed given the currently accumulated
+ *  m_skid_time.
+ *  \param bonus_time On return contains how long the bonus should be active.
+ *  \param bonus_speed How much additional speed the kart should get.
+ *  \return The bonus level: 0 = no bonus, 1 = first entry in bonus array etc.
+ */
+unsigned int Skidding::getSkidBonus(float *bonus_time, 
+                                    float *bonus_speed) const
+{
+    *bonus_time  = 0;
+    *bonus_speed = 0;
+    for(unsigned int i=0; i<m_skid_bonus_speed.size(); i++)
+    {
+        if(m_skid_time<=m_skid_time_till_bonus[i]) return i;
+        *bonus_speed = m_skid_bonus_speed[i];
+        *bonus_time= m_skid_bonus_time[i];
+    }
+    return m_skid_bonus_speed.size();
+}   // getSkidBonusForce
 
 // ----------------------------------------------------------------------------
 /** Determines how much the graphics model of the kart should be rotated
@@ -171,22 +186,24 @@ void Skidding::update(float dt, bool is_on_ground,
  */
 float Skidding::getVisualSkidOffset() const
 {
-    if(m_kart->getKartProperties()->getSkidVisualTime()==0)
+    float speed = m_kart->getSpeed();
+    float steer_percent = m_kart->getSteerPercent();
+    float current_max_speed = m_kart->getCurrentMaxSpeed();
+    if(m_skid_visual_time==0)
     {
-        float speed_ratio = m_kart->getSpeed()
-                          / m_kart->MaxSpeed::getCurrentMaxSpeed();
-        float r = m_skid_factor / m_kart->getKartProperties()->getMaxSkid();
-        return m_kart->getSteerPercent() * speed_ratio * r;
+        float speed_ratio = speed / current_max_speed;
+        float r = m_skid_factor / m_skid_max;
+        return steer_percent * speed_ratio * r;
     }
 
     // New skidding code
-    float f = m_kart->getKartProperties()->getSkidVisual() 
-            * m_kart->getSteerPercent();
-    if(m_kart->getSpeed() < m_kart->getKartProperties()->getMaxSpeed())
-        f *= m_kart->getSpeed()/m_kart->getKartProperties()->getMaxSpeed();
+    float f = m_skid_visual * steer_percent;
+    //if(m_kart->getSpeed() < m_kart->getKartProperties()->getMaxSpeed())
+    //    f *= m_kart->getSpeed()/m_kart->getKartProperties()->getMaxSpeed();
+
     float st = fabsf(m_skid_time);
-    if(st<m_kart->getKartProperties()->getSkidVisualTime())
-        f *= st/m_kart->getKartProperties()->getSkidVisualTime();
+    if(st<m_skid_visual_time)
+        f *= st/m_skid_visual_time;
 
     return f;
 

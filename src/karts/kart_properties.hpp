@@ -34,10 +34,10 @@ using namespace irr;
 #include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
-#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class Material;
+class SkiddingProperties;
 class XMLNode;
 
 /** 
@@ -55,6 +55,11 @@ class KartProperties
 private:
     /** Base directory for this kart. */
     std::string              m_root;
+
+    /** The skididing properties for this kart, as a separate object in order
+     *  to reduce dependencies (and therefore compile time) when changing
+     *  any skidding property. */
+    SkiddingProperties *m_skidding_properties;
 
     /** The absolute path of the icon texture to use. */
     Material                *m_icon_material;
@@ -285,47 +290,6 @@ private:
     /** How long the slip stream speed increase will gradually be reduced. */
     float m_slipstream_fade_out_time;
 
-    /** Maximal increase of steering when skidding. */
-    float m_skid_max;
-    /** Skidding is multiplied by this when skidding 
-     *  to increase to m_skid_increase. */
-    float m_skid_increase;
-    /** Skidding is multiplied by this when not skidding to decrease to 1.0. */
-    float m_skid_decrease;
-    /** Time till maximum skidding is reached. */
-    float m_time_till_max_skid;
-    /** Additional rotation of 3d model when skidding. */
-    float m_skid_visual;              
-    /** How long it takes for visual skid to reach maximum. */
-    float m_skid_visual_time;
-    /** This factor is used to determine how much the chassis of a kart
-     *  should rotate to match the graphical view. A factor of 1 is 
-     *  identical, a smaller factor will rotate the kart less (which might
-     *  feel better). */
-    float m_post_skid_rotate_factor;
-    /** A factor is used to reduce the amount of steering while skidding. This
-     *  is the minimum factor used (i.e. resulting in the largest turn 
-     *  radius). */
-    float m_skid_reduce_turn_min;
-    /** A factor is used to reduce the amount of steering while skidding. This
-     *  is the maximum factor used (i.e. resulting in the smallest turn 
-     *  radius). */
-    float m_skid_reduce_turn_max;
-
-    /** Kart leaves skid marks. */
-    bool  m_has_skidmarks;
-
-    /** Time of skidding before you get a bonus boost. It's possible to
-     *  define more than one time, i.e. longer skidding gives more bonus. */
-    std::vector<float> m_skid_time_till_bonus;
-
-    /** How much additional speed a kart gets when skidding. It's possible to
-     *  define more than one force, i.e. longer skidding gives more bonus. */
-    std::vector<float> m_skid_bonus_force;
-
-    /** How long the bonus will last. It's possible to define more than one 
-    *   time, i.e. longer skidding gives more bonus. */
-    std::vector<float> m_skid_bonus_time;
 
     /** Make the AI to steer at slightly different points to make it less
      *  likely that the AI creates 'trains' - the kart behind getting 
@@ -367,14 +331,13 @@ private:
 public:
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
+    void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);
     float getStartupBoost   () const;
 
     /** Returns the maximum steering angle (depending on speed). */
     float getMaxSteerAngle  (float speed) const;
-    unsigned int getSkidBonus(float t, float *bonus_time, 
-                              float *bonus_force) const;
 
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }
@@ -651,41 +614,9 @@ public:
      *  had to be set. */
     float getShadowYOffset          () const {return m_shadow_y_offset;       }
     
-    /** Returns the maximum factor by which the steering angle
-     *  can be increased. */
-    float getMaxSkid                () const {return m_skid_max;              }
-
-    /** Returns the factor by which m_skidding is multiplied when the kart is
-     *  skidding to increase it to the maximum. */
-    float getSkidIncrease           () const {return m_skid_increase;         }
-
-    /** Returns the factor by which m_skidding is multiplied when the kart is
-     *  not skidding to decrease the current skidding amount back to 1.0f . */
-    float getSkidDecrease           () const {return m_skid_decrease;         }
-
-    /** Returns the time (in seconds) of drifting till the maximum skidding
-     *  is reached. */
-    float getTimeTillMaxSkid        () const {return m_time_till_max_skid;    }
-
-    /** Returns additional rotation of 3d model when skidding. */
-    float getSkidVisual             () const {return m_skid_visual;           }
-
-    /** Returns the time for the visual skid to reach maximum. */
-    float getSkidVisualTime         () const {return m_skid_visual_time;      }
-
-    /** Returns a factor to be used to determine how much the chassis of a 
-     *  kart should rotate to match the graphical view. A factor of 1 is 
-     *  identical, a smaller factor will rotate the kart less (which might
-     *  feel better). */
-    float getPostSkidRotateFactor  () const {return m_post_skid_rotate_factor;}
-
-    /** Returns the factor by which to recude the amount of steering while 
-        skidding. */
-    float getSkidReduceTurnMin     () const { return m_skid_reduce_turn_min;  }
-    float getSkidReduceTurnMax     () const { return m_skid_reduce_turn_max;  }
-
-    /** Returns if the kart leaves skidmarks or not. */
-    bool hasSkidmarks               () const {return m_has_skidmarks;         }
+    /** Returns a pointer to the skidding properties. */
+    const SkiddingProperties *getSkiddingProperties() const 
+                                               { return m_skidding_properties; }
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */

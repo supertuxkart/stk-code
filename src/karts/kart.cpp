@@ -187,7 +187,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     loadData(type, is_first_kart, animations);
 
     m_kart_gfx = new KartGFX(this);
-    m_skidding = new Skidding(this);
+    m_skidding = new Skidding(this, 
+                              m_kart_properties->getSkiddingProperties());
 
     reset();
 }   // Kart
@@ -455,6 +456,7 @@ Kart::~Kart()
         delete m_kart_chassis.getChildShape(i);
     }
     delete m_kart_model;
+    delete m_skidding;
     if(m_controller)
         delete m_controller;
     if(m_saved_controller)
@@ -1006,7 +1008,7 @@ void Kart::update(float dt)
     static video::SColor pink(255, 255, 133, 253);
     
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
-    if(m_kart_properties->hasSkidmarks())
+    if(m_kart_properties->getSkiddingProperties()->hasSkidmarks())
     {
         m_skidmarks->update(dt,
                             m_bubblegum_time > 0,
@@ -1612,14 +1614,15 @@ void Kart::updatePhysics(float dt)
     float steering = getMaxSteerAngle() * m_controls.m_steer;
     // FIXME: Misuse (for now) the skid visual time to disable the new 
     //        skidding code
-    if(m_kart_properties->getSkidVisualTime()==0)
+    if(m_kart_properties->getSkiddingProperties()->getSkidVisualTime()==0)
     {
         steering *= m_skidding->getSkidFactor();
     }
     else if(m_controls.m_skid)
     {
-     steering *= m_kart_properties->getSkidReduceTurnMin()
-              * sqrt(m_kart_properties->getMaxSkid()
+     steering *= m_kart_properties->getSkiddingProperties()
+                                  ->getSkidReduceTurnMin()
+              * sqrt(m_kart_properties->getSkiddingProperties()->getMaxSkid()
                      / m_skidding->getSkidFactor());
     }
     else
@@ -1753,7 +1756,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
 
-        // Lose some traction when skidding, to balance the adventage
+        // Lose some traction when skidding, to balance the advantage
         if(m_controls.m_skid)
             engine_power *= 0.5f;
 
@@ -1959,7 +1962,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
         
     m_slipstream = new SlipStream(this);
 
-    if(m_kart_properties->hasSkidmarks())
+    if(m_kart_properties->getSkiddingProperties()->hasSkidmarks())
     {
         m_skidmarks = new SkidMarks(*this);
         m_skidmarks->adjustFog( 

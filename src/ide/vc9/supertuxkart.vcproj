@@ -872,6 +872,10 @@
 					RelativePath="..\..\karts\skidding.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\karts\skidding_properties.cpp"
+					>
+				</File>
 				<Filter
 					Name="controller"
 					>
@@ -2012,6 +2016,10 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\skidding.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\skidding_properties.hpp"
 					>
 				</File>
 				<Filter
