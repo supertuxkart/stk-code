@@ -91,6 +91,8 @@ protected:
     /** For action trigger objects */
     std::string                    m_action;
     
+    std::string                    m_interaction;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject(const core::vector3df& pos, const core::vector3df& hpr,

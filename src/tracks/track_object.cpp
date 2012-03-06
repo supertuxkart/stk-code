@@ -58,6 +58,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     std::string sound;
     xml_node.get("sound",   &sound       );
 
+    m_interaction = "static";
+    xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
     
     std::string type;

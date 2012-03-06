@@ -65,6 +65,8 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
 /** Creates a bullet rigid body for this animated model. */
 void ThreeDAnimation::createPhysicsBody(const std::string &shape)
 {
+    if (m_interaction == "ghost") return;
+    
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
