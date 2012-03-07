@@ -32,7 +32,7 @@ Skidding::Skidding(Kart *kart, const SkiddingProperties *sp)
     reset();
 }   // Skidding
 
-// ----------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------
 /** Resets all skidding related values.
  */
 void Skidding::reset()
@@ -42,7 +42,25 @@ void Skidding::reset()
     m_skid_factor = 1.0f;
 }   // reset
 
-// ----------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------
+float Skidding::getSteering(float steer, float max_steer_angle)
+{
+    float steering = steer * max_steer_angle;
+
+    switch(m_skid_state)
+    {
+    case SKID_NONE:
+    case SKID_SHOW_GFX:
+    case SKID_OLD:      steering *= m_skid_factor;
+    case SKID_ACCUMULATE_LEFT:
+    case SKID_ACCUMULATE_RIGHT:
+         steering *= m_skid_reduce_turn_min
+                  * sqrt(m_skid_max / m_skid_factor);
+    }   // switch m_skid_state
+    return steering;
+}   // getSteering
+
+// ----------------------------------------------------------------------------
 /** Updates skidding status.
  *  \param dt Time step size.
  *  \param is_on_ground True if the kart is on ground.

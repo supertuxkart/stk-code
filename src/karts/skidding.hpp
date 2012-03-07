@@ -64,7 +64,7 @@ public:
       void update(float dt, bool is_on_ground, float steer,
                   bool skidding);
       float getVisualSkidOffset() const;
-
+      float getSteering(float steer, float max_steer_angle);
       // ----------------------------------------------------------------------
       /** Returns the current skid factor in [1, skid_max_for_this_kart]. */
       float getSkidFactor() const { return m_skid_factor; }

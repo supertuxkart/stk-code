@@ -1616,27 +1616,14 @@ void Kart::updatePhysics(float dt)
     
     m_skidding->update(dt, isOnGround(), m_controls.m_steer, 
                        m_controls.m_skid);
-    updateSliding();
 
-    float steering = getMaxSteerAngle() * m_controls.m_steer;
-    // FIXME: Misuse (for now) the skid visual time to disable the new 
-    //        skidding code
-    if(m_kart_properties->getSkiddingProperties()->getSkidVisualTime()==0)
-    {
-        steering *= m_skidding->getSkidFactor();
-    }
-    else if(m_controls.m_skid)
-    {
-     steering *= m_kart_properties->getSkiddingProperties()
-                                  ->getSkidReduceTurnMin()
-              * sqrt(m_kart_properties->getSkiddingProperties()->getMaxSkid()
-                     / m_skidding->getSkidFactor());
-    }
-    else
-        steering *= m_skidding->getSkidFactor();
+    float steering = m_skidding->getSteering(m_controls.m_steer,
+                                             getMaxSteerAngle());
 
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
+
+    updateSliding();
 
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
