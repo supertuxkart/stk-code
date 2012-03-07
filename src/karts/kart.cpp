@@ -1937,8 +1937,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     // attachment is needed in createPhysics (which gets the mass, which
     // is dependent on the attachment).
     m_attachment = new Attachment(this);
-    if(type!=RaceManager::KT_GHOST)
-        createPhysics();
+    createPhysics();
 
     // Attach Particle System
     
