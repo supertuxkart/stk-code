@@ -59,9 +59,9 @@ void ReplayPlay::init()
 void ReplayPlay::reset()
 {
     m_next = 0;
-    for(unsigned int i=0; i<m_ghost_karts.size(); i++)
+    for(unsigned int i=0; i<(unsigned int)m_ghost_karts.size(); i++)
     {
-        m_ghost_karts[i]->reset();
+        m_ghost_karts[i].reset();
     }
 }   // reset
 
@@ -72,8 +72,8 @@ void ReplayPlay::reset()
 void ReplayPlay::update(float dt)
 {
     // First update all ghost karts
-    for(unsigned int i=0; i<m_ghost_karts.size(); i++)
-        m_ghost_karts[i]->update(dt);
+    for(unsigned int i=0; i<(unsigned int)m_ghost_karts.size(); i++)
+        m_ghost_karts[i].update(dt);
 
 }   // update
 
@@ -82,11 +82,7 @@ void ReplayPlay::update(float dt)
  */
 void ReplayPlay::Load()
 {
-    for(unsigned int i=0; i<m_ghost_karts.size(); i++)
-    {
-        delete m_ghost_karts[i];
-    }
-    m_ghost_karts.clear();
+    m_ghost_karts.clearAndDeleteAll();
     char s[1024], s1[1024];
 
     FILE *fd = openReplayFile(/*writeable*/false);
@@ -184,6 +180,8 @@ void ReplayPlay::Load()
                     k, kart_id);
         }
         m_ghost_karts.push_back(new GhostKart(std::string(s1)));
+        m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST, 
+                                                   /*is_first_kart*/false);
 
         fgets(s, 1023, fd);
         unsigned int size;
@@ -211,7 +209,7 @@ void ReplayPlay::Load()
             {
                 btQuaternion q(rx, ry, rz, rw);
                 btVector3 xyz(x, y, z);
-                m_ghost_karts[k]->addTransform(time, btTransform(q, xyz));
+                m_ghost_karts[k].addTransform(time, btTransform(q, xyz));
             }
             else
             {

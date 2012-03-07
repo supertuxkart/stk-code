@@ -1108,6 +1108,7 @@ void cleanSuperTuxKart()
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Referee::cleanup();
+    if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     if(network_http)            delete network_http;
     if(news_manager)            delete news_manager;

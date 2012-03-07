@@ -94,10 +94,8 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     Kart *new_kart         = new KartWithStats(kart_ident, 
                                                /*world kart id*/ index, 
                                                /*position*/ index+1,
-                                               /*is_first_kart*/false, 
-                                               init_pos, 
-                                               RaceManager::KT_AI);
-
+                                               init_pos);
+    new_kart->init(RaceManager::KT_AI, /*is_first_kart*/false);
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
 

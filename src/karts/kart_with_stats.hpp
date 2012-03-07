@@ -67,9 +67,8 @@ private:
 public:
                  KartWithStats(const std::string& ident, 
                                unsigned int world_kart_id,
-                               int position,  bool is_first_kart,
-                               const btTransform& init_transform, 
-                               RaceManager::KartType type);
+                               int position,
+                               const btTransform& init_transform);
     virtual void update(float dt);
     virtual void reset();
     virtual void handleExplosion(const Vec3& pos, bool direct_hit);

@@ -315,7 +315,7 @@ void Powerup::use()
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL, 
                                            stk_config->m_anvil_time);
-                kart->updatedWeight();
+                kart->updateWeight();
                 kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
                 
                 // should we position the sound at the kart that is hit,

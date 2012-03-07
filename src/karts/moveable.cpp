@@ -179,5 +179,6 @@ void Moveable::createBody(float mass, btTransform& trans,
 void Moveable::setTrans(const btTransform &t)
 {
     m_transform=t;
-    m_motion_state->setWorldTransform(t);
+    if(m_motion_state)
+        m_motion_state->setWorldTransform(t);
 }   // setTrans

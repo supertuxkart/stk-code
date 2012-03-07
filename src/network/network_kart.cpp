@@ -29,7 +29,7 @@ NetworkKart::NetworkKart(const std::string &kart_name,
                          int global_player_id,
                          RaceManager::KartType type)
                          : Kart(kart_name, world_kart_id, position, 
-                                /*is_first_kart*/false, init_transform, type)
+                                init_transform)
 {
     m_global_player_id = global_player_id;
 }   // NetworkKart

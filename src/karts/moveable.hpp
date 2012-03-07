@@ -89,14 +89,16 @@ public:
     void setXYZ(const Vec3& a) 
     {
         m_transform.setOrigin(a);
-        m_motion_state->setWorldTransform(m_transform);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
     /** Sets the rotation of this moveable. */
     void setRotation(const btQuaternion&a)
     {
         m_transform.setRotation(a);
-        m_motion_state->setWorldTransform(m_transform);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
     virtual void  updateGraphics(float dt, const Vec3& off_xyz,  

@@ -49,7 +49,12 @@ public:
     virtual void update (float dt);
     virtual void addTransform(float time, const btTransform &trans);
     virtual void reset();
-
+    // ------------------------------------------------------------------------
+    /** No physics body for ghost kart, so nothing to adjust. */
+    virtual void updateWeight() {};
+    // ------------------------------------------------------------------------
+    /** No physics for ghost kart. */
+    virtual void applyEngineForce (float force) {}
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
     virtual void createPhysics() {}

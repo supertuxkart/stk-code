@@ -73,8 +73,7 @@
  *  \param init_transform  The initial position and rotation for this kart.
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id, 
-            int position, bool is_first_kart,
-            const btTransform& init_transform, RaceManager::KartType type)
+            int position, const btTransform& init_transform)
      : TerrainInfo(1),
        Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
 
@@ -93,6 +92,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
     m_kart_model           = m_kart_properties->getKartModelCopy();
+    m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
     m_world_kart_id        = world_kart_id;
@@ -147,6 +147,14 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 
+}   // Kart
+
+// -----------------------------------------------------------------------------
+/** This is a second initialisation phase, necessary since in the constructor
+ *  virtual functions are not called for any superclasses.
+ */
+void Kart::init(RaceManager::KartType type, bool is_first_kart)
+{
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
@@ -173,6 +181,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         fprintf(stdout, "Error: Could not allocate a sfx object for the kart. Further errors may ensue!\n");
     }
 
+
     bool animations = true;
     const int anims = UserConfigParams::m_show_steering_animations;
     if (anims == ANIMS_NONE)
@@ -183,7 +192,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     {
         animations = false;
     }
-    
     loadData(type, is_first_kart, animations);
 
     m_kart_gfx = new KartGFX(this);
@@ -191,7 +199,121 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
                               m_kart_properties->getSkiddingProperties());
 
     reset();
-}   // Kart
+}   // init
+
+//-----------------------------------------------------------------------------
+/** Reset before a new race. It will remove all attachments, and
+ *  puts the kart back at its original start position.
+ */
+void Kart::reset()
+{
+    if (m_flying)
+    {
+        m_flying = false;
+        stopFlying();
+    }
+    
+    EmergencyAnimation::reset();
+    MaxSpeed::reset();
+    if (m_camera)
+    {
+        m_camera->reset();
+        m_camera->setInitialTransform();
+    }
+    
+    // Reset animations and wheels
+    m_kart_model->reset();
+
+    // If the controller was replaced (e.g. replaced by end controller), 
+    // restore the original controller. 
+    if(m_saved_controller)
+    {
+        m_controller       = m_saved_controller;
+        m_saved_controller = NULL;
+    }
+    m_kart_model->setAnimation(KartModel::AF_DEFAULT);
+    m_view_blocked_by_plunger = 0.0;
+    m_attachment->clear();
+    m_kart_gfx->reset();
+    m_skidding->reset();
+
+    
+    if (m_collision_particles) 
+        m_collision_particles->setCreationRateAbsolute(0.0f);
+    m_powerup.reset();
+
+    m_race_position        = m_initial_position;
+    m_finished_race        = false;
+    m_finish_time          = 0.0f;
+    m_bubblegum_time       = 0.0f;
+    m_invulnerable_time    = 0.0f;
+    m_squash_time          = 0.0f;
+    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    m_collected_energy     = 0;
+    m_has_started          = false;
+    m_wheel_rotation       = 0;
+    m_bounce_back_time     = 0.0f;
+    m_time_last_crash      = 0.0f;
+    m_speed                = 0.0f;
+    m_view_blocked_by_plunger = 0.0f;
+    
+    if(m_terrain_sound)
+    {
+        sfx_manager->deleteSFX(m_terrain_sound);
+    }
+    if(m_previous_terrain_sound)
+    {
+        sfx_manager->deleteSFX(m_previous_terrain_sound);
+    }
+    
+    m_terrain_sound = NULL;
+    m_previous_terrain_sound = NULL;
+    
+    if(m_engine_sound)
+        m_engine_sound->stop();
+
+    m_controls.m_steer     = 0.0f;
+    m_controls.m_accel     = 0.0f;
+    m_controls.m_brake     = false;
+    m_controls.m_nitro     = false;
+    m_controls.m_skid      = false;
+    m_controls.m_fire      = false;
+    m_controls.m_look_back = false;
+    m_slipstream->reset();
+    if(m_vehicle)
+    {
+        m_vehicle->reset();
+    }
+
+    setTrans(m_reset_transform);
+
+    applyEngineForce (0.0f);
+
+    Moveable::reset();
+    if (m_skidmarks)
+    {
+        m_skidmarks->reset();
+        const Track *track = 
+            track_manager->getTrack( race_manager->getTrackName() );
+        m_skidmarks->adjustFog(track->isFogEnabled() );
+    }
+    
+
+    TerrainInfo::update(getXYZ());
+
+    // Reset is also called when the kart is created, at which time
+    // m_controller is not yet defined, so this has to be tested here.
+    if(m_controller)
+        m_controller->reset();
+
+    // 3 strikes mode can hide the wheels
+    scene::ISceneNode** wheels = getKartModel()->getWheelNodes();
+    if(wheels[0]) wheels[0]->setVisible(true);
+    if(wheels[1]) wheels[1]->setVisible(true);
+    if(wheels[2]) wheels[2]->setVisible(true);
+    if(wheels[3]) wheels[3]->setVisible(true);
+    
+}   // reset
 
 // -----------------------------------------------------------------------------
 /** Saves the old controller in m_saved_controller and stores a new 
@@ -446,10 +568,14 @@ Kart::~Kart()
 
     if(m_skidmarks) delete m_skidmarks ;
 
-    World::getWorld()->getPhysics()->removeKart(this);
-    delete m_vehicle;
-    delete m_vehicle_raycaster;
-    delete m_uprightConstraint;
+    // Ghost karts don't have a body
+    if(m_body)
+    {
+        World::getWorld()->getPhysics()->removeKart(this);
+        delete m_vehicle;
+        delete m_vehicle_raycaster;
+        delete m_uprightConstraint;
+    }
 
     for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
     {
@@ -504,133 +630,14 @@ void Kart::capSpeed(float max_speed)
 /** This method is to be called every time the mass of the kart is updated,
  *  which includes attaching an anvil to the kart (and detaching).
  */
-void Kart::updatedWeight()
+void Kart::updateWeight()
 {
     float mass = m_kart_properties->getMass() + m_attachment->weightAdjust();
 
     btVector3 inertia;
     m_kart_chassis.calculateLocalInertia(mass, inertia);
     m_body->setMassProps(mass, inertia);
-}   // updatedWeight
-
-//-----------------------------------------------------------------------------
-/** Reset before a new race. It will remove all attachments, and
- *  puts the kart back at its original start position.
- */
-void Kart::reset()
-{
-    if (m_flying)
-    {
-        m_flying = false;
-        stopFlying();
-    }
-    
-    EmergencyAnimation::reset();
-    MaxSpeed::reset();
-    if (m_camera)
-    {
-        m_camera->reset();
-        m_camera->setInitialTransform();
-    }
-    
-    // Reset animations and wheels
-    m_kart_model->reset();
-
-    // If the controller was replaced (e.g. replaced by end controller), 
-    // restore the original controller. 
-    if(m_saved_controller)
-    {
-        m_controller       = m_saved_controller;
-        m_saved_controller = NULL;
-    }
-    m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-    m_view_blocked_by_plunger = 0.0;
-    m_attachment->clear();
-    m_kart_gfx->reset();
-    m_skidding->reset();
-
-    
-    if (m_collision_particles) 
-        m_collision_particles->setCreationRateAbsolute(0.0f);
-    m_powerup.reset();
-
-    m_race_position        = m_initial_position;
-    m_finished_race        = false;
-    m_finish_time          = 0.0f;
-    m_bubblegum_time       = 0.0f;
-    m_invulnerable_time    = 0.0f;
-    m_squash_time          = 0.0f;
-    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-    m_collected_energy     = 0;
-    m_has_started          = false;
-    m_wheel_rotation       = 0;
-    m_bounce_back_time     = 0.0f;
-    m_time_last_crash      = 0.0f;
-    m_speed                = 0.0f;
-    m_view_blocked_by_plunger = 0.0f;
-    
-    if(m_terrain_sound)
-    {
-        sfx_manager->deleteSFX(m_terrain_sound);
-    }
-    if(m_previous_terrain_sound)
-    {
-        sfx_manager->deleteSFX(m_previous_terrain_sound);
-    }
-    
-    m_terrain_sound = NULL;
-    m_previous_terrain_sound = NULL;
-    
-    if(m_engine_sound)
-        m_engine_sound->stop();
-
-    m_controls.m_steer     = 0.0f;
-    m_controls.m_accel     = 0.0f;
-    m_controls.m_brake     = false;
-    m_controls.m_nitro     = false;
-    m_controls.m_skid      = false;
-    m_controls.m_fire      = false;
-    m_controls.m_look_back = false;
-    m_slipstream->reset();
-    m_vehicle->deactivateZipper();
-
-    // Set the brakes so that karts don't slide downhill
-    m_vehicle->setAllBrakes(5.0f);
-
-    setTrans(m_reset_transform);
-
-    applyEngineForce (0.0f);
-
-    Moveable::reset();
-    if (m_skidmarks)
-    {
-        m_skidmarks->reset();
-        const Track *track = 
-            track_manager->getTrack( race_manager->getTrackName() );
-        m_skidmarks->adjustFog(track->isFogEnabled() );
-    }
-    
-    m_vehicle->reset();
-    for(int j=0; j<m_vehicle->getNumWheels(); j++)
-    {
-        m_vehicle->updateWheelTransform(j, true);
-    }
-
-    TerrainInfo::update(getXYZ());
-
-    // Reset is also called when the kart is created, at which time
-    // m_controller is not yet defined, so this has to be tested here.
-    if(m_controller)
-        m_controller->reset();
-
-    // 3 strikes mode can hide the wheels
-    scene::ISceneNode** wheels = getKartModel()->getWheelNodes();
-    if(wheels[0]) wheels[0]->setVisible(true);
-    if(wheels[1]) wheels[1]->setVisible(true);
-    if(wheels[2]) wheels[2]->setVisible(true);
-    if(wheels[3]) wheels[3]->setVisible(true);
-    
-}   // reset
+}   // updateWeight
 
 //-----------------------------------------------------------------------------
 /** Sets that this kart has finished the race and finishing time. It also
@@ -1930,7 +1937,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     // attachment is needed in createPhysics (which gets the mass, which
     // is dependent on the attachment).
     m_attachment = new Attachment(this);
-    createPhysics();
+    if(type!=RaceManager::KT_GHOST)
+        createPhysics();
 
     // Attach Particle System
     

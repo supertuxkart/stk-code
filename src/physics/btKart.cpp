@@ -109,7 +109,7 @@ void btKart::reset()
         btWheelInfo &wheel                     = m_wheelInfo[i];
         wheel.m_raycastInfo.m_suspensionLength = 0;
         wheel.m_rotation                       = 0;
-        updateWheelTransformsWS(wheel);
+        updateWheelTransform(i, true);
     }
     m_zipper_active             = false;
     m_zipper_velocity           = btScalar(0);
@@ -121,6 +121,10 @@ void btKart::reset()
     m_time_additional_impulse   = 0;
     m_additional_rotation       = btVector3(0,0,0);
     m_time_additional_rotation  = 0;
+
+    // Set the brakes so that karts don't slide downhill
+    setAllBrakes(5.0f);
+
 }   // reset
 
 // ----------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 #define HEADER_REPLAY__PLAY_HPP
 
 #include "replay/replay_base.hpp"
+#include "utils/ptr_vector.hpp"
 
 #include <string>
 #include <vector>
@@ -38,7 +39,7 @@ private:
     unsigned int m_next;
     
     /** All ghost karts. */
-    std::vector<GhostKart*> m_ghost_karts;
+    PtrVector<GhostKart>    m_ghost_karts;
 
           ReplayPlay();
          ~ReplayPlay();

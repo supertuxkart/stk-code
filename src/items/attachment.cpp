@@ -186,7 +186,7 @@ void Attachment::clear()
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to
     // ATTACH_NOTHING in order to reset the physics parameters.
-    m_kart->updatedWeight();
+    m_kart->updateWeight();
 }   // clear
 
 // -----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             // Reduce speed once (see description above), all other changes are
             // handled in Kart::updatePhysics
             m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
-            m_kart->updatedWeight();
+            m_kart->updateWeight();
             break ;
         }   // switch
     }

@@ -23,8 +23,7 @@
 
 GhostKart::GhostKart(const std::string& ident)
              : Kart(ident, /*world kart id*/99999, 
-                    /*position*/-1, /*is_first_kart*/false,
-                    btTransform(), RaceManager::KT_GHOST)
+                    /*position*/-1, btTransform())
 {
     m_current = 0;
 }   // GhostKart

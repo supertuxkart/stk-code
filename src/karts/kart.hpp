@@ -213,17 +213,18 @@ protected:
     
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
-                        int position,  bool is_first_kart,
-                        const btTransform& init_transform, RaceManager::KartType type);
+                        int position, const btTransform& init_transform);
     virtual       ~Kart();
+    virtual void   init(RaceManager::KartType type, bool is_first_kart);
     void           loadData(RaceManager::KartType type, bool is_first_kart,
                             bool animatedModel);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
+    virtual void   updateWeight     ();
     bool           isInRest         () const;
     void           setSuspensionLength();
-    void           applyEngineForce (float force);
+    virtual void   applyEngineForce (float force);
     float          handleNitro      (float dt);
     float          getActualWheelForce();
 
@@ -233,7 +234,6 @@ public:
     void           startEngineSFX   ();
     void           adjustSpeed      (float f);
     void           capSpeed         (float max_speed);
-    void           updatedWeight    ();
     virtual void   collectedItem    (Item *item, int random_attachment);
     virtual void   reset            ();
     void           handleZipper     (const Material *m=NULL, bool play_sound=false);
