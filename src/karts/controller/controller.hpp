@@ -72,13 +72,16 @@ public:
     virtual void  finishedRace       (float time) {};
     virtual bool  isPlayerController () const {return false;}
     virtual bool  isNetworkController() const {return false;}
+    virtual const irr::core::stringw& getNamePostfix() const;
+    // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void  action             (PlayerAction action, int value) {}
+    // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use.            */
     virtual void  newLap             (int lap) {}
-    virtual const irr::core::stringw& getNamePostfix() const;
-
+    // ------------------------------------------------------------------------
+    virtual void  skidBonusTriggered() {}
 };   // Controller
 
 #endif

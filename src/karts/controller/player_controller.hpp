@@ -57,6 +57,7 @@ public:
     void           handleZipper      (bool play_sound);
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
+    virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
     virtual void   finishedRace      (float time);
     bool           isPlayerController() const {return true;}

@@ -246,6 +246,15 @@ void PlayerController::steer(float dt, int steer_val)
 }   // steer
 
 //-----------------------------------------------------------------------------
+/** Callback when the skidding bonus is triggered. The player controller
+ *  resets the current steering to 0, which makes the kart easier to control.
+ */
+void PlayerController::skidBonusTriggered()
+{
+    m_controls->m_steer = 0;
+}   // skidBonusTriggered
+
+//-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
 void PlayerController::update(float dt)

@@ -131,7 +131,6 @@ public:
     float getSkidReduceTurnMax     () const { return m_skid_reduce_turn_max;  }
 
 
-
 };   // SkiddingProperties
 
 

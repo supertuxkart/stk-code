@@ -36,6 +36,17 @@ class Skidding : public SkiddingProperties
 public:
     LEAK_CHECK();
 private:
+    /** This is m_skid_reduce_turn_max - m_skid_reduce_turn_min. */
+    float m_skid_reduce_turn_delta;
+
+    /** This is the actual steering (in fraction of max-steering-angle)
+     *  to be used by this kart. */
+    float m_real_steering;
+
+    /** An additional rotation (heading) of the kart while skidding. This
+     *  is only a graphical effect, the actual physics body is not rotated. */
+    float m_visual_rotation;
+
     /** Accumulated skidding factor. */
     float m_skid_factor;
 
@@ -48,29 +59,38 @@ private:
      *  SKID_ACCUMULATE_LEFT: Kart is skidding to the left and accumulating
      *             for bonus.
      *  SKID_ACCUMULATE_RIGHT: Similar for turning right
-     *  SKID_SHOW_GFX: Shows the gfx, while the bonus is actibe. */
+     *  SKID_SHOW_GFX_LEFT: Shows the gfx, while the bonus is active,
+     *             and the kart was turning left.
+     *  SKID_SHOW_GFX_RIGHT: Similar for turning right. */
     enum  {SKID_OLD, SKID_NONE, SKID_ACCUMULATE_LEFT, SKID_ACCUMULATE_RIGHT,
-           SKID_SHOW_GFX} 
+           SKID_SHOW_GFX_LEFT, SKID_SHOW_GFX_RIGHT} 
           m_skid_state;
 
     /** A read-only pointer to the kart's properties. */
     Kart *m_kart;
 
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed) const;
-
+    void  updateSteering(float steer);
 public:
            Skidding(Kart *kart, const SkiddingProperties *sp);
       void reset();
       void update(float dt, bool is_on_ground, float steer,
                   bool skidding);
-      float getVisualSkidOffset() const;
-      float getSteering(float steer, float max_steer_angle);
+      // ----------------------------------------------------------------------
+      /** Determines how much the graphics model of the kart should be rotated
+       *  additionally (for skidding), depending on how long the kart has been
+       *  skidding etc. */
+      float getVisualSkidRotation() const { return m_visual_rotation; };
       // ----------------------------------------------------------------------
       /** Returns the current skid factor in [1, skid_max_for_this_kart]. */
       float getSkidFactor() const { return m_skid_factor; }
       // ----------------------------------------------------------------------
       /** Returns true if the kart is skidding. */
       bool isSkidding() const { return m_skid_factor>1.0f; }
+      // ----------------------------------------------------------------------
+      /** Returns the steering fraction to be used by the physics. This is
+       *  a fraction of the maximum steering angle ( so in [-1, 1]). */
+      float getSteeringFraction() { return m_real_steering; }
 
 };   // Skidding
 

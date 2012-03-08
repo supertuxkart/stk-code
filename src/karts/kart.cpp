@@ -328,7 +328,7 @@ void Kart::setController(Controller *controller)
     m_controller       = controller;
 }   // setController
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** Sets the position in race this kart has . 
  *  The position in this race for this kart (1<=p<=n)
  */
@@ -339,6 +339,7 @@ void Kart::setPosition(int p)
 }   // setPosition
 
 // -----------------------------------------------------------------------------
+
 /** Returns a transform that will align an object with the kart: the heading 
  *  and the pitch will be set appropriately. A custom pitch value can be 
  *  specified in order to overwrite the terrain pitch (which would be used
@@ -1627,9 +1628,7 @@ void Kart::updatePhysics(float dt)
     m_skidding->update(dt, isOnGround(), m_controls.m_steer, 
                        m_controls.m_skid);
 
-    float steering = m_skidding->getSteering(m_controls.m_steer,
-                                             getMaxSteerAngle());
-
+    float steering = getMaxSteerAngle() * m_skidding->getSteeringFraction();
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
 
@@ -2071,7 +2070,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
     Moveable::updateGraphics(dt, center_shift, 
-                             btQuaternion(m_skidding->getVisualSkidOffset(), 
+                             btQuaternion(m_skidding->getVisualSkidRotation(), 
                                           0, 0));
     
     /*
@@ -2105,7 +2104,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 // ----------------------------------------------------------------------------
 btQuaternion Kart::getVisualRotation() const
 {
-    return getRotation() * btQuaternion(m_skidding->getVisualSkidOffset(), 0, 0);
+    return getRotation() 
+         * btQuaternion(m_skidding->getVisualSkidRotation(), 0, 0);
 }   // getVisualRotation
 
 
