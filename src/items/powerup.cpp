@@ -26,6 +26,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"

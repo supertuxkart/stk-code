@@ -27,6 +27,7 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"

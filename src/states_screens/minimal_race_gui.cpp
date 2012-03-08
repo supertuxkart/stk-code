@@ -34,6 +34,7 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"

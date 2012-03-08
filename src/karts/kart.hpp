@@ -29,7 +29,6 @@
 #include "LinearMath/btTransform.h"
 
 #include "items/powerup.hpp"
-#include "karts/controller/controller.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/emergency_animation.hpp"
 #include "karts/max_speed.hpp"
@@ -43,6 +42,7 @@ class btUprightConstraint;
 
 class Attachment;
 class Camera;
+class Controller;
 class Item;
 class KartGFX;
 class KartModel;
@@ -244,6 +244,7 @@ public:
     
     virtual void   update           (float dt);
     virtual void   finishedRace     (float time);
+    virtual void   setPosition(int p);
     void           beep             ();
     void           showZipperFire   ();
     bool           playCustomSFX    (unsigned int type);
@@ -268,13 +269,6 @@ public:
     /** Sets a new powerup. */
     void setPowerup (PowerupManager::PowerupType t, int n)
                                      { m_powerup.set(t, n); }
-    // ------------------------------------------------------------------------
-    /** Sets the position in race this kart has (1<=p<=n). */
-    virtual void setPosition(int p)    
-    {
-        m_controller->setPosition(p);
-        m_race_position = p;
-    }   // setPosition
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
     const Attachment* getAttachment() const {return m_attachment; }

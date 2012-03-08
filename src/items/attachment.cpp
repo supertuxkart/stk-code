@@ -28,6 +28,7 @@
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
 #include "karts/kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"

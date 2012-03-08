@@ -18,7 +18,9 @@
 
 #include "graphics/skid_marks.hpp"
 
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "physics/btKart.hpp"
 

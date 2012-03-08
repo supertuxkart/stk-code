@@ -328,6 +328,16 @@ void Kart::setController(Controller *controller)
     m_controller       = controller;
 }   // setController
 
+// ----------------------------------------------------------------------------
+/** Sets the position in race this kart has . 
+ *  The position in this race for this kart (1<=p<=n)
+ */
+void Kart::setPosition(int p)    
+{
+    m_controller->setPosition(p);
+    m_race_position = p;
+}   // setPosition
+
 // -----------------------------------------------------------------------------
 /** Returns a transform that will align an object with the kart: the heading 
  *  and the pitch will be set appropriately. A custom pitch value can be 

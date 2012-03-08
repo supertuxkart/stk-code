@@ -22,6 +22,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/quad.hpp"

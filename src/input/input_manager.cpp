@@ -31,6 +31,7 @@
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"

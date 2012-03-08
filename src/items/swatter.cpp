@@ -33,6 +33,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "karts/kart.hpp"
 

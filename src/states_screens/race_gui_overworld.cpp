@@ -37,6 +37,7 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"

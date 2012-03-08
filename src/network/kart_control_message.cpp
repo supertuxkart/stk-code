@@ -18,6 +18,7 @@
 
 #include "network/kart_control_message.hpp"
 
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_kart.hpp"
 

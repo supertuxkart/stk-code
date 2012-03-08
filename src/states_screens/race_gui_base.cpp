@@ -38,6 +38,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
