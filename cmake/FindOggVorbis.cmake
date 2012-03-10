@@ -10,11 +10,11 @@
 #     OggVorbis library list
 
 
-find_path(OGGVORBIS_OGG_INCLUDE_DIR NAMES ogg/ogg.h)
-find_path(OGGVORBIS_VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h)
-find_library(OGGVORBIS_OGG_LIBRARY NAMES ogg Ogg)
-find_library(OGGVORBIS_VORBIS_LIBRARY NAMES vorbis Vorbis)
-find_library(OGGVORBIS_VORBISFILE_LIBRARY NAMES vorbisfile)
+find_path(OGGVORBIS_OGG_INCLUDE_DIR NAMES ogg/ogg.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+find_path(OGGVORBIS_VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+find_library(OGGVORBIS_OGG_LIBRARY NAMES ogg Ogg libogg PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+find_library(OGGVORBIS_VORBIS_LIBRARY NAMES vorbis Vorbis libvorbis PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+find_library(OGGVORBIS_VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
 
 if (APPLE)
     set(OGGVORBIS_OGG_INCLUDE_DIR "/Library/Frameworks/Ogg.framework/Headers/")

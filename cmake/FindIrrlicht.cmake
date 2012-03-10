@@ -19,20 +19,20 @@ if(APPLE)
 elseif(UNIX)
 	set(IRRLICHT_LIBRARY_DIR "${IRRLICHT_DIR}/lib/Linux")
 elseif(MSVC)
-	set(IRRLICHT_LIBRARY_DIR "${IRRLICHT_DIR}/lib/Win32-visualstudio")
+	set(IRRLICHT_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/dependencies/lib")
 else()
 	set(IRRLICHT_LIBRARY_DIR "${IRRLICHT_DIR}/lib/Win32-gcc")
 endif()
 
 # Find include directory and library
 find_path(IRRLICHT_INCLUDE_DIR NAMES irrlicht.h
-    PATHS ${IRRLICHT_DIR} /Library/Frameworks/IrrFramework.framework/Versions/A/Headers/
+    PATHS ${IRRLICHT_DIR} /Library/Frameworks/IrrFramework.framework/Versions/A/Headers/ ${PROJECT_SOURCE_DIR}/dependencies/include/irrlicht
     PATH_SUFFIXES include irrlicht)
 
 if(APPLE)
     find_library(IRRLICHT_LIBRARY NAMES IrrFramework PATHS ${IRRLICHT_LIBRARY_DIR})
 else()
-    find_library(IRRLICHT_LIBRARY NAMES Irrlicht PATHS ${IRRLICHT_LIBRARY_DIR})
+    find_library(IRRLICHT_LIBRARY NAMES Irrlicht PATHS ${IRRLICHT_LIBRARY_DIR} ${PROJECT_SOURCE_DIR})
 endif()
 
 # Determine Irrlicht version

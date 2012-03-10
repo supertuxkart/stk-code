@@ -45,7 +45,11 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 # OpenAL
-find_package(OpenAL REQUIRED)
+if(WIN32)
+  find_library(OPENAL_LIBRARY OpenAL32 REQUIRED PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+else()
+  find_package(OpenAL REQUIRED)
+endif()
 include_directories(${OPENAL_INCLUDE_DIR})
 
 # OggVorbis
@@ -53,7 +57,11 @@ find_package(OggVorbis REQUIRED)
 include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
 # CURL
-find_package(CURL REQUIRED)
+if(WIN32)
+  find_library(CURL_LIBRARIES curl libcurl_imp REQUIRED PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
+else()
+  find_package(CURL REQUIRED)
+endif()
 include_directories(${CURL_INCLUDE_DIRS})
 
 # Fribidi
@@ -72,6 +80,14 @@ endif()
 # Set some compiler options
 if(UNIX)
 	add_definitions(-Wall)
+endif()
+
+if(WIN32)
+    # By default windows.h has macros defined for min and max that screw up everything
+    add_definitions(-DNOMINMAX)
+	
+	# And shut up about unsafe stuff
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 # TODO: remove this switch
@@ -145,6 +161,11 @@ endif()
 if(USE_WIIUSE)
 	target_link_libraries(supertuxkart wiiuse bluetooth)
 	add_definitions(-DENABLE_WIIUSE)
+endif()
+
+if(WIN32)
+    find_library(PTHREAD_LIBRARY NAMES pthreadVC2 PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+	target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
 # Optional tools

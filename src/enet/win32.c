@@ -8,6 +8,9 @@
 #define ENET_BUILDING_LIB 1
 #include "enet/enet.h"
 
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winmm.lib")
+
 static enet_uint32 timeBase = 0;
 
 int
