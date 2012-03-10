@@ -124,8 +124,11 @@
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
+    <ClCompile Include="..\..\karts\ghost_kart.cpp" />
     <ClCompile Include="..\..\karts\kart_gfx.cpp" />
     <ClCompile Include="..\..\karts\kart_with_stats.cpp" />
+    <ClCompile Include="..\..\karts\skidding.cpp" />
+    <ClCompile Include="..\..\karts\skidding_properties.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp" />
@@ -161,6 +164,9 @@
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
     <ClCompile Include="..\..\modes\overworld.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
+    <ClCompile Include="..\..\replay\replay_base.cpp" />
+    <ClCompile Include="..\..\replay\replay_play.cpp" />
+    <ClCompile Include="..\..\replay\replay_recorder.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
@@ -271,10 +277,6 @@
     <ClCompile Include="..\..\tracks\track_manager.cpp" />
     <ClCompile Include="..\..\tracks\track_object.cpp" />
     <ClCompile Include="..\..\tracks\track_object_manager.cpp" />
-    <ClCompile Include="..\..\replay\replay_base.cpp" />
-    <ClCompile Include="..\..\replay\replay_buffers.cpp" />
-    <ClCompile Include="..\..\replay\replay_player.cpp" />
-    <ClCompile Include="..\..\replay\replay_recorder.cpp" />
     <ClCompile Include="..\..\io\file_manager.cpp" />
     <ClCompile Include="..\..\io\xml_node.cpp" />
     <ClCompile Include="..\..\io\xml_writer.cpp" />
@@ -353,8 +355,11 @@
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
+    <ClInclude Include="..\..\karts\ghost_kart.hpp" />
     <ClInclude Include="..\..\karts\kart_gfx.hpp" />
     <ClInclude Include="..\..\karts\kart_with_stats.hpp" />
+    <ClInclude Include="..\..\karts\skidding.hpp" />
+    <ClInclude Include="..\..\karts\skidding_properties.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp" />
@@ -403,6 +408,9 @@
     <ClInclude Include="..\..\network\remote_kart_info.hpp" />
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
+    <ClInclude Include="..\..\replay\replay_base.hpp" />
+    <ClInclude Include="..\..\replay\replay_play.hpp" />
+    <ClInclude Include="..\..\replay\replay_recorder.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
@@ -518,11 +526,6 @@
     <ClInclude Include="..\..\tracks\track_manager.hpp" />
     <ClInclude Include="..\..\tracks\track_object.hpp" />
     <ClInclude Include="..\..\tracks\track_object_manager.hpp" />
-    <ClInclude Include="..\..\replay\replay_base.hpp" />
-    <ClInclude Include="..\..\replay\replay_buffer_tpl.hpp" />
-    <ClInclude Include="..\..\replay\replay_buffers.hpp" />
-    <ClInclude Include="..\..\replay\replay_player.hpp" />
-    <ClInclude Include="..\..\replay\replay_recorder.hpp" />
     <ClInclude Include="..\..\io\file_manager.hpp" />
     <ClInclude Include="..\..\io\xml_node.hpp" />
     <ClInclude Include="..\..\io\xml_writer.hpp" />

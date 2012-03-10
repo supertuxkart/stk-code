@@ -519,18 +519,6 @@
     <ClCompile Include="..\..\tracks\track_object_manager.cpp">
       <Filter>Source Files\tracks</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\replay\replay_base.cpp">
-      <Filter>Source Files\replay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\replay\replay_buffers.cpp">
-      <Filter>Source Files\replay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\replay\replay_player.cpp">
-      <Filter>Source Files\replay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\replay\replay_recorder.cpp">
-      <Filter>Source Files\replay</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\io\file_manager.cpp">
       <Filter>Source Files\io</Filter>
     </ClCompile>
@@ -827,6 +815,24 @@
     </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp">
       <Filter>Source Files\states_screens\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\replay\replay_base.cpp">
+      <Filter>Source Files\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\replay\replay_play.cpp">
+      <Filter>Source Files\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\replay\replay_recorder.cpp">
+      <Filter>Source Files\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\ghost_kart.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\skidding.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\skidding_properties.cpp">
+      <Filter>Source Files\karts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1235,21 +1241,6 @@
     <ClInclude Include="..\..\tracks\track_object_manager.hpp">
       <Filter>Header Files\tracks</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\replay\replay_base.hpp">
-      <Filter>Header Files\replay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\replay\replay_buffer_tpl.hpp">
-      <Filter>Header Files\replay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\replay\replay_buffers.hpp">
-      <Filter>Header Files\replay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\replay\replay_player.hpp">
-      <Filter>Header Files\replay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\replay\replay_recorder.hpp">
-      <Filter>Header Files\replay</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\io\file_manager.hpp">
       <Filter>Header Files\io</Filter>
     </ClInclude>
@@ -1576,6 +1567,24 @@
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp">
       <Filter>Header Files\states_screens\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\replay\replay_base.hpp">
+      <Filter>Header Files\replay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\replay\replay_play.hpp">
+      <Filter>Header Files\replay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\replay\replay_recorder.hpp">
+      <Filter>Header Files\replay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\ghost_kart.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\skidding.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\skidding_properties.hpp">
+      <Filter>Header Files\karts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
