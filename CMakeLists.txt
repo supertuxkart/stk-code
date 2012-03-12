@@ -45,7 +45,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 # OpenAL
-if(WIN32)
+if(MSVC)
   find_library(OPENAL_LIBRARY OpenAL32 REQUIRED PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
 else()
   find_package(OpenAL REQUIRED)
@@ -56,8 +56,11 @@ include_directories(${OPENAL_INCLUDE_DIR})
 find_package(OggVorbis REQUIRED)
 include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
+
 # CURL
-if(WIN32)
+if(CYGWIN)
+  find_package(CURL REQUIRED)
+elseif(WIN32)
   find_library(CURL_LIBRARIES curl libcurl_imp REQUIRED PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
 else()
   find_package(CURL REQUIRED)
@@ -136,7 +139,9 @@ else()
 
     # Build the final executable
     add_executable(supertuxkart ${STK_SOURCES})
-    if(UNIX)
+	if(CYGWIN)
+	    target_link_libraries(supertuxkart pthread)
+    elseif(UNIX)
         target_link_libraries(supertuxkart pthread Xxf86vm)
     endif()
 endif()
@@ -164,8 +169,13 @@ if(USE_WIIUSE)
 endif()
 
 if(WIN32)
-    find_library(PTHREAD_LIBRARY NAMES pthreadVC2 PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-	target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
+    if(CYGWIN)
+		find_library(PTHREAD_LIBRARY NAMES pthread PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+		target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
+	else()
+		find_library(PTHREAD_LIBRARY NAMES pthreadVC2 PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+		target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
+	endif()
 endif()
 
 # Optional tools
