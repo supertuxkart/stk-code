@@ -59,6 +59,9 @@ protected:
     /** Additional rotation of 3d model when skidding. */
     float m_skid_visual;
 
+    /** Time for a small jump when skidding starts. */
+    float m_jump_time;
+
     /** This factor is used to determine how much the chassis of a kart
     *  should rotate to match the graphical view. A factor of 1 is 
     *  identical, a smaller factor will rotate the kart less (which might

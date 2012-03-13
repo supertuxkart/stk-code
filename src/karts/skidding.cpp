@@ -21,7 +21,9 @@
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/world.hpp"
 #include "physics/btKart.hpp"
+#include "tracks/track.hpp"
 
 /** Constructor of the skidding object.
  */
@@ -155,17 +157,29 @@ void Skidding::update(float dt, bool is_on_ground,
     switch(m_skid_state)
     {
     case SKID_NONE: 
-        // If skidding is pressed while the kart is going straight,
-        // do nothing (till the kart starts to steer in one direction).
-        // Just testing for the sign of steering can result in unexpected
-        // beahviour, e.g. if a player is still turning left, but already
-        // presses right (it will take a few frames for this steering to
-        // actuallu take place, see player_controller) - the kart would skid 
-        // to the left. So we test for a 'clear enough' steering direction.
-        if(!skidding || fabsf(steering)<0.3f) break;
-        m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
-                                    : SKID_ACCUMULATE_LEFT;
-        m_skid_time  = 0;   // fallthrough
+        {
+            // If skidding is pressed while the kart is going straight,
+            // do nothing (till the kart starts to steer in one direction).
+            // Just testing for the sign of steering can result in unexpected
+            // beahviour, e.g. if a player is still turning left, but already
+            // presses right (it will take a few frames for this steering to
+            // actuallu take place, see player_controller) - the kart would skid 
+            // to the left. So we test for a 'clear enough' steering direction.
+            if(!skidding || fabsf(steering)<0.3f) break;
+            m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
+                : SKID_ACCUMULATE_LEFT;
+            m_skid_time  = 0;   // fallthrough
+
+            // Add a little jump to the kart. Determine the vertical speed 
+            // necessary for the kart to go 0.5*jump_time up (then it needs
+            // the same time to come down again), based on v = gravity * t.
+            // Then use this speed to determine the impulse necessary to 
+            // reach this speed.
+            float v = World::getWorld()->getTrack()->getGravity() 
+                    * 0.5f*m_jump_time;
+            btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
+            m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
+        }
     case SKID_ACCUMULATE_LEFT:
     case SKID_ACCUMULATE_RIGHT:
         {

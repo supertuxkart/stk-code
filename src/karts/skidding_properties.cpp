@@ -35,6 +35,7 @@ SkiddingProperties::SkiddingProperties()
     m_post_skid_rotate_factor = UNDEFINED;
     m_skid_reduce_turn_min    = UNDEFINED;
     m_skid_reduce_turn_max    = UNDEFINED;
+    m_jump_time               = UNDEFINED;
     m_has_skidmarks           = true;
 
     m_skid_bonus_time.clear();
@@ -58,6 +59,7 @@ void SkiddingProperties::load(const XMLNode *skid_node)
     skid_node->get("bonus-time",             &m_skid_bonus_time        );
     skid_node->get("bonus-speed",            &m_skid_bonus_speed       );
     skid_node->get("time-till-bonus",        &m_skid_time_till_bonus   );
+    skid_node->get("jump-time",              &m_jump_time              );
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -67,15 +69,16 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
-    CHECK_NEG(m_skid_increase,              "skid increase"                 );
-    CHECK_NEG(m_skid_decrease,              "skid decrease"                 );
-    CHECK_NEG(m_skid_max,                   "skid max"                      );
-    CHECK_NEG(m_time_till_max_skid,         "skid time-till-max"            );
-    CHECK_NEG(m_skid_visual,                "skid visual"                   );
-    CHECK_NEG(m_skid_visual_time,           "skid visual-time"              );
-    CHECK_NEG(m_post_skid_rotate_factor,    "skid post-skid-rotate-factor"  );
-    CHECK_NEG(m_skid_reduce_turn_min,       "skid reduce-turn-min"          );
-    CHECK_NEG(m_skid_reduce_turn_max,       "skid reduce-turn-max"          );
+    CHECK_NEG(m_skid_increase,           "skid increase"                 );
+    CHECK_NEG(m_skid_decrease,           "skid decrease"                 );
+    CHECK_NEG(m_skid_max,                "skid max"                      );
+    CHECK_NEG(m_time_till_max_skid,      "skid time-till-max"            );
+    CHECK_NEG(m_skid_visual,             "skid visual"                   );
+    CHECK_NEG(m_skid_visual_time,        "skid visual-time"              );
+    CHECK_NEG(m_post_skid_rotate_factor, "skid post-skid-rotate-factor"  );
+    CHECK_NEG(m_skid_reduce_turn_min,    "skid reduce-turn-min"          );
+    CHECK_NEG(m_skid_reduce_turn_max,    "skid reduce-turn-max"          );
+    CHECK_NEG(m_jump_time,               "skid jump-time"                );
 
     if(m_skid_time_till_bonus.size()==0)
         fprintf(stderr, "Warning: no skid time declared, can be ignored.\n");
@@ -105,7 +108,6 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
 // ----------------------------------------------------------------------------
 void SkiddingProperties::copyFrom(const SkiddingProperties *destination)
 {
-    //memcpy(this, destination, sizeof(SkiddingProperties));
     *this = *destination;
 }   // copyFrom
 

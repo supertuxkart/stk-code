@@ -185,8 +185,8 @@
           visual="1.0" visual-time="0"
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-          post-skid-rotate-factor="1" reduce-turn-min="0.3"
-          reduce-turn-max="0.8"/>
+          post-skid-rotate-factor="1" jump-time="0.4"
+          reduce-turn-min="0.4" reduce-turn-max="0.8"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
