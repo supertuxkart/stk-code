@@ -140,9 +140,7 @@ void KartProperties::copyFrom(const KartProperties *source)
     // So all pointer variables need to be separately allocated and assigned.
     m_skidding_properties = new SkiddingProperties();
     assert(m_skidding_properties);
-    *m_skidding_properties = *source->m_skidding_properties;
-    //m_skidding_properties->copyFrom(source->m_skidding_properties);
-    
+    *m_skidding_properties = *source->m_skidding_properties;    
 }   // copy
 
 //-----------------------------------------------------------------------------
