@@ -165,7 +165,7 @@ void Skidding::update(float dt, bool is_on_ground,
             // presses right (it will take a few frames for this steering to
             // actuallu take place, see player_controller) - the kart would skid 
             // to the left. So we test for a 'clear enough' steering direction.
-            if(!skidding || fabsf(steering)<0.3f) break;
+            if(!skidding || fabsf(steering)<0.9f) break;
             m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
                 : SKID_ACCUMULATE_LEFT;
             m_skid_time  = 0;   // fallthrough
