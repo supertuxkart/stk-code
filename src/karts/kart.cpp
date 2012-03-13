@@ -1338,15 +1338,9 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake || m_speed<0) return;
 
-    MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_ZIPPER, 
-                               max_speed_increase, duration, fade_out_time);
-    // This will result in all max speed settings updated, but no 
-    // changes to any slow downs since dt=0
-    MaxSpeed::update(0);
-    float speed = std::min(m_speed + speed_gain, 
-                           MaxSpeed::getCurrentMaxSpeed() );
-
-    m_vehicle->activateZipper(speed);
+    MaxSpeed::instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+                                   max_speed_increase, speed_gain, 
+                                   duration, fade_out_time);
     // Play custom character sound (weee!)
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
     m_controller->handleZipper(play_sound);
@@ -1611,10 +1605,9 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = m_kart_properties->getStartupBoost();
-        if(f>0)
-            m_vehicle->activateZipper(f);
-        MaxSpeed::increaseMaxSpeed(MS_INCREASE_ZIPPER, 0.9f*f,
-                                   5.0f, 5.0f);
+        MaxSpeed::instantSpeedIncrease(MS_INCREASE_ZIPPER, 0.9f*f,
+                                       f, /*duration*/5.0f,
+                                       /*fade_out_time*/5.0f);
     }
 
     m_bounce_back_time-=dt;

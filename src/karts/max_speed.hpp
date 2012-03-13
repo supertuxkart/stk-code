@@ -129,6 +129,9 @@ public:
  
     void  increaseMaxSpeed(unsigned int category, float add_speed,
                            float duration, float fade_out_time);
+    void   instantSpeedIncrease(unsigned int category, 
+                                float add_speed, float speed_boost,
+                                float duration, float fade_out_time=1.0f);
     void  setSlowdown(unsigned int category, float max_speed_fraction, 
                       float fade_in_time);
     float getSpeedIncreaseTimeLeft(unsigned int category);

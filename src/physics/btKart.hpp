@@ -167,8 +167,7 @@ public:
     virtual void       updateFriction(btScalar timeStep);
 public:
     void               setSliding(bool active);
-    void               activateZipper(float speed);
-    void               deactivateZipper();
+    void               instantSpeedIncreaseTo(float speed);
     bool               projectVehicleToSurface(const btVector3& ray,
                                                bool translate_vehicle);
 

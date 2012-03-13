@@ -170,9 +170,9 @@ void Skidding::update(float dt, bool is_on_ground,
     case SKID_ACCUMULATE_RIGHT:
         {
             m_skid_time += dt;
-            float bonus_time, bonus_force;
+            float bonus_time, bonus_speed;
             unsigned int level = getSkidBonus(&bonus_time, 
-                                              &bonus_force);
+                                              &bonus_speed);
             // If at least level 1 bonus is reached, show appropriate gfx
             if(level>0) m_kart->getKartGFX()->setSkidLevel(level);
             // If player stops skidding, trigger bonus, and change state to
@@ -192,12 +192,13 @@ void Skidding::update(float dt, bool is_on_ground,
                 m_skid_time = t;
                 if(bonus_time>0)
                 {
-                    m_kart->MaxSpeed::increaseMaxSpeed(
-                        MaxSpeed::MS_INCREASE_SKIDDING, 10, bonus_time, 1);
                     m_kart->getKartGFX()
                           ->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
-                    // FIXME hiker: for now just misuse the zipper code
-                    m_kart->handleZipper(0);
+                    m_kart->MaxSpeed::
+                        instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
+                                             bonus_speed, bonus_speed, 
+                                             bonus_time, 
+                                             /*fade-out-time*/ 1.0f);
                 }
                 else
                     m_kart->getKartGFX()

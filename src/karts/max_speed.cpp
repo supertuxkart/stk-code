@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "karts/kart.hpp"
+#include "physics/btKart.hpp"
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
@@ -88,6 +89,35 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
     m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_current_speedup = add_speed;
 }   // increaseMaxSpeed
+
+// ----------------------------------------------------------------------------
+/** This adjusts the top speed using increaseMaxSpeed, but additionally 
+ *  causes an instant speed boost, which can be smaller than add-max-speed.
+ *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
+ *  allow the speed to go up by 10 m/s). Note that bullet does not restrict
+ *  speed (e.g. by simulating air resistance), so without capping the speed
+ *  (which is done my this object) the speed would go arbitrary high over time
+ *  \param category The category for which the speed is increased.
+ *  \param add_max_speed Increase of the maximum allowed speed.
+ *  \param speed_boost An instant speed increase for this kart.
+ *  \param duration Duration of the increased speed.
+ *  \param fade_out_time How long the maximum speed will fade out linearly.
+ */
+void MaxSpeed::instantSpeedIncrease(unsigned int category, 
+                                   float add_max_speed, float speed_boost,
+                                   float duration, float fade_out_time)
+{
+    increaseMaxSpeed(category, add_max_speed, duration, fade_out_time);
+    // This will result in all max speed settings updated, but no 
+    // changes to any slow downs since dt=0
+    update(0);
+    float speed = std::min(m_kart->getSpeed()+ speed_boost, 
+                           MaxSpeed::getCurrentMaxSpeed() );
+
+    m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
+
+}  
+// instantSpeedIncrease
 
 // ----------------------------------------------------------------------------
 /** Handles the update of speed increase objects. The m_duration variable

@@ -909,17 +909,11 @@ void btKart::setSliding(bool active)
  *  specified speed.
  *  \param speed The speed to reach.
  */
-void btKart::activateZipper(float speed)
+void btKart::instantSpeedIncreaseTo(float speed)
 {
     m_zipper_active   = true; 
     m_zipper_velocity = speed;
 }   // activateZipper
-
-// ----------------------------------------------------------------------------
-void btKart::deactivateZipper()
-{
-    m_zipper_active = false; 
-}   // deactivateZipper
 
 // ----------------------------------------------------------------------------
 //Shorter version of above raycast function. This is used when projecting
