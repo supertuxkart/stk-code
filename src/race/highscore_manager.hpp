@@ -35,7 +35,7 @@ class HighscoreManager
 {
 public:
 private:
-    static const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;
+    static const unsigned int CURRENT_HSCORE_FILE_VERSION = 2;
     typedef std::vector<Highscores*> type_all_scores;
     type_all_scores m_all_scores;
     
@@ -53,7 +53,8 @@ public:
                               int num_karts, 
                               const RaceManager::Difficulty difficulty, 
                               const std::string trackName, 
-                              const int number_of_laps);
+                              const int number_of_laps,
+                              const bool reverse);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

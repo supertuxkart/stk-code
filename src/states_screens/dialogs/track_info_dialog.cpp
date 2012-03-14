@@ -181,13 +181,14 @@ void TrackInfoDialog::updateHighScores()
 {
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const Highscores::HighscoreType type = "HST_" + game_mode_ident;
-    
+
     Highscores* highscores = 
         highscore_manager->getHighscores(type,
                                          race_manager->getNumberOfKarts(),
                                          race_manager->getDifficulty(),
                                          m_track_ident,
-                                         race_manager->getNumLaps()        );
+                                         race_manager->getNumLaps(),
+                                         race_manager->getReverseTrack()  );
     const int amount = highscores->getNumberEntries();
     
     std::string kart_name;
@@ -256,9 +257,12 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         onEnterPressedInternal();
         return GUIEngine::EVENT_BLOCK;
     }
-    else if (eventSource == "reversecheckbox")
+    else if (eventSource == "reverse")
     {
         race_manager->setReverseTrack(m_checkbox->getState());
+        // Makes sure the highscores get swapped when clicking the 'reverse'
+        // checkbox.
+        updateHighScores();
     }
     else if (eventSource == "lapcountspinner")
     {

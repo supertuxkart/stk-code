@@ -30,13 +30,15 @@ Highscores::Highscores(const HighscoreType highscore_type,
                        int num_karts, 
                        const RaceManager::Difficulty difficulty,
                        const std::string trackName, 
-                       const int number_of_laps)
+                       const int number_of_laps,
+                       const bool reverse)
 {
     m_track           = trackName; 
     m_highscore_type  = highscore_type;
     m_number_of_karts = num_karts;
     m_difficulty      = difficulty;
     m_number_of_laps  = number_of_laps;
+    m_reverse         = reverse;
     
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
@@ -53,6 +55,7 @@ Highscores::Highscores(const XMLNode &node)
     m_number_of_karts = -1;
     m_difficulty      = -1;
     m_number_of_laps  = -1;
+    m_reverse         = false;
     
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
@@ -74,6 +77,7 @@ void Highscores::readEntry(const XMLNode &node)
     m_highscore_type = (HighscoreType)hst;
     node.get("difficulty",     &m_difficulty          );
     node.get("number-of-laps", &m_number_of_laps      );
+    node.get("reverse",        &m_reverse             );
 
     for(unsigned int i=0; i<node.getNumNodes(); i++) 
     {
@@ -113,7 +117,8 @@ void Highscores::writeEntry(XMLWriter &writer)
     writer << L"             number-karts  =\"" << m_number_of_karts         << "\"\n";
     writer << L"             difficulty    =\"" << m_difficulty              << "\"\n";
     writer << L"             hscore-type   =\"" << m_highscore_type.c_str()  << "\"\n";
-    writer << L"             number-of-laps=\"" << m_number_of_laps          << "\">\n";
+    writer << L"             number-of-laps=\"" << m_number_of_laps          << "\"\n";
+    writer << L"             reverse       =\"" << m_reverse                 << "\">\n";
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
@@ -132,13 +137,15 @@ void Highscores::writeEntry(XMLWriter &writer)
 // -----------------------------------------------------------------------------
 int Highscores::matches(HighscoreType highscore_type,
                             int num_karts, RaceManager::Difficulty difficulty,
-                            const std::string track, const int number_of_laps)
+                            const std::string track, const int number_of_laps,
+                            const bool reverse)
 {
     return (m_highscore_type  == highscore_type   &&
             m_track           == track            &&
             m_difficulty      == difficulty       &&
             m_number_of_laps  == number_of_laps   &&
-            m_number_of_karts == num_karts          );
+            m_number_of_karts == num_karts        &&
+            m_reverse         == reverse            );
 }   // matches
 
 // -----------------------------------------------------------------------------
@@ -180,6 +187,7 @@ int Highscores::addData(const std::string& kart_name,
         m_number_of_karts     = race_manager->getNumberOfKarts();
         m_difficulty          = race_manager->getDifficulty();
         m_number_of_laps      = race_manager->getNumLaps();
+        m_reverse             = race_manager->getReverseTrack();
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;

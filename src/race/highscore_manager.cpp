@@ -165,11 +165,15 @@ void HighscoreManager::saveHighscores()
 
 // -----------------------------------------------------------------------------
 /*
- * Returns the high scores entry for a specific type of race. Creates one if none exists yet.
+ * Returns the high scores entry for a specific type of race.
+ * Creates one if none exists yet.
  */
 Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type,
-                                            int num_karts, const RaceManager::Difficulty difficulty, 
-                                            const std::string trackName, const int number_of_laps)
+                                            int num_karts,
+                                            const RaceManager::Difficulty difficulty, 
+                                            const std::string trackName,
+                                            const int number_of_laps,
+                                            const bool reverse)
 {
     Highscores *highscores = 0;
 
@@ -177,7 +181,8 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
     for(type_all_scores::iterator i  = m_all_scores.begin(); 
                                   i != m_all_scores.end();  i++)
     {
-        if((*i)->matches(highscore_type, num_karts, difficulty, trackName, number_of_laps) )
+        if((*i)->matches(highscore_type, num_karts, difficulty, trackName,
+                         number_of_laps, reverse) )
         {
             // we found one entry for this kind of race, return it
             return (*i);
@@ -185,7 +190,8 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
     }   // for i in m_all_scores
 
     // we don't have an entry for such a race currently. Create one.
-    highscores = new Highscores(highscore_type, num_karts, difficulty, trackName, number_of_laps);
+    highscores = new Highscores(highscore_type, num_karts, difficulty,
+                                trackName, number_of_laps, reverse);
     m_all_scores.push_back(highscores);
     return highscores;
 }   // getHighscores

@@ -694,7 +694,8 @@ Highscores* World::getHighscores() const
                                          getNumKarts(),
                                          race_manager->getDifficulty(),
                                          race_manager->getTrackName(),
-                                         race_manager->getNumLaps());
+                                         race_manager->getNumLaps(),
+                                         race_manager->getReverseTrack());
 
     return highscores;
 }   // getHighscores
