@@ -69,10 +69,11 @@ void Skidding::updateSteering(float steer)
     {
     case SKID_OLD: assert(false);
         break;
+    case SKID_SHOW_GFX_LEFT:
+    case SKID_SHOW_GFX_RIGHT:
     case SKID_NONE:
         m_real_steering = steer;
         break;
-    case SKID_SHOW_GFX_RIGHT:
     case SKID_ACCUMULATE_RIGHT:
         {
             float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
@@ -80,7 +81,6 @@ void Skidding::updateSteering(float steer)
                               m_skid_reduce_turn_delta*f;
             break;
         }
-    case SKID_SHOW_GFX_LEFT:
     case SKID_ACCUMULATE_LEFT:
         {
             float f = (-1.0f+steer)*0.5f;   // map [-1,1] --> [-1, 0]
