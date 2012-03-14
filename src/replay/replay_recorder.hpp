@@ -39,6 +39,11 @@ private:
     /** Counts the number of transform events for each kart. */
     std::vector<unsigned int> m_count_transforms;
 
+    /** Stores the last skid state. */
+    std::vector<bool> m_skid_control;
+
+    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
+
     /** Static pointer to the one instance of the replay object. */
     static ReplayRecorder *m_replay_recorder;
 

@@ -20,6 +20,7 @@
 #define HEADER_GHOST_KART_HPP
 
 #include "karts/kart.hpp"
+#include "replay/replay_base.hpp"
 
 #include "LinearMath/btTransform.h"
 
@@ -37,17 +38,25 @@ class GhostKart : public Kart
 private:
     /** The list of the times at which the transform were reached. */
     std::vector<float>       m_all_times;
+
     /** The transforms to assume at the corresponding time in m_all_times. */
     std::vector<btTransform> m_all_transform;
 
+    std::vector<ReplayBase::KartReplayEvent> m_replay_events;
+
     /** Pointer to the last index in m_all_times that is smaller than 
      *  the current world time. */
-    unsigned int m_current;
+    unsigned int m_current_transform;
+
+    /** Index of the next kart replay event. */
+    unsigned int m_next_event;
     
+    void         updateTransform(float t, float dt);
 public:
                  GhostKart(const std::string& ident);
     virtual void update (float dt);
     virtual void addTransform(float time, const btTransform &trans);
+    virtual void addReplayEvent(const ReplayBase::KartReplayEvent &kre);
     virtual void reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */

@@ -154,76 +154,99 @@ void ReplayPlay::Load()
     }
     race_manager->setNumLaps(num_laps);
 
-    fgets(s, 1023, fd);
-    unsigned int num_ghost_karts;
-    if(sscanf(s, "numkarts: %d",&num_ghost_karts)!=1)
+    // eof actually doesn't trigger here, since it requires first to try
+    // reading behind eof, but still it's clearer this way.
+    while(!feof(fd))
     {
-        fprintf(stderr,"WARNING: No number of karts found in replay file.\n");
-        exit(-2);
-    }
-
-    for(unsigned int k=0; k<num_ghost_karts; k++)
-    {
-        fgets(s, 1023, fd);
-	unsigned int kart_id;
-        if(sscanf(s, "model %d: %s",&kart_id, s1)!=2)
-        {
-            fprintf(stderr,
-                    "WARNING: No model information for kart %d found.\n",
-                    k);
-            exit(-2);
-        }
-        if(kart_id != k)
-        {
-            fprintf(stderr, 
-                    "WARNING: Expected kart id %d, got %d - ignored.\n",
-                    k, kart_id);
-        }
-        m_ghost_karts.push_back(new GhostKart(std::string(s1)));
-        m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST, 
-                                                   /*is_first_kart*/false);
-
-        fgets(s, 1023, fd);
-        unsigned int size;
-        if(sscanf(s,"size: %d",&size)!=1)
-        {
-            fprintf(stderr,
-                    "WARNING: Number of records not found in replay file "
-                    "for kart %d.\n",
-                    k);
-            exit(-2);
-        }
-
-        for(unsigned int i=0; i<size; i++)
-        {
-            fgets(s, 1023, fd);
-            float x, y, z, rx, ry, rz, rw, time;
-
-            // Check for EV_TRANSFORM event:
-            // -----------------------------
-            if(sscanf(s, "%f  %f %f %f  %f %f %f %f\n",
-                &time, 
-                &x, &y, &z,
-                &rx, &ry, &rz, &rw
-                )==8)
-            {
-                btQuaternion q(rx, ry, rz, rw);
-                btVector3 xyz(x, y, z);
-                m_ghost_karts[k].addTransform(time, btTransform(q, xyz));
-            }
-            else
-            {
-                // Invalid record found
-                // ---------------------
-                fprintf(stderr, "Can't read replay data line %d:\n", i);
-                fprintf(stderr, "%s", s);
-                fprintf(stderr, "Ignored.\n");
-            }
-        }   // for k
-
-    }   // for i<nKarts
+        if(fgets(s, 1023, fd)==NULL)  // eof reached
+            break;
+        readKartData(fd, s);
+    }   // for k<num_ghost_karts
 
     fprintf(fd, "Replay file end.\n");
     fclose(fd);
 }   // Load
 
+//-----------------------------------------------------------------------------
+/** Reads all data from a replay file for a specific kart.
+ *  \param fd The file descriptor from which to read.
+ */
+void ReplayPlay::readKartData(FILE *fd, char *next_line)
+{
+    char s[1024];
+    if(sscanf(next_line, "model: %s", s)!=1)
+    {
+        fprintf(stderr,
+            "WARNING: No model information for kart %d found.\n",
+            m_ghost_karts.size());
+        exit(-2);
+    }
+    m_ghost_karts.push_back(new GhostKart(std::string(s)));
+    m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST, 
+        /*is_first_kart*/false);
+
+    fgets(s, 1023, fd);
+    unsigned int size;
+    if(sscanf(s,"size: %d",&size)!=1)
+    {
+        fprintf(stderr,
+            "WARNING: Number of records not found in replay file "
+            "for kart %d.\n",
+            m_ghost_karts.size()-1);
+        exit(-2);
+    }
+
+    for(unsigned int i=0; i<size; i++)
+    {
+        fgets(s, 1023, fd);
+        float x, y, z, rx, ry, rz, rw, time;
+
+        // Check for EV_TRANSFORM event:
+        // -----------------------------
+        if(sscanf(s, "%f  %f %f %f  %f %f %f %f\n",
+            &time, 
+            &x, &y, &z,
+            &rx, &ry, &rz, &rw
+            )==8)
+        {
+            btQuaternion q(rx, ry, rz, rw);
+            btVector3 xyz(x, y, z);
+            m_ghost_karts[m_ghost_karts.size()-1].addTransform(time, 
+                                                          btTransform(q, xyz));
+        }
+        else
+        {
+            // Invalid record found
+            // ---------------------
+            fprintf(stderr, "Can't read replay data line %d:\n", i);
+            fprintf(stderr, "%s", s);
+            fprintf(stderr, "Ignored.\n");
+        }
+    }   // for i
+    fgets(s, 1023, fd);
+    unsigned int num_events;
+    if(sscanf(s,"events: %d",&num_events)!=1)
+    {
+        fprintf(stderr,
+                "WARNING: Number of events not found in replay file "
+                "for kart %d.\n",
+                m_ghost_karts.size()-1);
+    }
+    for(unsigned int i=0; i<num_events; i++)
+    {
+        fgets(s, 1023, fd);
+        KartReplayEvent kre;
+        if(sscanf(s, "%f %d\n", &kre.m_time, &kre.m_type)==2)
+            m_ghost_karts[m_ghost_karts.size()-1].addReplayEvent(kre);
+        else
+        {
+            // Invalid record found
+            // ---------------------
+            fprintf(stderr, "Can't read replay event line %d:\n", i);
+            fprintf(stderr, "%s", s);
+            fprintf(stderr, "Ignored.\n");
+        }
+
+    }   // for i < events
+
+}   // readKartData

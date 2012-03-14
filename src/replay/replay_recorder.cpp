@@ -52,9 +52,13 @@ void ReplayRecorder::init()
 {
     m_transform_events.clear();
     m_transform_events.resize(race_manager->getNumberOfKarts());
+    m_skid_control.resize(race_manager->getNumberOfKarts(), false);
+    m_kart_replay_event.resize(race_manager->getNumberOfKarts());
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         m_transform_events[i].resize(stk_config->m_max_history);
+        // Rather arbitraritly sized, it will be added with push_back
+        m_kart_replay_event[i].reserve(100);
     }
     m_count_transforms.clear();
     m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
@@ -90,6 +94,17 @@ void ReplayRecorder::update(float dt)
 
     for(unsigned int i=0; i<num_karts; i++)
     {
+        const Kart *kart = world->getKart(i);
+
+        // Check if skidding state has changed. If so, store this
+        if(kart->getControls().m_skid != m_skid_control[i])
+        {
+            KartReplayEvent kre;
+            kre.m_time = World::getWorld()->getTime();
+            kre.m_type = KartReplayEvent::KRE_SKID_TOGGLE;
+            m_kart_replay_event[i].push_back(kre);
+            m_skid_control[i] = ! m_skid_control[i];
+        }
 #ifdef DEBUG
         m_count ++;
 #endif
@@ -102,7 +117,6 @@ void ReplayRecorder::update(float dt)
         }
 
         m_count_transforms[i]++;
-        const Kart *kart = world->getKart(i);
         if(m_count_transforms[i]>=m_transform_events[i].size())
         {
             // Only print this message once.
@@ -116,13 +130,17 @@ void ReplayRecorder::update(float dt)
         p->m_transform.setOrigin(kart->getXYZ());
         p->m_transform.setRotation(kart->getVisualRotation());
     }   // for i
-}   // updateRecording
+}   // update
 
 //-----------------------------------------------------------------------------
 /** Saves the replay data stored in the internal data structures.
  */
 void ReplayRecorder::Save()
 {
+#ifdef DEBUG
+    printf("%d frames  %d transform events %d frequency compressed\n",
+        m_count, m_count_transforms, m_count_skipped_time);
+#endif
     FILE *fd = openReplayFile(/*writeable*/true);
     if(!fd)
     {
@@ -139,11 +157,10 @@ void ReplayRecorder::Save()
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "Laps: %d\n",       race_manager->getNumLaps());
-    fprintf(fd, "numkarts: %d\n",   num_karts);
 
     for(unsigned int k=0; k<num_karts; k++)
     {
-        fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getIdent().c_str());
+        fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
         for(unsigned int i=0; i<m_count_transforms[k]; i++)
@@ -159,9 +176,14 @@ void ReplayRecorder::Save()
                     p->m_transform.getRotation().getZ(),
                     p->m_transform.getRotation().getW()
                 );
-        }   // for k
+        }   // for i
+        fprintf(fd, "events: %d\n", m_kart_replay_event[k].size());
+        for(unsigned int i=0; i<m_kart_replay_event[k].size(); i++)
+        {
+            const KartReplayEvent *p=&(m_kart_replay_event[k][i]);
+            fprintf(fd, "%f %d\n", p->m_time, p->m_type);
+        }
     }
-    fprintf(fd, "Replay file end.\n");
     fclose(fd);
 }   // Save
 

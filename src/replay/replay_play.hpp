@@ -43,6 +43,7 @@ private:
 
           ReplayPlay();
          ~ReplayPlay();
+    void  readKartData(FILE *fd, char *next_line);
 public:
     void  init();
     void  update(float dt);

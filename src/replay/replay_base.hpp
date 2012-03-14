@@ -30,6 +30,8 @@
   */
 class ReplayBase : public NoCopy
 {
+    // Needs access to KartReplayEvent
+    friend class GhostKart;
 private:
     /** The filename of the replay file. Only defined after calling
      *  openReplayFile. */
@@ -44,9 +46,20 @@ protected:
         /** The transform at a certain time. */
         btTransform m_transform;
     };   // TransformEvent
+
     // ------------------------------------------------------------------------
-    ReplayBase();
+    /** Records all other events - atm start and end skidding. */
+    struct KartReplayEvent
+    {
+        /** The type of event. */
+        enum {KRE_NONE, KRE_SKID_TOGGLE} m_type;
+
+        /** Time at which this event happens. */
+        float       m_time;
+    };   // KartReplayEvent
+
     // ------------------------------------------------------------------------
+          ReplayBase();
     FILE *openReplayFile(bool writeable);
     // ----------------------------------------------------------------------
     /** Returns the filename that was opened. */

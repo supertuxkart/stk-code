@@ -25,7 +25,8 @@ GhostKart::GhostKart(const std::string& ident)
              : Kart(ident, /*world kart id*/99999, 
                     /*position*/-1, btTransform())
 {
-    m_current = 0;
+    m_current_transform = 0;
+    m_next_event        = 0;
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
@@ -33,7 +34,8 @@ void GhostKart::reset()
 {
     m_node->setVisible(true);
     Kart::reset();
-    m_current = 0;
+    m_current_transform = 0;
+    m_next_event        = 0;
     // This will set the correct start position
     update(0);
 }   // reset
@@ -55,30 +57,60 @@ void GhostKart::addTransform(float time, const btTransform &trans)
 }   // addTransform
 
 // ----------------------------------------------------------------------------
+/** Adds a replay event for this kart.
+ */
+void GhostKart::addReplayEvent(const ReplayBase::KartReplayEvent &kre)
+{
+    m_replay_events.push_back(kre);
+}   // addReplayEvent
+
+// ----------------------------------------------------------------------------
+/** Updates the ghost data each time step. It uses interpolation to get a new
+ *  position and rotation.
+ *  \param dt Time step size.
+ */
 void GhostKart::update(float dt)
 {
     float t = World::getWorld()->getTime();
     // Don't do anything at startup
     if(t==0) return;
+    updateTransform(t, dt);
+    while(m_next_event < m_replay_events.size() &&
+          m_replay_events[m_next_event].m_time <= t)
+    {
+        printf("Handling event %d\n", m_next_event);
+        // Handle the next event now
+        m_next_event++;
+    }
+}
+// ----------------------------------------------------------------------------
+/** Updates the current transform of the ghost kart using interpolation
+ *  \param t Current world time.
+ *  \param dt Time step size.
+ */
+void GhostKart::updateTransform(float t, float dt)
+{
 
     // Find (if necessary) the next index to use
-    while(m_current+1 < m_all_times.size() && 
-          t>=m_all_times[m_current+1])
+    while(m_current_transform+1 < m_all_times.size() && 
+          t>=m_all_times[m_current_transform+1])
     {
-          m_current ++;
+          m_current_transform ++;
     }
-    if(m_current+1>=m_all_times.size())
+    if(m_current_transform+1>=m_all_times.size())
     {
         m_node->setVisible(false);
         return;
     }
 
-    float f =(t - m_all_times[m_current])
-           / (m_all_times[m_current+1] - m_all_times[m_current]);
-    setXYZ((1-f)*m_all_transform[m_current  ].getOrigin() 
-           + f  *m_all_transform[m_current+1].getOrigin() );
-    const btQuaternion q = m_all_transform[m_current].getRotation()
-                          .slerp(m_all_transform[m_current+1].getRotation(), 
+    float f =(t - m_all_times[m_current_transform])
+           / (  m_all_times[m_current_transform+1] 
+              - m_all_times[m_current_transform]  );
+    setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin() 
+           + f  *m_all_transform[m_current_transform+1].getOrigin() );
+    const btQuaternion q = m_all_transform[m_current_transform].getRotation()
+                          .slerp(m_all_transform[m_current_transform+1]
+                                 .getRotation(),
                                  f);
     setRotation(q);
     Moveable::updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
