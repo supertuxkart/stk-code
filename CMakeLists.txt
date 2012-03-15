@@ -103,8 +103,13 @@ else()
 endif()
 
 
-# Provides list of source files in STK_SOURCES
+# Provides list of source and header files (STK_SOURCES and STK_HEADERS)
 include(sources.cmake)
+
+# Generate source groups useful for MSVC project explorer
+include(cmake/SourceGroupFunctions.cmake)
+source_group_hierarchy(STK_SOURCES STK_HEADERS)
+
 
 if(APPLE)
     # icon files to copy in the bundle
@@ -138,7 +143,7 @@ else()
     add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
 
     # Build the final executable
-    add_executable(supertuxkart ${STK_SOURCES})
+    add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
 	if(CYGWIN)
 	    target_link_libraries(supertuxkart pthread)
     elseif(UNIX)

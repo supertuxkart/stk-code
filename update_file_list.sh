@@ -7,5 +7,13 @@ find src \
 	-path 'src/bullet' -prune -o \
 	-path 'src/ide' -prune -o \
 	-path 'src/wiiuse' -prune -o \
-	-regex ".*\.cpp" -print >> $DEST_FILE
+	-regex ".*\.cpp" -print | sort >> $DEST_FILE
+echo ")" >> $DEST_FILE
+
+echo "set(STK_HEADERS" >> $DEST_FILE
+find src \
+	-path 'src/bullet' -prune -o \
+	-path 'src/ide' -prune -o \
+	-path 'src/wiiuse' -prune -o \
+	-regex ".*\.hpp" -print | sort >> $DEST_FILE
 echo ")" >> $DEST_FILE
