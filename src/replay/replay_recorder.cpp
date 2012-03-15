@@ -138,8 +138,8 @@ void ReplayRecorder::update(float dt)
 void ReplayRecorder::Save()
 {
 #ifdef DEBUG
-    printf("%d frames  %d transform events %d frequency compressed\n",
-        m_count, m_count_transforms, m_count_skipped_time);
+    printf("%d frames, %d removed because of frequency compression\n",
+           m_count, m_count_skipped_time);
 #endif
     FILE *fd = openReplayFile(/*writeable*/true);
     if(!fd)
@@ -177,7 +177,7 @@ void ReplayRecorder::Save()
                     p->m_transform.getRotation().getW()
                 );
         }   // for i
-        fprintf(fd, "events: %d\n", m_kart_replay_event[k].size());
+        fprintf(fd, "events: %d\n", (int)m_kart_replay_event[k].size());
         for(unsigned int i=0; i<m_kart_replay_event[k].size(); i++)
         {
             const KartReplayEvent *p=&(m_kart_replay_event[k][i]);

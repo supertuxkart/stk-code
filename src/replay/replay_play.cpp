@@ -236,8 +236,12 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     {
         fgets(s, 1023, fd);
         KartReplayEvent kre;
-        if(sscanf(s, "%f %d\n", &kre.m_time, &kre.m_type)==2)
+        int type;
+        if(sscanf(s, "%f %d\n", &kre.m_time, &type)==2)
+        {
+            kre.m_type = (KartReplayEvent::KartReplayEventType)type;
             m_ghost_karts[m_ghost_karts.size()-1].addReplayEvent(kre);
+        }
         else
         {
             // Invalid record found
