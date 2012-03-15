@@ -65,16 +65,16 @@ if(UNIX AND NOT APPLE AND NOT CYGWIN)
     set(CMAKE_REQUIRED_LIBRARIES ${IRRLICHT_LIBRARIES})
     check_cxx_source_compiles(${IRRLICHT_SNIPPET} IRRLICHT_WITHOUT_XF86VM)
 
-    # If it does not work without Xxf86vm library...
+    # If it did not work without Xxf86vm library try with it again
     if(NOT IRRLICHT_WITHOUT_XF86VM)
         set(CMAKE_REQUIRED_LIBRARIES ${IRRLICHT_LIBRARIES} ${IRRLICHT_XF86VM_LIBRARY})
         check_cxx_source_compiles(${IRRLICHT_SNIPPET} IRRLICHT_WITH_XF86VM)
 
-        # ... but with Xxf86vm, then add this library to Irrlicht dependencies
-        if(IRRLICHT_WITH_XF86VM)
-            set(IRRLICHT_LIBRARIES ${IRRLICHT_LIBRARIES} ${IRRLICHT_XF86VM_LIBRARY})
-        else()
+        if(NOT IRRLICHT_WITH_XF86VM)
             message(WARNING "Irrlicht does not compile with and without Xxf86vm")
         endif()
+
+        # Add Xxf86vm nevertheless as tests might fail under strange circumstances
+        set(IRRLICHT_LIBRARIES ${IRRLICHT_LIBRARIES} ${IRRLICHT_XF86VM_LIBRARY})
     endif()
 endif()
