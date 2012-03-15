@@ -1753,7 +1753,8 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the advantage
-        if(m_controls.m_skid)
+        if(m_controls.m_skid && 
+           m_kart_properties->getSkiddingProperties()->getSkidVisualTime()==0)
             engine_power *= 0.5f;
 
         applyEngineForce(engine_power*m_controls.m_accel);
