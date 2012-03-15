@@ -13,21 +13,6 @@
 
 set(IRRLICHT_DIR "" CACHE PATH "Path to Irrlicht")
 
-# Set library directories depending on system
-if(APPLE)
-	set(IRRLICHT_LIBRARY_DIR "/Library/Frameworks/IrrFramework.framework")
-elseif(CYGWIN)
-    # CYGWIN must be checked before "Unix" since Cygwin is a Unix
-	set(IRRLICHT_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/dependencies/lib")
-elseif(UNIX)
-	set(IRRLICHT_LIBRARY_DIR "${IRRLICHT_DIR}/lib/Linux")
-elseif(MSVC)
-	set(IRRLICHT_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/dependencies/lib")
-else()
-    # mingw / cygwin
-	set(IRRLICHT_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/dependencies/lib")
-endif()
-
 # Find include directory and library
 find_path(IRRLICHT_INCLUDE_DIR NAMES irrlicht.h
     PATHS ${IRRLICHT_DIR}
@@ -36,11 +21,10 @@ find_path(IRRLICHT_INCLUDE_DIR NAMES irrlicht.h
     PATH_SUFFIXES include irrlicht)
 
 if(APPLE)
-    find_library(IRRLICHT_LIBRARY NAMES IrrFramework PATHS ${IRRLICHT_LIBRARY_DIR})
+    find_library(IRRLICHT_LIBRARY NAMES IrrFramework PATHS /Library/Frameworks/IrrFramework.framework)
 else()
-    message("IRRLICHT_LIBRARY_DIR = ${IRRLICHT_LIBRARY_DIR}")
-    find_library(IRRLICHT_LIBRARY REQUIRED NAMES Irrlicht libIrrlicht PATHS ${IRRLICHT_LIBRARY_DIR} ${PROJECT_SOURCE_DIR})
-	message("IRRLICHT_LIBRARY = ${IRRLICHT_LIBRARY}")
+    find_library(IRRLICHT_LIBRARY NAMES Irrlicht libIrrlicht
+        PATHS ${IRRLICHT_DIR}/lib/Linux ${PROJECT_SOURCE_DIR}/dependencies/lib ${PROJECT_SOURCE_DIR})
 endif()
 
 # Determine Irrlicht version
