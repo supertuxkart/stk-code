@@ -36,16 +36,17 @@ endif()
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
+# With these variables set libraries in "dependencies" are found
+set(ENV{PATH} ${PROJECT_SOURCE_DIR}/dependencies/include)
+set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
+set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+
 # Irrlicht
 find_package(Irrlicht 1.8 REQUIRED)
 include_directories(${IRRLICHT_INCLUDE_DIRS})
 
 # OpenAL
-if(MSVC)
-    find_library(OPENAL_LIBRARY OpenAL32 REQUIRED PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-else()
-    find_package(OpenAL REQUIRED)
-endif()
+find_package(OpenAL REQUIRED)
 include_directories(${OPENAL_INCLUDE_DIR})
 
 # OggVorbis
@@ -53,13 +54,7 @@ find_package(OggVorbis REQUIRED)
 include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
 # CURL
-if(CYGWIN)
-    find_package(CURL REQUIRED)
-elseif(WIN32)
-    find_library(CURL_LIBRARIES curl libcurl_imp REQUIRED PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
-else()
-    find_package(CURL REQUIRED)
-endif()
+find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
 # Fribidi
