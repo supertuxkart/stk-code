@@ -40,10 +40,6 @@ include_directories(${STK_SOURCE_DIR})
 find_package(Irrlicht 1.8 REQUIRED)
 include_directories(${IRRLICHT_INCLUDE_DIRS})
 
-# OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-
 # OpenAL
 if(MSVC)
   find_library(OPENAL_LIBRARY OpenAL32 REQUIRED PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
@@ -144,10 +140,9 @@ else()
 
     # Build the final executable
     add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
-	if(CYGWIN)
-	    target_link_libraries(supertuxkart pthread)
-    elseif(UNIX)
-        target_link_libraries(supertuxkart pthread Xxf86vm)
+
+    if(UNIX OR CYGWIN)
+        target_link_libraries(supertuxkart pthread)
     endif()
 endif()
 
