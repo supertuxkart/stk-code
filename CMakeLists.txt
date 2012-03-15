@@ -135,14 +135,14 @@ if(APPLE)
     add_custom_command(TARGET supertuxkart PRE_BUILD
         COMMAND ln -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
 else()
+    find_library(PTHREAD_LIBRARY NAMES pthread pthreadVC2 PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    mark_as_advanced(PTHREAD_LIBRARY)
+
     add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
 
     # Build the final executable
     add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
-
-    if(UNIX OR CYGWIN)
-        target_link_libraries(supertuxkart pthread)
-    endif()
+    target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
 # Common library dependencies
@@ -167,15 +167,6 @@ if(USE_WIIUSE)
     add_definitions(-DENABLE_WIIUSE)
 endif()
 
-if(WIN32)
-    if(CYGWIN)
-        find_library(PTHREAD_LIBRARY NAMES pthread PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-        target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
-    else()
-        find_library(PTHREAD_LIBRARY NAMES pthreadVC2 PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-        target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
-    endif()
-endif()
 
 # Optional tools
 add_subdirectory(tools/font_tool)
