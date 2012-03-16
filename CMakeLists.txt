@@ -18,6 +18,11 @@ set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
+# Define install paths
+set(STK_INSTALL_BINARY_DIR "bin" CACHE
+    STRING "Install executable to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
+set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
+    STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
 # Build the Bullet physics library
 add_subdirectory("${STK_SOURCE_DIR}/bullet")
@@ -133,7 +138,13 @@ else()
     find_library(PTHREAD_LIBRARY NAMES pthread pthreadVC2 PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
     mark_as_advanced(PTHREAD_LIBRARY)
 
-    add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/share/games/supertuxkart\")
+    # Set data dir (absolute or relative to CMAKE_INSTALL_PREFIX)
+    get_filename_component(STK_INSTALL_DATA_DIR_ABSOLUTE ${STK_INSTALL_DATA_DIR} ABSOLUTE)
+    if(${STK_INSTALL_DATA_DIR_ABSOLUTE} STREQUAL ${STK_INSTALL_DATA_DIR})
+        add_definitions(-DSUPERTUXKART_DATADIR=\"${STK_INSTALL_DATA_DIR_ABSOLUTE}\")
+    else()
+        add_definitions(-DSUPERTUXKART_DATADIR=\"${CMAKE_INSTALL_PREFIX}/${STK_INSTALL_DATA_DIR}\")
+    endif()
 
     # Build the final executable
     add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
@@ -180,8 +191,8 @@ add_custom_target(dist
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 # ==== Install target ====
-install(TARGETS supertuxkart RUNTIME DESTINATION games BUNDLE DESTINATION .)
-install(DIRECTORY "${STK_DATA_DIR}/" DESTINATION "share/games/supertuxkart/data" PATTERN ".svn" EXCLUDE)
+install(TARGETS supertuxkart RUNTIME DESTINATION ${STK_INSTALL_BINARY_DIR} BUNDLE DESTINATION .)
+install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".svn" EXCLUDE)
 install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
 
