@@ -112,6 +112,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     }
     else
     {
+        getWidget<SpinnerWidget>("lapcountspinner")->setVisible(false);
         m_spinner = NULL;
     }
 

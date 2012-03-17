@@ -302,6 +302,9 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    // Reverse is meaningless in arena
+    m_reverse_available = !m_is_arena && m_reverse_available;
+
     
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
