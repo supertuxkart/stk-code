@@ -94,6 +94,17 @@ OverWorld::~OverWorld()
  */
 void OverWorld::update(float dt)
 {
+    // Skip annoying waiting without a purpose
+    // Make sure to do all things that would normally happen in the 
+    // update() method of the base classes.
+    if (m_phase < GO_PHASE)
+    {
+        m_phase = GO_PHASE;
+        // Go message disappears at 3, music starts at 2.5
+        m_auxiliary_timer = 2.0f;
+        // Normally done in WorldStatus::update(), SET_PHASE
+        World::getWorld()->getTrack()->startMusic();
+    }
     LinearWorld::update(dt);
     
     const unsigned int kart_amount  = m_karts.size();
@@ -103,7 +114,7 @@ void OverWorld::update(float dt)
     {
         m_karts[n]->setEnergy(100.0f);
     }
-    
+
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
