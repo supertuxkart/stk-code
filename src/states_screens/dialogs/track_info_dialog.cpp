@@ -263,7 +263,10 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         race_manager->setReverseTrack(m_checkbox->getState());
         // Makes sure the highscores get swapped when clicking the 'reverse'
         // checkbox.
-        updateHighScores();
+        if (race_manager->modeHasHighscores())
+        {
+            updateHighScores();
+        }
     }
     else if (eventSource == "lapcountspinner")
     {
