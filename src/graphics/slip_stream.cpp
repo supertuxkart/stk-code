@@ -23,7 +23,9 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/world.hpp"
 #include "tracks/quad.hpp"
 #include "utils/constants.hpp"
@@ -36,7 +38,7 @@
  *  \param kart Pointer to the kart to which the slip stream
  *              belongs to.
  */
-SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
+SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
     video::SMaterial m;
     m.BackfaceCulling = false;
@@ -233,7 +235,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
  *                      1 = collecting
  *                      2 = using slip stream bonus
  */
-void SlipStream::setIntensity(float f, const Kart *kart)
+void SlipStream::setIntensity(float f, const AbstractKart *kart)
 {
     if(!kart)
     {

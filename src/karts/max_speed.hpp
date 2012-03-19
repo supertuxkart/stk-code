@@ -21,7 +21,7 @@
 
 /** \defgroup karts */
 
-class Kart;
+class AbstractKart;
 
 class MaxSpeed
 {
@@ -47,7 +47,7 @@ public:
 
 private:
     /** A pointer to the kart to which this speed handling object belongs. */
-    Kart *m_kart;
+    AbstractKart *m_kart;
 
     /** The current maximum speed. */
     float m_current_max_speed;
@@ -125,7 +125,7 @@ private:
     SpeedIncrease  m_speed_increase[MS_INCREASE_MAX];
 
 public:
-          MaxSpeed(Kart *kart);
+          MaxSpeed(AbstractKart *kart);
  
     void  increaseMaxSpeed(unsigned int category, float add_speed,
                            float duration, float fade_out_time);

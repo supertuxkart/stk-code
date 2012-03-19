@@ -28,10 +28,13 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+
+#include <IMesh.h>
+#include <IAnimatedMesh.h>
 
 ItemManager* item_manager;
 
@@ -162,7 +165,7 @@ void ItemManager::loadDefaultItems()
  *         is affected by its own items.
  */
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
-                           const Vec3 &normal, Kart *parent)
+                           const Vec3 &normal, AbstractKart *parent)
 {
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
@@ -213,7 +216,7 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance, TriggerItemListener*
 /** Set an item as collected.
  *  This function is called on the server when an item is collected, or on the
  *  client upon receiving information about collected items.                  */
-void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
+void ItemManager::collectedItem(int item_id, AbstractKart *kart, int add_info)
 {
     Item *item=m_all_items[item_id];
     assert(item);
@@ -226,7 +229,7 @@ void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
  *  collectedItem if an item was collected.
  *  \param kart Pointer to the kart. 
  */
-void  ItemManager::checkItemHit(Kart* kart)
+void  ItemManager::checkItemHit(AbstractKart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
@@ -235,7 +238,9 @@ void  ItemManager::checkItemHit(Kart* kart)
         i!=m_all_items.end();  i++)
     {
         if((!*i) || (*i)->wasCollected()) continue;
-        if((*i)->hitKart(kart))
+        // To allow inlining and avoid including kart.hpp in item.hpp,
+        // we pass the kart and the position separately.
+        if((*i)->hitKart(kart, kart->getXYZ()))
         {
             collectedItem(i-m_all_items.begin(), kart);
         }   // if hit

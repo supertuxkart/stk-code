@@ -37,7 +37,9 @@
 
 #include <IGPUProgrammingServices.h>
 #include <IMaterialRendererServices.h>
+#include <ISceneNode.h>
 #include <IShaderConstantSetCallBack.h>
+
 using namespace irr::video;
 
 const unsigned int UCLAMP = 1;

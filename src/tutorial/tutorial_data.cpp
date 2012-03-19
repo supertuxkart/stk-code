@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "race/grand_prix_data.hpp"
@@ -193,7 +193,7 @@ bool TutorialData::raceFinished()
     if(track_name!=m_track_name                      ) return false;    // wrong track
     if((int)world->getNumKarts()<m_num_karts         ) return false;    // not enough AI karts
 
-    Kart* kart = world->getPlayerKart(0);
+    AbstractKart* kart = world->getPlayerKart(0);
     if(m_energy>0   && kart->getEnergy()  <m_energy  ) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 

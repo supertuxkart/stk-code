@@ -20,6 +20,7 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
 
 RaceState *race_state=NULL;
@@ -64,7 +65,7 @@ void RaceState::serialise()
     World *world = World::getWorld();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart = world->getKart(i);
+        const AbstractKart* kart = world->getKart(i);
         m_kart_controls[i].serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
@@ -123,7 +124,7 @@ void RaceState::receive(ENetPacket *pkt)
         // Currently not used!
         Vec3 xyz       = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart     = world->getKart(i);
+        AbstractKart *kart     = world->getKart(i);
         // Firing needs to be done from here to guarantee that any potential
         // new rockets are created before the update for the rockets is handled
         if(kc.m_fire)

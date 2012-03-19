@@ -38,6 +38,9 @@
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
+
+#include "karts/abstract_kart.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -46,7 +49,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-EndController::EndController(Kart *kart, StateManager::ActivePlayer *player) 
+EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player) 
              : AIBaseController(kart, player)
 {
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)

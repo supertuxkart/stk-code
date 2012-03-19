@@ -21,7 +21,8 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 
 /** This class handles maximum speed for karts. Several factors can influence
@@ -44,7 +45,7 @@
  *  At the end the maximum is capped by a value specified in stk_config
  *  (to avoid issues with physics etc).
 */
-MaxSpeed::MaxSpeed(Kart *kart)
+MaxSpeed::MaxSpeed(AbstractKart *kart)
 {
     m_kart = kart;
 }   // MaxSpeed
@@ -143,6 +144,11 @@ void MaxSpeed::SpeedIncrease::update(float dt)
 }   // SpeedIncrease::update
 
 // ----------------------------------------------------------------------------
+/** Defines a slowdown, which is in fraction of top speed.
+ *  \param category The category for which the speed is increased.
+ *  \param max_speed_fraction Fraction of top speed to allow only.
+ *  \param fade_in_time How long till maximum speed is capped.
+ */
 void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction, 
                            float fade_in_time)
 {
@@ -211,7 +217,8 @@ void MaxSpeed::update(float dt)
 
     // Then cap the current speed of the kart
     // --------------------------------------
-    m_kart->capSpeed(m_current_max_speed);
+    if ( m_kart->getSpeed()>m_current_max_speed && m_kart->isOnGround() )
+        m_kart->getVehicle()->capSpeed(m_current_max_speed);
 
 }   // update
 

@@ -21,6 +21,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
@@ -208,7 +209,7 @@ void Skidding::update(float dt, bool is_on_ground,
                 {
                     m_kart->getKartGFX()
                           ->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
-                    m_kart->MaxSpeed::
+                    m_kart->m_max_speed->
                         instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
                                              bonus_speed, bonus_speed, 
                                              bonus_time, 

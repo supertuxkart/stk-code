@@ -34,8 +34,9 @@
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
 #define SWAT_ANGLE_MIN  45
@@ -51,7 +52,7 @@
  *  \param bomb_scene_node The scene node of the bomb (i.e. the previous 
  *         attachment scene node).
  */
-Swatter::Swatter(Kart *kart, bool was_bomb, 
+Swatter::Swatter(AbstractKart *kart, bool was_bomb, 
                  scene::ISceneNode* bomb_scene_node)
        : AttachmentPlugin(kart)
 {
@@ -200,13 +201,13 @@ void Swatter::onAnimationEnd()
 void Swatter::chooseTarget()
 {
     // TODO: for the moment, only handle karts...
-    const World *world         = World::getWorld();
-    Kart        *closest_kart  = NULL;
-    float       min_dist2      = FLT_MAX;
+    const World*  world         = World::getWorld();
+    AbstractKart* closest_kart  = NULL;
+    float         min_dist2     = FLT_MAX;
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
         if(kart->isEliminated() || kart==m_kart)
             continue;
@@ -269,7 +270,7 @@ void Swatter::squashThingsAround()
     // Squash karts around
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady()
         if(kart->isEliminated() || kart==m_kart)
             continue;

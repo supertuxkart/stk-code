@@ -15,14 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
-//#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"

@@ -24,8 +24,9 @@
 #include "config/player.hpp"
 #include "karts/controller/controller.hpp"
 
-class SFXBase;
+class AbstractKart;
 class Player;
+class SFXBase;
 
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
@@ -49,7 +50,8 @@ private:
 
     void           steer(float, int);
 public:
-                   PlayerController  (Kart *kart, StateManager::ActivePlayer *_player,
+                   PlayerController  (AbstractKart *kart, 
+                                      StateManager::ActivePlayer *_player,
                                       unsigned int player_index);
                   ~PlayerController  ();
     void           update            (float);

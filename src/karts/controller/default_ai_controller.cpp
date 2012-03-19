@@ -39,7 +39,12 @@
 #  include "graphics/irr_driver.hpp"
 #endif
 #include "graphics/slip_stream.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/kart_control.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -47,7 +52,8 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
+DefaultAIController::DefaultAIController(AbstractKart *kart) 
+                   : AIBaseController(kart)
 {
     reset();
 
@@ -621,7 +627,7 @@ void DefaultAIController::computeNearestKarts()
     float my_dist = m_world->getDistanceDownTrackForKart(m_kart->getWorldKartId());
     for(unsigned int i=0; i<m_world->getNumKarts(); i++)
     {
-        Kart *k = m_world->getKart(i);
+        AbstractKart *k = m_world->getKart(i);
         if(k->isEliminated() || k->hasFinishedRace() || k==m_kart) continue;
         if(k->getPosition()==my_position+1) 
         {
@@ -875,9 +881,10 @@ void DefaultAIController::checkCrashes(int steps, const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const Kart* kart = m_world->getKart(j);
-                if(kart==m_kart||kart->isEliminated()) continue;   // ignore eliminated karts
-                const Kart *other_kart = m_world->getKart(j);
+                const AbstractKart* kart = m_world->getKart(j);
+                // Ignore eliminated karts
+                if(kart==m_kart||kart->isEliminated()) continue;
+                const AbstractKart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;

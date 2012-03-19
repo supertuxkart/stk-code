@@ -30,7 +30,7 @@ using namespace irr;
 #include "graphics/moving_texture.hpp"
 #include "utils/no_copy.hpp"
 
-class Kart;
+class AbstractKart;
 class Quad;
 
 /**
@@ -40,7 +40,7 @@ class SlipStream : public MovingTexture
 {
 private:
     /** The kart to which this smoke belongs. */
-    Kart              *m_kart;
+    AbstractKart *m_kart;
 
     /** The scene node. */
     scene::IMeshSceneNode *m_node;
@@ -78,16 +78,16 @@ private:
 
     /** The kart from which this kart gets slipstream. Used by the AI to
      ** overtake the right kart. */
-    Kart         *m_target_kart;
+    AbstractKart* m_target_kart;
 
     void         createMesh(const video::SMaterial &m);
     void         setDebugColor(const video::SColor &color);
 public:
-                 SlipStream  (Kart* kart);
+                 SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
     void         reset();
     virtual void update(float dt);
-    void         setIntensity(float f, const Kart* kart);
+    void         setIntensity(float f, const AbstractKart* kart);
     float        getSlipstreamPower();
     bool         isSlipstreamReady() const;
 
@@ -97,7 +97,7 @@ public:
     const Quad& getSlipstreamQuad() const { return *m_slipstream_quad; }
     // ------------------------------------------------------------------------
     /** Returns the kart from which slipstream is 'collected'. */
-    const Kart* getSlipstreamTarget() const {return m_target_kart;}
+    const AbstractKart* getSlipstreamTarget() const {return m_target_kart;}
     // ------------------------------------------------------------------------
     /** Returns if slipstream is being used. */
     bool        inUse() const {return m_slipstream_mode==SS_USE; }

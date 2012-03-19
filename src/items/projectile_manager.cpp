@@ -151,7 +151,7 @@ void ProjectileManager::updateClient(float dt)
 
 }   // updateClient
 // -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(Kart *kart, Track* track,
+Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
                                           PowerupManager::PowerupType type)
 {
     Flyable *f;

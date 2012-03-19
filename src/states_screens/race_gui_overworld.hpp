@@ -30,11 +30,11 @@ using namespace irr;
 #include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+class AbstractKart;
+class ChallengeData;
 class InputMap;
-class Kart;
 class Material;
 class RaceSetup;
-class ChallengeData;
 
 /** Distance (squared) at which a challenge orb "activates" */
 const int CHALLENGE_DISTANCE_SQUARED = 20;
@@ -98,7 +98,7 @@ private:
     int              m_trophy_points_width;
     
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (int x, int y, const Kart *kart,
+    void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     
@@ -111,7 +111,7 @@ public:
     RaceGUIOverworld();
     ~RaceGUIOverworld();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const Kart *kart);
+    virtual void renderPlayerView(const AbstractKart *kart);
     
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 

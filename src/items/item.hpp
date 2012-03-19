@@ -30,9 +30,10 @@ namespace irr
 }
 using namespace irr;
 
-#include "karts/kart.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
+class AbstractKart;
 class LODNode;
 class Item;
 
@@ -118,7 +119,7 @@ private:
     
     /** Optionally set this if this item was laid by a particular kart. in 
      *  this case the 'm_deactive_time' will also be set - see below. */ 
-    const Kart   *m_event_handler;
+    const AbstractKart   *m_event_handler;
 
     /** Optionally if item was placed by a kart, a timer can be used to 
      *  temporarly deactivate collision so a kart is not hit by its own item */
@@ -145,17 +146,20 @@ public:
                         unsigned int item_id);
     virtual       ~Item ();
     void          update  (float delta);
-    virtual void  collected(const Kart *kart, float t=2.0f);
+    virtual void  collected(const AbstractKart *kart, float t=2.0f);
     
     // ------------------------------------------------------------------------
-    /** Returns true if the Kart is close enough to hit this item, and
-     *  the item is not deactivated anymore.
+    /** Returns true if the Kart is close enough to hit this item, the item is 
+     *  not deactivated anymore, and it wasn't placed by this kart (this is 
+     *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
      *  \param kart Kart to test.
+     *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
+     *         kart.hpp does not need to be included here).
      */
-    bool hitKart (Kart* kart ) const
+    bool hitKart (const AbstractKart *kart, const Vec3 &xyz) const
     {
         return (m_event_handler!=kart || m_deactive_time <=0) &&
-               (kart->getXYZ()-m_xyz).length2()<m_distance_2;
+               (xyz-m_xyz).length2()<m_distance_2;
     }   // hitKart
 
     // ------------------------------------------------------------------------
@@ -188,7 +192,7 @@ public:
     /** Returns the time the item is disabled for. */
     float         getDisableTime() const { return m_time_till_return; }
     // ------------------------------------------------------------------------
-    void          setParent(Kart* parent);
+    void          setParent(AbstractKart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
     void          switchBack();

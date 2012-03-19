@@ -16,16 +16,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
-#include "states_screens/race_gui_base.hpp"
 
 #include <iostream>
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "network/network_manager.hpp" 
 #include "race/history.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -150,7 +152,7 @@ void LinearWorld::update(float dt)
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo& kart_info = m_kart_info[n];
-        Kart* kart = m_karts[n];
+        AbstractKart* kart = m_karts[n];
 
         // Nothing to do for karts that are currently being 
         // rescued or eliminated
@@ -215,7 +217,7 @@ void LinearWorld::update(float dt)
 void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
-    Kart    *kart       = m_karts[kart_index];
+    AbstractKart *kart  = m_karts[kart_index];
 
     // Only update the kart controller if a kart that has already finished 
     // the race crosses the start line again. This avoids 'fastest lap' 
@@ -349,11 +351,12 @@ void LinearWorld::newLap(unsigned int kart_index)
  *  \param kart_id The world kart id of the kart for which to return 
  *                 the sector.
  */
-int LinearWorld::getSectorForKart(const int kart_id) const
+int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 {
-    if(kart_id>=(int)m_kart_info.size())
+    if(kart->getWorldKartId()>=(int)m_kart_info.size())
         return QuadGraph::UNKNOWN_SECTOR;
-    return m_kart_info[kart_id].getSector()->getCurrentGraphNode();
+    return m_kart_info[kart->getWorldKartId()].getSector()
+          ->getCurrentGraphNode();
 }   // getSectorForKart
 
 //-----------------------------------------------------------------------------
@@ -415,7 +418,7 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
-        Kart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i];
 
         // reset color
         rank_info.r = 1.0;
@@ -446,7 +449,7 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         KartInfo& kart_info = m_kart_info[i];
-        Kart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i];
 
         const int position = kart->getPosition();
 
@@ -504,7 +507,7 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
  *  be updated to get the correct scoring.
  *  \param kart The kart for which to estimate the finishing times.
  */
-float LinearWorld::estimateFinishTimeForKart(Kart* kart)
+float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 {
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
     float distance_covered  = kart_info.m_race_lap * m_track->getTrackLength()
@@ -542,7 +545,7 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart
   */
-void LinearWorld::moveKartAfterRescue(Kart* kart)
+void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
 
@@ -608,7 +611,7 @@ void LinearWorld::updateRacePosition()
     // so that debug output is still correct!!!!!!!!!!!
     for (unsigned int i=0; i<kart_amount; i++)
     {
-        Kart* kart          = m_karts[i];
+        AbstractKart* kart = m_karts[i];
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
@@ -800,7 +803,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     if(!m_kart_info[i].getSector()->isOnRoad()||
         m_karts[i]->playingEmergencyAnimation()) return;
 
-    const Kart *kart=m_karts[i];
+    const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.

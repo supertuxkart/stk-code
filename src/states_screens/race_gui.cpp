@@ -37,6 +37,7 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -181,11 +182,11 @@ void RaceGUI::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUI::renderPlayerView(const Kart *kart)
+void RaceGUI::renderPlayerView(const AbstractKart *kart)
 {
     if (!m_enabled) return;
     
-    const core::recti &viewport    = kart->getCamera()->getViewport();
+    const core::recti &viewport = kart->getCamera()->getViewport();
     
     core::vector2df scaling = kart->getCamera()->getScaling();
     //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
@@ -290,7 +291,7 @@ void RaceGUI::drawGlobalMiniMap()
     
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const Kart *kart = world->getKart(i);
+        const AbstractKart *kart = world->getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
@@ -321,7 +322,7 @@ void RaceGUI::drawGlobalMiniMap()
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,              
+void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,              
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
@@ -380,7 +381,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
+void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart, 
+                                 const core::recti &viewport,
                                  const core::vector2df &scaling)
 {
 
@@ -496,7 +498,8 @@ void RaceGUI::drawSpeedAndEnergy(const Kart* kart, const core::recti &viewport,
 /** Displays the rank and the lap of the kart.
  *  \param info Info object c
 */
-void RaceGUI::drawRankLap(const KartIconDisplayInfo* info, const Kart* kart, 
+void RaceGUI::drawRankLap(const KartIconDisplayInfo* info,
+                          const AbstractKart* kart,
                           const core::recti &viewport)
 {
     // Don't display laps or ranks if the kart has already finished the race.

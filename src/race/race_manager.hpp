@@ -34,7 +34,7 @@
 #include "race/grand_prix_data.hpp"
 #include "utils/translation.hpp"
 
-class Kart;
+class AbstractKart;
 class Track;
 
 static const std::string IDENT_STD      ("STANDARD"        );
@@ -380,7 +380,7 @@ public:
     /** \brief Returns the kart with a given GP rank (or NULL if no such kart exists).
      *  \param n Rank (0<=n<num_karts) to look for.
      */
-    const Kart*  getKartWithGPRank(unsigned int n);
+    const AbstractKart* getKartWithGPRank(unsigned int n);
     
     /** \return the GP rank of a local player, or -1 if the given player ID doesn't exist */
     int          getLocalPlayerGPRank(const int playerID) const;
@@ -506,8 +506,8 @@ public:
       * These methods are to be used by the classes that manage the various races, to let
       * the race manager know about current status
       */
-    bool         allPlayerFinished()      const {return m_num_finished_players==m_player_karts.size();}
-    void         kartFinishedRace(const Kart* kart, float time);
+    bool allPlayerFinished() const {return m_num_finished_players==m_player_karts.size();}
+    void kartFinishedRace(const AbstractKart* kart, float time);
 
     /** \} */
     

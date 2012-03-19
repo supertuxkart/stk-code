@@ -34,6 +34,7 @@
 #include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
@@ -1312,7 +1313,7 @@ void IrrDriver::update(float dt)
             rg->update(dt);
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
-                Kart *kart=world->getKart(i);
+                AbstractKart *kart=world->getKart(i);
                 if(kart->getCamera()) 
                 {
                     #ifdef ENABLE_PROFILER
@@ -1352,7 +1353,7 @@ void IrrDriver::update(float dt)
 
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
-                Kart *kart = world->getKart(i);
+                AbstractKart *kart = world->getKart(i);
                 if(kart->getCamera())
                 {
                     {

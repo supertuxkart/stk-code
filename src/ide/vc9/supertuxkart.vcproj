@@ -829,6 +829,10 @@
 				Name="karts"
 				>
 				<File
+					RelativePath="..\..\karts\abstract_kart.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\emergency_animation.cpp"
 					>
 				</File>
@@ -1974,6 +1978,10 @@
 			<Filter
 				Name="karts"
 				>
+				<File
+					RelativePath="..\..\karts\abstract_kart.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\karts\emergency_animation.hpp"
 					>

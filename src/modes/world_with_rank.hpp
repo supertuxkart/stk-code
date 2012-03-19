@@ -22,6 +22,8 @@
 
 #include "modes/world.hpp"
 
+class AbstractKart;
+
 /**
  *  A WorldWithRank is a world where the karts are ranked. This is the base
  *  class for races and battle modes - all of which rank the kart.
@@ -63,7 +65,7 @@ public:
                                  unsigned int position);
     void          endSetKartPositions();
 
-    Kart*         getKartAtPosition(unsigned int p) const;
+    AbstractKart* getKartAtPosition(unsigned int p) const;
     };   // WorldWithRank
 
 #endif

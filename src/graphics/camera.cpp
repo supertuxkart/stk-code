@@ -29,7 +29,8 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -42,7 +43,7 @@
 
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 
-Camera::Camera(int camera_index, Kart* kart)
+Camera::Camera(int camera_index, AbstractKart* kart)
 {
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
@@ -87,7 +88,7 @@ Camera::~Camera()
 /** Changes the owner of this camera to the new kart.
  *  \param new_kart The new kart to use this camera.
  */
-void Camera::changeOwner(Kart *new_kart)
+void Camera::changeOwner(AbstractKart *new_kart)
 {
     m_kart->setCamera(NULL);
     m_kart = new_kart;

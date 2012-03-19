@@ -94,7 +94,7 @@ void ReplayRecorder::update(float dt)
 
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart *kart = world->getKart(i);
+        const AbstractKart *kart = world->getKart(i);
 
         // Check if skidding state has changed. If so, store this
         if(kart->getControls().m_skid != m_skid_control[i])

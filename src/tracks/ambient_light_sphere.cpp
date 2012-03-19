@@ -23,6 +23,7 @@
 
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -49,7 +50,7 @@ void AmbientLightSphere::update(float dt)
     World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        Kart *kart=world->getKart(i);
+        AbstractKart *kart=world->getKart(i);
         if(!kart->getCamera()) continue;
         if(isInside(i))
         {

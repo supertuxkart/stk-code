@@ -26,6 +26,8 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 
+#include "ISceneNode.h"
+
 Moveable::Moveable()
 {
     m_body            = 0;

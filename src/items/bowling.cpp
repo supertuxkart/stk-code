@@ -19,15 +19,16 @@
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
 #include "items/bowling.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "utils/random_generator.hpp"
 
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
 float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING, 
-                                       50.0f /* mass */)
+Bowling::Bowling(AbstractKart *kart) 
+        : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
     
@@ -94,7 +95,7 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
  *  \param kart The kart that was hit.
  *  \returns The string to display.
  */
-const core::stringw Bowling::getHitString(const Kart *kart) const
+const core::stringw Bowling::getHitString(const AbstractKart *kart) const
 {
     RandomGenerator r;
 
@@ -145,7 +146,7 @@ bool Bowling::updateAndDelete(float dt)
     if(can_be_deleted)
         return true;
 
-    const Kart *kart=0;
+    const AbstractKart *kart=0;
     Vec3        direction;
     float       minDistance;
     getClosestKart(&kart, &minDistance, &direction);
@@ -204,7 +205,7 @@ bool Bowling::updateAndDelete(float dt)
  *  \returns True if there was actually a hit (i.e. not owner, and target is 
  *           not immune), false otherwise.
  */
-bool Bowling::hit(Kart* kart, PhysicalObject* obj)
+bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)

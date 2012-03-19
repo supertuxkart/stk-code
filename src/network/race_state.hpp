@@ -23,8 +23,8 @@
 
 #include "items/flyable.hpp"
 #include "items/item.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
 #include "network/item_info.hpp"
@@ -90,7 +90,7 @@ private:
          *  called. This allows modifications of kart->m_control during the
          *  update (e.g. see in kart::update() how firing is handled).
          */
-        void storeKartControls(const Kart& kart) 
+        void storeKartControls(const AbstractKart& kart) 
         {
             m_kart_controls[kart.getWorldKartId()] = kart.getControls();
         }   // storeKartControls

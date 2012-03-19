@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "network/network_manager.hpp"

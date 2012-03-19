@@ -30,11 +30,11 @@ namespace irr
 #include "items/powerup_manager.hpp"
 #include "utils/no_copy.hpp"
 
-class Vec3;
-class Kart;
-class HitEffect;
+class AbstractKart;
 class Flyable;
+class HitEffect;
 class Track;
+class Vec3;
 
 /**
   * \ingroup items
@@ -61,7 +61,7 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Flyable*         newProjectile    (Kart *kart, Track* track,
+    Flyable*         newProjectile    (AbstractKart *kart, Track* track,
                                        PowerupManager::PowerupType type);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();

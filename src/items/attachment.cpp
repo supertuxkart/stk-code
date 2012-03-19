@@ -27,8 +27,9 @@
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
@@ -36,7 +37,7 @@
 
 /** Initialises the attachment each kart has.
  */
-Attachment::Attachment(Kart* kart)
+Attachment::Attachment(AbstractKart* kart)
 {
     m_type           = ATTACH_NOTHING;
     m_time_left      = 0.0;
@@ -84,7 +85,8 @@ Attachment::~Attachment()
  *         can be passed back to the previous owner). NULL if a no
  *         previous owner exists.
  */
-void Attachment::set(AttachmentType type, float time, Kart *current_kart)
+void Attachment::set(AttachmentType type, float time, 
+                     AbstractKart *current_kart)
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
@@ -298,7 +300,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
  *  the attachment for both karts.
  *  \param other Pointer to the other kart hit.
  */
-void Attachment::handleCollisionWithKart(Kart *other)
+void Attachment::handleCollisionWithKart(AbstractKart *other)
 {
     Attachment *attachment_other=other->getAttachment();
 

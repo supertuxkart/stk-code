@@ -35,7 +35,7 @@ using namespace irr;
 
 #include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
 class Material;
 class Referee;
 
@@ -77,19 +77,24 @@ private:
     class TimedMessage
     {
      public:
-        irr::core::stringw m_message;            //!< message to display
-        float              m_remaining_time;     //!< time remaining before removing this message from screen
-        video::SColor      m_color;              //!< color of message
-        const Kart        *m_kart;
-        bool               m_important;          //!< Important msgs are displayed in the middle of the screen
-        bool               m_big_font;
+         /** Message to display. */
+        irr::core::stringw  m_message;
+        /** Time remaining before removing this message from screen. */
+        float               m_remaining_time;
+        /** Color of message. */
+        video::SColor       m_color;
+
+        const AbstractKart *m_kart;
+        /** Important msgs are displayed in the middle of the screen. */
+        bool                m_important;
+        bool                m_big_font;
         
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
         TimedMessage(const irr::core::stringw &message, 
-                     const Kart *kart, float time,
+                     const AbstractKart *kart, float time,
                      const video::SColor &color, const bool important,
                      bool big_font)
         {
@@ -163,10 +168,10 @@ protected:
                               const core::vector2df &center,
                               const video::SColor &color,
                               video::S3DVertex *v, unsigned short int *index);
-    void drawAllMessages       (const Kart* kart,
+    void drawAllMessages       (const AbstractKart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawPowerupIcons      (const Kart* kart,
+    void drawPowerupIcons      (const AbstractKart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
@@ -193,15 +198,15 @@ public:
     virtual void renderGlobal(float dt);
     virtual void init();
     virtual void restartRace();
-    virtual void renderPlayerView(const Kart *kart);
-    virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
-                            float time,
+    virtual void renderPlayerView(const AbstractKart *kart);
+    virtual void addMessage(const irr::core::stringw &m, 
+                            const AbstractKart *kart, float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
                             bool big_font=false);
     virtual void update(float dt);
-    virtual void preRenderCallback(const Kart &kart);
+    virtual void preRenderCallback(const AbstractKart &kart);
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du 

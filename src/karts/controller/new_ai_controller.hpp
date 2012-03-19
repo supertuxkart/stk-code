@@ -25,9 +25,10 @@
 
 /* third coord won't be used */
 
-class Track;
 class LinearWorld;
 class QuadGraph;
+class Track;
+
 namespace irr
 {
     namespace scene
@@ -88,13 +89,13 @@ private:
 
     /** Pointer to the closest kart ahead of this kart. NULL if this
      *  kart is first. */
-    Kart *m_kart_ahead;
+    AbstractKart *m_kart_ahead;
     /** Distance to the kart ahead. */
     float m_distance_ahead;
 
     /** Pointer to the closest kart behind this kart. NULL if this kart
      *  is last. */
-    Kart *m_kart_behind;
+    AbstractKart *m_kart_behind;
     /** Distance to the kard behind. */
     float m_distance_behind;
 
@@ -143,11 +144,11 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
 
 public:
-                 NewAIController(Kart *kart);
+                 NewAIController(AbstractKart *kart);
     virtual     ~NewAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    virtual void crashed     (Kart *k) {if(k) m_collided = true;};
+    virtual void crashed     (AbstractKart *k) {if(k) m_collided = true;};
     virtual const irr::core::stringw& getN() const 
     {
         static irr::core::stringw name("(NewAI)");

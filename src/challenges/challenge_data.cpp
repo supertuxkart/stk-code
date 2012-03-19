@@ -21,7 +21,8 @@
 #include <sstream>
 
 #include "challenges/unlock_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "race/grand_prix_data.hpp"
@@ -366,7 +367,7 @@ bool ChallengeData::raceFinished()
     
     int d = race_manager->getDifficulty();
     
-    Kart* kart = world->getPlayerKart(0);
+    AbstractKart* kart = world->getPlayerKart(0);
 
     if (track_name != m_track_id                                ) return false;
     if ((int)world->getNumKarts() < m_num_karts[d]              ) return false;

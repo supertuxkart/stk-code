@@ -37,7 +37,9 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -171,7 +173,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUIOverworld::renderPlayerView(const Kart *kart)
+void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart)
 {
     if (!m_enabled) return;
     
@@ -267,7 +269,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     {
         for(unsigned int i=0; i<world->getNumKarts(); i++)
         {
-            const Kart *kart = world->getKart(i);
+            const AbstractKart *kart = world->getKart(i);
             if(kart->isEliminated()) continue;   // don't draw eliminated kart
                                                  // Make sure to only draw AI kart icons first, then
                                                  // only player karts.
@@ -401,7 +403,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void RaceGUIOverworld::drawEnergyMeter(int x, int y, const Kart *kart,              
+void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {

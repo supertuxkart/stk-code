@@ -22,6 +22,9 @@
 
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -101,7 +104,7 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
  *  \param kart The pointer to the kart (not used here).
  *  \param node The scene node of this kart.
  */
-void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
+void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 {
     float coord = -kart->getKartLength()*0.5f;
     
@@ -470,7 +473,7 @@ RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 /** Moves a kart to its rescue position.
  *  \param kart The kart that was rescued.
  */
-void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
+void ThreeStrikesBattle::moveKartAfterRescue(AbstractKart* kart)
 {
     // find closest point to drop kart on
     World *world = World::getWorld();
@@ -494,7 +497,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
                 
         for(unsigned int k=0; k<getCurrentNumKarts(); k++) 
         {
-            const Kart *currentKart = World::getWorld()->getKart(k);
+            const AbstractKart *currentKart = World::getWorld()->getKart(k);
             const float currentKart_x = currentKart->getXYZ().getX();
             const float currentKartk_z = currentKart->getXYZ().getZ();
 

@@ -25,8 +25,9 @@
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
@@ -90,7 +91,7 @@ const wchar_t* getSwapperString()
 /** Constructor, stores the kart to which this powerup belongs. 
  *  \param kart The kart to which this powerup belongs. 
  */
-Powerup::Powerup(Kart* kart)
+Powerup::Powerup(AbstractKart* kart)
 {
     m_owner               = kart;
     m_sound_use           = NULL;
@@ -309,7 +310,7 @@ void Powerup::use()
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
-            Kart *kart=world->getKart(i);
+            AbstractKart *kart=world->getKart(i);
             if(kart->isEliminated()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
@@ -342,13 +343,13 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_PARACHUTE:
         {
-            Kart* player_kart = NULL;
+            AbstractKart* player_kart = NULL;
             //Attach a parachutte(that last twice as long as the
             //one from the bananas) to all the karts that
             //are in front of this one.
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
-                Kart *kart=world->getKart(i);
+                AbstractKart *kart=world->getKart(i);
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(m_owner->getPosition() > kart->getPosition())
                 {

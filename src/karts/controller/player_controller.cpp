@@ -27,6 +27,8 @@
 #include "input/input_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item.hpp"
+#include "items/powerup.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -40,7 +42,8 @@
  *  \param init_pos The start coordinates and heading of the kart.
  *  \param player_index  Index of the player kart.
  */
-PlayerController::PlayerController(Kart *kart, StateManager::ActivePlayer *player, 
+PlayerController::PlayerController(AbstractKart *kart, 
+                                   StateManager::ActivePlayer *player, 
                                    unsigned int player_index)      
                 : Controller(kart)
 {
@@ -383,7 +386,7 @@ void PlayerController::setPosition(int p)
         //I'm not sure if this method of finding the passing kart is fail-safe.
         for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
         {
-            Kart *kart = world->getKart(i);
+            AbstractKart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
                 kart->beep();

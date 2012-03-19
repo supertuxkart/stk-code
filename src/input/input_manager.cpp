@@ -32,7 +32,7 @@
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
@@ -41,6 +41,8 @@
 #include "states_screens/options_screen_input2.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+
+#include <ISceneNode.h>
 
 InputManager *input_manager;
 
@@ -128,7 +130,7 @@ void InputManager::handleStaticAction(int key, int value)
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
             
-            Kart* kart = world->getLocalPlayerKart(0);
+            AbstractKart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
             
             kart->flyUp();
@@ -138,7 +140,7 @@ void InputManager::handleStaticAction(int key, int value)
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
             
-            Kart* kart = world->getLocalPlayerKart(0);
+            AbstractKart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
             
             kart->flyDown();
@@ -147,7 +149,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F1:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
@@ -159,42 +161,42 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F2:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
         case KEY_F3:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
             }
             break;
         case KEY_F4:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
             }
             break;
         case KEY_F5:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
             }
             break;
         case KEY_F6:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
             }
             break;
         case KEY_F7:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
@@ -216,7 +218,7 @@ void InputManager::handleStaticAction(int key, int value)
                 }
                 else
                 {
-                    Kart* kart = world->getLocalPlayerKart(0);
+                    AbstractKart* kart = world->getLocalPlayerKart(0);
                     kart->setEnergy(100.0f);
                 }
             }
@@ -225,7 +227,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F9:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
-                Kart* kart = world->getLocalPlayerKart(0);
+                AbstractKart* kart = world->getLocalPlayerKart(0);
                 if(control_is_pressed && race_manager->getMinorMode()!=
                                           RaceManager::MINOR_MODE_3_STRIKES)
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL,
@@ -535,16 +537,14 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         if (StateManager::get()->getGameState() == GUIEngine::GAME && 
              !GUIEngine::ModalDialog::isADialogActive()                  )
         {
-            // Find the corresponding PlayerKart from our ActivePlayer instance
-            Kart* pk;
-
             if (player == NULL)
             {
                 // Prevent null pointer crash
                 return;
             }
 
-            pk = player->getKart();
+            // Find the corresponding PlayerKart from our ActivePlayer instance
+            AbstractKart* pk = player->getKart();
 
             if (pk == NULL)
             {

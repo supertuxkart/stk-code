@@ -27,7 +27,8 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 

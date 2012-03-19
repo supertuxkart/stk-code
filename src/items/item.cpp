@@ -23,7 +23,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -217,7 +217,7 @@ void Item::reset()
  *  affected by its own items.
  *  \param parent Kart that dropped the item.
  */
-void Item::setParent(Kart* parent)
+void Item::setParent(AbstractKart* parent)
 {
     m_event_handler = parent;
     m_deactive_time = 1.5f;
@@ -274,7 +274,7 @@ void Item::update(float dt)
  *  has been collected, and the time to return to the parameter. 
  *  \param t Time till the object reappears (defaults to 2 seconds).
  */
-void Item::collected(const Kart *kart, float t)
+void Item::collected(const AbstractKart *kart, float t)
 {
     m_collected     = true;
     m_event_handler = kart;

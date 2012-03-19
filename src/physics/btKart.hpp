@@ -168,6 +168,7 @@ public:
 public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(float speed);
+    void               capSpeed(float max_speed);
     bool               projectVehicleToSurface(const btVector3& ray,
                                                bool translate_vehicle);
 

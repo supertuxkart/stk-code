@@ -916,6 +916,17 @@ void btKart::instantSpeedIncreaseTo(float speed)
 }   // activateZipper
 
 // ----------------------------------------------------------------------------
+/** Caps the speed at a given value. If necessary the kart will 
+ *  instantaneously change its speed. */
+void btKart::capSpeed(float max_speed)
+{
+    const btVector3 &velocity = m_chassisBody->getLinearVelocity();
+    float speed = velocity.length();
+    const float velocity_ratio = max_speed/speed;
+    m_chassisBody->setLinearVelocity( velocity * velocity_ratio);
+}   // capSpeed
+
+// ----------------------------------------------------------------------------
 //Shorter version of above raycast function. This is used when projecting
 //vehicles towards the ground at the start of a race
 btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)

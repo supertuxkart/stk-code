@@ -21,7 +21,7 @@
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "physics/btKart.hpp"
 
 #include <IMeshSceneNode.h>
@@ -32,7 +32,7 @@ const int SkidMarks::m_start_alpha       = 128;
 const int SkidMarks::m_start_grey        = 32;
 
 /** Initialises empty skid marks. */
-SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
+SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
 {
     m_width                   = width;
     m_material                = new video::SMaterial();

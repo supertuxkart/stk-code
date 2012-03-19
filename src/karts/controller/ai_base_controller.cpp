@@ -21,19 +21,20 @@
 
 #include <assert.h>
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/skidding_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-AIBaseController::AIBaseController(Kart *kart,
+AIBaseController::AIBaseController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player) 
                 : Controller(kart, player)
 {
     m_kart        = kart;
-    m_kart_length = m_kart->getKartModel()->getLength();
-    m_kart_width  = m_kart->getKartModel()->getWidth();
+    m_kart_length = m_kart->getKartLength();
+    m_kart_width  = m_kart->getKartWidth();
 
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {

@@ -22,13 +22,14 @@
 #include "items/cake.hpp"
 
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "utils/constants.hpp"
+#include "utils/random_generator.hpp"
 
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
 
-Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
+Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 
@@ -59,7 +60,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
     // Find closest kart in front of the current one
     const bool  backwards = kart->getControls().m_look_back;
-    const Kart *closest_kart=NULL;
+    const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
     getClosestKart(&closest_kart, &kart_dist_squared, &direction, 
@@ -74,7 +75,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
         m_speed>closest_kart->getSpeed())
     {
-        m_target = (Kart*)closest_kart;
+        m_target = (AbstractKart*)closest_kart;
 
         float fire_angle     = 0.0f;
         getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
@@ -138,7 +139,7 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
  *  \param The kart that was hit (ignored here).
  *  \returns The string to display.
  */
-const core::stringw Cake::getHitString(const Kart *kart) const
+const core::stringw Cake::getHitString(const AbstractKart *kart) const
 {
     const int CAKE_STRINGS_AMOUNT = 3;
     RandomGenerator r;
@@ -161,7 +162,7 @@ const core::stringw Cake::getHitString(const Kart *kart) const
  *  \returns True if there was actually a hit (i.e. not owner, and target is 
  *           not immune), false otherwise.
  */
-bool Cake::hit(Kart* kart, PhysicalObject* obj)
+bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)

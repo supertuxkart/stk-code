@@ -40,6 +40,7 @@ using namespace irr;
 #include "items/item.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
+#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 

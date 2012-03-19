@@ -27,7 +27,7 @@ using namespace irr;
 
 #include "items/flyable.hpp"
 
-class Kart;
+class AbstractKart;
 class PhysicalObject;
 class RubberBand;
 class XMLNode;
@@ -46,13 +46,13 @@ private:
 
     bool m_reverse_mode;
 public:
-                 Plunger(Kart *kart);
+                 Plunger(AbstractKart *kart);
                 ~Plunger();
     static  void init(const XMLNode &node, scene::IMesh* missile);
     virtual bool updateAndDelete(float dt);
     virtual void hitTrack ();
-    virtual const core::stringw getHitString(const Kart *kart) const;
-    virtual bool hit      (Kart *kart, PhysicalObject *obj=NULL);
+    virtual const core::stringw getHitString(const AbstractKart *kart) const;
+    virtual bool hit      (AbstractKart *kart, PhysicalObject *obj=NULL);
 
     // ------------------------------------------------------------------------
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger

@@ -35,8 +35,8 @@ using namespace irr;
 #include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+class AbstractKart;
 class InputMap;
-class Kart;
 class Material;
 class RaceSetup;
 
@@ -104,10 +104,11 @@ private:
     std::vector< core::vector2d<s32> > m_previous_icons_position;
     
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (const Kart *kart,
+    void drawEnergyMeter       (const AbstractKart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
+    void drawRankLap           (const KartIconDisplayInfo* info, 
+                                const AbstractKart* kart,
                                 const core::recti &viewport);
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
@@ -118,7 +119,7 @@ public:
          MinimalRaceGUI();
         ~MinimalRaceGUI();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const Kart *kart);
+    virtual void renderPlayerView(const AbstractKart *kart);
         
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 

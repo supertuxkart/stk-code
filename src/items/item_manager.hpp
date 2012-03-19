@@ -20,8 +20,9 @@
 #define HEADER_ITEMMANAGER_HPP
 
 
-#include <vector>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "items/item.hpp"
 #include "utils/no_copy.hpp"
@@ -61,15 +62,17 @@ public:
                   ~ItemManager();
     void           loadDefaultItems();
     Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
-                                    const Vec3 &normal, Kart* parent=NULL);
-    Item*          newItem         (const Vec3& xyz, float distance, TriggerItemListener* listener);
+                                    const Vec3 &normal, 
+                                    AbstractKart* parent=NULL);
+    Item*          newItem         (const Vec3& xyz, float distance, 
+                                    TriggerItemListener* listener);
     void           update          (float delta);
-    void           checkItemHit    (Kart* kart);
+    void           checkItemHit    (AbstractKart* kart);
     void           cleanup         ();
     void           reset           ();
     void           removeTextures  ();
     void           setUserFilename (char *s) {m_user_filename=s;}
-    void           collectedItem   (int item_id, Kart *kart,
+    void           collectedItem   (int item_id, AbstractKart *kart,
                                     int add_info=-1);
     void           switchItems     ();
     void           setSwitchItems(const std::vector<int> &switch_items);

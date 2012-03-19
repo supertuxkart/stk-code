@@ -29,10 +29,8 @@
 #include "LinearMath/btTransform.h"
 
 #include "items/powerup.hpp"
-#include "karts/controller/kart_control.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/emergency_animation.hpp"
-#include "karts/max_speed.hpp"
-#include "karts/moveable.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
@@ -43,9 +41,10 @@ class btUprightConstraint;
 class Attachment;
 class Camera;
 class Controller;
+class EmergencyAnimation;
 class Item;
 class KartGFX;
-class KartModel;
+class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
 class Rain;
@@ -64,18 +63,28 @@ class SlipStream;
  *  and TerrainInfo, which manages the terrain the kart is on.
  * \ingroup karts
  */
-class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation,
-             public MaxSpeed
+class Kart : public AbstractKart
 {
+    friend class Skidding;
+protected:
+    /** Handles all emergency animations: rescue and explosion. */
+    EmergencyAnimation *m_emergency_animation;
+
 private:
+    /** Handles speed increase and capping due to powerup, terrain, ... */
+    MaxSpeed           *m_max_speed;
+
+    /** Stores information about the terrain the kart is on. */
+    TerrainInfo        *m_terrain_info;
+
+    /** Handles the powerup of a kart. */
+    Powerup     *m_powerup;
+
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
     
     /** Reset position. */
     btTransform  m_reset_transform;
-
-    /** Index of kart in world. */
-    unsigned int m_world_kart_id;
 
     /** This object handles all skidding. */
     Skidding *m_skidding;
@@ -84,24 +93,21 @@ private:
      *  controller is used to run the kart. It will be replaced
      *  with an end kart controller when the kart finishes the race. */
     Controller  *m_controller;
+
     /** This saves the original controller when the end controller is
      *  used. This is an easy solution for restarting the race, since
      *  the controller do not need to be reinitialised. */
     Controller  *m_saved_controller;
 
     /** Initial rank of the kart. */
-    int          m_initial_position;
+    int m_initial_position;
 
     /** Current race position (1-num_karts). */
-    int          m_race_position;
+    int m_race_position;
 
 
-protected:       // Used by the AI atm
-    
-    KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
-    Powerup      m_powerup;
-    Attachment  *m_attachment;
-    
+
+protected:       // Used by the AI atm    
     /** The camera for each kart. Not all karts have cameras (e.g. AI karts
      *  usually don't), but there are exceptions: e.g. after the end of a
      *  race an AI kart is replacing the kart for a player.
@@ -201,234 +207,202 @@ private:
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
     void          updateEngineSFX();
-
+    float         handleNitro(float dt);
+    float         getActualWheelForce();
     void          crashed();
-
-protected:
-    const KartProperties *m_kart_properties;
-    /** This stores a copy of the kart model. It has to be a copy
-     *  since otherwise incosistencies can happen if the same kart
-     *  is used more than once. */
-    KartModel*            m_kart_model;
+    void          loadData(RaceManager::KartType type, bool is_first_kart,
+                           bool animatedModel);
     
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type, bool is_first_kart);
-    void           loadData(RaceManager::KartType type, bool is_first_kart,
-                            bool animatedModel);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
-    bool           isInRest         () const;
-    void           setSuspensionLength();
+    virtual bool   isInRest         () const;
+    virtual void   setSuspensionLength();
     virtual void   applyEngineForce (float force);
-    float          handleNitro      (float dt);
-    float          getActualWheelForce();
 
     virtual void flyUp();
     virtual void flyDown();
     
-    void           startEngineSFX   ();
-    void           adjustSpeed      (float f);
-    void           capSpeed         (float max_speed);
-    virtual void   collectedItem    (Item *item, int random_attachment);
-    virtual void   reset            ();
-    void           handleZipper     (const Material *m=NULL, bool play_sound=false);
-    void           setSquash        (float time, float slowdown);
+    virtual void   startEngineSFX   ();
+    virtual void   adjustSpeed      (float f);
+    virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
+                                    float duration, float fade_out_time);
+    virtual void   setSlowdown(unsigned int category, float max_speed_fraction, 
+                               float fade_in_time);
+    virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
+    virtual void  collectedItem(Item *item, int random_attachment);
+    virtual const Material *getMaterial() const;
+    virtual const Material *getLastMaterial() const;
+    /** Returns the pitch of the terrain depending on the heading. */
+    virtual float getTerrainPitch(float heading) const;
 
-    void           crashed          (Kart *k, bool update_attachments);
-    void           crashed          (const Material *m);
-    
+    virtual void   reset            ();
+    virtual void   handleZipper     (const Material *m=NULL, 
+                                     bool play_sound=false);
+    virtual void   setSquash        (float time, float slowdown);
+
+    virtual void   crashed          (AbstractKart *k, bool update_attachments);
+    virtual void   crashed          (const Material *m);
+    virtual float  getHoT           () const;
     virtual void   update           (float dt);
-    virtual void   finishedRace     (float time);
+    virtual void   finishedRace(float time);
     virtual void   setPosition(int p);
-    void           beep             ();
-    void           showZipperFire   ();
-    bool           playCustomSFX    (unsigned int type);
-    void           setController(Controller *controller);
+    virtual void   beep             ();
+    virtual void   showZipperFire   ();
+    virtual bool   playingExplosionAnimation() const;
+    virtual bool   playingRescueAnimation() const;
+    virtual bool   playingEmergencyAnimation() const;
+    virtual float  getCurrentMaxSpeed() const;
+
+    virtual bool   playCustomSFX    (unsigned int type);
+    virtual void   setController(Controller *controller);
+
+    // ========================================================================
+    // Powerup related functions.
     // ------------------------------------------------------------------------
-    /** Returns the index of this kart in world. */
-    unsigned int   getWorldKartId() const         { return m_world_kart_id;   }
+    /** Sets a new powerup. */
+    virtual void setPowerup (PowerupManager::PowerupType t, int n);
     // ------------------------------------------------------------------------
-    /** Returns this kart's kart model. */
-    KartModel*     getKartModel()                 { return m_kart_model;      }
+    /** Returns the current powerup. */
+    virtual const Powerup* getPowerup() const { return m_powerup; }
+    // ------------------------------------------------------------------------
+    /** Returns the current powerup. */
+    virtual Powerup* getPowerup() { return m_powerup; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of powerups. */
+    virtual int getNumPowerup() const;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
     // ------------------------------------------------------------------------
-    /** Returns the kart properties of this kart. */
-    const KartProperties*
-                   getKartProperties() const      { return m_kart_properties; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart properties. */
-    void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
-    // ------------------------------------------------------------------------
-    /** Sets a new powerup. */
-    void setPowerup (PowerupManager::PowerupType t, int n)
-                                     { m_powerup.set(t, n); }
-    // ------------------------------------------------------------------------
-    /** Returns the current attachment. */
-    const Attachment* getAttachment() const {return m_attachment; }
-    // ------------------------------------------------------------------------
-    /** Returns the current attachment, non-const version. */
-    Attachment*    getAttachment() {return m_attachment; }
-    // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
      *  to this kart). */
-    Camera*        getCamera         ()       {return m_camera;}
+    virtual Camera* getCamera         ()       {return m_camera;}
     // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
      *  to this kart) - const version. */
-    const Camera*  getCamera         () const {return m_camera;}
+    virtual const Camera*  getCamera  () const {return m_camera;}
     // ------------------------------------------------------------------------
-    /** Sets the camera for this kart. Takes ownership of the camera and will delete it. */
-    void           setCamera(Camera *camera);
-    // ------------------------------------------------------------------------
-    /** Returns the current powerup. */
-    const Powerup *getPowerup          () const { return &m_powerup;         }
-    // ------------------------------------------------------------------------
-    /** Returns the current powerup. */
-    Powerup       *getPowerup          ()       { return &m_powerup;         }
-    // ------------------------------------------------------------------------
-    /** Returns the number of powerups. */
-    int            getNumPowerup       () const { return m_powerup.getNum(); }
+    /** Sets the camera for this kart. Takes ownership of the camera and
+     *  will delete it. */
+    virtual void setCamera(Camera *camera);
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
-    float          getEnergy           () const { return m_collected_energy; }
+    virtual float  getEnergy           () const { return m_collected_energy; }
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
-    int            getPosition         () const { return m_race_position;    }
+    virtual int    getPosition         () const { return m_race_position;    }
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
-    int            getInitialPosition  () const { return m_initial_position; }
+    virtual int    getInitialPosition  () const { return m_initial_position; }
     // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
-    float          getFinishTime       () const { return m_finish_time;      }
+    virtual float  getFinishTime       () const { return m_finish_time;      }
     // ------------------------------------------------------------------------
     /** Returns true if this kart has finished the race. */
-    bool           hasFinishedRace     () const { return m_finished_race;    }
+    virtual bool   hasFinishedRace     () const { return m_finished_race;    }
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    bool           hasViewBlockedByPlunger() const
+    virtual bool   hasViewBlockedByPlunger() const
                                      { return m_view_blocked_by_plunger > 0; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
-    void           blockViewWithPlunger()   
+    virtual void   blockViewWithPlunger()   
                              { m_view_blocked_by_plunger = 
                                    m_kart_properties->getPlungerInFaceTime();}
     // -------------------------------------------------------------------------
     /** Returns a bullet transform object located at the kart's position
         and oriented in the direction the kart is going. Can be useful
         e.g. to calculate the starting point and direction of projectiles. */
-    btTransform     getAlignedTransform(const float customPitch=-1);
+    virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
     const video::SColor &getColor() const 
                                         {return m_kart_properties->getColor();}
     // ------------------------------------------------------------------------
-    /** Returns the maximum engine power for this kart. */
-    float getMaxPower     () const {return m_kart_properties->getMaxPower(); }
-    // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart. */
-    float getTimeFullSteer() const 
+    virtual float getTimeFullSteer() const 
                               { return m_kart_properties->getTimeFullSteer(); }
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
-    float getMaxSteerAngle () const
+    virtual float getMaxSteerAngle () const
                     { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
-    const Skidding *getSkidding() const { return m_skidding; }
-    // ------------------------------------------------------------------------
-    /** Returns the current steering value for this kart. */
-    float getSteerPercent() const { return m_controls.m_steer;  }
-    // ------------------------------------------------------------------------
-    /** Returns all controls of this kart. */
-    KartControl&  getControls() { return m_controls; }
-    // ------------------------------------------------------------------------
-    /** Returns all controls of this kart - const version. */
-    const KartControl& getControls() const { return m_controls; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart controls. Used e.g. by replaying history. */
-    void           setControls(const KartControl &c) { m_controls = c;        }
-    // ------------------------------------------------------------------------
-    /** Returns the length of the kart. */
-    float          getKartLength   () const {return m_kart_model->getLength();}
-    // ------------------------------------------------------------------------
-    /** Returns the height of the kart. */
-    float          getKartHeight   () const {return m_kart_model->getHeight();}
-    // ------------------------------------------------------------------------
-    /** Returns the width of the kart. */
-    float          getKartWidth    () const {return m_kart_model->getWidth(); }
+    virtual const Skidding *getSkidding() const { return m_skidding; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
-    btKart        *getVehicle      () const {return m_vehicle;                }
+    virtual btKart    *getVehicle      () const {return m_vehicle;                }
     // ------------------------------------------------------------------------
     /** Returns the upright constraint for this kart. */
-    btUprightConstraint *getUprightConstraint() const 
+    virtual btUprightConstraint *getUprightConstraint() const 
                                                   {return m_uprightConstraint;}
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
-    float          getSpeed         () const {return m_speed;                 }
+    virtual float        getSpeed() const {return m_speed;                 }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
-    void           setSpeed         (float s) {m_speed = s;                   }
+    virtual void         setSpeed(float s) {m_speed = s;                   }
     // ------------------------------------------------------------------------
-    btQuaternion   getVisualRotation() const ;
-    // ------------------------------------------------------------------------
-    /** Returns the slipstream object of this kart. */
-    const SlipStream* getSlipstream() const {return m_slipstream; }
+    virtual btQuaternion getVisualRotation() const;
     // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
-    SlipStream* getSlipstream() {return m_slipstream; }
+    virtual const SlipStream* getSlipstream() const {return m_slipstream; }
+    // ------------------------------------------------------------------------
+    /** Returns the slipstream object of this kart. */
+    virtual SlipStream* getSlipstream() {return m_slipstream; }
     // ------------------------------------------------------------------------
     /** Activates a slipstream effect, atm that is display some nitro. */
-    void           setSlipstreamEffect(float f);
-    // ------------------------------------------------------------------------
-    /** Returns a name to be displayed for this kart. */
-    virtual const wchar_t* getName() const 
-                                        { return m_kart_properties->getName(); }
-    // ------------------------------------------------------------------------
-    /** Returns a unique identifier for this kart (name of the directory the
-     *  kart was loaded from). */
-    const std::string& getIdent() const {return m_kart_properties->getIdent();}
+    virtual void setSlipstreamEffect(float f);
     // ------------------------------------------------------------------------
     /** Returns the start transform, i.e. position and rotation. */
     const btTransform& getResetTransform() const {return m_reset_transform;}
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart. */
-    Controller*    getController() { return m_controller; }
+    virtual Controller* getController() { return m_controller; }
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart (const version). */
     const Controller* getController() const { return m_controller; }
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
-    bool           isOnGround       () const;
+    virtual bool isOnGround() const;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     // ------------------------------------------------------------------------
+    virtual bool isEliminated() const;
+    // ------------------------------------------------------------------------
+    virtual void eliminate (bool remove);
+    // ------------------------------------------------------------------------
+    virtual void handleExplosion(const Vec3& pos, bool direct_hit);
+    // ------------------------------------------------------------------------
+    virtual void forceRescue(bool is_auto_rescue=false);
+    // ------------------------------------------------------------------------
+    /** Returns the timer for the currently played animation. */
+    virtual float getAnimationTimer() const;
+    // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
     void           setInvulnerableTime(float t) { m_invulnerable_time = t; };
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
-    bool           isInvulnerable() const { return m_invulnerable_time > 0; }
+    virtual bool   isInvulnerable() const { return m_invulnerable_time > 0; }
     // ------------------------------------------------------------------------
     /** Sets the energy the kart has collected. */
-    void           setEnergy(float val) { m_collected_energy = val; }
+    virtual void   setEnergy(float val) { m_collected_energy = val; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
-    bool           isSquashed() const { return m_squash_time >0; }
-    // ------------------------------------------------------------------------
-    bool           isWheeless() const {return m_kart_model->getWheelModel(0)==NULL;}
+    virtual bool   isSquashed() const { return m_squash_time >0; }
 };   // Kart
 
 

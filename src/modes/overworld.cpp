@@ -19,7 +19,7 @@
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "network/network_manager.hpp"

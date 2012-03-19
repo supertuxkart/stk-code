@@ -31,7 +31,7 @@ KartControlMessage::KartControlMessage()
     allocate(control_size*num_local_players);
     for(unsigned int i=0; i<num_local_players; i++)
     {
-        const Kart *kart            = world->getLocalPlayerKart(i);
+        const AbstractKart *kart    = world->getLocalPlayerKart(i);
         const KartControl& controls = kart->getControls();
         controls.serialise(this);
     }
@@ -51,7 +51,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         KartControl kc(this);
-        Kart *kart = World::getWorld()->getKart(i);
+        AbstractKart *kart = World::getWorld()->getKart(i);
         if(kart->getController()->isNetworkController())
         {
             ((NetworkKart*)kart)->setControl(kc);

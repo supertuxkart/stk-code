@@ -18,6 +18,7 @@
 
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include <stdexcept>

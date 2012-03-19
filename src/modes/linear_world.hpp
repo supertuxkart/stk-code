@@ -102,10 +102,10 @@ protected:
     /** Linear races can trigger rescues for one additional reason : shortcuts.
       * It may need to do some specific world before calling the generic Kart::forceRescue
       */
-    void          rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
+    void          rescueKartAfterShortcut(AbstractKart* kart, KartInfo& kart_info);
     virtual void  checkForWrongDirection(unsigned int i);
     void          updateRacePosition();
-    virtual float estimateFinishTimeForKart(Kart* kart);
+    virtual float estimateFinishTimeForKart(AbstractKart* kart);
 
 public:
                   LinearWorld();
@@ -116,7 +116,7 @@ public:
     virtual      ~LinearWorld();
 
     virtual void  update(float delta);
-    int           getSectorForKart(const int kart_id) const;
+    int           getSectorForKart(const AbstractKart *kart) const;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
@@ -125,7 +125,7 @@ public:
 
     virtual  RaceGUIBase::KartIconDisplayInfo* 
                   getKartsDisplayInfo();
-    virtual void  moveKartAfterRescue(Kart* kart);
+    virtual void  moveKartAfterRescue(AbstractKart* kart);
     virtual void  restartRace();
     virtual void  newLap(unsigned int kart_index);
     

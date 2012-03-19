@@ -33,7 +33,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
 
 /** \brief This class is responsible for drawing skid marks for a kart.
   * \ingroup graphics
@@ -42,7 +42,7 @@ class SkidMarks : public NoCopy
 {
 private:
     /** Reference to the kart to which these skidmarks belong. */
-    const Kart        &m_kart;
+    const AbstractKart &m_kart;
 
     /** True if the kart was skidding in the previous frame. */
     bool               m_skid_marking;
@@ -102,7 +102,7 @@ private:
     static float                  m_avoid_z_fighting;
 
 public:
-         SkidMarks(const Kart& kart, float width=0.2f);
+         SkidMarks(const AbstractKart& kart, float width=0.2f);
         ~SkidMarks();
     void update (float dt, bool force_skid_marks=false, 
                  video::SColor* custom_color = NULL); 

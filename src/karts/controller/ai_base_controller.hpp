@@ -80,7 +80,7 @@ protected:
     void     computePath();
 
 public:
-             AIBaseController(Kart *kart,
+             AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
 };

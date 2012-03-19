@@ -27,7 +27,9 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"
@@ -254,7 +256,7 @@ void RaceResultGUI::determineTableLayout()
     for(unsigned int position=first_position; 
         position<=race_manager->getNumberOfKarts(); position++)
     {
-        const Kart *kart = rank_world->getKartAtPosition(position);
+        const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
         // Save a pointer to the current row_info entry
         RowInfo *ri              = &(m_all_row_infos[position-first_position]);
@@ -589,7 +591,7 @@ void RaceResultGUI::determineGPLayout()
         // In case of FTL mode: ignore the leader
         if(rank<0) continue;
         old_rank[kart_id]    = rank;
-        const Kart *kart     = World::getWorld()->getKart(kart_id);
+        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
         RowInfo *ri          = &(m_all_row_infos[rank]);
         ri->m_kart_icon      = 
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -749,7 +751,7 @@ void RaceResultGUI::clearHighscores()
 
 //-----------------------------------------------------------------------------
 
-void RaceResultGUI::setHighscore(std::string who, 
+void RaceResultGUI::setHighscore(const std::string &who, 
                                  StateManager::ActivePlayer* player, int rank, 
                                  int time)
 {

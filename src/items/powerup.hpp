@@ -25,7 +25,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
-class Kart;
+class AbstractKart;
 class Item;
 class SFXBase;
 
@@ -48,10 +48,10 @@ private:
     int                         m_number;
 
     /** The owner (kart) of this powerup. */
-    Kart*                       m_owner;
+    AbstractKart*               m_owner;
 
 public:
-                    Powerup      (Kart* kart_);
+                    Powerup      (AbstractKart* kart_);
                    ~Powerup      ();
     void            set          (PowerupManager::PowerupType _type, int n=1);
     void            reset        ();

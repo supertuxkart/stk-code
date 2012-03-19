@@ -17,7 +17,7 @@
 
 #include "modes/world_with_rank.hpp"
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "race/history.hpp"
 
 #include <iostream>
@@ -40,7 +40,7 @@ void WorldWithRank::init()
 /** Returns the kart with a given position.
  *  \param p The position of the kart, 1<=p<=num_karts).
  */
-Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
+AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
 {
     if(p<1 || p>m_position_index.size())
         return NULL;

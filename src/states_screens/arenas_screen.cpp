@@ -26,6 +26,7 @@
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>

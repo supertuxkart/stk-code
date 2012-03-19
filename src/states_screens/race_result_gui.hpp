@@ -216,7 +216,7 @@ public:
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const Kart *kart) {}
+    virtual void renderPlayerView(const AbstractKart *kart) {}
 
     virtual void onUpdate(float dt, irr::video::IVideoDriver*);
 
@@ -224,7 +224,8 @@ public:
      *  called (e.g. 'new lap' message if the end controller is used for more
      *  than one lap). So do nothing in this case.
     */
-    virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
+    virtual void addMessage(const irr::core::stringw &m, 
+                            const AbstractKart *kart, 
                             float time, 
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
@@ -245,7 +246,8 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(std::string kart, StateManager::ActivePlayer* player, int rank, int time);
+    void setHighscore(const std::string &kart, 
+                      StateManager::ActivePlayer* player, int rank, int time);
     
 };   // RaceResultGUI
 

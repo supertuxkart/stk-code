@@ -22,7 +22,7 @@
 
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -110,7 +110,7 @@ void History::updateSaving(float dt)
     unsigned int index     = m_current*num_karts;
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart *kart         = world->getKart(i);
+        const AbstractKart *kart         = world->getKart(i);
         m_all_controls[index+i]  = kart->getControls();
         m_all_xyz[index+i]       = kart->getXYZ();
         m_all_rotations[index+i] = kart->getVisualRotation();
@@ -136,7 +136,7 @@ void History::updateReplay(float dt)
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
-        Kart *kart = world->getKart(k);
+        AbstractKart *kart = world->getKart(k);
         unsigned int index=m_current*num_karts+k;
         if(m_replay_mode==HISTORY_POSITION)
         {

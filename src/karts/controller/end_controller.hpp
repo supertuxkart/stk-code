@@ -77,7 +77,8 @@ private:
     void         findNonCrashingPoint(Vec3 *result);
     int          calcSteps();
 public:
-                 EndController(Kart *kart, StateManager::ActivePlayer* player);
+                 EndController(AbstractKart *kart, 
+                               StateManager::ActivePlayer* player);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();

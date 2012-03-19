@@ -3,8 +3,8 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
-#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -136,7 +136,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
     // ignore this while in menus
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return;
 
-    Kart* pk = player->getKart();
+    AbstractKart* pk = player->getKart();
     if (pk == NULL)
     {
         fprintf(stderr, "Error, trying to reset axis for an unknown player\n");

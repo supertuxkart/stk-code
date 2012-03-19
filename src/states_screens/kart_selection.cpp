@@ -35,6 +35,7 @@
 #include "input/input_device.hpp"
 #include "items/item_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "states_screens/race_setup_screen.hpp"

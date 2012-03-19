@@ -31,9 +31,9 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
-struct Input;
+class AbstractKart;
 class InputDevice;
-class Kart;
+struct Input;
 
 namespace GUIEngine
 {
@@ -76,7 +76,7 @@ public:
         InputDevice   *m_device;
     
         /** Pointer to the kart of this player, only valid during the game. */
-        Kart          *m_kart;
+        AbstractKart  *m_kart;
         
         /** ID of this player within the list of active players */
         int m_id;
@@ -95,60 +95,80 @@ public:
         bool ok()
         {
             return (m_magic_number == 0xAC1EF1AE);
-        }
+        }   // ok
 #endif
-        
+        // -------------------------------------------------------------------- 
         /** \return the identity of this active player */
-        PlayerProfile* getProfile() { 
+        PlayerProfile* getProfile() 
+        { 
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE); 
 #endif
-			return m_player; }
+			return m_player; 
+        }   // getProfile
         
+        // -------------------------------------------------------------------- 
         /** \return the identity of this active player */
-        const PlayerProfile* getConstProfile() const { 
+        const PlayerProfile* getConstProfile() const 
+        {
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE); 
 #endif
-			return m_player; }
+			return m_player; 
+        }   // getConstProfile
 
+        // -------------------------------------------------------------------- 
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
         
+        // -------------------------------------------------------------------- 
         /** ID of this player within the list of active players */
-        int getID() const {
+        int getID() const 
+        {
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE); 
 #endif
-			return m_id; }
+			return m_id; 
+        }   // getID
+        // -------------------------------------------------------------------- 
         
         /** \return Which input device this player is using, or NULL if none 
          *  is set yet */
-        InputDevice* getDevice() const { 
+        InputDevice* getDevice() const 
+        { 
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_device; }
+			return m_device; 
+        }   // getDevice
          
+        // -------------------------------------------------------------------- 
         void setDevice(InputDevice* device);
         
+        // -------------------------------------------------------------------- 
         /** Sets the kart for this player. */
-        void setKart(Kart *kart) { 
+        void setKart(AbstractKart *kart) 
+        {
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			m_kart = kart; }
+			m_kart = kart; 
+        }   // setKart
         
+        // -------------------------------------------------------------------- 
         /** \return the kart of this player. Only valid while world exists. */
-        Kart* getKart()          { 
+        AbstractKart* getKart()
+        { 
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE); 
 #endif
-            return m_kart; }
-    };
+            return m_kart; 
+        }   // getKart
 
+    };   // ActivePlayer
 
+    // ========================================================================
     const PtrVector<ActivePlayer, HOLD>& getActivePlayers() 
                                  { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);

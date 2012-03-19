@@ -20,7 +20,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
@@ -182,7 +182,7 @@ Referee::Referee()
  *  it. This is the constructor used when a rescue referee is needed.
  *  \param kart The kart which the referee should rescue.
  */
-Referee::Referee(const Kart &kart)
+Referee::Referee(const AbstractKart &kart)
 {
     assert(m_st_referee_mesh);
     // First add a NULL mesh, then set the material to be read only

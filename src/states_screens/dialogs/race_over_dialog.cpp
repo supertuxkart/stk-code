@@ -23,7 +23,8 @@
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
@@ -129,7 +130,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
     for (unsigned int position = 1; position <= num_karts; position++)
     {
-        const Kart* current_kart = world->getKartAtPosition(position);        
+        const AbstractKart* current_kart = world->getKartAtPosition(position);        
         stringw kart_results_line;
         
         const stringw& kart_name = current_kart->getName();
@@ -277,7 +278,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             //if (order[i] == -1) continue;
             const int gp_rank = race_manager->getKartGPRank(i);
             
-            const Kart *current_kart = world->getKart(i);
+            const AbstractKart *current_kart = world->getKart(i);
             const KartProperties* prop = current_kart->getKartProperties();
             const std::string &icon_path = prop->getAbsoluteIconFile();
             ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
@@ -650,7 +651,7 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     const int iconSize = h/10;
     for (unsigned int k=0; k<kart_count; k++)
     {
-        const Kart* current_kart = world->getKart(k);
+        const AbstractKart* current_kart = world->getKart(k);
 
         const KartProperties* prop   = current_kart->getKartProperties();
         const std::string& icon_path = prop->getAbsoluteIconFile();

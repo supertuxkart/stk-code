@@ -34,7 +34,9 @@ using namespace irr;
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
@@ -197,7 +199,7 @@ void MinimalRaceGUI::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void MinimalRaceGUI::renderPlayerView(const Kart *kart)
+void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart)
 {
     if (!m_enabled) return;
     
@@ -309,7 +311,7 @@ void MinimalRaceGUI::drawGlobalMiniMap()
     {
         for(unsigned int i=0; i<world->getNumKarts(); i++)
         {
-            const Kart *kart = world->getKart(i);
+            const AbstractKart *kart = world->getKart(i);
             if(kart->isEliminated()) continue;   // don't draw eliminated kart
             // Make sure to only draw AI kart icons first, then
             // only player karts.
@@ -362,7 +364,7 @@ void MinimalRaceGUI::drawGlobalMiniMap()
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,              
+void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
                                      const core::recti &viewport, 
                                      const core::vector2df &scaling)
 {
@@ -441,7 +443,7 @@ void MinimalRaceGUI::drawEnergyMeter(const Kart *kart,
  *  \param info Info object c
 */
 void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info, 
-                                 const Kart* kart,
+                                 const AbstractKart* kart,
                                  const core::recti &viewport)
 {
     // Don't display laps or ranks if the kart has already finished the race.

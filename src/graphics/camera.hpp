@@ -37,7 +37,7 @@ using namespace irr;
 #include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
 
 /**
   * \brief Handles the game camera
@@ -89,7 +89,7 @@ private:
 
     /** The kart that the camera follows. It can't be const,
      *  since in profile mode the camera might change its owner. */
-    Kart           *m_kart;
+    AbstractKart   *m_kart;
 
     /** The list of viewports for this cameras. */
     core::recti     m_viewport;
@@ -191,7 +191,7 @@ private:
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
 public:
-         Camera            (int camera_index, Kart* kart);
+         Camera            (int camera_index, AbstractKart* kart);
         ~Camera            ();
     static void readEndCamera(const XMLNode &root);
     static void clearEndCameras();
@@ -203,7 +203,7 @@ public:
     void setInitialTransform();
     void activate();
     void update            (float dt);
-    void changeOwner       (Kart *new_kart);
+    void changeOwner       (AbstractKart *new_kart);
 
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */

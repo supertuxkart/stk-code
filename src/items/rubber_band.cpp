@@ -24,12 +24,15 @@
 #include "graphics/material_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IMesh.h>
 
 const wchar_t* getPlungerString()
 {
@@ -59,8 +62,8 @@ const wchar_t* getPlungerString()
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
-RubberBand::RubberBand(Plunger *plunger, Kart *kart) :
-            m_plunger(plunger), m_owner(kart)
+RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
+          : m_plunger(plunger), m_owner(kart)
 {
     video::SColor color(77, 179, 0, 0);
     video::SMaterial m;
@@ -228,7 +231,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
  *  \param track _xyz The coordinated where the track was hit (NULL if a kart
  *                    was hit.
  */
-void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
+void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
 {
     // More than one report of a hit. This can happen if the raycast detects
     // a hit as well as the bullet physics.

@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"

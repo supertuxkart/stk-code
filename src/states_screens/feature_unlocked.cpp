@@ -24,7 +24,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -34,8 +34,9 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <ILightSceneNode.h>
+#include <IAnimatedMeshSceneNode.h>
 #include <ICameraSceneNode.h>
+#include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 

@@ -47,6 +47,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "network/race_state.hpp"
@@ -74,28 +75,19 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id, 
             int position, const btTransform& init_transform)
-     : TerrainInfo(1),
-       Moveable(), EmergencyAnimation(this), MaxSpeed(this), m_powerup(this)
+     : AbstractKart(ident, world_kart_id, position, init_transform)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
 #endif
-{    
-    m_kart_properties = kart_properties_manager->getKart(ident);
-    assert(m_kart_properties != NULL);
-    
-    // We have to take a copy of the kart model, since otherwise
-    // the animations will be mixed up (i.e. different instances of
-    // the same model will set different animation frames).
-    // Technically the mesh in m_kart_model needs to be grab'ed and
-    // released when the kart is deleted, but since the original 
-    // kart_model is stored in the kart_properties all the time,
-    // there is no risk of a mesh being deleted to early.
-    m_kart_model           = m_kart_properties->getKartModelCopy();
+{
+    m_emergency_animation  = new EmergencyAnimation(this);
+    m_max_speed            = new MaxSpeed(this);
+    m_terrain_info         = new TerrainInfo();
+    m_powerup              = new Powerup(this);
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
-    m_world_kart_id        = world_kart_id;
     m_collected_energy     = 0;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -201,6 +193,65 @@ void Kart::init(RaceManager::KartType type, bool is_first_kart)
     reset();
 }   // init
 
+// ----------------------------------------------------------------------------
+/** The destructor frees the memory of this kart, but note that the actual kart
+ *  model is still stored in the kart_properties (m_kart_model variable), so 
+ *  it is not reloaded).
+ */
+Kart::~Kart()
+{
+    // Delete all custom sounds (TODO: add back when properly done)
+    /*
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        if (m_custom_sounds[n] != NULL)
+            sfx_manager->deleteSFX(m_custom_sounds[n]);
+    }*/
+
+    sfx_manager->deleteSFX(m_engine_sound );
+    sfx_manager->deleteSFX(m_crash_sound  );
+    sfx_manager->deleteSFX(m_skid_sound   );
+    sfx_manager->deleteSFX(m_goo_sound    );
+    sfx_manager->deleteSFX(m_beep_sound   );
+    delete m_kart_gfx;
+    if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
+    if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
+    if(m_collision_particles)    delete m_collision_particles;
+    if(m_slipstream)             delete m_slipstream;
+    if(m_rain)                   delete m_rain;
+    if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
+    if(m_attachment)             delete m_attachment;
+
+    delete m_shadow;
+
+    if(m_skidmarks) delete m_skidmarks ;
+
+    // Ghost karts don't have a body
+    if(m_body)
+    {
+        World::getWorld()->getPhysics()->removeKart(this);
+        delete m_vehicle;
+        delete m_vehicle_raycaster;
+        delete m_uprightConstraint;
+    }
+
+    for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
+    {
+        delete m_kart_chassis.getChildShape(i);
+    }
+    delete m_skidding;
+    delete m_max_speed;
+    delete m_emergency_animation;
+    delete m_terrain_info;
+    delete m_powerup;
+
+    if(m_controller)
+        delete m_controller;
+    if(m_saved_controller)
+        delete m_saved_controller;
+    if (m_camera) delete m_camera;
+}   // ~Kart
+
 //-----------------------------------------------------------------------------
 /** Reset before a new race. It will remove all attachments, and
  *  puts the kart back at its original start position.
@@ -213,8 +264,10 @@ void Kart::reset()
         stopFlying();
     }
     
-    EmergencyAnimation::reset();
-    MaxSpeed::reset();
+    m_emergency_animation->reset();
+    m_max_speed->reset();
+    m_powerup->reset();
+
     if (m_camera)
     {
         m_camera->reset();
@@ -240,7 +293,6 @@ void Kart::reset()
     
     if (m_collision_particles) 
         m_collision_particles->setCreationRateAbsolute(0.0f);
-    m_powerup.reset();
 
     m_race_position        = m_initial_position;
     m_finished_race        = false;
@@ -299,7 +351,7 @@ void Kart::reset()
     }
     
 
-    TerrainInfo::update(getXYZ());
+    m_terrain_info->update(getXYZ());
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
@@ -314,6 +366,100 @@ void Kart::reset()
     if(wheels[3]) wheels[3]->setVisible(true);
     
 }   // reset
+
+// -----------------------------------------------------------------------------
+void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
+                            float duration, float fade_out_time)
+{
+    m_max_speed->increaseMaxSpeed(category, add_speed, duration, fade_out_time);
+}   // increaseMaxSpeed
+
+// -----------------------------------------------------------------------------
+void Kart::setSlowdown(unsigned int category, float max_speed_fraction, 
+                       float fade_in_time)
+{
+    m_max_speed->setSlowdown(category, max_speed_fraction, fade_in_time);
+}   // setSlowdown
+
+// -----------------------------------------------------------------------------
+float Kart::getCurrentMaxSpeed() const
+{
+    return m_max_speed->getCurrentMaxSpeed();
+}   // getCurrentMaxSpeed
+// -----------------------------------------------------------------------------
+float Kart::getSpeedIncreaseTimeLeft(unsigned int category) const
+{
+    return m_max_speed->getSpeedIncreaseTimeLeft(category);
+}   // getSpeedIncreaseTimeLeft
+// -----------------------------------------------------------------------------
+bool Kart::playingRescueAnimation() const
+{
+    return m_emergency_animation->playingRescueAnimation();
+}   // playingRescueAnimation
+
+// -----------------------------------------------------------------------------
+bool Kart::playingExplosionAnimation() const
+{
+    return m_emergency_animation->playingExplosionAnimation();
+}   // playingExplosionAnimation
+
+// -----------------------------------------------------------------------------
+/** Returns the timer for the currently played animation. */
+float Kart::getAnimationTimer() const
+{
+    return m_emergency_animation->getAnimationTimer();
+}   // getAnimationTimer
+
+// -----------------------------------------------------------------------------
+/** Returns true if an emergency animation is being played. */
+bool Kart::playingEmergencyAnimation() const
+{
+    return m_emergency_animation->playingEmergencyAnimation();
+}   // playingEmergencyAnimation
+
+// -----------------------------------------------------------------------------
+/** Returns the current material the kart is on. */
+const Material *Kart::getMaterial() const
+{
+    return m_terrain_info->getMaterial();
+}   // getMaterial
+
+// -----------------------------------------------------------------------------
+/** Returns the previous material the kart was one (which might be
+ *  the same as getMaterial() ). */
+const Material *Kart::getLastMaterial() const
+{
+    return m_terrain_info->getLastMaterial();
+}   // getLastMaterial
+// -----------------------------------------------------------------------------
+/** Returns the pitch of the terrain depending on the heading. */
+float Kart::getTerrainPitch(float heading) const
+{
+    return m_terrain_info->getTerrainPitch(heading);
+}   // getTerrainPitch
+
+// -----------------------------------------------------------------------------
+/** Returns the height of the terrain. we're currently above */
+float Kart::getHoT() const
+{
+    return m_terrain_info->getHoT();
+}   // getHoT
+
+// ----------------------------------------------------------------------------
+/** Sets the powerup this kart has collected.
+ *  \param t Type of the powerup.
+ *  \param n Number of powerups collected.
+ */
+void Kart::setPowerup(PowerupManager::PowerupType t, int n)
+{
+    m_powerup->set(t, n); 
+}   // setPowerup
+
+// -----------------------------------------------------------------------------
+int Kart::getNumPowerup() const
+{
+    return m_powerup->getNum();
+}   // getNumPowerup
 
 // -----------------------------------------------------------------------------
 /** Saves the old controller in m_saved_controller and stores a new 
@@ -514,7 +660,7 @@ void Kart::flyDown()
     {
         Moveable::flyDown();
     }
-}
+}   // flyUp
 
 // ----------------------------------------------------------------------------
 /** Starts the engine sound effect. Called once the track intro phase is over.
@@ -546,61 +692,6 @@ void Kart::startEngineSFX()
     m_engine_sound->play();
 }   // startEngineSFX
 
-// ----------------------------------------------------------------------------
-/** The destructor frees the memory of this kart, but note that the actual kart
- *  model is still stored in the kart_properties (m_kart_model variable), so 
- *  it is not reloaded).
- */
-Kart::~Kart()
-{
-    // Delete all custom sounds (TODO: add back when properly done)
-    /*
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
-    {
-        if (m_custom_sounds[n] != NULL)
-            sfx_manager->deleteSFX(m_custom_sounds[n]);
-    }*/
-
-    sfx_manager->deleteSFX(m_engine_sound );
-    sfx_manager->deleteSFX(m_crash_sound  );
-    sfx_manager->deleteSFX(m_skid_sound   );
-    sfx_manager->deleteSFX(m_goo_sound    );
-    sfx_manager->deleteSFX(m_beep_sound   );
-    delete m_kart_gfx;
-    if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
-    if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
-    if(m_collision_particles)    delete m_collision_particles;
-    if(m_slipstream)             delete m_slipstream;
-    if(m_rain)                   delete m_rain;
-    if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
-    if(m_attachment)             delete m_attachment;
-
-    delete m_shadow;
-
-    if(m_skidmarks) delete m_skidmarks ;
-
-    // Ghost karts don't have a body
-    if(m_body)
-    {
-        World::getWorld()->getPhysics()->removeKart(this);
-        delete m_vehicle;
-        delete m_vehicle_raycaster;
-        delete m_uprightConstraint;
-    }
-
-    for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
-    {
-        delete m_kart_chassis.getChildShape(i);
-    }
-    delete m_kart_model;
-    delete m_skidding;
-    if(m_controller)
-        delete m_controller;
-    if(m_saved_controller)
-        delete m_saved_controller;
-    if (m_camera) delete m_camera;
-}   // ~Kart
-
 //-----------------------------------------------------------------------------
 /** Returns true if the kart is 'resting', i.e. (nearly) not moving.
  */
@@ -619,23 +710,6 @@ void Kart::adjustSpeed(float f)
     m_body->setLinearVelocity(m_body->getLinearVelocity()*f);
     m_body->setAngularVelocity(m_body->getAngularVelocity()*f);
 }   // adjustSpeed
-
-//-----------------------------------------------------------------------------
-/** Caps the speed at a given value. If necessary the kart will 
- *  instantaneously change its speed.
- *  \param max_speed Maximum speed of the kart.
- */
-void Kart::capSpeed(float max_speed)
-{
-    if ( m_speed >  max_speed && isOnGround() )
-    {
-        const float velocity_ratio = max_speed/m_speed;
-        btVector3 velocity         = getBody()->getLinearVelocity();
-        velocity *= velocity_ratio;
-        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
-    }
-
-}   // capSpeed
 
 //-----------------------------------------------------------------------------
 /** This method is to be called every time the mass of the kart is updated,
@@ -744,7 +818,7 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
-            m_powerup.hitBonusBox(*item, add_info);
+            m_powerup->hitBonusBox(*item, add_info);
             break;
         }
     case Item::ITEM_BUBBLEGUM:
@@ -781,18 +855,21 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getActualWheelForce()
 {
-    float time_left = MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER);
-    float zipper_force = time_left>0.0f ? m_kart_properties->getZipperForce(): 0.0f;
+    float time_left = 
+        m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER);
+    float zipper_force = time_left>0.0f ? m_kart_properties->getZipperForce()
+                                        : 0.0f;
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getMaxSpeed()*gear_ratio[i])
         {
-            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]
+            return m_kart_properties->getMaxPower()
+                  *m_kart_properties->getGearPowerIncrease()[i]
                   +zipper_force;
         }
     }
-    return getMaxPower()+zipper_force;
+    return m_kart_properties->getMaxPower()+zipper_force;
 
 }   // getActualWheelForce
 
@@ -813,11 +890,45 @@ bool Kart::isOnGround() const
 */
 bool Kart::isNearGround() const
 {
-    if(getHoT()==Track::NOHIT)
+    if(m_terrain_info->getHoT()==Track::NOHIT)
         return false;
     else
-        return ((getXYZ().getY() - getHoT()) < stk_config->m_near_ground);
+        return ((getXYZ().getY() - m_terrain_info->getHoT()) 
+                 < stk_config->m_near_ground);
 }   // isNearGround
+
+//-----------------------------------------------------------------------------
+/** Returns true if the kart is eliminated. 
+ */
+bool Kart::isEliminated() const 
+{
+    return m_emergency_animation->isEliminated(); 
+}   // isEliminated
+// ------------------------------------------------------------------------
+void Kart::eliminate(bool remove)
+{
+    m_emergency_animation->eliminate(remove); 
+}   // eliminate
+
+// ------------------------------------------------------------------------
+/** Starts an explosion animation.
+ *  \param pos The coordinates of the explosion.
+ *  \param direct_hig True if the kart was hit directly --> maximal impact.
+ */
+void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
+{
+    m_emergency_animation->handleExplosion(pos, direct_hit);
+}   // handleExplosion
+
+//-----------------------------------------------------------------------------
+/** Sets the mode of the kart to being rescued, attaches the rescue model
+ *  and saves the current pitch and roll (for the rescue animation). It
+ *  also removes the kart from the physics world.
+ */
+void Kart::forceRescue(bool is_auto_rescue)
+{
+    m_emergency_animation->forceRescue(is_auto_rescue);
+}   // forceRescue
 
 //-----------------------------------------------------------------------------
 /** Updates the kart in each time step. It updates the physics setting,
@@ -826,9 +937,9 @@ bool Kart::isNearGround() const
  */
 void Kart::update(float dt)
 {
-    if (m_eliminated)
+    if (m_emergency_animation->isEliminated())
     {
-        EmergencyAnimation::update(dt);
+        m_emergency_animation->update(dt);
         return;
     }
 
@@ -839,8 +950,8 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, 
-                                  /*slowdown*/1.0f, /*fade in*/0.0f);
+            m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, 
+                                    /*slowdown*/1.0f, /*fade in*/0.0f);
         }
     }
     
@@ -885,7 +996,7 @@ void Kart::update(float dt)
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
-        m_powerup.use() ;
+        m_powerup->use() ;
         m_controls.m_fire = false;
     }
 
@@ -894,7 +1005,7 @@ void Kart::update(float dt)
         // When really on air, free fly, when near ground, try to glide / adjust for landing
         // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
         if(!isNearGround() && 
-            MaxSpeed::getSpeedIncreaseTimeLeft(MS_INCREASE_ZIPPER)<=0.0f )
+            m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f )
             m_uprightConstraint->setLimit(M_PI);
         else
             m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
@@ -923,7 +1034,7 @@ void Kart::update(float dt)
     m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
     m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
 
-    EmergencyAnimation::update(dt);
+    m_emergency_animation->update(dt);
 
     m_attachment->update(dt);
 
@@ -978,13 +1089,13 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
-    TerrainInfo::update(pos_plus_epsilon);
+    m_terrain_info->update(pos_plus_epsilon);
     if(m_body->getBroadphaseHandle())
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
     handleMaterialGFX();
-    const Material* material=TerrainInfo::getMaterial();
+    const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
@@ -1005,9 +1116,9 @@ void Kart::update(float dt)
         }
         else
         {
-            MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
-                                  material->getMaxSpeedFraction(), 
-                                  material->getSlowDownTime()     );
+            m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
+                                     material->getMaxSpeedFraction(), 
+                                     material->getSlowDownTime()     );
 #ifdef DEBUG
             if(UserConfigParams::m_material_debug)
             {
@@ -1062,10 +1173,8 @@ void Kart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-
-/**
-  * Show fire to go with a zipper
-  */
+/** Show fire to go with a zipper.
+ */
 void Kart::showZipperFire()
 {
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
@@ -1087,7 +1196,7 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-    MaxSpeed::setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
     m_squash_time  = time;
 }   // setSquash
 
@@ -1177,7 +1286,8 @@ void Kart::handleMaterialGFX()
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() && 
-        m_kart_mode != EA_RESCUE && UserConfigParams::m_graphical_effects)
+        !m_emergency_animation->playingRescueAnimation()&& 
+        UserConfigParams::m_graphical_effects)
     {
 
         // Get the appropriate particle data depending on
@@ -1225,7 +1335,7 @@ void Kart::handleMaterialGFX()
     Vec3 from = (ri2.m_contactPointWS + ri3.m_contactPointWS)*0.5f;
     Vec3 xyz;
     const Material *surface_material;
-    if(!getSurfaceInfo(from, &xyz, &surface_material))
+    if(!m_terrain_info->getSurfaceInfo(from, &xyz, &surface_material))
     {
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
         return;
@@ -1233,7 +1343,7 @@ void Kart::handleMaterialGFX()
     const ParticleKind *pk = 
         surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
 
-    if(!pk || m_flying || m_kart_mode == EA_RESCUE)
+    if(!pk || m_flying || m_emergency_animation->playingRescueAnimation())
         return;
 
     // Now the kart is under a surface, and there is a surface effect
@@ -1251,7 +1361,7 @@ void Kart::handleMaterialGFX()
     // Play special sound effects for this terrain
     // -------------------------------------------
     const std::string s = surface_material->getSFXName();
-    if (s != "" && m_kart_mode != EA_RESCUE &&
+    if (s != "" && !m_emergency_animation->playingRescueAnimation()&&
         (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
     {
         if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
@@ -1280,7 +1390,7 @@ void Kart::setCamera(Camera *camera)
 
 #ifdef DEBUG
     m_camera->getCameraSceneNode()
-            ->setName((m_kart_properties->getIdent() + "'s camera").c_str());
+            ->setName((getIdent() + "'s camera").c_str());
 #endif
     
     // Handle camera-specific nodes for now if in multiplayer
@@ -1338,9 +1448,9 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake || m_speed<0) return;
 
-    MaxSpeed::instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                                   max_speed_increase, speed_gain, 
-                                   duration, fade_out_time);
+    m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+                                     max_speed_increase, speed_gain, 
+                                     duration, fade_out_time);
     // Play custom character sound (weee!)
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
     m_controller->handleZipper(play_sound);
@@ -1359,11 +1469,12 @@ float Kart::handleNitro(float dt)
         m_collected_energy = 0;
         return 0.0;
     }
-    MaxSpeed::increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
+    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
                                m_kart_properties->getNitroMaxSpeedIncrease(),
                                m_kart_properties->getNitroDuration(), 
                                m_kart_properties->getNitroFadeOutTime()      );
-    return m_kart_properties->getNitroPowerBoost() * getMaxPower();
+    return m_kart_properties->getNitroPowerBoost() 
+         * m_kart_properties->getMaxPower();
 
 }   // handleNitro
 
@@ -1380,7 +1491,7 @@ void Kart::setSlipstreamEffect(float f)
  *  \param update_attachments If true the attachment of this kart and the
  *          other kart hit will be updated (e.g. bombs will be moved)
  */
-void Kart::crashed(Kart *k, bool update_attachments)
+void Kart::crashed(AbstractKart *k, bool update_attachments)
 {
     if(update_attachments)
     {
@@ -1421,7 +1532,7 @@ void Kart::crashed(const Material *m)
     const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
     if(lw && m_vehicle->getCentralImpulseTime()<=0)
     {
-        int sector = lw->getSectorForKart(m_world_kart_id);
+        int sector = lw->getSectorForKart(this);
         if(sector!=QuadGraph::UNKNOWN_SECTOR)
         {
             const GraphNode &gn = QuadGraph::get()->getNode(
@@ -1519,6 +1630,8 @@ void Kart::crashed()
 }   // crashed
 
 // -----------------------------------------------------------------------------
+/** Plays a beep sfx.
+ */
 void Kart::beep()
 {
     // If the custom horn can't play (isn't defined) then play the default one
@@ -1605,9 +1718,9 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = m_kart_properties->getStartupBoost();
-        MaxSpeed::instantSpeedIncrease(MS_INCREASE_ZIPPER, 0.9f*f,
-                                       f, /*duration*/5.0f,
-                                       /*fade_out_time*/5.0f);
+        m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER, 0.9f*f,
+                                          f, /*duration*/5.0f,
+                                          /*fade_out_time*/5.0f);
     }
 
     m_bounce_back_time-=dt;
@@ -1643,7 +1756,7 @@ void Kart::updatePhysics(float dt)
         m_speed *= -1.f;
 
     // Cap speed if necessary
-    MaxSpeed::update(dt);
+    m_max_speed->update(dt);
 
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
@@ -1697,7 +1810,7 @@ void Kart::updateEngineSFX()
 
     if(isOnGround())
     {
-        float max_speed = MaxSpeed::getCurrentMaxSpeed();
+        float max_speed = m_max_speed->getCurrentMaxSpeed();
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
         // ignoring the gear settings from stk_config, but providing a
@@ -1782,7 +1895,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
                 m_vehicle->setAllBrakes(0);
                 // going backward, apply reverse gear ratio (unless he goes 
                 // too fast backwards)
-                if ( -m_speed <  MaxSpeed::getCurrentMaxSpeed()
+                if ( -m_speed <  m_max_speed->getCurrentMaxSpeed()
                                  *m_kart_properties->getMaxSpeedReverseRatio())
                 {
                     // The backwards acceleration is artificially increased to
@@ -1919,7 +2032,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
     m_node = m_kart_model->attachModel(is_animated_model);
     
 #ifdef DEBUG
-    m_node->setName( (m_kart_properties->getIdent()+"(lod-node)").c_str() );
+    m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
     
     // Attachment must be created after attachModel, since only then the

@@ -33,6 +33,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track.hpp"

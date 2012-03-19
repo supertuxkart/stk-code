@@ -28,6 +28,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"

@@ -22,7 +22,7 @@
 #include "audio/sfx_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -43,7 +43,7 @@ int   RubberBall::m_next_id = 0;
 // Debug only, so that we can get a feel on how well balls are aiming etc.
 #undef PRINT_BALL_REMOVE_INFO
 
-RubberBall::RubberBall(Kart *kart)
+RubberBall::RubberBall(AbstractKart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {    
@@ -187,7 +187,7 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
     if(lin_world)
     {
         unsigned int sect = 
-            lin_world->getSectorForKart(m_target->getWorldKartId());
+            lin_world->getSectorForKart(m_target);
         succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
     }
     if(dist)
@@ -294,7 +294,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *bowling)
  *  \param The kart that was hit (ignored here).
  *  \returns The string to display.
  */
-const core::stringw RubberBall::getHitString(const Kart *kart) const
+const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
 {
     const int COUNT = 2;
     RandomGenerator r;
@@ -686,7 +686,7 @@ void RubberBall::updateDistanceToTarget()
  *  \params object The object that was hit (NULL if none).
  *  \returns True if 
  */
-bool RubberBall::hit(Kart* kart, PhysicalObject* object)
+bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 {
 #ifdef PRINT_BALL_REMOVE_INFO
     if(kart)

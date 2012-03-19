@@ -33,7 +33,7 @@
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/user_pointer.hpp"
 
-class Kart;
+class AbstractKart;
 class STKDynamicsWorld;
 class Vec3;
 
@@ -138,12 +138,12 @@ public:
           Physics          ();
          ~Physics          ();
     void  init             (const Vec3 &min_world, const Vec3 &max_world);
-    void  addKart          (const Kart *k);
+    void  addKart          (const AbstractKart *k);
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
-    void  removeKart       (const Kart *k);
+    void  removeKart       (const AbstractKart *k);
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
-    void  KartKartCollision(Kart *ka, const Vec3 &contact_point_a,
-                            Kart *kb, const Vec3 &contact_point_b);
+    void  KartKartCollision(AbstractKart *ka, const Vec3 &contact_point_a,
+                            AbstractKart *kb, const Vec3 &contact_point_b);
     void  update           (float dt);
     void  draw             ();
     STKDynamicsWorld*
@@ -153,7 +153,7 @@ public:
     void  nextDebugMode    () {m_debug_drawer->nextDebugMode(); }
     /** Returns true if the debug drawer is enabled. */
     bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
-    bool  projectKartDownwards(const Kart *k);
+    bool  projectKartDownwards(const AbstractKart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

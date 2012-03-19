@@ -34,9 +34,9 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/random_generator.hpp"
 
+class AbstractKart;
 class btRigidBody;
 class Controller;
-class Kart;
 class Track;
 
 /** 
@@ -60,7 +60,7 @@ class Track;
 class World : public WorldStatus
 {
 public:
-    typedef std::vector<Kart*> KartList;
+    typedef std::vector<AbstractKart*> KartList;
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
@@ -70,8 +70,8 @@ protected:
     KartList                  m_karts;
     RandomGenerator           m_random;
 
-    Physics*    m_physics;
-    Kart*       m_fastest_kart;
+    Physics*      m_physics;
+    AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
     /** Number of eliminated players. */
@@ -93,9 +93,9 @@ protected:
     void  eliminateKart     (int kart_number, bool notifyOfElimination=true, 
                              bool remove=true);
     Controller* 
-          loadAIController  (Kart *kart);
+          loadAIController  (AbstractKart *kart);
 
-    virtual Kart *createKart(const std::string &kart_ident, int index, 
+    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type);
     /** Pointer to the track. The track is managed by world. */
@@ -114,22 +114,6 @@ protected:
     bool     m_clear_back_buffer;
     
     irr::video::SColor m_clear_color;
-    
-    virtual void    onGo();
-    /** Returns true if the race is over. Must be defined by all modes. */
-    virtual bool    isRaceOver() = 0;
-    virtual void    update(float dt);
-            void    updateTrack(float dt);
-    /** Used for AI karts that are still racing when all player kart finished.
-     *  Generally it should estimate the arrival time for those karts, but as
-     *  a default (useful for battle mode and ftl races) we just use the 
-     *  current time for this (since this is a good value for karts still 
-     *  around at the end of a race, and other criteria (number of lives,
-     *  race position) will be used to determine the final order.
-     */
-    virtual float   estimateFinishTimeForKart(Kart* kart) {return getTime(); }
-
-    virtual void    createRaceGUI();
     
     /** Pausing/unpausing are not done immediately, but at next udpdate. The 
      *  use of this is when switching between screens : if we leave a screen 
@@ -151,6 +135,24 @@ protected:
      * because you are e.g. within World::update()
      */
     bool m_self_destruct;
+    
+    virtual void  onGo();
+    /** Returns true if the race is over. Must be defined by all modes. */
+    virtual bool  isRaceOver() = 0;
+    virtual void  update(float dt);
+    virtual void  createRaceGUI();
+            void  updateTrack(float dt);
+    // ------------------------------------------------------------------------
+    /** Used for AI karts that are still racing when all player kart finished.
+     *  Generally it should estimate the arrival time for those karts, but as
+     *  a default (useful for battle mode and ftl races) we just use the 
+     *  current time for this (since this is a good value for karts still 
+     *  around at the end of a race, and other criteria (number of lives,
+     *  race position) will be used to determine the final order.
+     */
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) 
+                                        {return getTime(); }
+
     
 public:
                     World();
@@ -182,7 +184,7 @@ public:
     /** Since each mode will have a different way of deciding where a rescued
      *  kart is dropped, this method will be called and each mode can implement 
      *  it. */
-    virtual void    moveKartAfterRescue(Kart* kart) = 0;
+    virtual void moveKartAfterRescue(AbstractKart* kart) = 0;
     // ------------------------------------------------------------------------    
     /** Called when it is needed to know whether this kind of race involves 
      *  counting laps. */
@@ -212,7 +214,7 @@ public:
     // ------------------------------------------------------------------------    
     /** If you want to do something to karts or their graphics at the start 
      *  of the race, override this. */
-    virtual void kartAdded(Kart* kart, scene::ISceneNode* node) {}
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) {}
     // ------------------------------------------------------------------------    
     /** Called whenever a kart starts a new lap. Meaningless (and won't be 
      *  called) in non-laped races.
@@ -229,10 +231,10 @@ public:
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            updateWorld(float dt);
-    void            handleExplosion(const Vec3 &xyz, Kart *kart_hit, 
+    void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);
-    Kart           *getPlayerKart(unsigned int player) const;
-    Kart           *getLocalPlayerKart(unsigned int n) const;
+    AbstractKart*   getPlayerKart(unsigned int player) const;
+    AbstractKart*   getLocalPlayerKart(unsigned int n) const;
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
@@ -241,7 +243,7 @@ public:
     unsigned int    getNumKarts() const { return m_karts.size(); }
     // ------------------------------------------------------------------------
     /** Returns the kart with a given world id. */
-    Kart           *getKart(int kartId) const {
+    AbstractKart       *getKart(int kartId) const {
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
                         return m_karts[kartId];                              }
     // ------------------------------------------------------------------------

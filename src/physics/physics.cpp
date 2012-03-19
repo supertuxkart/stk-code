@@ -20,6 +20,7 @@
 
 #include "animations/three_d_animation.hpp"
 #include "config/user_config.hpp"
+#include "karts/kart_properties.hpp"
 #include "network/race_state.hpp"
 #include "graphics/stars.hpp"
 #include "physics/btKart.hpp"
@@ -76,7 +77,7 @@ Physics::~Physics()
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
-void Physics::addKart(const Kart *kart)
+void Physics::addKart(const AbstractKart *kart)
 {
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(kart->getVehicle());
@@ -88,7 +89,7 @@ void Physics::addKart(const Kart *kart)
  *  (and during cleanup).
  *  \param kart The kart to remove.
  */
-void Physics::removeKart(const Kart *kart)
+void Physics::removeKart(const AbstractKart *kart)
 {
     m_dynamics_world->removeRigidBody(kart->getBody());
     m_dynamics_world->removeVehicle(kart->getVehicle());
@@ -124,8 +125,8 @@ void Physics::update(float dt)
         // --------------------
         if(p->getUserPointer(0)->is(UserPointer::UP_KART))
         {
-            Kart *a=p->getUserPointer(0)->getPointerKart();
-            Kart *b=p->getUserPointer(1)->getPointerKart();
+            AbstractKart *a=p->getUserPointer(0)->getPointerKart();
+            AbstractKart *b=p->getUserPointer(1)->getPointerKart();
             race_state->addCollision(a->getWorldKartId(),
                                      b->getWorldKartId());
             KartKartCollision(p->getUserPointer(0)->getPointerKart(), 
@@ -143,7 +144,7 @@ void Physics::update(float dt)
                                    ->getPointerPhysicalObject();
             if(obj->isCrashReset())
             {
-                Kart *kart = p->getUserPointer(1)->getPointerKart();
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 kart->forceRescue();
             }
             continue;
@@ -155,7 +156,7 @@ void Physics::update(float dt)
             ThreeDAnimation *anim=p->getUserPointer(0)->getPointerAnimation();
             if(anim->isCrashReset())
             {
-                Kart *kart = p->getUserPointer(1)->getPointerKart();
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 kart->forceRescue();
             }
             continue;
@@ -204,7 +205,7 @@ void Physics::update(float dt)
  *  Used in setting the starting positions of all the karts.
  */
 
-bool Physics::projectKartDownwards(const Kart *k)
+bool Physics::projectKartDownwards(const AbstractKart *k)
 {
     btVector3 hell(0, -10000, 0);
     return k->getVehicle()->projectVehicleToSurface(hell, 
@@ -224,15 +225,17 @@ bool Physics::projectKartDownwards(const Kart *k)
  *  \param contact_point_b Location of collision at second kart (in kart
  *         coordinates).
  */
-void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
-                                Kart *kart_b, const Vec3 &contact_point_b)
+void Physics::KartKartCollision(AbstractKart *kart_a, 
+                                const Vec3 &contact_point_a,
+                                AbstractKart *kart_b, 
+                                const Vec3 &contact_point_b)
 {
     // Only one kart needs to handle the attachments, it will
     // fix the attachments for the other kart.
     kart_a->crashed(kart_b, /*handle_attachments*/true);
     kart_b->crashed(kart_a, /*handle_attachments*/false);
 
-    Kart *left_kart, *right_kart;
+    AbstractKart *left_kart, *right_kart;
 
     // Determine which kart is pushed to the left, and which one to the
     // right. Ideally the sign of the X coordinate of the local conact point 
@@ -399,7 +402,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
             {
-                Kart *kart=upB->getPointerKart();
+                AbstractKart *kart=upB->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m 
@@ -414,7 +417,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_TRACK))
             {
-                Kart *kart = upA->getPointerKart();
+                AbstractKart *kart = upA->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m 

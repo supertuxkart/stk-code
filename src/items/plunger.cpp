@@ -25,7 +25,8 @@
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track.hpp"
@@ -35,7 +36,8 @@
 
 
 // -----------------------------------------------------------------------------
-Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
+Plunger::Plunger(AbstractKart *kart) 
+       : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     const float gravity = 0.0f;
 
@@ -47,7 +49,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     m_reverse_mode = kart->getControls().m_look_back;
 
     // find closest kart in front of the current one
-    const Kart *closest_kart=0;   
+    const AbstractKart *closest_kart=0;   
     Vec3        direction;
     float       kart_dist_2;
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
@@ -120,7 +122,7 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
  *  \param The kart that was hit (ignored here).
  *  \returns The string to display.
  */
-const core::stringw Plunger::getHitString(const Kart *kart) const
+const core::stringw Plunger::getHitString(const AbstractKart *kart) const
 {
     const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
     RandomGenerator r;
@@ -173,7 +175,7 @@ bool Plunger::updateAndDelete(float dt)
  *  \returns True if there was actually a hit (i.e. not owner, and target is 
  *           not immune), false otherwise.
  */
-bool Plunger::hit(Kart *kart, PhysicalObject *obj)
+bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
 

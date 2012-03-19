@@ -26,7 +26,7 @@
 #include "config/stk_config.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -140,7 +140,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
 /** Returns a pointer to the kart which has a given GP rank.
  *  \param n The rank (1 to number of karts) to look for.
  */
-const Kart *RaceManager::getKartWithGPRank(unsigned int n)
+const AbstractKart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
         if(m_kart_status[i].m_gp_rank == (int)n)
@@ -477,7 +477,7 @@ void RaceManager::computeGPRanks()
         //    m_kart_status[position[i]].m_ident.c_str(), i-start);
         if(UserConfigParams::m_ftl_debug)
         {
-            const Kart *kart =
+            const AbstractKart *kart =
                 World::getWorld()->getKart(sort_data[i].m_position);
             printf("[ftl] kart '%s' has now position %d.\n",
                 kart->getIdent().c_str(), 
@@ -573,7 +573,7 @@ void RaceManager::exitRace(bool delete_world)
  *  \param kart The kart that finished the race.
  *  \param time Time at which the kart finished the race.
  */
-void RaceManager::kartFinishedRace(const Kart *kart, float time)
+void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
 {
     unsigned int id = kart->getWorldKartId();
     int pos = kart->getPosition();

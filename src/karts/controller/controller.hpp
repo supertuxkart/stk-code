@@ -29,11 +29,11 @@ using namespace irr;
   */
 
 #include "input/input.hpp"
-#include "karts/controller/kart_control.hpp"
 #include "states_screens/state_manager.hpp"
 
-class Kart;
+class AbstractKart;
 class Item;
+class KartControl;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
@@ -43,7 +43,7 @@ class Controller
 {
 protected:
     /** Pointer to the kart that is controlled by this controller. */
-    Kart         *m_kart;
+    AbstractKart *m_kart;
 
     /** A pointer to the main controller, from which the kart takes
      *  it commands. */
@@ -53,7 +53,8 @@ protected:
      *  structure. Otherwise it is 0. */
     StateManager::ActivePlayer *m_player;
 public:
-                  Controller         (Kart *kart, StateManager::ActivePlayer *player=NULL);
+                  Controller         (AbstractKart *kart, 
+                                      StateManager::ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
     /** Returns the active player for this controller (NULL 
      *  if this controller does not belong to a player.    */

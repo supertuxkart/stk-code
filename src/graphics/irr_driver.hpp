@@ -49,8 +49,8 @@ using namespace irr;
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
+class AbstractKart;
 class Camera;
-class Kart;
 class PerCameraNode;
 
 /**
@@ -177,7 +177,7 @@ public:
                          *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
                          *addCameraSceneNode();
-    Camera               *addCamera(unsigned int index, Kart *kart);
+    Camera               *addCamera(unsigned int index, AbstractKart *kart);
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
     void                  update(float dt);

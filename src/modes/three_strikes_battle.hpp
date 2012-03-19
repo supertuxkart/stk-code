@@ -96,14 +96,14 @@ public:
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(Kart* kart);
+    virtual void moveKartAfterRescue(AbstractKart* kart);
     
     virtual const std::string& getIdent() const;
     
     virtual void kartHit(const int kart_id);
     virtual void update(float dt);
     
-    virtual void kartAdded(Kart* kart, scene::ISceneNode* node);
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
 
     
     void updateKartRanks();

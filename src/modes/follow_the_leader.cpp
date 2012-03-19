@@ -21,6 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
@@ -73,7 +74,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     // kart, otherwise remove the last kart.
     int position_to_remove = m_karts[0]->getPosition()==1 
                            ? getCurrentNumKarts() : 1;
-    Kart *kart = getKartAtPosition(position_to_remove);
+    AbstractKart *kart = getKartAtPosition(position_to_remove);
     if(!kart || kart->isEliminated())
     {
         fprintf(stderr,"Problem with removing leader: position %d not found\n",

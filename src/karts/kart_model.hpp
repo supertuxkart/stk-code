@@ -31,7 +31,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
 class KartProperties;
 class XMLNode;
 
@@ -135,7 +135,7 @@ private:
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     /** Pointer to the kart object belonging to this kart model. */
-    Kart* m_kart;
+    AbstractKart* m_kart;
     
 public:
                   KartModel(bool is_master);
@@ -197,7 +197,7 @@ public:
     void  setAnimation(AnimationFrameType type);    
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
-    void  setKart(Kart* k) { m_kart = k; }
+    void  setKart(AbstractKart* k) { m_kart = k; }
     // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }

@@ -38,8 +38,10 @@
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
+#include "items/powerup.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
@@ -100,7 +102,7 @@ void RaceGUIBase::init()
     // profile mode where there might be a camera, but no player).
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
-        const Kart *kart = World::getWorld()->getKart(i);
+        const AbstractKart *kart = World::getWorld()->getKart(i);
         m_referee_pos.push_back(kart->getTrans()(Referee::getStartOffset()));
         Vec3 hpr = Referee::getStartRotation() 
                  + Vec3(0, kart->getHeading()*RAD_TO_DEGREE, 0);
@@ -253,7 +255,7 @@ void RaceGUIBase::createRegularPolygon(unsigned int n, float radius,
 //-----------------------------------------------------------------------------
 /** Displays all messages in the message queue
  **/
-void RaceGUIBase::drawAllMessages(const Kart* kart,
+void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::recti &viewport, 
                                   const core::vector2df &scaling)
 {    
@@ -360,7 +362,7 @@ void RaceGUIBase::cleanupMessages(const float dt)
  *  \param viewport The viewport into which to draw the icons.
  *  \param scaling The scaling to use when draing the icons.
  */
-void RaceGUIBase::drawPowerupIcons(const Kart* kart, 
+void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart, 
                                    const core::recti &viewport, 
                                    const core::vector2df &scaling)
 {
@@ -369,7 +371,7 @@ void RaceGUIBase::drawPowerupIcons(const Kart* kart,
     if (powerup->getType() == PowerupManager::POWERUP_NOTHING
         || kart->hasFinishedRace()) return;
 
-    int n = kart->getNumPowerup() ;
+    int n = kart->getPowerup()->getNum() ;
     if (n<1) return;    // shouldn't happen, but just in case
     if (n>5) n=5;       // Display at most 5 items
 
@@ -457,7 +459,7 @@ void RaceGUIBase::update(float dt)
  *  is used here to display the referee during the ready-set-go phase.
  *  \param kart The kart whose view is rendered next.
  */
-void RaceGUIBase::preRenderCallback(const Kart &kart)
+void RaceGUIBase::preRenderCallback(const AbstractKart &kart)
 {
     if(m_referee)
     {
@@ -469,9 +471,9 @@ void RaceGUIBase::preRenderCallback(const Kart &kart)
 }   // preRenderCallback
 
 // ----------------------------------------------------------------------------
-void RaceGUIBase::renderPlayerView(const Kart *kart)
+void RaceGUIBase::renderPlayerView(const AbstractKart *kart)
 {
-    const core::recti &viewport    = kart->getCamera()->getViewport();
+    const core::recti &viewport = kart->getCamera()->getViewport();
 
     if (m_lightning > 0.0f)
     {
@@ -533,7 +535,8 @@ void RaceGUIBase::renderPlayerView(const Kart *kart)
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
  **/
-void RaceGUIBase::addMessage(const core::stringw &msg, const Kart *kart, 
+void RaceGUIBase::addMessage(const core::stringw &msg, 
+                             const AbstractKart *kart, 
                              float time, const video::SColor &color,
                              bool important, bool big_font)
 {
@@ -723,7 +726,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
     {
         for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
         {
-            const Kart *kart = world->getKart(i);
+            const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();
             core::vector2d<s32> pos(x_base,y_base+(position-1)*(ICON_PLAYER_WIDTH+2));
             m_previous_icons_position.push_back(pos);
@@ -750,7 +753,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
     
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
-        Kart *kart = world->getKartAtPosition(position);
+        AbstractKart *kart = world->getKartAtPosition(position);
         
         if (kart->getPosition() == -1)//if position is not set
         {

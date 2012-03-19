@@ -23,13 +23,14 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
 #include <iostream>
 
-KartGFX::KartGFX(const Kart *kart)
+KartGFX::KartGFX(const AbstractKart *kart)
 {
     if(!UserConfigParams::m_graphical_effects)
     {

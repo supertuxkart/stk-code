@@ -75,10 +75,10 @@ void KartWithStats::handleExplosion(const Vec3& pos, bool direct_hit)
     Kart::handleExplosion(pos, direct_hit);
     // If a kart is too far away from an explosion to be affected, its timer
     // will be 0, and this should then not be counted as an explosion.
-    if(is_new_explosion && EmergencyAnimation::m_timer>0)
+    if(is_new_explosion && m_emergency_animation->getAnimationTimer()>0)
     {
         m_explosion_count ++;
-        m_explosion_time += EmergencyAnimation::m_timer;
+        m_explosion_time += m_emergency_animation->getAnimationTimer();
     }
 
 }   // handleExplosion
@@ -97,7 +97,7 @@ void KartWithStats::forceRescue(bool is_auto_rescue)
     if(is_new_rescue)
     {
         m_rescue_count++;
-        m_rescue_time += EmergencyAnimation::m_timer;
+        m_rescue_time += m_emergency_animation->getAnimationTimer();
     }
 }   // forceRescue
 

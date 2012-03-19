@@ -33,9 +33,9 @@ using namespace irr;
 #include "karts/moveable.hpp"
 #include "tracks/terrain_info.hpp"
 
+class AbstractKart;
 class FlyableInfo;
 class HitEffect;
-class Kart;
 class PhysicalObject;
 class XMLNode;
 
@@ -71,7 +71,7 @@ private:
     bool              m_do_terrain_info;
 protected:
     /** Kart which shot this flyable. */
-    Kart*             m_owner;
+    AbstractKart*     m_owner;
 
     /** Type of the powerup. */
     PowerupManager::PowerupType       
@@ -136,14 +136,14 @@ protected:
      *  with it for a short time. */
     bool              m_owner_has_temporary_immunity;
 
-    void              getClosestKart(const Kart **minKart, 
+    void              getClosestKart(const AbstractKart **minKart, 
                                      float *minDistSquared,
                                      Vec3 *minDelta, 
-                                     const Kart* inFrontOf=NULL,
+                                     const AbstractKart* inFrontOf=NULL,
                                      const bool backwards=false) const;
 
     void getLinearKartItemIntersection(const Vec3 &origin, 
-                                       const Kart *target_kart,
+                                       const AbstractKart *target_kart,
                                        float item_XY_velocity, float gravity,
                                        float forw_offset,
                                        float *fire_angle, float *up_velocity);
@@ -160,18 +160,19 @@ protected:
                                     const btTransform* customDirection=NULL);
 public:
 
-                 Flyable     (Kart* kart, PowerupManager::PowerupType type, 
+                 Flyable     (AbstractKart* kart, 
+                              PowerupManager::PowerupType type,
                               float mass=1.0f);
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
-    virtual const core::stringw getHitString(const Kart *kart) const = 0;
+    virtual const core::stringw getHitString(const AbstractKart *kart) const = 0;
     virtual HitEffect*        getHitEffect() const;
     void                      updateFromServer(const FlyableInfo &f, float dt);
-    bool                      isOwnerImmunity(const Kart *kart_hit) const;
-    virtual bool              hit(Kart* kart, PhysicalObject* obj=NULL);
-    void                      explode(Kart* kart, PhysicalObject* obj=NULL);
+    bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
+    virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the 
      *  flyable stays at a height close to the average height.

@@ -35,7 +35,7 @@
 #include "graphics/stars.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
 #include "tracks/track.hpp"
@@ -51,7 +51,8 @@ float         Flyable::m_st_force_updown[PowerupManager::POWERUP_MAX];
 Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass) 
+Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type, 
+                 float mass) 
        : Moveable(), TerrainInfo()
 {
     // get the appropriate data from the static fields
@@ -196,8 +197,9 @@ Flyable::~Flyable()
  *  behind). Useful e.g. for throwing projectiles in front only.
  */
 
-void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
-                             Vec3 *minDelta, const Kart* inFrontOf, 
+void Flyable::getClosestKart(const AbstractKart **minKart, 
+                             float *minDistSquared, Vec3 *minDelta, 
+                             const AbstractKart* inFrontOf, 
                              const bool backwards) const
 {
     btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
@@ -209,7 +211,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     World *world = World::getWorld();
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         // If a kart has star effect shown, the kart is immune, so
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner || 
@@ -268,7 +270,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
  *  \param up_velocity Returns the upwards velocity to use for the item.
  */
 void Flyable::getLinearKartItemIntersection (const Vec3 &origin, 
-                                             const Kart *target_kart,
+                                             const AbstractKart *target_kart,
                                              float item_XZ_speed, 
                                              float gravity, float forw_offset,
                                              float *fire_angle, 
@@ -419,7 +421,7 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
  *  that's too close to the shoter hits the shoter).
  *  \param kart Kart who was hit.
  */
-bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
+bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
 {
     return m_owner_has_temporary_immunity &&
            kart_hit == m_owner            &&
@@ -433,7 +435,7 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
  *  \return True if there was actually a hit (i.e. not owner, and target is 
  *          not immune), false otherwise.
  */
-bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
+bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable
     if(isOwnerImmunity(kart_hit)) return false;
@@ -461,14 +463,14 @@ bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 /** Creates the explosion physical effect, i.e. pushes the karts and ph
  *  appropriately. The corresponding visual/sfx needs to be added manually!
  */
-void Flyable::explode(Kart *kart_hit, PhysicalObject *object)
+void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
 {
     // Apply explosion effect
     // ----------------------
     World *world = World::getWorld();
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.

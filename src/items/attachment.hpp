@@ -27,7 +27,7 @@
 #include <IAnimatedMeshSceneNode.h>
 using namespace irr;
 
-class Kart;
+class AbstractKart;
 class Item;
 class SFXBase;
 
@@ -67,7 +67,7 @@ private:
     AttachmentType  m_type;
 
     /** Kart the attachment is attached to. */
-    Kart           *m_kart;
+    AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
     float           m_time_left;
@@ -78,10 +78,10 @@ private:
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
     scene::IAnimatedMeshSceneNode 
-                   *m_node;
+                     *m_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
-    Kart           *m_previous_owner;
+    AbstractKart     *m_previous_owner;
 
     /** An optional attachment - additional functionality can be implemented
      *  for certain attachments. */
@@ -94,13 +94,14 @@ private:
     SFXBase          *m_bomb_sound;
 
 public:
-          Attachment(Kart* kart);
+          Attachment(AbstractKart* kart);
          ~Attachment();
     void  clear ();
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
-    void  handleCollisionWithKart(Kart *other);
-    void  set (AttachmentType type, float time, Kart *previous_kart=NULL);
+    void  handleCollisionWithKart(AbstractKart *other);
+    void  set (AttachmentType type, float time, 
+               AbstractKart *previous_kart=NULL);
 
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */
@@ -117,7 +118,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
-    Kart* getPreviousOwner() const { return m_previous_owner; }
+    AbstractKart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
     float weightAdjust() const { 

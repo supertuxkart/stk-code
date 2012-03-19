@@ -37,6 +37,7 @@
 #include "karts/controller/new_ai_controller.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
@@ -143,7 +144,7 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-        Kart* newkart = createKart(kart_ident, i, local_player_id,  
+        AbstractKart* newkart = createKart(kart_ident, i, local_player_id,  
                                    global_player_id, 
                                    race_manager->getKartType(i));
         m_karts.push_back(newkart);
@@ -191,13 +192,13 @@ void World::createRaceGUI()
  *  \param global_player_id If the kart is a player kart this is the index of
  *         this player globally (i.e. including network players).
  */
-Kart *World::createKart(const std::string &kart_ident, int index,
-                        int local_player_id, int global_player_id,
-                        RaceManager::KartType kart_type)
+AbstractKart *World::createKart(const std::string &kart_ident, int index,
+                                int local_player_id, int global_player_id,
+                                RaceManager::KartType kart_type)
 {
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
-    Kart *new_kart         = new Kart(kart_ident, index, position, init_pos);
+    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
     new_kart->init(race_manager->getKartType(index), (local_player_id == 0));
     Controller *controller = NULL;
     switch(kart_type)
@@ -232,7 +233,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
 /** Creates an AI controller for the kart.
  *  \param kart The kart to be controlled by an AI.
  */
-Controller* World::loadAIController(Kart *kart)
+Controller* World::loadAIController(AbstractKart *kart)
 {
     Controller *controller;
     // const int NUM_ROBOTS = 1;
@@ -398,7 +399,7 @@ void World::resetAllKarts()
             // heights and so things might change from kart to kart.
             for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
             {
-                Kart *kart = m_karts[kart_id];
+                AbstractKart *kart = m_karts[kart_id];
                 kart->setXYZ(center);
     
                 btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
@@ -792,7 +793,7 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
  *  so it shouldn't be called inside of loops.
  *  \param n Index of player kart to return.
  */
-Kart *World::getPlayerKart(unsigned int n) const
+AbstractKart *World::getPlayerKart(unsigned int n) const
 {
     unsigned int count=-1;
 
@@ -811,7 +812,7 @@ Kart *World::getPlayerKart(unsigned int n) const
  *  (since an AI kart will have the camera).
  *  \param n Index of player kart to return.
  */
-Kart *World::getLocalPlayerKart(unsigned int n) const
+AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 {
     int count=-1;
     const int kart_count = m_karts.size();
@@ -833,7 +834,7 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
 void World::eliminateKart(int kart_number, bool notify_of_elimination, 
                           bool remove)
 {
-    Kart *kart = m_karts[kart_number];
+    AbstractKart *kart = m_karts[kart_number];
     
     // Display a message about the eliminated kart in the race gui
     if (notify_of_elimination)

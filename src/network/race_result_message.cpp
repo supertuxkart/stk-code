@@ -18,7 +18,7 @@
 
 #include "network/race_result_message.hpp"
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
@@ -32,7 +32,7 @@ RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
     allocate(num_karts * (getFloatLength()+getCharLength()));
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart *kart = world->getKart(i);
+        const AbstractKart *kart = world->getKart(i);
         addFloat(kart->getFinishTime());
         addChar(kart->getPosition());
     }   // for i in karts
@@ -50,7 +50,7 @@ RaceResultMessage::RaceResultMessage(ENetPacket* pkt)
     const unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         float time  = getFloat();
         char position = getChar();
         kart->setPosition(position);

@@ -18,8 +18,8 @@
 
 #include "network/kart_update_message.hpp"
 
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
-#include "karts/kart.hpp"
 
 KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)
@@ -35,7 +35,7 @@ KartUpdateMessage::KartUpdateMessage()
     addChar(num_karts);
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart = world->getKart(i);
+        const AbstractKart* kart = world->getKart(i);
         const KartControl& kc=kart->getControls();
         kc.serialise(this);
         addVec3(kart->getXYZ());
@@ -54,7 +54,7 @@ KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
         KartControl kc(this);
         Vec3 xyz = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         kart->setXYZ(xyz);
         kart->setRotation(q);
     }   // for i

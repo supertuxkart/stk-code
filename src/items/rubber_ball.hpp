@@ -24,7 +24,7 @@
 #include "items/flyable.hpp"
 #include "tracks/track_sector.hpp"
 
-class Kart;
+class AbstractKart;
 class QuadGraph;
 class SFXBase;
 
@@ -99,7 +99,7 @@ private:
     static float m_st_early_target_factor;
 
     /** A pointer to the target kart. */
-    const Kart  *m_target;
+    const AbstractKart  *m_target;
 
     /** The last graph node who's coordinates are stored in
      *  m_control_points[3]. */
@@ -197,12 +197,12 @@ private:
     float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
     bool         checkTunneling();
 public:
-                 RubberBall  (Kart* kart);
+                 RubberBall  (AbstractKart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL);
-    virtual const core::stringw getHitString(const Kart *kart) const;
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    virtual const core::stringw getHitString(const AbstractKart *kart) const;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
