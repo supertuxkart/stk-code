@@ -29,7 +29,7 @@
 #include <string>
 
 // For mkdir
-#if !defined(WIN32) || defined(__CYGWIN__)
+#if !defined(WIN32)
 #  include <sys/stat.h>
 #  include <sys/types.h>
 // For RemoveDirectory
@@ -546,7 +546,7 @@ void FileManager::checkAndCreateConfigDir()
     }
     else
     {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__CYGWIN__)
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
         if(getenv("APPDATA")!=NULL)
@@ -628,7 +628,7 @@ void FileManager::checkAndCreateConfigDir()
  */
 void FileManager::checkAndCreateAddonsDir()
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__CYGWIN__)
     m_addons_dir  = m_config_dir+"/addons";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
@@ -845,7 +845,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 {
     result.clear();
 
-#ifdef WIN32
+#if defined(WIN32)
     std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
 #else
     std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
@@ -934,7 +934,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             removeFile(full_path);
         }
     }
-#ifdef WIN32
+#if defined(WIN32)
         return RemoveDirectory(name.c_str())==TRUE;
 #else
     return remove(name.c_str())==0;

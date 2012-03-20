@@ -75,7 +75,7 @@ private:
 public:
     LEAK_CHECK()
     
-#if defined(WIN32) || defined(_WIN32)
+#if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #pragma warning(disable:4290)
 #endif
                       ~MusicInformation ();

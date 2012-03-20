@@ -16,7 +16,7 @@ subject to the following restrictions:
 #ifndef BT_COLLISION_OBJECT_H
 #define BT_COLLISION_OBJECT_H
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  define isnan _isnan
 #  define isinf(x) (!_finite(x))
 #else

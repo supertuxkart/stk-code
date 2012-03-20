@@ -21,7 +21,7 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  define isnan _isnan
 #endif
 #include <math.h>

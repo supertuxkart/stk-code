@@ -61,7 +61,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
 #endif
@@ -77,7 +77,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform)
      : AbstractKart(ident, world_kart_id, position, init_transform)
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
 #endif
 {

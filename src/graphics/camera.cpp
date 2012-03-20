@@ -19,7 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
 #  define isnan _isnan
 #else
 #  include <math.h>

@@ -169,12 +169,15 @@ bool TrackManager::loadTrack(const std::string& dirname)
         return false;
     }
     
-    if(track->getVersion()<stk_config->m_min_track_version ||
+    if (track->getVersion()<stk_config->m_min_track_version ||
         track->getVersion()>stk_config->m_max_track_version)
     {
         fprintf(stderr, "[TrackManager] Warning: track '%s' is not supported "
-                        "by this binary, ignored.\n",
-                track->getIdent().c_str());
+                        "by this binary, ignored. (Track is version %i, this "
+                        "executable supports from %i to %i)\n",
+                track->getIdent().c_str(), track->getVersion(),
+                stk_config->m_min_track_version,
+                stk_config->m_max_track_version);
         delete track;
         return false;
     }
