@@ -364,11 +364,24 @@ void DefaultAIController::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
+	float side_dist = 
+		m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
+    if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
-        steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
-                                                    .getCenter());
+		// If the speed is negative, the kart is most likely being pushed
+		// away from a collision with the terrain, and this most likely means
+		// that the kart is off track. In this case, steer so that the kart
+		// will rotate towards the center of the track. E.g. if the kart is 
+		// to the right, steer towards the right.
+		if(m_kart->getSpeed()<0)
+		{
+			steer_angle = side_dist > 0 ? -m_kart->getMaxSteerAngle()
+				                        :  m_kart->getMaxSteerAngle();
+		}
+		else
+			steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
+                                                        .getCenter());
 
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(QuadGraph::get()->getQuadOfNode(next)
