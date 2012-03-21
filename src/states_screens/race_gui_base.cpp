@@ -58,7 +58,9 @@ RaceGUIBase::RaceGUIBase()
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_ready          = _("Ready!");
+    //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_set            = _("Set!");
+    //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_go             = _("Go!");
     // Make the two materials permanent (in case that they are not listed
     // in the textures/materials.xml file).
@@ -339,7 +341,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
 /** Removes messages which have been displayed long enough. This function
  *  must be called after drawAllMessages, otherwise messages which are only
  *  displayed once will not be drawn!
- **/
+ */
 void RaceGUIBase::cleanupMessages(const float dt)
 {
     AllMessageType::iterator p =m_messages.begin(); 
@@ -400,7 +402,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
 // ----------------------------------------------------------------------------
 /** Updates lightning related information.
-*/
+ */
 void RaceGUIBase::renderGlobal(float dt)
 {
     if (m_lightning > 0.0f) m_lightning -= dt;
@@ -534,7 +536,7 @@ void RaceGUIBase::renderPlayerView(const AbstractKart *kart)
 /** Adds a message to the message queue. The message is displayed for a
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
- **/
+ */
 void RaceGUIBase::addMessage(const core::stringw &msg, 
                              const AbstractKart *kart, 
                              float time, const video::SColor &color,
@@ -544,8 +546,9 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
 }   // addMessage
 
 //-----------------------------------------------------------------------------
-// Displays the description given for the music currently being played -
-// usually the title and composer.
+/** Displays the description given for the music currently being played.
+ *  This is usually the title and composer.
+ */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
      // show no music description when it's off
@@ -676,7 +679,6 @@ void RaceGUIBase::drawGlobalReadySetGo()
                                 UserConfigParams::m_width>>1, 
                                 UserConfigParams::m_height>>1);
             gui::IGUIFont* font = GUIEngine::getTitleFont();
-            //I18N: as in "ready, set, go", shown at the beginning of the race
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
@@ -689,7 +691,6 @@ void RaceGUIBase::drawGlobalReadySetGo()
                                 UserConfigParams::m_height>>1);
             //gui::IGUIFont* font = irr_driver->getRaceFont();
             gui::IGUIFont* font = GUIEngine::getTitleFont();
-            //I18N: as in "ready, set, go", shown at the beginning of the race
             font->draw(m_string_go.c_str(), pos, color, true, true);
         }
         break;
@@ -699,27 +700,48 @@ void RaceGUIBase::drawGlobalReadySetGo()
 }   // drawGlobalReadySetGo
 
 //-----------------------------------------------------------------------------
-// Draw players icons and their times (if defined in the current mode).
+/** Draw players icons and their times (if defined in the current mode).
+ *  Also takes care of icon looking different due to plumber, squashing, ...
+ */
 void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
                                         int bottom_margin)
 {
     int x_base = 10;
     int y_base = 20;
-    int ICON_WIDTH=(int)(40*(UserConfigParams::m_width/800.0f));
-    int ICON_PLAYER_WIDTH=(int)(50*(UserConfigParams::m_width/800.0f));
-    if(UserConfigParams::m_height<600)
-    {
-        ICON_WIDTH        = 27;
-        ICON_PLAYER_WIDTH = 35;
-    }
-    
+    unsigned int y_space = UserConfigParams::m_height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getNumLocalPlayers() == 3)
     {
         x_base = UserConfigParams::m_width/2 + x_base;
         y_base = UserConfigParams::m_height/2 + y_base;
+        y_space = UserConfigParams::m_height - y_base;
     }
-    
+
+    // -2 because that's the spacing further on
+    int ICON_PLAYER_WIDTH = y_space / race_manager->getNumberOfKarts() - 2;
+
+    int icon_width_max = (int)(50*(UserConfigParams::m_width/800.0f));
+    int icon_width_min = (int)(35*(UserConfigParams::m_height/600.0f));
+    if (icon_width_min > icon_width_max)
+    {
+        int icon_width_tmp = icon_width_max;
+        icon_width_max = icon_width_min;
+        icon_width_min = icon_width_tmp;
+    }
+
+    // Make sure it fits within our boundaries
+    if (ICON_PLAYER_WIDTH > icon_width_max) ICON_PLAYER_WIDTH = icon_width_max;
+    if (ICON_PLAYER_WIDTH < icon_width_min) ICON_PLAYER_WIDTH = icon_width_min;
+
+    // TODO: Is this absolute treshold necessary?
+    if(UserConfigParams::m_height<600)
+    {
+        ICON_PLAYER_WIDTH = 35;
+    }
+
+    // Icon width for the AI karts
+    int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
+
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
