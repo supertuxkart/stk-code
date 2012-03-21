@@ -169,7 +169,9 @@
          decrease: multiplicative decrease of skidding factor in each frame.
          max: maximum skidding factor = maximum increase of steering angle.
          time-till-max: Time till maximum skidding is reached.
-         visual: Additional graphical rotation of kart.
+         visual: Additional graphical rotation of kart. The graphical rotation
+           of the kart also determines the direction the kart is driving to
+           when skidding is stopped.
          visual-time: How long it takes for the visual skid to reach maximum.
          angular-velocity: Angular velocity to be used for the kart when skidding.
          time-till-bonus: How long a kart needs to skid in order to get a bonus.
@@ -179,8 +181,13 @@
            the chassis of a kart should rotate to match the graphical view. 
            A factor of 1 is identical, a smaller factor will rotate the kart
            less (which might  feel better).   
-         reduce-turn: A factor that's multiplied to the steering when skidding,
-           which is used to reduce the turn angle  used to reduce the turn angle. -->
+         reduce-turn-min/max: The steering done by the controller (which is in
+           [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
+           is active (for left turn, right turn will use [-max, -min]). The 
+           effect is that while you skid (say left) you can adjust the direction
+           of the turn the kart is doing somewhat by steering to the left and right,
+           but you will always keep on doing a left turn, just more or less. -->
+
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
           visual="1.0" visual-time="0"
           time-till-bonus="1.0 3.0" 
@@ -304,14 +311,6 @@
            period, which results in less abrupt changes. If set to 0,
            the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
-         side-impulse: an additional (artificial) impulse that
-           pushes the slower kart out of the way of the faster karts (i.e. 
-           sideways to the faster kart) when a collision happens. This is 
-           for now disabled since it needs tuning and additionally has the
-           problem that the amount of push a hit kart receives depends on
-           the orientation - if a kart is pushed in the direction it is 
-           driving, it will be more (no friction from tires), while when 
-           pushed to the side, hardly anything happens. 
          bevel-factor: for each point of the chassis collision box one 
            additional point is added, resulting in a bevelled box shape.
            The original Z coordinate of the chassis is multiplied by 
