@@ -127,8 +127,6 @@ void DefaultAIController::reset()
     m_curve_target_speed         = m_kart->getCurrentMaxSpeed();
     m_curve_angle                = 0.0;
     m_start_delay                = -1.0f;
-    m_crash_time                 = 0.0f;
-    m_collided                   = false;
     m_time_since_stuck           = 0.0f;
     m_kart_ahead                 = NULL;
     m_distance_ahead             = 0.0f;
@@ -147,6 +145,7 @@ void DefaultAIController::reset()
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
+	AIBaseController::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -191,6 +190,14 @@ void DefaultAIController::update(float dt)
         AIBaseController::update(dt);
         return;
     }
+
+	// If the kart needs to be rescued, do it now (and nothing else)
+	if(isStuck())
+	{
+		m_kart->forceRescue();
+		AIBaseController::update(dt);
+		return;
+	}
 
     if( m_world->isStartPhase() )
     {
@@ -270,7 +277,6 @@ void DefaultAIController::update(float dt)
 
     /*And obviously general kart stuff*/
     AIBaseController::update(dt);
-    m_collided = false;
     m_controls->m_fire = false;
 }   // update
 
@@ -374,12 +380,14 @@ void DefaultAIController::handleSteering(float dt)
 		// that the kart is off track. In this case, steer so that the kart
 		// will rotate towards the center of the track. E.g. if the kart is 
 		// to the right, steer towards the right.
+#ifdef XX
 		if(m_kart->getSpeed()<0)
 		{
 			steer_angle = side_dist > 0 ? -m_kart->getMaxSteerAngle()
 				                        :  m_kart->getMaxSteerAngle();
 		}
 		else
+#endif
 			steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
                                                         .getCenter());
 

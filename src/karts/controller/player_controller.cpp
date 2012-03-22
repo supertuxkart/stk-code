@@ -86,7 +86,6 @@ void PlayerController::reset()
     m_prev_brake   = 0;
     m_prev_accel   = 0;
     m_penalty_time = 0;
-    Controller::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -320,13 +319,6 @@ void PlayerController::update(float dt)
             m_controls->m_accel = 0.0f;
             
         }   // if key pressed
-        else
-        {
-            // The call to update is necessary here (even though the kart
-            // shouldn't actually change) to update m_transform. Otherwise
-            // the camera gets the wrong position. 
-            Controller::update(dt);
-        }
         return;
     }   // if isStartPhase
 
@@ -371,7 +363,6 @@ void PlayerController::update(float dt)
     {
         m_bzzt_sound->play();
     }
-    Controller::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------

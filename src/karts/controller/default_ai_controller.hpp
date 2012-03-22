@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -93,20 +94,18 @@ private:
     bool m_make_use_of_slipstream;
 
     /*General purpose variables*/
-    //The crash percentage is how much of the time the AI has been crashing,
-    //if the AI has been crashing for some time, use the rescue.
-    float m_crash_time;
-    int   m_collided;           // true if the kart collided with the track
 
     /** Pointer to the closest kart ahead of this kart. NULL if this
      *  kart is first. */
     AbstractKart *m_kart_ahead;
+
     /** Distance to the kart ahead. */
     float m_distance_ahead;
 
     /** Pointer to the closest kart behind this kart. NULL if this kart
      *  is last. */
     AbstractKart *m_kart_behind;
+
     /** Distance to the kard behind. */
     float m_distance_behind;
 
@@ -151,7 +150,6 @@ public:
                 ~DefaultAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    virtual void crashed     (AbstractKart *k) {if(k) m_collided = true;};
     virtual const irr::core::stringw& getNamePostfix() const;
 };
 

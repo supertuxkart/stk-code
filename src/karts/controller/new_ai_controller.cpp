@@ -208,7 +208,6 @@ void NewAIController::update(float dt)
             m_controls->m_fire  = true;
         }
     }
-    m_collided = false;
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -823,7 +822,6 @@ void NewAIController::reset()
     m_curve_angle                = 0.0;
     m_time_till_start            = -1.0f;
     m_crash_time                 = 0.0f;
-    m_collided                   = false;
     m_time_since_stuck           = 0.0f;
     m_kart_ahead                 = NULL;
     m_distance_ahead             = 0.0f;

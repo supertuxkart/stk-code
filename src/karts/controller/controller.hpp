@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010  Joerg Henrichs
@@ -34,6 +35,7 @@ using namespace irr;
 class AbstractKart;
 class Item;
 class KartControl;
+class Material;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
@@ -56,33 +58,36 @@ public:
                   Controller         (AbstractKart *kart, 
                                       StateManager::ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
+    virtual void  reset              () = 0;
+    virtual void  update             (float dt) = 0;
+    virtual void  handleZipper       (bool play_sound) = 0;
+    virtual void  collectedItem      (const Item &item, int add_info=-1,
+                                      float previous_energy=0) = 0;
+    virtual void  crashed            (const AbstractKart *k) = 0;
+    virtual void  crashed            (const Material *m) = 0;
+    virtual void  setPosition        (int p) = 0;
+    virtual void  finishedRace       (float time) = 0;
+    virtual bool  isPlayerController () const = 0;
+    virtual bool  isNetworkController() const = 0;
+    virtual const irr::core::stringw& getNamePostfix() const;
+	// ---------------------------------------------------------------------------
     /** Returns the active player for this controller (NULL 
      *  if this controller does not belong to a player.    */
     StateManager::ActivePlayer *getPlayer () {return m_player;}
     
+	// ---------------------------------------------------------------------------
+	/** Returns the player object (or NULL if it's a computer controller). */
     const StateManager::ActivePlayer *getPlayer () const { return m_player; }
     
-    virtual void  reset              () {};
-    virtual void  update             (float dt) {};
-    virtual void  handleZipper       (bool play_sound) {};
-    virtual void  collectedItem      (const Item &item, int add_info=-1,
-                                     float previous_energy=0) {};
-
-    virtual void  crashed            () {};
-    virtual void  setPosition        (int p) {};
-    virtual void  finishedRace       (float time) {};
-    virtual bool  isPlayerController () const {return false;}
-    virtual bool  isNetworkController() const {return false;}
-    virtual const irr::core::stringw& getNamePostfix() const;
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
-    virtual void  action             (PlayerAction action, int value) {}
+    virtual void action(PlayerAction action, int value) = 0;
     // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use.            */
-    virtual void  newLap             (int lap) {}
+    virtual void  newLap(int lap) = 0;
     // ------------------------------------------------------------------------
-    virtual void  skidBonusTriggered() {}
+    virtual void  skidBonusTriggered() = 0;
 };   // Controller
 
 #endif

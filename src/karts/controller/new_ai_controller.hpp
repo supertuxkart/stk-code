@@ -85,7 +85,6 @@ private:
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
-    int   m_collided;           // true if the kart collided with the track
 
     /** Pointer to the closest kart ahead of this kart. NULL if this
      *  kart is first. */
@@ -148,7 +147,6 @@ public:
     virtual     ~NewAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    virtual void crashed     (AbstractKart *k) {if(k) m_collided = true;};
     virtual const irr::core::stringw& getN() const 
     {
         static irr::core::stringw name("(NewAI)");

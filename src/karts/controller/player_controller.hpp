@@ -62,9 +62,16 @@ public:
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
     virtual void   finishedRace      (float time);
-    bool           isPlayerController() const {return true;}
+    virtual bool   isPlayerController() const {return true;}
+	virtual bool   isNetworkController() const { return false; }
     virtual void   reset             ();
     void           resetInputState   ();
+	virtual void   crashed           (const AbstractKart *k) {}
+	virtual void   crashed           (const Material *m) {}
+    // ------------------------------------------------------------------------
+    /** Callback whenever a new lap is triggered. Used by the AI
+     *  to trigger a recomputation of the way to use.            */
+	virtual void  newLap(int lap) {}
 };
 
 #endif

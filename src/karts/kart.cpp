@@ -1498,6 +1498,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
         assert(k);
         getAttachment()->handleCollisionWithKart(k);
     }
+	m_controller->crashed(k);
     crashed();
 }   // crashed(Kart, update_attachments
 
@@ -1598,7 +1599,7 @@ void Kart::crashed(const Material *m)
             }
         }
     }
-
+	m_controller->crashed(m);
     crashed();
 }   // crashed(Material)
 
@@ -1607,8 +1608,6 @@ void Kart::crashed(const Material *m)
  */
 void Kart::crashed()
 {
-    m_controller->crashed();
-
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
     m_time_last_crash = World::getWorld()->getTime();
