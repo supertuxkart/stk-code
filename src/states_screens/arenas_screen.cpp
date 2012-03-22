@@ -40,19 +40,19 @@ DEFINE_SCREEN_SINGLETON( ArenasScreen );
 const char* ALL_ARENA_GROUPS_ID = "all";
 
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void ArenasScreen::loadedFromFile()
 {
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void ArenasScreen::beforeAddingWidget()
 {
@@ -100,7 +100,7 @@ void ArenasScreen::beforeAddingWidget()
     tracks_widget->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void ArenasScreen::init()
 {
@@ -112,7 +112,7 @@ void ArenasScreen::init()
     w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
 }   // init
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -130,9 +130,23 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         {
             RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
             assert( tabs != NULL );
-            
-            const std::vector<int>& curr_group = track_manager->getArenasInGroup(
-                    tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) );
+
+            std::vector<int> curr_group;
+            if (tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) == ALL_ARENA_GROUPS_ID)
+            {
+                const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
+                for (unsigned int i = 0; i < groups.size(); i++)
+                {
+                    const std::vector<int>& tmp_group = track_manager->getArenasInGroup(groups[i]);
+                    // Append to our main vector
+                    curr_group.insert(curr_group.end(), tmp_group.begin(), tmp_group.end());
+                }
+            } // if on tab "all"
+            else
+            {
+                curr_group = track_manager->getArenasInGroup(
+                        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) );
+            }
             
             RandomGenerator random;
             const int randomID = random.get(curr_group.size());
