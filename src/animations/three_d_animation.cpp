@@ -228,7 +228,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
                 }
             }
         }   // for i<getMeshBufferCount
-        triangle_mesh->createPhysicalBody();
+        triangle_mesh->createCollisionShape();
         m_collision_shape = &triangle_mesh->getCollisionShape();
         m_triangle_mesh = triangle_mesh;
     }
@@ -263,7 +263,12 @@ ThreeDAnimation::~ThreeDAnimation()
         World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
-        delete m_collision_shape;
+		// If an exact shape was used, the collision shape pointer
+		// here is a copy of the collision shape pointer in the
+		// triangle mesh. In order to avoid double-freeing this
+		// pointer, we don't free the pointer in this case.
+        if(!m_triangle_mesh)
+			delete m_collision_shape;
     }
     
     if (m_triangle_mesh)
