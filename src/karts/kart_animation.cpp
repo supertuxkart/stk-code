@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/emergency_animation.hpp"
+#include "karts/kart_animation.hpp"
 
 #include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
@@ -33,7 +33,7 @@
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
  */
-EmergencyAnimation::EmergencyAnimation(Kart *kart)
+KartAnimation::KartAnimation(Kart *kart)
 {
     m_stars_effect = NULL;
     m_referee      = NULL;
@@ -45,19 +45,19 @@ EmergencyAnimation::EmergencyAnimation(Kart *kart)
     // rescue is not set.
     m_kart_mode    = EA_NONE;
     m_eliminated   = false;
-};   // EmergencyAnimation
+};   // KartAnimation
 
 //-----------------------------------------------------------------------------
-EmergencyAnimation::~EmergencyAnimation()
+KartAnimation::~KartAnimation()
 {
     if(m_stars_effect)
         delete m_stars_effect;
-}   // ~EmergencyAnimation
+}   // ~KartAnimation
 
 //-----------------------------------------------------------------------------
 /** Resets all data at the beginning of a race.
  */
-void EmergencyAnimation::reset()
+void KartAnimation::reset()
 {
 
     // Create the stars effect in the first reset
@@ -74,7 +74,7 @@ void EmergencyAnimation::reset()
 
     // If the kart was eliminated or rescued, the body was removed from the
     // physics world. Add it again.
-    if(m_eliminated || playingEmergencyAnimation())
+    if(m_eliminated || playingAnimation())
     {
         World::getWorld()->getPhysics()->addKart(m_kart);
     }
@@ -92,9 +92,9 @@ void EmergencyAnimation::reset()
 /** Eliminates a kart from the race. It removes the kart from the physics
  *  world, and makes the scene node invisible.
  */
-void EmergencyAnimation::eliminate(bool remove)
+void KartAnimation::eliminate(bool remove)
 {
-    if (!playingEmergencyAnimation() && remove)
+    if (!playingAnimation() && remove)
     {
         World::getWorld()->getPhysics()->removeKart(m_kart);
     }
@@ -119,9 +119,9 @@ void EmergencyAnimation::eliminate(bool remove)
  *  and saves the current pitch and roll (for the rescue animation). It
  *  also removes the kart from the physics world.
  */
-void EmergencyAnimation::forceRescue(bool is_auto_rescue)
+void KartAnimation::forceRescue(bool is_auto_rescue)
 {
-    if(playingEmergencyAnimation()) return;
+    if(playingAnimation()) return;
 
     assert(!m_referee);
     m_referee     = new Referee(*m_kart);
@@ -155,10 +155,10 @@ void EmergencyAnimation::forceRescue(bool is_auto_rescue)
  *  \param pos The coordinates of the explosion.
  *  \param direct_hig True if the kart was hit directly --> maximal impact.
  */
-void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
+void KartAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
 {
     // Avoid doing another explosion while a kart is thrown around in the air.
-    if(playingEmergencyAnimation())
+    if(playingAnimation())
         return;
     
     if(m_kart->isInvulnerable())
@@ -214,7 +214,7 @@ void EmergencyAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
  */
-void EmergencyAnimation::update(float dt)
+void KartAnimation::update(float dt)
 {
     if ( UserConfigParams::m_graphical_effects )
     {
@@ -222,7 +222,7 @@ void EmergencyAnimation::update(float dt)
         m_stars_effect->update(dt);
     }
 
-    if(!playingEmergencyAnimation()) return;
+    if(!playingAnimation()) return;
 
     // See if the timer expires, if so return the kart to normal game play
     m_timer -= dt;

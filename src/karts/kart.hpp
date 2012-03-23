@@ -30,7 +30,6 @@
 
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/emergency_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
@@ -41,8 +40,8 @@ class btUprightConstraint;
 class Attachment;
 class Camera;
 class Controller;
-class EmergencyAnimation;
 class Item;
+class KartAnimation;
 class KartGFX;
 class MaxSpeed;
 class ParticleEmitter;
@@ -67,8 +66,8 @@ class Kart : public AbstractKart
 {
     friend class Skidding;
 protected:
-    /** Handles all emergency animations: rescue and explosion. */
-    EmergencyAnimation *m_emergency_animation;
+    /** Handles all kart animations, such as rescue and explosion. */
+    KartAnimation *m_kart_animation;
 
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */

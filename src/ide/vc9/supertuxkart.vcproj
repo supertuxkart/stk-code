@@ -833,15 +833,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\emergency_animation.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\karts\ghost_kart.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\kart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_animation.cpp"
 					>
 				</File>
 				<File
@@ -1983,15 +1983,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\emergency_animation.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\karts\ghost_kart.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\kart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_animation.hpp"
 					>
 				</File>
 				<File

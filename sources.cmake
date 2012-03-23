@@ -99,9 +99,9 @@ src/karts/controller/default_ai_controller.cpp
 src/karts/controller/end_controller.cpp
 src/karts/controller/new_ai_controller.cpp
 src/karts/controller/player_controller.cpp
-src/karts/emergency_animation.cpp
 src/karts/ghost_kart.cpp
 src/karts/kart.cpp
+src/karts/kart_animation.cpp
 src/karts/kart_gfx.cpp
 src/karts/kart_model.cpp
 src/karts/kart_properties.cpp
@@ -338,9 +338,9 @@ src/karts/controller/end_controller.hpp
 src/karts/controller/kart_control.hpp
 src/karts/controller/new_ai_controller.hpp
 src/karts/controller/player_controller.hpp
-src/karts/emergency_animation.hpp
 src/karts/ghost_kart.hpp
 src/karts/kart.hpp
+src/karts/kart_animation.hpp
 src/karts/kart_gfx.hpp
 src/karts/kart_model.hpp
 src/karts/kart_properties.hpp

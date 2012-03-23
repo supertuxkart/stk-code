@@ -38,7 +38,7 @@ class Stars;
  *  explosion happens.
  * \ingroup karts
  */
-class EmergencyAnimation: public NoCopy
+class KartAnimation: public NoCopy
 {
 protected:
     /** The coordinates where the kart was hit originally. */
@@ -79,16 +79,16 @@ protected:
     enum {EA_NONE, EA_RESCUE, EA_EXPLOSION}
           m_kart_mode;
 public:
-                 EmergencyAnimation(Kart *kart);
-    virtual     ~EmergencyAnimation();
+                 KartAnimation(Kart *kart);
+    virtual     ~KartAnimation();
     void         reset();
     virtual void handleExplosion(const Vec3& pos, bool direct_hit);
     virtual void forceRescue(bool is_auto_rescue=false);
     void         update(float dt);
     void         eliminate (bool remove);
     // ------------------------------------------------------------------------
-    /** Returns true if an emergency animation is being played. */
-    bool playingEmergencyAnimation() const {return m_kart_mode!=EA_NONE; }
+    /** Returns true if an animation is being played. */
+    bool playingAnimation() const {return m_kart_mode!=EA_NONE; }
     // ------------------------------------------------------------------------
     /** Returns if a rescue animation is being shown. */
     bool playingRescueAnimation() const {return m_kart_mode==EA_RESCUE; }
@@ -105,5 +105,5 @@ public:
     /** Returns a pointer to the stars effect. */
     const Stars *getStarEffect   () const {return m_stars_effect; }
     
-};   // EmergencyAnimation
+};   // KartAnimation
 #endif
