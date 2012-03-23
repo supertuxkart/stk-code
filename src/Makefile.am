@@ -221,8 +221,8 @@ supertuxkart_SOURCES = \
  karts/controller/new_ai_controller.hpp \
  karts/controller/player_controller.cpp \
  karts/controller/player_controller.hpp \
- karts/emergency_animation.cpp \
- karts/emergency_animation.hpp \
+ karts/kart_animation.cpp \
+ karts/kart_animation.hpp \
  karts/ghost_kart.cpp \
  karts/ghost_lart.hpp \
  karts/kart.cpp \
