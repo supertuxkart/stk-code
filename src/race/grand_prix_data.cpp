@@ -24,6 +24,7 @@
 
 #include "io/file_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -73,21 +74,29 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
         {
             std::string trackID;
             int numLaps;
-            bool reversed;
+            bool reversed = false;
             
             const int idFound      = node->get("id",      &trackID  );
             const int lapFound     = node->get("laps",    &numLaps  );
-            const int reverseFound = node->get("reverse", &reversed );
+            // Will stay false if not found
+            node->get("reverse", &reversed );
 
-            if (!idFound || !lapFound || !reverseFound)
+            if (!idFound || !lapFound)
             {
                 fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
-                                "<track> tag does not have id, laps and reverse attributes. \n",
+                                "<track> tag does not have idi and laps reverse attributes. \n",
                                 filename.c_str());
                 delete root;
                 throw std::logic_error("File contents are incomplete or corrupt");
             }
             
+            // Make sure the track really is reversible
+            Track* t = track_manager->getTrack(trackID);
+            if (t != NULL && reversed)
+            {
+                reversed = t->reverseAvailable();
+            }
+
             m_tracks.push_back(trackID);
             m_laps.push_back(numLaps);
             m_reversed.push_back(reversed);
