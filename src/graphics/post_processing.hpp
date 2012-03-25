@@ -27,6 +27,9 @@ namespace irr
 }
 using namespace irr;
 
+/** \brief   Handles post processing, eg motion blur
+ *  \ingroup graphics
+ */
 class PostProcessing : public video::IShaderConstantSetCallBack
 {
 private:

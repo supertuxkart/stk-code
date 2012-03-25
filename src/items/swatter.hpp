@@ -41,11 +41,11 @@ class Swatter : public NoCopy, public AttachmentPlugin
 {
 
 private:
-    /** State of the animation: the swatter is successively:
-      - aiming (default state) => it's turning to the nearest target
-      - going down to the target
-      - going up from the target
-    */
+    /** State of the animation, the swatter is successively:
+     *   - aiming (default state) => it's turning to the nearest target
+     *   - going down to the target
+     *   - going up from the target
+     */
     enum    {SWATTER_AIMING, SWATTER_TO_TARGET, SWATTER_FROM_TARGET}
                     m_animation_phase;
 

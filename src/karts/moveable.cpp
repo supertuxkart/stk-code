@@ -75,7 +75,8 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------
-// The reset position must be set before calling reset
+/** The reset position must be set before calling reset
+ */
 void Moveable::reset()
 {
     if(m_body)
