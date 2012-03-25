@@ -274,7 +274,9 @@ private:
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
     {
-        return (left.m_score < right.m_score);
+        return (left.m_score < right.m_score) ||
+            (left.m_score == right.m_score &&
+             left.m_overall_time > right.m_overall_time);
     }
 
 
