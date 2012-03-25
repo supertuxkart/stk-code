@@ -48,6 +48,9 @@ class GrandPrixData
     /** The number of laps that each track should be raced, in the right order */
     std::vector<int> m_laps;
 
+    /** Whether the track in question should be done in reverse mode */
+    std::vector<bool> m_reversed;
+
 public:
 
     /** Load the GrandPrixData from the given filename */
@@ -63,7 +66,7 @@ public:
     /** @return the (potentially translated) user-visible description of the Grand Prix */
     //const irr::core::stringw& getDescription () const { return m_description;   }
 
-    /** @return the internale name identifier of the Grand Prix (not translated) */
+    /** @return the internal name identifier of the Grand Prix (not translated) */
     const std::string& getId          ()        const { return m_id;            }
     
     const std::string& getFilename    ()        const { return m_filename;      }
@@ -71,6 +74,7 @@ public:
                                                        return m_tracks[track_index]; }
     const std::vector<std::string>& getTracks()  const {return m_tracks;        }
     const std::vector<int>&         getLaps()    const {return m_laps;          }
+    const std::vector<bool>&        getReverse() const {return m_reversed;      }
     size_t             getTrackCount()           const {return m_tracks.size(); }
     const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
                                                         return m_laps[lap_index];}

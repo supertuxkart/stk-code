@@ -244,10 +244,12 @@ void RaceManager::computeRandomKartList()
 
 void RaceManager::startNew()
 {
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
     {
-        m_tracks   = m_grand_prix.getTracks();
-        m_num_laps = m_grand_prix.getLaps();
+        // GP: get tracks, laps and reverse info from grand prix
+        m_tracks        = m_grand_prix.getTracks();
+        m_num_laps      = m_grand_prix.getLaps();
+        m_reverse_track = m_grand_prix.getReverse();
     }
     assert(m_player_karts.size() > 0);
 

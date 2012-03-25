@@ -73,22 +73,27 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
         {
             std::string trackID;
             int numLaps;
+            bool reversed;
             
-            const int idFound  = node->get("id",   &trackID );
-            const int lapFound = node->get("laps", &numLaps );
+            const int idFound      = node->get("id",      &trackID  );
+            const int lapFound     = node->get("laps",    &numLaps  );
+            const int reverseFound = node->get("reverse", &reversed );
 
-            if (!idFound || !lapFound)
+            if (!idFound || !lapFound || !reverseFound)
             {
                 fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
-                                "<track> tag does not have id and laps attributes. \n", filename.c_str());
+                                "<track> tag does not have id, laps and reverse attributes. \n",
+                                filename.c_str());
                 delete root;
                 throw std::logic_error("File contents are incomplete or corrupt");
             }
             
             m_tracks.push_back(trackID);
             m_laps.push_back(numLaps);
+            m_reversed.push_back(reversed);
             
-            assert(m_tracks.size() == m_laps.size());
+            assert(m_tracks.size() == m_laps.size()    );
+            assert(m_laps.size()   == m_reversed.size());
         }
         else
         {
