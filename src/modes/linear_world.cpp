@@ -353,7 +353,7 @@ void LinearWorld::newLap(unsigned int kart_index)
  */
 int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 {
-    if(kart->getWorldKartId()>=(int)m_kart_info.size())
+    if(kart->getWorldKartId()>=m_kart_info.size())
         return QuadGraph::UNKNOWN_SECTOR;
     return m_kart_info[kart->getWorldKartId()].getSector()
           ->getCurrentGraphNode();
