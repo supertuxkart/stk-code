@@ -439,6 +439,8 @@ supertuxkart_SOURCES = \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
+ tracks/check_canon.cpp \
+ tracks/check_canon.hpp \
  tracks/check_lap.cpp \
  tracks/check_lap.hpp \
  tracks/check_line.cpp \
